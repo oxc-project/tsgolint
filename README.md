@@ -52,6 +52,12 @@ Scope of tsgolint is only:
 * run the type aware rules
 * pass structured diagnostics back to oxlint
 
+## Note about typescript-go shims
+
+tsgolint accesses internal typescript-go APIs via [shims](./tools/gen_shims/main.go), which is not a recommended approach.
+We advise against using this method and suggest waiting for an official API release instead.
+See [this discussion](https://github.com/microsoft/typescript-go/discussions/455) and [this one](https://github.com/microsoft/typescript-go/discussions/481).
+
 ## Building `tsgolint`
 
 ```bash
