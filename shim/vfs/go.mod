@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/vfs
 
 go 1.24.0
 
-toolchain go1.24.1
+toolchain go1.24.5
 
 require (
 	github.com/dlclark/regexp2 v1.11.5
