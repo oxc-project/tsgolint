@@ -1,6 +1,6 @@
 # ✨ tsgolint ✨
 
-**tsgolint** is a TypeScript linter containing only type-ware rules, powered by [typescript-go](https://github.com/microsoft/typescript-go) adapted for [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+**tsgolint** is a TypeScript linter containing only type-aware rules, powered by [typescript-go](https://github.com/microsoft/typescript-go) adapted for [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
 
 This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint). Fork permission is granted by @auvred.
 
@@ -8,7 +8,7 @@ This project originated in [typescript-eslint/tsgolint](https://github.com/types
 
 > [!IMPORTANT]
 > **tsgolint** is a prototype in the early stages of development.
-> This is a community effort. Feel free to ask for assignee in any of the [good first issues](https://github.com/oxc-project/tsgolint/contribute).
+> This is a community effort. Feel free to ask to be assigned to any of the [good first issues](https://github.com/oxc-project/tsgolint/contribute).
 
 ![Running tsgolint on microsoft/typescript repo](./docs/record.gif)
 
@@ -44,12 +44,12 @@ See [benchmarks](./benchmarks/README.md) for more info.
 
 Oxlint CLI -> paths + rules -> tsgolint -> diagnostics -> Oxlint CLI.
 
-* Oxlint is the "frontend" for tsgolint, it handles cli, paths walk, ignore logic and printing of diagnostics.
-* tsgolint is the backend for Oxlint, accepting paths as input, and output structured diagnostics.
+* Oxlint is the "frontend" for tsgolint, it handles CLI, path walking, ignores logic and printing of diagnostics.
+* tsgolint is the backend for Oxlint, accepting paths as input, and outputs structured diagnostics.
 
 Scope of tsgolint is only:
 
-* run the type aware rules
+* run the type-aware rules
 * pass structured diagnostics back to oxlint
 
 ## Note about typescript-go shims
