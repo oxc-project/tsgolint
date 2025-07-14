@@ -1,4 +1,4 @@
-FROM node:22.14
+FROM node:24.4
 
 RUN corepack enable
 
