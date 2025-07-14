@@ -58,6 +58,8 @@ tsgolint accesses internal typescript-go APIs via [shims](./tools/gen_shims/main
 We advise against using this method and suggest waiting for an official API release instead.
 See [this discussion](https://github.com/microsoft/typescript-go/discussions/455) and [this one](https://github.com/microsoft/typescript-go/discussions/481).
 
+More technical details can be found [here](./tools/gen_shims/README.md).
+
 ## Building `tsgolint`
 
 ```bash
