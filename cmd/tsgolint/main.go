@@ -218,13 +218,25 @@ Options:
     -h, --help        Show help
 `
 
+type stringFlags []string
+
+func (i *stringFlags) String() string {
+	return fmt.Sprintf("%v", *i)
+}
+
+func (i *stringFlags) Set(value string) error {
+	*i = append(*i, strings.Split(value, ",")...)
+	return nil
+}
+
 func runMain() int {
 	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
 
 	var (
-		help      bool
-		tsconfig  string
-		listFiles bool
+		help       bool
+		tsconfig   string
+		listFiles  bool
+		inputFiles stringFlags
 
 		traceOut       string
 		cpuprofOut     string
@@ -235,6 +247,7 @@ func runMain() int {
 	flag.BoolVar(&listFiles, "list-files", false, "list matched files")
 	flag.BoolVar(&help, "help", false, "show help")
 	flag.BoolVar(&help, "h", false, "show help")
+	flag.Var(&inputFiles, "files", "files to lint")
 
 	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
 	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
@@ -357,6 +370,10 @@ func runMain() int {
 		return 1
 	}
 
+	inputFilesLower := make([]string, len(inputFiles))
+	for i := range inputFiles {
+		inputFilesLower[i] = strings.ToLower(inputFiles[i])
+	}
 	files := []*ast.SourceFile{}
 	cwdPath := string(tspath.ToPath("", currentDirectory, program.Host().FS().UseCaseSensitiveFileNames()).EnsureTrailingDirectorySeparator())
 	var matchedFiles strings.Builder
@@ -366,6 +383,11 @@ func runMain() int {
 			continue
 		}
 		if fileName, matched := strings.CutPrefix(p, cwdPath); matched {
+			// If files are supplied to the CLI, only lint those files. Otherwise, lint all files.
+			if len(inputFilesLower) > 0 && !slices.Contains(inputFilesLower, strings.ToLower(p)) && !slices.Contains(inputFilesLower, strings.ToLower(fileName)) {
+				continue
+			}
+
 			if listFiles {
 				matchedFiles.WriteString("Found file: ")
 				matchedFiles.WriteString(fileName)
