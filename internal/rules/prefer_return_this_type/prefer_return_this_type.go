@@ -103,7 +103,7 @@ var PreferReturnThisTypeRule = rule.Rule{
 
 		return rule.RuleListeners{
 			ast.KindPropertyDeclaration: func(node *ast.Node) {
-				if !ast.IsClassDeclaration(node.Parent) && !ast.IsClassExpression(node.Parent) {
+				if !ast.IsClassLike(node.Parent) {
 					return
 				}
 
@@ -114,26 +114,16 @@ var PreferReturnThisTypeRule = rule.Rule{
 				}
 
 				if ast.IsFunctionExpression(property.Initializer) || ast.IsArrowFunction(property.Initializer) {
-					if ast.IsClassDeclaration(node.Parent) {
-						classNode := node.Parent.AsClassDeclaration()
-						checkFunction(property.Initializer, node.Parent, classNode.Name())
-					} else {
-						classNode := node.Parent.AsClassExpression()
-						checkFunction(property.Initializer, node.Parent, classNode.Name())
-					}
+					classNode := node.Parent.ClassLikeData();
+					checkFunction(property.Initializer, node.Parent, classNode.Name())
 				}
 			},
 			ast.KindMethodDeclaration: func(node *ast.Node) {
-				if !ast.IsClassDeclaration(node.Parent) && !ast.IsClassExpression(node.Parent) {
+				if !ast.IsClassLike(node.Parent) {
 					return
 				}
-				if ast.IsClassDeclaration(node.Parent) {
-					classNode := node.Parent.AsClassDeclaration()
-					checkFunction(node, node.Parent, classNode.Name())
-				} else {
-					classNode := node.Parent.AsClassExpression()
-					checkFunction(node, node.Parent, classNode.Name())
-				}
+				classNode := node.Parent.ClassLikeData();
+				checkFunction(node, node.Parent, classNode.Name())
 			},
 		}
 	},
