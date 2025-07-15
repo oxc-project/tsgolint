@@ -36,13 +36,18 @@ var PreferReturnThisTypeRule = rule.Rule{
 			return nil
 		}
 
-		checkFunction := func(fn *ast.Node, originalClass *ast.ClassDeclaration) {
+		checkFunction := func(fn *ast.Node, originalClass *ast.Node, originalClassName *ast.DeclarationName) {
 			returnType := fn.Type()
 			body := fn.Body()
 			if returnType == nil || body == nil {
 				return
 			}
-			className := originalClass.Name().Text()
+
+			if originalClassName == nil {
+				return
+			}
+
+			className := originalClassName.Text()
 
 			node := tryGetNameInTypeNode(className, returnType)
 			if node == nil {
@@ -57,7 +62,7 @@ var PreferReturnThisTypeRule = rule.Rule{
 				}
 			}
 
-			classType := ctx.TypeChecker.GetTypeAtLocation(originalClass.AsNode()).AsInterfaceType()
+			classType := ctx.TypeChecker.GetTypeAtLocation(originalClass).AsInterfaceType()
 
 			if ast.IsBlock(body) {
 				hasReturnThis := false
@@ -98,7 +103,7 @@ var PreferReturnThisTypeRule = rule.Rule{
 
 		return rule.RuleListeners{
 			ast.KindPropertyDeclaration: func(node *ast.Node) {
-				if !ast.IsClassDeclaration(node.Parent) {
+				if !ast.IsClassDeclaration(node.Parent) && !ast.IsClassExpression(node.Parent) {
 					return
 				}
 
@@ -109,14 +114,26 @@ var PreferReturnThisTypeRule = rule.Rule{
 				}
 
 				if ast.IsFunctionExpression(property.Initializer) || ast.IsArrowFunction(property.Initializer) {
-					checkFunction(property.Initializer, node.Parent.AsClassDeclaration())
+					if ast.IsClassDeclaration(node.Parent) {
+						classNode := node.Parent.AsClassDeclaration()
+						checkFunction(property.Initializer, node.Parent, classNode.Name())
+					} else {
+						classNode := node.Parent.AsClassExpression()
+						checkFunction(property.Initializer, node.Parent, classNode.Name())
+					}
 				}
 			},
 			ast.KindMethodDeclaration: func(node *ast.Node) {
-				if !ast.IsClassDeclaration(node.Parent) {
+				if !ast.IsClassDeclaration(node.Parent) && !ast.IsClassExpression(node.Parent) {
 					return
 				}
-				checkFunction(node, node.Parent.AsClassDeclaration())
+				if ast.IsClassDeclaration(node.Parent) {
+					classNode := node.Parent.AsClassDeclaration()
+					checkFunction(node, node.Parent, classNode.Name())
+				} else {
+					classNode := node.Parent.AsClassExpression()
+					checkFunction(node, node.Parent, classNode.Name())
+				}
 			},
 		}
 	},

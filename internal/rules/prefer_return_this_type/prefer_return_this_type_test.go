@@ -93,6 +93,13 @@ class Foo {
   f?: string;
 }
     `},
+		{Code: `
+const Foo = class {
+	bar(): this {
+    return this;
+  }
+};
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -398,6 +405,30 @@ class Animal<T> {
 					Line:      3,
 					Column:    10,
 					EndColumn: 19,
+				},
+			},
+		},
+		{
+			Code: `
+const Foo = class FooClass {
+  f(): FooClass {
+    return this;
+  }
+}
+      `,
+			Output: []string{`
+const Foo = class FooClass {
+  f(): this {
+    return this;
+  }
+}
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "useThisType",
+					Line:      3,
+					Column:    8,
 				},
 			},
 		},
