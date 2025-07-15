@@ -35,13 +35,17 @@ jobs:
           - goos: linux
             goarch: amd64
             asset_name: tsgolint-linux-x64-musl
-            build_flags: "-a -ldflags '-linkmode external -extldflags -static'"
+            build_flags: "-a"
             build_tags: "netgo"
+            ldflags: "-s -w"
+            pre_command: "export CGO_ENABLED=0"
           - goos: linux
             goarch: arm64
             asset_name: tsgolint-linux-arm64-musl
-            build_flags: "-a -ldflags '-linkmode external -extldflags -static'"
+            build_flags: "-a"
             build_tags: "netgo"
+            ldflags: "-s -w"
+            pre_command: "export CGO_ENABLED=0"
           - goos: darwin
             goarch: amd64
             asset_name: tsgolint-darwin-x64
@@ -64,4 +68,6 @@ jobs:
           asset_name: ${{ matrix.asset_name }}
           build_flags: ${{ matrix.build_flags }}
           build_tags: ${{ matrix.build_tags }}
+          ldflags: ${{ matrix.ldflags }}
+          pre_command: ${{ matrix.pre_command }}
           extra_files: LICENSE README.md
