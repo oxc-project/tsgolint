@@ -36,20 +36,20 @@ var PreferReturnThisTypeRule = rule.Rule{
 			return nil
 		}
 
-		checkFunction := func(fn *ast.Node, originalClass *ast.Node, originalClassName *ast.DeclarationName) {
+		checkFunction := func(fn *ast.Node, originalClass *ast.Node) {
 			returnType := fn.Type()
 			body := fn.Body()
 			if returnType == nil || body == nil {
 				return
 			}
 
-			if originalClassName == nil {
+			className := originalClass.Name()
+
+			if className == nil {
 				return
 			}
 
-			className := originalClassName.Text()
-
-			node := tryGetNameInTypeNode(className, returnType)
+			node := tryGetNameInTypeNode(className.Text(), returnType)
 			if node == nil {
 				return
 			}
@@ -114,16 +114,14 @@ var PreferReturnThisTypeRule = rule.Rule{
 				}
 
 				if ast.IsFunctionExpression(property.Initializer) || ast.IsArrowFunction(property.Initializer) {
-					classNode := node.Parent.ClassLikeData();
-					checkFunction(property.Initializer, node.Parent, classNode.Name())
+					checkFunction(property.Initializer, node.Parent)
 				}
 			},
 			ast.KindMethodDeclaration: func(node *ast.Node) {
 				if !ast.IsClassLike(node.Parent) {
 					return
 				}
-				classNode := node.Parent.ClassLikeData();
-				checkFunction(node, node.Parent, classNode.Name())
+				checkFunction(node, node.Parent)
 			},
 		}
 	},
