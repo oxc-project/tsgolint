@@ -1,12 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["helpers:pinGitHubActionDigestsToSemver"],
-  "timezone": "Asia/Shanghai",
-  "schedule": ["before 9am on monday"],
-  "automerge": true,
-  "automergeType": "pr",
-  "automergeSchedule": ["at any time"],
-  "prHourlyLimit": 3,
+  "extends": ["github>Boshen/renovate", "helpers:pinGitHubActionDigestsToSemver"],
   "git-submodules": {
     "enabled": false
   },
