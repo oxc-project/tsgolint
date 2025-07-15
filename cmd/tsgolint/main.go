@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"math"
@@ -71,7 +72,7 @@ import (
 
 const spaces = "                                                                                                    "
 
-func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions tspath.ComparePathsOptions) {
+func printStylishDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions tspath.ComparePathsOptions) {
 	diagnosticStart := d.Range.Pos()
 	diagnosticEnd := d.Range.End()
 
@@ -207,6 +208,32 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	w.WriteString("  \x1b[2m╰────────────────────────────────\x1b[0m\n\n")
 }
 
+type jsonSpan struct {
+	Offset int `json:"offset"`
+	Length int `json:"length"`
+}
+
+type jsonDiagnostic struct {
+	Code     string   `json:"code"`
+	Message  string   `json:"message"`
+	FileName string   `json:"fileName"`
+	Span     jsonSpan `json:"span"`
+}
+
+func printJsonDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions tspath.ComparePathsOptions) {
+	bytes, _ := json.Marshal(jsonDiagnostic{
+		Code:     d.RuleName,
+		FileName: d.SourceFile.FileName(),
+		Message:  d.Message.Description,
+		Span: jsonSpan{
+			Offset: d.Range.Pos(),
+			Length: d.Range.Len(),
+		},
+	})
+
+	w.Write(bytes)
+}
+
 const usage = `✨ tsgolint - speedy TypeScript linter
 
 Usage:
@@ -225,6 +252,7 @@ func runMain() int {
 		help      bool
 		tsconfig  string
 		listFiles bool
+		format    string
 
 		traceOut       string
 		cpuprofOut     string
@@ -232,6 +260,7 @@ func runMain() int {
 	)
 
 	flag.StringVar(&tsconfig, "tsconfig", "", "which tsconfig to use")
+	flag.StringVar(&format, "format", "stylish", "output format - stylish or json, defaults to stylish")
 	flag.BoolVar(&listFiles, "list-files", false, "list matched files")
 	flag.BoolVar(&help, "help", false, "show help")
 	flag.BoolVar(&help, "h", false, "show help")
@@ -273,6 +302,10 @@ func runMain() int {
 			return 1
 		}
 		defer pprof.StopCPUProfile()
+	}
+	if format != "stylish" && format != "json" {
+		fmt.Fprintf(os.Stderr, "invalid format \"%s\"\n", format)
+		return 1
 	}
 
 	currentDirectory, err := os.Getwd()
@@ -394,9 +427,18 @@ func runMain() int {
 		for d := range diagnosticsChan {
 			errorsCount++
 			if errorsCount == 1 {
-				w.WriteByte('\n')
+				if format == "stylish" {
+					w.WriteByte('\n')
+				} else if format == "json" {
+					w.WriteString("{\"diagnostics\": [")
+				}
 			}
-			printDiagnostic(d, w, comparePathOptions)
+
+			if "stylish" == format {
+				printStylishDiagnostic(d, w, comparePathOptions)
+			} else if "json" == format {
+				printJsonDiagnostic(d, w, comparePathOptions)
+			}
 			if w.Available() < 4096 {
 				w.Flush()
 			}
@@ -430,39 +472,45 @@ func runMain() int {
 
 	wg.Wait()
 
-	errorsColor := "\x1b[1m"
-	if errorsCount == 0 {
-		errorsColor = "\x1b[1;32m"
-	}
-	errorsText := "errors"
-	if errorsCount == 1 {
-		errorsText = "error"
-	}
-	filesText := "files"
-	if len(files) == 1 {
-		filesText = "file"
-	}
-	rulesText := "rules"
-	if len(rules) == 1 {
-		rulesText = "rule"
-	}
 	threadsCount := 1
 	if !singleThreaded {
 		threadsCount = runtime.GOMAXPROCS(0)
 	}
-	fmt.Fprintf(
-		os.Stdout,
-		"Found %v%v\x1b[0m %v \x1b[2m(linted \x1b[1m%v\x1b[22m\x1b[2m %v with \x1b[1m%v\x1b[22m\x1b[2m %v in \x1b[1m%v\x1b[22m\x1b[2m using \x1b[1m%v\x1b[22m\x1b[2m threads)\n",
-		errorsColor,
-		errorsCount,
-		errorsText,
-		len(files),
-		filesText,
-		len(rules),
-		rulesText,
-		time.Since(timeBefore).Round(time.Millisecond),
-		threadsCount,
-	)
+
+	if format == "stylish" {
+		errorsColor := "\x1b[1m"
+		if errorsCount == 0 {
+			errorsColor = "\x1b[1;32m"
+		}
+		errorsText := "errors"
+		if errorsCount == 1 {
+			errorsText = "error"
+		}
+		filesText := "files"
+		if len(files) == 1 {
+			filesText = "file"
+		}
+		rulesText := "rules"
+		if len(rules) == 1 {
+			rulesText = "rule"
+		}
+		fmt.Fprintf(
+			os.Stdout,
+			"Found %v%v\x1b[0m %v \x1b[2m(linted \x1b[1m%v\x1b[22m\x1b[2m %v with \x1b[1m%v\x1b[22m\x1b[2m %v in \x1b[1m%v\x1b[22m\x1b[2m using \x1b[1m%v\x1b[22m\x1b[2m threads)\n",
+			errorsColor,
+			errorsCount,
+			errorsText,
+			len(files),
+			filesText,
+			len(rules),
+			rulesText,
+			time.Since(timeBefore).Round(time.Millisecond),
+			threadsCount,
+		)
+	} else if format == "json" {
+		os.Stdout.WriteString("],")
+		fmt.Fprintf(os.Stdout, "\"number_of_files\": %v, \"number_of_rules\": %v, \"threads_count\": %v}", len(files), len(rules), threadsCount)
+	}
 
 	return 0
 }
