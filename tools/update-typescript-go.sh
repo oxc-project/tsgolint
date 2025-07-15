@@ -1,12 +1,18 @@
 #!/usr/bin/env -S bash -euxo pipefail
 
+# Updates the typescript-go submodule, its dependent modules, and regenerates code.
+# All changes are staged for a new commit.
+# Use the "--no-build" flag to skip the final build verification.
+
+BUILD=true
+if [[ "${1:-}" == "--no-build" ]]; then
+    BUILD=false
+fi
+
 pushd typescript-go
 git switch main
 git reset --hard origin/main
 git pull --prune
-popd
-git add ./typescript-go
-pushd typescript-go
 git am --3way --no-gpg-sign ../patches/*.patch
 popd
 
@@ -17,6 +23,8 @@ go mod tidy
 
 go run ./tools/gen_shims
 
-git add ./shim ./go.mod ./go.sum
+git add ./typescript-go ./shim ./go.mod ./go.sum
 
-go build ./cmd/tsgolint
+if [[ "$BUILD" == "true" ]]; then
+    go build ./cmd/tsgolint
+fi

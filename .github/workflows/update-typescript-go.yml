@@ -1,0 +1,85 @@
+name: Update TypeScript-Go
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  update-typescript-go:
+    name: Update TypeScript-Go Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0 # Fetch full history to ensure submodules work properly
+          submodules: recursive
+
+      - name: Set up Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+
+      - name: Create update branch
+        run: |
+          BRANCH_NAME="automated/update-typescript-go-$(date +%Y%m%d)"
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          git checkout -b "$BRANCH_NAME"
+
+      - name: Run TypeScript-Go update script
+        run: |
+          ./tools/update-typescript-go.sh --no-build
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff --quiet && git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Changes detected:"
+            git diff --name-only
+            git diff --staged --name-only
+          fi
+
+      - name: Commit changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add .
+          git commit -m "chore: update typescript-go dependencies"
+
+      - name: Push branch
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git push origin "$BRANCH_NAME"
+
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --title "chore: daily typescript-go update $(date +%Y-%m-%d)" \
+            --body "## Summary
+
+          This PR contains automated updates to the typescript-go dependencies.
+
+          ## Changes
+          - Updates typescript-go submodule to the latest version
+          - Updates all shim module dependencies to use the latest typescript-go
+          - Regenerates shim code using \`go run ./tools/gen_shims\`
+          - Verifies that the build and tests still pass
+
+          ## Notes
+          This is an automated PR created by the daily typescript-go update workflow. Please review the changes and merge if everything looks good.
+
+          If this PR introduces breaking changes or test failures, please investigate and fix them before merging." \
+            --head "$BRANCH_NAME" \
+            --base main \
