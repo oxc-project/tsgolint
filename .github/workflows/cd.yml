@@ -28,24 +28,10 @@ jobs:
             asset_name: tsgolint-win32-arm64
           - goos: linux
             goarch: amd64
-            asset_name: tsgolint-linux-x64-gnu
+            asset_name: tsgolint-linux-x64
           - goos: linux
             goarch: arm64
-            asset_name: tsgolint-linux-arm64-gnu
-          - goos: linux
-            goarch: amd64
-            asset_name: tsgolint-linux-x64-musl
-            build_flags: "-a"
-            build_tags: "netgo"
-            ldflags: "-s -w"
-            pre_command: "export CGO_ENABLED=0"
-          - goos: linux
-            goarch: arm64
-            asset_name: tsgolint-linux-arm64-musl
-            build_flags: "-a"
-            build_tags: "netgo"
-            ldflags: "-s -w"
-            pre_command: "export CGO_ENABLED=0"
+            asset_name: tsgolint-linux-arm64
           - goos: darwin
             goarch: amd64
             asset_name: tsgolint-darwin-x64
@@ -55,14 +41,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
           submodules: true
       - uses: wangyoucao577/go-release-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
           goarch: ${{ matrix.goarch }}
-          goversion: "https://dl.google.com/go/go1.21.5.linux-amd64.tar.gz"
+          goversion: "https://dl.google.com/go/go1.24.5.linux-amd64.tar.gz"
           project_path: "./cmd/tsgolint"
           binary_name: "tsgolint"
           asset_name: ${{ matrix.asset_name }}
