@@ -23,16 +23,16 @@ import (
 )
 
 type headlessConfigForFile struct {
-	FilePath string
-	Rules    []string
+	FilePath string   `json:"file_path"`
+	Rules    []string `json:"rules"`
 }
 type headlessConfig struct {
-	Files []headlessConfigForFile
+	Files []headlessConfigForFile `json:"files"`
 }
 
 type headlessRange struct {
-	Pos int
-	End int
+	Pos int `json:"pos"`
+	End int `json:"end"`
 }
 
 func headlessRangeFromRange(r core.TextRange) headlessRange {
@@ -43,8 +43,8 @@ func headlessRangeFromRange(r core.TextRange) headlessRange {
 }
 
 type headlessRuleMessage struct {
-	Id          string
-	Description string
+	Id          string `json:"id"`
+	Description string `json:"description"`
 }
 
 func headlessRuleMessageFromRuleMessage(msg rule.RuleMessage) headlessRuleMessage {
@@ -55,20 +55,20 @@ func headlessRuleMessageFromRuleMessage(msg rule.RuleMessage) headlessRuleMessag
 }
 
 type headlessFix struct {
-	Text  string
-	Range headlessRange
+	Text  string        `json:"text"`
+	Range headlessRange `json:"range"`
 }
 type headlessSuggestion struct {
-	Message headlessRuleMessage
-	Fixes   []headlessFix
+	Message headlessRuleMessage `json:"message"`
+	Fixes   []headlessFix       `json:"fixes"`
 }
 type headlessDiagnostic struct {
-	Range       headlessRange
-	RuleName    string
-	Message     headlessRuleMessage
-	Fixes       []headlessFix
-	Suggestions []headlessSuggestion
-	FilePath    string
+	Range       headlessRange        `json:"range"`
+	Rule        string               `json:"rule"`
+	Message     headlessRuleMessage  `json:"message"`
+	Fixes       []headlessFix        `json:"fixes"`
+	Suggestions []headlessSuggestion `json:"suggestions"`
+	FilePath    string               `json:"file_path"`
 }
 
 type headlessMessageType uint8
@@ -174,7 +174,7 @@ func runHeadless(args []string) int {
 		for d := range diagnosticsChan {
 			hd := headlessDiagnostic{
 				Range:       headlessRangeFromRange(d.Range),
-				RuleName:    d.RuleName,
+				Rule:        d.RuleName,
 				Message:     headlessRuleMessageFromRuleMessage(d.Message),
 				Fixes:       make([]headlessFix, len(d.Fixes())),
 				Suggestions: make([]headlessSuggestion, len(d.GetSuggestions())),
