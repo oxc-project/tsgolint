@@ -26,6 +26,11 @@ jobs:
         with:
           go-version-file: go.mod
 
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Create update branch
         run: |
           BRANCH_NAME="automated/update-typescript-go-$(date +%Y%m%d)"
