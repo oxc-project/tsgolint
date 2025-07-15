@@ -101,6 +101,12 @@ func (d RuleDiagnostic) Fixes() []RuleFix {
 	}
 	return *d.FixesPtr
 }
+func (d RuleDiagnostic) GetSuggestions() []RuleSuggestion {
+	if d.Suggestions == nil {
+		return []RuleSuggestion{}
+	}
+	return *d.Suggestions
+}
 
 type RuleContext struct {
 	SourceFile                 *ast.SourceFile

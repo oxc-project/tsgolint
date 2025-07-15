@@ -69,6 +69,57 @@ import (
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 )
 
+var allRules = []rule.Rule{
+	await_thenable.AwaitThenableRule,
+	no_array_delete.NoArrayDeleteRule,
+	no_base_to_string.NoBaseToStringRule,
+	no_confusing_void_expression.NoConfusingVoidExpressionRule,
+	no_duplicate_type_constituents.NoDuplicateTypeConstituentsRule,
+	no_floating_promises.NoFloatingPromisesRule,
+	no_for_in_array.NoForInArrayRule,
+	no_implied_eval.NoImpliedEvalRule,
+	no_meaningless_void_operator.NoMeaninglessVoidOperatorRule,
+	no_misused_promises.NoMisusedPromisesRule,
+	no_misused_spread.NoMisusedSpreadRule,
+	no_mixed_enums.NoMixedEnumsRule,
+	no_redundant_type_constituents.NoRedundantTypeConstituentsRule,
+	no_unnecessary_boolean_literal_compare.NoUnnecessaryBooleanLiteralCompareRule,
+	no_unnecessary_template_expression.NoUnnecessaryTemplateExpressionRule,
+	no_unnecessary_type_arguments.NoUnnecessaryTypeArgumentsRule,
+	no_unnecessary_type_assertion.NoUnnecessaryTypeAssertionRule,
+	no_unsafe_argument.NoUnsafeArgumentRule,
+	no_unsafe_assignment.NoUnsafeAssignmentRule,
+	no_unsafe_call.NoUnsafeCallRule,
+	no_unsafe_enum_comparison.NoUnsafeEnumComparisonRule,
+	no_unsafe_member_access.NoUnsafeMemberAccessRule,
+	no_unsafe_return.NoUnsafeReturnRule,
+	no_unsafe_type_assertion.NoUnsafeTypeAssertionRule,
+	no_unsafe_unary_minus.NoUnsafeUnaryMinusRule,
+	non_nullable_type_assertion_style.NonNullableTypeAssertionStyleRule,
+	only_throw_error.OnlyThrowErrorRule,
+	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
+	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,
+	prefer_return_this_type.PreferReturnThisTypeRule,
+	promise_function_async.PromiseFunctionAsyncRule,
+	related_getter_setter_pairs.RelatedGetterSetterPairsRule,
+	require_array_sort_compare.RequireArraySortCompareRule,
+	require_await.RequireAwaitRule,
+	restrict_plus_operands.RestrictPlusOperandsRule,
+	restrict_template_expressions.RestrictTemplateExpressionsRule,
+	return_await.ReturnAwaitRule,
+	switch_exhaustiveness_check.SwitchExhaustivenessCheckRule,
+	unbound_method.UnboundMethodRule,
+	use_unknown_in_catch_callback_variable.UseUnknownInCatchCallbackVariableRule,
+}
+
+var allRulesByName = make(map[string]rule.Rule, len(allRules))
+
+func init() {
+	for _, rule := range allRules {
+		allRulesByName[rule.Name] = rule
+	}
+}
+
 const spaces = "                                                                                                    "
 
 func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions tspath.ComparePathsOptions) {
@@ -219,6 +270,10 @@ Options:
 `
 
 func runMain() int {
+	if len(os.Args) > 1 && os.Args[1] == "headless" {
+		return runHeadless(os.Args[2:])
+	}
+
 	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
 
 	var (
@@ -301,49 +356,6 @@ func runMain() int {
 
 	currentDirectory = tspath.GetDirectoryPath(configFileName)
 
-	var rules = []rule.Rule{
-		await_thenable.AwaitThenableRule,
-		no_array_delete.NoArrayDeleteRule,
-		no_base_to_string.NoBaseToStringRule,
-		no_confusing_void_expression.NoConfusingVoidExpressionRule,
-		no_duplicate_type_constituents.NoDuplicateTypeConstituentsRule,
-		no_floating_promises.NoFloatingPromisesRule,
-		no_for_in_array.NoForInArrayRule,
-		no_implied_eval.NoImpliedEvalRule,
-		no_meaningless_void_operator.NoMeaninglessVoidOperatorRule,
-		no_misused_promises.NoMisusedPromisesRule,
-		no_misused_spread.NoMisusedSpreadRule,
-		no_mixed_enums.NoMixedEnumsRule,
-		no_redundant_type_constituents.NoRedundantTypeConstituentsRule,
-		no_unnecessary_boolean_literal_compare.NoUnnecessaryBooleanLiteralCompareRule,
-		no_unnecessary_template_expression.NoUnnecessaryTemplateExpressionRule,
-		no_unnecessary_type_arguments.NoUnnecessaryTypeArgumentsRule,
-		no_unnecessary_type_assertion.NoUnnecessaryTypeAssertionRule,
-		no_unsafe_argument.NoUnsafeArgumentRule,
-		no_unsafe_assignment.NoUnsafeAssignmentRule,
-		no_unsafe_call.NoUnsafeCallRule,
-		no_unsafe_enum_comparison.NoUnsafeEnumComparisonRule,
-		no_unsafe_member_access.NoUnsafeMemberAccessRule,
-		no_unsafe_return.NoUnsafeReturnRule,
-		no_unsafe_type_assertion.NoUnsafeTypeAssertionRule,
-		no_unsafe_unary_minus.NoUnsafeUnaryMinusRule,
-		non_nullable_type_assertion_style.NonNullableTypeAssertionStyleRule,
-		only_throw_error.OnlyThrowErrorRule,
-		prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
-		prefer_reduce_type_parameter.PreferReduceTypeParameterRule,
-		prefer_return_this_type.PreferReturnThisTypeRule,
-		promise_function_async.PromiseFunctionAsyncRule,
-		related_getter_setter_pairs.RelatedGetterSetterPairsRule,
-		require_array_sort_compare.RequireArraySortCompareRule,
-		require_await.RequireAwaitRule,
-		restrict_plus_operands.RestrictPlusOperandsRule,
-		restrict_template_expressions.RestrictTemplateExpressionsRule,
-		return_await.ReturnAwaitRule,
-		switch_exhaustiveness_check.SwitchExhaustivenessCheckRule,
-		unbound_method.UnboundMethodRule,
-		use_unknown_in_catch_callback_variable.UseUnknownInCatchCallbackVariableRule,
-	}
-
 	host := utils.CreateCompilerHost(currentDirectory, fs)
 
 	comparePathOptions := tspath.ComparePathsOptions{
@@ -408,7 +420,7 @@ func runMain() int {
 		singleThreaded,
 		files,
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			return utils.Map(rules, func(r rule.Rule) linter.ConfiguredRule {
+			return utils.Map(allRules, func(r rule.Rule) linter.ConfiguredRule {
 				return linter.ConfiguredRule{
 					Name: r.Name,
 					Run: func(ctx rule.RuleContext) rule.RuleListeners {
@@ -443,7 +455,7 @@ func runMain() int {
 		filesText = "file"
 	}
 	rulesText := "rules"
-	if len(rules) == 1 {
+	if len(allRules) == 1 {
 		rulesText = "rule"
 	}
 	threadsCount := 1
@@ -458,7 +470,7 @@ func runMain() int {
 		errorsText,
 		len(files),
 		filesText,
-		len(rules),
+		len(allRules),
 		rulesText,
 		time.Since(timeBefore).Round(time.Millisecond),
 		threadsCount,
