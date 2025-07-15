@@ -1,0 +1,47 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["helpers:pinGitHubActionDigestsToSemver"],
+  "schedule": ["before 9am on monday"],
+  "automerge": true,
+  "automergeType": "pr",
+  "automergeSchedule": ["at any time"],
+  "prHourlyLimit": 3,
+  "git-submodules": {
+    "enabled": false
+  },
+  "ignorePaths": [
+    "shim/**/go.mod",
+    "shim/**/go.sum"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["gomod"],
+      "matchPackagePatterns": ["^github\\.com/microsoft/typescript-go"],
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["node"],
+      "enabled": false
+    },
+    {
+      "groupName": "golang.org packages",
+      "matchManagers": ["gomod"],
+      "matchPackagePatterns": ["^golang\\.org/x/"],
+      "rangeStrategy": "auto",
+      "schedule": ["at any time"]
+    },
+    {
+      "groupName": "testing dependencies",
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["gotest.tools/v3"],
+      "rangeStrategy": "auto",
+      "schedule": ["at any time"]
+    },
+    {
+      "groupName": "go dependencies (root)",
+      "matchManagers": ["gomod"],
+      "rangeStrategy": "auto"
+    }
+  ]
+}
