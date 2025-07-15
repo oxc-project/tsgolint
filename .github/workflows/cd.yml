@@ -1,0 +1,67 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  releases-matrix:
+    name: Release Go Binary
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: windows
+            goarch: amd64
+            asset_name: tsgolint-win32-x64
+          - goos: windows
+            goarch: arm64
+            asset_name: tsgolint-win32-arm64
+          - goos: linux
+            goarch: amd64
+            asset_name: tsgolint-linux-x64-gnu
+          - goos: linux
+            goarch: arm64
+            asset_name: tsgolint-linux-arm64-gnu
+          - goos: linux
+            goarch: amd64
+            asset_name: tsgolint-linux-x64-musl
+            build_flags: "-a -ldflags '-linkmode external -extldflags -static'"
+            build_tags: "netgo"
+          - goos: linux
+            goarch: arm64
+            asset_name: tsgolint-linux-arm64-musl
+            build_flags: "-a -ldflags '-linkmode external -extldflags -static'"
+            build_tags: "netgo"
+          - goos: darwin
+            goarch: amd64
+            asset_name: tsgolint-darwin-x64
+          - goos: darwin
+            goarch: arm64
+            asset_name: tsgolint-darwin-arm64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          submodules: true
+      - uses: wangyoucao577/go-release-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          goversion: "https://dl.google.com/go/go1.21.5.linux-amd64.tar.gz"
+          project_path: "./cmd/tsgolint"
+          binary_name: "tsgolint"
+          asset_name: ${{ matrix.asset_name }}
+          build_flags: ${{ matrix.build_flags }}
+          build_tags: ${{ matrix.build_tags }}
+          extra_files: LICENSE README.md
