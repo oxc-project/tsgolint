@@ -1,0 +1,45 @@
+name: Update typescript-go
+
+on:
+  push:
+    branches:
+      - renovate/typescript-go-*
+    paths:
+      - typescript-go
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0 # required for git am --3way to work properly
+          submodules: true
+          # Using secrets.GITHUB_TOKEN isn't allowed to trigger downstream
+          # workflow runs, so we're using a Personal Access Token (PAT) instead
+          token: ${{ secrets.OXC_BOT_PAT }}
+      - name: Install Go
+        uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+        with:
+          go-version-file: go.mod
+
+      - name: Set commiter identity
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions"
+        
+      - run: ./tools/update-typescript-go-shims.sh
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if ! git diff --staged --quiet; then
+            echo 'has_changes=true' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git commit -m "update typescript-go"
+          git push
