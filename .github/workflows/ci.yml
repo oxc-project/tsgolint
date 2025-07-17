@@ -6,7 +6,8 @@ on:
   push:
     branches:
       - main
-      - renovate/typescript-go-*
+      # TODO: uncomment once automergeType=branch is enabled in Renovate
+      # - renovate/typescript-go-*
 
 jobs:
   test:
