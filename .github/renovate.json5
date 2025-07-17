@@ -19,7 +19,28 @@
       matchManagers: ['git-submodules'],
       matchDepNames: ['typescript-go'],
       automerge: true,
-      automergeType: 'pr', // TODO: branch (temp stub for debugging)
+      automergeType: 'branch',
+      // I suspect there's a bug in Renovate.
+      // Very similar to:
+      //  - https://github.com/renovatebot/renovate/issues/20966
+      //  - https://github.com/renovatebot/renovate/issues/21004
+      // 
+      // 1. Renovate pushes to a branch
+      // 2. github-actions pushes to the same branch
+      // 3. Renovate detects that SHA of the latest commit has changed,
+      // and resets the commitFingerprint:
+      // https://github.com/renovatebot/renovate/blob/26cc39cf43fb90ef0766c020462a7b30fbabedc9/lib/workers/repository/process/write.ts#L105
+      // 4. Since commitFingerprint is now empty, skipBranchUpdate becomes false:
+      // https://github.com/renovatebot/renovate/blob/26cc39cf43fb90ef0766c020462a7b30fbabedc9/lib/workers/repository/process/write.ts#L42
+      // 5. Renovate proceeds to rebase the branch again:
+      // https://github.com/renovatebot/renovate/blob/26cc39cf43fb90ef0766c020462a7b30fbabedc9/lib/workers/repository/update/branch/index.ts#L483
+      // 6. Infinite loop!
+      // 
+      // As a temporary workaround, I've set rebaseWhen=never
+      // https://github.com/renovatebot/renovate/blob/26cc39cf43fb90ef0766c020462a7b30fbabedc9/lib/workers/repository/update/branch/index.ts#L462
+      //
+      // TODO: create a minimal reproduction and file a bug report
+      rebaseWhen: 'never',
       // TODO: enable schedule
       // every day from 0 to 6
       // schedule: ['* 0-6 * * *'],
