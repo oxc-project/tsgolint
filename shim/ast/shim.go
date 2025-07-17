@@ -982,6 +982,8 @@ func IsStringTextContainingNode(node *ast.Node) bool
 func IsSuperCall(node *ast.Node) bool
 //go:linkname IsSyntheticExpression github.com/microsoft/typescript-go/internal/ast.IsSyntheticExpression
 func IsSyntheticExpression(node *ast.Node) bool
+//go:linkname IsSyntheticReferenceExpression github.com/microsoft/typescript-go/internal/ast.IsSyntheticReferenceExpression
+func IsSyntheticReferenceExpression(node *ast.Node) bool
 //go:linkname IsTaggedTemplateExpression github.com/microsoft/typescript-go/internal/ast.IsTaggedTemplateExpression
 func IsTaggedTemplateExpression(node *ast.Node) bool
 //go:linkname IsTemplateExpression github.com/microsoft/typescript-go/internal/ast.IsTemplateExpression
@@ -1979,6 +1981,7 @@ func SymbolName(symbol *ast.Symbol) string
 type SymbolTable = ast.SymbolTable
 type SyntaxList = ast.SyntaxList
 type SyntheticExpression = ast.SyntheticExpression
+type SyntheticReferenceExpression = ast.SyntheticReferenceExpression
 type TaggedTemplateExpression = ast.TaggedTemplateExpression
 type TemplateExpression = ast.TemplateExpression
 type TemplateHead = ast.TemplateHead
