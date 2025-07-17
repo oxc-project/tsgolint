@@ -19,7 +19,7 @@
       matchManagers: ['git-submodules'],
       matchDepNames: ['typescript-go'],
       automerge: true,
-      automergeType: 'branch',
+      automergeType: 'pr', // TODO: branch (temp stub for debugging)
       // TODO: enable schedule
       // every day from 0 to 6
       // schedule: ['* 0-6 * * *'],
