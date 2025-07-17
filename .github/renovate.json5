@@ -8,11 +8,12 @@
   'git-submodules': {
     "enabled": true,
   },
+  gitIgnoredAuthors: ['github-actions[bot]@users.noreply.github.com'],
   packageRules: [
     {
       matchManagers: ['gomod'],
       automerge: true,
-      minimumReleaseAge: "7 days"
+      minimumReleaseAge: '7 days',
     },
     {
       matchManagers: ['git-submodules'],
@@ -22,6 +23,6 @@
       // TODO: enable schedule
       // every day from 0 to 6
       // schedule: ['* 0-6 * * *'],
-    }
+    },
   ],
 }
