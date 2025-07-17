@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: wangyoucao577/go-release-action@v1
+      - uses: wangyoucao577/go-release-action@61cc78e76424f632a76513bd230c88536d9ea65e # v1.0.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.goos }}
