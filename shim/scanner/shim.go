@@ -27,6 +27,8 @@ const EscapeSequenceScanningFlagsReportInvalidEscapeErrors = scanner.EscapeSeque
 const EscapeSequenceScanningFlagsString = scanner.EscapeSequenceScanningFlagsString
 //go:linkname GetEndLinePosition github.com/microsoft/typescript-go/internal/scanner.GetEndLinePosition
 func GetEndLinePosition(sourceFile *ast.SourceFile, line int) int
+//go:linkname GetErrorRangeForNode github.com/microsoft/typescript-go/internal/scanner.GetErrorRangeForNode
+func GetErrorRangeForNode(sourceFile *ast.SourceFile, node *ast.Node) core.TextRange
 //go:linkname GetIdentifierToken github.com/microsoft/typescript-go/internal/scanner.GetIdentifierToken
 func GetIdentifierToken(str string) ast.Kind
 //go:linkname GetLeadingCommentRanges github.com/microsoft/typescript-go/internal/scanner.GetLeadingCommentRanges
