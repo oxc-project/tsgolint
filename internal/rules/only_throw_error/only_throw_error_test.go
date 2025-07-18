@@ -179,6 +179,26 @@ throw new Map();
 				AllowThrowingUnknown: utils.Ref(false),
 			},
 		},
+		{
+			Code: `
+async function foo() {
+  throw await Promise.resolve(new Error('error'));
+}
+      `,
+			Options: OnlyThrowErrorOptions{
+				AllowThrowingAny: utils.Ref(false),
+			},
+		},
+		{
+			Code: `
+function *foo(): Generator<number, void, Error> {
+  throw yield 303;
+}
+      `,
+			Options: OnlyThrowErrorOptions{
+				AllowThrowingAny: utils.Ref(false),
+			},
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: "throw undefined;",
@@ -557,6 +577,48 @@ throw new UnknownError();
 				Allow:                []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"CustomError"}}},
 				AllowThrowingAny:     utils.Ref(false),
 				AllowThrowingUnknown: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+async function foo() {
+  throw await bar;
+}
+			`,
+			Options: OnlyThrowErrorOptions{
+				AllowThrowingAny: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+async function foo() {
+  throw await Promise.resolve<number>(303);
+}
+			`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+function *foo(): Generator<number, void, string> {
+  throw yield 303;
+}
+      `,
+			Options: OnlyThrowErrorOptions{
+				AllowThrowingAny: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{

@@ -50,14 +50,6 @@ var OnlyThrowErrorRule = rule.Rule{
 		return rule.RuleListeners{
 			ast.KindThrowStatement: func(node *ast.Node) {
 				expr := node.Expression()
-				// TODO(port): why do we ignore await and yield here??
-				// if (
-				//   node.type === AST_NODE_TYPES.AwaitExpression ||
-				//   node.type === AST_NODE_TYPES.YieldExpression
-				// ) {
-				//   return;
-				// }
-
 				t := ctx.TypeChecker.GetTypeAtLocation(expr)
 
 				if utils.TypeMatchesSomeSpecifier(t, opts.Allow, opts.AllowInline, ctx.Program) {
