@@ -26,9 +26,8 @@
       // automerge: true,
       // automergeType: 'branch',
 
-      // TODO: enable schedule
-      // every day from 0 to 6
-      // schedule: ['* 0-6 * * *'],
+      // every 3rd day from 00 to 06
+      schedule: ['0 0-6 */3 * *'],
     },
   ],
 }
