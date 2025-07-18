@@ -980,6 +980,8 @@ func IsStringOrNumericLiteralLike(node *ast.Node) bool
 func IsStringTextContainingNode(node *ast.Node) bool
 //go:linkname IsSuperCall github.com/microsoft/typescript-go/internal/ast.IsSuperCall
 func IsSuperCall(node *ast.Node) bool
+//go:linkname IsSwitchStatement github.com/microsoft/typescript-go/internal/ast.IsSwitchStatement
+func IsSwitchStatement(node *ast.Node) bool
 //go:linkname IsSyntheticExpression github.com/microsoft/typescript-go/internal/ast.IsSyntheticExpression
 func IsSyntheticExpression(node *ast.Node) bool
 //go:linkname IsSyntheticReferenceExpression github.com/microsoft/typescript-go/internal/ast.IsSyntheticReferenceExpression
