@@ -26,8 +26,8 @@
       // automerge: true,
       // automergeType: 'branch',
 
-      // every 3rd day from 00 to 06
-      schedule: ['0 0-6 */3 * *'],
+      // from 00 to 06 on Monday, Wednesday, and Friday
+      schedule: ['* 0-6 * * 1,3,5'],
     },
   ],
 }
