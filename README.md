@@ -20,6 +20,16 @@ This project originated in [typescript-eslint/tsgolint](https://github.com/types
 - 40 [type-aware](https://typescript-eslint.io/blog/typed-linting) typescript-eslint's rules
 - Basic `tsgolint` CLI
 
+tsgolint is published under the `@oxlint-tsgolint/` npm organization.
+
+Try running
+
+```shell
+npx @oxlint-tsgolint/core --help
+```
+
+to see available options.
+
 ### Speedup over ESLint
 
 **tsgolint** is **20-40 times faster** than ESLint + typescript-eslint.
