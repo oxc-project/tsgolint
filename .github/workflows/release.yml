@@ -32,7 +32,7 @@ jobs:
       - name: Apply typescript-go patches
         run: |
           pushd typescript-go
-          git am --3way --no-gpg-sign 
+          git am --3way --no-gpg-sign ../patches/*.patch
           popd
 
       - name: Build binaries
@@ -61,6 +61,8 @@ jobs:
           path: build
 
       - name: Generate npm packages
+        env:
+          TSGOLINT_BUILD_NUMBER: ${{ github.run_number }}
         run: node ./tools/gen-npm-packages.mjs
 
       - run: tree build && tree npm
