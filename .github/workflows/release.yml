@@ -2,10 +2,6 @@ name: Release
 
 on:
   workflow_dispatch:
-  # TODO: remove
-  push:
-    branches:
-      - publish-to-npm
 
 permissions:
   contents: read
