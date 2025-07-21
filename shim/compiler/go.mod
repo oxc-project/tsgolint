@@ -4,7 +4,7 @@ go 1.24.0
 
 toolchain go1.24.5
 
-require github.com/microsoft/typescript-go v0.0.0-20250717220155-4fd6eb1694ae
+require github.com/microsoft/typescript-go v0.0.0-20250718154220-96c0688f42ce
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect

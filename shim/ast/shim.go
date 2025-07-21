@@ -223,8 +223,6 @@ func GetContainingClass(node *ast.Node) *ast.Node
 func GetDeclarationContainer(node *ast.Node) *ast.Node
 //go:linkname GetDeclarationOfKind github.com/microsoft/typescript-go/internal/ast.GetDeclarationOfKind
 func GetDeclarationOfKind(symbol *ast.Symbol, kind ast.Kind) *ast.Node
-//go:linkname GetEffectiveTypeParent github.com/microsoft/typescript-go/internal/ast.GetEffectiveTypeParent
-func GetEffectiveTypeParent(parent *ast.Node) *ast.Node
 //go:linkname GetElementOrPropertyAccessName github.com/microsoft/typescript-go/internal/ast.GetElementOrPropertyAccessName
 func GetElementOrPropertyAccessName(node *ast.Node) *ast.Node
 //go:linkname GetEmitModuleFormatOfFileWorker github.com/microsoft/typescript-go/internal/ast.GetEmitModuleFormatOfFileWorker
