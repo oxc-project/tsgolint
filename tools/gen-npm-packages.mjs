@@ -87,7 +87,7 @@ await Promise.all([
         path.join(packageDir, 'package.json'),
         JSON.stringify({
           ...commonPackageJson,
-          name: `${NPM_ORG}/core`,
+          name: `@${NPM_ORG}/core`,
           bin: {
             tsgolint: './bin/tsgolint.js',
           },
