@@ -69,6 +69,9 @@ jobs:
           pattern: tsgolint-*
           path: build
 
+      - name: chmod +x
+        run: find build -type f -name tsgolint -exec chmod +x {} \;
+
       - name: Generate npm packages
         env:
           TSGOLINT_BUILD_NUMBER: ${{ github.run_number }}
