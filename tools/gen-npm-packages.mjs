@@ -18,10 +18,13 @@ const GOARCH2PROCESS_ARCH = {
   'arm64': 'arm64',
 }
 
-const binariesMatrix = Object.values(GOOS2PROCESS_PLATFORM)
-  .flatMap(platform => Object.values(GOARCH2PROCESS_ARCH).map(arch => ({ 
+const binariesMatrix = Object.entries(GOOS2PROCESS_PLATFORM)
+  .flatMap(([goos, platform]) => Object.entries(GOARCH2PROCESS_ARCH).map(([goarch, arch]) => ({ 
+    goarch,
+    goos,
     arch,
     platform,
+    artifactName: `tsgolint-${goos}-${goarch}`,
     npmPackageName: `@${NPM_ORG}/${platform}-${arch}`,
   })))
 
@@ -43,15 +46,18 @@ const commonPackageJson = {
   },
 }
 
-const npmDir = path.join(import.meta.dirname, '..', 'npm')
-const licensePath = path.join(import.meta.dirname, '..', 'LICENSE')
+const repoRoot = path.join(import.meta.dirname, '..')
+
+const npmDir = path.join(repoRoot, 'npm')
+const licensePath = path.join(repoRoot, 'LICENSE')
+const buildDir = path.join(repoRoot, 'build')
 
 await Promise.all([
   ...binariesMatrix
-    .map(async ({ arch, platform, npmPackageName }) => {
+    .map(async ({ arch, platform, artifactName, npmPackageName }) => {
       const packageName = `${platform}-${arch}`
-
       const packageDir = path.join(npmDir, packageName)
+      const binaryName = `tsgolint${platform === 'win32' ? '.exe' : ''}`
 
       await fs.rm(packageDir, { recursive: true, force: true })
       await fs.mkdir(packageDir)
@@ -62,11 +68,16 @@ await Promise.all([
             ...commonPackageJson,
             name: npmPackageName,
             preferUnplugged: true,
+            files: [binaryName],
             os: [platform],
             arch: [arch],
           }, null, 2)
         ),
         fs.copyFile(licensePath, path.join(packageDir, 'LICENSE')),
+        fs.copyFile(
+          path.join(buildDir, artifactName, 'tsgolint'),
+          path.join(packageDir, binaryName)
+        ),
       ])
     }),
   (async () => {
