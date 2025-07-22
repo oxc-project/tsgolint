@@ -95,7 +95,7 @@ await Promise.all([
         JSON.stringify(
           {
             ...commonPackageJson,
-            name: `@${NPM_ORG}/core`,
+            name: 'oxlint-tsgolint',
             bin: {
               tsgolint: './bin/tsgolint.js',
             },
