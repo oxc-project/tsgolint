@@ -5,6 +5,7 @@ package core
 
 import "context"
 import "github.com/microsoft/typescript-go/internal/core"
+import "golang.org/x/text/language"
 import "iter"
 import _ "unsafe"
 
@@ -16,6 +17,8 @@ func ComputeLineStarts(text string) []core.TextPos
 //go:linkname ComputeLineStartsSeq github.com/microsoft/typescript-go/internal/core.ComputeLineStartsSeq
 func ComputeLineStartsSeq(text string) iter.Seq[core.TextPos]
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
+//go:linkname GetLocale github.com/microsoft/typescript-go/internal/core.GetLocale
+func GetLocale(ctx context.Context) language.Tag
 //go:linkname GetRequestID github.com/microsoft/typescript-go/internal/core.GetRequestID
 func GetRequestID(ctx context.Context) string
 //go:linkname GetScriptKindFromFileName github.com/microsoft/typescript-go/internal/core.GetScriptKindFromFileName
@@ -150,6 +153,8 @@ const WatchFileKindPriorityPollingInterval = core.WatchFileKindPriorityPollingIn
 const WatchFileKindUseFsEvents = core.WatchFileKindUseFsEvents
 const WatchFileKindUseFsEventsOnParentDirectory = core.WatchFileKindUseFsEventsOnParentDirectory
 type WatchOptions = core.WatchOptions
+//go:linkname WithLocale github.com/microsoft/typescript-go/internal/core.WithLocale
+func WithLocale(ctx context.Context, locale language.Tag) context.Context
 //go:linkname WithRequestID github.com/microsoft/typescript-go/internal/core.WithRequestID
 func WithRequestID(ctx context.Context, id string) context.Context
 type WorkGroup = core.WorkGroup

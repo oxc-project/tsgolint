@@ -820,6 +820,8 @@ func IsModuleExportsAccessExpression(node *ast.Node) bool
 func IsModuleIdentifier(node *ast.Node) bool
 //go:linkname IsModuleOrEnumDeclaration github.com/microsoft/typescript-go/internal/ast.IsModuleOrEnumDeclaration
 func IsModuleOrEnumDeclaration(node *ast.Node) bool
+//go:linkname IsModuleWithStringLiteralName github.com/microsoft/typescript-go/internal/ast.IsModuleWithStringLiteralName
+func IsModuleWithStringLiteralName(node *ast.Node) bool
 //go:linkname IsNamedExports github.com/microsoft/typescript-go/internal/ast.IsNamedExports
 func IsNamedExports(node *ast.Node) bool
 //go:linkname IsNamedImports github.com/microsoft/typescript-go/internal/ast.IsNamedImports
@@ -1642,6 +1644,8 @@ func NewCompilerDiagnostic(message *diagnostics.Message, args ...any) *ast.Diagn
 func NewDiagnostic(file *ast.SourceFile, loc core.TextRange, message *diagnostics.Message, args ...any) *ast.Diagnostic
 //go:linkname NewDiagnosticChain github.com/microsoft/typescript-go/internal/ast.NewDiagnosticChain
 func NewDiagnosticChain(chain *ast.Diagnostic, message *diagnostics.Message, args ...any) *ast.Diagnostic
+//go:linkname NewDiagnosticWith github.com/microsoft/typescript-go/internal/ast.NewDiagnosticWith
+func NewDiagnosticWith(file *ast.SourceFile, loc core.TextRange, code int32, category diagnostics.Category, message string, messageChain []*ast.Diagnostic, relatedInformation []*ast.Diagnostic, reportsUnnecessary bool, reportsDeprecated bool, skippedOnNoEmit bool) *ast.Diagnostic
 type NewExpression = ast.NewExpression
 //go:linkname NewFlowReduceLabelData github.com/microsoft/typescript-go/internal/ast.NewFlowReduceLabelData
 func NewFlowReduceLabelData(target *ast.FlowLabel, antecedents *ast.FlowList) *ast.Node
