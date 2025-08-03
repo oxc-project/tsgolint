@@ -14,7 +14,7 @@ import (
 
 func CreateCompilerHost(cwd string, fs vfs.FS) compiler.CompilerHost {
 	defaultLibraryPath := bundled.LibPath()
-	return compiler.NewCompilerHost(cwd, fs, defaultLibraryPath)
+	return compiler.NewCompilerHost(cwd, fs, defaultLibraryPath, nil)
 }
 
 func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost) (*compiler.Program, error) {
@@ -29,6 +29,8 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		Config:         configParseResult,
 		SingleThreaded: core.TSTrue,
 		Host:           host,
+		// TODO: custom checker pool
+		// CreateCheckerPool: func(p *compiler.Program) compiler.CheckerPool {},
 	}
 	if !singleThreaded {
 		opts.SingleThreaded = core.TSFalse
@@ -44,8 +46,6 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	}
 
 	program.BindSourceFiles()
-
-	// program.CreateCheckers()
 
 	return program, nil
 }

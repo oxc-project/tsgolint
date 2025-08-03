@@ -10,13 +10,16 @@ import "github.com/microsoft/typescript-go/internal/diagnostics"
 import "github.com/microsoft/typescript-go/internal/tsoptions"
 import "github.com/microsoft/typescript-go/internal/tspath"
 import "github.com/microsoft/typescript-go/internal/vfs"
+import "reflect"
 import _ "unsafe"
 
 type AlternateModeDiagnostics = tsoptions.AlternateModeDiagnostics
 var BuildNameMap = tsoptions.BuildNameMap
 var BuildOpts = tsoptions.BuildOpts
+var CommandLineCompilerOptionsMap = tsoptions.CommandLineCompilerOptionsMap
 type CommandLineOption = tsoptions.CommandLineOption
 type CommandLineOptionKind = tsoptions.CommandLineOptionKind
+type CommandLineOptionNameMap = tsoptions.CommandLineOptionNameMap
 const CommandLineOptionTypeBoolean = tsoptions.CommandLineOptionTypeBoolean
 const CommandLineOptionTypeEnum = tsoptions.CommandLineOptionTypeEnum
 const CommandLineOptionTypeList = tsoptions.CommandLineOptionTypeList
@@ -25,13 +28,23 @@ const CommandLineOptionTypeNumber = tsoptions.CommandLineOptionTypeNumber
 const CommandLineOptionTypeObject = tsoptions.CommandLineOptionTypeObject
 const CommandLineOptionTypeString = tsoptions.CommandLineOptionTypeString
 var CompilerNameMap = tsoptions.CompilerNameMap
+//go:linkname CompilerOptionsAffectDeclarationPath github.com/microsoft/typescript-go/internal/tsoptions.CompilerOptionsAffectDeclarationPath
+func CompilerOptionsAffectDeclarationPath(oldOptions *core.CompilerOptions, newOptions *core.CompilerOptions) bool
+//go:linkname CompilerOptionsAffectEmit github.com/microsoft/typescript-go/internal/tsoptions.CompilerOptionsAffectEmit
+func CompilerOptionsAffectEmit(oldOptions *core.CompilerOptions, newOptions *core.CompilerOptions) bool
+//go:linkname CompilerOptionsAffectSemanticDiagnostics github.com/microsoft/typescript-go/internal/tsoptions.CompilerOptionsAffectSemanticDiagnostics
+func CompilerOptionsAffectSemanticDiagnostics(oldOptions *core.CompilerOptions, newOptions *core.CompilerOptions) bool
 var CompilerOptionsDidYouMeanDiagnostics = tsoptions.CompilerOptionsDidYouMeanDiagnostics
 type CompilerOptionsValue = tsoptions.CompilerOptionsValue
+//go:linkname ConvertOptionToAbsolutePath github.com/microsoft/typescript-go/internal/tsoptions.ConvertOptionToAbsolutePath
+func ConvertOptionToAbsolutePath(o string, v any, optionMap tsoptions.CommandLineOptionNameMap, cwd string) (any, bool)
 //go:linkname CreateDiagnosticForNodeInSourceFileOrCompilerDiagnostic github.com/microsoft/typescript-go/internal/tsoptions.CreateDiagnosticForNodeInSourceFileOrCompilerDiagnostic
 func CreateDiagnosticForNodeInSourceFileOrCompilerDiagnostic(sourceFile *ast.SourceFile, node *ast.Node, message *diagnostics.Message, args ...any) *ast.Diagnostic
 type DidYouMeanOptionsDiagnostics = tsoptions.DidYouMeanOptionsDiagnostics
 type ExtendedConfigCacheEntry = tsoptions.ExtendedConfigCacheEntry
 type FileExtensionInfo = tsoptions.FileExtensionInfo
+//go:linkname ForEachCompilerOptionValue github.com/microsoft/typescript-go/internal/tsoptions.ForEachCompilerOptionValue
+func ForEachCompilerOptionValue(options *core.CompilerOptions, declFilter func(*tsoptions.CommandLineOption) bool, fn func(option *tsoptions.CommandLineOption, value reflect.Value, i int) bool) bool
 //go:linkname GetDefaultLibFileName github.com/microsoft/typescript-go/internal/tsoptions.GetDefaultLibFileName
 func GetDefaultLibFileName(options *core.CompilerOptions) string
 //go:linkname GetLibFileName github.com/microsoft/typescript-go/internal/tsoptions.GetLibFileName
@@ -70,6 +83,8 @@ type ParsedCommandLine = tsoptions.ParsedCommandLine
 //go:linkname ReloadFileNamesOfParsedCommandLine github.com/microsoft/typescript-go/internal/tsoptions.ReloadFileNamesOfParsedCommandLine
 func ReloadFileNamesOfParsedCommandLine(p *tsoptions.ParsedCommandLine, fs vfs.FS) *tsoptions.ParsedCommandLine
 type SourceAndProjectReference = tsoptions.SourceAndProjectReference
+//go:linkname TargetToLibMap github.com/microsoft/typescript-go/internal/tsoptions.TargetToLibMap
+func TargetToLibMap() map[core.ScriptTarget]string
 type TsConfigSourceFile = tsoptions.TsConfigSourceFile
 var TscBuildOption = tsoptions.TscBuildOption
 var WatchNameMap = tsoptions.WatchNameMap

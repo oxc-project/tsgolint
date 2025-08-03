@@ -165,7 +165,6 @@ type extra_Checker struct {
   wasCanceled bool
   arrayVariances []checker.VarianceFlags
   globals ast.SymbolTable
-  globalSymbols []*ast.Symbol
   evaluate evaluator.Evaluator
   stringLiteralTypes map[string]*checker.Type
   numberLiteralTypes map[jsnum.Number]*checker.Type
@@ -332,7 +331,6 @@ type extra_Checker struct {
   typeResolutions []checker.TypeResolution
   resolutionStart int
   inVarianceComputation bool
-  suggestionCount int
   apparentArgumentCount *int
   lastGetCombinedNodeFlagsNode *ast.Node
   lastGetCombinedNodeFlagsResult ast.NodeFlags
@@ -432,6 +430,8 @@ type extra_Checker struct {
   packagesMap map[string]bool
   activeMappers []*checker.TypeMapper
   activeTypeMappersCaches []map[string]*checker.Type
+  ambientModulesOnce sync.Once
+  ambientModules []*ast.Symbol
 }
 type extra_emitResolver struct {
   checker *checker.Checker
@@ -895,7 +895,7 @@ type SingleSignatureType = checker.SingleSignatureType
 //go:linkname SkipAlias github.com/microsoft/typescript-go/internal/checker.SkipAlias
 func SkipAlias(symbol *ast.Symbol, checker *checker.Checker) *ast.Symbol
 //go:linkname SkipTypeChecking github.com/microsoft/typescript-go/internal/checker.SkipTypeChecking
-func SkipTypeChecking(sourceFile *ast.SourceFile, options *core.CompilerOptions, host checker.Program) bool
+func SkipTypeChecking(sourceFile *ast.SourceFile, options *core.CompilerOptions, host checker.Program, ignoreNoCheck bool) bool
 type SourceFileLinks = checker.SourceFileLinks
 type SpreadLinks = checker.SpreadLinks
 type StringLiteralType = checker.StringLiteralType
