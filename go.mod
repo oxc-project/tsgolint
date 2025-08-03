@@ -2,7 +2,7 @@ module github.com/typescript-eslint/tsgolint
 
 go 1.24.2
 
-toolchain go1.24.3
+toolchain go1.24.5
 
 replace (
 	github.com/microsoft/typescript-go/shim/ast => ./shim/ast
