@@ -8,18 +8,18 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"slices"
+	"strings"
 	"sync"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 type headlessConfigForFile struct {
@@ -101,37 +101,52 @@ func writeErrorMessage(text string) error {
 	})
 }
 
+func fileNameToScriptKind(fileName string) core.ScriptKind {
+	switch {
+	case strings.HasSuffix(fileName, ".ts"):
+		return core.ScriptKindTS
+	case strings.HasSuffix(fileName, ".tsx"):
+		return core.ScriptKindTSX
+	case strings.HasSuffix(fileName, ".js"):
+		return core.ScriptKindJS
+	case strings.HasSuffix(fileName, ".jsx"):
+		return core.ScriptKindJSX
+	default:
+		return core.ScriptKindUnknown
+	}
+}
+
 func runHeadless(args []string) int {
 	var (
-		tsconfig string
-		cwd      string
+		traceOut   string
+		cpuprofOut string
 	)
-
-	flag.StringVar(&tsconfig, "tsconfig", "", "which tsconfig to use")
-	flag.StringVar(&cwd, "cwd", "", "current directory")
+	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
+	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
 	flag.CommandLine.Parse(args)
 
-	if tsconfig == "" {
-		fmt.Fprint(os.Stderr, "--tsconfig is required\n")
+	if done, err := recordTrace(traceOut); err != nil {
+		os.Stderr.WriteString(err.Error())
 		return 1
+	} else {
+		defer done()
 	}
-	if cwd == "" {
-		fmt.Fprint(os.Stderr, "--cwd is required\n")
+	if done, err := recordCpuprof(cpuprofOut); err != nil {
+		os.Stderr.WriteString(err.Error())
 		return 1
+	} else {
+		defer done()
 	}
 
-	cwd = tspath.NormalizePath(cwd)
-	tsconfig = tspath.NormalizePath(tsconfig)
+	cwd, err := os.Getwd()
+	if err != nil {
+		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
+		return 1
+	}
 
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 
-	host := utils.CreateCompilerHost(cwd, fs)
-
-	program, err := utils.CreateProgram(false, fs, cwd, tsconfig, host)
-	if err != nil {
-		writeErrorMessage(fmt.Sprintf("error creating TS program: %v", err))
-		return 1
-	}
+	service := newProjectService(fs, cwd)
 
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -147,20 +162,31 @@ func runHeadless(args []string) int {
 	}
 
 	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
-	files := make([]*ast.SourceFile, len(config.Files))
-	for i, fileConfig := range config.Files {
+	workload := linter.Workload{}
+	for _, fileConfig := range config.Files {
+		source, err := os.ReadFile(fileConfig.FilePath)
+		if err != nil {
+			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
+			return 1
+		}
+		service.OpenFile(fileConfig.FilePath, string(source), fileNameToScriptKind(fileConfig.FilePath), "")
+		_, project := service.EnsureDefaultProjectForFile(fileConfig.FilePath)
+		program := project.GetProgram()
 		file := program.GetSourceFile(fileConfig.FilePath)
 		if file == nil {
 			writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", fileConfig.FilePath))
 			return 1
 		}
-		files[i] = file
 		fileConfigs[file] = fileConfig
+
+		workload[program] = append(workload[program], file)
 	}
 
-	slices.SortFunc(files, func(a *ast.SourceFile, b *ast.SourceFile) int {
-		return len(b.Text()) - len(a.Text())
-	})
+	for _, files := range workload {
+		slices.SortFunc(files, func(a *ast.SourceFile, b *ast.SourceFile) int {
+			return len(b.Text()) - len(a.Text())
+		})
+	}
 
 	var wg sync.WaitGroup
 
@@ -206,9 +232,8 @@ func runHeadless(args []string) int {
 	}()
 
 	err = linter.RunLinter(
-		program,
-		false,
-		files,
+		workload,
+		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			cfg := fileConfigs[sourceFile]
 			rules := make([]linter.ConfiguredRule, len(cfg.Rules))
