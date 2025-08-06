@@ -6,7 +6,7 @@ toolchain go1.24.5
 
 require (
 	github.com/dlclark/regexp2 v1.11.5
-	github.com/microsoft/typescript-go v0.0.0-20250801222851-644bde289397
+	github.com/microsoft/typescript-go v0.0.0-20250805170944-16953b75a0d1
 )
 
 require (
