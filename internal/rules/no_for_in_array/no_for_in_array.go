@@ -15,7 +15,7 @@ func buildForInViolationMessage() rule.RuleMessage {
 }
 
 var NoForInArrayRule = rule.Rule{
-	Name: "no-for-in-array-rule",
+	Name: "no-for-in-array",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		hasArrayishLength := func(t *checker.Type) bool {
 			lengthProperty := checker.Checker_getPropertyOfType(ctx.TypeChecker, t, "length")

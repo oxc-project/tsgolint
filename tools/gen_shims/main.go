@@ -32,6 +32,8 @@ func main() {
 		"checker",
 		"compiler",
 		"core",
+		"lsp/lsproto",
+		"project",
 		"scanner",
 		"tsoptions",
 		"tspath",

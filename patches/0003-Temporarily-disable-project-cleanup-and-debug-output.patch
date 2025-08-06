@@ -1,0 +1,32 @@
+From 621186e5dbed808f9e8fc41be3eb5e853f5cec07 Mon Sep 17 00:00:00 2001
+From: auvred <aauvred@gmail.com>
+Date: Wed, 6 Aug 2025 11:38:58 +0000
+Subject: [PATCH 3/4] Temporarily disable project cleanup and debug output in
+ OpenFile
+
+---
+ internal/project/service.go | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/internal/project/service.go b/internal/project/service.go
+index 9fbf1c5ed..4c7245cda 100644
+--- a/internal/project/service.go
++++ b/internal/project/service.go
+@@ -218,10 +218,10 @@ func (s *Service) OpenFile(fileName string, fileContent string, scriptKind core.
+ 		// Invoke wild card directory watcher to ensure that the file presence is reflected
+ 		s.configFileRegistry.tryInvokeWildCardDirectories(fileName, info.path)
+ 	}
+-	result := s.assignProjectToOpenedScriptInfo(info)
+-	s.cleanupProjectsAndScriptInfos(info, result)
+-	s.printMemoryUsage()
+-	s.printProjects()
++	s.assignProjectToOpenedScriptInfo(info)
++	// s.cleanupProjectsAndScriptInfos(info, result)
++	// s.printMemoryUsage()
++	// s.printProjects()
+ }
+ 
+ func (s *Service) ChangeFile(document lsproto.VersionedTextDocumentIdentifier, changes []lsproto.TextDocumentContentChangePartialOrWholeDocument) error {
+-- 
+2.49.0
+

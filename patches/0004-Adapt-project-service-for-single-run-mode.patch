@@ -1,0 +1,54 @@
+From d03e49379709884ca84e11316c3cfa9b41997884 Mon Sep 17 00:00:00 2001
+From: auvred <aauvred@gmail.com>
+Date: Wed, 6 Aug 2025 11:39:11 +0000
+Subject: [PATCH 4/4] Adapt project service for single run mode
+
+---
+ internal/project/checkerpool.go | 9 +++++++++
+ internal/project/project.go     | 3 ++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/internal/project/checkerpool.go b/internal/project/checkerpool.go
+index 6bcbcc686..27dff946d 100644
+--- a/internal/project/checkerpool.go
++++ b/internal/project/checkerpool.go
+@@ -94,6 +94,15 @@ func (p *checkerPool) GetAllCheckers(ctx context.Context) ([]*checker.Checker, f
+ 	if requestID == "" {
+ 		panic("cannot call GetAllCheckers on a project.checkerPool without a request ID")
+ 	}
++	if requestID == "__single_run__" {
++		for i, existing := range p.checkers {
++			if existing == nil {
++				checker := checker.NewChecker(p.program)
++				p.checkers[i] = checker
++			}
++		}
++		return p.checkers, noop
++	}
+ 
+ 	// A request can only access one checker
+ 	if c, release := p.getRequestCheckerLocked(requestID); c != nil {
+diff --git a/internal/project/project.go b/internal/project/project.go
+index b4a22c3a6..e35668330 100644
+--- a/internal/project/project.go
++++ b/internal/project/project.go
+@@ -3,6 +3,7 @@ package project
+ import (
+ 	"context"
+ 	"fmt"
++	"runtime"
+ 	"slices"
+ 	"strings"
+ 	"sync"
+@@ -600,7 +601,7 @@ func (p *Project) updateProgram() bool {
+ 			UseSourceOfProjectReference: true,
+ 			TypingsLocation:             typingsLocation,
+ 			CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {
+-				p.checkerPool = newCheckerPool(4, program, p.Log)
++				p.checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.Log)
+ 				return p.checkerPool
+ 			},
+ 			JSDocParsingMode: ast.JSDocParsingModeParseAll,
+-- 
+2.49.0
+

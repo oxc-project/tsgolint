@@ -69,6 +69,38 @@ import (
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 )
 
+func recordTrace(traceOut string) (func(), error) {
+	if traceOut != "" {
+		f, err := os.Create(traceOut)
+		if err != nil {
+			return nil, fmt.Errorf("error creating trace file: %v", err)
+		}
+		trace.Start(f)
+		return func() {
+			trace.Stop()
+			f.Close()
+		}, nil
+	}
+	return func() {}, nil
+}
+func recordCpuprof(cpuprofOut string) (func(), error) {
+	if cpuprofOut != "" {
+		f, err := os.Create(cpuprofOut)
+		if err != nil {
+			return nil, fmt.Errorf("error creating cpuprof file: %v", err)
+		}
+		err = pprof.StartCPUProfile(f)
+		if err != nil {
+			return nil, fmt.Errorf("error starting cpu profiling: %v", err)
+		}
+		return func() {
+			pprof.StopCPUProfile()
+			f.Close()
+		}, nil
+	}
+	return func() {}, nil
+}
+
 var allRules = []rule.Rule{
 	await_thenable.AwaitThenableRule,
 	no_array_delete.NoArrayDeleteRule,
@@ -305,29 +337,17 @@ func runMain() int {
 	enableVirtualTerminalProcessing()
 	timeBefore := time.Now()
 
-	if traceOut != "" {
-		f, err := os.Create(traceOut)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error creating trace file: %v\n", err)
-			return 1
-		}
-		defer f.Close()
-		trace.Start(f)
-		defer trace.Stop()
+	if done, err := recordTrace(traceOut); err != nil {
+		os.Stderr.WriteString(err.Error())
+		return 1
+	} else {
+		defer done()
 	}
-	if cpuprofOut != "" {
-		f, err := os.Create(cpuprofOut)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error creating cpuprof file: %v\n", err)
-			return 1
-		}
-		defer f.Close()
-		err = pprof.StartCPUProfile(f)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error starting cpu profiling: %v\n", err)
-			return 1
-		}
-		defer pprof.StopCPUProfile()
+	if done, err := recordCpuprof(cpuprofOut); err != nil {
+		os.Stderr.WriteString(err.Error())
+		return 1
+	} else {
+		defer done()
 	}
 
 	currentDirectory, err := os.Getwd()
@@ -416,9 +436,10 @@ func runMain() int {
 	}()
 
 	err = linter.RunLinter(
-		program,
-		singleThreaded,
-		files,
+		linter.Workload{
+			program: files,
+		},
+		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			return utils.Map(allRules, func(r rule.Rule) linter.ConfiguredRule {
 				return linter.ConfiguredRule{
