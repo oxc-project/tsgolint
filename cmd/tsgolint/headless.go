@@ -10,7 +10,6 @@ import (
 	"os"
 	"runtime"
 	"slices"
-	"strings"
 	"sync"
 
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -101,21 +100,6 @@ func writeErrorMessage(text string) error {
 	})
 }
 
-func fileNameToScriptKind(fileName string) core.ScriptKind {
-	switch {
-	case strings.HasSuffix(fileName, ".ts"):
-		return core.ScriptKindTS
-	case strings.HasSuffix(fileName, ".tsx"):
-		return core.ScriptKindTSX
-	case strings.HasSuffix(fileName, ".js"):
-		return core.ScriptKindJS
-	case strings.HasSuffix(fileName, ".jsx"):
-		return core.ScriptKindJSX
-	default:
-		return core.ScriptKindUnknown
-	}
-}
-
 func runHeadless(args []string) int {
 	var (
 		traceOut   string
@@ -169,7 +153,7 @@ func runHeadless(args []string) int {
 			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
 			return 1
 		}
-		service.OpenFile(fileConfig.FilePath, string(source), fileNameToScriptKind(fileConfig.FilePath), "")
+		service.OpenFile(fileConfig.FilePath, string(source), core.GetScriptKindFromFileName(fileConfig.FilePath), "")
 		_, project := service.EnsureDefaultProjectForFile(fileConfig.FilePath)
 		program := project.GetProgram()
 		file := program.GetSourceFile(fileConfig.FilePath)
