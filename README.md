@@ -50,23 +50,7 @@ See [benchmarks](./benchmarks/README.md) for more info.
 
 ## Architecture
 
-Oxlint CLI -> paths + rules -> tsgolint -> diagnostics -> Oxlint CLI.
-
-* Oxlint is the "frontend" for tsgolint, it handles CLI, path walking, ignores logic and printing of diagnostics.
-* tsgolint is the backend for Oxlint, accepting paths as input, and outputs structured diagnostics.
-
-Scope of tsgolint is only:
-
-* run the type-aware rules
-* pass structured diagnostics back to oxlint
-
-## Note about typescript-go shims
-
-tsgolint accesses internal typescript-go APIs via [shims](./tools/gen_shims/main.go), which is not a recommended approach.
-We advise against using this method and suggest waiting for an official API release instead.
-See [this discussion](https://github.com/microsoft/typescript-go/discussions/455) and [this one](https://github.com/microsoft/typescript-go/discussions/481).
-
-More technical details can be found [here](./tools/gen_shims/README.md).
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architectural documentation.
 
 ## Building `tsgolint`
 
