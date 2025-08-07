@@ -1,5 +1,7 @@
 name: Update typescript-go
 
+permissions: {}
+
 on:
   push:
     branches:
@@ -28,7 +30,7 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions"
-        
+
       - run: ./tools/update-typescript-go-shims.sh
 
       - name: Check for changes
