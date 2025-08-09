@@ -4,6 +4,11 @@ permissions: {}
 
 on:
   workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: version without leading `v`
 
 jobs:
   build:
@@ -18,6 +23,8 @@ jobs:
         with:
           fetch-depth: 0 # required for git am --3way to work properly
           submodules: true
+          persist-credentials: false
+
       - name: Install Go
         uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:
@@ -27,6 +34,7 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions"
+
       - name: Apply typescript-go patches
         run: |
           pushd typescript-go
@@ -54,6 +62,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -71,7 +80,7 @@ jobs:
 
       - name: Generate npm packages
         env:
-          TSGOLINT_BUILD_NUMBER: ${{ github.run_number }}
+          TSGOLINT_VERSION: ${{ inputs.version }}
         run: node ./tools/gen-npm-packages.mjs
 
       - name: Publish
@@ -83,3 +92,10 @@ jobs:
             npm publish --provenance --access public
             popd
           done
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
+        with:
+          draft: false
+          tag_name: ${{ inputs.version }}
+          generate_release_notes: true

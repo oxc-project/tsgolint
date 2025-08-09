@@ -6,6 +6,8 @@ import path from 'node:path'
 import assert from 'node:assert/strict'
 import process from 'node:process'
 
+const npmPackageVersion = requiredEnvVar('TSGOLINT_VERSION')
+
 const NPM_ORG = `oxlint-tsgolint`
 
 const GOOS2PROCESS_PLATFORM = {
@@ -29,12 +31,6 @@ const binariesMatrix = Object.entries(GOOS2PROCESS_PLATFORM).flatMap(
       npmPackageName: `@${NPM_ORG}/${platform}-${arch}`,
     })),
 )
-
-const BUILD_NUMBER = requiredEnvVar('TSGOLINT_BUILD_NUMBER')
-
-const BUILD_DATE = new Date().toISOString().slice(0, 10).replaceAll('-', '')
-
-const npmPackageVersion = `0.0.0-${BUILD_NUMBER}+${BUILD_DATE}`
 
 const commonPackageJson = {
   version: npmPackageVersion,
