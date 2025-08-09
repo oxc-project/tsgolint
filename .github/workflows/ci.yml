@@ -38,3 +38,5 @@ jobs:
           popd
 
       - run: go test ./internal/...
+
+      - run: ./test.sh
