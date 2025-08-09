@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"runtime"
 	"slices"
 	"sync"
@@ -15,10 +16,12 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 type headlessConfigForFile struct {
@@ -100,6 +103,30 @@ func writeErrorMessage(text string) error {
 	})
 }
 
+// findTsConfigForFile walks up the directory tree to find the appropriate tsconfig.json
+func findTsConfigForFile(filePath, cwd string, fs bundled.FS) string {
+	dir := filepath.Dir(filePath)
+	for {
+		tsconfigPath := filepath.Join(dir, "tsconfig.json")
+		if fs.FileExists(tsconfigPath) {
+			return tsconfigPath
+		}
+
+		parent := filepath.Dir(dir)
+		if parent == dir || parent == "." || parent == "/" {
+			// Reached root, return default tsconfig in cwd
+			defaultTsconfig := filepath.Join(cwd, "tsconfig.json")
+			if fs.FileExists(defaultTsconfig) {
+				return defaultTsconfig
+			}
+			// Return a path for the default config even if it doesn't exist
+			// (CreateProgram will handle this case)
+			return defaultTsconfig
+		}
+		dir = parent
+	}
+}
+
 func runHeadless(args []string) int {
 	var (
 		traceOut   string
@@ -127,10 +154,9 @@ func runHeadless(args []string) int {
 		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
 		return 1
 	}
+	cwd = tspath.NormalizePath(cwd)
 
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
-
-	service := newProjectService(fs, cwd)
 
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -145,25 +171,74 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
+	// Group files by their tsconfig.json to minimize program creation
+	tsconfigToFiles := make(map[string][]headlessConfigForFile)
+	for _, fileConfig := range config.Files {
+		absPath, err := filepath.Abs(fileConfig.FilePath)
+		if err != nil {
+			writeErrorMessage(fmt.Sprintf("error resolving absolute path for %v: %v", fileConfig.FilePath, err))
+			return 1
+		}
+
+		tsconfigPath := findTsConfigForFile(absPath, cwd, fs)
+		tsconfigToFiles[tsconfigPath] = append(tsconfigToFiles[tsconfigPath], fileConfig)
+	}
+
 	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{}
-	for _, fileConfig := range config.Files {
-		source, err := os.ReadFile(fileConfig.FilePath)
-		if err != nil {
-			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
-			return 1
-		}
-		service.OpenFile(fileConfig.FilePath, string(source), core.GetScriptKindFromFileName(fileConfig.FilePath), "")
-		_, project := service.EnsureDefaultProjectForFile(fileConfig.FilePath)
-		program := project.GetProgram()
-		file := program.GetSourceFile(fileConfig.FilePath)
-		if file == nil {
-			writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", fileConfig.FilePath))
-			return 1
-		}
-		fileConfigs[file] = fileConfig
 
-		workload[program] = append(workload[program], file)
+	// Create one program per tsconfig.json
+	for tsconfigPath, filesForTsconfig := range tsconfigToFiles {
+		currentDirectory := tspath.GetDirectoryPath(tsconfigPath)
+
+		// Create overlay VFS with file contents
+		overlayFiles := make(map[string]string)
+		for _, fileConfig := range filesForTsconfig {
+			source, err := os.ReadFile(fileConfig.FilePath)
+			if err != nil {
+				writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
+				return 1
+			}
+			overlayFiles[fileConfig.FilePath] = string(source)
+		}
+
+		// If tsconfig doesn't exist, create a default one
+		if !fs.FileExists(tsconfigPath) {
+			overlayFiles[tsconfigPath] = "{}"
+		}
+
+		overlayFS := utils.NewOverlayVFS(fs, overlayFiles)
+		host := utils.CreateCompilerHost(currentDirectory, overlayFS)
+
+		// Create program using the same approach as main.go
+		program, err := utils.CreateProgram(false, overlayFS, currentDirectory, tsconfigPath, host)
+		if err != nil {
+			writeErrorMessage(fmt.Sprintf("error creating TS program for %v: %v", tsconfigPath, err))
+			return 1
+		}
+
+		// Map each requested file to its source file in the program
+		for _, fileConfig := range filesForTsconfig {
+			file := program.GetSourceFile(fileConfig.FilePath)
+			if file == nil {
+				// Try to find by normalized path
+				normalizedPath := tspath.NormalizePath(fileConfig.FilePath)
+				for _, sourceFile := range program.SourceFiles() {
+					if tspath.NormalizePath(sourceFile.FileName()) == normalizedPath {
+						file = sourceFile
+						break
+					}
+				}
+			}
+
+			if file == nil {
+				writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig %v", fileConfig.FilePath, tsconfigPath))
+				return 1
+			}
+
+			fileConfigs[file] = fileConfig
+			workload[program] = append(workload[program], file)
+		}
 	}
 
 	for _, files := range workload {
