@@ -36,5 +36,6 @@ jobs:
           popd
 
       - run: go test ./internal/...
-
-      - run: ./test.sh
+      - run: |
+          go build -o tsgolint ./cmd/tsgolint
+          ./test.sh
