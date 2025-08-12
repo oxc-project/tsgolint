@@ -212,7 +212,7 @@ func TestUnboundMethodRule(t *testing.T) {
 			"ContainsMethods.boundStatic /= 1;",
 
 			"ContainsMethods.boundStatic || 0;",
-			"instane.boundStatic && 0;",
+			"instance.boundStatic && 0;",
 
 			"ContainsMethods.boundStatic ? 1 : 0;",
 			"ContainsMethods.unboundStatic ? 1 : 0;",
