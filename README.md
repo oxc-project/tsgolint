@@ -64,6 +64,22 @@ cd ..
 go build -o tsgolint ./cmd/tsgolint
 ```
 
+## Development
+
+### Linting
+
+This project uses [golangci-lint](https://golangci-lint.run/) to ensure code quality. To run the linter:
+
+```bash
+# Using just
+just lint
+
+# Or directly
+golangci-lint run --timeout=5m
+```
+
+The linting configuration is in `.golangci.yml` and runs automatically in CI.
+
 ## Implemented rules
 
 | Name                                                                                                                | Status |

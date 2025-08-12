@@ -1,0 +1,76 @@
+# yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
+
+version: '2'
+
+run:
+  allow-parallel-runners: true
+
+linters:
+  default: none
+  enable:
+    # Enabled
+    - asasalint
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - copyloopvar
+    - customlint
+    - depguard
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - fatcontext
+    - gocheckcompilerdirectives
+    - goprintffuncname
+    - govet
+    - grouper
+    - inamedparam
+    - ineffassign
+    - intrange
+    - makezero
+    - mirror
+    - misspell
+    - musttag
+    - nakedret
+    - nolintlint
+    - paralleltest
+    - perfsprint
+    - predeclared
+    - reassign
+    - testableexamples
+    - tparallel
+    - unconvert
+    - usestdlibvars
+    - usetesting
+    - goheader
+    - exhaustive
+    - gocritic
+    - gosec
+    - revive
+    - staticcheck
+    - testifylint
+    - unparam
+    - unused
+
+  settings:
+    custom:
+      customlint:
+        type: module
+
+    depguard:
+      rules:
+        main:
+          deny:
+            - pkg: 'encoding/json$'
+              desc: 'Use "github.com/go-json-experiment/json" instead.'
+
+  exclusions:
+    presets:
+      - comments
+      - std-error-handling
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
