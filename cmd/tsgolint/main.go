@@ -19,6 +19,12 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
+	
+	// Go linter imports
+	"github.com/typescript-eslint/tsgolint/internal/golinter"
+	"github.com/typescript-eslint/tsgolint/internal/gorule"
+	"github.com/typescript-eslint/tsgolint/internal/gorules/no_unused_vars"
+	"github.com/typescript-eslint/tsgolint/internal/gorules/inefficient_string_concat"
 
 	"github.com/typescript-eslint/tsgolint/internal/rules/await_thenable"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_array_delete"
@@ -144,11 +150,20 @@ var allRules = []rule.Rule{
 	use_unknown_in_catch_callback_variable.UseUnknownInCatchCallbackVariableRule,
 }
 
+var allGoRules = []gorule.GoRule{
+	no_unused_vars.NoUnusedVarsRule,
+	inefficient_string_concat.InefficientStringConcatRule,
+}
+
 var allRulesByName = make(map[string]rule.Rule, len(allRules))
+var allGoRulesByName = make(map[string]gorule.GoRule, len(allGoRules))
 
 func init() {
 	for _, rule := range allRules {
 		allRulesByName[rule.Name] = rule
+	}
+	for _, rule := range allGoRules {
+		allGoRulesByName[rule.Name] = rule
 	}
 }
 
@@ -290,14 +305,26 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	w.WriteString("  \x1b[2m╰────────────────────────────────\x1b[0m\n\n")
 }
 
-const usage = `✨ tsgolint - speedy TypeScript linter
+func printGoDiagnostic(d gorule.GoRuleDiagnostic, w *bufio.Writer) {
+	w.Write([]byte{' ', 0x1b, '[', '7', 'm', 0x1b, '[', '1', 'm', 0x1b, '[', '3', '8', ';', '5', ';', '3', '7', 'm', ' '})
+	w.WriteString(d.RuleName)
+	w.WriteString(" \x1b[0m — ")
+	w.WriteString(d.Message.Description)
+	w.WriteString("\n  \x1b[2m╭─┴──────────(\x1b[0m \x1b[3m\x1b[38;5;117m")
+	w.WriteString(d.FileName)
+	w.WriteString("\x1b[0m \x1b[2m)─────\x1b[0m\n")
+	w.WriteString("  \x1b[2m╰────────────────────────────────\x1b[0m\n\n")
+}
+
+const usage = `✨ tsgolint - speedy TypeScript and Go linter
 
 Usage:
     tsgolint [OPTIONS]
 
 Options:
     --tsconfig PATH   Which tsconfig to use. Defaults to tsconfig.json.
-		--list-files      List matched files
+    --go              Enable Go linting alongside TypeScript linting.
+    --list-files      List matched files
     -h, --help        Show help
 `
 
@@ -312,6 +339,7 @@ func runMain() int {
 		help      bool
 		tsconfig  string
 		listFiles bool
+		enableGo  bool
 
 		traceOut       string
 		cpuprofOut     string
@@ -320,6 +348,7 @@ func runMain() int {
 
 	flag.StringVar(&tsconfig, "tsconfig", "", "which tsconfig to use")
 	flag.BoolVar(&listFiles, "list-files", false, "list matched files")
+	flag.BoolVar(&enableGo, "go", false, "enable Go linting")
 	flag.BoolVar(&help, "help", false, "show help")
 	flag.BoolVar(&help, "h", false, "show help")
 
@@ -414,18 +443,22 @@ func runMain() int {
 	})
 
 	var wg sync.WaitGroup
-
+	var tsErrorsCount, goErrorsCount int
+	
+	// Channel for TypeScript diagnostics
 	diagnosticsChan := make(chan rule.RuleDiagnostic, 4096)
-	errorsCount := 0
+	// Channel for Go diagnostics  
+	goDiagnosticsChan := make(chan gorule.GoRuleDiagnostic, 4096)
 
+	// Handle TypeScript diagnostics
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
 		for d := range diagnosticsChan {
-			errorsCount++
-			if errorsCount == 1 {
+			tsErrorsCount++
+			if tsErrorsCount == 1 && goErrorsCount == 0 {
 				w.WriteByte('\n')
 			}
 			printDiagnostic(d, w, comparePathOptions)
@@ -435,6 +468,27 @@ func runMain() int {
 		}
 	}()
 
+	// Handle Go diagnostics (if Go linting is enabled)
+	if enableGo {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			w := bufio.NewWriterSize(os.Stdout, 4096*100)
+			defer w.Flush()
+			for d := range goDiagnosticsChan {
+				goErrorsCount++
+				if goErrorsCount == 1 && tsErrorsCount == 0 {
+					w.WriteByte('\n')
+				}
+				printGoDiagnostic(d, w)
+				if w.Available() < 4096 {
+					w.Flush()
+				}
+			}
+		}()
+	}
+
+	// Run TypeScript linter
 	err = linter.RunLinter(
 		linter.Workload{
 			program: files,
@@ -457,41 +511,93 @@ func runMain() int {
 
 	close(diagnosticsChan)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error running linter: %v\n", err)
+		fmt.Fprintf(os.Stderr, "error running TypeScript linter: %v\n", err)
 		return 1
+	}
+
+	// Run Go linter if enabled
+	var goFiles []golinter.GoFile
+	if enableGo {
+		goFiles, err = golinter.ParseGoFiles(currentDirectory)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error parsing Go files: %v\n", err)
+			return 1
+		}
+
+		if listFiles {
+			for _, file := range goFiles {
+				fmt.Printf("Found Go file: %s\n", file.Path)
+			}
+		}
+
+		err = golinter.RunGoLinter(
+			goFiles,
+			func(file golinter.GoFile) []golinter.ConfiguredGoRule {
+				var rules []golinter.ConfiguredGoRule
+				for _, r := range allGoRules {
+					ruleName := r.Name // Capture rule name
+					rules = append(rules, golinter.ConfiguredGoRule{
+						Name: ruleName,
+						Run: func(ctx gorule.GoRuleContext) gorule.GoRuleListeners {
+							return r.Run(ctx, nil)
+						},
+					})
+				}
+				return rules
+			},
+			func(d gorule.GoRuleDiagnostic) {
+				goDiagnosticsChan <- d
+			},
+		)
+
+		close(goDiagnosticsChan)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error running Go linter: %v\n", err)
+			return 1
+		}
+	} else {
+		close(goDiagnosticsChan)
 	}
 
 	wg.Wait()
 
+	totalErrors := tsErrorsCount + goErrorsCount
 	errorsColor := "\x1b[1m"
-	if errorsCount == 0 {
+	if totalErrors == 0 {
 		errorsColor = "\x1b[1;32m"
 	}
 	errorsText := "errors"
-	if errorsCount == 1 {
+	if totalErrors == 1 {
 		errorsText = "error"
 	}
 	filesText := "files"
-	if len(files) == 1 {
+	totalFiles := len(files) + len(goFiles)
+	if totalFiles == 1 {
 		filesText = "file"
 	}
+	
+	totalRules := len(allRules)
+	if enableGo {
+		totalRules += len(allGoRules)
+	}
 	rulesText := "rules"
-	if len(allRules) == 1 {
+	if totalRules == 1 {
 		rulesText = "rule"
 	}
 	threadsCount := 1
 	if !singleThreaded {
 		threadsCount = runtime.GOMAXPROCS(0)
 	}
+	
 	fmt.Fprintf(
 		os.Stdout,
 		"Found %v%v\x1b[0m %v \x1b[2m(linted \x1b[1m%v\x1b[22m\x1b[2m %v with \x1b[1m%v\x1b[22m\x1b[2m %v in \x1b[1m%v\x1b[22m\x1b[2m using \x1b[1m%v\x1b[22m\x1b[2m threads)\n",
 		errorsColor,
-		errorsCount,
+		totalErrors,
 		errorsText,
-		len(files),
+		totalFiles,
 		filesText,
-		len(allRules),
+		totalRules,
 		rulesText,
 		time.Since(timeBefore).Round(time.Millisecond),
 		threadsCount,
