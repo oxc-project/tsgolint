@@ -1,6 +1,6 @@
 # ✨ tsgolint ✨
 
-**tsgolint** is a TypeScript linter containing only type-aware rules, powered by [typescript-go](https://github.com/microsoft/typescript-go) adapted for [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+**tsgolint** is a TypeScript and Go linter containing only type-aware rules for TypeScript and efficient rules for Go, powered by [typescript-go](https://github.com/microsoft/typescript-go) adapted for [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
 
 This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint). Fork permission is granted by @auvred.
 
@@ -18,6 +18,7 @@ This project originated in [typescript-eslint/tsgolint](https://github.com/types
 - Lint rules tester
 - Source code fixer
 - 40 [type-aware](https://typescript-eslint.io/blog/typed-linting) typescript-eslint's rules
+- **Go linter with performance-focused rules**
 - Basic `tsgolint` CLI
 
 Try running
@@ -28,6 +29,21 @@ npx oxlint-tsgolint --help
 
 to see available options.
 
+### Go Linting
+
+**tsgolint** now includes Go linting capabilities alongside TypeScript linting. Enable Go linting with the `--go` flag:
+
+```shell
+./tsgolint --go
+```
+
+#### Implemented Go Rules
+
+| Name                                                                                              | Status |
+| ------------------------------------------------------------------------------------------------- | ------ |
+| no-unused-vars                                                                                     | ✅     |
+| inefficient-string-concat                                                                          | ✅     |
+
 ### Speedup over ESLint
 
 **tsgolint** is **20-40 times faster** than ESLint + typescript-eslint.
@@ -37,6 +53,7 @@ Most of the speedup is due to the following facts:
 - Native speed parsing and type-checking (thanks to [typescript-go](https://github.com/microsoft/typescript-go))
 - No more [TS AST -> ESTree AST](https://typescript-eslint.io/blog/asts-and-typescript-eslint/#ast-formats) conversions. TS AST is directly used in rules.
 - Parallel parsing, type checking and linting. **tsgolint** uses all available CPU cores.
+- For Go files: Direct use of Go's standard library AST parsing for maximum efficiency.
 
 See [benchmarks](./benchmarks/README.md) for more info.
 
