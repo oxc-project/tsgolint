@@ -198,11 +198,11 @@ func main() {
 					if len(typeParams) > 0 {
 						// (*typeWriter)typeList
 						shimBuilder.WriteByte('[')
-						for i, typ := range typeParams {
+						for i, ty := range typeParams {
 							if i > 0 {
 								shimBuilder.WriteByte(',')
 							}
-							shimBuilder.WriteString(typ.String())
+							shimBuilder.WriteString(ty.String())
 						}
 						shimBuilder.WriteByte(']')
 					}

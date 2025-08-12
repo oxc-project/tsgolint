@@ -25,7 +25,7 @@ func buildPredicateMessage() rule.RuleMessage {
 func buildSpreadMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "spread",
-		Description: "Expected a non-Promise value to be spreaded in an object.",
+		Description: "Expected a non-Promise value to be spread in an object.",
 	}
 }
 func buildVoidReturnArgumentMessage() rule.RuleMessage {

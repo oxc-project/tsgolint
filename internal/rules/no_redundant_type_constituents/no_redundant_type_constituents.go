@@ -318,10 +318,10 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				checkLiteralTypeOverridesPrimitive(seenStringLiteralTypes, seenStringPrimitiveTypes, "string")
 			},
 			ast.KindUnionType: func(node *ast.Node) {
-				overridenBigIntTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
-				overridenBooleanTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
-				overridenNumberTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
-				overridenStringTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
+				overriddenBigIntTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
+				overriddenBooleanTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
+				overriddenNumberTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
+				overriddenStringTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
 
 				seenPrimitiveTypeFlags := checker.TypeFlagsNone
 
@@ -364,13 +364,13 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						// upsert the literal text and primitive type under the backing type node
 						switch typePart.flags {
 						case checker.TypeFlagsBigIntLiteral:
-							overridenBigIntTypeNodes[typeNode] = append(overridenBigIntTypeNodes[typeNode], typePart)
+							overriddenBigIntTypeNodes[typeNode] = append(overriddenBigIntTypeNodes[typeNode], typePart)
 						case checker.TypeFlagsBooleanLiteral:
-							overridenBooleanTypeNodes[typeNode] = append(overridenBooleanTypeNodes[typeNode], typePart)
+							overriddenBooleanTypeNodes[typeNode] = append(overriddenBooleanTypeNodes[typeNode], typePart)
 						case checker.TypeFlagsNumberLiteral:
-							overridenNumberTypeNodes[typeNode] = append(overridenNumberTypeNodes[typeNode], typePart)
+							overriddenNumberTypeNodes[typeNode] = append(overriddenNumberTypeNodes[typeNode], typePart)
 						case checker.TypeFlagsStringLiteral, checker.TypeFlagsTemplateLiteral:
-							overridenStringTypeNodes[typeNode] = append(overridenStringTypeNodes[typeNode], typePart)
+							overriddenStringTypeNodes[typeNode] = append(overriddenStringTypeNodes[typeNode], typePart)
 						}
 
 						seenPrimitiveTypeFlags |= typePart.flags & (checker.TypeFlagsBigInt | checker.TypeFlagsBoolean | checker.TypeFlagsNumber | checker.TypeFlagsString)
@@ -381,12 +381,12 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				// group those literals by their primitive type,
 				// then report each primitive type with all its literals
 
-				checkOverridenTypes := func(primitiveFlag checker.TypeFlags, overridenNodes map[*ast.Node][]typeFlagsWithNodeOrType, primitiveName string) {
+				checkOverriddenTypes := func(primitiveFlag checker.TypeFlags, overriddenNodes map[*ast.Node][]typeFlagsWithNodeOrType, primitiveName string) {
 					if seenPrimitiveTypeFlags&primitiveFlag == 0 {
 						return
 					}
 
-					for typeNode, typeFlags := range overridenNodes {
+					for typeNode, typeFlags := range overriddenNodes {
 						ctx.ReportNode(typeNode, buildLiteralOverriddenMessage(strings.Join(utils.Map(typeFlags, func(t typeFlagsWithNodeOrType) string {
 							return t.ToString(ctx.TypeChecker)
 						}), " | "), primitiveName))
@@ -394,10 +394,10 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 					}
 				}
 
-				checkOverridenTypes(checker.TypeFlagsBigInt, overridenBigIntTypeNodes, "bigint")
-				checkOverridenTypes(checker.TypeFlagsBoolean, overridenBooleanTypeNodes, "boolean")
-				checkOverridenTypes(checker.TypeFlagsNumber, overridenNumberTypeNodes, "number")
-				checkOverridenTypes(checker.TypeFlagsString, overridenStringTypeNodes, "string")
+				checkOverriddenTypes(checker.TypeFlagsBigInt, overriddenBigIntTypeNodes, "bigint")
+				checkOverriddenTypes(checker.TypeFlagsBoolean, overriddenBooleanTypeNodes, "boolean")
+				checkOverriddenTypes(checker.TypeFlagsNumber, overriddenNumberTypeNodes, "number")
+				checkOverriddenTypes(checker.TypeFlagsString, overriddenStringTypeNodes, "string")
 			},
 		}
 	},

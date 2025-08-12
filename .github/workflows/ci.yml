@@ -31,6 +31,7 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions"
+
       - name: Apply typescript-go patches
         run: |
           pushd typescript-go
@@ -38,6 +39,16 @@ jobs:
           popd
 
       - run: go test ./internal/...
+
       - run: |
           go build -o tsgolint ./cmd/tsgolint
           ./test.sh
+
+  typos:
+    name: Typos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: taiki-e/checkout-action@b13d20b7cda4e2f325ef19895128f7ff735c0b3d # v1.3.1
+      - uses: crate-ci/typos@52bd719c2c91f9d676e2aa359fc8e0db8925e6d8 # v1.35.3
+        with:
+          files: .

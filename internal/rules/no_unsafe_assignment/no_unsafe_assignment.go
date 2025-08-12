@@ -365,7 +365,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 		}
 
 		return rule.RuleListeners{
-			// ESTree PropertyDefintion, AccessorProperty
+			// ESTree PropertyDefinition, AccessorProperty
 			ast.KindPropertyDeclaration: func(node *ast.Node) {
 				initializer := node.Initializer()
 				if initializer == nil {

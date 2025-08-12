@@ -140,7 +140,7 @@ if (returnsPromise?.call()) {
     `},
 		{Code: "Promise.resolve() ?? false;"},
 		{Code: `
-function test(a: Promise<void> | undefinded) {
+function test(a: Promise<void> | undefined) {
   const foo = a ?? Promise.reject();
 }
     `},
