@@ -26,6 +26,7 @@ type BindingElementList = ast.BindingElementList
 type BindingElementNode = ast.BindingElementNode
 type BindingName = ast.BindingName
 type BindingPattern = ast.BindingPattern
+type BindingPatternNode = ast.BindingPatternNode
 type Block = ast.Block
 type BlockNode = ast.BlockNode
 type BlockOrExpression = ast.BlockOrExpression
@@ -682,10 +683,10 @@ func IsIntersectionTypeNode(node *ast.Node) bool
 func IsIterationStatement(node *ast.Node, lookInLabeledStatements bool) bool
 //go:linkname IsJSDocAugmentsTag github.com/microsoft/typescript-go/internal/ast.IsJSDocAugmentsTag
 func IsJSDocAugmentsTag(node *ast.Node) bool
-//go:linkname IsJSDocCommentContainingNode github.com/microsoft/typescript-go/internal/ast.IsJSDocCommentContainingNode
-func IsJSDocCommentContainingNode(node *ast.Node) bool
 //go:linkname IsJSDocDeprecatedTag github.com/microsoft/typescript-go/internal/ast.IsJSDocDeprecatedTag
 func IsJSDocDeprecatedTag(node *ast.Node) bool
+//go:linkname IsJSDocImplementsTag github.com/microsoft/typescript-go/internal/ast.IsJSDocImplementsTag
+func IsJSDocImplementsTag(node *ast.Node) bool
 //go:linkname IsJSDocImportTag github.com/microsoft/typescript-go/internal/ast.IsJSDocImportTag
 func IsJSDocImportTag(node *ast.Node) bool
 //go:linkname IsJSDocKind github.com/microsoft/typescript-go/internal/ast.IsJSDocKind
@@ -698,14 +699,20 @@ func IsJSDocNode(node *ast.Node) bool
 func IsJSDocNonNullableType(node *ast.Node) bool
 //go:linkname IsJSDocNullableType github.com/microsoft/typescript-go/internal/ast.IsJSDocNullableType
 func IsJSDocNullableType(node *ast.Node) bool
+//go:linkname IsJSDocParameterTag github.com/microsoft/typescript-go/internal/ast.IsJSDocParameterTag
+func IsJSDocParameterTag(node *ast.Node) bool
 //go:linkname IsJSDocReturnTag github.com/microsoft/typescript-go/internal/ast.IsJSDocReturnTag
 func IsJSDocReturnTag(node *ast.Node) bool
 //go:linkname IsJSDocSingleCommentNode github.com/microsoft/typescript-go/internal/ast.IsJSDocSingleCommentNode
 func IsJSDocSingleCommentNode(node *ast.Node) bool
+//go:linkname IsJSDocSingleCommentNodeComment github.com/microsoft/typescript-go/internal/ast.IsJSDocSingleCommentNodeComment
+func IsJSDocSingleCommentNodeComment(node *ast.Node) bool
 //go:linkname IsJSDocSingleCommentNodeList github.com/microsoft/typescript-go/internal/ast.IsJSDocSingleCommentNodeList
-func IsJSDocSingleCommentNodeList(parent *ast.Node, nodeList *ast.NodeList) bool
+func IsJSDocSingleCommentNodeList(nodeList *ast.NodeList) bool
 //go:linkname IsJSDocTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTag
 func IsJSDocTag(node *ast.Node) bool
+//go:linkname IsJSDocTemplateTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTemplateTag
+func IsJSDocTemplateTag(n *ast.Node) bool
 //go:linkname IsJSDocTypeTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTypeTag
 func IsJSDocTypeTag(node *ast.Node) bool
 //go:linkname IsJSDocUnknownTag github.com/microsoft/typescript-go/internal/ast.IsJSDocUnknownTag
@@ -1100,6 +1107,7 @@ type JSDocLink = ast.JSDocLink
 type JSDocLinkCode = ast.JSDocLinkCode
 type JSDocLinkPlain = ast.JSDocLinkPlain
 type JSDocNameReference = ast.JSDocNameReference
+type JSDocNode = ast.JSDocNode
 type JSDocNonNullableType = ast.JSDocNonNullableType
 type JSDocNullableType = ast.JSDocNullableType
 type JSDocOptionalType = ast.JSDocOptionalType
