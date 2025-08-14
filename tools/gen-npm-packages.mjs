@@ -69,7 +69,7 @@ await Promise.all([
               preferUnplugged: true,
               files: [binaryName],
               os: [platform],
-              arch: [arch],
+              cpu: [arch],
             },
             null,
             2,
