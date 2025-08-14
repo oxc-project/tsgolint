@@ -11,4 +11,5 @@ build:
   go build -o tsgolint ./cmd/tsgolint
 
 test:
+  ./test.sh
   go test ./internal/...
