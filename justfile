@@ -13,3 +13,4 @@ build:
 test:
   ./test.sh
   go test ./internal/...
+  ./test-snapshot.sh

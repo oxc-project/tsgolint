@@ -108,3 +108,34 @@ go build -o tsgolint ./cmd/tsgolint
 | [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)                       | ✅     |
 | [unbound-method](https://typescript-eslint.io/rules/unbound-method)                                                 | ✅     |
 | [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable) | ✅     |
+
+## Testing
+
+**tsgolint** includes several types of tests to ensure correctness:
+
+### Unit Tests
+Run Go unit tests for individual rules:
+```shell
+go test ./internal/...
+```
+
+### Integration Tests
+- `./test.sh` - Basic integration test using only `no-floating-promises` rule
+- `./test-snapshot.sh` - End-to-end snapshot test running all 40+ rules
+
+### End-to-End Snapshot Testing
+The snapshot test (`./test-snapshot.sh`) provides comprehensive end-to-end validation:
+- Runs **all** tsgolint rules on all fixture files 
+- Captures diagnostic output in deterministic, sortable format
+- Verifies output matches expected snapshot
+
+#### Usage:
+```shell
+# Run snapshot test (verify current output matches snapshot)
+./test-snapshot.sh
+
+# Update snapshot with current output  
+./test-snapshot.sh --update
+```
+
+The snapshot test uses `GOMAXPROCS=1` to ensure deterministic output ordering, as diagnostics may vary between runs due to parallel processing.
