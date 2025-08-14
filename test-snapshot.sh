@@ -16,69 +16,87 @@ EOF
 echo "Running tsgolint with all rules..."
 
 # Generate the config and run tsgolint in single-threaded mode for deterministic results
-DIAGNOSTICS=$(find "$SCRIPT_DIR/fixtures" -type f -not -name "*.json" | xargs realpath | jq -Rn --argjson rules "$RULES" '{files: [inputs | {file_path: ., rules: $rules}]}' | GOMAXPROCS=1 ./tsgolint headless | python3 -c "
-import sys
-import json
-import struct
-import os
+DIAGNOSTICS=$(find "$SCRIPT_DIR/fixtures" -type f -not -name "*.json" | xargs realpath | jq -Rn --argjson rules "$RULES" '{files: [inputs | {file_path: ., rules: $rules}]}' | GOMAXPROCS=1 ./tsgolint headless | node -e "
+const fs = require('fs');
 
-def parse_headless_output(data):
-    '''Parse binary headless output to extract JSON diagnostics.'''
-    offset = 0
-    diagnostics = []
+function parseHeadlessOutput(data) {
+    // Parse binary headless output to extract JSON diagnostics
+    let offset = 0;
+    const diagnostics = [];
     
-    while offset < len(data):
-        if offset + 5 > len(data):
-            break
+    while (offset < data.length) {
+        if (offset + 5 > data.length) {
+            break;
+        }
         
-        # Read header: 4 bytes length + 1 byte message type
-        length = struct.unpack('<I', data[offset:offset+4])[0]
-        msg_type = data[offset+4]
-        offset += 5
+        // Read header: 4 bytes length + 1 byte message type
+        const length = data.readUInt32LE(offset);
+        const msgType = data[offset + 4];
+        offset += 5;
         
-        if offset + length > len(data):
-            break
+        if (offset + length > data.length) {
+            break;
+        }
         
-        # Read payload
-        payload = data[offset:offset+length]
-        offset += length
+        // Read payload
+        const payload = data.slice(offset, offset + length);
+        offset += length;
         
-        # Only process diagnostic messages (type 1)
-        if msg_type == 1:
-            try:
-                diagnostic = json.loads(payload.decode('utf-8'))
-                # Make file paths relative to fixtures/ for deterministic snapshots
-                file_path = diagnostic.get('file_path', '')
-                if 'fixtures/' in file_path:
-                    diagnostic['file_path'] = 'fixtures/' + file_path.split('fixtures/', 1)[1]
-                diagnostics.append(diagnostic)
-            except Exception as e:
-                continue
+        // Only process diagnostic messages (type 1)
+        if (msgType === 1) {
+            try {
+                const diagnostic = JSON.parse(payload.toString('utf-8'));
+                // Make file paths relative to fixtures/ for deterministic snapshots
+                const filePath = diagnostic.file_path || '';
+                if (filePath.includes('fixtures/')) {
+                    diagnostic.file_path = 'fixtures/' + filePath.split('fixtures/', 2)[1];
+                }
+                diagnostics.push(diagnostic);
+            } catch (e) {
+                continue;
+            }
+        }
+    }
     
-    return diagnostics
+    return diagnostics;
+}
 
-def sort_diagnostics(diagnostics):
-    '''Sort diagnostics deterministically.'''
-    def sort_key(diag):
-        return (
-            diag.get('file_path', ''),
-            diag.get('rule', ''),
-            diag.get('range', {}).get('pos', 0),
-            diag.get('range', {}).get('end', 0)
-        )
+function sortDiagnostics(diagnostics) {
+    // Sort diagnostics deterministically
+    diagnostics.sort((a, b) => {
+        const aFilePath = a.file_path || '';
+        const bFilePath = b.file_path || '';
+        if (aFilePath !== bFilePath) return aFilePath.localeCompare(bFilePath);
+        
+        const aRule = a.rule || '';
+        const bRule = b.rule || '';
+        if (aRule !== bRule) return aRule.localeCompare(bRule);
+        
+        const aPos = (a.range && a.range.pos) || 0;
+        const bPos = (b.range && b.range.pos) || 0;
+        if (aPos !== bPos) return aPos - bPos;
+        
+        const aEnd = (a.range && a.range.end) || 0;
+        const bEnd = (b.range && b.range.end) || 0;
+        return aEnd - bEnd;
+    });
     
-    diagnostics.sort(key=sort_key)
-    return diagnostics
+    return diagnostics;
+}
 
-# Read binary data from stdin
-data = sys.stdin.buffer.read()
-
-# Parse and sort diagnostics
-diagnostics = parse_headless_output(data)
-diagnostics = sort_diagnostics(diagnostics)
-
-# Output as JSON
-print(json.dumps(diagnostics, indent=2, sort_keys=True))
+// Read binary data from stdin
+const chunks = [];
+process.stdin.on('data', chunk => chunks.push(chunk));
+process.stdin.on('end', () => {
+    const data = Buffer.concat(chunks);
+    
+    // Parse and sort diagnostics
+    let diagnostics = parseHeadlessOutput(data);
+    diagnostics = sortDiagnostics(diagnostics);
+    
+    // Output as JSON
+    console.log(JSON.stringify(diagnostics, null, 2));
+});
 ")
 
 echo "Processing diagnostic output..."
