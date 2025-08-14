@@ -691,6 +691,7 @@ type NotebookDocumentSyncOptions = lsproto.NotebookDocumentSyncOptions
 type NotebookDocumentSyncOptionsOrRegistrationOptions = lsproto.NotebookDocumentSyncOptionsOrRegistrationOptions
 type NotebookDocumentSyncRegistrationOptions = lsproto.NotebookDocumentSyncRegistrationOptions
 type NotificationInfo[Params any] = lsproto.NotificationInfo[Params]
+type Null = lsproto.Null
 type OptionalVersionedTextDocumentIdentifier = lsproto.OptionalVersionedTextDocumentIdentifier
 type ParameterInformation = lsproto.ParameterInformation
 type PartialResultParams = lsproto.PartialResultParams
