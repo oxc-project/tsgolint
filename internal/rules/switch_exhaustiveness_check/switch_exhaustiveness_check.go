@@ -1,7 +1,6 @@
 package switch_exhaustiveness_check
 
 import (
-	"fmt"
 	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -25,7 +24,7 @@ func buildDangerousDefaultCaseMessage() rule.RuleMessage {
 func buildSwitchIsNotExhaustiveMessage(missingBranches string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "switchIsNotExhaustive",
-		Description: fmt.Sprintf("Switch is not exhaustive"), // . Cases not matched: %v", missingBranches),
+		Description: "Switch is not exhaustive",
 	}
 }
 

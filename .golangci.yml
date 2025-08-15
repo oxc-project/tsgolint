@@ -35,7 +35,7 @@ linters:
     - nakedret
     - nolintlint
     # - paralleltest # TODO
-    # - perfsprint # TODO
+    - perfsprint
     - predeclared
     - reassign
     - testableexamples
