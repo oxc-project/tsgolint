@@ -9,9 +9,6 @@
   'git-submodules': {
     "enabled": true,
   },
-  // TODO: add github-actions to gitIgnoredAuthors once this issue is resolved
-  // https://github.com/renovatebot/renovate/issues/30279
-  // gitIgnoredAuthors: ['github-actions[bot]@users.noreply.github.com'],
   packageRules: [
     {
       groupName: "gomod",
@@ -23,14 +20,9 @@
     {
       matchManagers: ['git-submodules'],
       matchDepNames: ['typescript-go'],
-
-      // TODO: enable automerge once this issue is resolved
-      // https://github.com/renovatebot/renovate/issues/30279
-      // automerge: true,
-      // automergeType: 'branch',
-
-      // from 00 to 06 on Monday, Wednesday, and Friday
-      schedule: ['* 0-6 * * 1,3,5'],
+      automerge: true,
+      automergeSchedule: ["at any time"],
+      schedule: ['before 9am'],
     },
   ],
 }
