@@ -107,6 +107,8 @@ type ConstructSignatureDeclaration = ast.ConstructSignatureDeclaration
 type ConstructorDeclaration = ast.ConstructorDeclaration
 type ConstructorDeclarationNode = ast.ConstructorDeclarationNode
 type ConstructorTypeNode = ast.ConstructorTypeNode
+//go:linkname ContainsObjectRestOrSpread github.com/microsoft/typescript-go/internal/ast.ContainsObjectRestOrSpread
+func ContainsObjectRestOrSpread(node *ast.Node) bool
 type ContinueStatement = ast.ContinueStatement
 //go:linkname CreateModifiersFromModifierFlags github.com/microsoft/typescript-go/internal/ast.CreateModifiersFromModifierFlags
 func CreateModifiersFromModifierFlags(flags ast.ModifierFlags, createModifier func(kind ast.Kind) *ast.Node) []*ast.Node
@@ -226,6 +228,8 @@ func GetDeclarationContainer(node *ast.Node) *ast.Node
 func GetDeclarationOfKind(symbol *ast.Symbol, kind ast.Kind) *ast.Node
 //go:linkname GetElementOrPropertyAccessName github.com/microsoft/typescript-go/internal/ast.GetElementOrPropertyAccessName
 func GetElementOrPropertyAccessName(node *ast.Node) *ast.Node
+//go:linkname GetElementsOfBindingOrAssignmentPattern github.com/microsoft/typescript-go/internal/ast.GetElementsOfBindingOrAssignmentPattern
+func GetElementsOfBindingOrAssignmentPattern(name *ast.Node) []*ast.Node
 //go:linkname GetEmitModuleFormatOfFileWorker github.com/microsoft/typescript-go/internal/ast.GetEmitModuleFormatOfFileWorker
 func GetEmitModuleFormatOfFileWorker(fileName string, options *core.CompilerOptions, sourceFileMetaData ast.SourceFileMetaData) core.ModuleKind
 //go:linkname GetEnclosingBlockScopeContainer github.com/microsoft/typescript-go/internal/ast.GetEnclosingBlockScopeContainer
@@ -302,6 +306,8 @@ func GetPragmaArgument(pragma *ast.Pragma, name string) string
 func GetPragmaFromSourceFile(file *ast.SourceFile, name string) *ast.Pragma
 //go:linkname GetPropertyNameForPropertyNameNode github.com/microsoft/typescript-go/internal/ast.GetPropertyNameForPropertyNameNode
 func GetPropertyNameForPropertyNameNode(name *ast.Node) string
+//go:linkname GetRestIndicatorOfBindingOrAssignmentElement github.com/microsoft/typescript-go/internal/ast.GetRestIndicatorOfBindingOrAssignmentElement
+func GetRestIndicatorOfBindingOrAssignmentElement(bindingElement *ast.Node) *ast.Node
 //go:linkname GetRightMostAssignedExpression github.com/microsoft/typescript-go/internal/ast.GetRightMostAssignedExpression
 func GetRightMostAssignedExpression(node *ast.Node) *ast.Node
 //go:linkname GetRootDeclaration github.com/microsoft/typescript-go/internal/ast.GetRootDeclaration
@@ -322,6 +328,8 @@ func GetSuperContainer(node *ast.Node, stopOnFunctions bool) *ast.Node
 func GetSymbolId(symbol *ast.Symbol) ast.SymbolId
 //go:linkname GetSymbolTable github.com/microsoft/typescript-go/internal/ast.GetSymbolTable
 func GetSymbolTable(data *ast.SymbolTable) ast.SymbolTable
+//go:linkname GetTargetOfBindingOrAssignmentElement github.com/microsoft/typescript-go/internal/ast.GetTargetOfBindingOrAssignmentElement
+func GetTargetOfBindingOrAssignmentElement(bindingElement *ast.Node) *ast.Node
 //go:linkname GetTextOfPropertyName github.com/microsoft/typescript-go/internal/ast.GetTextOfPropertyName
 func GetTextOfPropertyName(name *ast.Node) string
 //go:linkname GetThisContainer github.com/microsoft/typescript-go/internal/ast.GetThisContainer
@@ -425,6 +433,8 @@ func IsAssertionExpression(node *ast.Node) bool
 func IsAssignmentExpression(node *ast.Node, excludeCompoundAssignment bool) bool
 //go:linkname IsAssignmentOperator github.com/microsoft/typescript-go/internal/ast.IsAssignmentOperator
 func IsAssignmentOperator(token ast.Kind) bool
+//go:linkname IsAssignmentPattern github.com/microsoft/typescript-go/internal/ast.IsAssignmentPattern
+func IsAssignmentPattern(node *ast.Node) bool
 //go:linkname IsAssignmentTarget github.com/microsoft/typescript-go/internal/ast.IsAssignmentTarget
 func IsAssignmentTarget(node *ast.Node) bool
 //go:linkname IsAutoAccessorPropertyDeclaration github.com/microsoft/typescript-go/internal/ast.IsAutoAccessorPropertyDeclaration
@@ -515,6 +525,8 @@ func IsConstructorTypeNode(node *ast.Node) bool
 func IsContextualKeyword(token ast.Kind) bool
 //go:linkname IsDeclaration github.com/microsoft/typescript-go/internal/ast.IsDeclaration
 func IsDeclaration(node *ast.Node) bool
+//go:linkname IsDeclarationBindingElement github.com/microsoft/typescript-go/internal/ast.IsDeclarationBindingElement
+func IsDeclarationBindingElement(bindingElement *ast.Node) bool
 //go:linkname IsDeclarationName github.com/microsoft/typescript-go/internal/ast.IsDeclarationName
 func IsDeclarationName(name *ast.Node) bool
 //go:linkname IsDeclarationNameOrImportPropertyName github.com/microsoft/typescript-go/internal/ast.IsDeclarationNameOrImportPropertyName
@@ -541,6 +553,10 @@ func IsEffectiveExternalModule(node *ast.SourceFile, compilerOptions *core.Compi
 func IsElementAccessExpression(node *ast.Node) bool
 //go:linkname IsEmittableImport github.com/microsoft/typescript-go/internal/ast.IsEmittableImport
 func IsEmittableImport(node *ast.Node) bool
+//go:linkname IsEmptyArrayLiteral github.com/microsoft/typescript-go/internal/ast.IsEmptyArrayLiteral
+func IsEmptyArrayLiteral(expression *ast.Node) bool
+//go:linkname IsEmptyObjectLiteral github.com/microsoft/typescript-go/internal/ast.IsEmptyObjectLiteral
+func IsEmptyObjectLiteral(expression *ast.Node) bool
 //go:linkname IsEmptyStatement github.com/microsoft/typescript-go/internal/ast.IsEmptyStatement
 func IsEmptyStatement(node *ast.Node) bool
 //go:linkname IsEntityName github.com/microsoft/typescript-go/internal/ast.IsEntityName
@@ -1889,7 +1905,7 @@ const SubtreeContainsMissingCatchClauseVariable = ast.SubtreeContainsMissingCatc
 const SubtreeContainsNullishCoalescing = ast.SubtreeContainsNullishCoalescing
 const SubtreeContainsObjectRestOrSpread = ast.SubtreeContainsObjectRestOrSpread
 const SubtreeContainsOptionalChaining = ast.SubtreeContainsOptionalChaining
-const SubtreeContainsRest = ast.SubtreeContainsRest
+const SubtreeContainsRestOrSpread = ast.SubtreeContainsRestOrSpread
 const SubtreeContainsTypeScript = ast.SubtreeContainsTypeScript
 const SubtreeContainsUsing = ast.SubtreeContainsUsing
 const SubtreeExclusionsAccessor = ast.SubtreeExclusionsAccessor
@@ -2049,6 +2065,8 @@ type TokenNode = ast.TokenNode
 func TryGetClassExtendingExpressionWithTypeArguments(node *ast.Node) *ast.ClassLikeDeclaration
 //go:linkname TryGetClassImplementingOrExtendingExpressionWithTypeArguments github.com/microsoft/typescript-go/internal/ast.TryGetClassImplementingOrExtendingExpressionWithTypeArguments
 func TryGetClassImplementingOrExtendingExpressionWithTypeArguments(node *ast.Node) (class *ast.ClassLikeDeclaration, isImplements bool)
+//go:linkname TryGetPropertyNameOfBindingOrAssignmentElement github.com/microsoft/typescript-go/internal/ast.TryGetPropertyNameOfBindingOrAssignmentElement
+func TryGetPropertyNameOfBindingOrAssignmentElement(bindingElement *ast.Node) *ast.Node
 //go:linkname TryGetTextOfPropertyName github.com/microsoft/typescript-go/internal/ast.TryGetTextOfPropertyName
 func TryGetTextOfPropertyName(name *ast.Node) (string, bool)
 type TryStatement = ast.TryStatement
