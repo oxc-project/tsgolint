@@ -21,6 +21,7 @@ jobs:
           # Using secrets.GITHUB_TOKEN isn't allowed to trigger downstream
           # workflow runs, so we're using a Personal Access Token (PAT) instead
           token: ${{ secrets.OXC_BOT_PAT }}
+
       - name: Install Go
         uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
         with:

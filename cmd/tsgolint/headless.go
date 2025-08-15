@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
-	"encoding/json"
+	"github.com/go-json-experiment/json"
 	"flag"
 	"fmt"
 	"io"

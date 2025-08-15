@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"errors"
 
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/compiler"
@@ -37,7 +38,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	}
 	program := compiler.NewProgram(opts)
 	if program == nil {
-		return nil, fmt.Errorf("couldn't create program")
+		return nil, errors.New("couldn't create program")
 	}
 
 	diagnostics := program.GetSyntacticDiagnostics(context.Background(), nil)

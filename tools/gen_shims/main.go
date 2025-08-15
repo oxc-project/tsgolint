@@ -2,18 +2,19 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
+	"github.com/go-json-experiment/json"
 	"fmt"
 	"go/types"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-	"golang.org/x/tools/go/packages"
 	"log"
 	"maps"
 	"os"
 	"path"
 	"slices"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+	"golang.org/x/tools/go/packages"
 )
 
 const tsgoInternalPrefix = "github.com/microsoft/typescript-go/internal/"

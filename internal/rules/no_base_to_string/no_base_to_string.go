@@ -275,7 +275,7 @@ var NoBaseToStringRule = rule.Rule{
 				// // eslint-disable-next-line @typescript-eslint/internal/prefer-ast-types-enum
 				// const variable = scope.set.get('String');
 				// return !variable?.defs.length;
-				return true
+				// return true
 			}
 			return false
 		}

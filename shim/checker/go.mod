@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/checker
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20250814000348-eb88029bb671
+require github.com/microsoft/typescript-go v0.0.0-20250815041535-72edb9e527d5
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
