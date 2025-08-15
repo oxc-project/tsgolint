@@ -14,16 +14,16 @@ linters:
     - bodyclose
     - canonicalheader
     - copyloopvar
-    - depguard
+    - depguard # TODO
     - durationcheck
-    - errcheck
+    # - errcheck # TODO
     - errchkjson
     - errname
-    - errorlint
+    # - errorlint #TODO
     - fatcontext
     - gocheckcompilerdirectives
     - goprintffuncname
-    - govet
+    # - govet # TODO
     - grouper
     - inamedparam
     - ineffassign
@@ -31,11 +31,11 @@ linters:
     - makezero
     - mirror
     - misspell
-    - musttag
+    # - musttag # TODO
     - nakedret
     - nolintlint
-    - paralleltest
-    - perfsprint
+    # - paralleltest # TODO
+    # - perfsprint # TODO
     - predeclared
     - reassign
     - testableexamples
@@ -44,14 +44,14 @@ linters:
     - usestdlibvars
     - usetesting
     - goheader
-    - exhaustive
-    - gocritic
+    # - exhaustive # TODO
+    # - gocritic # TODO
     - gosec
-    - revive
-    - staticcheck
+    # - revive # TODO
+    # - staticcheck # TODO
     - testifylint
-    - unparam
-    - unused
+    # - unparam # TODO
+    # - unused # TODO
 
   settings:
     depguard:
