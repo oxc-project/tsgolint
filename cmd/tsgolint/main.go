@@ -194,9 +194,9 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	w.WriteString("\n  \x1b[2m╭─┴──────────(\x1b[0m \x1b[3m\x1b[38;5;117m")
 	w.WriteString(tspath.ConvertToRelativePath(d.SourceFile.FileName(), comparePathOptions))
 	w.WriteByte(':')
-	w.Write([]byte(strconv.Itoa(diagnosticStartLine + 1)))
+	w.WriteString(strconv.Itoa(diagnosticStartLine + 1))
 	w.WriteByte(':')
-	w.Write([]byte(strconv.Itoa(diagnosticStartColumn + 1)))
+	w.WriteString(strconv.Itoa(diagnosticStartColumn + 1))
 	w.WriteString("\x1b[0m \x1b[2m)─────\x1b[0m\n")
 
 	indentSize := math.MaxInt
@@ -250,7 +250,7 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 			}
 			w.WriteString(number)
 		}
-		w.Write([]byte(" │\x1b[0m  "))
+		w.WriteString(" │\x1b[0m  ")
 
 		lineTextStart := int(lineMap[line]) + indentSize
 		underlineStart := max(lineTextStart, int(lineMap[line])+lineStarts[line-codeboxStartLine])
