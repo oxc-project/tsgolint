@@ -31,7 +31,7 @@ linters:
     - makezero
     - mirror
     - misspell
-    # - musttag # TODO
+    - musttag
     - nakedret
     - nolintlint
     # - paralleltest # TODO
