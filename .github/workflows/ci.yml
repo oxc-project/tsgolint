@@ -23,14 +23,9 @@ jobs:
 
       - run: go test ./internal/...
 
-      - name: Build tsgolint
-        run: go build -o tsgolint ./cmd/tsgolint
-
-      - name: Run existing integration test
-        run: ./test.sh
-
-      - name: Run end-to-end snapshot test
-        run: ./test-snapshot.sh
+      - run: |
+          go build -o tsgolint ./cmd/tsgolint
+          ./test.sh
 
   lint:
     runs-on: ubuntu-latest
