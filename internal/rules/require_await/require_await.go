@@ -13,12 +13,13 @@ func buildMissingAwaitMessage() rule.RuleMessage {
 		Description: "Function has no 'await' expression.",
 	}
 }
-func buildRemoveAsyncMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "removeAsync",
-		Description: "Remove 'async'.",
-	}
-}
+
+// func buildRemoveAsyncMessage() rule.RuleMessage {
+// return rule.RuleMessage{
+// Id:          "removeAsync",
+// Description: "Remove 'async'.",
+// }
+// }
 
 type scopeInfo struct {
 	hasAwait      bool
@@ -218,7 +219,7 @@ var RequireAwaitRule = rule.Rule{
 			},
 			rule.ListenerOnExit(ast.KindArrowFunction): exitFunction,
 
-			ast.KindAwaitExpression: func(node *ast.Node) { markAsHasAwait() },
+			ast.KindAwaitExpression: func(_node *ast.Node) { markAsHasAwait() },
 			ast.KindForOfStatement: func(node *ast.Node) {
 				if node.AsForInOrOfStatement().AwaitModifier != nil {
 					markAsHasAwait()

@@ -15,9 +15,9 @@ func certaintyToString(certainty usefulness) string {
 	case usefulnessAlways:
 		return "always"
 	case usefulnessNever:
-		return "always"
+		return "will"
 	case usefulnessSometimes:
-		return "always"
+		return "may"
 	default:
 		panic("unknown certainty")
 	}

@@ -9,19 +9,20 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildAddMissingCasesMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "addMissingCases",
-		Description: "Add branches for missing cases.",
-	}
-}
+// func buildAddMissingCasesMessage() rule.RuleMessage {
+// return rule.RuleMessage{
+// Id:          "addMissingCases",
+// Description: "Add branches for missing cases.",
+// }
+// }
+
 func buildDangerousDefaultCaseMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "dangerousDefaultCase",
 		Description: "The switch statement is exhaustive, so the default case is unnecessary.",
 	}
 }
-func buildSwitchIsNotExhaustiveMessage(missingBranches string) rule.RuleMessage {
+func buildSwitchIsNotExhaustiveMessage(_missingBranches string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "switchIsNotExhaustive",
 		Description: "Switch is not exhaustive",

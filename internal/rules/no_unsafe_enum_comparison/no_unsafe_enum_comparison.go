@@ -21,12 +21,13 @@ func buildMismatchedConditionMessage() rule.RuleMessage {
 		Description: "The two values in this comparison do not have a shared enum type.",
 	}
 }
-func buildReplaceValueWithEnumMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "replaceValueWithEnum",
-		Description: "Replace with an enum value comparison.",
-	}
-}
+
+// func buildReplaceValueWithEnumMessage() rule.RuleMessage {
+// return rule.RuleMessage{
+// Id:          "replaceValueWithEnum",
+// Description: "Replace with an enum value comparison.",
+// }
+// }
 
 /**
  * @returns What type a type's enum value is (number or string), if either.

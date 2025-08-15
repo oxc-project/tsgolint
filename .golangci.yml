@@ -22,7 +22,7 @@ linters:
     # - errcheck # TODO
     - errchkjson
     - errname
-    # - errorlint #TODO
+    - errorlint #TODO
     - fatcontext
     - gocheckcompilerdirectives
     - goprintffuncname
@@ -53,8 +53,8 @@ linters:
     # - revive # TODO
     # - staticcheck # TODO
     - testifylint
-    # - unparam # TODO
-    # - unused # TODO
+    - unparam # TODO
+    - unused # TODO
 
   settings:
     depguard:

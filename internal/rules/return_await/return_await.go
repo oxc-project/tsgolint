@@ -114,7 +114,7 @@ var ReturnAwaitRule = rule.Rule{
 				parent:     scope,
 			}
 		}
-		exitFunction := func(node *ast.Node) {
+		exitFunction := func(_node *ast.Node) {
 			scope = scope.parent
 		}
 
