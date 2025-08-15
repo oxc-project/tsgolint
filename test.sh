@@ -108,5 +108,5 @@ echo "Generated $DIAGNOSTIC_COUNT diagnostics"
 echo "$DIAGNOSTICS" > "$SNAPSHOT_FILE"
 echo "Updated snapshot file: $SNAPSHOT_FILE"
 
-# Use git diff to check if there are any changes
-git diff --exit-code
+# Only check if the snapshot file has changed
+git diff --exit-code "$SNAPSHOT_FILE"
