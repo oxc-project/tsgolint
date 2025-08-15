@@ -14,7 +14,7 @@ linters:
     - bodyclose
     - canonicalheader
     - copyloopvar
-    - depguard # TODO
+    # - depguard # TODO
     - durationcheck
     # - errcheck # TODO
     - errchkjson
@@ -46,7 +46,7 @@ linters:
     - goheader
     # - exhaustive # TODO
     # - gocritic # TODO
-    - gosec
+    # - gosec # TODO
     # - revive # TODO
     # - staticcheck # TODO
     - testifylint

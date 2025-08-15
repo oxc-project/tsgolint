@@ -44,7 +44,6 @@ jobs:
         uses: golangci/golangci-lint-action@v8
         with:
           version: latest
-          args: --timeout=5m
 
   typos:
     name: Typos
