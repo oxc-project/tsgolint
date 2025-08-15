@@ -14,7 +14,7 @@ linters:
     - bodyclose
     - canonicalheader
     - copyloopvar
-    # - depguard # TODO
+    - depguard
     - durationcheck
     # - errcheck # TODO
     - errchkjson

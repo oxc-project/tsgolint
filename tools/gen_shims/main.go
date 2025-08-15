@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
+	"github.com/go-json-experiment/json"
 	"fmt"
 	"go/types"
 	"log"
