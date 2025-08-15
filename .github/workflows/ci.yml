@@ -29,6 +29,22 @@ jobs:
           go build -o tsgolint ./cmd/tsgolint
           ./test.sh
 
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # required for git am --3way to work properly
+          submodules: true
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: latest
+
   typos:
     name: Typos
     runs-on: ubuntu-latest

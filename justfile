@@ -13,3 +13,6 @@ build:
 test:
   ./test.sh
   go test ./internal/...
+
+lint:
+  golangci-lint run

@@ -290,7 +290,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
             case 'two':
               return 2;
             default:
-              throw new Error(` + "`" + `Unrecognised arg: ${arg}` + "`" + `);
+              throw new Error(` + "`" + `Unrecognized arg: ${arg}` + "`" + `);
           }
         }
       `,
