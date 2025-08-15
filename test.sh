@@ -111,5 +111,9 @@ echo "Updated snapshot file: $SNAPSHOT_FILE"
 # Use git diff to check if there are any changes
 if git diff --exit-code "$SNAPSHOT_FILE" > /dev/null; then
     echo "Snapshot does not match expected output. Please review the changes."
+    
+    # output the diff to stdout
+    git diff "$SNAPSHOT_FILE"
+
     exit 1
 fi
