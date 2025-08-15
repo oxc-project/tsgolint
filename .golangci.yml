@@ -23,7 +23,7 @@ linters:
     - fatcontext
     - gocheckcompilerdirectives
     - goprintffuncname
-    # - govet # TODO
+    - govet
     - grouper
     - inamedparam
     - ineffassign
