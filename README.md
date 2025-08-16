@@ -108,3 +108,21 @@ go build -o tsgolint ./cmd/tsgolint
 | [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)                       | ✅     |
 | [unbound-method](https://typescript-eslint.io/rules/unbound-method)                                                 | ✅     |
 | [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable) | ✅     |
+
+## Testing
+
+**tsgolint** includes several types of tests to ensure correctness:
+
+### Unit Tests
+
+Run Go unit tests for individual rules:
+```shell
+go test ./internal/...
+```
+
+### Integration Tests
+
+- `./test.sh` - End-to-end snapshot test running all 40+ rules
+  - Runs **all** tsgolint rules on all fixture files 
+  - Captures diagnostic output in deterministic, sortable format
+  - Verifies output matches expected snapshot

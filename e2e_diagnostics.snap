@@ -1,0 +1,4065 @@
+[
+  {
+    "range": {
+      "pos": 55,
+      "end": 63
+    },
+    "rule": "await-thenable",
+    "message": {
+      "id": "await",
+      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "await",
+          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+        },
+        "fixes": [
+          {
+            "text": "",
+            "range": {
+              "pos": 55,
+              "end": 60
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/await-thenable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 106,
+      "end": 123
+    },
+    "rule": "await-thenable",
+    "message": {
+      "id": "await",
+      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "await",
+          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+        },
+        "fixes": [
+          {
+            "text": "",
+            "range": {
+              "pos": 106,
+              "end": 111
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/await-thenable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 262,
+      "end": 278
+    },
+    "rule": "await-thenable",
+    "message": {
+      "id": "await",
+      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "await",
+          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+        },
+        "fixes": [
+          {
+            "text": "",
+            "range": {
+              "pos": 262,
+              "end": 267
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/await-thenable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/await-thenable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 65,
+      "end": 70
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/await-thenable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 133,
+      "end": 137
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/await-thenable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 85,
+      "end": 98
+    },
+    "rule": "no-array-delete",
+    "message": {
+      "id": "noArrayDelete",
+      "description": "Using the `delete` operator with an array expression is unsafe."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "noArrayDelete",
+          "description": "Using the `delete` operator with an array expression is unsafe."
+        },
+        "fixes": [
+          {
+            "text": "",
+            "range": {
+              "pos": 85,
+              "end": 91
+            }
+          },
+          {
+            "text": ".splice(",
+            "range": {
+              "pos": 95,
+              "end": 96
+            }
+          },
+          {
+            "text": ", 1)",
+            "range": {
+              "pos": 97,
+              "end": 98
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/no-array-delete/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-array-delete/index.ts"
+  },
+  {
+    "range": {
+      "pos": 102,
+      "end": 106
+    },
+    "rule": "no-base-to-string",
+    "message": {
+      "id": "baseToString",
+      "description": "'// Examples of incorrect code for no-base-to-string rule\n\n// These will evaluate to '[object Object]'\n({})' always use Object's default stringification format ('[object Object]') when stringified."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 119,
+      "end": 133
+    },
+    "rule": "no-base-to-string",
+    "message": {
+      "id": "baseToString",
+      "description": "'\n({foo: 'bar'})' always use Object's default stringification format ('[object Object]') when stringified."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 146,
+      "end": 160
+    },
+    "rule": "no-base-to-string",
+    "message": {
+      "id": "baseToString",
+      "description": "'\n({foo: 'bar'})' always use Object's default stringification format ('[object Object]') when stringified."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 216,
+      "end": 222
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 216,
+      "end": 238
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 230,
+      "end": 238
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .toString on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-base-to-string/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-confusing-void-expression/index.ts"
+  },
+  {
+    "range": {
+      "pos": 87,
+      "end": 90
+    },
+    "rule": "no-duplicate-type-constituents",
+    "message": {
+      "id": "duplicate",
+      "description": "Union type constituent is duplicated with  'A'."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 87,
+          "end": 90
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 85,
+          "end": 86
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-duplicate-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 210,
+      "end": 215
+    },
+    "rule": "no-duplicate-type-constituents",
+    "message": {
+      "id": "duplicate",
+      "description": "Union type constituent is duplicated with  'foo'."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 210,
+          "end": 215
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 208,
+          "end": 209
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-duplicate-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 103,
+      "end": 104
+    },
+    "rule": "no-redundant-type-constituents",
+    "message": {
+      "id": "errorTypeOverrides",
+      "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-duplicate-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 107,
+      "end": 108
+    },
+    "rule": "no-redundant-type-constituents",
+    "message": {
+      "id": "errorTypeOverrides",
+      "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-duplicate-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 111,
+      "end": 112
+    },
+    "rule": "no-redundant-type-constituents",
+    "message": {
+      "id": "errorTypeOverrides",
+      "description": "'B' is an 'error' type that acts as 'any' and overrides all other types in this union type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-duplicate-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-duplicate-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 134,
+      "end": 166
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingVoid",
+      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "void ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      },
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 238,
+      "end": 272
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingPromiseArrayVoid",
+      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 6,
+      "end": 67
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 16,
+      "end": 67
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeNew",
+      "description": "Unsafe construction of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 57
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 182
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 197
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 216
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 233
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 176,
+      "end": 182
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 192,
+      "end": 197
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 210,
+      "end": 216
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 226,
+      "end": 233
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .finally on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 66
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 79,
+      "end": 132
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 252,
+      "end": 270
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-floating-promises/index.ts"
+  },
+  {
+    "range": {
+      "pos": 80,
+      "end": 100
+    },
+    "rule": "no-for-in-array",
+    "message": {
+      "id": "forInViolation",
+      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-for-in-array/index.ts"
+  },
+  {
+    "range": {
+      "pos": 129,
+      "end": 149
+    },
+    "rule": "no-for-in-array",
+    "message": {
+      "id": "forInViolation",
+      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-for-in-array/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-for-in-array/index.ts"
+  },
+  {
+    "range": {
+      "pos": 67,
+      "end": 82
+    },
+    "rule": "no-implied-eval",
+    "message": {
+      "id": "noImpliedEvalError",
+      "description": "Implied eval. Consider passing a function."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 103,
+      "end": 118
+    },
+    "rule": "no-implied-eval",
+    "message": {
+      "id": "noImpliedEvalError",
+      "description": "Implied eval. Consider passing a function."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 140,
+      "end": 154
+    },
+    "rule": "no-implied-eval",
+    "message": {
+      "id": "noImpliedEvalError",
+      "description": "Implied eval. Consider passing a function."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 176,
+      "end": 187
+    },
+    "rule": "no-implied-eval",
+    "message": {
+      "id": "noImpliedEvalError",
+      "description": "Implied eval. Consider passing a function."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 214,
+      "end": 225
+    },
+    "rule": "no-implied-eval",
+    "message": {
+      "id": "noImpliedEvalError",
+      "description": "Implied eval. Consider passing a function."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 244,
+      "end": 282
+    },
+    "rule": "no-implied-eval",
+    "message": {
+      "id": "noFunctionConstructor",
+      "description": "Implied eval. Do not use the Function constructor to create functions."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 127,
+      "end": 139
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-implied-eval/index.ts"
+  },
+  {
+    "range": {
+      "pos": 161,
+      "end": 175
+    },
+    "rule": "no-meaningless-void-operator",
+    "message": {
+      "id": "meaninglessVoidOperator",
+      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored"
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 161,
+          "end": 165
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-meaningless-void-operator/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-meaningless-void-operator/index.ts"
+  },
+  {
+    "range": {
+      "pos": 160,
+      "end": 172
+    },
+    "rule": "no-misused-spread",
+    "message": {
+      "id": "noFunctionSpreadInObject",
+      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?"
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-misused-spread/index.ts"
+  },
+  {
+    "range": {
+      "pos": 300,
+      "end": 311
+    },
+    "rule": "no-misused-spread",
+    "message": {
+      "id": "noStringSpread",
+      "description": "Using the spread operator on a string can mishandle special characters, as can `.split(\"\")`.\n'- `...` produces Unicode code points, which will decompose complex emojis into individual emojis- .split(\"\") produces UTF-16 code units, which breaks rich characters in many languagesConsider using `Intl.Segmenter` for locale-aware string decomposition.Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-misused-spread/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-misused-spread/index.ts"
+  },
+  {
+    "range": {
+      "pos": 46,
+      "end": 76
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-misused-spread/index.ts"
+  },
+  {
+    "range": {
+      "pos": 223,
+      "end": 245
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-misused-spread/index.ts"
+  },
+  {
+    "range": {
+      "pos": 92,
+      "end": 100
+    },
+    "rule": "no-mixed-enums",
+    "message": {
+      "id": "mixed",
+      "description": "Mixing number and string enums can be confusing."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-mixed-enums/index.ts"
+  },
+  {
+    "range": {
+      "pos": 144,
+      "end": 145
+    },
+    "rule": "no-mixed-enums",
+    "message": {
+      "id": "mixed",
+      "description": "Mixing number and string enums can be confusing."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-mixed-enums/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-mixed-enums/index.ts"
+  },
+  {
+    "range": {
+      "pos": 124,
+      "end": 131
+    },
+    "rule": "no-redundant-type-constituents",
+    "message": {
+      "id": "overrides",
+      "description": "'unknown' overrides all other types in this union type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-redundant-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 183,
+      "end": 186
+    },
+    "rule": "no-redundant-type-constituents",
+    "message": {
+      "id": "overrides",
+      "description": "'any' overrides all other types in this union type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-redundant-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 240,
+      "end": 245
+    },
+    "rule": "no-redundant-type-constituents",
+    "message": {
+      "id": "overridden",
+      "description": "'never' is overridden by other types in this union type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-redundant-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-redundant-type-constituents/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-boolean-literal-compare/index.ts"
+  },
+  {
+    "range": {
+      "pos": 122,
+      "end": 144
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "direct",
+      "description": "This expression unnecessarily compares a boolean value to a boolean instead of using it directly."
+    },
+    "fixes": [
+      {
+        "text": "someCondition",
+        "range": {
+          "pos": 122,
+          "end": 144
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-boolean-literal-compare/index.ts"
+  },
+  {
+    "range": {
+      "pos": 164,
+      "end": 187
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "direct",
+      "description": "This expression unnecessarily compares a boolean value to a boolean instead of using it directly."
+    },
+    "fixes": [
+      {
+        "text": "someCondition",
+        "range": {
+          "pos": 164,
+          "end": 187
+        }
+      },
+      {
+        "text": "!",
+        "range": {
+          "pos": 164,
+          "end": 164
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-boolean-literal-compare/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-template-expression/index.ts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 212
+    },
+    "rule": "no-unnecessary-template-expression",
+    "message": {
+      "id": "noUnnecessaryTemplateExpression",
+      "description": "Template literal expression is unnecessary and can be simplified."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-template-expression/index.ts"
+  },
+  {
+    "range": {
+      "pos": 213,
+      "end": 223
+    },
+    "rule": "no-unnecessary-template-expression",
+    "message": {
+      "id": "noUnnecessaryTemplateExpression",
+      "description": "Template literal expression is unnecessary and can be simplified."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-template-expression/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-type-arguments/index.ts"
+  },
+  {
+    "range": {
+      "pos": 207,
+      "end": 213
+    },
+    "rule": "no-unnecessary-type-arguments",
+    "message": {
+      "id": "unnecessaryTypeParameter",
+      "description": "This is the default value for this type parameter, so it can be omitted."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 206,
+          "end": 214
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-type-arguments/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 117,
+      "end": 130
+    },
+    "rule": "no-unnecessary-type-assertion",
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 121,
+          "end": 123
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 124,
+          "end": 130
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 237,
+      "end": 258
+    },
+    "rule": "no-unnecessary-type-assertion",
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 249,
+          "end": 251
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 252,
+          "end": 258
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 350,
+      "end": 359
+    },
+    "rule": "no-unnecessary-type-assertion",
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 354,
+          "end": 356
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 357,
+          "end": 359
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unnecessary-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-argument/index.ts"
+  },
+  {
+    "range": {
+      "pos": 173,
+      "end": 181
+    },
+    "rule": "no-unsafe-argument",
+    "message": {
+      "id": "unsafeArgument",
+      "description": "Unsafe argument of type any assigned to a parameter of type string."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-argument/index.ts"
+  },
+  {
+    "range": {
+      "pos": 273,
+      "end": 281
+    },
+    "rule": "no-unsafe-argument",
+    "message": {
+      "id": "unsafeArgument",
+      "description": "Unsafe argument of type any assigned to a parameter of type number."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-argument/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-assignment/index.ts"
+  },
+  {
+    "range": {
+      "pos": 220,
+      "end": 235
+    },
+    "rule": "no-unnecessary-type-assertion",
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 229,
+          "end": 231
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 232,
+          "end": 235
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-assignment/index.ts"
+  },
+  {
+    "range": {
+      "pos": 97,
+      "end": 119
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-assignment/index.ts"
+  },
+  {
+    "range": {
+      "pos": 160,
+      "end": 174
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-assignment/index.ts"
+  },
+  {
+    "range": {
+      "pos": 214,
+      "end": 235
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-assignment/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 154,
+      "end": 180
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 85,
+      "end": 93
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 113,
+      "end": 121
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 163,
+      "end": 171
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 222,
+      "end": 230
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 222,
+      "end": 237
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 222,
+      "end": 245
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 233,
+      "end": 237
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .then on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 240,
+      "end": 245
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-call/index.ts"
+  },
+  {
+    "range": {
+      "pos": 89,
+      "end": 95
+    },
+    "rule": "no-mixed-enums",
+    "message": {
+      "id": "mixed",
+      "description": "Mixing number and string enums can be confusing."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-enum-comparison/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-enum-comparison/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 240,
+      "end": 266
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 249,
+      "end": 264
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 103,
+      "end": 106
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .foo on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 142,
+      "end": 145
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .bar on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 192,
+      "end": 197
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access ['key'] on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 258,
+      "end": 264
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .method on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-return/index.ts"
+  },
+  {
+    "range": {
+      "pos": 120,
+      "end": 136
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-return/index.ts"
+  },
+  {
+    "range": {
+      "pos": 189,
+      "end": 197
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-return/index.ts"
+  },
+  {
+    "range": {
+      "pos": 275,
+      "end": 291
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-return/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 102,
+      "end": 120
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 265,
+      "end": 289
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 320,
+      "end": 332
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .someProperty on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 303,
+      "end": 333
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 108,
+      "end": 120
+    },
+    "rule": "no-unsafe-type-assertion",
+    "message": {
+      "id": "unsafeToAnyTypeAssertion",
+      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 160,
+      "end": 172
+    },
+    "rule": "no-unsafe-type-assertion",
+    "message": {
+      "id": "unsafeToAnyTypeAssertion",
+      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 160,
+      "end": 182
+    },
+    "rule": "no-unsafe-type-assertion",
+    "message": {
+      "id": "unsafeOfAnyTypeAssertion",
+      "description": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 277,
+      "end": 289
+    },
+    "rule": "no-unsafe-type-assertion",
+    "message": {
+      "id": "unsafeToAnyTypeAssertion",
+      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-type-assertion/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-unary-minus/index.ts"
+  },
+  {
+    "range": {
+      "pos": 104,
+      "end": 110
+    },
+    "rule": "no-unsafe-unary-minus",
+    "message": {
+      "id": "unaryMinus",
+      "description": "Argument of unary negation should be assignable to number | bigint but is unknown instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-unary-minus/index.ts"
+  },
+  {
+    "range": {
+      "pos": 173,
+      "end": 177
+    },
+    "rule": "no-unsafe-unary-minus",
+    "message": {
+      "id": "unaryMinus",
+      "description": "Argument of unary negation should be assignable to number | bigint but is string instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-unary-minus/index.ts"
+  },
+  {
+    "range": {
+      "pos": 245,
+      "end": 250
+    },
+    "rule": "no-unsafe-unary-minus",
+    "message": {
+      "id": "unaryMinus",
+      "description": "Argument of unary negation should be assignable to number | bigint but is false instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-unary-minus/index.ts"
+  },
+  {
+    "range": {
+      "pos": 317,
+      "end": 321
+    },
+    "rule": "no-unsafe-unary-minus",
+    "message": {
+      "id": "unaryMinus",
+      "description": "Argument of unary negation should be assignable to number | bigint but is { prop: any; } instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/no-unsafe-unary-minus/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/non-nullable-type-assertion-style/index.ts"
+  },
+  {
+    "range": {
+      "pos": 261,
+      "end": 276
+    },
+    "rule": "no-unnecessary-type-assertion",
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 267,
+          "end": 269
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 270,
+          "end": 276
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/non-nullable-type-assertion-style/index.ts"
+  },
+  {
+    "range": {
+      "pos": 186,
+      "end": 201
+    },
+    "rule": "no-unsafe-type-assertion",
+    "message": {
+      "id": "unsafeTypeAssertion",
+      "description": "Unsafe type assertion: type 'string' is more narrow than the original type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/non-nullable-type-assertion-style/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/only-throw-error/index.ts"
+  },
+  {
+    "range": {
+      "pos": 63,
+      "end": 70
+    },
+    "rule": "only-throw-error",
+    "message": {
+      "id": "object",
+      "description": "Expected an error object to be thrown."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/only-throw-error/index.ts"
+  },
+  {
+    "range": {
+      "pos": 98,
+      "end": 100
+    },
+    "rule": "only-throw-error",
+    "message": {
+      "id": "object",
+      "description": "Expected an error object to be thrown."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/only-throw-error/index.ts"
+  },
+  {
+    "range": {
+      "pos": 128,
+      "end": 132
+    },
+    "rule": "only-throw-error",
+    "message": {
+      "id": "object",
+      "description": "Expected an error object to be thrown."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/only-throw-error/index.ts"
+  },
+  {
+    "range": {
+      "pos": 161,
+      "end": 181
+    },
+    "rule": "only-throw-error",
+    "message": {
+      "id": "object",
+      "description": "Expected an error object to be thrown."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/only-throw-error/index.ts"
+  },
+  {
+    "range": {
+      "pos": 215,
+      "end": 219
+    },
+    "rule": "only-throw-error",
+    "message": {
+      "id": "object",
+      "description": "Expected an error object to be thrown."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/only-throw-error/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 69,
+      "end": 83
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 120,
+      "end": 134
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 166,
+      "end": 180
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 215,
+      "end": 229
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 285,
+      "end": 299
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 77,
+      "end": 83
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 128,
+      "end": 134
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 174,
+      "end": 180
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 223,
+      "end": 229
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 293,
+      "end": 299
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-promise-reject-errors/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-reduce-type-parameter/index.ts"
+  },
+  {
+    "range": {
+      "pos": 131,
+      "end": 183
+    },
+    "rule": "no-unnecessary-type-assertion",
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 174,
+          "end": 176
+        }
+      },
+      {
+        "text": "",
+        "range": {
+          "pos": 177,
+          "end": 183
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-reduce-type-parameter/index.ts"
+  },
+  {
+    "range": {
+      "pos": 330,
+      "end": 344
+    },
+    "rule": "prefer-reduce-type-parameter",
+    "message": {
+      "id": "preferTypeParameter",
+      "description": "Unnecessary assertion: Array#reduce accepts a type parameter for the default value."
+    },
+    "fixes": [
+      {
+        "text": "",
+        "range": {
+          "pos": 332,
+          "end": 344
+        }
+      },
+      {
+        "text": "< string[]>",
+        "range": {
+          "pos": 256,
+          "end": 256
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-reduce-type-parameter/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-return-this-type/index.ts"
+  },
+  {
+    "range": {
+      "pos": 138,
+      "end": 145
+    },
+    "rule": "prefer-return-this-type",
+    "message": {
+      "id": "useThisType",
+      "description": "Use `this` type instead."
+    },
+    "fixes": [
+      {
+        "text": "this",
+        "range": {
+          "pos": 138,
+          "end": 145
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/prefer-return-this-type/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/promise-function-async/index.ts"
+  },
+  {
+    "range": {
+      "pos": 107,
+      "end": 201
+    },
+    "rule": "promise-function-async",
+    "message": {
+      "id": "missingAsync",
+      "description": "Functions that return promises must be async."
+    },
+    "fixes": [
+      {
+        "text": " async ",
+        "range": {
+          "pos": 107,
+          "end": 107
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/promise-function-async/index.ts"
+  },
+  {
+    "range": {
+      "pos": 180,
+      "end": 197
+    },
+    "rule": "promise-function-async",
+    "message": {
+      "id": "missingAsync",
+      "description": "Functions that return promises must be async."
+    },
+    "fixes": [
+      {
+        "text": " async ",
+        "range": {
+          "pos": 180,
+          "end": 180
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/promise-function-async/index.ts"
+  },
+  {
+    "range": {
+      "pos": 267,
+      "end": 351
+    },
+    "rule": "promise-function-async",
+    "message": {
+      "id": "missingAsync",
+      "description": "Functions that return promises must be async."
+    },
+    "fixes": [
+      {
+        "text": " async ",
+        "range": {
+          "pos": 267,
+          "end": 267
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/promise-function-async/index.ts"
+  },
+  {
+    "range": {
+      "pos": 328,
+      "end": 345
+    },
+    "rule": "promise-function-async",
+    "message": {
+      "id": "missingAsync",
+      "description": "Functions that return promises must be async."
+    },
+    "fixes": [
+      {
+        "text": " async ",
+        "range": {
+          "pos": 328,
+          "end": 328
+        }
+      }
+    ],
+    "suggestions": [],
+    "file_path": "fixtures/rules/promise-function-async/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/related-getter-setter-pairs/index.ts"
+  },
+  {
+    "range": {
+      "pos": 179,
+      "end": 185
+    },
+    "rule": "related-getter-setter-pairs",
+    "message": {
+      "id": "mismatch",
+      "description": "`get()` type should be assignable to its equivalent `set()` type."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/related-getter-setter-pairs/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-array-sort-compare/index.ts"
+  },
+  {
+    "range": {
+      "pos": 100,
+      "end": 114
+    },
+    "rule": "require-array-sort-compare",
+    "message": {
+      "id": "requireCompare",
+      "description": "Require 'compare' argument."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-array-sort-compare/index.ts"
+  },
+  {
+    "range": {
+      "pos": 265,
+      "end": 281
+    },
+    "rule": "require-array-sort-compare",
+    "message": {
+      "id": "requireCompare",
+      "description": "Require 'compare' argument."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-array-sort-compare/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 228,
+      "end": 240
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 237,
+      "end": 240
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .map on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 221,
+      "end": 253
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 205,
+      "end": 255
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/require-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-plus-operands/index.ts"
+  },
+  {
+    "range": {
+      "pos": 4,
+      "end": 16
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-plus-operands/index.ts"
+  },
+  {
+    "range": {
+      "pos": 10,
+      "end": 16
+    },
+    "rule": "restrict-plus-operands",
+    "message": {
+      "id": "bigintAndNumber",
+      "description": "Numeric '+' operations must either be both bigints or both numbers. Got `bigint` + `number`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-plus-operands/index.ts"
+  },
+  {
+    "range": {
+      "pos": 56,
+      "end": 57
+    },
+    "rule": "restrict-plus-operands",
+    "message": {
+      "id": "invalid",
+      "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`. Got `never`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-plus-operands/index.ts"
+  },
+  {
+    "range": {
+      "pos": 244,
+      "end": 247
+    },
+    "rule": "no-base-to-string",
+    "message": {
+      "id": "baseToString",
+      "description": "'obj' always use Object's default stringification format ('[object Object]') when stringified."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-template-expressions/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-template-expressions/index.ts"
+  },
+  {
+    "range": {
+      "pos": 244,
+      "end": 247
+    },
+    "rule": "restrict-template-expressions",
+    "message": {
+      "id": "invalidType",
+      "description": "Invalid type \"{ prop: any; }\" of template literal expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-template-expressions/index.ts"
+  },
+  {
+    "range": {
+      "pos": 316,
+      "end": 319
+    },
+    "rule": "restrict-template-expressions",
+    "message": {
+      "id": "invalidType",
+      "description": "Invalid type \"symbol\" of template literal expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-template-expressions/index.ts"
+  },
+  {
+    "range": {
+      "pos": 398,
+      "end": 400
+    },
+    "rule": "restrict-template-expressions",
+    "message": {
+      "id": "invalidType",
+      "description": "Invalid type \"Function\" of template literal expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-template-expressions/index.ts"
+  },
+  {
+    "range": {
+      "pos": 465,
+      "end": 468
+    },
+    "rule": "restrict-template-expressions",
+    "message": {
+      "id": "invalidType",
+      "description": "Invalid type \"number[]\" of template literal expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/restrict-template-expressions/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/return-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 340,
+      "end": 351
+    },
+    "rule": "return-await",
+    "message": {
+      "id": "requiredPromiseAwait",
+      "description": "Returning an awaited promise is required in this context."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "requiredPromiseAwait",
+          "description": "Returning an awaited promise is required in this context."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 340,
+              "end": 340
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/return-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 592,
+      "end": 605
+    },
+    "rule": "return-await",
+    "message": {
+      "id": "requiredPromiseAwait",
+      "description": "Returning an awaited promise is required in this context."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "requiredPromiseAwait",
+          "description": "Returning an awaited promise is required in this context."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 592,
+              "end": 592
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/rules/return-await/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/switch-exhaustiveness-check/index.ts"
+  },
+  {
+    "range": {
+      "pos": 184,
+      "end": 236
+    },
+    "rule": "no-unsafe-enum-comparison",
+    "message": {
+      "id": "mismatchedCase",
+      "description": "The case statement does not have a shared enum type with the switch predicate."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/switch-exhaustiveness-check/index.ts"
+  },
+  {
+    "range": {
+      "pos": 241,
+      "end": 290
+    },
+    "rule": "no-unsafe-enum-comparison",
+    "message": {
+      "id": "mismatchedCase",
+      "description": "The case statement does not have a shared enum type with the switch predicate."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/switch-exhaustiveness-check/index.ts"
+  },
+  {
+    "range": {
+      "pos": 170,
+      "end": 176
+    },
+    "rule": "switch-exhaustiveness-check",
+    "message": {
+      "id": "switchIsNotExhaustive",
+      "description": "Switch is not exhaustive"
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/switch-exhaustiveness-check/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/unbound-method/index.ts"
+  },
+  {
+    "range": {
+      "pos": 328,
+      "end": 336
+    },
+    "rule": "unbound-method",
+    "message": {
+      "id": "unboundWithoutThisAnnotation",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/unbound-method/index.ts"
+  },
+  {
+    "range": {
+      "pos": 440,
+      "end": 453
+    },
+    "rule": "unbound-method",
+    "message": {
+      "id": "unboundWithoutThisAnnotation",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/unbound-method/index.ts"
+  },
+  {
+    "range": {
+      "pos": 557,
+      "end": 565
+    },
+    "rule": "unbound-method",
+    "message": {
+      "id": "unboundWithoutThisAnnotation",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/unbound-method/index.ts"
+  },
+  {
+    "range": {
+      "pos": 647,
+      "end": 655
+    },
+    "rule": "unbound-method",
+    "message": {
+      "id": "unboundWithoutThisAnnotation",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/unbound-method/index.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/use-unknown-in-catch-callback-variable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 416,
+      "end": 429
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/use-unknown-in-catch-callback-variable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 218,
+      "end": 225
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .message on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/use-unknown-in-catch-callback-variable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 424,
+      "end": 429
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/use-unknown-in-catch-callback-variable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 499,
+      "end": 506
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .message on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/rules/use-unknown-in-catch-callback-variable/index.ts"
+  },
+  {
+    "range": {
+      "pos": 134,
+      "end": 166
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingVoid",
+      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "void ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      },
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 238,
+      "end": 272
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingPromiseArrayVoid",
+      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 6,
+      "end": 67
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 16,
+      "end": 67
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeNew",
+      "description": "Unsafe construction of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 57
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 182
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 197
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 216
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 233
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 176,
+      "end": 182
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 192,
+      "end": 197
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 210,
+      "end": 216
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 226,
+      "end": 233
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .finally on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 66
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 79,
+      "end": 132
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 252,
+      "end": 270
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/a.ts"
+  },
+  {
+    "range": {
+      "pos": 134,
+      "end": 166
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingVoid",
+      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "void ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      },
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 238,
+      "end": 272
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingPromiseArrayVoid",
+      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 6,
+      "end": 67
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 16,
+      "end": 67
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeNew",
+      "description": "Unsafe construction of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 57
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 182
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 197
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 216
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 233
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 176,
+      "end": 182
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 192,
+      "end": 197
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 210,
+      "end": 216
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 226,
+      "end": 233
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .finally on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 66
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 79,
+      "end": 132
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 252,
+      "end": 270
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/b.mts"
+  },
+  {
+    "range": {
+      "pos": 134,
+      "end": 166
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingVoid",
+      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "void ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      },
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 238,
+      "end": 272
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingPromiseArrayVoid",
+      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 6,
+      "end": 67
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 16,
+      "end": 67
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeNew",
+      "description": "Unsafe construction of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 57
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 182
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 197
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 216
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 233
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 176,
+      "end": 182
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 192,
+      "end": 197
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 210,
+      "end": 216
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 226,
+      "end": 233
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .finally on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 66
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 79,
+      "end": 132
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 252,
+      "end": 270
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/c.cts"
+  },
+  {
+    "range": {
+      "pos": 134,
+      "end": 166
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingVoid",
+      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "void ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      },
+      {
+        "message": {
+          "id": "floatingVoid",
+          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+        },
+        "fixes": [
+          {
+            "text": "await ",
+            "range": {
+              "pos": 134,
+              "end": 134
+            }
+          }
+        ]
+      }
+    ],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 238,
+      "end": 272
+    },
+    "rule": "no-floating-promises",
+    "message": {
+      "id": "floatingPromiseArrayVoid",
+      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 0,
+      "end": 0
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "message": {
+      "id": "noStrictNullCheck",
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 6,
+      "end": 67
+    },
+    "rule": "no-unsafe-assignment",
+    "message": {
+      "id": "anyAssignment",
+      "description": "Unsafe assignment of an any value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 16,
+      "end": 67
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeNew",
+      "description": "Unsafe construction of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 57
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 182
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 168,
+      "end": 197
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 216
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 202,
+      "end": 233
+    },
+    "rule": "no-unsafe-call",
+    "message": {
+      "id": "unsafeCall",
+      "description": "Unsafe call of a(n) `any` typed value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 176,
+      "end": 182
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 192,
+      "end": 197
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .catch on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 210,
+      "end": 216
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .reject on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 226,
+      "end": 233
+    },
+    "rule": "no-unsafe-member-access",
+    "message": {
+      "id": "unsafeMemberExpression",
+      "description": "Unsafe member access .finally on an `any` value."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 50,
+      "end": 66
+    },
+    "rule": "no-unsafe-return",
+    "message": {
+      "id": "unsafeReturn",
+      "description": "Unsafe return of a value of type `any`."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 79,
+      "end": 132
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  },
+  {
+    "range": {
+      "pos": 252,
+      "end": 270
+    },
+    "rule": "require-await",
+    "message": {
+      "id": "missingAwait",
+      "description": "Function has no 'await' expression."
+    },
+    "fixes": [],
+    "suggestions": [],
+    "file_path": "fixtures/src/d.tsx"
+  }
+]
