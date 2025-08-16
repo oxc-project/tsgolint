@@ -1,3 +1,8 @@
+ready:
+  just fmt
+  just lint
+  just test
+
 init:
   git submodule update --init
   pushd typescript-go && git am --3way --no-gpg-sign ../patches/*.patch && popd
@@ -14,3 +19,6 @@ lint:
 
 fmt:
   gofmt -w internal cmd tools
+
+shim:
+  ./tools/gen-npm-packages.mjs
