@@ -118,85 +118,46 @@ func runHeadless(args []string) int {
 	}
 
 	if done, err := recordTrace(traceOut); err != nil {
-		if logger != nil {
-			logger.Error(fmt.Sprintf("Failed to setup trace: %v", err))
-		}
 		os.Stderr.WriteString(err.Error())
 		return 1
 	} else {
 		defer done()
-		if logger != nil && traceOut != "" {
-			logger.Info(fmt.Sprintf("Trace output enabled: %s", traceOut))
-		}
 	}
 	if done, err := recordCpuprof(cpuprofOut); err != nil {
-		if logger != nil {
-			logger.Error(fmt.Sprintf("Failed to setup CPU profile: %v", err))
-		}
 		os.Stderr.WriteString(err.Error())
 		return 1
 	} else {
 		defer done()
-		if logger != nil && cpuprofOut != "" {
-			logger.Info(fmt.Sprintf("CPU profile output enabled: %s", cpuprofOut))
-		}
 	}
 
 	cwd, err := os.Getwd()
 	if err != nil {
-		if logger != nil {
-			logger.Error(fmt.Sprintf("Failed to get current directory: %v", err))
-		}
 		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
 		return 1
-	}
-	if logger != nil {
-		logger.Info(fmt.Sprintf("Working directory: %s", cwd))
 	}
 
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 
 	service := newProjectService(fs, cwd)
-	if logger != nil {
-		logger.Info("Created TypeScript project service")
-	}
 
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
-		if logger != nil {
-			logger.Error(fmt.Sprintf("Failed to read config from stdin: %v", err))
-		}
 		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
 		return 1
-	}
-	if logger != nil {
-		logger.Info(fmt.Sprintf("Read %d bytes of config from stdin", len(configRaw)))
 	}
 
 	var config headlessConfig
 
 	if err := json.Unmarshal(configRaw, &config); err != nil {
-		if logger != nil {
-			logger.Error(fmt.Sprintf("Failed to parse config JSON: %v", err))
-		}
 		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
 		return 1
-	}
-	if logger != nil {
-		logger.Info(fmt.Sprintf("Parsed config with %d files", len(config.Files)))
 	}
 
 	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{}
-	for i, fileConfig := range config.Files {
-		if logger != nil {
-			logger.Info(fmt.Sprintf("Processing file %d/%d: %s", i+1, len(config.Files), fileConfig.FilePath))
-		}
+	for _, fileConfig := range config.Files {
 		source, err := os.ReadFile(fileConfig.FilePath)
 		if err != nil {
-			if logger != nil {
-				logger.Error(fmt.Sprintf("Failed to read file %s: %v", fileConfig.FilePath, err))
-			}
 			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
 			return 1
 		}
@@ -205,18 +166,12 @@ func runHeadless(args []string) int {
 		program := project.GetProgram()
 		file := program.GetSourceFile(fileConfig.FilePath)
 		if file == nil {
-			if logger != nil {
-				logger.Error(fmt.Sprintf("File %s not matched by tsconfig", fileConfig.FilePath))
-			}
 			writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", fileConfig.FilePath))
 			return 1
 		}
 		fileConfigs[file] = fileConfig
 
 		workload[program] = append(workload[program], file)
-		if logger != nil {
-			logger.Info(fmt.Sprintf("Successfully processed file: %s (rules: %v)", fileConfig.FilePath, fileConfig.Rules))
-		}
 	}
 
 	for _, files := range workload {
@@ -224,29 +179,17 @@ func runHeadless(args []string) int {
 			return len(b.Text()) - len(a.Text())
 		})
 	}
-	if logger != nil {
-		totalFiles := 0
-		for _, files := range workload {
-			totalFiles += len(files)
-		}
-		logger.Info(fmt.Sprintf("Prepared workload with %d files across %d programs", totalFiles, len(workload)))
-	}
 
 	var wg sync.WaitGroup
 
 	diagnosticsChan := make(chan rule.RuleDiagnostic, 4096)
-	if logger != nil {
-		logger.Info(fmt.Sprintf("Starting linter with %d workers", runtime.GOMAXPROCS(0)))
-	}
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
-		diagnosticsCount := 0
 		for d := range diagnosticsChan {
-			diagnosticsCount++
 			hd := headlessDiagnostic{
 				Range:       headlessRangeFromRange(d.Range),
 				Rule:        d.RuleName,
@@ -277,9 +220,6 @@ func runHeadless(args []string) int {
 			if w.Available() < 4096 {
 				w.Flush()
 			}
-		}
-		if logger != nil {
-			logger.Info(fmt.Sprintf("Processed %d diagnostics", diagnosticsCount))
 		}
 	}()
 
@@ -312,20 +252,11 @@ func runHeadless(args []string) int {
 
 	close(diagnosticsChan)
 	if err != nil {
-		if logger != nil {
-			logger.Error(fmt.Sprintf("Linter execution failed: %v", err))
-		}
 		writeErrorMessage(fmt.Sprintf("error running linter: %v", err))
 		return 1
 	}
-	if logger != nil {
-		logger.Info("Linter execution completed successfully")
-	}
 
 	wg.Wait()
-	if logger != nil {
-		logger.Info("Headless mode completed")
-	}
 
 	return 0
 }
