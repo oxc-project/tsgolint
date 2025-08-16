@@ -5,10 +5,14 @@ version: '2'
 run:
   allow-parallel-runners: true
 
+formatters:
+  default: none
+  enable:
+    - gofmt
+
 linters:
   default: none
   enable:
-    # Enabled
     - asasalint
     - bidichk
     - bodyclose

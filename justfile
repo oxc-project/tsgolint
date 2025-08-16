@@ -11,3 +11,6 @@ test:
 
 lint:
   golangci-lint run
+
+fmt:
+  gofmt -w internal cmd tools
