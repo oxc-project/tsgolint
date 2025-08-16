@@ -18,10 +18,13 @@ type NoFloatingPromisesOptions struct {
 	IgnoreVoid                      *bool
 }
 
-var messageBase = "Promises must be awaited, end with a call to .catch, or end with a call to .then with a rejection handler."
+var messageBase = "Promises must be awaited."
 
-var messageBaseVoid = "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler" +
-	" or be explicitly marked as ignored with the `void` operator."
+var messageBaseHelp = "The promise must end with a call to .catch, or end with a call to .then with a rejection handler."
+
+var messageBaseVoid = "Promises must be awaited."
+
+var messageBaseVoidHelp = "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
 
 var messageRejectionHandler = "A rejection handler that is not a function will be ignored."
 
@@ -29,6 +32,7 @@ func buildFloatingMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "floating",
 		Description: messageBase,
+		Help:        messageBaseHelp,
 	}
 }
 func buildFloatingFixAwaitMessage() rule.RuleMessage {
@@ -46,32 +50,37 @@ func buildFloatingFixVoidMessage() rule.RuleMessage {
 func buildFloatingPromiseArrayMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "floatingPromiseArray",
-		Description: "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar.",
+		Description: "An array of Promises may be unintentional.",
+		Help:        "Consider handling the promises' fulfillment or rejection with Promise.all or similar.",
 	}
 }
 func buildFloatingPromiseArrayVoidMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id: "floatingPromiseArrayVoid",
-		Description: "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar," +
+		Id:          "floatingPromiseArrayVoid",
+		Description: "An array of Promises may be unintentional.",
+		Help: "Consider handling the promises' fulfillment or rejection with Promise.all or similar," +
 			" or explicitly marking the expression as ignored with the `void` operator.",
 	}
 }
 func buildFloatingUselessRejectionHandlerMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "floatingUselessRejectionHandler",
-		Description: messageBase + " " + messageRejectionHandler,
+		Description: messageBase,
+		Help:        messageBaseHelp + " " + messageRejectionHandler,
 	}
 }
 func buildFloatingUselessRejectionHandlerVoidMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "floatingUselessRejectionHandlerVoid",
-		Description: messageBaseVoid + " " + messageRejectionHandler,
+		Description: messageBaseVoid,
+		Help:        messageBaseVoidHelp + " " + messageRejectionHandler,
 	}
 }
 func buildFloatingVoidMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "floatingVoid",
 		Description: messageBaseVoid,
+		Help:        messageBaseVoidHelp,
 	}
 }
 

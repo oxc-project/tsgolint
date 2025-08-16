@@ -44,12 +44,14 @@ func headlessRangeFromRange(r core.TextRange) headlessRange {
 type headlessRuleMessage struct {
 	Id          string `json:"id"`
 	Description string `json:"description"`
+	Help        string `json:"help,omitempty"`
 }
 
 func headlessRuleMessageFromRuleMessage(msg rule.RuleMessage) headlessRuleMessage {
 	return headlessRuleMessage{
 		Id:          msg.Id,
 		Description: msg.Description,
+		Help:        msg.Help,
 	}
 }
 

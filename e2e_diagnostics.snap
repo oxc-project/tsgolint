@@ -423,14 +423,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -445,7 +447,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -468,7 +471,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -2994,14 +2998,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3016,7 +3022,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3039,7 +3046,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3263,14 +3271,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3285,7 +3295,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3308,7 +3319,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3532,14 +3544,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3554,7 +3568,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3577,7 +3592,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3801,14 +3817,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3823,7 +3841,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3846,7 +3865,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
