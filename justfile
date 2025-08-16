@@ -1,6 +1,7 @@
 ready:
   just fmt
   just lint
+  just build
   just test
 
 init:
