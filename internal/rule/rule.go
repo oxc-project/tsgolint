@@ -39,6 +39,7 @@ type Rule struct {
 type RuleMessage struct {
 	Id          string
 	Description string
+	Help        string
 }
 
 type RuleFix struct {
