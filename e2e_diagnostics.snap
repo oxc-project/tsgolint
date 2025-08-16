@@ -7,14 +7,16 @@
     "rule": "await-thenable",
     "message": {
       "id": "await",
-      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "await",
-          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+          "help": ""
         },
         "fixes": [
           {
@@ -37,14 +39,16 @@
     "rule": "await-thenable",
     "message": {
       "id": "await",
-      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "await",
-          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+          "help": ""
         },
         "fixes": [
           {
@@ -67,14 +71,16 @@
     "rule": "await-thenable",
     "message": {
       "id": "await",
-      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+      "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "await",
-          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value."
+          "description": "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+          "help": ""
         },
         "fixes": [
           {
@@ -97,7 +103,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -111,7 +118,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -125,7 +133,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -139,14 +148,16 @@
     "rule": "no-array-delete",
     "message": {
       "id": "noArrayDelete",
-      "description": "Using the `delete` operator with an array expression is unsafe."
+      "description": "Using the `delete` operator with an array expression is unsafe.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "noArrayDelete",
-          "description": "Using the `delete` operator with an array expression is unsafe."
+          "description": "Using the `delete` operator with an array expression is unsafe.",
+          "help": ""
         },
         "fixes": [
           {
@@ -183,7 +194,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -197,7 +209,8 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'// Examples of incorrect code for no-base-to-string rule\n\n// These will evaluate to '[object Object]'\n({})' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'// Examples of incorrect code for no-base-to-string rule\n\n// These will evaluate to '[object Object]'\n({})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -211,7 +224,8 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'\n({foo: 'bar'})' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'\n({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -225,7 +239,8 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'\n({foo: 'bar'})' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'\n({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -239,7 +254,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -253,7 +269,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -267,7 +284,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -281,7 +299,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .toString on an `any` value."
+      "description": "Unsafe member access .toString on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -295,7 +314,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -309,7 +329,8 @@
     "rule": "no-duplicate-type-constituents",
     "message": {
       "id": "duplicate",
-      "description": "Union type constituent is duplicated with  'A'."
+      "description": "Union type constituent is duplicated with  'A'.",
+      "help": ""
     },
     "fixes": [
       {
@@ -338,7 +359,8 @@
     "rule": "no-duplicate-type-constituents",
     "message": {
       "id": "duplicate",
-      "description": "Union type constituent is duplicated with  'foo'."
+      "description": "Union type constituent is duplicated with  'foo'.",
+      "help": ""
     },
     "fixes": [
       {
@@ -367,7 +389,8 @@
     "rule": "no-redundant-type-constituents",
     "message": {
       "id": "errorTypeOverrides",
-      "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type."
+      "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -381,7 +404,8 @@
     "rule": "no-redundant-type-constituents",
     "message": {
       "id": "errorTypeOverrides",
-      "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type."
+      "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -395,7 +419,8 @@
     "rule": "no-redundant-type-constituents",
     "message": {
       "id": "errorTypeOverrides",
-      "description": "'B' is an 'error' type that acts as 'any' and overrides all other types in this union type."
+      "description": "'B' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -409,7 +434,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -423,14 +449,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -445,7 +473,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -468,7 +497,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -482,7 +512,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -496,7 +527,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -510,7 +542,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeNew",
-      "description": "Unsafe construction of a(n) `any` typed value."
+      "description": "Unsafe construction of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -524,7 +557,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -538,7 +572,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -552,7 +587,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -566,7 +602,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -580,7 +617,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -594,7 +632,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -608,7 +647,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -622,7 +662,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -636,7 +677,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .finally on an `any` value."
+      "description": "Unsafe member access .finally on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -650,7 +692,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -664,7 +707,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -678,7 +722,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -692,7 +737,8 @@
     "rule": "no-for-in-array",
     "message": {
       "id": "forInViolation",
-      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead."
+      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -706,7 +752,8 @@
     "rule": "no-for-in-array",
     "message": {
       "id": "forInViolation",
-      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead."
+      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -720,7 +767,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -734,7 +782,8 @@
     "rule": "no-implied-eval",
     "message": {
       "id": "noImpliedEvalError",
-      "description": "Implied eval. Consider passing a function."
+      "description": "Implied eval. Consider passing a function.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -748,7 +797,8 @@
     "rule": "no-implied-eval",
     "message": {
       "id": "noImpliedEvalError",
-      "description": "Implied eval. Consider passing a function."
+      "description": "Implied eval. Consider passing a function.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -762,7 +812,8 @@
     "rule": "no-implied-eval",
     "message": {
       "id": "noImpliedEvalError",
-      "description": "Implied eval. Consider passing a function."
+      "description": "Implied eval. Consider passing a function.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -776,7 +827,8 @@
     "rule": "no-implied-eval",
     "message": {
       "id": "noImpliedEvalError",
-      "description": "Implied eval. Consider passing a function."
+      "description": "Implied eval. Consider passing a function.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -790,7 +842,8 @@
     "rule": "no-implied-eval",
     "message": {
       "id": "noImpliedEvalError",
-      "description": "Implied eval. Consider passing a function."
+      "description": "Implied eval. Consider passing a function.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -804,7 +857,8 @@
     "rule": "no-implied-eval",
     "message": {
       "id": "noFunctionConstructor",
-      "description": "Implied eval. Do not use the Function constructor to create functions."
+      "description": "Implied eval. Do not use the Function constructor to create functions.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -818,7 +872,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -832,7 +887,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -846,7 +902,8 @@
     "rule": "no-meaningless-void-operator",
     "message": {
       "id": "meaninglessVoidOperator",
-      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored"
+      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
+      "help": ""
     },
     "fixes": [
       {
@@ -868,7 +925,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -882,7 +940,8 @@
     "rule": "no-misused-spread",
     "message": {
       "id": "noFunctionSpreadInObject",
-      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?"
+      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -896,7 +955,8 @@
     "rule": "no-misused-spread",
     "message": {
       "id": "noStringSpread",
-      "description": "Using the spread operator on a string can mishandle special characters, as can `.split(\"\")`.\n'- `...` produces Unicode code points, which will decompose complex emojis into individual emojis- .split(\"\") produces UTF-16 code units, which breaks rich characters in many languagesConsider using `Intl.Segmenter` for locale-aware string decomposition.Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option."
+      "description": "Using the spread operator on a string can mishandle special characters, as can `.split(\"\")`.\n'- `...` produces Unicode code points, which will decompose complex emojis into individual emojis- .split(\"\") produces UTF-16 code units, which breaks rich characters in many languagesConsider using `Intl.Segmenter` for locale-aware string decomposition.Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -910,7 +970,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -924,7 +985,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -938,7 +1000,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -952,7 +1015,8 @@
     "rule": "no-mixed-enums",
     "message": {
       "id": "mixed",
-      "description": "Mixing number and string enums can be confusing."
+      "description": "Mixing number and string enums can be confusing.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -966,7 +1030,8 @@
     "rule": "no-mixed-enums",
     "message": {
       "id": "mixed",
-      "description": "Mixing number and string enums can be confusing."
+      "description": "Mixing number and string enums can be confusing.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -980,7 +1045,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -994,7 +1060,8 @@
     "rule": "no-redundant-type-constituents",
     "message": {
       "id": "overrides",
-      "description": "'unknown' overrides all other types in this union type."
+      "description": "'unknown' overrides all other types in this union type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1008,7 +1075,8 @@
     "rule": "no-redundant-type-constituents",
     "message": {
       "id": "overrides",
-      "description": "'any' overrides all other types in this union type."
+      "description": "'any' overrides all other types in this union type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1022,7 +1090,8 @@
     "rule": "no-redundant-type-constituents",
     "message": {
       "id": "overridden",
-      "description": "'never' is overridden by other types in this union type."
+      "description": "'never' is overridden by other types in this union type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1036,7 +1105,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1050,7 +1120,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1064,7 +1135,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "direct",
-      "description": "This expression unnecessarily compares a boolean value to a boolean instead of using it directly."
+      "description": "This expression unnecessarily compares a boolean value to a boolean instead of using it directly.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1086,7 +1158,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "direct",
-      "description": "This expression unnecessarily compares a boolean value to a boolean instead of using it directly."
+      "description": "This expression unnecessarily compares a boolean value to a boolean instead of using it directly.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1115,7 +1188,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1129,7 +1203,8 @@
     "rule": "no-unnecessary-template-expression",
     "message": {
       "id": "noUnnecessaryTemplateExpression",
-      "description": "Template literal expression is unnecessary and can be simplified."
+      "description": "Template literal expression is unnecessary and can be simplified.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1143,7 +1218,8 @@
     "rule": "no-unnecessary-template-expression",
     "message": {
       "id": "noUnnecessaryTemplateExpression",
-      "description": "Template literal expression is unnecessary and can be simplified."
+      "description": "Template literal expression is unnecessary and can be simplified.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1157,7 +1233,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1171,7 +1248,8 @@
     "rule": "no-unnecessary-type-arguments",
     "message": {
       "id": "unnecessaryTypeParameter",
-      "description": "This is the default value for this type parameter, so it can be omitted."
+      "description": "This is the default value for this type parameter, so it can be omitted.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1193,7 +1271,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1207,7 +1286,8 @@
     "rule": "no-unnecessary-type-assertion",
     "message": {
       "id": "unnecessaryAssertion",
-      "description": "This assertion is unnecessary since it does not change the type of the expression."
+      "description": "This assertion is unnecessary since it does not change the type of the expression.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1236,7 +1316,8 @@
     "rule": "no-unnecessary-type-assertion",
     "message": {
       "id": "unnecessaryAssertion",
-      "description": "This assertion is unnecessary since it does not change the type of the expression."
+      "description": "This assertion is unnecessary since it does not change the type of the expression.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1265,7 +1346,8 @@
     "rule": "no-unnecessary-type-assertion",
     "message": {
       "id": "unnecessaryAssertion",
-      "description": "This assertion is unnecessary since it does not change the type of the expression."
+      "description": "This assertion is unnecessary since it does not change the type of the expression.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1294,7 +1376,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1308,7 +1391,8 @@
     "rule": "no-unsafe-argument",
     "message": {
       "id": "unsafeArgument",
-      "description": "Unsafe argument of type any assigned to a parameter of type string."
+      "description": "Unsafe argument of type any assigned to a parameter of type string.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1322,7 +1406,8 @@
     "rule": "no-unsafe-argument",
     "message": {
       "id": "unsafeArgument",
-      "description": "Unsafe argument of type any assigned to a parameter of type number."
+      "description": "Unsafe argument of type any assigned to a parameter of type number.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1336,7 +1421,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1350,7 +1436,8 @@
     "rule": "no-unnecessary-type-assertion",
     "message": {
       "id": "unnecessaryAssertion",
-      "description": "This assertion is unnecessary since it does not change the type of the expression."
+      "description": "This assertion is unnecessary since it does not change the type of the expression.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1379,7 +1466,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1393,7 +1481,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1407,7 +1496,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1421,7 +1511,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1435,7 +1526,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1449,7 +1541,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1463,7 +1556,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1477,7 +1571,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1491,7 +1586,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1505,7 +1601,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1519,7 +1616,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1533,7 +1631,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .then on an `any` value."
+      "description": "Unsafe member access .then on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1547,7 +1646,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1561,7 +1661,8 @@
     "rule": "no-mixed-enums",
     "message": {
       "id": "mixed",
-      "description": "Mixing number and string enums can be confusing."
+      "description": "Mixing number and string enums can be confusing.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1575,7 +1676,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1589,7 +1691,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1603,7 +1706,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1617,7 +1721,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1631,7 +1736,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .foo on an `any` value."
+      "description": "Unsafe member access .foo on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1645,7 +1751,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .bar on an `any` value."
+      "description": "Unsafe member access .bar on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1659,7 +1766,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access ['key'] on an `any` value."
+      "description": "Unsafe member access ['key'] on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1673,7 +1781,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .method on an `any` value."
+      "description": "Unsafe member access .method on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1687,7 +1796,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1701,7 +1811,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1715,7 +1826,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1729,7 +1841,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1743,7 +1856,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1757,7 +1871,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1771,7 +1886,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1785,7 +1901,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .someProperty on an `any` value."
+      "description": "Unsafe member access .someProperty on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1799,7 +1916,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1813,7 +1931,8 @@
     "rule": "no-unsafe-type-assertion",
     "message": {
       "id": "unsafeToAnyTypeAssertion",
-      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety."
+      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1827,7 +1946,8 @@
     "rule": "no-unsafe-type-assertion",
     "message": {
       "id": "unsafeToAnyTypeAssertion",
-      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety."
+      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1841,7 +1961,8 @@
     "rule": "no-unsafe-type-assertion",
     "message": {
       "id": "unsafeOfAnyTypeAssertion",
-      "description": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion."
+      "description": "Unsafe assertion from `any` detected: consider using type guards or a safer assertion.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1855,7 +1976,8 @@
     "rule": "no-unsafe-type-assertion",
     "message": {
       "id": "unsafeToAnyTypeAssertion",
-      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety."
+      "description": "Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1869,7 +1991,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1883,7 +2006,8 @@
     "rule": "no-unsafe-unary-minus",
     "message": {
       "id": "unaryMinus",
-      "description": "Argument of unary negation should be assignable to number | bigint but is unknown instead."
+      "description": "Argument of unary negation should be assignable to number | bigint but is unknown instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1897,7 +2021,8 @@
     "rule": "no-unsafe-unary-minus",
     "message": {
       "id": "unaryMinus",
-      "description": "Argument of unary negation should be assignable to number | bigint but is string instead."
+      "description": "Argument of unary negation should be assignable to number | bigint but is string instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1911,7 +2036,8 @@
     "rule": "no-unsafe-unary-minus",
     "message": {
       "id": "unaryMinus",
-      "description": "Argument of unary negation should be assignable to number | bigint but is false instead."
+      "description": "Argument of unary negation should be assignable to number | bigint but is false instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1925,7 +2051,8 @@
     "rule": "no-unsafe-unary-minus",
     "message": {
       "id": "unaryMinus",
-      "description": "Argument of unary negation should be assignable to number | bigint but is { prop: any; } instead."
+      "description": "Argument of unary negation should be assignable to number | bigint but is { prop: any; } instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1939,7 +2066,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1953,7 +2081,8 @@
     "rule": "no-unnecessary-type-assertion",
     "message": {
       "id": "unnecessaryAssertion",
-      "description": "This assertion is unnecessary since it does not change the type of the expression."
+      "description": "This assertion is unnecessary since it does not change the type of the expression.",
+      "help": ""
     },
     "fixes": [
       {
@@ -1982,7 +2111,8 @@
     "rule": "no-unsafe-type-assertion",
     "message": {
       "id": "unsafeTypeAssertion",
-      "description": "Unsafe type assertion: type 'string' is more narrow than the original type."
+      "description": "Unsafe type assertion: type 'string' is more narrow than the original type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -1996,7 +2126,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2010,7 +2141,8 @@
     "rule": "only-throw-error",
     "message": {
       "id": "object",
-      "description": "Expected an error object to be thrown."
+      "description": "Expected an error object to be thrown.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2024,7 +2156,8 @@
     "rule": "only-throw-error",
     "message": {
       "id": "object",
-      "description": "Expected an error object to be thrown."
+      "description": "Expected an error object to be thrown.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2038,7 +2171,8 @@
     "rule": "only-throw-error",
     "message": {
       "id": "object",
-      "description": "Expected an error object to be thrown."
+      "description": "Expected an error object to be thrown.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2052,7 +2186,8 @@
     "rule": "only-throw-error",
     "message": {
       "id": "object",
-      "description": "Expected an error object to be thrown."
+      "description": "Expected an error object to be thrown.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2066,7 +2201,8 @@
     "rule": "only-throw-error",
     "message": {
       "id": "object",
-      "description": "Expected an error object to be thrown."
+      "description": "Expected an error object to be thrown.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2080,7 +2216,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2094,7 +2231,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2108,7 +2246,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2122,7 +2261,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2136,7 +2276,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2150,7 +2291,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2164,7 +2306,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2178,7 +2321,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2192,7 +2336,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2206,7 +2351,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2220,7 +2366,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2234,7 +2381,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2248,7 +2396,8 @@
     "rule": "no-unnecessary-type-assertion",
     "message": {
       "id": "unnecessaryAssertion",
-      "description": "This assertion is unnecessary since it does not change the type of the expression."
+      "description": "This assertion is unnecessary since it does not change the type of the expression.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2277,7 +2426,8 @@
     "rule": "prefer-reduce-type-parameter",
     "message": {
       "id": "preferTypeParameter",
-      "description": "Unnecessary assertion: Array#reduce accepts a type parameter for the default value."
+      "description": "Unnecessary assertion: Array#reduce accepts a type parameter for the default value.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2306,7 +2456,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2320,7 +2471,8 @@
     "rule": "prefer-return-this-type",
     "message": {
       "id": "useThisType",
-      "description": "Use `this` type instead."
+      "description": "Use `this` type instead.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2342,7 +2494,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2356,7 +2509,8 @@
     "rule": "promise-function-async",
     "message": {
       "id": "missingAsync",
-      "description": "Functions that return promises must be async."
+      "description": "Functions that return promises must be async.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2378,7 +2532,8 @@
     "rule": "promise-function-async",
     "message": {
       "id": "missingAsync",
-      "description": "Functions that return promises must be async."
+      "description": "Functions that return promises must be async.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2400,7 +2555,8 @@
     "rule": "promise-function-async",
     "message": {
       "id": "missingAsync",
-      "description": "Functions that return promises must be async."
+      "description": "Functions that return promises must be async.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2422,7 +2578,8 @@
     "rule": "promise-function-async",
     "message": {
       "id": "missingAsync",
-      "description": "Functions that return promises must be async."
+      "description": "Functions that return promises must be async.",
+      "help": ""
     },
     "fixes": [
       {
@@ -2444,7 +2601,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2458,7 +2616,8 @@
     "rule": "related-getter-setter-pairs",
     "message": {
       "id": "mismatch",
-      "description": "`get()` type should be assignable to its equivalent `set()` type."
+      "description": "`get()` type should be assignable to its equivalent `set()` type.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2472,7 +2631,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2486,7 +2646,8 @@
     "rule": "require-array-sort-compare",
     "message": {
       "id": "requireCompare",
-      "description": "Require 'compare' argument."
+      "description": "Require 'compare' argument.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2500,7 +2661,8 @@
     "rule": "require-array-sort-compare",
     "message": {
       "id": "requireCompare",
-      "description": "Require 'compare' argument."
+      "description": "Require 'compare' argument.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2514,7 +2676,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2528,7 +2691,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2542,7 +2706,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .map on an `any` value."
+      "description": "Unsafe member access .map on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2556,7 +2721,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2570,7 +2736,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2584,7 +2751,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2598,7 +2766,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2612,7 +2781,8 @@
     "rule": "restrict-plus-operands",
     "message": {
       "id": "bigintAndNumber",
-      "description": "Numeric '+' operations must either be both bigints or both numbers. Got `bigint` + `number`."
+      "description": "Numeric '+' operations must either be both bigints or both numbers. Got `bigint` + `number`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2626,7 +2796,8 @@
     "rule": "restrict-plus-operands",
     "message": {
       "id": "invalid",
-      "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`. Got `never`."
+      "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`. Got `never`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2640,7 +2811,8 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'obj' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'obj' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2654,7 +2826,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2668,7 +2841,8 @@
     "rule": "restrict-template-expressions",
     "message": {
       "id": "invalidType",
-      "description": "Invalid type \"{ prop: any; }\" of template literal expression."
+      "description": "Invalid type \"{ prop: any; }\" of template literal expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2682,7 +2856,8 @@
     "rule": "restrict-template-expressions",
     "message": {
       "id": "invalidType",
-      "description": "Invalid type \"symbol\" of template literal expression."
+      "description": "Invalid type \"symbol\" of template literal expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2696,7 +2871,8 @@
     "rule": "restrict-template-expressions",
     "message": {
       "id": "invalidType",
-      "description": "Invalid type \"Function\" of template literal expression."
+      "description": "Invalid type \"Function\" of template literal expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2710,7 +2886,8 @@
     "rule": "restrict-template-expressions",
     "message": {
       "id": "invalidType",
-      "description": "Invalid type \"number[]\" of template literal expression."
+      "description": "Invalid type \"number[]\" of template literal expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2724,7 +2901,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2738,14 +2916,16 @@
     "rule": "return-await",
     "message": {
       "id": "requiredPromiseAwait",
-      "description": "Returning an awaited promise is required in this context."
+      "description": "Returning an awaited promise is required in this context.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "requiredPromiseAwait",
-          "description": "Returning an awaited promise is required in this context."
+          "description": "Returning an awaited promise is required in this context.",
+          "help": ""
         },
         "fixes": [
           {
@@ -2768,14 +2948,16 @@
     "rule": "return-await",
     "message": {
       "id": "requiredPromiseAwait",
-      "description": "Returning an awaited promise is required in this context."
+      "description": "Returning an awaited promise is required in this context.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "requiredPromiseAwait",
-          "description": "Returning an awaited promise is required in this context."
+          "description": "Returning an awaited promise is required in this context.",
+          "help": ""
         },
         "fixes": [
           {
@@ -2798,7 +2980,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2812,7 +2995,8 @@
     "rule": "no-unsafe-enum-comparison",
     "message": {
       "id": "mismatchedCase",
-      "description": "The case statement does not have a shared enum type with the switch predicate."
+      "description": "The case statement does not have a shared enum type with the switch predicate.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2826,7 +3010,8 @@
     "rule": "no-unsafe-enum-comparison",
     "message": {
       "id": "mismatchedCase",
-      "description": "The case statement does not have a shared enum type with the switch predicate."
+      "description": "The case statement does not have a shared enum type with the switch predicate.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2840,7 +3025,8 @@
     "rule": "switch-exhaustiveness-check",
     "message": {
       "id": "switchIsNotExhaustive",
-      "description": "Switch is not exhaustive"
+      "description": "Switch is not exhaustive",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2854,7 +3040,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2868,7 +3055,8 @@
     "rule": "unbound-method",
     "message": {
       "id": "unboundWithoutThisAnnotation",
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2882,7 +3070,8 @@
     "rule": "unbound-method",
     "message": {
       "id": "unboundWithoutThisAnnotation",
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2896,7 +3085,8 @@
     "rule": "unbound-method",
     "message": {
       "id": "unboundWithoutThisAnnotation",
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2910,7 +3100,8 @@
     "rule": "unbound-method",
     "message": {
       "id": "unboundWithoutThisAnnotation",
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead."
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of `this`.\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2924,7 +3115,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2938,7 +3130,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2952,7 +3145,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .message on an `any` value."
+      "description": "Unsafe member access .message on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2966,7 +3160,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2980,7 +3175,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .message on an `any` value."
+      "description": "Unsafe member access .message on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -2994,14 +3190,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3016,7 +3214,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3039,7 +3238,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3053,7 +3253,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3067,7 +3268,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3081,7 +3283,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeNew",
-      "description": "Unsafe construction of a(n) `any` typed value."
+      "description": "Unsafe construction of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3095,7 +3298,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3109,7 +3313,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3123,7 +3328,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3137,7 +3343,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3151,7 +3358,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3165,7 +3373,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3179,7 +3388,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3193,7 +3403,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3207,7 +3418,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .finally on an `any` value."
+      "description": "Unsafe member access .finally on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3221,7 +3433,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3235,7 +3448,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3249,7 +3463,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3263,14 +3478,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3285,7 +3502,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3308,7 +3526,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3322,7 +3541,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3336,7 +3556,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3350,7 +3571,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeNew",
-      "description": "Unsafe construction of a(n) `any` typed value."
+      "description": "Unsafe construction of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3364,7 +3586,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3378,7 +3601,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3392,7 +3616,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3406,7 +3631,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3420,7 +3646,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3434,7 +3661,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3448,7 +3676,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3462,7 +3691,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3476,7 +3706,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .finally on an `any` value."
+      "description": "Unsafe member access .finally on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3490,7 +3721,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3504,7 +3736,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3518,7 +3751,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3532,14 +3766,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3554,7 +3790,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3577,7 +3814,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3591,7 +3829,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3605,7 +3844,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3619,7 +3859,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeNew",
-      "description": "Unsafe construction of a(n) `any` typed value."
+      "description": "Unsafe construction of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3633,7 +3874,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3647,7 +3889,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3661,7 +3904,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3675,7 +3919,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3689,7 +3934,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3703,7 +3949,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3717,7 +3964,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3731,7 +3979,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3745,7 +3994,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .finally on an `any` value."
+      "description": "Unsafe member access .finally on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3759,7 +4009,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3773,7 +4024,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3787,7 +4039,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3801,14 +4054,16 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingVoid",
-      "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3823,7 +4078,8 @@
       {
         "message": {
           "id": "floatingVoid",
-          "description": "Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator."
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
         },
         "fixes": [
           {
@@ -3846,7 +4102,8 @@
     "rule": "no-floating-promises",
     "message": {
       "id": "floatingPromiseArrayVoid",
-      "description": "An array of Promises may be unintentional. Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
+      "description": "An array of Promises may be unintentional.",
+      "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the `void` operator."
     },
     "fixes": [],
     "suggestions": [],
@@ -3860,7 +4117,8 @@
     "rule": "no-unnecessary-boolean-literal-compare",
     "message": {
       "id": "noStrictNullCheck",
-      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly."
+      "description": "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3874,7 +4132,8 @@
     "rule": "no-unsafe-assignment",
     "message": {
       "id": "anyAssignment",
-      "description": "Unsafe assignment of an any value."
+      "description": "Unsafe assignment of an any value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3888,7 +4147,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeNew",
-      "description": "Unsafe construction of a(n) `any` typed value."
+      "description": "Unsafe construction of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3902,7 +4162,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3916,7 +4177,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3930,7 +4192,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3944,7 +4207,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3958,7 +4222,8 @@
     "rule": "no-unsafe-call",
     "message": {
       "id": "unsafeCall",
-      "description": "Unsafe call of a(n) `any` typed value."
+      "description": "Unsafe call of a(n) `any` typed value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3972,7 +4237,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -3986,7 +4252,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .catch on an `any` value."
+      "description": "Unsafe member access .catch on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -4000,7 +4267,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .reject on an `any` value."
+      "description": "Unsafe member access .reject on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -4014,7 +4282,8 @@
     "rule": "no-unsafe-member-access",
     "message": {
       "id": "unsafeMemberExpression",
-      "description": "Unsafe member access .finally on an `any` value."
+      "description": "Unsafe member access .finally on an `any` value.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -4028,7 +4297,8 @@
     "rule": "no-unsafe-return",
     "message": {
       "id": "unsafeReturn",
-      "description": "Unsafe return of a value of type `any`."
+      "description": "Unsafe return of a value of type `any`.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -4042,7 +4312,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
@@ -4056,7 +4327,8 @@
     "rule": "require-await",
     "message": {
       "id": "missingAwait",
-      "description": "Function has no 'await' expression."
+      "description": "Function has no 'await' expression.",
+      "help": ""
     },
     "fixes": [],
     "suggestions": [],
