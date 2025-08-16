@@ -2,8 +2,8 @@ package main
 
 import (
 	"bytes"
-	"github.com/go-json-experiment/json"
 	"fmt"
+	"github.com/go-json-experiment/json"
 	"go/types"
 	"log"
 	"maps"

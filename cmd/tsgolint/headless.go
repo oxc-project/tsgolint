@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
-	"github.com/go-json-experiment/json"
 	"flag"
 	"fmt"
+	"github.com/go-json-experiment/json"
 	"io"
 	"os"
 	"runtime"
