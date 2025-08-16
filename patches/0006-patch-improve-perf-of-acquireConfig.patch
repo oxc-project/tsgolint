@@ -1,0 +1,460 @@
+From 90313142aea26a4518742878b55007fe2eb43cbf Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Sat, 16 Aug 2025 15:43:15 +0100
+Subject: [PATCH] patch: improve perf of `acquireConfig`
+
+---
+ internal/project/configfileregistry.go   | 144 +++++++++++++++++-----
+ internal/project/defaultprojectfinder.go | 149 +++++++++++++++++------
+ internal/project/service.go              |  13 +-
+ 3 files changed, 231 insertions(+), 75 deletions(-)
+
+diff --git a/internal/project/configfileregistry.go b/internal/project/configfileregistry.go
+index fc4600e4a..2e53bd80b 100644
+--- a/internal/project/configfileregistry.go
++++ b/internal/project/configfileregistry.go
+@@ -28,12 +28,22 @@ type ExtendedConfigFileEntry struct {
+ 	configFiles collections.Set[tspath.Path]
+ }
+ 
++// parseStatus tracks ongoing parses to prevent duplicate work
++type parseStatus struct {
++	wg  *sync.WaitGroup
++	err error
++}
++
+ type ConfigFileRegistry struct {
+ 	Host                  ProjectHost
+ 	defaultProjectFinder  *defaultProjectFinder
+ 	ConfigFiles           collections.SyncMap[tspath.Path, *ConfigFileEntry]
+ 	ExtendedConfigCache   collections.SyncMap[tspath.Path, *tsoptions.ExtendedConfigCacheEntry]
+ 	ExtendedConfigsUsedBy collections.SyncMap[tspath.Path, *ExtendedConfigFileEntry]
++
++	// Parse deduplication - prevents multiple concurrent parses of the same config
++	parseMu       sync.Mutex
++	activeParsing map[tspath.Path]*parseStatus
+ }
+ 
+ func (e *ConfigFileEntry) SetPendingReload(level PendingReload) bool {
+@@ -74,41 +84,113 @@ func (c *ConfigFileRegistry) releaseConfig(path tspath.Path, project *Project) {
+ }
+ 
+ func (c *ConfigFileRegistry) acquireConfig(fileName string, path tspath.Path, project *Project, info *ScriptInfo) *tsoptions.ParsedCommandLine {
+-	entry, ok := c.ConfigFiles.Load(path)
+-	if !ok {
+-		// Create parsed command line
++	// Try fast path - config already exists and doesn't need reload
++	if entry, ok := c.ConfigFiles.Load(path); ok {
++		entry.mu.RLock()
++		needsReload := entry.pendingReload != PendingReloadNone
++		commandLine := entry.commandLine
++		entry.mu.RUnlock()
++
++		if !needsReload && commandLine != nil {
++			// Fast path - just register the project/info
++			entry.mu.Lock()
++			if project != nil {
++				entry.projects.Add(project)
++			} else if info != nil {
++				entry.infos.Add(info)
++			}
++			entry.mu.Unlock()
++			return commandLine
++		}
++	}
++
++	// Check if another goroutine is already parsing this config
++	c.parseMu.Lock()
++	if status, ok := c.activeParsing[path]; ok {
++		c.parseMu.Unlock()
++		// Wait for the ongoing parse to complete
++		status.wg.Wait()
++
++		// Now try to load the result
++		if entry, ok := c.ConfigFiles.Load(path); ok {
++			entry.mu.Lock()
++			defer entry.mu.Unlock()
++			if project != nil {
++				entry.projects.Add(project)
++			} else if info != nil {
++				entry.infos.Add(info)
++			}
++			return entry.commandLine
++		}
++		// If we still don't have it, fall through to parse it ourselves
++	}
++
++	// Mark that we're parsing this config
++	status := &parseStatus{wg: &sync.WaitGroup{}}
++	status.wg.Add(1)
++	c.activeParsing[path] = status
++	c.parseMu.Unlock()
++
++	// Ensure we clean up the parse status
++	defer func() {
++		status.wg.Done()
++		c.parseMu.Lock()
++		delete(c.activeParsing, path)
++		c.parseMu.Unlock()
++	}()
++
++	// Load or create the entry
++	entry, loaded := c.ConfigFiles.Load(path)
++	if !loaded {
++		// Parse the config file
+ 		config, _ := tsoptions.GetParsedCommandLineOfConfigFilePath(fileName, path, nil, c.Host, &c.ExtendedConfigCache)
++
+ 		var rootFilesWatch *watchedFiles[[]string]
+ 		client := c.Host.Client()
+ 		if c.Host.IsWatchEnabled() && client != nil {
+-			rootFilesWatch = newWatchedFiles(&configFileWatchHost{fileName: fileName, host: c.Host}, lsproto.WatchKindChange|lsproto.WatchKindCreate|lsproto.WatchKindDelete, core.Identity, "root files")
++			rootFilesWatch = newWatchedFiles(&configFileWatchHost{fileName: fileName, host: c.Host},
++				lsproto.WatchKindChange|lsproto.WatchKindCreate|lsproto.WatchKindDelete,
++				core.Identity, "root files")
+ 		}
+-		entry, _ = c.ConfigFiles.LoadOrStore(path, &ConfigFileEntry{
++
++		newEntry := &ConfigFileEntry{
+ 			commandLine:    config,
+-			pendingReload:  PendingReloadFull,
++			pendingReload:  PendingReloadNone, // Already parsed, no reload needed
+ 			rootFilesWatch: rootFilesWatch,
+-		})
++		}
++
++		entry, loaded = c.ConfigFiles.LoadOrStore(path, newEntry)
++		if !loaded {
++			// We created the entry, update watches
++			c.updateRootFilesWatch(fileName, entry)
++			c.updateExtendedConfigsUsedBy(path, entry, nil)
++		}
+ 	}
++
+ 	entry.mu.Lock()
+ 	defer entry.mu.Unlock()
++
++	// Register the project or info
+ 	if project != nil {
+ 		entry.projects.Add(project)
+ 	} else if info != nil {
+ 		entry.infos.Add(info)
+ 	}
+-	if entry.pendingReload == PendingReloadNone {
+-		return entry.commandLine
+-	}
+-	switch entry.pendingReload {
+-	case PendingReloadFileNames:
+-		entry.commandLine = entry.commandLine.ReloadFileNamesOfParsedCommandLine(c.Host.FS())
+-	case PendingReloadFull:
+-		oldCommandLine := entry.commandLine
+-		entry.commandLine, _ = tsoptions.GetParsedCommandLineOfConfigFilePath(fileName, path, nil, c.Host, &c.ExtendedConfigCache)
+-		c.updateExtendedConfigsUsedBy(path, entry, oldCommandLine)
+-		c.updateRootFilesWatch(fileName, entry)
++
++	// Handle pending reloads
++	if entry.pendingReload != PendingReloadNone {
++		switch entry.pendingReload {
++		case PendingReloadFileNames:
++			entry.commandLine = entry.commandLine.ReloadFileNamesOfParsedCommandLine(c.Host.FS())
++		case PendingReloadFull:
++			oldCommandLine := entry.commandLine
++			entry.commandLine, _ = tsoptions.GetParsedCommandLineOfConfigFilePath(fileName, path, nil, c.Host, &c.ExtendedConfigCache)
++			c.updateExtendedConfigsUsedBy(path, entry, oldCommandLine)
++			c.updateRootFilesWatch(fileName, entry)
++		}
++		entry.pendingReload = PendingReloadNone
+ 	}
+-	entry.pendingReload = PendingReloadNone
++
+ 	return entry.commandLine
+ }
+ 
+@@ -164,17 +246,19 @@ func (c *ConfigFileRegistry) updateExtendedConfigsUsedBy(path tspath.Path, entry
+ 		extendedEntry.configFiles.Add(path)
+ 		extendedEntry.mu.Unlock()
+ 	}
+-	for _, extendedConfig := range oldCommandLine.ExtendedSourceFiles() {
+-		extendedPath := tspath.ToPath(extendedConfig, c.Host.GetCurrentDirectory(), c.Host.FS().UseCaseSensitiveFileNames())
+-		if !slices.Contains(newConfigs, extendedPath) {
+-			extendedEntry, _ := c.ExtendedConfigsUsedBy.Load(extendedPath)
+-			extendedEntry.mu.Lock()
+-			extendedEntry.configFiles.Delete(path)
+-			if extendedEntry.configFiles.Len() == 0 {
+-				c.ExtendedConfigsUsedBy.Delete(extendedPath)
+-				c.ExtendedConfigCache.Delete(extendedPath)
++	if oldCommandLine != nil {
++		for _, extendedConfig := range oldCommandLine.ExtendedSourceFiles() {
++			extendedPath := tspath.ToPath(extendedConfig, c.Host.GetCurrentDirectory(), c.Host.FS().UseCaseSensitiveFileNames())
++			if !slices.Contains(newConfigs, extendedPath) {
++				extendedEntry, _ := c.ExtendedConfigsUsedBy.Load(extendedPath)
++				extendedEntry.mu.Lock()
++				extendedEntry.configFiles.Delete(path)
++				if extendedEntry.configFiles.Len() == 0 {
++					c.ExtendedConfigsUsedBy.Delete(extendedPath)
++					c.ExtendedConfigCache.Delete(extendedPath)
++				}
++				extendedEntry.mu.Unlock()
+ 			}
+-			extendedEntry.mu.Unlock()
+ 		}
+ 	}
+ }
+@@ -235,7 +319,7 @@ func (c *ConfigFileRegistry) onConfigChange(path tspath.Path, changeKind lsproto
+ 	return true
+ }
+ 
+-func (c *ConfigFileRegistry) tryInvokeWildCardDirectories(fileName string, path tspath.Path) {
++func (c *ConfigFileRegistry) tryInvokeWildCardDirectories(fileName string, _ tspath.Path) {
+ 	configFiles := c.ConfigFiles.ToMap()
+ 	for configPath, entry := range configFiles {
+ 		entry.mu.Lock()
+diff --git a/internal/project/defaultprojectfinder.go b/internal/project/defaultprojectfinder.go
+index 05688bd9c..4fa436323 100644
+--- a/internal/project/defaultprojectfinder.go
++++ b/internal/project/defaultprojectfinder.go
+@@ -5,7 +5,6 @@ import (
+ 	"strings"
+ 	"sync"
+ 
+-	"github.com/microsoft/typescript-go/internal/collections"
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+@@ -190,33 +189,92 @@ func (f *defaultProjectFinder) tryFindDefaultConfiguredProjectFromReferences(
+ 	if len(config.ProjectReferences()) == 0 {
+ 		return false
+ 	}
+-	wg := core.NewWorkGroup(false)
+-	f.tryFindDefaultConfiguredProjectFromReferencesWorker(info, config, loadKind, result, wg)
+-	wg.RunAndWait()
+-	return result.isDone()
+-}
+ 
+-func (f *defaultProjectFinder) tryFindDefaultConfiguredProjectFromReferencesWorker(
+-	info *ScriptInfo,
+-	config *tsoptions.ParsedCommandLine,
+-	loadKind projectLoadKind,
+-	result *openScriptInfoProjectResult,
+-	wg core.WorkGroup,
+-) {
++	// Use breadth-first search to avoid deep recursion and improve cache locality
++	type configItem struct {
++		fileName string
++		path     tspath.Path
++		config   *tsoptions.ParsedCommandLine
++		loadKind projectLoadKind // Track the effective loadKind for this config
++	}
++
++	type visitKey struct {
++		path     tspath.Path
++		loadKind projectLoadKind
++	}
++
++	var queue []configItem
++	visited := make(map[visitKey]bool)
++
++	// Check if DisableReferencedProjectLoad is set for the initial config
++	initialLoadKind := loadKind
+ 	if config.CompilerOptions().DisableReferencedProjectLoad.IsTrue() {
+-		loadKind = projectLoadKindFind
++		initialLoadKind = projectLoadKindFind
+ 	}
++
++	// Add initial references to queue
+ 	for _, childConfigFileName := range config.ResolvedProjectReferencePaths() {
+-		wg.Queue(func() {
++		childConfigFilePath := f.service.toPath(childConfigFileName)
++		key := visitKey{path: childConfigFilePath, loadKind: initialLoadKind}
++		if !visited[key] {
++			visited[key] = true
++			childConfig := f.findOrAcquireConfig(info, childConfigFileName, childConfigFilePath, initialLoadKind)
++			if childConfig != nil {
++				queue = append(queue, configItem{
++					fileName: childConfigFileName,
++					path:     childConfigFilePath,
++					config:   childConfig,
++					loadKind: initialLoadKind,
++				})
++			}
++		}
++	}
++
++	// Process queue in breadth-first order
++	for len(queue) > 0 {
++		current := queue[0]
++		queue = queue[1:]
++
++		// Check if this config is the default for the script info
++		// Use the loadKind specific to this config path
++		if f.isDefaultConfigForScriptInfo(info, current.fileName, current.path, current.config, current.loadKind, result) {
++			return true
++		}
++
++		// Check if we should stop searching
++		if result.isDone() {
++			return true
++		}
++
++		// Determine loadKind for children of this config
++		childLoadKind := current.loadKind
++		if current.config.CompilerOptions().DisableReferencedProjectLoad.IsTrue() {
++			childLoadKind = projectLoadKindFind
++		}
++
++		// Add child references to queue
++		for _, childConfigFileName := range current.config.ResolvedProjectReferencePaths() {
+ 			childConfigFilePath := f.service.toPath(childConfigFileName)
+-			childConfig := f.findOrAcquireConfig(info, childConfigFileName, childConfigFilePath, loadKind)
+-			if childConfig == nil || f.isDefaultConfigForScriptInfo(info, childConfigFileName, childConfigFilePath, childConfig, loadKind, result) {
+-				return
++			key := visitKey{path: childConfigFilePath, loadKind: childLoadKind}
++
++			// Allow visiting the same config with different loadKind
++			// This handles the case where one path has disableReferencedProjectLoad and another doesn't
++			if !visited[key] {
++				visited[key] = true
++				childConfig := f.findOrAcquireConfig(info, childConfigFileName, childConfigFilePath, childLoadKind)
++				if childConfig != nil {
++					queue = append(queue, configItem{
++						fileName: childConfigFileName,
++						path:     childConfigFilePath,
++						config:   childConfig,
++						loadKind: childLoadKind,
++					})
++				}
+ 			}
+-			// Search in references if we cant find default project in current config
+-			f.tryFindDefaultConfiguredProjectFromReferencesWorker(info, childConfig, loadKind, result, wg)
+-		})
++		}
+ 	}
++
++	return result.isDone()
+ }
+ 
+ func (f *defaultProjectFinder) tryFindDefaultConfiguredProjectFromAncestor(
+@@ -318,57 +376,70 @@ func (f *defaultProjectFinder) findDefaultConfiguredProject(scriptInfo *ScriptIn
+ }
+ 
+ type openScriptInfoProjectResult struct {
+-	projectMu         sync.RWMutex
+-	project           *Project
+-	fallbackDefaultMu sync.RWMutex
+-	fallbackDefault   *Project // use this if we cant find actual project
+-	seenProjects      collections.SyncMap[*Project, projectLoadKind]
+-	seenConfigs       collections.SyncMap[tspath.Path, projectLoadKind]
++	mu              sync.Mutex // Single mutex for all fields
++	project         *Project
++	fallbackDefault *Project                        // use this if we cant find actual project
++	seenProjects    map[*Project]projectLoadKind    // Regular map since we're single-threaded now
++	seenConfigs     map[tspath.Path]projectLoadKind // Regular map since we're single-threaded now
+ }
+ 
+ func (r *openScriptInfoProjectResult) addSeenProject(project *Project, loadKind projectLoadKind) bool {
+-	if kind, loaded := r.seenProjects.LoadOrStore(project, loadKind); loaded {
++	r.mu.Lock()
++	defer r.mu.Unlock()
++
++	if r.seenProjects == nil {
++		r.seenProjects = make(map[*Project]projectLoadKind)
++	}
++
++	if kind, exists := r.seenProjects[project]; exists {
+ 		if kind >= loadKind {
+ 			return false
+ 		}
+-		r.seenProjects.Store(project, loadKind)
+ 	}
++	r.seenProjects[project] = loadKind
+ 	return true
+ }
+ 
+ func (r *openScriptInfoProjectResult) addSeenConfig(configPath tspath.Path, loadKind projectLoadKind) bool {
+-	if kind, loaded := r.seenConfigs.LoadOrStore(configPath, loadKind); loaded {
++	r.mu.Lock()
++	defer r.mu.Unlock()
++
++	if r.seenConfigs == nil {
++		r.seenConfigs = make(map[tspath.Path]projectLoadKind)
++	}
++
++	if kind, exists := r.seenConfigs[configPath]; exists {
+ 		if kind >= loadKind {
+ 			return false
+ 		}
+-		r.seenConfigs.Store(configPath, loadKind)
+ 	}
++	r.seenConfigs[configPath] = loadKind
+ 	return true
+ }
+ 
+ func (r *openScriptInfoProjectResult) isDone() bool {
+-	r.projectMu.RLock()
+-	defer r.projectMu.RUnlock()
++	r.mu.Lock()
++	defer r.mu.Unlock()
+ 	return r.project != nil
+ }
+ 
+ func (r *openScriptInfoProjectResult) setProject(project *Project) {
+-	r.projectMu.Lock()
+-	defer r.projectMu.Unlock()
++	r.mu.Lock()
++	defer r.mu.Unlock()
+ 	if r.project == nil {
+ 		r.project = project
+ 	}
+ }
+ 
+ func (r *openScriptInfoProjectResult) hasFallbackDefault() bool {
+-	r.fallbackDefaultMu.RLock()
+-	defer r.fallbackDefaultMu.RUnlock()
++	r.mu.Lock()
++	defer r.mu.Unlock()
+ 	return r.fallbackDefault != nil
+ }
+ 
+ func (r *openScriptInfoProjectResult) setFallbackDefault(project *Project) {
+-	r.fallbackDefaultMu.Lock()
+-	defer r.fallbackDefaultMu.Unlock()
++	r.mu.Lock()
++	defer r.mu.Unlock()
+ 	if r.fallbackDefault == nil {
+ 		r.fallbackDefault = project
+ 	}
+diff --git a/internal/project/service.go b/internal/project/service.go
+index 4c7245cda..a45548015 100644
+--- a/internal/project/service.go
++++ b/internal/project/service.go
+@@ -93,6 +93,7 @@ func NewService(host ServiceHost, options ServiceOptions) *Service {
+ 	service.configFileRegistry = &ConfigFileRegistry{
+ 		Host:                 service,
+ 		defaultProjectFinder: service.defaultProjectFinder,
++		activeParsing:        make(map[tspath.Path]*parseStatus),
+ 	}
+ 	service.converters = ls.NewConverters(options.PositionEncoding, func(fileName string) *ls.LineMap {
+ 		return service.documentStore.GetScriptInfoByPath(service.toPath(fileName)).LineMap()
+@@ -497,14 +498,14 @@ func (s *Service) cleanupConfiguredProjects(openInfo *ScriptInfo, retainedByOpen
+ 		if r == nil {
+ 			return
+ 		}
+-		r.seenProjects.Range(func(project *Project, _ projectLoadKind) bool {
++		r.mu.Lock()
++		for project := range r.seenProjects {
+ 			delete(toRemoveProjects, project.configFilePath)
+-			return true
+-		})
+-		r.seenConfigs.Range(func(config tspath.Path, _ projectLoadKind) bool {
++		}
++		for config := range r.seenConfigs {
+ 			delete(toRemoveConfigs, config)
+-			return true
+-		})
++		}
++		r.mu.Unlock()
+ 		// // Keep original projects used
+ 		// markOriginalProjectsAsUsed(project);
+ 		// // Keep all the references alive
+-- 
+2.39.5 (Apple Git-154)
+
