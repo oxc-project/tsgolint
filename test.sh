@@ -11,6 +11,8 @@ RULES=$(cat << 'EOF'
 EOF
 )
 
+rm ./fixtures/.DS_Store
+
 # Generate the config and run tsgolint in single-threaded mode for deterministic results
 DIAGNOSTICS=$(find "$SCRIPT_DIR/fixtures" -type f -not -name "*.json" | xargs realpath | jq -Rn --argjson rules "$RULES" '{files: [inputs | {file_path: ., rules: $rules}]}' | GOMAXPROCS=1 ./tsgolint headless | node -e "
 const fs = require('fs');
@@ -19,25 +21,25 @@ function parseHeadlessOutput(data) {
     // Parse binary headless output to extract JSON diagnostics
     let offset = 0;
     const diagnostics = [];
-    
+
     while (offset < data.length) {
         if (offset + 5 > data.length) {
             break;
         }
-        
+
         // Read header: 4 bytes length + 1 byte message type
         const length = data.readUInt32LE(offset);
         const msgType = data[offset + 4];
         offset += 5;
-        
+
         if (offset + length > data.length) {
             break;
         }
-        
+
         // Read payload
         const payload = data.slice(offset, offset + length);
         offset += length;
-        
+
         // Only process diagnostic messages (type 1)
         if (msgType === 1) {
             try {
@@ -53,7 +55,7 @@ function parseHeadlessOutput(data) {
             }
         }
     }
-    
+
     return diagnostics;
 }
 
@@ -63,20 +65,20 @@ function sortDiagnostics(diagnostics) {
         const aFilePath = a.file_path || '';
         const bFilePath = b.file_path || '';
         if (aFilePath !== bFilePath) return aFilePath.localeCompare(bFilePath);
-        
+
         const aRule = a.rule || '';
         const bRule = b.rule || '';
         if (aRule !== bRule) return aRule.localeCompare(bRule);
-        
+
         const aPos = (a.range && a.range.pos) || 0;
         const bPos = (b.range && b.range.pos) || 0;
         if (aPos !== bPos) return aPos - bPos;
-        
+
         const aEnd = (a.range && a.range.end) || 0;
         const bEnd = (b.range && b.range.end) || 0;
         return aEnd - bEnd;
     });
-    
+
     return diagnostics;
 }
 
@@ -85,11 +87,11 @@ const chunks = [];
 process.stdin.on('data', chunk => chunks.push(chunk));
 process.stdin.on('end', () => {
     const data = Buffer.concat(chunks);
-    
+
     // Parse and sort diagnostics
     let diagnostics = parseHeadlessOutput(data);
     diagnostics = sortDiagnostics(diagnostics);
-    
+
     // Output as JSON
     console.log(JSON.stringify(diagnostics, null, 2));
 });

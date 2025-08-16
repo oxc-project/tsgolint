@@ -197,7 +197,7 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'// Examples of incorrect code for no-base-to-string rule\n\n// These will evaluate to '[object Object]'\n({})' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'// Examples of incorrect code for no-base-to-string rule\n\n// These will evaluate to '[object Object]'\n({})' will use Object's default stringification format ('[object Object]') when stringified."
     },
     "fixes": [],
     "suggestions": [],
@@ -211,7 +211,7 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'\n({foo: 'bar'})' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'\n({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified."
     },
     "fixes": [],
     "suggestions": [],
@@ -225,7 +225,7 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'\n({foo: 'bar'})' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'\n({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified."
     },
     "fixes": [],
     "suggestions": [],
@@ -2640,7 +2640,7 @@
     "rule": "no-base-to-string",
     "message": {
       "id": "baseToString",
-      "description": "'obj' always use Object's default stringification format ('[object Object]') when stringified."
+      "description": "'obj' will use Object's default stringification format ('[object Object]') when stringified."
     },
     "fixes": [],
     "suggestions": [],
