@@ -101,6 +101,23 @@ func recordCpuprof(cpuprofOut string) (func(), error) {
 	return func() {}, nil
 }
 
+func writeMemProfiles(heapOut string, allocsOut string) {
+	if heapOut != "" {
+		if f, err := os.Create(heapOut); err == nil {
+			_ = pprof.WriteHeapProfile(f)
+			_ = f.Close()
+		}
+	}
+
+	if allocsOut != "" {
+		if f, err := os.Create(allocsOut); err == nil {
+			// debug=0 → compressed protobuf suitable for pprof
+			_ = pprof.Lookup("allocs").WriteTo(f, 0)
+			_ = f.Close()
+		}
+	}
+}
+
 var allRules = []rule.Rule{
 	await_thenable.AwaitThenableRule,
 	no_array_delete.NoArrayDeleteRule,
