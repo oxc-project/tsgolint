@@ -5,12 +5,13 @@ import (
 	"encoding/binary"
 	"flag"
 	"fmt"
-	"github.com/go-json-experiment/json"
 	"io"
 	"os"
 	"runtime"
 	"slices"
 	"sync"
+
+	"github.com/go-json-experiment/json"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
@@ -106,9 +107,13 @@ func runHeadless(args []string) int {
 	var (
 		traceOut   string
 		cpuprofOut string
+		heapOut    string
+		allocsOut  string
 	)
 	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
 	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
+	flag.StringVar(&heapOut, "heap", "", "file to put heap profiling to")
+	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
 	flag.CommandLine.Parse(args)
 
 	if done, err := recordTrace(traceOut); err != nil {
@@ -251,6 +256,8 @@ func runHeadless(args []string) int {
 	}
 
 	wg.Wait()
+
+	writeMemProfiles(heapOut, allocsOut)
 
 	return 0
 }
