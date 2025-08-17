@@ -107,6 +107,11 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 
 			// Just check the last one. Must specify previous type parameters if the last one is specified.
 			i := len(arguments.Nodes) - 1
+
+			if i >= len(parameters) {
+				return
+			}
+
 			arg := arguments.Nodes[i]
 			param := parameters[i]
 

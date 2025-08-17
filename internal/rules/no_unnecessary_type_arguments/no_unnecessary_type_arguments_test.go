@@ -209,6 +209,19 @@ interface Bar extends Foo {
 function f<T = Foo>() {}
 f<Bar>();
 		`},
+		// https://github.com/oxc-project/oxc/issues/13164
+		{Code: `
+type OneParam<T = any> = T;
+interface TestInterface {
+  prop?: OneParam<string, number>;  // TypeScript error, but shouldn't panic
+}
+		`},
+		{Code: `
+type OneParam<T = any, U = any, V = any> = T;
+interface TestInterface {
+  prop?: OneParam<string, number>;  // TypeScript error, but shouldn't panic
+}
+		`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
