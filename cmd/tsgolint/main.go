@@ -47,6 +47,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_unary_minus"
 	"github.com/typescript-eslint/tsgolint/internal/rules/non_nullable_type_assertion_style"
 	"github.com/typescript-eslint/tsgolint/internal/rules/only_throw_error"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_for_of"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_promise_reject_errors"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_reduce_type_parameter"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_return_this_type"
@@ -146,6 +147,7 @@ var allRules = []rule.Rule{
 	no_unsafe_unary_minus.NoUnsafeUnaryMinusRule,
 	non_nullable_type_assertion_style.NonNullableTypeAssertionStyleRule,
 	only_throw_error.OnlyThrowErrorRule,
+	prefer_for_of.PreferForOfRule,
 	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
 	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,
 	prefer_return_this_type.PreferReturnThisTypeRule,
