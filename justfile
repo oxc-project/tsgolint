@@ -22,3 +22,7 @@ fmt:
 
 shim:
   ./tools/gen-npm-packages.mjs
+
+pull:
+  pushd typescript-go && git reset --hard origin/main
+  just init
