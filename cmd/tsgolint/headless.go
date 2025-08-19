@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"runtime"
 	"slices"
@@ -104,6 +105,8 @@ func writeErrorMessage(text string) error {
 }
 
 func runHeadless(args []string) int {
+	logLevel := getLogLevel()
+
 	var (
 		traceOut   string
 		cpuprofOut string
@@ -115,6 +118,12 @@ func runHeadless(args []string) int {
 	flag.StringVar(&heapOut, "heap", "", "file to put heap profiling to")
 	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
 	flag.CommandLine.Parse(args)
+
+	log.SetOutput(os.Stderr)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	if logLevel == LogLevelDebug {
+		log.Printf("Starting tsgolint")
+	}
 
 	if done, err := recordTrace(traceOut); err != nil {
 		os.Stderr.WriteString(err.Error())
@@ -154,12 +163,22 @@ func runHeadless(args []string) int {
 
 	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{}
-	for _, fileConfig := range config.Files {
+
+	if logLevel == LogLevelDebug {
+		log.Printf("Starting to assign files to programs. Total files: %d", len(config.Files))
+	}
+
+	for idx, fileConfig := range config.Files {
+		if logLevel == LogLevelDebug {
+			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
+		}
+
 		source, err := os.ReadFile(fileConfig.FilePath)
 		if err != nil {
 			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
 			return 1
 		}
+
 		service.OpenFile(fileConfig.FilePath, string(source), core.GetScriptKindFromFileName(fileConfig.FilePath), "")
 		_, project := service.EnsureDefaultProjectForFile(fileConfig.FilePath)
 		program := project.GetProgram()
@@ -173,10 +192,27 @@ func runHeadless(args []string) int {
 		workload[program] = append(workload[program], file)
 	}
 
+	// Log final summary
+	if logLevel == LogLevelDebug {
+		log.Printf("Done assigning files to programs. Total programs: %d", len(workload))
+		for program, files := range workload {
+			configPath := program.Options().ConfigFilePath
+			if configPath == "" {
+				configPath = "<no tsconfig associated>"
+			}
+			log.Printf("  Program %s: %d files", configPath, len(files))
+		}
+	}
+
 	for _, files := range workload {
 		slices.SortFunc(files, func(a *ast.SourceFile, b *ast.SourceFile) int {
 			return len(b.Text()) - len(a.Text())
 		})
+	}
+
+	if logLevel == LogLevelDebug {
+		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
+		log.Printf("Workload distribution: %d programs", len(workload))
 	}
 
 	var wg sync.WaitGroup
@@ -222,6 +258,10 @@ func runHeadless(args []string) int {
 		}
 	}()
 
+	if logLevel == LogLevelDebug {
+		log.Printf("Running Linter")
+	}
+
 	err = linter.RunLinter(
 		workload,
 		runtime.GOMAXPROCS(0),
@@ -251,11 +291,16 @@ func runHeadless(args []string) int {
 
 	close(diagnosticsChan)
 	if err != nil {
+		log.Printf("ERROR: Linter failed: %v", err)
 		writeErrorMessage(fmt.Sprintf("error running linter: %v", err))
 		return 1
 	}
 
 	wg.Wait()
+
+	if logLevel == LogLevelDebug {
+		log.Printf("Linting Complete")
+	}
 
 	writeMemProfiles(heapOut, allocsOut)
 
