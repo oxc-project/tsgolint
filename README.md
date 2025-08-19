@@ -64,6 +64,30 @@ cd ..
 go build -o tsgolint ./cmd/tsgolint
 ```
 
+## Debugging
+
+For troubleshooting and development purposes, **tsgolint** supports debug logging through the `OXC_LOG` environment variable.
+
+### Debug Logging
+
+To enable verbose debug output, set the `OXC_LOG` environment variable to `debug`:
+
+```bash
+OXC_LOG=debug tsgolint
+```
+
+Debug logging provides detailed information about the linting process, including:
+- File assignment to TypeScript programs
+- Worker distribution and execution
+- Performance timing information
+- Internal state details
+
+This can be helpful when:
+- Diagnosing performance issues
+- Understanding how files are being processed
+- Troubleshooting TypeScript configuration problems
+- Contributing to **tsgolint** development
+
 ## Implemented rules
 
 | Name                                                                                                                | Status |
