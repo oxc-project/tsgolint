@@ -196,7 +196,11 @@ func runHeadless(args []string) int {
 	if logLevel == LogLevelDebug {
 		log.Printf("Done assigning files to programs. Total programs: %d", len(workload))
 		for program, files := range workload {
-			log.Printf("  Program %s: %d files", program.Options().ConfigFilePath, len(files))
+			configPath := program.Options().ConfigFilePath
+			if configPath == "" {
+				configPath = "<no tsconfig associated>"
+			}
+			log.Printf("  Program %s: %d files", configPath, len(files))
 		}
 	}
 
