@@ -210,7 +210,9 @@ func runHeadless(args []string) int {
 		})
 	}
 
-	log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
+	if logLevel == LogLevelDebug {
+		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
+	}
 	log.Printf("Workload distribution: %d programs", len(workload))
 
 	var wg sync.WaitGroup
