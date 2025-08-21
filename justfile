@@ -25,4 +25,5 @@ shim:
 
 pull:
   pushd typescript-go && git reset --hard origin/main
+  git pull
   just init
