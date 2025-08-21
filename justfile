@@ -8,9 +8,9 @@ init:
   pushd typescript-go && git am --3way --no-gpg-sign ../patches/*.patch && popd
 
 build:
-  go build -o tsgolint ./cmd/tsgolint
+  GOEXPERIMENT=greenteagc go build -o tsgolint ./cmd/tsgolint
 
-test:
+test: build
   ./test.sh
   go test ./internal/...
 

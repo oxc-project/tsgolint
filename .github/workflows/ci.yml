@@ -20,12 +20,7 @@ jobs:
           persist-credentials: false
 
       - uses: ./.github/actions/setup
-
-      - run: go test ./internal/...
-
-      - run: |
-          go build -o tsgolint ./cmd/tsgolint
-          ./test.sh
+      - run: just test
 
   lint:
     runs-on: ubuntu-latest
