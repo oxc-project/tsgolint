@@ -23,14 +23,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 )
 
-type headlessConfigForFile struct {
-	FilePath string   `json:"file_path"`
-	Rules    []string `json:"rules"`
-}
-type headlessConfig struct {
-	Files []headlessConfigForFile `json:"files"`
-}
-
 type headlessRange struct {
 	Pos int `json:"pos"`
 	End int `json:"end"`
@@ -154,42 +146,55 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	var config headlessConfig
-
-	if err := json.Unmarshal(configRaw, &config); err != nil {
-		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
+	var payload headlessPayload
+	if err := json.Unmarshal(configRaw, &payload); err != nil {
+		writeErrorMessage(fmt.Sprintf("error parsing payload: %v", err))
 		return 1
 	}
 
-	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
+	if len(payload.Configs) == 0 {
+		writeErrorMessage("invalid payload format: 'configs' field is required and must not be empty")
+		return 1
+	}
+
 	workload := linter.Workload{}
 
 	if logLevel == LogLevelDebug {
-		log.Printf("Starting to assign files to programs. Total files: %d", len(config.Files))
+		totalFileCount := 0
+		for _, config := range payload.Configs {
+			totalFileCount += len(config.FilePaths)
+		}
+		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
 	}
 
-	for idx, fileConfig := range config.Files {
-		if logLevel == LogLevelDebug {
-			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
-		}
+	var fileConfigs = make(map[*ast.SourceFile]*[]headlessRule, len(payload.Configs))
 
-		source, err := os.ReadFile(fileConfig.FilePath)
-		if err != nil {
-			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
-			return 1
-		}
+	idx := 0
+	for _, config := range payload.Configs {
+		for _, filePath := range config.FilePaths {
 
-		service.OpenFile(fileConfig.FilePath, string(source), core.GetScriptKindFromFileName(fileConfig.FilePath), "")
-		_, project := service.EnsureDefaultProjectForFile(fileConfig.FilePath)
-		program := project.GetProgram()
-		file := program.GetSourceFile(fileConfig.FilePath)
-		if file == nil {
-			writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", fileConfig.FilePath))
-			return 1
-		}
-		fileConfigs[file] = fileConfig
+			if logLevel == LogLevelDebug {
+				log.Printf("[%d/%d] Processing file: %s", idx+1, len(fileConfigs), filePath)
+			}
 
-		workload[program] = append(workload[program], file)
+			source, err := os.ReadFile(filePath)
+			if err != nil {
+				writeErrorMessage(fmt.Sprintf("error reading %v file: %v", filePath, err))
+				return 1
+			}
+
+			service.OpenFile(filePath, string(source), core.GetScriptKindFromFileName(filePath), "")
+			_, project := service.EnsureDefaultProjectForFile(filePath)
+			program := project.GetProgram()
+			file := program.GetSourceFile(filePath)
+			if file == nil {
+				writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", filePath))
+				return 1
+			}
+			fileConfigs[file] = &config.Rules
+			workload[program] = append(workload[program], file)
+			idx++
+		}
 	}
 
 	// Log final summary
@@ -267,12 +272,12 @@ func runHeadless(args []string) int {
 		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			cfg := fileConfigs[sourceFile]
-			rules := make([]linter.ConfiguredRule, len(cfg.Rules))
+			rules := make([]linter.ConfiguredRule, len(*cfg))
 
-			for i, ruleName := range cfg.Rules {
-				r, ok := allRulesByName[ruleName]
+			for i, headlessRule := range *cfg {
+				r, ok := allRulesByName[headlessRule.Name]
 				if !ok {
-					panic(fmt.Sprintf("unknown rule: %v", ruleName))
+					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
 				}
 				rules[i] = linter.ConfiguredRule{
 					Name: r.Name,
