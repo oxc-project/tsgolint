@@ -9,7 +9,7 @@ runs:
       with:
         go-version-file: go.mod
 
-    - uses: extractions/setup-just@v3
+    - uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3
 
     - name: Set commiter identity
       shell: bash
