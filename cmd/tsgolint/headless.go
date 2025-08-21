@@ -282,7 +282,7 @@ func runHeadless(args []string) int {
 				rules[i] = linter.ConfiguredRule{
 					Name: r.Name,
 					Run: func(ctx rule.RuleContext) rule.RuleListeners {
-						return r.Run(ctx, nil)
+						return r.Run(ctx, headlessRule.Config)
 					},
 				}
 			}
