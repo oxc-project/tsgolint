@@ -68,6 +68,7 @@ func GetSupportedExtensionsWithJsonIfResolveJsonModule(compilerOptions *core.Com
 func GetTsConfigPropArrayElementValue(tsConfigSourceFile *ast.SourceFile, propKey string, elementValue string) *ast.StringLiteral
 var InverseJsxOptionMap = tsoptions.InverseJsxOptionMap
 var LibFilesSet = tsoptions.LibFilesSet
+var LibMap = tsoptions.LibMap
 var Libs = tsoptions.Libs
 type NameMap = tsoptions.NameMap
 //go:linkname NewParsedCommandLine github.com/microsoft/typescript-go/internal/tsoptions.NewParsedCommandLine
@@ -75,7 +76,10 @@ func NewParsedCommandLine(compilerOptions *core.CompilerOptions, rootFileNames [
 //go:linkname NewTsconfigSourceFileFromFilePath github.com/microsoft/typescript-go/internal/tsoptions.NewTsconfigSourceFileFromFilePath
 func NewTsconfigSourceFileFromFilePath(configFileName string, configPath tspath.Path, configSourceText string) *tsoptions.TsConfigSourceFile
 var OptionsDeclarations = tsoptions.OptionsDeclarations
-type OutputDtsAndProjectReference = tsoptions.OutputDtsAndProjectReference
+//go:linkname ParseBuildCommandLine github.com/microsoft/typescript-go/internal/tsoptions.ParseBuildCommandLine
+func ParseBuildCommandLine(commandLine []string, host tsoptions.ParseConfigHost) *tsoptions.ParsedBuildCommandLine
+//go:linkname ParseBuildOptions github.com/microsoft/typescript-go/internal/tsoptions.ParseBuildOptions
+func ParseBuildOptions(key string, value any, allOptions *core.BuildOptions) []*ast.Diagnostic
 //go:linkname ParseCommandLine github.com/microsoft/typescript-go/internal/tsoptions.ParseCommandLine
 func ParseCommandLine(commandLine []string, host tsoptions.ParseConfigHost) *tsoptions.ParsedCommandLine
 type ParseCommandLineWorkerDiagnostics = tsoptions.ParseCommandLineWorkerDiagnostics
@@ -90,8 +94,9 @@ func ParseListTypeOption(opt *tsoptions.CommandLineOption, value string) ([]any,
 func ParseTypeAcquisition(key string, value any, allOptions *core.TypeAcquisition) []*ast.Diagnostic
 //go:linkname ParseWatchOptions github.com/microsoft/typescript-go/internal/tsoptions.ParseWatchOptions
 func ParseWatchOptions(key string, value any, allOptions *core.WatchOptions) []*ast.Diagnostic
+type ParsedBuildCommandLine = tsoptions.ParsedBuildCommandLine
 type ParsedCommandLine = tsoptions.ParsedCommandLine
-type SourceAndProjectReference = tsoptions.SourceAndProjectReference
+type SourceOutputAndProjectReference = tsoptions.SourceOutputAndProjectReference
 //go:linkname TargetToLibMap github.com/microsoft/typescript-go/internal/tsoptions.TargetToLibMap
 func TargetToLibMap() map[core.ScriptTarget]string
 type TsConfigSourceFile = tsoptions.TsConfigSourceFile
