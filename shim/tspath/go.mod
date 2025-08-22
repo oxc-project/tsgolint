@@ -2,4 +2,4 @@ module github.com/microsoft/typescript-go/shim/tspath
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20250821000407-bca9518930e5
+require github.com/microsoft/typescript-go v0.0.0-20250822042943-15ae26cccfb7

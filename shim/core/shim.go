@@ -14,6 +14,7 @@ func BoolToTristate(b bool) core.Tristate
 type BreadthFirstSearchLevel[N comparable] = core.BreadthFirstSearchLevel[N]
 type BreadthFirstSearchOptions[N comparable] = core.BreadthFirstSearchOptions[N]
 type BreadthFirstSearchResult[N comparable] = core.BreadthFirstSearchResult[N]
+type BuildOptions = core.BuildOptions
 type CompilerOptions = core.CompilerOptions
 //go:linkname ComputeLineStarts github.com/microsoft/typescript-go/internal/core.ComputeLineStarts
 func ComputeLineStarts(text string) []core.TextPos
@@ -92,6 +93,8 @@ type ResolutionMode = core.ResolutionMode
 const ResolutionModeCommonJS = core.ResolutionModeCommonJS
 const ResolutionModeESM = core.ResolutionModeESM
 const ResolutionModeNone = core.ResolutionModeNone
+//go:linkname ResolveConfigFileNameOfProjectReference github.com/microsoft/typescript-go/internal/core.ResolveConfigFileNameOfProjectReference
+func ResolveConfigFileNameOfProjectReference(path string) string
 //go:linkname ResolveProjectReferencePath github.com/microsoft/typescript-go/internal/core.ResolveProjectReferencePath
 func ResolveProjectReferencePath(ref *core.ProjectReference) string
 type ScriptKind = core.ScriptKind
