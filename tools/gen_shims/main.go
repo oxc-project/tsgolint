@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/go-json-experiment/json"
 	"go/types"
 	"log"
 	"maps"
@@ -12,12 +11,32 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/go-json-experiment/json"
+
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golang.org/x/tools/go/packages"
 )
 
 const tsgoInternalPrefix = "github.com/microsoft/typescript-go/internal/"
+
+func signatureHasUnexportedType(t types.Signature) bool {
+	if params := t.Params(); params != nil {
+		for i := range params.Len() {
+			ty := params.At(i).Type()
+
+			if ptrType, ok := ty.(*types.Pointer); ok {
+				ty = ptrType.Elem()
+			}
+			if named, ok := ty.(*types.Named); ok {
+				if !named.Obj().Exported() {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
 
 type ExtraShim struct {
 	ExtraFunctions  []string
@@ -126,6 +145,10 @@ func main() {
 			if fn.Signature().TypeParams() != nil {
 				// https://github.com/golang/go/issues/60425
 				// linking to functions with generics is not supported in go:linkname
+				return false
+			}
+			if signatureHasUnexportedType(*fn.Signature()) {
+				fmt.Fprintf(os.Stderr, "Skipping %s.%s: references unexported types\n", fn.Pkg().Name(), fn.Name())
 				return false
 			}
 			name := cases.Title(language.English, cases.NoLower).String(fn.Name())
