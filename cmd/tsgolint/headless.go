@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -17,6 +18,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/lsp/lsproto"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
@@ -104,6 +106,23 @@ func writeErrorMessage(text string) error {
 	})
 }
 
+func scriptKindToLanguageKind(scriptKind core.ScriptKind) lsproto.LanguageKind {
+	switch scriptKind {
+	case core.ScriptKindTS:
+		return "typescript"
+	case core.ScriptKindTSX:
+		return "typescriptreact"
+	case core.ScriptKindJS:
+		return "javascript"
+	case core.ScriptKindJSX:
+		return "javascriptreact"
+	case core.ScriptKindJSON:
+		return "json"
+	default:
+		return "unknown"
+	}
+}
+
 func runHeadless(args []string) int {
 	logLevel := getLogLevel()
 
@@ -146,7 +165,7 @@ func runHeadless(args []string) int {
 
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 
-	service := newProjectService(fs, cwd)
+	session := newProjectSession(fs, cwd)
 
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
@@ -183,9 +202,17 @@ func runHeadless(args []string) int {
 			return 1
 		}
 
-		service.OpenFile(fileConfig.FilePath, string(source), core.GetScriptKindFromFileName(fileConfig.FilePath), "")
-		_, project := service.EnsureDefaultProjectForFile(fileConfig.FilePath)
-		program := project.GetProgram()
+		ctx := context.Background()
+		fileURI := lsproto.DocumentUri("file://" + fileConfig.FilePath)
+		session.DidOpenFile(ctx, fileURI, 0, string(source), scriptKindToLanguageKind(core.GetScriptKindFromFileName(fileConfig.FilePath)))
+
+		languageService, err := session.GetLanguageService(ctx, fileURI)
+		if err != nil {
+			writeErrorMessage(fmt.Sprintf("error getting language service for %v: %v", fileConfig.FilePath, err))
+			return 1
+		}
+
+		program := languageService.GetProgram()
 		file := program.GetSourceFile(fileConfig.FilePath)
 		if file == nil {
 			writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", fileConfig.FilePath))

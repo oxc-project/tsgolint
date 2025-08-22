@@ -1,7 +1,7 @@
-From d03e49379709884ca84e11316c3cfa9b41997884 Mon Sep 17 00:00:00 2001
+From de4ca0a0b0daf5933c4050066afaf30eb99686bd Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 6 Aug 2025 11:39:11 +0000
-Subject: [PATCH 4/4] Adapt project service for single run mode
+Subject: [PATCH] Adapt project service for single run mode
 
 ---
  internal/project/checkerpool.go | 9 +++++++++
@@ -29,26 +29,26 @@ index 6bcbcc686..27dff946d 100644
  	// A request can only access one checker
  	if c, release := p.getRequestCheckerLocked(requestID); c != nil {
 diff --git a/internal/project/project.go b/internal/project/project.go
-index b4a22c3a6..e35668330 100644
+index 17689ce50..f2ee08235 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
-@@ -3,6 +3,7 @@ package project
+@@ -2,6 +2,7 @@ package project
+ 
  import (
- 	"context"
  	"fmt"
 +	"runtime"
- 	"slices"
  	"strings"
  	"sync"
-@@ -600,7 +601,7 @@ func (p *Project) updateProgram() bool {
- 			UseSourceOfProjectReference: true,
- 			TypingsLocation:             typingsLocation,
- 			CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {
--				p.checkerPool = newCheckerPool(4, program, p.Log)
-+				p.checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.Log)
- 				return p.checkerPool
+ 
+@@ -311,7 +312,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
+ 				TypingsLocation:             typingsLocation,
+ 				JSDocParsingMode:            ast.JSDocParsingModeParseAll,
+ 				CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {
+-					checkerPool = newCheckerPool(4, program, p.log)
++					checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.log)
+ 					return checkerPool
+ 				},
  			},
- 			JSDocParsingMode: ast.JSDocParsingModeParseAll,
 -- 
-2.49.0
+2.39.5 (Apple Git-154)
 

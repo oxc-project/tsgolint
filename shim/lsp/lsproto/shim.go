@@ -367,6 +367,7 @@ type FormattingOptions = lsproto.FormattingOptions
 type FullDocumentDiagnosticReport = lsproto.FullDocumentDiagnosticReport
 type FullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport = lsproto.FullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport
 type GeneralClientCapabilities = lsproto.GeneralClientCapabilities
+type HasTextDocumentURI = lsproto.HasTextDocumentURI
 type Hover = lsproto.Hover
 type HoverClientCapabilities = lsproto.HoverClientCapabilities
 type HoverOptions = lsproto.HoverOptions

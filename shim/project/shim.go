@@ -3,88 +3,49 @@
 
 package project
 
-import "github.com/microsoft/typescript-go/internal/collections"
-import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/project"
-import "github.com/microsoft/typescript-go/internal/tspath"
-import "github.com/microsoft/typescript-go/internal/vfs"
-import "io"
-import "sync/atomic"
 import _ "unsafe"
 
-type CachedTyping = project.CachedTyping
+type APISnapshotRequest = project.APISnapshotRequest
+type ATAStateChange = project.ATAStateChange
 type Client = project.Client
-type ConfigFileEntry = project.ConfigFileEntry
 type ConfigFileRegistry = project.ConfigFileRegistry
-//go:linkname DiscoverTypings github.com/microsoft/typescript-go/internal/project.DiscoverTypings
-func DiscoverTypings(fs vfs.FS, log func(s string), typingsInfo *project.TypingsInfo, fileNames []string, projectRootPath string, packageNameToTypingLocation *collections.SyncMap[string, *project.CachedTyping], typesRegistry map[string]map[string]string) (cachedTypingPaths []string, newTypingNames []string, filesToWatch []string)
-type DocumentRegistry = project.DocumentRegistry
-type DocumentRegistryHooks = project.DocumentRegistryHooks
-type DocumentStore = project.DocumentStore
-type DocumentStoreOptions = project.DocumentStoreOptions
-const EmptyName = project.EmptyName
-type ExtendedConfigFileEntry = project.ExtendedConfigFileEntry
-//go:linkname InstallNpmPackages github.com/microsoft/typescript-go/internal/project.InstallNpmPackages
-func InstallNpmPackages(packageNames []string, installPackages func(packages []string, hasError *atomic.Bool)) bool
-//go:linkname IsTypingUpToDate github.com/microsoft/typescript-go/internal/project.IsTypingUpToDate
-func IsTypingUpToDate(cachedTyping *project.CachedTyping, availableTypingVersions map[string]string) bool
+type CreateProgramResult = project.CreateProgramResult
+type FileChange = project.FileChange
+type FileChangeKind = project.FileChangeKind
+const FileChangeKindChange = project.FileChangeKindChange
+const FileChangeKindClose = project.FileChangeKindClose
+const FileChangeKindOpen = project.FileChangeKindOpen
+const FileChangeKindSave = project.FileChangeKindSave
+const FileChangeKindWatchChange = project.FileChangeKindWatchChange
+const FileChangeKindWatchCreate = project.FileChangeKindWatchCreate
+const FileChangeKindWatchDelete = project.FileChangeKindWatchDelete
+type FileChangeSummary = project.FileChangeSummary
+type FileContent = project.FileContent
+type FileHandle = project.FileHandle
+type FileSource = project.FileSource
 type Kind = project.Kind
-const KindAutoImportProvider = project.KindAutoImportProvider
-const KindAuxiliary = project.KindAuxiliary
 const KindConfigured = project.KindConfigured
 const KindInferred = project.KindInferred
-type LogLevel = project.LogLevel
-const LogLevelNormal = project.LogLevelNormal
-const LogLevelRequestTime = project.LogLevelRequestTime
-const LogLevelTerse = project.LogLevelTerse
-const LogLevelVerbose = project.LogLevelVerbose
-type Logger = project.Logger
-const NameContainsNonURISafeCharacters = project.NameContainsNonURISafeCharacters
-const NameOk = project.NameOk
-const NameStartsWithDot = project.NameStartsWithDot
-const NameStartsWithUnderscore = project.NameStartsWithUnderscore
-const NameTooLong = project.NameTooLong
-type NameValidationResult = project.NameValidationResult
-//go:linkname NewConfiguredProject github.com/microsoft/typescript-go/internal/project.NewConfiguredProject
-func NewConfiguredProject(configFileName string, configFilePath tspath.Path, host project.ProjectHost) *project.Project
-//go:linkname NewDocumentStore github.com/microsoft/typescript-go/internal/project.NewDocumentStore
-func NewDocumentStore(options project.DocumentStoreOptions) *project.DocumentStore
-//go:linkname NewInferredProject github.com/microsoft/typescript-go/internal/project.NewInferredProject
-func NewInferredProject(compilerOptions *core.CompilerOptions, currentDirectory string, projectRootPath tspath.Path, host project.ProjectHost) *project.Project
-//go:linkname NewLogger github.com/microsoft/typescript-go/internal/project.NewLogger
-func NewLogger(outputs []io.Writer, file string, level project.LogLevel) *project.Logger
-//go:linkname NewProject github.com/microsoft/typescript-go/internal/project.NewProject
-func NewProject(name string, kind project.Kind, currentDirectory string, host project.ProjectHost) *project.Project
-//go:linkname NewScriptInfo github.com/microsoft/typescript-go/internal/project.NewScriptInfo
-func NewScriptInfo(fileName string, path tspath.Path, scriptKind core.ScriptKind, fs vfs.FS) *project.ScriptInfo
-//go:linkname NewService github.com/microsoft/typescript-go/internal/project.NewService
-func NewService(host project.ServiceHost, options project.ServiceOptions) *project.Service
-type NpmConfig = project.NpmConfig
-type NpmDependecyEntry = project.NpmDependecyEntry
-//go:linkname NpmInstall github.com/microsoft/typescript-go/internal/project.NpmInstall
-func NpmInstall(cwd string, npmInstallArgs []string) ([]byte, error)
-type NpmInstallOperation = project.NpmInstallOperation
-type NpmLock = project.NpmLock
-type ParsedFileCache = project.ParsedFileCache
+//go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
+func NewSession(init *project.SessionInit) *project.Session
+type ParseCache = project.ParseCache
+type ParseCacheOptions = project.ParseCacheOptions
 type PendingReload = project.PendingReload
 const PendingReloadFileNames = project.PendingReloadFileNames
 const PendingReloadFull = project.PendingReloadFull
 const PendingReloadNone = project.PendingReloadNone
-type PendingRequest = project.PendingRequest
+type ProgramUpdateKind = project.ProgramUpdateKind
+const ProgramUpdateKindCloned = project.ProgramUpdateKindCloned
+const ProgramUpdateKindNewFiles = project.ProgramUpdateKindNewFiles
+const ProgramUpdateKindNone = project.ProgramUpdateKindNone
+const ProgramUpdateKindSameFileNames = project.ProgramUpdateKindSameFileNames
 type Project = project.Project
-type ProjectHost = project.ProjectHost
-//go:linkname RenderPackageNameValidationFailure github.com/microsoft/typescript-go/internal/project.RenderPackageNameValidationFailure
-func RenderPackageNameValidationFailure(typing string, result project.NameValidationResult, name string, isScopeName bool) string
-type ResolutionWithLookupLocations = project.ResolutionWithLookupLocations
-type ScriptInfo = project.ScriptInfo
-type Service = project.Service
-type ServiceHost = project.ServiceHost
-type ServiceOptions = project.ServiceOptions
-const TsVersionToUse = project.TsVersionToUse
-type TypingsInfo = project.TypingsInfo
-type TypingsInstaller = project.TypingsInstaller
-type TypingsInstallerOptions = project.TypingsInstallerOptions
-type TypingsInstallerStatus = project.TypingsInstallerStatus
-//go:linkname ValidatePackageName github.com/microsoft/typescript-go/internal/project.ValidatePackageName
-func ValidatePackageName(packageName string) (result project.NameValidationResult, name string, isScopeName bool)
-type WatcherHandle = project.WatcherHandle
+type ProjectCollection = project.ProjectCollection
+type Session = project.Session
+type SessionInit = project.SessionInit
+type SessionOptions = project.SessionOptions
+type Snapshot = project.Snapshot
+type SnapshotChange = project.SnapshotChange
+type WatchedFiles[T any] = project.WatchedFiles[T]
+type WatcherID = project.WatcherID

@@ -11,6 +11,9 @@ import _ "unsafe"
 
 //go:linkname BoolToTristate github.com/microsoft/typescript-go/internal/core.BoolToTristate
 func BoolToTristate(b bool) core.Tristate
+type BreadthFirstSearchLevel[N comparable] = core.BreadthFirstSearchLevel[N]
+type BreadthFirstSearchOptions[N comparable] = core.BreadthFirstSearchOptions[N]
+type BreadthFirstSearchResult[N comparable] = core.BreadthFirstSearchResult[N]
 type CompilerOptions = core.CompilerOptions
 //go:linkname ComputeLineStarts github.com/microsoft/typescript-go/internal/core.ComputeLineStarts
 func ComputeLineStarts(text string) []core.TextPos
@@ -67,6 +70,8 @@ const NewLineKindLF = core.NewLineKindLF
 const NewLineKindNone = core.NewLineKindNone
 //go:linkname NewTextRange github.com/microsoft/typescript-go/internal/core.NewTextRange
 func NewTextRange(pos int, end int) core.TextRange
+//go:linkname NewThrottleGroup github.com/microsoft/typescript-go/internal/core.NewThrottleGroup
+func NewThrottleGroup(ctx context.Context, semaphore chan struct{}) *core.ThrottleGroup
 //go:linkname NewWorkGroup github.com/microsoft/typescript-go/internal/core.NewWorkGroup
 func NewWorkGroup(singleThreaded bool) core.WorkGroup
 //go:linkname NonRelativeModuleNameForTypingCache github.com/microsoft/typescript-go/internal/core.NonRelativeModuleNameForTypingCache
@@ -127,6 +132,7 @@ const TSUnknown = core.TSUnknown
 type TextChange = core.TextChange
 type TextPos = core.TextPos
 type TextRange = core.TextRange
+type ThrottleGroup = core.ThrottleGroup
 type Tristate = core.Tristate
 //go:linkname TryParsePattern github.com/microsoft/typescript-go/internal/core.TryParsePattern
 func TryParsePattern(pattern string) core.Pattern
