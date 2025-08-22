@@ -160,6 +160,10 @@ func runHeadless(args []string) int {
 		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
 		return 1
 	}
+	if len(config.Files) == 0 {
+		writeErrorMessage("no files specified in config")
+		return 1
+	}
 
 	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{}
