@@ -2,8 +2,8 @@ github.com/go-json-experiment/json v0.0.0-20250811204210-4789234c3ea1 h1:KaJSg7E
 github.com/go-json-experiment/json v0.0.0-20250811204210-4789234c3ea1/go.mod h1:TiCD2a1pcmjd7YnhGH0f/zKNcCD06B029pHhzV23c2M=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
-github.com/microsoft/typescript-go v0.0.0-20250822235821-e0df534f24ee h1:kIHHAng9WSpltxrZVWWVnqRdKIL5xvWFbD88rbaWNPk=
-github.com/microsoft/typescript-go v0.0.0-20250822235821-e0df534f24ee/go.mod h1:A7HQr1XidFhXZBSB1VVWqMjfrisXlWDPeNwMLxj6mDc=
+github.com/microsoft/typescript-go v0.0.0-20250825153342-7376eb247d7f h1:4W72JMaLAqChZpVFfX2VXNxccLpzoaYRUl1fxvvcvIM=
+github.com/microsoft/typescript-go v0.0.0-20250825153342-7376eb247d7f/go.mod h1:A7HQr1XidFhXZBSB1VVWqMjfrisXlWDPeNwMLxj6mDc=
 golang.org/x/sync v0.16.0 h1:ycBJEhp9p4vXvUZNszeOq0kGTPghopOL8q0fq3vstxw=
 golang.org/x/sync v0.16.0/go.mod h1:1dzgHSNfp02xaA81J2MS99Qcpr2w7fw1gpm99rleRqA=
 golang.org/x/text v0.28.0 h1:rhazDwis8INMIwQ4tpjLDzUhx6RlXqZNPEM0huQojng=
