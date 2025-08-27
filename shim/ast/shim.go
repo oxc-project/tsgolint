@@ -699,6 +699,8 @@ func IsIntersectionTypeNode(node *ast.Node) bool
 func IsIterationStatement(node *ast.Node, lookInLabeledStatements bool) bool
 //go:linkname IsJSDocAugmentsTag github.com/microsoft/typescript-go/internal/ast.IsJSDocAugmentsTag
 func IsJSDocAugmentsTag(node *ast.Node) bool
+//go:linkname IsJSDocCallbackTag github.com/microsoft/typescript-go/internal/ast.IsJSDocCallbackTag
+func IsJSDocCallbackTag(node *ast.Node) bool
 //go:linkname IsJSDocDeprecatedTag github.com/microsoft/typescript-go/internal/ast.IsJSDocDeprecatedTag
 func IsJSDocDeprecatedTag(node *ast.Node) bool
 //go:linkname IsJSDocImplementsTag github.com/microsoft/typescript-go/internal/ast.IsJSDocImplementsTag
@@ -731,6 +733,8 @@ func IsJSDocTag(node *ast.Node) bool
 func IsJSDocTemplateTag(n *ast.Node) bool
 //go:linkname IsJSDocTypeTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTypeTag
 func IsJSDocTypeTag(node *ast.Node) bool
+//go:linkname IsJSDocTypedefTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTypedefTag
+func IsJSDocTypedefTag(node *ast.Node) bool
 //go:linkname IsJSDocUnknownTag github.com/microsoft/typescript-go/internal/ast.IsJSDocUnknownTag
 func IsJSDocUnknownTag(node *ast.Node) bool
 //go:linkname IsJSExportAssignment github.com/microsoft/typescript-go/internal/ast.IsJSExportAssignment
