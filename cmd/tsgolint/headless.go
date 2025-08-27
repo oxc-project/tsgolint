@@ -23,6 +23,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 type headlessConfigForFile struct {
@@ -124,7 +125,7 @@ func scriptKindToLanguageKind(scriptKind core.ScriptKind) lsproto.LanguageKind {
 }
 
 func runHeadless(args []string) int {
-	logLevel := getLogLevel()
+	logLevel := utils.GetLogLevel()
 
 	var (
 		traceOut   string
@@ -140,7 +141,7 @@ func runHeadless(args []string) int {
 
 	log.SetOutput(os.Stderr)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
-	if logLevel == LogLevelDebug {
+	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting tsgolint")
 	}
 
@@ -187,12 +188,12 @@ func runHeadless(args []string) int {
 	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{}
 
-	if logLevel == LogLevelDebug {
+	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting to assign files to programs. Total files: %d", len(config.Files))
 	}
 
 	for idx, fileConfig := range config.Files {
-		if logLevel == LogLevelDebug {
+		if logLevel == utils.LogLevelDebug {
 			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
 		}
 
@@ -224,7 +225,7 @@ func runHeadless(args []string) int {
 	}
 
 	// Log final summary
-	if logLevel == LogLevelDebug {
+	if logLevel == utils.LogLevelDebug {
 		log.Printf("Done assigning files to programs. Total programs: %d", len(workload))
 		for program, files := range workload {
 			configPath := program.Options().ConfigFilePath
@@ -241,7 +242,7 @@ func runHeadless(args []string) int {
 		})
 	}
 
-	if logLevel == LogLevelDebug {
+	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
 		log.Printf("Workload distribution: %d programs", len(workload))
 	}
@@ -289,7 +290,7 @@ func runHeadless(args []string) int {
 		}
 	}()
 
-	if logLevel == LogLevelDebug {
+	if logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
 	}
 
@@ -329,7 +330,7 @@ func runHeadless(args []string) int {
 
 	wg.Wait()
 
-	if logLevel == LogLevelDebug {
+	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")
 	}
 
