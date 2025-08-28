@@ -268,6 +268,7 @@ func runHeadless(args []string) int {
 	}
 
 	err = linter.RunLinter(
+		cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {

@@ -27,7 +27,7 @@ type Workload struct {
 	UnmatchedFiles []string
 }
 
-func RunLinter(workload Workload, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
+func RunLinter(currentDirectory string, workload Workload, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
 	// TODO(camc314): pass in via argument??
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 
@@ -69,7 +69,19 @@ func RunLinter(workload Workload, workers int, getRulesForFile func(sourceFile *
 		idx++
 	}
 
-	// TODO: do something with unmatched files?
+	{
+		host := utils.CreateCompilerHost(currentDirectory, fs)
+		program, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
+
+		if err != nil {
+			return err
+		}
+
+		err = RunLinterOnProgram(program, program.SourceFiles(), workers, getRulesForFile, onDiagnostic)
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 

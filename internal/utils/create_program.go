@@ -46,3 +46,34 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 
 	return program, nil
 }
+
+func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, host compiler.CompilerHost, fileNames []string) (*compiler.Program, error) {
+	program := compiler.NewProgram(compiler.ProgramOptions{
+		Config: &tsoptions.ParsedCommandLine{
+			ParsedConfig: &core.ParsedOptions{
+				CompilerOptions: &core.CompilerOptions{
+					AllowJs:                    core.TSTrue,
+					Module:                     core.ModuleKindESNext,
+					ModuleResolution:           core.ModuleResolutionKindBundler,
+					Target:                     core.ScriptTargetES2022,
+					Jsx:                        core.JsxEmitReactJSX,
+					AllowImportingTsExtensions: core.TSTrue,
+					StrictNullChecks:           core.TSTrue,
+					StrictFunctionTypes:        core.TSTrue,
+					SourceMap:                  core.TSTrue,
+					ESModuleInterop:            core.TSTrue,
+					AllowNonTsExtensions:       core.TSTrue,
+					ResolveJsonModule:          core.TSTrue,
+				},
+				FileNames: fileNames,
+			},
+		},
+		SingleThreaded: core.TSTrue,
+		Host:           host,
+	})
+
+	// TODO: report syntactic diagnostics?
+
+	program.BindSourceFiles()
+	return program, nil
+}
