@@ -53,6 +53,7 @@ func main() {
 		"compiler",
 		"core",
 		"lsp/lsproto",
+		"parser",
 		"project",
 		"scanner",
 		"tsoptions",

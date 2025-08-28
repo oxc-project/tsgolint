@@ -36,7 +36,7 @@ func RunLinter(currentDirectory string, workload Workload, workers int, getRules
 		log.Printf("[%d/%d] Running linter on program: %s", idx+1, len(workload.Programs), configFileName)
 
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
-		host := utils.CreateCompilerHost(currentDirectory, fs)
+		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
 		program, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host)
 
@@ -70,7 +70,7 @@ func RunLinter(currentDirectory string, workload Workload, workers int, getRules
 	}
 
 	{
-		host := utils.CreateCompilerHost(currentDirectory, fs)
+		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 		program, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
 
 		if err != nil {
