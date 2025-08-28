@@ -23,3 +23,9 @@ runs:
         pushd typescript-go
         git am --3way --no-gpg-sign ../patches/*.patch
         popd
+
+    - name: Expose typescript-go collections package
+      shell: bash
+      run: |
+        mkdir -p internal/collections
+        find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;

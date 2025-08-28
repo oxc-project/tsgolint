@@ -4,13 +4,19 @@
 package project
 
 import "github.com/microsoft/typescript-go/internal/project"
+import "github.com/microsoft/typescript-go/internal/project/logging"
+import "github.com/microsoft/typescript-go/internal/vfs"
 import _ "unsafe"
 
 type APISnapshotRequest = project.APISnapshotRequest
 type ATAStateChange = project.ATAStateChange
 type Client = project.Client
+type ConfigFileEntry = project.ConfigFileEntry
 type ConfigFileRegistry = project.ConfigFileRegistry
+type ConfigFileRegistryBuilder = project.ConfigFileRegistryBuilder
 type CreateProgramResult = project.CreateProgramResult
+type DiskFile = project.DiskFile
+type ExtendedConfigCache = project.ExtendedConfigCache
 type FileChange = project.FileChange
 type FileChangeKind = project.FileChangeKind
 const FileChangeKindChange = project.FileChangeKindChange
@@ -27,6 +33,10 @@ type FileSource = project.FileSource
 type Kind = project.Kind
 const KindConfigured = project.KindConfigured
 const KindInferred = project.KindInferred
+//go:linkname NewConfigFileEntry github.com/microsoft/typescript-go/internal/project.NewConfigFileEntry
+func NewConfigFileEntry(fileName string) *project.ConfigFileEntry
+//go:linkname NewConfigFileRegistryBuilder github.com/microsoft/typescript-go/internal/project.NewConfigFileRegistryBuilder
+func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
 //go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
 func NewSession(init *project.SessionInit) *project.Session
 type ParseCache = project.ParseCache
@@ -42,10 +52,16 @@ const ProgramUpdateKindNone = project.ProgramUpdateKindNone
 const ProgramUpdateKindSameFileNames = project.ProgramUpdateKindSameFileNames
 type Project = project.Project
 type ProjectCollection = project.ProjectCollection
+type ProjectLoadKind = project.ProjectLoadKind
+const ProjectLoadKindCreate = project.ProjectLoadKindCreate
+const ProjectLoadKindFind = project.ProjectLoadKindFind
 type Session = project.Session
 type SessionInit = project.SessionInit
 type SessionOptions = project.SessionOptions
 type Snapshot = project.Snapshot
 type SnapshotChange = project.SnapshotChange
+type SnapshotFSBuilder = project.SnapshotFSBuilder
+//go:linkname TsGoLintNewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.TsGoLintNewSnapshotFSBuilder
+func TsGoLintNewSnapshotFSBuilder(fs vfs.FS) *project.SnapshotFSBuilder
 type WatchedFiles[T any] = project.WatchedFiles[T]
 type WatcherID = project.WatcherID

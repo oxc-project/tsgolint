@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -18,7 +17,6 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/lsp/lsproto"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
@@ -107,23 +105,6 @@ func writeErrorMessage(text string) error {
 	})
 }
 
-func scriptKindToLanguageKind(scriptKind core.ScriptKind) lsproto.LanguageKind {
-	switch scriptKind {
-	case core.ScriptKindTS:
-		return "typescript"
-	case core.ScriptKindTSX:
-		return "typescriptreact"
-	case core.ScriptKindJS:
-		return "javascript"
-	case core.ScriptKindJSX:
-		return "javascriptreact"
-	case core.ScriptKindJSON:
-		return "json"
-	default:
-		return "unknown"
-	}
-}
-
 func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 
@@ -166,8 +147,6 @@ func runHeadless(args []string) int {
 
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 
-	session := newProjectSession(fs, cwd)
-
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
@@ -185,66 +164,60 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	fileConfigs := make(map[*ast.SourceFile]headlessConfigForFile, len(config.Files))
-	workload := linter.Workload{}
+	fileConfigs := make(map[string]headlessConfigForFile, len(config.Files))
+	workload := linter.Workload{
+		Programs:       make(map[string][]string),
+		UnmatchedFiles: []string{},
+	}
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting to assign files to programs. Total files: %d", len(config.Files))
 	}
+
+	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
 	for idx, fileConfig := range config.Files {
 		if logLevel == utils.LogLevelDebug {
 			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
 		}
 
-		source, err := os.ReadFile(fileConfig.FilePath)
-		if err != nil {
-			writeErrorMessage(fmt.Sprintf("error reading %v file: %v", fileConfig.FilePath, err))
-			return 1
+		tsconfig, found := tsConfigResolver.FindTsconfigForFile(fileConfig.FilePath, false)
+		if logLevel == utils.LogLevelDebug {
+			log.Printf("Got tsconfig for file %s: %s", fileConfig.FilePath, tsconfig)
 		}
 
-		ctx := context.Background()
-		fileURI := lsproto.DocumentUri("file://" + fileConfig.FilePath)
-		session.DidOpenFile(ctx, fileURI, 0, string(source), scriptKindToLanguageKind(core.GetScriptKindFromFileName(fileConfig.FilePath)))
-
-		languageService, err := session.GetLanguageService(ctx, fileURI)
-		if err != nil {
-			writeErrorMessage(fmt.Sprintf("error getting language service for %v: %v", fileConfig.FilePath, err))
-			return 1
+		if !found {
+			workload.UnmatchedFiles = append(workload.UnmatchedFiles, fileConfig.FilePath)
+		} else {
+			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], fileConfig.FilePath)
 		}
-
-		program := languageService.GetProgram()
-		file := program.GetSourceFile(fileConfig.FilePath)
-		if file == nil {
-			writeErrorMessage(fmt.Sprintf("file %v is not matched by tsconfig", fileConfig.FilePath))
-			return 1
-		}
-		fileConfigs[file] = fileConfig
-
-		workload[program] = append(workload[program], file)
+		fileConfigs[fileConfig.FilePath] = fileConfig
 	}
 
-	// Log final summary
 	if logLevel == utils.LogLevelDebug {
-		log.Printf("Done assigning files to programs. Total programs: %d", len(workload))
-		for program, files := range workload {
-			configPath := program.Options().ConfigFilePath
-			if configPath == "" {
-				configPath = "<no tsconfig associated>"
-			}
-			log.Printf("  Program %s: %d files", configPath, len(files))
+		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
+		for program, files := range workload.Programs {
+			log.Printf("  Program %s: %d files", program, len(files))
+		}
+		for _, file := range workload.UnmatchedFiles {
+			log.Printf("  Unmatched file: %s", file)
 		}
 	}
 
-	for _, files := range workload {
-		slices.SortFunc(files, func(a *ast.SourceFile, b *ast.SourceFile) int {
-			return len(b.Text()) - len(a.Text())
+	allRulesByName := make(map[string]rule.Rule, len(allRules))
+	for _, r := range allRules {
+		allRulesByName[r.Name] = r
+	}
+
+	for _, files := range workload.Programs {
+		slices.SortFunc(files, func(a, b string) int {
+			return len(b) - len(a)
 		})
 	}
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
-		log.Printf("Workload distribution: %d programs", len(workload))
+		log.Printf("Workload distribution: %d programs", len(workload.Programs))
 	}
 
 	var wg sync.WaitGroup
@@ -298,7 +271,7 @@ func runHeadless(args []string) int {
 		workload,
 		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			cfg := fileConfigs[sourceFile]
+			cfg := fileConfigs[sourceFile.FileName()]
 			rules := make([]linter.ConfiguredRule, len(cfg.Rules))
 
 			for i, ruleName := range cfg.Rules {

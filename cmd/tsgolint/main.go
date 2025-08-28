@@ -452,10 +452,9 @@ func runMain() int {
 		}
 	}()
 
-	err = linter.RunLinter(
-		linter.Workload{
-			program: files,
-		},
+	err = linter.RunLinterOnProgram(
+		program,
+		files,
 		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			return utils.Map(allRules, func(r rule.Rule) linter.ConfiguredRule {
