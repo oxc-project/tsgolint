@@ -12,7 +12,7 @@ build:
   GOEXPERIMENT=greenteagc go build -o tsgolint ./cmd/tsgolint
 
 test: build
-  ./test.sh
+  cd e2e && pnpm run test && cd ..
   go test ./internal/...
 
 lint:

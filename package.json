@@ -1,0 +1,7 @@
+{
+    "name": "tsgolint",
+    "packageManager": "pnpm@10.15.0",
+    "volta": {
+        "node": "22.14.0"
+    }
+}
