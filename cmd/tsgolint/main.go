@@ -435,9 +435,7 @@ func runMain() int {
 	diagnosticsChan := make(chan rule.RuleDiagnostic, 4096)
 	errorsCount := 0
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
 		for d := range diagnosticsChan {
@@ -450,7 +448,7 @@ func runMain() int {
 				w.Flush()
 			}
 		}
-	}()
+	})
 
 	err = linter.RunLinterOnProgram(
 		program,
