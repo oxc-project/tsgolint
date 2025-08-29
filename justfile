@@ -1,3 +1,8 @@
+#!/usr/bin/env -S just --justfile
+
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+set shell := ["bash", "-cu"]
+
 ready:
   just fmt
   just lint
