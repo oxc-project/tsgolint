@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"log"
 	"slices"
 
 	"github.com/microsoft/typescript-go/shim/core"
@@ -33,6 +34,8 @@ func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
 func (r *TsConfigResolver) FindTsconfigForFile(filePath string, skipSearchInDirectoryOfFile bool) (configPath string, found bool) {
 	configFileName := r.configFileRegistryBuilder.ComputeConfigFileName(filePath, skipSearchInDirectoryOfFile, nil)
 
+	log.Println("got tsconfig file name: " + configFileName)
+
 	if configFileName == "" {
 		return "", false
 	}
@@ -42,6 +45,7 @@ func (r *TsConfigResolver) FindTsconfigForFile(filePath string, skipSearchInDire
 	// Search through the config and its references
 	// This corresponds to findOrCreateDefaultConfiguredProjectWorker
 	result := r.findConfigWithReferences(filePath, normalizedPath, configFileName, nil, nil)
+	log.Println("found tsconfig file: " + result.configFileName)
 
 	if result.configFileName != "" {
 		return result.configFileName, true

@@ -1,0 +1,39 @@
+From fa3505234bc028ed15b8bf858a9948d0e83d000e Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Fri, 29 Aug 2025 13:40:34 +0100
+Subject: [PATCH] testing
+
+---
+ internal/project/configfileregistrybuilder.go | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/internal/project/configfileregistrybuilder.go b/internal/project/configfileregistrybuilder.go
+index ba6e44c72..11e3a3b14 100644
+--- a/internal/project/configfileregistrybuilder.go
++++ b/internal/project/configfileregistrybuilder.go
+@@ -2,6 +2,7 @@ package project
+ 
+ import (
+ 	"fmt"
++	"log"
+ 	"maps"
+ 	"slices"
+ 	"strings"
+@@ -410,11 +411,14 @@ func (c *ConfigFileRegistryBuilder) handleConfigChange(entry *dirty.SyncMapEntry
+ func (c *ConfigFileRegistryBuilder) ComputeConfigFileName(fileName string, skipSearchInDirectoryOfFile bool, logger *logging.LogTree) string {
+ 	searchPath := tspath.GetDirectoryPath(fileName)
+ 	result, _ := tspath.ForEachAncestorDirectory(searchPath, func(directory string) (result string, stop bool) {
++		log.Println("Checking directory: " + directory)
+ 		tsconfigPath := tspath.CombinePaths(directory, "tsconfig.json")
++		log.Printf("Looking for tsconfig file: %s exists? %t", tsconfigPath, c.FS().FileExists(tsconfigPath))
+ 		if !skipSearchInDirectoryOfFile && c.FS().FileExists(tsconfigPath) {
+ 			return tsconfigPath, true
+ 		}
+ 		jsconfigPath := tspath.CombinePaths(directory, "jsconfig.json")
++		log.Printf("Looking for jsconfig file: %s exists? %t", jsconfigPath, c.FS().FileExists(jsconfigPath))
+ 		if !skipSearchInDirectoryOfFile && c.FS().FileExists(jsconfigPath) {
+ 			return jsconfigPath, true
+ 		}
+-- 
+2.39.5 (Apple Git-154)
+

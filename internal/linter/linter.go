@@ -68,6 +68,14 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 				f += k + ", "
 			}
 			f = f[:len(f)-2]
+			log.Println("Available source files:")
+			for _, sf := range program.SourceFiles() {
+				log.Println(" - " + sf.FileName())
+			}
+			log.Println("Requested source files:")
+			for k := range fileSet {
+				log.Println(" - " + k)
+			}
 			panic(fmt.Sprintf("file '%s' not in program '%s'", f, configFileName))
 		}
 

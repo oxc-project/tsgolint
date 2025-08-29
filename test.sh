@@ -11,10 +11,15 @@ RULES=$(cat << 'EOF'
 EOF
 )
 
-rm ./fixtures/.DS_Store
+# Remove .DS_Store if it exists (macOS artifact)
+[ -f ./fixtures/.DS_Store ] && rm ./fixtures/.DS_Store
+
+# Create temp files for stderr and exit code
+STDERR_FILE=$(mktemp)
+EXIT_CODE_FILE=$(mktemp)
 
 # Generate the config and run tsgolint in single-threaded mode for deterministic results
-DIAGNOSTICS=$(find "$SCRIPT_DIR/fixtures" -type f -not -name "*.json" | xargs realpath | jq -Rn --argjson rules "$RULES" '{files: [inputs | {file_path: ., rules: $rules}]}' | GOMAXPROCS=1 ./tsgolint headless | node -e "
+DIAGNOSTICS=$(find "$SCRIPT_DIR/fixtures" -type f -not -name "*.json" | xargs realpath | jq -Rn --argjson rules "$RULES" '{files: [inputs | {file_path: ., rules: $rules}]}' | { GOMAXPROCS=1 ./tsgolint headless 2>"$STDERR_FILE"; echo $? > "$EXIT_CODE_FILE"; } | node -e "
 const fs = require('fs');
 
 function parseHeadlessOutput(data) {
@@ -97,11 +102,44 @@ process.stdin.on('end', () => {
 });
 ")
 
+# Read the exit code
+EXIT_CODE=$(cat "$EXIT_CODE_FILE")
+rm "$EXIT_CODE_FILE"
+
+# Check for panics in stderr
+STDERR_OUTPUT=$(cat "$STDERR_FILE")
+if echo "$STDERR_OUTPUT" | grep -q "panic:"; then
+    echo "ERROR: Program panicked!"
+    echo "Panic output:"
+    echo "$STDERR_OUTPUT"
+    rm "$STDERR_FILE"
+    exit 1
+fi
+
+# Report exit code if non-zero
+if [ "$EXIT_CODE" -ne 0 ]; then
+    echo "ERROR: tsgolint exited with code $EXIT_CODE"
+    if [ -n "$STDERR_OUTPUT" ]; then
+        echo "stderr output:"
+        echo "$STDERR_OUTPUT"
+    fi
+    rm "$STDERR_FILE"
+    exit 1
+fi
+
 # Check if we got any diagnostics
 if [ -z "$DIAGNOSTICS" ] || [ "$DIAGNOSTICS" = "[]" ]; then
     echo "No diagnostics generated. This might indicate an issue with the test."
+    if [ -n "$STDERR_OUTPUT" ]; then
+        echo "stderr output:"
+        echo "$STDERR_OUTPUT"
+    fi
+    rm "$STDERR_FILE"
     exit 1
 fi
+
+# Clean up stderr file
+rm "$STDERR_FILE"
 
 # Count diagnostics
 DIAGNOSTIC_COUNT=$(echo "$DIAGNOSTICS" | jq '. | length')
