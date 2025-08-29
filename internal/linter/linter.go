@@ -27,13 +27,15 @@ type Workload struct {
 	UnmatchedFiles []string
 }
 
-func RunLinter(currentDirectory string, workload Workload, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
+func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Workload, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
 	// TODO(camc314): pass in via argument??
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 
 	idx := 0
 	for configFileName, filePaths := range workload.Programs {
-		log.Printf("[%d/%d] Running linter on program: %s", idx+1, len(workload.Programs), configFileName)
+		if logLevel == utils.LogLevelDebug {
+			log.Printf("[%d/%d] Running linter on program: %s", idx+1, len(workload.Programs), configFileName)
+		}
 
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
