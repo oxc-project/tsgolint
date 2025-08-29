@@ -2,6 +2,7 @@ package linter
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule"
@@ -48,19 +49,26 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 
 		fileSet := make(map[string]struct{}, len(filePaths))
 		for _, f := range filePaths {
-			fileSet[f] = struct{}{}
+			normalized := tspath.ToFileNameLowerCase(f)
+			fileSet[normalized] = struct{}{}
 		}
 
 		sourceFiles := make([]*ast.SourceFile, 0, len(filePaths))
 		for _, sf := range program.SourceFiles() {
-			if _, ok := fileSet[sf.FileName()]; ok {
+			normalized := tspath.ToFileNameLowerCase(sf.FileName())
+			if _, ok := fileSet[normalized]; ok {
 				sourceFiles = append(sourceFiles, sf)
-				delete(fileSet, sf.FileName())
+				delete(fileSet, normalized)
 			}
 		}
 
-		for f := range fileSet {
-			panic("file not in program: " + f)
+		if len(fileSet) > 0 {
+			f := ""
+			for k := range fileSet {
+				f += k + ", "
+			}
+			f = f[:len(f)-2]
+			panic(fmt.Sprintf("file '%s' not in program '%s'", f, configFileName))
 		}
 
 		err = RunLinterOnProgram(program, sourceFiles, workers, getRulesForFile, onDiagnostic)
