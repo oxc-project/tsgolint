@@ -1,10 +1,10 @@
-From 5a0d709a164f113b7e4a6bb6a9f7fdcee66f5a0a Mon Sep 17 00:00:00 2001
+From 8683091cefb65cd119ebdf926c869768cb71870d Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
-Date: Wed, 27 Aug 2025 12:48:05 +0100
-Subject: [PATCH] patch: expose more functions via the shim
+Date: Fri, 29 Aug 2025 17:49:17 +0100
+Subject: [PATCH 4/4] patch: expose more functions via the shim with type fixes
 
 ---
- internal/project/compilerhost.go              |   2 +-
+ internal/project/compilerhost.go              |   4 +-
  internal/project/configfileregistry.go        |  22 +--
  internal/project/configfileregistrybuilder.go | 142 +++++++++---------
  internal/project/extendedconfigcache.go       |  12 +-
@@ -12,16 +12,16 @@ Subject: [PATCH] patch: expose more functions via the shim
  internal/project/project.go                   |   8 +-
  internal/project/projectcollectionbuilder.go  |  50 +++---
  internal/project/session.go                   |  12 +-
- internal/project/snapshot.go                  |  12 +-
+ internal/project/snapshot.go                  |  14 +-
  internal/project/snapshotfs.go                |  57 ++++---
  internal/vfs/utilities.go                     |  18 +--
- 11 files changed, 184 insertions(+), 171 deletions(-)
+ 11 files changed, 186 insertions(+), 173 deletions(-)
 
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
-index 262e55403..6dfe20fd0 100644
+index 36cf2dfc4..3670cfb49 100644
 --- a/internal/project/compilerhost.go
 +++ b/internal/project/compilerhost.go
-@@ -19,7 +19,7 @@ type compilerHost struct {
+@@ -20,7 +20,7 @@ type compilerHost struct {
  	currentDirectory string
  	sessionOptions   *SessionOptions
 
@@ -29,7 +29,16 @@ index 262e55403..6dfe20fd0 100644
 +	fs                 *SnapshotFSBuilder
  	compilerFS         *compilerFS
  	configFileRegistry *ConfigFileRegistry
+ 	seenFiles          *collections.SyncSet[tspath.Path]
+@@ -32,7 +32,7 @@ type compilerHost struct {
 
+ type builderFileSource struct {
+ 	seenFiles         *collections.SyncSet[tspath.Path]
+-	snapshotFSBuilder *snapshotFSBuilder
++	snapshotFSBuilder *SnapshotFSBuilder
+ }
+
+ func (c *builderFileSource) GetFile(fileName string) FileHandle {
 diff --git a/internal/project/configfileregistry.go b/internal/project/configfileregistry.go
 index bae60b66c..2d9948bd1 100644
 --- a/internal/project/configfileregistry.go
@@ -552,7 +561,7 @@ index 38654c55a..bf4e62758 100644
  	entry.mu.Lock()
  	if existing, loaded := c.entries.LoadOrStore(path, entry); loaded {
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index 1e3c2f70f..ec4298a69 100644
+index a59e1a74d..493c02764 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
 @@ -55,13 +55,13 @@ func (f *fileBase) LineMap() *ls.LineMap {
@@ -641,7 +650,7 @@ index f2ee08235..1aebd3806 100644
  		if builder.sessionOptions.TypingsLocation != "" {
  			project.typingsFilesWatch = NewWatchedFiles(
 diff --git a/internal/project/projectcollectionbuilder.go b/internal/project/projectcollectionbuilder.go
-index f706bef8a..fd8242706 100644
+index 309b31c4a..5e6f1d321 100644
 --- a/internal/project/projectcollectionbuilder.go
 +++ b/internal/project/projectcollectionbuilder.go
 @@ -16,25 +16,25 @@ import (
@@ -842,10 +851,10 @@ index f706bef8a..fd8242706 100644
  		})
  		changed := b.inferredProject.ChangeIf(
 diff --git a/internal/project/session.go b/internal/project/session.go
-index fabaf9a3c..55e522fea 100644
+index 4e78c2888..585ab380a 100644
 --- a/internal/project/session.go
 +++ b/internal/project/session.go
-@@ -61,7 +61,7 @@ type Session struct {
+@@ -73,7 +73,7 @@ type Session struct {
  	parseCache *ParseCache
  	// extendedConfigCache is the ref-counted cache of tsconfig ASTs
  	// that are used in the "extends" of another tsconfig.
@@ -854,7 +863,7 @@ index fabaf9a3c..55e522fea 100644
  	// programCounter counts how many snapshots reference a program.
  	// When a program is no longer referenced, its source files are
  	// released from the parseCache.
-@@ -117,7 +117,7 @@ func NewSession(init *SessionInit) *Session {
+@@ -121,7 +121,7 @@ func NewSession(init *SessionInit) *Session {
  	if parseCache == nil {
  		parseCache = &ParseCache{}
  	}
@@ -863,7 +872,7 @@ index fabaf9a3c..55e522fea 100644
 
  	session := &Session{
  		options:             init.Options,
-@@ -502,16 +502,16 @@ func (s *Session) updateWatches(oldSnapshot *Snapshot, newSnapshot *Snapshot) er
+@@ -449,16 +449,16 @@ func (s *Session) updateWatches(oldSnapshot *Snapshot, newSnapshot *Snapshot) er
  	core.DiffMapsFunc(
  		oldSnapshot.ConfigFileRegistry.configs,
  		newSnapshot.ConfigFileRegistry.configs,
@@ -885,10 +894,10 @@ index fabaf9a3c..55e522fea 100644
  		},
  	)
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index 112e2225c..38c8338e2 100644
+index b5d7d1722..5f0af2cbc 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
-@@ -42,7 +42,7 @@ func NewSnapshot(
+@@ -43,7 +43,7 @@ func NewSnapshot(
  	fs *snapshotFS,
  	sessionOptions *SessionOptions,
  	parseCache *ParseCache,
@@ -897,7 +906,16 @@ index 112e2225c..38c8338e2 100644
  	configFileRegistry *ConfigFileRegistry,
  	compilerOptionsForInferredProjects *core.CompilerOptions,
  	toPath func(fileName string) tspath.Path,
-@@ -207,10 +207,10 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -209,7 +209,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 		if changedFiles {
+ 			cleanFilesStart := time.Now()
+ 			removedFiles := 0
+-			fs.diskFiles.Range(func(entry *dirty.SyncMapEntry[tspath.Path, *diskFile]) bool {
++			fs.diskFiles.Range(func(entry *dirty.SyncMapEntry[tspath.Path, *DiskFile]) bool {
+ 				for _, project := range projectCollection.Projects() {
+ 					if project.host.seenFiles.Has(entry.Key()) {
+ 						return true
+@@ -261,10 +261,10 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  		}
  	}
  	for path, config := range newSnapshot.ConfigFileRegistry.configs {
@@ -911,7 +929,7 @@ index 112e2225c..38c8338e2 100644
  						// Ref count extended configs that were already loaded in the previous snapshot.
  						// New/changed ones were handled during config file registry building.
  						session.extendedConfigCache.Ref(s.toPath(file))
-@@ -241,8 +241,8 @@ func (s *Snapshot) dispose(session *Session) {
+@@ -295,8 +295,8 @@ func (s *Snapshot) dispose(session *Session) {
  		}
  	}
  	for _, config := range s.ConfigFileRegistry.configs {

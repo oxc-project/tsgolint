@@ -63,5 +63,12 @@ type SnapshotChange = project.SnapshotChange
 type SnapshotFSBuilder = project.SnapshotFSBuilder
 //go:linkname TsGoLintNewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.TsGoLintNewSnapshotFSBuilder
 func TsGoLintNewSnapshotFSBuilder(fs vfs.FS) *project.SnapshotFSBuilder
+type UpdateReason = project.UpdateReason
+const UpdateReasonDidChangeCompilerOptionsForInferredProjects = project.UpdateReasonDidChangeCompilerOptionsForInferredProjects
+const UpdateReasonDidOpenFile = project.UpdateReasonDidOpenFile
+const UpdateReasonRequestedLanguageServicePendingChanges = project.UpdateReasonRequestedLanguageServicePendingChanges
+const UpdateReasonRequestedLanguageServiceProjectDirty = project.UpdateReasonRequestedLanguageServiceProjectDirty
+const UpdateReasonRequestedLanguageServiceProjectNotLoaded = project.UpdateReasonRequestedLanguageServiceProjectNotLoaded
+const UpdateReasonUnknown = project.UpdateReasonUnknown
 type WatchedFiles[T any] = project.WatchedFiles[T]
 type WatcherID = project.WatcherID

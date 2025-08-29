@@ -1,4 +1,4 @@
-From 27f6e7695e353624b78762bf0022493d4434eca3 Mon Sep 17 00:00:00 2001
+From 19e225e6d04955973deac33458ee9bc14aa3441c Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 18 Jun 2025 15:24:34 +0300
 Subject: [PATCH 1/4] Parallel readDirectory visitor
@@ -186,5 +186,5 @@ index d86a7f0d1..9eb2698b4 100644
  
  func ReadDirectory(host FS, currentDir string, path string, extensions []string, excludes []string, includes []string, depth *int) []string {
 -- 
-2.49.0
+2.39.5 (Apple Git-154)
 
