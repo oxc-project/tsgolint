@@ -55,10 +55,11 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architectural documentatio
 ## Building `tsgolint`
 
 ```bash
-git submodule update --init                       # init typescript-go submodule
+git submodule update --init  --recursive          # init typescript-go submodule
 
 cd typescript-go
 git am --3way --no-gpg-sign ../patches/*.patch    # apply typescript-go patches
+# for windows: Get-ChildItem ../patches/*.patch | ForEach-Object { git am --3way --no-gpg-sign $_.FullName }
 cd ..
 
 go build -o tsgolint ./cmd/tsgolint
@@ -147,6 +148,6 @@ go test ./internal/...
 ### Integration Tests
 
 - `./test.sh` - End-to-end snapshot test running all 40+ rules
-  - Runs **all** tsgolint rules on all fixture files 
+  - Runs **all** tsgolint rules on all fixture files
   - Captures diagnostic output in deterministic, sortable format
   - Verifies output matches expected snapshot

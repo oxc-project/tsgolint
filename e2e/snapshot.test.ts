@@ -1,9 +1,9 @@
 import { execFileSync } from 'node:child_process';
-import { join, resolve, dirname } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { describe, it, expect } from 'vitest';
 import { glob } from 'fast-glob';
+import { describe, expect, it } from 'vitest';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -176,7 +176,6 @@ describe('TSGoLint E2E Snapshot Tests', () => {
         diagnostics = sortDiagnostics(diagnostics);
 
         expect(diagnostics.length).toBeGreaterThan(0);
-
         expect(diagnostics).toMatchSnapshot();
     });
 });

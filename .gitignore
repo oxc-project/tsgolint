@@ -1,3 +1,4 @@
 /tsgolint
+/tsgolint.exe
 internal/collections/
 e2e/node_modules/

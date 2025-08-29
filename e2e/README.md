@@ -6,13 +6,13 @@ Cross-platform end-to-end testing for TSGoLint using TypeScript and Vitest.
 
 ```bash
 cd e2e
-npm install
+pnpm install
 ```
 
 ## Running Tests
 
 ```bash
-npm test
+pnpm test
 ```
 
 ## Structure
