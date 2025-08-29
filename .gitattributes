@@ -1,0 +1,3 @@
+# CI on Windows fails because git appears to convert `lf` to `crlf` when checking out
+# https://github.com/actions/checkout/issues/135
+* text eol=lf

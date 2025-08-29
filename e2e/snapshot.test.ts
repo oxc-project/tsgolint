@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 const ROOT_DIR = resolve(__dirname, '..');
 const E2E_DIR = __dirname;
 const FIXTURES_DIR = join(E2E_DIR, 'fixtures');
-const TSGOLINT_BIN = join(ROOT_DIR, 'tsgolint');
+const TSGOLINT_BIN = join(ROOT_DIR, `tsgolint${process.platform === 'win32' ? '.exe' : ''}`);
 
 const ALL_RULES = [
     'await-thenable',
