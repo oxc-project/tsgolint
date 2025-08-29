@@ -43,7 +43,7 @@ jobs:
     needs: build
     permissions:
       contents: write # for softprops/action-gh-release
-      id-token: write
+      id-token: write # for `pnpm publish --provenance`
     steps:
       - name: Checkout repo
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -70,9 +70,9 @@ jobs:
           TSGOLINT_VERSION: ${{ inputs.version }}
         run: node ./tools/gen-npm-packages.mjs
 
+      - run: npm install -g npm@latest # For trusted publishing support
+
       - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           for package in npm/*; do
             pushd "$package"
