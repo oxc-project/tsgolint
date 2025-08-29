@@ -96,10 +96,8 @@ var NoUnsafeEnumComparisonRule = rule.Rule{
 			// ```ts
 			// Fruit.Apple === Fruit.Banana;
 			// ```
-			for _, leftEnumType := range leftEnumTypes {
-				if rightEnumTypes.Has(leftEnumType) {
-					return false
-				}
+			if slices.ContainsFunc(leftEnumTypes, rightEnumTypes.Has) {
+				return false
 			}
 
 			// We need to split the type into the union type parts in order to find
