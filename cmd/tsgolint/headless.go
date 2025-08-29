@@ -224,9 +224,7 @@ func runHeadless(args []string) int {
 
 	diagnosticsChan := make(chan rule.RuleDiagnostic, 4096)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
+	wg.Go(func() {
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
 		for d := range diagnosticsChan {
@@ -261,7 +259,7 @@ func runHeadless(args []string) int {
 				w.Flush()
 			}
 		}
-	}()
+	})
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
