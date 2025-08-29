@@ -127,12 +127,7 @@ func Map[T, U any](slice []T, f func(T) U) []U {
 
 // Source: typescript-go/internal/core/core.go
 func Some[T any](slice []T, f func(T) bool) bool {
-	for _, value := range slice {
-		if f(value) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(slice, f)
 }
 
 // Source: typescript-go/internal/core/core.go
