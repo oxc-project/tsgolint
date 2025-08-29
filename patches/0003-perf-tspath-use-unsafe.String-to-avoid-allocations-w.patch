@@ -1,15 +1,15 @@
-From e978a5e409e5660859b1f96cdd71e3f7653e79d1 Mon Sep 17 00:00:00 2001
+From 11d57b270f4576e3f2cf35a5e8743e8636f785f8 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 15 Aug 2025 16:06:42 +0100
-Subject: [PATCH] perf(tspath): use `unsafe.String` to avoid allocations when
- lower casing string
+Subject: [PATCH 3/4] perf(tspath): use `unsafe.String` to avoid allocations
+ when lower casing string
 
 ---
  internal/tspath/path.go | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/internal/tspath/path.go b/internal/tspath/path.go
-index 43d7bb6ea..4c62c817b 100644
+index 64a12c5da..066d4ec18 100644
 --- a/internal/tspath/path.go
 +++ b/internal/tspath/path.go
 @@ -4,6 +4,7 @@ import (
