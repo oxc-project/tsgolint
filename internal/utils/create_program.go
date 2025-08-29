@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -40,7 +41,10 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, errors.New("couldn't create program")
 	}
 
-	// TODO: report syntactic diagnostics?
+	diagnostics := program.GetSyntacticDiagnostics(context.Background(), nil)
+	if len(diagnostics) != 0 {
+		return nil, fmt.Errorf("found %v syntactic errors. Try running \"tsgo --noEmit\" first\n", len(diagnostics))
+	}
 
 	program.BindSourceFiles()
 

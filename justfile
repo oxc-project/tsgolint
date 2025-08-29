@@ -6,7 +6,6 @@ ready:
 init:
   git submodule update --init
   pushd typescript-go && git am --3way --no-gpg-sign ../patches/*.patch && popd
-  mkdir -p internal/collections && find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
 
 build:
   GOEXPERIMENT=greenteagc go build -o tsgolint ./cmd/tsgolint

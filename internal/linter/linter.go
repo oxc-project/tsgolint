@@ -2,19 +2,14 @@ package linter
 
 import (
 	"context"
-	"log"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 
 	"github.com/microsoft/typescript-go/shim/ast"
-	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/compiler"
 	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/tspath"
-	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
-	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 )
 
 type ConfiguredRule struct {
@@ -22,80 +17,28 @@ type ConfiguredRule struct {
 	Run  func(ctx rule.RuleContext) rule.RuleListeners
 }
 
-type Workload struct {
-	Programs       map[string][]string
-	UnmatchedFiles []string
-}
+type Workload = map[*compiler.Program][]*ast.SourceFile
 
 func RunLinter(workload Workload, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
-	// TODO(camc314): pass in via argument??
-	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
-
-	idx := 0
-	for configFileName, filePaths := range workload.Programs {
-		log.Printf("[%d/%d] Running linter on program: %s", idx+1, len(workload.Programs), configFileName)
-
-		currentDirectory := tspath.GetDirectoryPath(configFileName)
-		host := utils.CreateCompilerHost(currentDirectory, fs)
-
-		program, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host)
-
-		if err != nil {
-			return err
-		}
-
-		fileSet := make(map[string]struct{}, len(filePaths))
-		for _, f := range filePaths {
-			fileSet[f] = struct{}{}
-		}
-
-		sourceFiles := make([]*ast.SourceFile, 0, len(filePaths))
-		for _, sf := range program.SourceFiles() {
-			if _, ok := fileSet[sf.FileName()]; ok {
-				sourceFiles = append(sourceFiles, sf)
-				delete(fileSet, sf.FileName())
-			}
-		}
-
-		for f := range fileSet {
-			panic("file not in program: " + f)
-		}
-
-		err = RunLinterOnProgram(program, sourceFiles, workers, getRulesForFile, onDiagnostic)
-		if err != nil {
-			return err
-		}
-
-		idx++
-	}
-
-	// TODO: do something with unmatched files?
-
-	return nil
-
-}
-
-func RunLinterOnProgram(program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
 	type checkerWorkload struct {
 		checker *checker.Checker
 		program *compiler.Program
 		queue   chan *ast.SourceFile
 	}
 	flatQueue := []checkerWorkload{}
-	queue := make(chan *ast.SourceFile, len(files))
-
-	for _, f := range files {
-		queue <- f
+	for program, files := range workload {
+		queue := make(chan *ast.SourceFile, len(files))
+		for _, file := range files {
+			queue <- file
+		}
+		close(queue)
+		program.BindSourceFiles()
+		checkers, done := program.GetTypeCheckers(core.WithRequestID(context.Background(), "__single_run__"))
+		defer done()
+		for _, ch := range checkers {
+			flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
+		}
 	}
-
-	close(queue)
-	program.BindSourceFiles()
-	checkers, done := program.GetTypeCheckers(core.WithRequestID(context.Background(), "__single_run__"))
-	defer done()
-	for _, ch := range checkers {
-		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
-	}
-
 	workloadQueue := make(chan checkerWorkload, len(flatQueue))
 	for _, w := range flatQueue {
 		workloadQueue <- w
