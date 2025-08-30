@@ -179,4 +179,34 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
         expect(diagnostics).toMatchSnapshot();
     });
+
+    it.runIf(process.platform === 'win32')('should not panic with mixed forward/backslash paths from Rust (issue #143)', async () => {
+        // Regression test for https://github.com/oxc-project/tsgolint/issues/143
+        // This test reproduces the issue where Rust sends paths with backslashes
+        // but TypeScript program has forward slashes, causing:
+        // "panic: Expected file 'E:\oxc\...\index.ts' to be in program"
+
+        const testFile = join(FIXTURES_DIR, 'rules', 'no-floating-promises', 'index.ts');
+
+        // On Windows, convert forward slashes to backslashes to simulate Rust input
+        const rustStylePath = testFile.replace(/\//g, '\\');
+
+        const config = {
+            files: [
+                {
+                    file_path: rustStylePath,
+                    rules: ['no-floating-promises'],
+                },
+            ],
+        };
+
+        const env = { ...process.env, GOMAXPROCS: '1' };
+
+        expect(() => {
+            execFileSync(TSGOLINT_BIN, ['headless'], {
+                input: JSON.stringify(config),
+                env,
+            });
+        }).not.toThrow();
+    });
 });
