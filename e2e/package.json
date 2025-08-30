@@ -1,0 +1,16 @@
+{
+    "name": "tsgolint-e2e",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "test": "vitest"
+    },
+    "devDependencies": {
+        "@types/node": "^24.3.0",
+        "fast-glob": "^3.3.3",
+        "typescript": "^5.6.0",
+        "vitest": "^2.0.0"
+    },
+    "packageManager": "pnpm@9.15.5+sha256.8472168c3e1fd0bff287e694b053fccbbf20579a3ff9526b6333beab8df65a8d"
+}

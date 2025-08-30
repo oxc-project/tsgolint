@@ -1,2 +1,3 @@
 /tsgolint
 internal/collections/
+e2e/node_modules/

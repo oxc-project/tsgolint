@@ -23,8 +23,21 @@ jobs:
           submodules: true
           persist-credentials: false
 
+      - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
+
       - uses: ./.github/actions/setup
-      - run: just test
+
+      - name: Run go tests
+        run: go test ./internal/...
+
+      - name: Build
+        run: just build
+
+      - name: Run e2e tests
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run test
+        working-directory: e2e
 
   lint:
     runs-on: ubuntu-latest
