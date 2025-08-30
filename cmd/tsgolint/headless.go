@@ -17,6 +17,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
@@ -181,17 +182,19 @@ func runHeadless(args []string) int {
 			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
 		}
 
-		tsconfig, found := tsConfigResolver.FindTsconfigForFile(fileConfig.FilePath, false)
+		normalizedFilePath := tspath.NormalizeSlashes(fileConfig.FilePath)
+
+		tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
 		if logLevel == utils.LogLevelDebug {
-			log.Printf("Got tsconfig for file %s: %s", fileConfig.FilePath, tsconfig)
+			log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfig)
 		}
 
 		if !found {
-			workload.UnmatchedFiles = append(workload.UnmatchedFiles, fileConfig.FilePath)
+			workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
 		} else {
-			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], fileConfig.FilePath)
+			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
 		}
-		fileConfigs[fileConfig.FilePath] = fileConfig
+		fileConfigs[normalizedFilePath] = fileConfig
 	}
 
 	if logLevel == utils.LogLevelDebug {
