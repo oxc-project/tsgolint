@@ -39,6 +39,32 @@ jobs:
           pnpm run test
         working-directory: e2e
 
+  test-windows:
+    # if: ${{ github.ref_name == 'main' }}
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # required for git am --3way to work properly
+          submodules: true
+          persist-credentials: false
+
+      - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
+
+      - uses: ./.github/actions/setup
+
+      - name: Run go tests
+        run: go test ./internal/...
+
+      - name: Build
+        run: go build -o tsgolint.exe ./cmd/tsgolint
+
+      - name: Run e2e tests
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run test
+        working-directory: e2e
+
   lint:
     runs-on: ubuntu-latest
     steps:
