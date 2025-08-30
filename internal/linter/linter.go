@@ -2,7 +2,9 @@ package linter
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -59,8 +61,21 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			}
 		}
 
-		for f := range fileSet {
-			panic("file not in program: " + f)
+		if len(fileSet) > 0 {
+			var unmatchedFiles []string
+			for k := range fileSet {
+				unmatchedFiles = append(unmatchedFiles, k)
+			}
+			unmatchedFilesString := strings.Join(unmatchedFiles, ", ")
+			log.Println("Unmatched files found:", unmatchedFilesString)
+
+			var programFiles []string
+			for _, k := range program.SourceFiles() {
+				programFiles = append(programFiles, k.FileName())
+			}
+			log.Printf("Program source files (%d): %s", len(programFiles), strings.Join(programFiles, ", "))
+
+			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
 		err = RunLinterOnProgram(program, sourceFiles, workers, getRulesForFile, onDiagnostic)
