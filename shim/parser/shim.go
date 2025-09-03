@@ -8,6 +8,8 @@ import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/parser"
 import _ "unsafe"
 
+//go:linkname GetJSDocCommentRanges github.com/microsoft/typescript-go/internal/parser.GetJSDocCommentRanges
+func GetJSDocCommentRanges(f *ast.NodeFactory, commentRanges []ast.CommentRange, node *ast.Node, text string) []ast.CommentRange
 const PCArgumentExpressions = parser.PCArgumentExpressions
 const PCArrayBindingElements = parser.PCArrayBindingElements
 const PCArrayLiteralMembers = parser.PCArrayLiteralMembers

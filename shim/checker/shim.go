@@ -919,6 +919,8 @@ const TernaryMaybe = checker.TernaryMaybe
 const TernaryTrue = checker.TernaryTrue
 const TernaryUnknown = checker.TernaryUnknown
 type TrackedSymbolArgs = checker.TrackedSymbolArgs
+//go:linkname TryGetModuleSpecifierFromDeclaration github.com/microsoft/typescript-go/internal/checker.TryGetModuleSpecifierFromDeclaration
+func TryGetModuleSpecifierFromDeclaration(node *ast.Node) *ast.Node
 type TupleElementInfo = checker.TupleElementInfo
 type TupleNormalizer = checker.TupleNormalizer
 type TupleType = checker.TupleType

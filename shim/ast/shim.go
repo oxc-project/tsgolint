@@ -266,6 +266,8 @@ func GetImpliedNodeFormatForEmitWorker(fileName string, emitModuleKind core.Modu
 func GetImpliedNodeFormatForFile(path string, packageJsonType string) core.ModuleKind
 //go:linkname GetImportAttributes github.com/microsoft/typescript-go/internal/ast.GetImportAttributes
 func GetImportAttributes(node *ast.Node) *ast.Node
+//go:linkname GetImportClauseOfDeclaration github.com/microsoft/typescript-go/internal/ast.GetImportClauseOfDeclaration
+func GetImportClauseOfDeclaration(declaration *ast.Declaration) *ast.ImportClause
 //go:linkname GetInitializerOfBinaryExpression github.com/microsoft/typescript-go/internal/ast.GetInitializerOfBinaryExpression
 func GetInitializerOfBinaryExpression(expr *ast.BinaryExpression) *ast.Expression
 //go:linkname GetInvokedExpression github.com/microsoft/typescript-go/internal/ast.GetInvokedExpression
@@ -967,6 +969,8 @@ func IsQuestionToken(node *ast.Node) bool
 func IsRegularExpressionLiteral(node *ast.Node) bool
 //go:linkname IsRequireCall github.com/microsoft/typescript-go/internal/ast.IsRequireCall
 func IsRequireCall(node *ast.Node, requireStringLiteralLikeArgument bool) bool
+//go:linkname IsRequireVariableStatement github.com/microsoft/typescript-go/internal/ast.IsRequireVariableStatement
+func IsRequireVariableStatement(node *ast.Node) bool
 //go:linkname IsResolutionModeOverrideHost github.com/microsoft/typescript-go/internal/ast.IsResolutionModeOverrideHost
 func IsResolutionModeOverrideHost(node *ast.Node) bool
 //go:linkname IsRestTypeNode github.com/microsoft/typescript-go/internal/ast.IsRestTypeNode

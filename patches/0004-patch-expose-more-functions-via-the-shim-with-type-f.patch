@@ -1,4 +1,4 @@
-From 8683091cefb65cd119ebdf926c869768cb71870d Mon Sep 17 00:00:00 2001
+From c0aae26eba85f1c1255f2108af390b567f786f1b Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 29 Aug 2025 17:49:17 +0100
 Subject: [PATCH 4/4] patch: expose more functions via the shim with type fixes
@@ -10,12 +10,12 @@ Subject: [PATCH 4/4] patch: expose more functions via the shim with type fixes
  internal/project/extendedconfigcache.go       |  12 +-
  internal/project/overlayfs.go                 |  20 +--
  internal/project/project.go                   |   8 +-
- internal/project/projectcollectionbuilder.go  |  50 +++---
+ internal/project/projectcollectionbuilder.go  |  52 +++----
  internal/project/session.go                   |  12 +-
  internal/project/snapshot.go                  |  14 +-
  internal/project/snapshotfs.go                |  57 ++++---
  internal/vfs/utilities.go                     |  18 +--
- 11 files changed, 186 insertions(+), 173 deletions(-)
+ 11 files changed, 187 insertions(+), 174 deletions(-)
 
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
 index 36cf2dfc4..3670cfb49 100644
@@ -650,7 +650,7 @@ index f2ee08235..1aebd3806 100644
  		if builder.sessionOptions.TypingsLocation != "" {
  			project.typingsFilesWatch = NewWatchedFiles(
 diff --git a/internal/project/projectcollectionbuilder.go b/internal/project/projectcollectionbuilder.go
-index 309b31c4a..5e6f1d321 100644
+index 771701690..8c5c327ba 100644
 --- a/internal/project/projectcollectionbuilder.go
 +++ b/internal/project/projectcollectionbuilder.go
 @@ -16,25 +16,25 @@ import (
@@ -747,7 +747,7 @@ index 309b31c4a..5e6f1d321 100644
  	if result.project != nil {
  		// !!! sheetal todo this later
  		// // Create ancestor tree for findAllRefs (dont load them right away)
-@@ -469,7 +469,7 @@ func (b *projectCollectionBuilder) ensureConfiguredProjectAndAncestorsForOpenFil
+@@ -469,13 +469,13 @@ func (b *projectCollectionBuilder) ensureConfiguredProjectAndAncestorsForOpenFil
 
  type searchNode struct {
  	configFileName string
@@ -756,16 +756,23 @@ index 309b31c4a..5e6f1d321 100644
  	logger         *logging.LogTree
  }
 
-@@ -482,7 +482,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+ type searchNodeKey struct {
+ 	configFileName string
+-	loadKind       projectLoadKind
++	loadKind       ProjectLoadKind
+ }
+
+ type searchResult struct {
+@@ -487,7 +487,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  	fileName string,
  	path tspath.Path,
  	configFileName string,
 -	loadKind projectLoadKind,
 +	loadKind ProjectLoadKind,
- 	visited *collections.SyncSet[searchNode],
+ 	visited *collections.SyncSet[searchNodeKey],
  	fallback *searchResult,
  	logger *logging.LogTree,
-@@ -498,7 +498,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+@@ -503,7 +503,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  			if config, ok := configs.Load(b.toPath(node.configFileName)); ok && len(config.ProjectReferences()) > 0 {
  				referenceLoadKind := node.loadKind
  				if config.CompilerOptions().DisableReferencedProjectLoad.IsTrue() {
@@ -774,7 +781,7 @@ index 309b31c4a..5e6f1d321 100644
  				}
 
  				var refLogger *logging.LogTree
-@@ -514,7 +514,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+@@ -519,7 +519,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  		},
  		func(node searchNode) (isResult bool, stop bool) {
  			configFilePath := b.toPath(node.configFileName)
@@ -783,7 +790,7 @@ index 309b31c4a..5e6f1d321 100644
  			if config == nil {
  				node.logger.Log("Config file for project does not already exist")
  				return false, false
-@@ -542,7 +542,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+@@ -547,7 +547,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  				return false, false
  			}
 
@@ -792,16 +799,16 @@ index 309b31c4a..5e6f1d321 100644
  				// Ensure project is up to date before checking for file inclusion
  				b.updateProgram(project, node.logger)
  			}
-@@ -562,7 +562,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+@@ -567,7 +567,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  			Visited: visited,
- 			PreprocessLevel: func(level *core.BreadthFirstSearchLevel[searchNode]) {
+ 			PreprocessLevel: func(level *core.BreadthFirstSearchLevel[searchNodeKey, searchNode]) {
  				level.Range(func(node searchNode) bool {
--					if node.loadKind == projectLoadKindFind && level.Has(searchNode{configFileName: node.configFileName, loadKind: projectLoadKindCreate, logger: node.logger}) {
-+					if node.loadKind == ProjectLoadKindFind && level.Has(searchNode{configFileName: node.configFileName, loadKind: ProjectLoadKindCreate, logger: node.logger}) {
+-					if node.loadKind == projectLoadKindFind && level.Has(searchNodeKey{configFileName: node.configFileName, loadKind: projectLoadKindCreate}) {
++					if node.loadKind == ProjectLoadKindFind && level.Has(searchNodeKey{configFileName: node.configFileName, loadKind: ProjectLoadKindCreate}) {
  						// Remove find requests when a create request for the same project is already present.
- 						level.Delete(node)
+ 						level.Delete(searchNodeKey{configFileName: node.configFileName, loadKind: node.loadKind})
  					}
-@@ -609,7 +609,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+@@ -617,7 +617,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  			return *fallback
  		}
  	}
@@ -810,7 +817,7 @@ index 309b31c4a..5e6f1d321 100644
  		return b.findOrCreateDefaultConfiguredProjectWorker(
  			fileName,
  			path,
-@@ -636,7 +636,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
+@@ -644,7 +644,7 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectWorker(
  func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectForOpenScriptInfo(
  	fileName string,
  	path tspath.Path,
@@ -819,7 +826,7 @@ index 309b31c4a..5e6f1d321 100644
  	logger *logging.LogTree,
  ) searchResult {
  	if key, ok := b.fileDefaultProjects[path]; ok {
-@@ -680,10 +680,10 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectForOpenSc
+@@ -688,10 +688,10 @@ func (b *projectCollectionBuilder) findOrCreateDefaultConfiguredProjectForOpenSc
  func (b *projectCollectionBuilder) findOrCreateProject(
  	configFileName string,
  	configFilePath tspath.Path,
@@ -832,7 +839,7 @@ index 309b31c4a..5e6f1d321 100644
  		entry, _ := b.configuredProjects.Load(configFilePath)
  		return entry
  	}
-@@ -692,7 +692,7 @@ func (b *projectCollectionBuilder) findOrCreateProject(
+@@ -700,7 +700,7 @@ func (b *projectCollectionBuilder) findOrCreateProject(
  }
 
  func (b *projectCollectionBuilder) toPath(fileName string) tspath.Path {
@@ -841,7 +848,7 @@ index 309b31c4a..5e6f1d321 100644
  }
 
  func (b *projectCollectionBuilder) updateInferredProjectRoots(rootFileNames []string, logger *logging.LogTree) bool {
-@@ -715,7 +715,7 @@ func (b *projectCollectionBuilder) updateInferredProjectRoots(rootFileNames []st
+@@ -723,7 +723,7 @@ func (b *projectCollectionBuilder) updateInferredProjectRoots(rootFileNames []st
  			newCompilerOptions = b.compilerOptionsForInferredProjects
  		}
  		newCommandLine := tsoptions.NewParsedCommandLine(newCompilerOptions, rootFileNames, tspath.ComparePathsOptions{
