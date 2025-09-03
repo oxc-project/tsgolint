@@ -9,11 +9,13 @@ import "golang.org/x/text/language"
 import "iter"
 import _ "unsafe"
 
+//go:linkname ApplyBulkEdits github.com/microsoft/typescript-go/internal/core.ApplyBulkEdits
+func ApplyBulkEdits(text string, edits []core.TextChange) string
 //go:linkname BoolToTristate github.com/microsoft/typescript-go/internal/core.BoolToTristate
 func BoolToTristate(b bool) core.Tristate
-type BreadthFirstSearchLevel[N comparable] = core.BreadthFirstSearchLevel[N]
-type BreadthFirstSearchOptions[N comparable] = core.BreadthFirstSearchOptions[N]
-type BreadthFirstSearchResult[N comparable] = core.BreadthFirstSearchResult[N]
+type BreadthFirstSearchLevel[K comparable, N any] = core.BreadthFirstSearchLevel[K,N]
+type BreadthFirstSearchOptions[K comparable, N any] = core.BreadthFirstSearchOptions[K,N]
+type BreadthFirstSearchResult[N any] = core.BreadthFirstSearchResult[N]
 type BuildOptions = core.BuildOptions
 type CompilerOptions = core.CompilerOptions
 //go:linkname ComputeLineStarts github.com/microsoft/typescript-go/internal/core.ComputeLineStarts
@@ -23,6 +25,8 @@ func ComputeLineStartsSeq(text string) iter.Seq[core.TextPos]
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
 //go:linkname GetLocale github.com/microsoft/typescript-go/internal/core.GetLocale
 func GetLocale(ctx context.Context) language.Tag
+//go:linkname GetNewLineKind github.com/microsoft/typescript-go/internal/core.GetNewLineKind
+func GetNewLineKind(s string) core.NewLineKind
 //go:linkname GetRequestID github.com/microsoft/typescript-go/internal/core.GetRequestID
 func GetRequestID(ctx context.Context) string
 //go:linkname GetScriptKindFromFileName github.com/microsoft/typescript-go/internal/core.GetScriptKindFromFileName
@@ -75,6 +79,7 @@ func NewTextRange(pos int, end int) core.TextRange
 func NewThrottleGroup(ctx context.Context, semaphore chan struct{}) *core.ThrottleGroup
 //go:linkname NewWorkGroup github.com/microsoft/typescript-go/internal/core.NewWorkGroup
 func NewWorkGroup(singleThreaded bool) core.WorkGroup
+var NodeCoreModules = core.NodeCoreModules
 //go:linkname NonRelativeModuleNameForTypingCache github.com/microsoft/typescript-go/internal/core.NonRelativeModuleNameForTypingCache
 func NonRelativeModuleNameForTypingCache(moduleName string) string
 type ParsedOptions = core.ParsedOptions
