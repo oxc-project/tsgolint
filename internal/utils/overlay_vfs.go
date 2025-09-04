@@ -174,3 +174,10 @@ func NewOverlayVFSForFile(filePath string, source string) vfs.FS {
 		virtualFiles,
 	}
 }
+
+func NewOverlayVFSForFiles(virtualFiles map[string]string) vfs.FS {
+	return &OverlayVFS{
+		bundled.WrapFS(osvfs.FS()),
+		virtualFiles,
+	}
+}
