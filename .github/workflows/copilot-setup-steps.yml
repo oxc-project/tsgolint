@@ -26,3 +26,5 @@ jobs:
           persist-credentials: false
 
       - uses: ./.github/actions/setup
+
+      - run: just init
