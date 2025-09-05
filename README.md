@@ -88,51 +88,6 @@ This can be helpful when:
 - Troubleshooting TypeScript configuration problems
 - Contributing to **tsgolint** development
 
-## Implemented rules
-
-| Name                                                                                                                | Status |
-| ------------------------------------------------------------------------------------------------------------------- | ------ |
-| [await-thenable](https://typescript-eslint.io/rules/await-thenable)                                                 | ✅     |
-| [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)                                               | ✅     |
-| [no-base-to-string](https://typescript-eslint.io/rules/no-base-to-string)                                           | ✅     |
-| [no-confusing-void-expression](https://typescript-eslint.io/rules/no-confusing-void-expression)                     | ✅     |
-| [no-duplicate-type-constituents](https://typescript-eslint.io/rules/no-duplicate-type-constituents)                 | ✅     |
-| [no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises)                                     | ✅     |
-| [no-for-in-array](https://typescript-eslint.io/rules/no-for-in-array)                                               | ✅     |
-| [no-implied-eval](https://typescript-eslint.io/rules/no-implied-eval)                                               | ✅     |
-| [no-meaningless-void-operator](https://typescript-eslint.io/rules/no-meaningless-void-operator)                     | ✅     |
-| [no-misused-promises](https://typescript-eslint.io/rules/no-misused-promises)                                       | ✅     |
-| [no-misused-spread](https://typescript-eslint.io/rules/no-misused-spread)                                           | ✅     |
-| [no-mixed-enums](https://typescript-eslint.io/rules/no-mixed-enums)                                                 | ✅     |
-| [no-redundant-type-constituents](https://typescript-eslint.io/rules/no-redundant-type-constituents)                 | ✅     |
-| [no-unnecessary-boolean-literal-compare](https://typescript-eslint.io/rules/no-unnecessary-boolean-literal-compare) | ✅     |
-| [no-unnecessary-template-expression](https://typescript-eslint.io/rules/no-unnecessary-template-expression)         | ✅     |
-| [no-unnecessary-type-arguments](https://typescript-eslint.io/rules/no-unnecessary-type-arguments)                   | ✅     |
-| [no-unnecessary-type-assertion](https://typescript-eslint.io/rules/no-unnecessary-type-assertion)                   | ✅     |
-| [no-unsafe-argument](https://typescript-eslint.io/rules/no-unsafe-argument)                                         | ✅     |
-| [no-unsafe-assignment](https://typescript-eslint.io/rules/no-unsafe-assignment)                                     | ✅     |
-| [no-unsafe-call](https://typescript-eslint.io/rules/no-unsafe-call)                                                 | ✅     |
-| [no-unsafe-enum-comparison](https://typescript-eslint.io/rules/no-unsafe-enum-comparison)                           | ✅     |
-| [no-unsafe-member-access](https://typescript-eslint.io/rules/no-unsafe-member-access)                               | ✅     |
-| [no-unsafe-return](https://typescript-eslint.io/rules/no-unsafe-return)                                             | ✅     |
-| [no-unsafe-type-assertion](https://typescript-eslint.io/rules/no-unsafe-type-assertion)                             | ✅     |
-| [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)                                   | ✅     |
-| [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)           | ✅     |
-| [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)                                             | ✅     |
-| [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)                     | ✅     |
-| [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)                     | ✅     |
-| [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)                               | ✅     |
-| [promise-function-async](https://typescript-eslint.io/rules/promise-function-async)                                 | ✅     |
-| [related-getter-setter-pairs](https://typescript-eslint.io/rules/related-getter-setter-pairs)                       | ✅     |
-| [require-array-sort-compare](https://typescript-eslint.io/rules/require-array-sort-compare)                         | ✅     |
-| [require-await](https://typescript-eslint.io/rules/require-await)                                                   | ✅     |
-| [restrict-plus-operands](https://typescript-eslint.io/rules/restrict-plus-operands)                                 | ✅     |
-| [restrict-template-expressions](https://typescript-eslint.io/rules/restrict-template-expressions)                   | ✅     |
-| [return-await](https://typescript-eslint.io/rules/return-await)                                                     | ✅     |
-| [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)                       | ✅     |
-| [unbound-method](https://typescript-eslint.io/rules/unbound-method)                                                 | ✅     |
-| [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable) | ✅     |
-
 ## Testing
 
 **tsgolint** includes several types of tests to ensure correctness:
@@ -147,6 +102,68 @@ go test ./internal/...
 ### Integration Tests
 
 - `./test.sh` - End-to-end snapshot test running all 40+ rules
-  - Runs **all** tsgolint rules on all fixture files 
+  - Runs **all** tsgolint rules on all fixture files
   - Captures diagnostic output in deterministic, sortable format
   - Verifies output matches expected snapshot
+
+## Implemented rules (40/59)
+
+- [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
+- [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
+- [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
+- [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
+- [ ] [no-deprecated](https://typescript-eslint.io/rules/no-deprecated)
+- [ ] [no-unnecessary-condition](https://typescript-eslint.io/rules/no-unnecessary-condition)
+- [ ] [no-unnecessary-qualifier](https://typescript-eslint.io/rules/no-unnecessary-qualifier)
+- [ ] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
+- [ ] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
+- [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
+- [ ] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
+- [ ] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
+- [ ] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
+- [ ] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
+- [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
+- [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
+- [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
+- [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
+- [ ] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
+- [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
+- [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
+- [x] [no-base-to-string](https://typescript-eslint.io/rules/no-base-to-string)
+- [x] [no-confusing-void-expression](https://typescript-eslint.io/rules/no-confusing-void-expression)
+- [x] [no-duplicate-type-constituents](https://typescript-eslint.io/rules/no-duplicate-type-constituents)
+- [x] [no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises)
+- [x] [no-for-in-array](https://typescript-eslint.io/rules/no-for-in-array)
+- [x] [no-implied-eval](https://typescript-eslint.io/rules/no-implied-eval)
+- [x] [no-meaningless-void-operator](https://typescript-eslint.io/rules/no-meaningless-void-operator)
+- [x] [no-misused-promises](https://typescript-eslint.io/rules/no-misused-promises)
+- [x] [no-misused-spread](https://typescript-eslint.io/rules/no-misused-spread)
+- [x] [no-mixed-enums](https://typescript-eslint.io/rules/no-mixed-enums)
+- [x] [no-redundant-type-constituents](https://typescript-eslint.io/rules/no-redundant-type-constituents)
+- [x] [no-unnecessary-boolean-literal-compare](https://typescript-eslint.io/rules/no-unnecessary-boolean-literal-compare)
+- [x] [no-unnecessary-template-expression](https://typescript-eslint.io/rules/no-unnecessary-template-expression)
+- [x] [no-unnecessary-type-arguments](https://typescript-eslint.io/rules/no-unnecessary-type-arguments)
+- [x] [no-unnecessary-type-assertion](https://typescript-eslint.io/rules/no-unnecessary-type-assertion)
+- [x] [no-unsafe-argument](https://typescript-eslint.io/rules/no-unsafe-argument)
+- [x] [no-unsafe-assignment](https://typescript-eslint.io/rules/no-unsafe-assignment)
+- [x] [no-unsafe-call](https://typescript-eslint.io/rules/no-unsafe-call)
+- [x] [no-unsafe-enum-comparison](https://typescript-eslint.io/rules/no-unsafe-enum-comparison)
+- [x] [no-unsafe-member-access](https://typescript-eslint.io/rules/no-unsafe-member-access)
+- [x] [no-unsafe-return](https://typescript-eslint.io/rules/no-unsafe-return)
+- [x] [no-unsafe-type-assertion](https://typescript-eslint.io/rules/no-unsafe-type-assertion)
+- [x] [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)
+- [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
+- [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
+- [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
+- [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
+- [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)
+- [x] [promise-function-async](https://typescript-eslint.io/rules/promise-function-async)
+- [x] [related-getter-setter-pairs](https://typescript-eslint.io/rules/related-getter-setter-pairs)
+- [x] [require-array-sort-compare](https://typescript-eslint.io/rules/require-array-sort-compare)
+- [x] [require-await](https://typescript-eslint.io/rules/require-await)
+- [x] [restrict-plus-operands](https://typescript-eslint.io/rules/restrict-plus-operands)
+- [x] [restrict-template-expressions](https://typescript-eslint.io/rules/restrict-template-expressions)
+- [x] [return-await](https://typescript-eslint.io/rules/return-await)
+- [x] [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)
+- [x] [unbound-method](https://typescript-eslint.io/rules/unbound-method)
+- [x] [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable)
