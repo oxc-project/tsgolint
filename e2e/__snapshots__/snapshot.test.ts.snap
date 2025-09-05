@@ -1737,6 +1737,20 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "suggestions": [],
   },
   {
+    "file_path": "fixtures/rules/no-unsafe-member-access/index.ts",
+    "fixes": [],
+    "message": {
+      "description": "Unsafe member access .foo on an \`any\` value.",
+      "id": "unsafeMemberExpression",
+    },
+    "range": {
+      "end": 362,
+      "pos": 359,
+    },
+    "rule": "no-unsafe-member-access",
+    "suggestions": [],
+  },
+  {
     "file_path": "fixtures/rules/no-unsafe-return/index.ts",
     "fixes": [],
     "message": {

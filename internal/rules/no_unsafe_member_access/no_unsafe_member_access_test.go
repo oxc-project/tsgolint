@@ -323,5 +323,19 @@ function log(arg: unknown) {}
 				},
 			},
 		},
+		{
+			Code: `
+const a: any = {};
+a.foo = 45;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeMemberExpression",
+					Line:      3,
+					Column:    3,
+					EndColumn: 6,
+				},
+			},
+		},
 	})
 }
