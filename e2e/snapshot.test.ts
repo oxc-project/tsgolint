@@ -137,7 +137,7 @@ async function getTestFiles(): Promise<string[]> {
         const files = await glob(pattern, {
             cwd: FIXTURES_DIR,
             absolute: true,
-            ignore: ['**/node_modules/**', '**/*.json'],
+            ignore: ['**/node_modules/**', '**/*.json', '**/path-aliases/**'],
         });
         allFiles.push(...files);
     }
