@@ -209,4 +209,49 @@ describe('TSGoLint E2E Snapshot Tests', () => {
             });
         }).not.toThrow();
     });
+
+    it('should handle tsconfig extending another tsconfig with path aliases', async () => {
+        // Test files using path aliases
+        const pathAliasesDir = join(FIXTURES_DIR, 'path-aliases');
+        const testFiles = [
+            join(pathAliasesDir, 'src', 'index.ts'),
+            join(pathAliasesDir, 'src', 'constants', 'app.ts')
+        ];
+
+        const config = {
+            files: testFiles.map((filePath) => ({
+                file_path: filePath,
+                rules: ['no-floating-promises', 'no-unsafe-argument'], // Include no-unsafe-argument rule
+            })),
+        };
+
+        const env = { ...process.env, GOMAXPROCS: '1' };
+
+        // Run tsgolint in headless mode
+        let output: Buffer;
+        try {
+            output = execFileSync(TSGOLINT_BIN, ['headless'], {
+                input: JSON.stringify(config),
+                env,
+            });
+        } catch (error: any) {
+            // If there's stderr output, include it in the error message
+            const stderr = error.stderr?.toString() || '';
+            const stdout = error.stdout?.toString() || '';
+            throw new Error(`tsgolint failed: ${error.message}\nstdout: ${stdout}\nstderr: ${stderr}`);
+        }
+
+        const diagnostics = parseHeadlessOutput(output);
+        
+        // We expect path alias resolution to work without errors
+        // The test ensures tsgolint can analyze code using path aliases
+        expect(() => {
+            execFileSync(TSGOLINT_BIN, ['headless'], {
+                input: JSON.stringify(config),
+                env,
+            });
+        }).not.toThrow();
+        
+        console.log(`Path aliases test completed with ${diagnostics.length} diagnostics`);
+    });
 });

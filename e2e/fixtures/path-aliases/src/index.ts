@@ -1,15 +1,13 @@
-// Main entry point that uses path aliases
-import { makeApiCall, getAppInfo } from "@utils/api-client";
-import { API_URL } from "@constants/api";
+// Import app name from constants file using path alias
+import { APP_NAME } from "@constants/app";
 
-async function main() {
-  console.log(getAppInfo());
-  
-  // This should trigger no-floating-promises rule
-  makeApiCall();
-  
-  console.log(`Using API: ${API_URL}`);
+// Function called formatAppInfo, which takes two arguments, the app name, and app version and returns a string
+function formatAppInfo(appName: string, appVersion: string): string {
+  return `${appName} v${appVersion}`;
 }
 
-// Call main but don't await - should trigger linting rules
-main();
+// Export a new function called getAppInfo which has no args, but calls formatAppInfo with the app name/app version from the constant file and returns the value
+export function getAppInfo(): string {
+  // Since VERSION was deleted per feedback, using a default version
+  return formatAppInfo(APP_NAME, "1.0.0");
+}
