@@ -137,7 +137,7 @@ async function getTestFiles(): Promise<string[]> {
         const files = await glob(pattern, {
             cwd: FIXTURES_DIR,
             absolute: true,
-            ignore: ['**/node_modules/**', '**/*.json'],
+            ignore: ['**/node_modules/**', '**/*.json', '**/path-aliases/**'],
         });
         allFiles.push(...files);
     }
@@ -208,5 +208,35 @@ describe('TSGoLint E2E Snapshot Tests', () => {
                 env,
             });
         }).not.toThrow();
+    });
+
+    it('should handle tsconfig extending another tsconfig with path aliases', async () => {
+        // Test files using path aliases
+        const pathAliasesDir = join(FIXTURES_DIR, 'path-aliases');
+        const testFiles = [
+            join(pathAliasesDir, 'src', 'index.ts'),
+            join(pathAliasesDir, 'src', 'constants', 'app.ts')
+        ];
+
+        const config = {
+            files: testFiles.map((filePath) => ({
+                file_path: filePath,
+                rules: ['no-floating-promises', 'no-unsafe-argument'], // Include no-unsafe-argument rule
+            })),
+        };
+
+        const env = { ...process.env, GOMAXPROCS: '1' };
+
+        // Run tsgolint in headless mode
+        let output: Buffer;
+        output = execFileSync(TSGOLINT_BIN, ['headless'], {
+            input: JSON.stringify(config),
+            env,
+        });
+
+        let diagnostics = parseHeadlessOutput(output);
+        diagnostics = sortDiagnostics(diagnostics);
+
+        expect(diagnostics).toMatchSnapshot();
     });
 });
