@@ -229,29 +229,14 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
         // Run tsgolint in headless mode
         let output: Buffer;
-        try {
-            output = execFileSync(TSGOLINT_BIN, ['headless'], {
-                input: JSON.stringify(config),
-                env,
-            });
-        } catch (error: any) {
-            // If there's stderr output, include it in the error message
-            const stderr = error.stderr?.toString() || '';
-            const stdout = error.stdout?.toString() || '';
-            throw new Error(`tsgolint failed: ${error.message}\nstdout: ${stdout}\nstderr: ${stderr}`);
-        }
+        output = execFileSync(TSGOLINT_BIN, ['headless'], {
+            input: JSON.stringify(config),
+            env,
+        });
 
-        const diagnostics = parseHeadlessOutput(output);
-        
-        // We expect path alias resolution to work without errors
-        // The test ensures tsgolint can analyze code using path aliases
-        expect(() => {
-            execFileSync(TSGOLINT_BIN, ['headless'], {
-                input: JSON.stringify(config),
-                env,
-            });
-        }).not.toThrow();
-        
-        console.log(`Path aliases test completed with ${diagnostics.length} diagnostics`);
+        let diagnostics = parseHeadlessOutput(output);
+        diagnostics = sortDiagnostics(diagnostics);
+
+        expect(diagnostics).toMatchSnapshot();
     });
 });
