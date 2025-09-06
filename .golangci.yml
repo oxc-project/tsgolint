@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://golangci-lint.run/jsonschema/golangci.jsonschema.json
 
-version: '2'
+version: "2"
 
 run:
   allow-parallel-runners: true
@@ -61,7 +61,7 @@ linters:
       rules:
         main:
           deny:
-            - pkg: 'encoding/json$'
+            - pkg: "encoding/json$"
               desc: 'Use "github.com/go-json-experiment/json" instead.'
 
   exclusions:

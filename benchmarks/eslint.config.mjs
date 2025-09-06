@@ -1,22 +1,22 @@
-import tseslint from 'typescript-eslint'
-import path from 'node:path'
-import process from 'node:process'
-import { fileURLToPath } from 'node:url'
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
+import tseslint from 'typescript-eslint';
 
-const { TSGOLINT_BENCHMARK_PROJECT } = process.env
+const { TSGOLINT_BENCHMARK_PROJECT } = process.env;
 
-let files = []
-let project = ''
+let files = [];
+let project = '';
 
 if (TSGOLINT_BENCHMARK_PROJECT === 'vscode') {
-  files = ['src/**/*.ts']
-  project = './src/tsconfig.json'
+  files = ['src/**/*.ts'];
+  project = './src/tsconfig.json';
 } else if (TSGOLINT_BENCHMARK_PROJECT === 'typescript') {
-  files = ['src/**/*.ts']
-  project = './src/tsconfig-eslint.json'
+  files = ['src/**/*.ts'];
+  project = './src/tsconfig-eslint.json';
 } else if (TSGOLINT_BENCHMARK_PROJECT === 'typeorm') {
-  files = ['src/**/*.ts', 'sample/**/*.ts', 'test/**/*.ts']
-  project = './tsconfig.json'
+  files = ['src/**/*.ts', 'sample/**/*.ts', 'test/**/*.ts'];
+  project = './tsconfig.json';
 } else if (TSGOLINT_BENCHMARK_PROJECT === 'vuejs') {
   files = [
     'packages/global.d.ts',
@@ -25,8 +25,8 @@ if (TSGOLINT_BENCHMARK_PROJECT === 'vscode') {
     'packages/vue/jsx-runtime/**/*.ts',
     'packages/runtime-dom/types/jsx.d.ts',
     'scripts/*.ts',
-  ]
-  project = './tsconfig.json'
+  ];
+  project = './tsconfig.json';
 }
 
 export default tseslint.config(
@@ -95,4 +95,4 @@ export default tseslint.config(
       '@typescript-eslint/use-unknown-in-catch-callback-variable': 'error',
     },
   },
-)
+);

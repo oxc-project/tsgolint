@@ -26,7 +26,7 @@ pnpm test
 
 ## Cross-Platform Compatibility
 
--   Uses Node.js built-in modules and cross-platform npm packages
--   Avoids shell-specific syntax (no bash required)
--   Works on Windows, macOS, and Linux
--   Path handling uses Node.js path module for OS-agnostic paths
+- Uses Node.js built-in modules and cross-platform npm packages
+- Avoids shell-specific syntax (no bash required)
+- Works on Windows, macOS, and Linux
+- Path handling uses Node.js path module for OS-agnostic paths

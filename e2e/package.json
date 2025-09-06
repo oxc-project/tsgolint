@@ -1,15 +1,15 @@
 {
-    "name": "tsgolint-e2e",
-    "version": "1.0.0",
-    "private": true,
-    "type": "module",
-    "scripts": {
-        "test": "vitest"
-    },
-    "devDependencies": {
-        "@types/node": "^24.3.1",
-        "fast-glob": "^3.3.3",
-        "typescript": "^5.9.2",
-        "vitest": "^3.2.4"
-    }
+  "name": "tsgolint-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "fast-glob": "^3.3.3",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
 }
