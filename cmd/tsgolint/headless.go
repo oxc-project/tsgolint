@@ -25,12 +25,18 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type headlessConfigForFile struct {
-	FilePath string   `json:"file_path"`
-	Rules    []string `json:"rules"`
+type headlessPayload struct {
+	Version string           `json:"version,omitempty"`
+	Configs []headlessConfig `json:"configs"`
 }
+
 type headlessConfig struct {
-	Files []headlessConfigForFile `json:"files"`
+	FilePaths []string       `json:"file_paths"`
+	Rules     []headlessRule `json:"rules"`
+}
+
+type headlessRule struct {
+	Name string `json:"name"`
 }
 
 type headlessRange struct {
@@ -154,47 +160,56 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	var config headlessConfig
+	var payload headlessPayload
 
-	if err := json.Unmarshal(configRaw, &config); err != nil {
-		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
+	if err := json.Unmarshal(configRaw, &payload); err != nil {
+		writeErrorMessage(fmt.Sprintf("error parsing payload: %v", err))
 		return 1
 	}
-	if len(config.Files) == 0 {
-		writeErrorMessage("no files specified in config")
+	if len(payload.Configs) == 0 {
+		writeErrorMessage("invalid payload format: 'configs' field is required and must not be empty")
 		return 1
 	}
 
-	fileConfigs := make(map[string]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{
 		Programs:       make(map[string][]string),
 		UnmatchedFiles: []string{},
 	}
 
+	totalFileCount := 0
+	for _, config := range payload.Configs {
+		totalFileCount += len(config.FilePaths)
+	}
 	if logLevel == utils.LogLevelDebug {
-		log.Printf("Starting to assign files to programs. Total files: %d", len(config.Files))
+		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
 	}
 
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
-	for idx, fileConfig := range config.Files {
-		if logLevel == utils.LogLevelDebug {
-			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
-		}
+	var fileConfigs = make(map[string]*[]headlessRule, totalFileCount)
 
-		normalizedFilePath := tspath.NormalizeSlashes(fileConfig.FilePath)
+	idx := 0
+	for _, config := range payload.Configs {
+		for _, filePath := range config.FilePaths {
+			if logLevel == utils.LogLevelDebug {
+				log.Printf("[%d/%d] Processing file: %s", idx+1, len(fileConfigs), filePath)
+			}
 
-		tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
-		if logLevel == utils.LogLevelDebug {
-			log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfig)
-		}
+			normalizedFilePath := tspath.NormalizeSlashes(filePath)
 
-		if !found {
-			workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
-		} else {
-			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
+			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
+			if logLevel == utils.LogLevelDebug {
+				log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfig)
+			}
+
+			if !found {
+				workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
+			} else {
+				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
+				fileConfigs[normalizedFilePath] = &config.Rules
+			}
+			idx++
 		}
-		fileConfigs[normalizedFilePath] = fileConfig
 	}
 
 	if logLevel == utils.LogLevelDebug {
@@ -275,12 +290,12 @@ func runHeadless(args []string) int {
 		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			cfg := fileConfigs[sourceFile.FileName()]
-			rules := make([]linter.ConfiguredRule, len(cfg.Rules))
+			rules := make([]linter.ConfiguredRule, len(*cfg))
 
-			for i, ruleName := range cfg.Rules {
-				r, ok := allRulesByName[ruleName]
+			for i, headlessRule := range *cfg {
+				r, ok := allRulesByName[headlessRule.Name]
 				if !ok {
-					panic(fmt.Sprintf("unknown rule: %v", ruleName))
+					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
 				}
 				rules[i] = linter.ConfiguredRule{
 					Name: r.Name,
