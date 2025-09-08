@@ -1,5 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`TSGoLint E2E Snapshot Tests > should correctly evaluate project references 1`] = `[]`;
+
 exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics snapshot 1`] = `
 [
   {

@@ -93,6 +93,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 			if config == nil {
 				return false, false
 			}
+			configs.Store(configFilePath, config)
 			if len(config.FileNames()) == 0 {
 				return false, false
 			}
@@ -125,7 +126,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 
 	tsconfig := ""
 	if len(search.Path) > 0 {
-		tsconfig = search.Path[len(search.Path)-1].configFileName
+		tsconfig = search.Path[0].configFileName
 	} else {
 		tsconfig = ""
 	}

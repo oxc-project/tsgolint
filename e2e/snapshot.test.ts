@@ -54,7 +54,7 @@ const ALL_RULES = [
   'switch-exhaustiveness-check',
   'unbound-method',
   'use-unknown-in-catch-callback-variable',
-];
+] as const;
 
 interface Diagnostic {
   file_path?: string;
@@ -145,11 +145,11 @@ async function getTestFiles(testPath: string): Promise<string[]> {
   return allFiles;
 }
 
-function generateConfig(files: string[]): string {
+function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES): string {
   const config = {
     files: files.map((filePath) => ({
       file_path: filePath,
-      rules: ALL_RULES,
+      rules,
     })),
   };
   return JSON.stringify(config);
@@ -212,4 +212,25 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       }).not.toThrow();
     },
   );
+
+  it('should correctly evaluate project references', async () => {
+    const testFiles = await getTestFiles('project-references');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-unsafe-argument']);
+
+    // Run tsgolint in headless mode with single thread for deterministic results
+    // Set GOMAXPROCS=1 for single-threaded execution
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
 });
