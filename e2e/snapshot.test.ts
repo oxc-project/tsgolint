@@ -129,8 +129,8 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
   return diagnostics;
 }
 
-async function getTestFiles(): Promise<string[]> {
-  const patterns = ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'];
+async function getTestFiles(testPath: string): Promise<string[]> {
+  const patterns = [`${testPath}/**/*.ts`, `${testPath}/**/*.tsx`, `${testPath}/**/*.mts`, `${testPath}/**/*.cts`];
   const allFiles: string[] = [];
 
   for (const pattern of patterns) {
@@ -157,7 +157,7 @@ function generateConfig(files: string[]): string {
 
 describe('TSGoLint E2E Snapshot Tests', () => {
   it('should generate consistent diagnostics snapshot', async () => {
-    const testFiles = await getTestFiles();
+    const testFiles = await getTestFiles('basic');
     expect(testFiles.length).toBeGreaterThan(0);
 
     const config = generateConfig(testFiles);
