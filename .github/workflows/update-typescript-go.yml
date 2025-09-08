@@ -18,6 +18,7 @@ jobs:
         with:
           fetch-depth: 0 # required for git am --3way to work properly
           submodules: true
+          persist-credentials: true
           # Using secrets.GITHUB_TOKEN isn't allowed to trigger downstream
           # workflow runs, so we're using a Personal Access Token (PAT) instead
           token: ${{ secrets.OXC_BOT_PAT }}
