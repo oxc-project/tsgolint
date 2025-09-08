@@ -2,6 +2,39 @@
 
 exports[`TSGoLint E2E Snapshot Tests > should correctly evaluate project references 1`] = `[]`;
 
+exports[`TSGoLint E2E Snapshot Tests > should correctly lint files not inside a project 1`] = `
+[
+  {
+    "file_path": "fixtures/with-unmatched-files/src/index.ts",
+    "fixes": [],
+    "message": {
+      "description": "Unsafe argument of type any assigned to a parameter of type string.",
+      "id": "unsafeArgument",
+    },
+    "range": {
+      "end": 45,
+      "pos": 36,
+    },
+    "rule": "no-unsafe-argument",
+    "suggestions": [],
+  },
+  {
+    "file_path": "fixtures/with-unmatched-files/test.ts",
+    "fixes": [],
+    "message": {
+      "description": "Unsafe argument of type any assigned to a parameter of type string.",
+      "id": "unsafeArgument",
+    },
+    "range": {
+      "end": 45,
+      "pos": 36,
+    },
+    "rule": "no-unsafe-argument",
+    "suggestions": [],
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics snapshot 1`] = `
 [
   {

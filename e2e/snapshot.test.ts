@@ -233,4 +233,23 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect(diagnostics).toMatchSnapshot();
   });
+
+  it('should correctly lint files not inside a project', async () => {
+    const testFiles = await getTestFiles('with-unmatched-files');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-unsafe-argument']);
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
 });
