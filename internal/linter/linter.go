@@ -94,7 +94,17 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			return err
 		}
 
-		err = RunLinterOnProgram(program, program.SourceFiles(), workers, getRulesForFile, onDiagnostic)
+
+		files := make([]*ast.SourceFile, 0, len(workload.UnmatchedFiles))
+		for _, f := range workload.UnmatchedFiles {
+			sf := program.GetSourceFile(f)
+			if sf == nil {
+				panic(fmt.Sprintf("Expected file '%s' to be in inferred program", f))
+			}
+			files = append(files, sf)
+		}
+
+		err = RunLinterOnProgram(program, files, workers, getRulesForFile, onDiagnostic)
 		if err != nil {
 			return err
 		}
