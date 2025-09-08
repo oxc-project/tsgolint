@@ -89,11 +89,3 @@ jobs:
       - uses: crate-ci/typos@85f62a8a84f939ae994ab3763f01a0296d61a7ee # v1.36.2
         with:
           files: .
-
-  format:
-    name: Format
-    runs-on: ubuntu-latest
-    steps:
-      - uses: taiki-e/checkout-action@b13d20b7cda4e2f325ef19895128f7ff735c0b3d # v1.3.1
-      - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
-      - run: pnpx dprint check

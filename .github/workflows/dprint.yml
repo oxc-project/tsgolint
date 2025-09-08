@@ -1,0 +1,30 @@
+name: Save dprint plugin cache
+
+permissions: {}
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "dprint.json"
+      - ".github/workflows/dprint.yml"
+
+jobs:
+  cache:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: taiki-e/checkout-action@b13d20b7cda4e2f325ef19895128f7ff735c0b3d # v1.3.1
+
+      - uses: taiki-e/install-action@57511bcdf8cdb0eab6448cb7fa632952d9f25742 # v2.59.1
+        with:
+          tool: dprint
+
+      - run: dprint check
+
+      - name: Save dprint plugin cache
+        uses: actions/cache/save@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          key: dprint-${{ hashFiles('dprint.json') }}
+          path: ~/.cache/dprint

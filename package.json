@@ -1,10 +1,13 @@
 {
   "name": "tsgolint",
   "packageManager": "pnpm@10.15.1",
-  "volta": {
-    "node": "22.19.0"
+  "scripts": {
+    "fmt": "dprint fmt"
   },
   "devDependencies": {
     "dprint": "^0.50.1"
+  },
+  "volta": {
+    "node": "22.19.0"
   }
 }

@@ -1,0 +1,35 @@
+name: autofix.ci # For security reasons, the workflow in which the autofix.ci action is used must be named "autofix.ci".
+
+permissions: {}
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: taiki-e/checkout-action@b13d20b7cda4e2f325ef19895128f7ff735c0b3d # v1.3.1
+
+      - name: Restore dprint plugin cache
+        id: cache-restore
+        uses: actions/cache/restore@0400d5f644dc74513175e3cd8d07132dd4860809 # v4.2.4
+        with:
+          key: dprint-${{ hashFiles('dprint.json') }}
+          path: ~/.cache/dprint
+
+      - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
+
+      - uses: ./.github/actions/setup
+
+      - run: gofmt -w internal cmd tools
+      # - run: pnpx dprint fmt # FIXME: dprint is reading typescript-go/.dprint.jsonc and formatting takes forever
+
+      - uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27 # v1.3.2
+        with:
+          fail-fast: false
