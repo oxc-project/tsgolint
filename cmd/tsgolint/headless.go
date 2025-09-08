@@ -186,7 +186,11 @@ func runHeadless(args []string) int {
 
 		tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
 		if logLevel == utils.LogLevelDebug {
-			log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfig)
+			tsconfigStr := "<none>"
+			if found {
+				tsconfigStr = tsconfig
+			}
+			log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
 		}
 
 		if !found {
