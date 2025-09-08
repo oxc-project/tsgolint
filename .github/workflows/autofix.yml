@@ -25,10 +25,7 @@ jobs:
 
       - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
 
-      - uses: ./.github/actions/setup
-
-      - run: gofmt -w internal cmd tools
-      # - run: pnpx dprint fmt # FIXME: dprint is reading typescript-go/.dprint.jsonc and formatting takes forever
+      - run: pnpm run fmt
 
       - uses: autofix-ci/action@635ffb0c9798bd160680f18fd73371e355b85f27 # v1.3.2
         with:
