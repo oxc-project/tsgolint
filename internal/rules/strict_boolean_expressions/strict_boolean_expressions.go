@@ -1,0 +1,516 @@
+package strict_boolean_expressions
+
+import (
+	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
+)
+
+type StrictBooleanExpressionsOptions struct {
+	AllowAny                                               *bool
+	AllowNullableBoolean                                   *bool
+	AllowNullableNumber                                    *bool
+	AllowNullableString                                    *bool
+	AllowNullableEnum                                      *bool
+	AllowNullableObject                                    *bool
+	AllowString                                            *bool
+	AllowNumber                                            *bool
+	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing *bool
+}
+
+func buildUnexpectedAny() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedAny",
+		Description: "Unexpected any value in conditional. An explicit comparison or type cast is required.",
+	}
+}
+
+func buildUnexpectedNullableBoolean() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNullableBoolean",
+		Description: "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
+	}
+}
+
+func buildUnexpectedNullableString() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNullableString",
+		Description: "Unexpected nullable string value in conditional. Please handle the nullish case explicitly.",
+	}
+}
+
+func buildUnexpectedNullableNumber() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNullableNumber",
+		Description: "Unexpected nullable number value in conditional. Please handle the nullish case explicitly.",
+	}
+}
+
+func buildUnexpectedNullableObject() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNullableObject",
+		Description: "Unexpected nullable object value in conditional. An explicit null check is required.",
+	}
+}
+
+func buildUnexpectedNullish() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNullish",
+		Description: "Unexpected nullish value in conditional. An explicit null check is required.",
+	}
+}
+
+func buildUnexpectedString() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedString",
+		Description: "Unexpected string value in conditional. An explicit empty string check is required.",
+	}
+}
+
+func buildUnexpectedNumber() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNumber",
+		Description: "Unexpected number value in conditional. An explicit zero/NaN check is required.",
+	}
+}
+
+func buildUnexpectedObjectContext() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedObjectContext",
+		Description: "Unexpected object value in conditional. The condition is always true.",
+	}
+}
+
+func buildUnexpectedMixedCondition() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedMixedCondition",
+		Description: "Unexpected mixed type in conditional. The constituent types do not have a best common type.",
+	}
+}
+
+func buildNoStrictNullCheck() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "msgNoStrictNullCheck",
+		Description: "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
+	}
+}
+
+var StrictBooleanExpressionsRule = rule.Rule{
+	Name: "strict-boolean-expressions",
+	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+		opts, ok := options.(StrictBooleanExpressionsOptions)
+		if !ok {
+			opts = StrictBooleanExpressionsOptions{}
+		}
+
+		if opts.AllowAny == nil {
+			opts.AllowAny = utils.Ref(false)
+		}
+		if opts.AllowNullableBoolean == nil {
+			opts.AllowNullableBoolean = utils.Ref(false)
+		}
+		if opts.AllowNullableNumber == nil {
+			opts.AllowNullableNumber = utils.Ref(false)
+		}
+		if opts.AllowNullableString == nil {
+			opts.AllowNullableString = utils.Ref(false)
+		}
+		if opts.AllowNullableEnum == nil {
+			opts.AllowNullableEnum = utils.Ref(false)
+		}
+		if opts.AllowNullableObject == nil {
+			opts.AllowNullableObject = utils.Ref(false)
+		}
+		if opts.AllowString == nil {
+			opts.AllowString = utils.Ref(true)
+		}
+		if opts.AllowNumber == nil {
+			opts.AllowNumber = utils.Ref(true)
+		}
+		if opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing == nil {
+			opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = utils.Ref(false)
+		}
+
+		compilerOptions := ctx.Program.Options()
+		if !*opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing &&
+			!utils.IsStrictCompilerOptionEnabled(compilerOptions, compilerOptions.StrictNullChecks) {
+			ctx.ReportRange(
+				core.NewTextRange(0, 0),
+				buildNoStrictNullCheck(),
+			)
+			return rule.RuleListeners{}
+		}
+
+		checkNode := func(node *ast.Node) {
+			nodeType := ctx.TypeChecker.GetTypeAtLocation(node)
+			checkCondition(ctx, node, nodeType, opts)
+		}
+
+		return rule.RuleListeners{
+			ast.KindIfStatement: func(node *ast.Node) {
+				ifStmt := node.AsIfStatement()
+				checkNode(ifStmt.Expression)
+			},
+			ast.KindWhileStatement: func(node *ast.Node) {
+				whileStmt := node.AsWhileStatement()
+				checkNode(whileStmt.Expression)
+			},
+			ast.KindDoStatement: func(node *ast.Node) {
+				doStmt := node.AsDoStatement()
+				checkNode(doStmt.Expression)
+			},
+			ast.KindForStatement: func(node *ast.Node) {
+				forStmt := node.AsForStatement()
+				if forStmt.Condition != nil {
+					checkNode(forStmt.Condition)
+				}
+			},
+			ast.KindConditionalExpression: func(node *ast.Node) {
+				condExpr := node.AsConditionalExpression()
+				checkNode(condExpr.Condition)
+			},
+			ast.KindBinaryExpression: func(node *ast.Node) {
+				binExpr := node.AsBinaryExpression()
+				switch binExpr.OperatorToken.Kind {
+				case ast.KindAmpersandAmpersandToken, ast.KindBarBarToken:
+					checkNode(binExpr.Left)
+				}
+			},
+			ast.KindCallExpression: func(node *ast.Node) {
+				callExpr := node.AsCallExpression()
+
+				//assertedArgument := findTruthinessAssertedArgument(ctx.TypeChecker, callExpr)
+				//if assertedArgument != nil {
+				//	checkNode(assertedArgument)
+				//}
+
+				if callExpr.Expression != nil && callExpr.Expression.Kind == ast.KindPropertyAccessExpression {
+					propAccess := callExpr.Expression.AsPropertyAccessExpression()
+					if propAccess == nil {
+						return
+					}
+					methodName := propAccess.Name().Text()
+
+					switch methodName {
+					case "filter", "find", "some", "every", "findIndex", "findLast", "findLastIndex":
+						if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+							arg := callExpr.Arguments.Nodes[0]
+							if arg != nil && (arg.Kind == ast.KindArrowFunction || arg.Kind == ast.KindFunctionExpression) {
+								funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
+								signatures := ctx.TypeChecker.GetCallSignatures(funcType)
+								for _, signature := range signatures {
+									returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
+									typeFlags := checker.Type_flags(returnType)
+									if typeFlags&checker.TypeFlagsTypeParameter != 0 {
+										constraint := ctx.TypeChecker.GetConstraintOfTypeParameter(returnType)
+										if constraint != nil {
+											returnType = constraint
+										}
+									}
+
+									if returnType != nil && !isBooleanType(returnType) {
+										checkCondition(ctx, node, returnType, opts)
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
+				unaryExpr := node.AsPrefixUnaryExpression()
+				if unaryExpr.Operator == ast.KindExclamationToken {
+					checkNode(unaryExpr.Operand)
+				}
+			},
+		}
+	},
+}
+
+// TODO: Not exported TypePredicate struct variables
+//func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.CallExpression) *ast.Node {
+//	var checkableArguments []*ast.Node
+//	for _, argument := range callExpr.Arguments.Nodes {
+//		if argument.Kind == ast.KindSpreadElement {
+//			continue
+//		}
+//		checkableArguments = append(checkableArguments, argument)
+//	}
+//	if len(checkableArguments) == 0 {
+//		return nil
+//	}
+//	node := callExpr.AsNode()
+//	signature := typeChecker.GetResolvedSignature(node)
+//	if signature == nil {
+//		return nil
+//	}
+//	firstTypePredicateResult := typeChecker.GetTypePredicateOfSignature(signature)
+//	if firstTypePredicateResult == nil {
+//		return nil
+//	}
+//  if firstTypePredicateResult.kind != checker.TypePredicateKindAssertsIdentifier ||
+//	  firstTypePredicateResult.type == nil {
+//	    return nil
+//  }
+//  return checkableArguments[firstTypePredicateResult.parameterIndex]
+//}
+
+// Type analysis types
+type typeVariant int
+
+const (
+	typeVariantNullish typeVariant = iota
+	typeVariantBoolean
+	typeVariantString
+	typeVariantNumber
+	typeVariantBigInt
+	typeVariantObject
+	typeVariantAny
+	typeVariantUnknown
+	typeVariantNever
+	typeVariantMixed
+	typeVariantGeneric
+)
+
+type typeInfo struct {
+	variant        typeVariant
+	isNullable     bool
+	isTruthy       bool
+	types          []*checker.Type
+	isUnion        bool
+	isIntersection bool
+	isEnum         bool
+}
+
+func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
+	info := typeInfo{
+		types: []*checker.Type{t},
+	}
+
+	if utils.IsUnionType(t) {
+		info.isUnion = true
+		parts := utils.UnionTypeParts(t)
+		variants := make(map[typeVariant]bool)
+		hasNullish := false
+		hasEnum := false
+
+		for _, part := range parts {
+			partInfo := analyzeTypePart(typeChecker, part)
+			variants[partInfo.variant] = true
+			if partInfo.variant == typeVariantNullish {
+				hasNullish = true
+			}
+			if partInfo.isEnum {
+				hasEnum = true
+			}
+		}
+
+		info.isNullable = hasNullish
+		info.isEnum = hasEnum
+
+		if len(variants) == 1 {
+			for v := range variants {
+				info.variant = v
+			}
+		} else if len(variants) == 2 && hasNullish {
+			for v := range variants {
+				if v != typeVariantNullish {
+					info.variant = v
+					break
+				}
+			}
+		} else {
+			info.variant = typeVariantMixed
+		}
+
+		return info
+	}
+
+	if utils.IsIntersectionType(t) {
+		info.isIntersection = true
+		info.variant = typeVariantObject
+		return info
+	}
+
+	return analyzeTypePart(typeChecker, t)
+}
+
+func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
+	info := typeInfo{}
+	flags := checker.Type_flags(t)
+
+	if flags&checker.TypeFlagsTypeParameter != 0 {
+		info.variant = typeVariantGeneric
+		return info
+	}
+
+	if flags&checker.TypeFlagsAny != 0 {
+		info.variant = typeVariantAny
+		return info
+	}
+
+	if flags&checker.TypeFlagsUnknown != 0 {
+		info.variant = typeVariantUnknown
+		return info
+	}
+
+	if flags&checker.TypeFlagsNever != 0 {
+		info.variant = typeVariantNever
+		return info
+	}
+
+	if flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
+		info.variant = typeVariantNullish
+		return info
+	}
+
+	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral) != 0 {
+		info.variant = typeVariantBoolean
+		return info
+	}
+
+	if flags&(checker.TypeFlagsString|checker.TypeFlagsStringLiteral) != 0 {
+		info.variant = typeVariantString
+		if flags&checker.TypeFlagsStringLiteral != 0 && t.AsLiteralType().Value() != "" {
+			info.isTruthy = true
+		}
+		return info
+	}
+
+	if flags&(checker.TypeFlagsNumber|checker.TypeFlagsNumberLiteral) != 0 {
+		info.variant = typeVariantNumber
+		if flags&checker.TypeFlagsNumberLiteral != 0 && t.AsLiteralType().Value() != 0 {
+			info.isTruthy = true
+		}
+		return info
+	}
+
+	if flags&(checker.TypeFlagsEnum|checker.TypeFlagsEnumLiteral) != 0 {
+		if flags&checker.TypeFlagsStringLiteral != 0 {
+			info.variant = typeVariantString
+		} else {
+			info.variant = typeVariantNumber
+		}
+		info.isEnum = true
+		return info
+	}
+
+	if flags&(checker.TypeFlagsBigInt|checker.TypeFlagsBigIntLiteral) != 0 {
+		info.variant = typeVariantBigInt
+		if flags&checker.TypeFlagsBigIntLiteral != 0 && t.AsLiteralType().Value() != 0 {
+			info.isTruthy = true
+		}
+		return info
+	}
+
+	if flags&(checker.TypeFlagsESSymbol|checker.TypeFlagsUniqueESSymbol) != 0 {
+		info.variant = typeVariantObject
+		return info
+	}
+
+	if flags&checker.TypeFlagsObject != 0 ||
+		flags&checker.TypeFlagsNonPrimitive != 0 ||
+		utils.IsObjectType(t) {
+		info.variant = typeVariantObject
+		return info
+	}
+
+	info.variant = typeVariantMixed
+	return info
+}
+
+func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts StrictBooleanExpressionsOptions) {
+	if isBooleanType(t) {
+		return
+	}
+
+	info := analyzeType(ctx.TypeChecker, t)
+
+	switch info.variant {
+	case typeVariantAny, typeVariantUnknown, typeVariantGeneric:
+		if !*opts.AllowAny {
+			ctx.ReportNode(node, buildUnexpectedAny())
+		}
+		return
+	case typeVariantNever:
+		return
+	case typeVariantNullish:
+		ctx.ReportNode(node, buildUnexpectedNullish())
+	case typeVariantString:
+		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
+		if *opts.AllowString && info.isNullable && info.isTruthy {
+			return
+		}
+
+		if info.isNullable {
+			if info.isEnum {
+				if !*opts.AllowNullableEnum {
+					ctx.ReportNode(node, buildUnexpectedNullableString())
+				}
+			} else {
+				if !*opts.AllowNullableString {
+					ctx.ReportNode(node, buildUnexpectedNullableString())
+				}
+			}
+		} else if !*opts.AllowString {
+			ctx.ReportNode(node, buildUnexpectedString())
+		}
+	case typeVariantNumber:
+		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
+		if *opts.AllowNumber && info.isNullable && info.isTruthy {
+			return
+		}
+
+		if info.isNullable {
+			if info.isEnum {
+				if !*opts.AllowNullableEnum {
+					ctx.ReportNode(node, buildUnexpectedNullableNumber())
+				}
+			} else {
+				if !*opts.AllowNullableNumber {
+					ctx.ReportNode(node, buildUnexpectedNullableNumber())
+				}
+			}
+		} else if !*opts.AllowNumber {
+			ctx.ReportNode(node, buildUnexpectedNumber())
+		}
+	case typeVariantBoolean:
+		if info.isNullable && !*opts.AllowNullableBoolean {
+			ctx.ReportNode(node, buildUnexpectedNullableBoolean())
+		}
+	case typeVariantObject:
+		if info.isNullable && !*opts.AllowNullableObject {
+			ctx.ReportNode(node, buildUnexpectedNullableObject())
+		} else if !info.isNullable {
+			ctx.ReportNode(node, buildUnexpectedObjectContext())
+		}
+	case typeVariantMixed:
+		ctx.ReportNode(node, buildUnexpectedMixedCondition())
+	case typeVariantBigInt:
+		if info.isNullable && !*opts.AllowNullableNumber {
+			ctx.ReportNode(node, buildUnexpectedNullableNumber())
+		} else if !info.isNullable && !*opts.AllowNumber {
+			ctx.ReportNode(node, buildUnexpectedNumber())
+		}
+	}
+}
+
+func isBooleanType(t *checker.Type) bool {
+	flags := checker.Type_flags(t)
+
+	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral) != 0 {
+		if utils.IsUnionType(t) {
+			for _, part := range utils.UnionTypeParts(t) {
+				partFlags := checker.Type_flags(part)
+				if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
+					return false
+				}
+			}
+		}
+		return true
+	}
+
+	return false
+}
