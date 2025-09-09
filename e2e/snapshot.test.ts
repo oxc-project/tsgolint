@@ -252,4 +252,23 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect(diagnostics).toMatchSnapshot();
   });
+
+  it('should work with `resolveJsonModule`', async () => {
+    const testFiles = await getTestFiles('resolve-json-module');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-unsafe-argument', 'no-unsafe-member-access']);
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
 });
