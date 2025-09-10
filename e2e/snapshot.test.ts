@@ -202,7 +202,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       // but TypeScript program has forward slashes, causing:
       // "panic: Expected file 'E:\oxc\...\index.ts' to be in program"
 
-      const testFile = join(FIXTURES_DIR, 'rules', 'no-floating-promises', 'index.ts');
+      const testFile = join(FIXTURES_DIR, 'basic', 'rules', 'no-floating-promises', 'index.ts');
 
       // On Windows, convert forward slashes to backslashes to simulate Rust input
       const rustStylePath = testFile.replace(/\//g, '\\');
