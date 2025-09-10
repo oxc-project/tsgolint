@@ -25,14 +25,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type headlessConfigForFile struct {
-	FilePath string   `json:"file_path"`
-	Rules    []string `json:"rules"`
-}
-type headlessConfig struct {
-	Files []headlessConfigForFile `json:"files"`
-}
-
 type headlessRange struct {
 	Pos int `json:"pos"`
 	End int `json:"end"`
@@ -154,51 +146,56 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	var config headlessConfig
+	payload, err := deserializePayload(configRaw)
 
-	if err := json.Unmarshal(configRaw, &config); err != nil {
+	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
 		return 1
 	}
-	if len(config.Files) == 0 {
-		writeErrorMessage("no files specified in config")
-		return 1
-	}
 
-	fileConfigs := make(map[string]headlessConfigForFile, len(config.Files))
 	workload := linter.Workload{
 		Programs:       make(map[string][]string),
 		UnmatchedFiles: []string{},
 	}
 
+	totalFileCount := 0
+	for _, config := range payload.Configs {
+		totalFileCount += len(config.FilePaths)
+	}
 	if logLevel == utils.LogLevelDebug {
-		log.Printf("Starting to assign files to programs. Total files: %d", len(config.Files))
+		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
 	}
 
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
-	for idx, fileConfig := range config.Files {
-		if logLevel == utils.LogLevelDebug {
-			log.Printf("[%d/%d] Processing file: %s", idx+1, len(config.Files), fileConfig.FilePath)
-		}
+	fileConfigs := make(map[string][]headlessRule, totalFileCount)
 
-		normalizedFilePath := tspath.NormalizeSlashes(fileConfig.FilePath)
-
-		tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
-		if logLevel == utils.LogLevelDebug {
-			tsconfigStr := "<none>"
-			if found {
-				tsconfigStr = tsconfig
+	idx := 0
+	for _, config := range payload.Configs {
+		for _, filePath := range config.FilePaths {
+			if logLevel == utils.LogLevelDebug {
+				log.Printf("[%d/%d] Processing file: %s", idx+1, totalFileCount, filePath)
 			}
-			log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
-		}
 
-		if !found {
-			workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
-		} else {
-			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
+			normalizedFilePath := tspath.NormalizeSlashes(filePath)
+
+			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
+			if logLevel == utils.LogLevelDebug {
+				tsconfigStr := "<none>"
+				if found {
+					tsconfigStr = tsconfig
+				}
+				log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
+			}
+
+			if !found {
+				workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
+			} else {
+				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
+			}
+			fileConfigs[normalizedFilePath] = config.Rules
+			idx++
 		}
-		fileConfigs[normalizedFilePath] = fileConfig
 	}
 
 	if logLevel == utils.LogLevelDebug {
@@ -279,12 +276,12 @@ func runHeadless(args []string) int {
 		runtime.GOMAXPROCS(0),
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			cfg := fileConfigs[sourceFile.FileName()]
-			rules := make([]linter.ConfiguredRule, len(cfg.Rules))
+			rules := make([]linter.ConfiguredRule, len(cfg))
 
-			for i, ruleName := range cfg.Rules {
-				r, ok := allRulesByName[ruleName]
+			for i, headlessRule := range cfg {
+				r, ok := allRulesByName[headlessRule.Name]
 				if !ok {
-					panic(fmt.Sprintf("unknown rule: %v", ruleName))
+					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
 				}
 				rules[i] = linter.ConfiguredRule{
 					Name: r.Name,

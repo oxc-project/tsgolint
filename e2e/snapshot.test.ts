@@ -146,12 +146,26 @@ async function getTestFiles(testPath: string): Promise<string[]> {
 }
 
 function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES): string {
+  // Headless payload format:
+  // ```json
+  // {
+  //   "configs": [
+  //     {
+  //       "file_paths": ["/abs/path/a.ts", ...],
+  //       "rules": [ { "name": "rule-a" }, { "name": "rule-b" } ]
+  //     }
+  //   ]
+  // }
+  // ```
   const config = {
-    files: files.map((filePath) => ({
-      file_path: filePath,
-      rules,
-    })),
-  };
+    version: 2,
+    configs: [
+      {
+        file_paths: files,
+        rules: rules.map((r) => ({ name: r })),
+      },
+    ],
+  } as const;
   return JSON.stringify(config);
 }
 
@@ -194,13 +208,13 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       const rustStylePath = testFile.replace(/\//g, '\\');
 
       const config = {
-        files: [
+        configs: [
           {
-            file_path: rustStylePath,
-            rules: ['no-floating-promises'],
+            file_paths: [rustStylePath],
+            rules: [{ name: 'no-floating-promises' }],
           },
         ],
-      };
+      } as const;
 
       const env = { ...process.env, GOMAXPROCS: '1' };
 
@@ -251,5 +265,42 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     diagnostics = sortDiagnostics(diagnostics);
 
     expect(diagnostics).toMatchSnapshot();
+  });
+
+  it('should work with the old version of the headless payload', async () => {
+    function generateV1HeadlessPayload(
+      files: string[],
+      rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES,
+    ): string {
+      const config = {
+        files: files.map((filePath) => ({
+          file_path: filePath,
+          rules,
+        })),
+      };
+      return JSON.stringify(config);
+    }
+
+    function getDiagnostics(config: string): Diagnostic[] {
+      let output: Buffer;
+      output = execFileSync(TSGOLINT_BIN, ['headless'], {
+        input: config,
+        env: { ...process.env, GOMAXPROCS: '1' },
+      });
+
+      const diagnostics = parseHeadlessOutput(output);
+      return sortDiagnostics(diagnostics);
+    }
+
+    const testFiles = await getTestFiles('basic');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const v1Config = generateV1HeadlessPayload(testFiles);
+    const v1Diagnostics = getDiagnostics(v1Config);
+
+    const v2Config = generateConfig(testFiles);
+    const v2Diagnostics = getDiagnostics(v2Config);
+
+    expect(v1Diagnostics).toStrictEqual(v2Diagnostics);
   });
 });

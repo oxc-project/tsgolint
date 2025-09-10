@@ -94,7 +94,6 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			return err
 		}
 
-
 		files := make([]*ast.SourceFile, 0, len(workload.UnmatchedFiles))
 		for _, f := range workload.UnmatchedFiles {
 			sf := program.GetSourceFile(f)
