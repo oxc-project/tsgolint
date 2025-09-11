@@ -18,6 +18,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/tspath"
+	"github.com/microsoft/typescript-go/shim/vfs"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
@@ -98,6 +99,128 @@ func writeErrorMessage(text string) error {
 	})
 }
 
+// prepareWorkload prepares the workload from the payload
+func prepareWorkload(payload *headlessPayload, fs vfs.FS, cwd string, logLevel utils.LogLevel) (linter.Workload, map[string][]headlessRule) {
+	workload := linter.Workload{
+		Programs:       make(map[string][]string),
+		UnmatchedFiles: []string{},
+	}
+
+	totalFileCount := 0
+	for _, config := range payload.Configs {
+		totalFileCount += len(config.FilePaths)
+	}
+
+	if logLevel == utils.LogLevelDebug {
+		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
+	}
+
+	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
+	fileConfigs := make(map[string][]headlessRule, totalFileCount)
+
+	idx := 0
+	for _, config := range payload.Configs {
+		for _, filePath := range config.FilePaths {
+			if logLevel == utils.LogLevelDebug {
+				log.Printf("[%d/%d] Processing file: %s", idx+1, totalFileCount, filePath)
+			}
+
+			normalizedFilePath := tspath.NormalizeSlashes(filePath)
+
+			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
+			if logLevel == utils.LogLevelDebug {
+				tsconfigStr := "<none>"
+				if found {
+					tsconfigStr = tsconfig
+				}
+				log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
+			}
+
+			if !found {
+				workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
+			} else {
+				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
+			}
+			fileConfigs[normalizedFilePath] = config.Rules
+			idx++
+		}
+	}
+
+	if logLevel == utils.LogLevelDebug {
+		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
+		for program, files := range workload.Programs {
+			log.Printf("  Program %s: %d files", program, len(files))
+		}
+		for _, file := range workload.UnmatchedFiles {
+			log.Printf("  Unmatched file: %s", file)
+		}
+	}
+
+	for _, files := range workload.Programs {
+		slices.SortFunc(files, func(a, b string) int {
+			return len(b) - len(a)
+		})
+	}
+
+	return workload, fileConfigs
+}
+
+// createRuleGetter creates a function that returns configured rules for a source file
+func createRuleGetter(fileConfigs map[string][]headlessRule, allowUnknownRules bool) func(*ast.SourceFile) []linter.ConfiguredRule {
+	allRulesByName := make(map[string]rule.Rule, len(allRules))
+	for _, r := range allRules {
+		allRulesByName[r.Name] = r
+	}
+
+	return func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
+		cfg := fileConfigs[sourceFile.FileName()]
+		rules := make([]linter.ConfiguredRule, 0, len(cfg))
+
+		for _, headlessRule := range cfg {
+			r, ok := allRulesByName[headlessRule.Name]
+			if !ok {
+				if allowUnknownRules {
+					continue // Skip unknown rules in benchmarks
+				} else {
+					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
+				}
+			}
+			capturedRule := r // capture for closure
+			rules = append(rules, linter.ConfiguredRule{
+				Name: capturedRule.Name,
+				Run: func(ctx rule.RuleContext) rule.RuleListeners {
+					return capturedRule.Run(ctx, nil)
+				},
+			})
+		}
+
+		return rules
+	}
+}
+
+func runHeadlessWithPayload(payload *headlessPayload, cwd string, diagnosticsCallback func(rule.RuleDiagnostic)) error {
+	logLevel := utils.GetLogLevel()
+	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
+
+	workload, fileConfigs := prepareWorkload(payload, fs, cwd, logLevel)
+
+	if logLevel == utils.LogLevelDebug {
+		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
+		log.Printf("Workload distribution: %d programs", len(workload.Programs))
+	}
+
+	err := linter.RunLinter(
+		logLevel,
+		cwd,
+		workload,
+		runtime.GOMAXPROCS(0),
+		createRuleGetter(fileConfigs, true), // Allow unknown rules for benchmarks
+		diagnosticsCallback,
+	)
+
+	return err
+}
+
 func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 
@@ -153,71 +276,7 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	workload := linter.Workload{
-		Programs:       make(map[string][]string),
-		UnmatchedFiles: []string{},
-	}
-
-	totalFileCount := 0
-	for _, config := range payload.Configs {
-		totalFileCount += len(config.FilePaths)
-	}
-	if logLevel == utils.LogLevelDebug {
-		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
-	}
-
-	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
-
-	fileConfigs := make(map[string][]headlessRule, totalFileCount)
-
-	idx := 0
-	for _, config := range payload.Configs {
-		for _, filePath := range config.FilePaths {
-			if logLevel == utils.LogLevelDebug {
-				log.Printf("[%d/%d] Processing file: %s", idx+1, totalFileCount, filePath)
-			}
-
-			normalizedFilePath := tspath.NormalizeSlashes(filePath)
-
-			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
-			if logLevel == utils.LogLevelDebug {
-				tsconfigStr := "<none>"
-				if found {
-					tsconfigStr = tsconfig
-				}
-				log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
-			}
-
-			if !found {
-				workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
-			} else {
-				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
-			}
-			fileConfigs[normalizedFilePath] = config.Rules
-			idx++
-		}
-	}
-
-	if logLevel == utils.LogLevelDebug {
-		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
-		for program, files := range workload.Programs {
-			log.Printf("  Program %s: %d files", program, len(files))
-		}
-		for _, file := range workload.UnmatchedFiles {
-			log.Printf("  Unmatched file: %s", file)
-		}
-	}
-
-	allRulesByName := make(map[string]rule.Rule, len(allRules))
-	for _, r := range allRules {
-		allRulesByName[r.Name] = r
-	}
-
-	for _, files := range workload.Programs {
-		slices.SortFunc(files, func(a, b string) int {
-			return len(b) - len(a)
-		})
-	}
+	workload, fileConfigs := prepareWorkload(payload, fs, cwd, logLevel)
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
@@ -274,25 +333,7 @@ func runHeadless(args []string) int {
 		cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
-		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			cfg := fileConfigs[sourceFile.FileName()]
-			rules := make([]linter.ConfiguredRule, len(cfg))
-
-			for i, headlessRule := range cfg {
-				r, ok := allRulesByName[headlessRule.Name]
-				if !ok {
-					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
-				}
-				rules[i] = linter.ConfiguredRule{
-					Name: r.Name,
-					Run: func(ctx rule.RuleContext) rule.RuleListeners {
-						return r.Run(ctx, nil)
-					},
-				}
-			}
-
-			return rules
-		},
+		createRuleGetter(fileConfigs, false), // Don't allow unknown rules in production
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- d
 		},
