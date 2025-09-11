@@ -28,6 +28,6 @@ jobs:
       - name: Run benchmarks
         uses: CodSpeedHQ/action@v4
         with:
-          mode: instrumentation
-          run: go test -bench=. -run=^$ ./internal/utils ./internal/linter
+          mode: walltime
+          run: go test -bench=. -run=^$ ./cmd/tsgolint
           token: ${{ secrets.CODSPEED_TOKEN }}
