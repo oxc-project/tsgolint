@@ -207,21 +207,10 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       // On Windows, convert forward slashes to backslashes to simulate Rust input
       const rustStylePath = testFile.replace(/\//g, '\\');
 
-      const config = {
-        configs: [
-          {
-            file_paths: [rustStylePath],
-            rules: [{ name: 'no-floating-promises' }],
-          },
-        ],
-      } as const;
-
-      const env = { ...process.env, GOMAXPROCS: '1' };
-
       expect(() => {
         execFileSync(TSGOLINT_BIN, ['headless'], {
-          input: JSON.stringify(config),
-          env,
+          input: generateConfig([rustStylePath], ['no-floating-promises']),
+          env: { ...process.env, GOMAXPROCS: '1' },
         });
       }).not.toThrow();
     },
