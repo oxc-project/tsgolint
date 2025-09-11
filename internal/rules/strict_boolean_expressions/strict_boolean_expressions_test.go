@@ -339,23 +339,6 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 		},
 
 		// ============================================
-		// NULLABLE ENUM - Valid with Option
-		// ============================================
-		// NOTE: Enum detection from union types is complex - skipping for now
-		// {
-		// 	Code: `enum E { A = 0, B = 1 } declare const x: E | null; if (x) {}`,
-		// 	Options: StrictBooleanExpressionsOptions{
-		// 		AllowNullableEnum: utils.Ref(true),
-		// 	},
-		// },
-		// {
-		// 	Code: `enum E { A = '', B = 'foo' } declare const x: E | undefined; if (x) {}`,
-		// 	Options: StrictBooleanExpressionsOptions{
-		// 		AllowNullableEnum: utils.Ref(true),
-		// 	},
-		// },
-
-		// ============================================
 		// ARRAY METHOD PREDICATES
 		// ============================================
 
@@ -385,10 +368,6 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 
 		{Code: `function isString(x: unknown): x is string { return typeof x === 'string'; }`},
 		{Code: `declare function isString(x: unknown): x is string; if (isString(value)) {}`},
-
-		// ============================================
-		// VOID TYPE - handled as nullish, so moved to invalid section
-		// ============================================
 
 		// ============================================
 		// DOUBLE NEGATION - Always Valid
@@ -424,8 +403,6 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 		// Mixed types with default options
 		{Code: `'' || 0 || false;`},
 		{Code: `'foo' && 1 && true;`},
-		// NOTE: Objects in logical operators should be errors - commenting out incorrect test
-		// {Code: `({}) || [] || true;`},
 
 		// ============================================
 		// SPECIAL CASES
@@ -434,8 +411,6 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 		// Always allow boolean in right side of logical operators
 		{Code: `'foo' && true;`},
 		{Code: `0 || false;`},
-		// NOTE: Object in logical operator should be error - commenting out incorrect test
-		// {Code: `({}) && (1 > 2);`},
 
 		// Template literals
 		{Code: "declare const x: string; `foo${x}` ? 'a' : 'b';"},
@@ -1199,31 +1174,31 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 		// ============================================
 		// ARRAY METHOD PREDICATES - Invalid
 		// ============================================
-		// NOTE: Arrow function predicate checking not implemented - skipping for now
-		// {
-		// 	Code: `[1, 2, 3].filter(x => x);`,
-		// 	Options: StrictBooleanExpressionsOptions{
-		// 		AllowNumber: utils.Ref(false),
-		// 	},
-		// 	Errors: []rule_tester.InvalidTestCaseError{
-		// 		{MessageId: "unexpectedNumber", Line: 1},
-		// 	},
-		// },
-		// {
-		// 	Code: `['', 'foo'].filter(x => x);`,
-		// 	Options: StrictBooleanExpressionsOptions{
-		// 		AllowString: utils.Ref(false),
-		// 	},
-		// 	Errors: []rule_tester.InvalidTestCaseError{
-		// 		{MessageId: "unexpectedString", Line: 1},
-		// 	},
-		// },
-		// {
-		// 	Code: `[{}, []].filter(x => x);`,
-		// 	Errors: []rule_tester.InvalidTestCaseError{
-		// 		{MessageId: "unexpectedObjectContext", Line: 1},
-		// 	},
-		// },
+
+		{
+			Code: `[1, 2, 3].filter(x => x);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1},
+			},
+		},
+		{
+			Code: `['', 'foo'].filter(x => x);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowString: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedString", Line: 1},
+			},
+		},
+		{
+			Code: `[{}, []].filter(x => x);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1},
+			},
+		},
 
 		// ============================================
 		// COMPLEX LOGICAL EXPRESSIONS - Invalid
