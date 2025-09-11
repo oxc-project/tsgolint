@@ -237,6 +237,11 @@ var UnboundMethodRule = rule.Rule{
 		}
 
 		checkBindingProperty := func(patternNode *ast.Node, initNode *ast.Node, propertyName *ast.Node, parentIsAssignmentPatternLike bool) {
+			// Skip computed property names as they cannot be statically analyzed
+			if ast.IsComputedPropertyName(propertyName) {
+				return
+			}
+			
 			if initNode != nil {
 				if !isNativelyBound(initNode, propertyName) {
 					reported := checkIfMethodAndReport(propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(initNode), propertyName.Text()))
