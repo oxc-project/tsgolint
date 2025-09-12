@@ -240,14 +240,15 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 	if firstTypePredicateResult == nil {
 		return nil
 	}
-	if firstTypePredicateResult.Kind() != checker.TypePredicateKindAssertsIdentifier ||
-		firstTypePredicateResult.Type() != nil {
+	if checker.TypePredicate_kind(firstTypePredicateResult) != checker.TypePredicateKindAssertsIdentifier ||
+		checker.TypePredicate_t(firstTypePredicateResult) != nil {
 		return nil
 	}
-	if firstTypePredicateResult.ParameterIndex() >= int32(len(checkableArguments)) {
+	parameterIndex := checker.TypePredicate_parameterIndex(firstTypePredicateResult)
+	if parameterIndex >= int32(len(checkableArguments)) {
 		return nil
 	}
-	return checkableArguments[firstTypePredicateResult.ParameterIndex()]
+	return checkableArguments[parameterIndex]
 }
 
 func checkNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions) {

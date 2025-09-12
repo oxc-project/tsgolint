@@ -1144,6 +1144,21 @@ const TypeMapperKindUnknown = checker.TypeMapperKindUnknown
 type TypeNodeLinks = checker.TypeNodeLinks
 type TypeParameter = checker.TypeParameter
 type TypePredicate = checker.TypePredicate
+type extra_TypePredicate struct {
+  kind checker.TypePredicateKind
+  parameterIndex int32
+  parameterName string
+  t *checker.Type
+}
+func TypePredicate_kind(v *checker.TypePredicate) checker.TypePredicateKind {
+  return ((*extra_TypePredicate)(unsafe.Pointer(v))).kind
+}
+func TypePredicate_t(v *checker.TypePredicate) *checker.Type {
+  return ((*extra_TypePredicate)(unsafe.Pointer(v))).t
+}
+func TypePredicate_parameterIndex(v *checker.TypePredicate) int32 {
+  return ((*extra_TypePredicate)(unsafe.Pointer(v))).parameterIndex
+}
 type TypePredicateKind = checker.TypePredicateKind
 const TypePredicateKindAssertsIdentifier = checker.TypePredicateKindAssertsIdentifier
 const TypePredicateKindAssertsThis = checker.TypePredicateKindAssertsThis
