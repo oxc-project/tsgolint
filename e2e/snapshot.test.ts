@@ -110,7 +110,7 @@ function parseHeadlessOutput(data: Buffer): { diagnostics: Diagnostic[]; typeDia
         if (filePath.includes('fixtures/')) {
           diagnostic.file_path = 'fixtures/' + filePath.split('fixtures/').pop();
         }
-        
+
         if (msgType === 1) {
           diagnostics.push(diagnostic);
         } else if (msgType === 2) {
@@ -232,9 +232,9 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect(sortedDiagnostics.length).toBeGreaterThan(0);
 
-    expect({ 
+    expect({
       lintDiagnostics: sortedDiagnostics,
-      typeDiagnostics: sortedTypeDiagnostics 
+      typeDiagnostics: sortedTypeDiagnostics,
     }).toMatchSnapshot();
   });
 
@@ -264,7 +264,13 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     const testFiles = await getTestFiles('type-checking');
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(testFiles, ['require-await', 'no-floating-promises', 'no-unsafe-assignment', 'no-unsafe-call', 'no-unsafe-member-access']);
+    const config = generateConfig(testFiles, [
+      'require-await',
+      'no-floating-promises',
+      'no-unsafe-assignment',
+      'no-unsafe-call',
+      'no-unsafe-member-access',
+    ]);
 
     const env = { ...process.env, GOMAXPROCS: '1' };
 
@@ -283,7 +289,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect({
       lintDiagnostics: sortedDiagnostics,
-      typeDiagnostics: sortedTypeDiagnostics
+      typeDiagnostics: sortedTypeDiagnostics,
     }).toMatchSnapshot();
   });
 
@@ -308,7 +314,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect({
       lintDiagnostics: sortedDiagnostics,
-      typeDiagnostics: sortedTypeDiagnostics
+      typeDiagnostics: sortedTypeDiagnostics,
     }).toMatchSnapshot();
   });
 
@@ -331,7 +337,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect({
       lintDiagnostics: sortedDiagnostics,
-      typeDiagnostics: sortedTypeDiagnostics
+      typeDiagnostics: sortedTypeDiagnostics,
     }).toMatchSnapshot();
   });
 
@@ -349,7 +355,9 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       return JSON.stringify(config);
     }
 
-    function getDiagnostics(config: string): { lintDiagnostics: Diagnostic[], typeDiagnostics: TypeScriptDiagnostic[] } {
+    function getDiagnostics(
+      config: string,
+    ): { lintDiagnostics: Diagnostic[]; typeDiagnostics: TypeScriptDiagnostic[] } {
       let output: Buffer;
       output = execFileSync(TSGOLINT_BIN, ['headless'], {
         input: config,
@@ -359,7 +367,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       const { diagnostics, typeDiagnostics } = parseHeadlessOutput(output);
       return {
         lintDiagnostics: sortDiagnostics(diagnostics),
-        typeDiagnostics: sortTypeScriptDiagnostics(typeDiagnostics)
+        typeDiagnostics: sortTypeScriptDiagnostics(typeDiagnostics),
       };
     }
 
