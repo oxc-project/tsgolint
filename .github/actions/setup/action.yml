@@ -11,7 +11,7 @@ runs:
 
     - uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3
 
-    - name: Set commiter identity
+    - name: Set committer identity
       shell: bash
       run: |
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
