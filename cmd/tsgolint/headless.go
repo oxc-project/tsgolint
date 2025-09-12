@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/binary"
 	"flag"
 	"fmt"
@@ -68,11 +69,20 @@ type headlessDiagnostic struct {
 	FilePath    string               `json:"file_path"`
 }
 
+type headlessTypeScriptDiagnostic struct {
+	Range    headlessRange `json:"range"`
+	Code     int32         `json:"code"`
+	Category string        `json:"category"`
+	Message  string        `json:"message"`
+	FilePath string        `json:"file_path"`
+}
+
 type headlessMessageType uint8
 
 const (
 	headlessMessageTypeError headlessMessageType = iota
 	headlessMessageTypeDiagnostic
+	headlessMessageTypeTypeScriptDiagnostic
 )
 
 type headlessMessagePayloadError struct {
@@ -267,6 +277,60 @@ func runHeadless(args []string) int {
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
+	}
+
+	// Collect and send TypeScript diagnostics first
+	ctx := context.Background()
+	for configFileName, filePaths := range workload.Programs {
+		currentDir := tspath.GetDirectoryPath(configFileName)
+		host := utils.NewCachedFSCompilerHost(currentDir, fs, bundled.LibPath(), nil, nil)
+
+		program, err := utils.CreateProgram(false, fs, currentDir, configFileName, host)
+		if err != nil {
+			writeErrorMessage(fmt.Sprintf("error creating program: %v", err))
+			return 1
+		}
+
+		fileSet := make(map[string]struct{}, len(filePaths))
+		for _, f := range filePaths {
+			fileSet[f] = struct{}{}
+		}
+
+		for _, sf := range program.SourceFiles() {
+			if _, ok := fileSet[sf.FileName()]; ok {
+				// Get syntactic and semantic diagnostics
+				syntacticDiags := program.GetSyntacticDiagnostics(ctx, sf)
+				semanticDiags := program.GetSemanticDiagnostics(ctx, sf)
+
+				allDiags := append(syntacticDiags, semanticDiags...)
+
+				for _, diag := range allDiags {
+					categoryStr := "error"
+					if diag.Category() == 0 {
+						categoryStr = "warning"
+					}
+
+					hd := headlessTypeScriptDiagnostic{
+						Code:     diag.Code(),
+						Category: categoryStr,
+						Message:  diag.Message(),
+						FilePath: sf.FileName(),
+					}
+
+					if diag.File() != nil {
+						hd.Range = headlessRange{
+							Pos: diag.Pos(),
+							End: diag.End(),
+						}
+					}
+
+					// Write TypeScript diagnostic directly
+					w := bufio.NewWriterSize(os.Stdout, 4096)
+					writeMessage(w, headlessMessageTypeTypeScriptDiagnostic, hd)
+					w.Flush()
+				}
+			}
+		}
 	}
 
 	err = linter.RunLinter(

@@ -66,9 +66,22 @@ interface Diagnostic {
   [key: string]: any;
 }
 
-function parseHeadlessOutput(data: Buffer): Diagnostic[] {
+interface TypeScriptDiagnostic {
+  file_path?: string;
+  code?: number;
+  category?: string;
+  message?: string;
+  range?: {
+    pos: number;
+    end: number;
+  };
+  [key: string]: any;
+}
+
+function parseHeadlessOutput(data: Buffer): { diagnostics: Diagnostic[]; typeDiagnostics: TypeScriptDiagnostic[] } {
   let offset = 0;
   const diagnostics: Diagnostic[] = [];
+  const typeDiagnostics: TypeScriptDiagnostic[] = [];
 
   while (offset < data.length) {
     if (offset + 5 > data.length) {
@@ -88,8 +101,8 @@ function parseHeadlessOutput(data: Buffer): Diagnostic[] {
     const payload = data.subarray(offset, offset + length);
     offset += length;
 
-    // Only process diagnostic messages (type 1)
-    if (msgType === 1) {
+    // Process diagnostic messages (type 1) and TypeScript diagnostic messages (type 2)
+    if (msgType === 1 || msgType === 2) {
       try {
         const diagnostic = JSON.parse(payload.toString('utf-8'));
         // Make file paths relative to fixtures/ for deterministic snapshots
@@ -97,14 +110,19 @@ function parseHeadlessOutput(data: Buffer): Diagnostic[] {
         if (filePath.includes('fixtures/')) {
           diagnostic.file_path = 'fixtures/' + filePath.split('fixtures/').pop();
         }
-        diagnostics.push(diagnostic);
+        
+        if (msgType === 1) {
+          diagnostics.push(diagnostic);
+        } else if (msgType === 2) {
+          typeDiagnostics.push(diagnostic);
+        }
       } catch {
         continue;
       }
     }
   }
 
-  return diagnostics;
+  return { diagnostics, typeDiagnostics };
 }
 
 function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
@@ -116,6 +134,28 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
     const aRule = a.rule || '';
     const bRule = b.rule || '';
     if (aRule !== bRule) return aRule.localeCompare(bRule);
+
+    const aPos = (a.range && a.range.pos) || 0;
+    const bPos = (b.range && b.range.pos) || 0;
+    if (aPos !== bPos) return aPos - bPos;
+
+    const aEnd = (a.range && a.range.end) || 0;
+    const bEnd = (b.range && b.range.end) || 0;
+    return aEnd - bEnd;
+  });
+
+  return diagnostics;
+}
+
+function sortTypeScriptDiagnostics(diagnostics: TypeScriptDiagnostic[]): TypeScriptDiagnostic[] {
+  diagnostics.sort((a, b) => {
+    const aFilePath = a.file_path || '';
+    const bFilePath = b.file_path || '';
+    if (aFilePath !== bFilePath) return aFilePath.localeCompare(bFilePath);
+
+    const aCode = a.code || 0;
+    const bCode = b.code || 0;
+    if (aCode !== bCode) return aCode - bCode;
 
     const aPos = (a.range && a.range.pos) || 0;
     const bPos = (b.range && b.range.pos) || 0;
@@ -186,12 +226,16 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       env,
     });
 
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    const { diagnostics, typeDiagnostics } = parseHeadlessOutput(output);
+    const sortedDiagnostics = sortDiagnostics(diagnostics);
+    const sortedTypeDiagnostics = sortTypeScriptDiagnostics(typeDiagnostics);
 
-    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(sortedDiagnostics.length).toBeGreaterThan(0);
 
-    expect(diagnostics).toMatchSnapshot();
+    expect({ 
+      lintDiagnostics: sortedDiagnostics,
+      typeDiagnostics: sortedTypeDiagnostics 
+    }).toMatchSnapshot();
   });
 
   it.runIf(process.platform === 'win32')(
@@ -216,6 +260,33 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     },
   );
 
+  it('should generate TypeScript type checking diagnostics', async () => {
+    const testFiles = await getTestFiles('type-checking');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['require-await', 'no-floating-promises', 'no-unsafe-assignment', 'no-unsafe-call', 'no-unsafe-member-access']);
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    const { diagnostics, typeDiagnostics } = parseHeadlessOutput(output);
+    const sortedDiagnostics = sortDiagnostics(diagnostics);
+    const sortedTypeDiagnostics = sortTypeScriptDiagnostics(typeDiagnostics);
+
+    // Should have both type and lint diagnostics
+    expect(sortedTypeDiagnostics.length).toBeGreaterThan(0);
+    expect(sortedDiagnostics.length).toBeGreaterThan(0);
+
+    expect({
+      lintDiagnostics: sortedDiagnostics,
+      typeDiagnostics: sortedTypeDiagnostics
+    }).toMatchSnapshot();
+  });
+
   it('should correctly evaluate project references', async () => {
     const testFiles = await getTestFiles('project-references');
     expect(testFiles.length).toBeGreaterThan(0);
@@ -231,10 +302,14 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       env,
     });
 
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    const { diagnostics, typeDiagnostics } = parseHeadlessOutput(output);
+    const sortedDiagnostics = sortDiagnostics(diagnostics);
+    const sortedTypeDiagnostics = sortTypeScriptDiagnostics(typeDiagnostics);
 
-    expect(diagnostics).toMatchSnapshot();
+    expect({
+      lintDiagnostics: sortedDiagnostics,
+      typeDiagnostics: sortedTypeDiagnostics
+    }).toMatchSnapshot();
   });
 
   it('should correctly lint files not inside a project', async () => {
@@ -250,10 +325,14 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       env,
     });
 
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    const { diagnostics, typeDiagnostics } = parseHeadlessOutput(output);
+    const sortedDiagnostics = sortDiagnostics(diagnostics);
+    const sortedTypeDiagnostics = sortTypeScriptDiagnostics(typeDiagnostics);
 
-    expect(diagnostics).toMatchSnapshot();
+    expect({
+      lintDiagnostics: sortedDiagnostics,
+      typeDiagnostics: sortedTypeDiagnostics
+    }).toMatchSnapshot();
   });
 
   it('should work with the old version of the headless payload', async () => {
@@ -270,26 +349,31 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       return JSON.stringify(config);
     }
 
-    function getDiagnostics(config: string): Diagnostic[] {
+    function getDiagnostics(config: string): { lintDiagnostics: Diagnostic[], typeDiagnostics: TypeScriptDiagnostic[] } {
       let output: Buffer;
       output = execFileSync(TSGOLINT_BIN, ['headless'], {
         input: config,
         env: { ...process.env, GOMAXPROCS: '1' },
       });
 
-      const diagnostics = parseHeadlessOutput(output);
-      return sortDiagnostics(diagnostics);
+      const { diagnostics, typeDiagnostics } = parseHeadlessOutput(output);
+      return {
+        lintDiagnostics: sortDiagnostics(diagnostics),
+        typeDiagnostics: sortTypeScriptDiagnostics(typeDiagnostics)
+      };
     }
 
     const testFiles = await getTestFiles('basic');
     expect(testFiles.length).toBeGreaterThan(0);
 
     const v1Config = generateV1HeadlessPayload(testFiles);
-    const v1Diagnostics = getDiagnostics(v1Config);
+    const v1Result = getDiagnostics(v1Config);
 
     const v2Config = generateConfig(testFiles);
-    const v2Diagnostics = getDiagnostics(v2Config);
+    const v2Result = getDiagnostics(v2Config);
 
-    expect(v1Diagnostics).toStrictEqual(v2Diagnostics);
+    // For backward compatibility test, we only compare lint diagnostics
+    // since v1 format doesn't support type diagnostics
+    expect(v1Result.lintDiagnostics).toStrictEqual(v2Result.lintDiagnostics);
   });
 });
