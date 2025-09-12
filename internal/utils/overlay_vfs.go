@@ -174,3 +174,4 @@ func NewOverlayVFSForFile(filePath string, source string) vfs.FS {
 		virtualFiles,
 	}
 }
+

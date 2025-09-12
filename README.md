@@ -40,6 +40,10 @@ Most of the speedup is due to the following facts:
 
 See [benchmarks](./benchmarks/README.md) for more info.
 
+## Performance Monitoring
+
+Performance is continuously monitored using [CodSpeed](https://docs.codspeed.io/) to detect regressions and track improvements over time. See [benchmarks documentation](./docs/benchmarks.md) for details.
+
 ## What hasn't been prototyped
 
 - Non-type-aware rules
