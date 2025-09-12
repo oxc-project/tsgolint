@@ -37,5 +37,5 @@ jobs:
         uses: CodSpeedHQ/action@v4
         with:
           mode: walltime
-          run: go test -bench ^BenchmarkHeadlessVueCore$ github.com/typescript-eslint/tsgolint/cmd/tsgolint
+          run: go test -bench=BenchmarkHeadlessVueCore ./cmd/tsgolint
           token: ${{ secrets.CODSPEED_TOKEN }}
