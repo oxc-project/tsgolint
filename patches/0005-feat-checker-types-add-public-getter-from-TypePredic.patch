@@ -1,7 +1,7 @@
 From 5f2b70a9908160df84f6b37c8480c8f94aad117d Mon Sep 17 00:00:00 2001
 From: Noel Kim <react-native@naver.com>
 Date: Thu, 11 Sep 2025 11:46:56 +0900
-Subject: [PATCH] feat(checker/types): add public getter from `TypePredicate`
+Subject: [PATCH 5/5] feat(checker/types): add public getter from `TypePredicate`
 
 ---
  internal/checker/types.go | 8 ++++++++
