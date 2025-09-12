@@ -1,4 +1,4 @@
-package tsgolint
+package main
 
 import (
 	"bytes"
