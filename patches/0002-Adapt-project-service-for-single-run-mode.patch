@@ -1,7 +1,7 @@
 From 70e5921f3e00d1fb3e968fc8dc5b9db1f01160b0 Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 6 Aug 2025 11:39:11 +0000
-Subject: [PATCH 2/5] Adapt project service for single run mode
+Subject: [PATCH 2/4] Adapt project service for single run mode
 
 ---
  internal/project/checkerpool.go | 9 +++++++++

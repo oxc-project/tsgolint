@@ -53,6 +53,11 @@
     ],
     "InterfaceType": [
       "thisType"
+    ],
+    "TypePredicate": [
+      "kind",
+      "t",
+      "parameterIndex"
     ]
   }
 }
