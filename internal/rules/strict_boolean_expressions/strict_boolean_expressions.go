@@ -143,48 +143,39 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			return rule.RuleListeners{}
 		}
 
-		checkNode := func(node *ast.Node) {
-			nodeType := ctx.TypeChecker.GetTypeAtLocation(node)
-			checkCondition(ctx, node, nodeType, opts)
-		}
-
 		return rule.RuleListeners{
 			ast.KindIfStatement: func(node *ast.Node) {
 				ifStmt := node.AsIfStatement()
-				checkNode(ifStmt.Expression)
+				traverseNode(ctx, ifStmt.Expression, opts, true)
 			},
 			ast.KindWhileStatement: func(node *ast.Node) {
 				whileStmt := node.AsWhileStatement()
-				checkNode(whileStmt.Expression)
+				traverseNode(ctx, whileStmt.Expression, opts, true)
 			},
 			ast.KindDoStatement: func(node *ast.Node) {
 				doStmt := node.AsDoStatement()
-				checkNode(doStmt.Expression)
+				traverseNode(ctx, doStmt.Expression, opts, true)
 			},
 			ast.KindForStatement: func(node *ast.Node) {
 				forStmt := node.AsForStatement()
 				if forStmt.Condition != nil {
-					checkNode(forStmt.Condition)
+					traverseNode(ctx, forStmt.Condition, opts, true)
 				}
 			},
 			ast.KindConditionalExpression: func(node *ast.Node) {
 				condExpr := node.AsConditionalExpression()
-				checkNode(condExpr.Condition)
+				traverseNode(ctx, condExpr.Condition, opts, true)
 			},
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				binExpr := node.AsBinaryExpression()
-				switch binExpr.OperatorToken.Kind {
-				case ast.KindAmpersandAmpersandToken, ast.KindBarBarToken:
-					checkNode(binExpr.Left)
-				}
+				traverseNode(ctx, node, opts, false)
 			},
 			ast.KindCallExpression: func(node *ast.Node) {
 				callExpr := node.AsCallExpression()
 
-				//assertedArgument := findTruthinessAssertedArgument(ctx.TypeChecker, callExpr)
-				//if assertedArgument != nil {
-				//	checkNode(assertedArgument)
-				//}
+				assertedArgument := findTruthinessAssertedArgument(ctx.TypeChecker, callExpr)
+				if assertedArgument != nil {
+					traverseNode(ctx, assertedArgument, opts, true)
+				}
 
 				if callExpr.Expression != nil && callExpr.Expression.Kind == ast.KindPropertyAccessExpression {
 					propAccess := callExpr.Expression.AsPropertyAccessExpression()
@@ -222,40 +213,68 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
 				unaryExpr := node.AsPrefixUnaryExpression()
 				if unaryExpr.Operator == ast.KindExclamationToken {
-					checkNode(unaryExpr.Operand)
+					traverseNode(ctx, unaryExpr.Operand, opts, true)
 				}
 			},
 		}
 	},
 }
 
-// TODO: Not exported TypePredicate struct variables
-//func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.CallExpression) *ast.Node {
-//	var checkableArguments []*ast.Node
-//	for _, argument := range callExpr.Arguments.Nodes {
-//		if argument.Kind == ast.KindSpreadElement {
-//			continue
-//		}
-//		checkableArguments = append(checkableArguments, argument)
-//	}
-//	if len(checkableArguments) == 0 {
-//		return nil
-//	}
-//	node := callExpr.AsNode()
-//	signature := typeChecker.GetResolvedSignature(node)
-//	if signature == nil {
-//		return nil
-//	}
-//	firstTypePredicateResult := typeChecker.GetTypePredicateOfSignature(signature)
-//	if firstTypePredicateResult == nil {
-//		return nil
-//	}
-//  if firstTypePredicateResult.kind != checker.TypePredicateKindAssertsIdentifier ||
-//	  firstTypePredicateResult.type == nil {
-//	    return nil
-//  }
-//  return checkableArguments[firstTypePredicateResult.parameterIndex]
-//}
+func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.CallExpression) *ast.Node {
+	var checkableArguments []*ast.Node
+	for _, argument := range callExpr.Arguments.Nodes {
+		if argument.Kind == ast.KindSpreadElement {
+			continue
+		}
+		checkableArguments = append(checkableArguments, argument)
+	}
+	if len(checkableArguments) == 0 {
+		return nil
+	}
+	node := callExpr.AsNode()
+	signature := typeChecker.GetResolvedSignature(node)
+	if signature == nil {
+		return nil
+	}
+	firstTypePredicateResult := typeChecker.GetTypePredicateOfSignature(signature)
+	if firstTypePredicateResult == nil {
+		return nil
+	}
+	if firstTypePredicateResult.Kind() != checker.TypePredicateKindAssertsIdentifier ||
+		firstTypePredicateResult.Type() != nil {
+		return nil
+	}
+	if firstTypePredicateResult.ParameterIndex() >= int32(len(checkableArguments)) {
+		return nil
+	}
+	return checkableArguments[firstTypePredicateResult.ParameterIndex()]
+}
+
+func checkNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions) {
+	nodeType := ctx.TypeChecker.GetTypeAtLocation(node)
+	checkCondition(ctx, node, nodeType, opts)
+}
+
+func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpression, opts StrictBooleanExpressionsOptions, isCondition bool) {
+	traverseNode(ctx, binExpr.Left, opts, true)
+	traverseNode(ctx, binExpr.Right, opts, isCondition)
+}
+
+func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions, isCondition bool) {
+	if node.Kind == ast.KindBinaryExpression {
+		binExpr := node.AsBinaryExpression()
+		switch binExpr.OperatorToken.Kind {
+		case ast.KindAmpersandAmpersandToken, ast.KindBarBarToken:
+			traverseLogicalExpression(ctx, binExpr, opts, true)
+		}
+	}
+
+	if !isCondition {
+		return
+	}
+
+	checkNode(ctx, node, opts)
+}
 
 // Type analysis types
 type typeVariant int
@@ -440,7 +459,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 		ctx.ReportNode(node, buildUnexpectedNullish())
 	case typeVariantString:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
-		if *opts.AllowString && info.isNullable && info.isTruthy {
+		if *opts.AllowString && info.isTruthy {
 			return
 		}
 
@@ -458,8 +477,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 			ctx.ReportNode(node, buildUnexpectedString())
 		}
 	case typeVariantNumber:
-		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
-		if *opts.AllowNumber && info.isNullable && info.isTruthy {
+		if *opts.AllowNumber && info.isTruthy {
 			return
 		}
 
