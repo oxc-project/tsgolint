@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
 	"math"
@@ -170,6 +171,54 @@ func init() {
 }
 
 const spaces = "                                                                                                    "
+
+func printTypeScriptDiagnostic(diag *ast.Diagnostic, comparePathOptions tspath.ComparePathsOptions) {
+	if diag.File() == nil {
+		// Global diagnostic without file location
+		fmt.Printf("  \x1b[31mTS%d\x1b[0m: %s\n", diag.Code(), diag.Message())
+		return
+	}
+
+	file := diag.File()
+	startLine, startColumn := scanner.GetLineAndCharacterOfPosition(file, diag.Pos())
+	endLine, _ := scanner.GetLineAndCharacterOfPosition(file, diag.End())
+
+	categoryColor := "\x1b[31m" // Red for errors
+	categoryText := "error"
+	if diag.Category() == 0 { // Warning
+		categoryColor = "\x1b[33m"
+		categoryText = "warning"
+	}
+
+	fmt.Printf("  %s%s\x1b[0m TS%d: %s\n", categoryColor, categoryText, diag.Code(), diag.Message())
+	fmt.Printf("    \x1b[2m╭─ \x1b[0m\x1b[3m\x1b[38;5;117m%s:%d:%d\x1b[0m\n",
+		tspath.ConvertToRelativePath(file.FileName(), comparePathOptions),
+		startLine+1, startColumn+1)
+
+	// Print a simplified code snippet
+	lineMap := file.LineMap()
+	text := file.Text()
+
+	for line := startLine; line <= endLine && line < len(lineMap); line++ {
+		lineStart := int(lineMap[line])
+		var lineEnd int
+		if line == len(lineMap)-1 {
+			lineEnd = len(text)
+		} else {
+			lineEnd = int(lineMap[line+1]) - 1
+		}
+
+		if lineEnd > lineStart {
+			lineText := text[lineStart:lineEnd]
+			// Remove trailing newline if present
+			if len(lineText) > 0 && lineText[len(lineText)-1] == '\n' {
+				lineText = lineText[:len(lineText)-1]
+			}
+			fmt.Printf("    \x1b[2m│\x1b[0m %s\n", lineText)
+		}
+	}
+	fmt.Println("    \x1b[2m╰─\x1b[0m")
+}
 
 func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions tspath.ComparePathsOptions) {
 	diagnosticStart := d.Range.Pos()
@@ -434,14 +483,42 @@ func runMain() int {
 
 	diagnosticsChan := make(chan rule.RuleDiagnostic, 4096)
 	errorsCount := 0
+	typeErrorsCount := 0
+
+	// First, collect and display TypeScript type checking diagnostics
+	ctx := context.Background()
+	for _, file := range files {
+		// Get syntactic diagnostics
+		syntacticDiags := program.GetSyntacticDiagnostics(ctx, file)
+		// Get semantic diagnostics (type checking)
+		semanticDiags := program.GetSemanticDiagnostics(ctx, file)
+
+		allDiags := append(syntacticDiags, semanticDiags...)
+
+		for _, diag := range allDiags {
+			if diag.Category() == 1 { // Error category
+				typeErrorsCount++
+				if typeErrorsCount == 1 {
+					fmt.Println("\n\x1b[1;31mTypeScript Type Checking Errors:\x1b[0m")
+				}
+				printTypeScriptDiagnostic(diag, comparePathOptions)
+			}
+		}
+	}
+
+	if typeErrorsCount > 0 {
+		fmt.Println()
+	}
 
 	wg.Go(func() {
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
+		hasStartedLintErrors := false
 		for d := range diagnosticsChan {
 			errorsCount++
-			if errorsCount == 1 {
-				w.WriteByte('\n')
+			if errorsCount == 1 && !hasStartedLintErrors {
+				w.WriteString("\x1b[1;33mLinting Errors:\x1b[0m\n")
+				hasStartedLintErrors = true
 			}
 			printDiagnostic(d, w, comparePathOptions)
 			if w.Available() < 4096 {
@@ -477,14 +554,30 @@ func runMain() int {
 
 	wg.Wait()
 
+	totalErrors := errorsCount + typeErrorsCount
+
 	errorsColor := "\x1b[1m"
-	if errorsCount == 0 {
+	if totalErrors == 0 {
 		errorsColor = "\x1b[1;32m"
 	}
-	errorsText := "errors"
-	if errorsCount == 1 {
-		errorsText = "error"
+
+	// Build summary message
+	var summaryParts []string
+	if typeErrorsCount > 0 {
+		typeErrorsText := "type error"
+		if typeErrorsCount != 1 {
+			typeErrorsText = "type errors"
+		}
+		summaryParts = append(summaryParts, fmt.Sprintf("\x1b[31m%d\x1b[0m %s", typeErrorsCount, typeErrorsText))
 	}
+	if errorsCount > 0 {
+		lintErrorsText := "lint error"
+		if errorsCount != 1 {
+			lintErrorsText = "lint errors"
+		}
+		summaryParts = append(summaryParts, fmt.Sprintf("\x1b[33m%d\x1b[0m %s", errorsCount, lintErrorsText))
+	}
+
 	filesText := "files"
 	if len(files) == 1 {
 		filesText = "file"
@@ -497,19 +590,32 @@ func runMain() int {
 	if !singleThreaded {
 		threadsCount = runtime.GOMAXPROCS(0)
 	}
-	fmt.Fprintf(
-		os.Stdout,
-		"Found %v%v\x1b[0m %v \x1b[2m(linted \x1b[1m%v\x1b[22m\x1b[2m %v with \x1b[1m%v\x1b[22m\x1b[2m %v in \x1b[1m%v\x1b[22m\x1b[2m using \x1b[1m%v\x1b[22m\x1b[2m threads)\n",
-		errorsColor,
-		errorsCount,
-		errorsText,
-		len(files),
-		filesText,
-		len(allRules),
-		rulesText,
-		time.Since(timeBefore).Round(time.Millisecond),
-		threadsCount,
-	)
+
+	if len(summaryParts) > 0 {
+		fmt.Fprintf(
+			os.Stdout,
+			"Found %s \x1b[2m(checked \x1b[1m%v\x1b[22m\x1b[2m %v with \x1b[1m%v\x1b[22m\x1b[2m %v in \x1b[1m%v\x1b[22m\x1b[2m using \x1b[1m%v\x1b[22m\x1b[2m threads)\x1b[0m\n",
+			strings.Join(summaryParts, " and "),
+			len(files),
+			filesText,
+			len(allRules),
+			rulesText,
+			time.Since(timeBefore).Round(time.Millisecond),
+			threadsCount,
+		)
+	} else {
+		fmt.Fprintf(
+			os.Stdout,
+			"%vNo errors found!\x1b[0m \x1b[2m(checked \x1b[1m%v\x1b[22m\x1b[2m %v with \x1b[1m%v\x1b[22m\x1b[2m %v in \x1b[1m%v\x1b[22m\x1b[2m using \x1b[1m%v\x1b[22m\x1b[2m threads)\x1b[0m\n",
+			errorsColor,
+			len(files),
+			filesText,
+			len(allRules),
+			rulesText,
+			time.Since(timeBefore).Round(time.Millisecond),
+			threadsCount,
+		)
+	}
 
 	return 0
 }
