@@ -1,6 +1,7 @@
 package tsgolint
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,32 +10,52 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 )
 
-// cloneVueCore clones the vuejs/core repository at the specified commit
-func cloneVueCore(b *testing.B) string {
+const (
+	repoOrg       = "vuejs"
+	repoName      = "core"
+	vueCoreCommit = "75220c7995a13a483ae9599a739075be1c8e17f8"
+)
+
+func cloneRepo(b *testing.B, org, name, commit string) string {
 	b.Helper()
 
 	// Create a temporary directory for the benchmark
 	tmpDir := b.TempDir()
-	repoPath := filepath.Join(tmpDir, "vue-core")
+	repoPath := filepath.Join(tmpDir, fmt.Sprintf("%s-%s", org, name))
 
 	// Clone the repository at the specific commit
-	cmd := exec.Command("git", "clone", "--depth", "1", "https://github.com/vuejs/core.git", repoPath)
+	cmd := exec.Command("git", "clone", "--depth", "1", "origin", fmt.Sprintf("https://github.com/%s/%s.git", org, name), repoPath)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		b.Fatalf("Failed to clone repository: %v\nOutput: %s", err, output)
 	}
 
 	// Checkout the specific commit
-	cmd = exec.Command("git", "-C", repoPath, "fetch", "--depth", "1", "origin", "75220c7995a13a483ae9599a739075be1c8e17f8")
+	cmd = exec.Command("git", "-C", repoPath, "fetch", "--depth", "1", "origin", commit)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		b.Fatalf("Failed to fetch commit: %v\nOutput: %s", err, output)
 	}
 
-	cmd = exec.Command("git", "-C", repoPath, "checkout", "75220c7995a13a483ae9599a739075be1c8e17f8")
+	cmd = exec.Command("git", "-C", repoPath, "checkout", commit)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		b.Fatalf("Failed to checkout commit: %v\nOutput: %s", err, output)
 	}
 
 	return repoPath
+}
+
+func cloneVueCore(b *testing.B) string {
+	b.Helper()
+
+	vueCoreRepoPath := cloneRepo(b, repoOrg, repoName, vueCoreCommit)
+
+	// Install dependencies using pnpm
+	cmd := exec.Command("pnpm", "install", "--prefer-offline", "--no-frozen-lockfile")
+	cmd.Dir = vueCoreRepoPath
+	if output, err := cmd.CombinedOutput(); err != nil {
+		b.Fatalf("Failed to install dependencies: %v\nOutput: %s", err, output)
+	}
+
+	return vueCoreRepoPath
 }
 
 func findAllFilesForLinting(rootPath string) ([]string, error) {
@@ -64,12 +85,9 @@ func findAllFilesForLinting(rootPath string) ([]string, error) {
 	return files, err
 }
 
-// BenchmarkHeadlessVueCore benchmarks running the headless linter on the entire Vue.js core repository
 func BenchmarkHeadlessVueCore(b *testing.B) {
-	// Clone the repository
 	repoPath := cloneVueCore(b)
 
-	// Find all TypeScript files
 	files, err := findAllFilesForLinting(repoPath)
 	if err != nil {
 		b.Fatalf("Failed to find TypeScript files: %v", err)
@@ -81,7 +99,6 @@ func BenchmarkHeadlessVueCore(b *testing.B) {
 
 	b.Logf("Found %d TypeScript files to lint", len(files))
 
-	// Create the headless payload with all rules
 	allRuleNames := make([]headlessRule, len(allRules))
 	for i, r := range allRules {
 		allRuleNames[i] = headlessRule{Name: r.Name}
@@ -103,7 +120,6 @@ func BenchmarkHeadlessVueCore(b *testing.B) {
 			diagnosticCount++
 		}
 
-		// Run the headless linter
 		err := runHeadlessWithPayload(payload, repoPath, onDiagnostic)
 		if err != nil {
 			b.Fatalf("Linting failed: %v", err)
