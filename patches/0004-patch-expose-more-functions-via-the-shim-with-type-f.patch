@@ -1,7 +1,7 @@
 From c0aae26eba85f1c1255f2108af390b567f786f1b Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 29 Aug 2025 17:49:17 +0100
-Subject: [PATCH 4/4] patch: expose more functions via the shim with type fixes
+Subject: [PATCH 4/5] patch: expose more functions via the shim with type fixes
 
 ---
  internal/project/compilerhost.go              |   4 +-

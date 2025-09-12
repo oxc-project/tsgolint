@@ -1,7 +1,7 @@
 From d55ed5ae63cf53e04abe24f5de8574beb244d5cf Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 15 Aug 2025 16:06:42 +0100
-Subject: [PATCH 3/4] perf(tspath): use `unsafe.String` to avoid allocations
+Subject: [PATCH 3/5] perf(tspath): use `unsafe.String` to avoid allocations
  when lower casing string
 
 ---
