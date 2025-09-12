@@ -30,7 +30,7 @@ build:
   $env:GOEXPERIMENT="greenteagc"; $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o tsgolint.exe ./cmd/tsgolint
 
 test: build
-  cd e2e && pnpm run test && cd ..
+  cd e2e && pnpm run test --run && cd ..
   go test ./internal/...
 
 lint:
