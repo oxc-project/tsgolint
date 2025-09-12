@@ -23,6 +23,8 @@ jobs:
           submodules: true
           persist-credentials: false
 
+      - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
+
       - uses: ./.github/actions/setup
 
       - name: Install Rust
