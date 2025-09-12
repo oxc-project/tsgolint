@@ -1,4 +1,4 @@
-package main
+package tsgolint
 
 import (
 	"golang.org/x/sys/windows"

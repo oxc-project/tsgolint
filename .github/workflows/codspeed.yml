@@ -25,6 +25,12 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install codspeed-go-runner from git
+        run: cargo install --git https://github.com/codSpeedHQ/codspeed-go.git codspeed-go-runner
+
       - name: Run benchmarks
         uses: CodSpeedHQ/action@v4
         with:
