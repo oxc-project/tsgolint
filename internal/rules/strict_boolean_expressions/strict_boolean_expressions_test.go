@@ -106,17 +106,6 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 		{Code: `declare const b: bigint; if (b) {}`},
 
 		// ============================================
-		// OBJECT TYPES in logical operators
-		// ============================================
-
-		// Note: Objects in logical operators are treated as boolean conditions
-		// and will be flagged as errors (always truthy) unless in the right side
-		// Right side of logical operators is not checked as a boolean condition
-		{Code: `'foo' || ({});`},         // Object on right side is OK
-		{Code: `false || [];`},           // Array on right side is OK
-		{Code: `(false && true) || [];`}, // Array on right side is OK
-
-		// ============================================
 		// ANY TYPE - Valid with Option
 		// ============================================
 
@@ -368,6 +357,112 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 
 		{Code: `function isString(x: unknown): x is string { return typeof x === 'string'; }`},
 		{Code: `declare function isString(x: unknown): x is string; if (isString(value)) {}`},
+		{
+			Code: `
+			declare function assert(a: number, b: unknown): asserts a;
+			declare const nullableString: string | null;
+			declare const boo: boolean;
+			assert(boo, nullableString);
+    		`,
+		},
+		{
+			Code: `
+			declare function assert(a: boolean, b: unknown): asserts b is string;
+			declare const nullableString: string | null;
+			declare const boo: boolean;
+			assert(boo, nullableString);
+	    	`,
+		},
+		{
+			Code: `
+			declare function assert(a: number, b: unknown): asserts b;
+			declare const nullableString: string | null;
+			declare const boo: boolean;
+			assert(nullableString, boo);
+    	`,
+		},
+		{
+			Code: `
+			declare function assert(a: number, b: unknown): asserts b;
+			declare const nullableString: string | null;
+			declare const boo: boolean;
+			assert(...nullableString, nullableString);
+    		`,
+		},
+		{
+			Code: `
+			declare function assert(
+			  this: object,
+			  a: number,
+			  b?: unknown,
+			  c?: unknown,
+			): asserts c;
+			declare const nullableString: string | null;
+			declare const foo: number;
+			const o: { assert: typeof assert } = {
+			  assert,
+			};
+			o.assert(foo, nullableString);
+    		`,
+		},
+		{
+			Code: `
+			declare function assert(x: unknown): x is string;
+			declare const nullableString: string | null;
+			assert(nullableString);
+      		`,
+		},
+		{
+			Code: `
+			class ThisAsserter {
+			  assertThis(this: unknown, arg2: unknown): asserts this {}
+			}
+
+			declare const lol: string | number | unknown | null;
+
+			const thisAsserter: ThisAsserter = new ThisAsserter();
+			thisAsserter.assertThis(lol);
+      		`,
+		},
+		{
+			Code: `
+			function assert(this: object, a: number, b: unknown): asserts b;
+			function assert(a: bigint, b: unknown): asserts b;
+			function assert(this: object, a: string, two: string): asserts two;
+			function assert(
+			  this: object,
+			  a: string,
+			  assertee: string,
+			  c: bigint,
+			  d: object,
+			): asserts assertee;
+			function assert(...args: any[]): void;
+			
+			function assert(...args: any[]) {
+			  throw new Error('lol');
+			}
+			
+			declare const nullableString: string | null;
+			assert(3 as any, nullableString);
+      		`,
+		},
+		// Intentional use of `any` to test a function call with no call signatures.
+		{
+			Code: `
+			declare const assert: any;
+			declare const nullableString: string | null;
+			assert(nullableString);
+    		`,
+		},
+		// Coverage for absent "test expression".
+		// Ensure that no crash or false positive occurs
+		{
+			Code: `
+      		for (let x = 0; ; x++) {
+        		break;
+      		}
+    		`,
+		},
 
 		// ============================================
 		// DOUBLE NEGATION - Always Valid
@@ -641,6 +736,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1},
 			},
 		},
 		{
@@ -649,6 +745,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedString", Line: 1},
 				{MessageId: "unexpectedString", Line: 1},
 			},
 		},
@@ -783,6 +880,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedNumber", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1},
 			},
 		},
 		{
@@ -791,6 +889,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				AllowNumber: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1},
 				{MessageId: "unexpectedNumber", Line: 1},
 			},
 		},
@@ -936,6 +1035,23 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			Code: `const foo = () => {}; if (foo) {}`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedObjectContext", Line: 1},
+			},
+		},
+
+		// ============================================
+		// ASSERT FUNCTIONS AND TYPE PREDICATES
+		// ============================================
+
+		{
+			Code: `
+			declare function assert(a: boolean, b: unknown): asserts b;
+			declare function assert({ a }: { a: boolean }, b: unknown): asserts b;
+			declare const nullableString: string | null;
+			declare const boo: boolean;
+			assert(boo, nullableString);
+	    	`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 6},
 			},
 		},
 
@@ -1226,6 +1342,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			Code: `({}) && [];`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedObjectContext", Line: 1},
+				{MessageId: "unexpectedObjectContext", Line: 1},
 			},
 		},
 		{
@@ -1236,6 +1353,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1},
 			},
 		},
 
