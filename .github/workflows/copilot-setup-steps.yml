@@ -27,4 +27,7 @@ jobs:
 
       - uses: ./.github/actions/setup
 
+      - shell: bash
+        run: pnpm install --global @ast-grep/cli
+
       - run: just init
