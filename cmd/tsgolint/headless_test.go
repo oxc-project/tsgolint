@@ -86,8 +86,13 @@ func findAllFilesForLinting(rootPath string) ([]string, error) {
 }
 
 func BenchmarkHeadlessVueCore(b *testing.B) {
-	repoPath := cloneVueCore(b)
-
+	// Use local e2e fixture files for benchmarking to avoid external dependencies
+	cwd, err := os.Getwd()
+	if err != nil {
+		b.Fatalf("Failed to get current directory: %v", err)
+	}
+	repoPath := filepath.Join(cwd, "../../e2e/fixtures")
+	
 	files, err := findAllFilesForLinting(repoPath)
 	if err != nil {
 		b.Fatalf("Failed to find TypeScript files: %v", err)
