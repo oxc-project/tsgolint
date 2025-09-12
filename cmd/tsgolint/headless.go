@@ -165,8 +165,7 @@ func prepareWorkload(payload *headlessPayload, fs vfs.FS, cwd string, logLevel u
 	return workload, fileConfigs
 }
 
-// createRuleGetter creates a function that returns configured rules for a source file
-func createRuleGetter(fileConfigs map[string][]headlessRule, allowUnknownRules bool) func(*ast.SourceFile) []linter.ConfiguredRule {
+func createRuleGetter(fileConfigs map[string][]headlessRule) func(*ast.SourceFile) []linter.ConfiguredRule {
 	allRulesByName := make(map[string]rule.Rule, len(allRules))
 	for _, r := range allRules {
 		allRulesByName[r.Name] = r
@@ -179,11 +178,7 @@ func createRuleGetter(fileConfigs map[string][]headlessRule, allowUnknownRules b
 		for _, headlessRule := range cfg {
 			r, ok := allRulesByName[headlessRule.Name]
 			if !ok {
-				if allowUnknownRules {
-					continue // Skip unknown rules in benchmarks
-				} else {
-					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
-				}
+				panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
 			}
 			capturedRule := r // capture for closure
 			rules = append(rules, linter.ConfiguredRule{
@@ -214,7 +209,7 @@ func runHeadlessWithPayload(payload *headlessPayload, cwd string, diagnosticsCal
 		cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
-		createRuleGetter(fileConfigs, true), // Allow unknown rules for benchmarks
+		createRuleGetter(fileConfigs),
 		diagnosticsCallback,
 	)
 
@@ -333,7 +328,7 @@ func runHeadless(args []string) int {
 		cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
-		createRuleGetter(fileConfigs, false), // Don't allow unknown rules in production
+		createRuleGetter(fileConfigs),
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- d
 		},
