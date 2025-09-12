@@ -24,7 +24,7 @@ func cloneRepo(b *testing.B, org, name, commit string) string {
 	repoPath := filepath.Join(tmpDir, fmt.Sprintf("%s-%s", org, name))
 
 	// Clone the repository at the specific commit
-	cmd := exec.Command("git", "clone", "--depth", "1", "origin", fmt.Sprintf("https://github.com/%s/%s.git", org, name), repoPath)
+	cmd := exec.Command("git", "clone", "--depth", "1", fmt.Sprintf("https://github.com/%s/%s.git", org, name), repoPath)
 	if output, err := cmd.CombinedOutput(); err != nil {
 		b.Fatalf("Failed to clone repository: %v\nOutput: %s", err, output)
 	}
