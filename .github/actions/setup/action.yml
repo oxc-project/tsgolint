@@ -11,6 +11,8 @@ runs:
 
     - uses: extractions/setup-just@e33e0265a09d6d736e2ee1e0eb685ef1de4669ff # v3
 
+    - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
+
     - name: Set commiter identity
       shell: bash
       run: |
