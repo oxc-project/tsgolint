@@ -11,5 +11,10 @@
     "fast-glob": "^3.3.3",
     "typescript": "^5.9.2",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "vitest>vite": "npm:rolldown-vite@7.1.10"
+    }
   }
 }
