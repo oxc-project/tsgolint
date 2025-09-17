@@ -166,8 +166,8 @@ func prepareWorkload(payload *headlessPayload, fs vfs.FS, cwd string, logLevel u
 }
 
 func createRuleGetter(fileConfigs map[string][]headlessRule) func(*ast.SourceFile) []linter.ConfiguredRule {
-	allRulesByName := make(map[string]rule.Rule, len(allRules))
-	for _, r := range allRules {
+	allRulesByName := make(map[string]rule.Rule, len(AllRules))
+	for _, r := range AllRules {
 		allRulesByName[r.Name] = r
 	}
 
@@ -216,7 +216,7 @@ func runHeadlessWithPayload(payload *headlessPayload, cwd string, diagnosticsCal
 	return err
 }
 
-func runHeadless(args []string) int {
+func RunHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 
 	var (
@@ -237,13 +237,13 @@ func runHeadless(args []string) int {
 		log.Printf("Starting tsgolint")
 	}
 
-	if done, err := recordTrace(traceOut); err != nil {
+	if done, err := RecordTrace(traceOut); err != nil {
 		os.Stderr.WriteString(err.Error())
 		return 1
 	} else {
 		defer done()
 	}
-	if done, err := recordCpuprof(cpuprofOut); err != nil {
+	if done, err := RecordCpuprof(cpuprofOut); err != nil {
 		os.Stderr.WriteString(err.Error())
 		return 1
 	} else {
@@ -347,7 +347,7 @@ func runHeadless(args []string) int {
 		log.Printf("Linting Complete")
 	}
 
-	writeMemProfiles(heapOut, allocsOut)
+	WriteMemProfiles(heapOut, allocsOut)
 
 	return 0
 }
