@@ -50,7 +50,7 @@ linters:
     # - staticcheck # TODO
     - testifylint
     - unparam # TODO
-    # - unused # TODO - disabled due to false positives with main package
+    - unused # TODO
 
   settings:
     depguard:
