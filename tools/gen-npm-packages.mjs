@@ -48,6 +48,7 @@ const repoRoot = path.join(import.meta.dirname, '..');
 
 const npmDir = path.join(repoRoot, 'npm');
 const licensePath = path.join(repoRoot, 'LICENSE');
+const readmePath = path.join(repoRoot, 'README.md');
 const buildDir = path.join(repoRoot, 'build');
 
 await Promise.all([
@@ -107,6 +108,7 @@ await Promise.all([
         ),
       ),
       fs.copyFile(licensePath, path.join(packageDir, 'LICENSE')),
+      fs.copyFile(readmePath, path.join(packageDir, 'README.md')),
     ]);
   })(),
 ]);
