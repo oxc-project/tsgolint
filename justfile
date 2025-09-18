@@ -46,3 +46,6 @@ pull:
   pushd typescript-go && git reset --hard origin/main
   git pull
   just init
+
+new-rule name:
+  cd tasks/rulegen && pnpm run rulegen {{name}} && cd ../..
