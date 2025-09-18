@@ -77,6 +77,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 		files := []*ast.SourceFile{program.GetSourceFile(fileName)}
 
 		err = linter.RunLinterOnProgram(
+			utils.LogLevelNormal,
 			program,
 			files,
 			1,
