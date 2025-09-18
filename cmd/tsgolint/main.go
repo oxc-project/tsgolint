@@ -451,6 +451,7 @@ func runMain() int {
 	})
 
 	err = linter.RunLinterOnProgram(
+		utils.GetLogLevel(),
 		program,
 		files,
 		runtime.GOMAXPROCS(0),

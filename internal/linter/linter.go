@@ -78,7 +78,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		err = RunLinterOnProgram(program, sourceFiles, workers, getRulesForFile, onDiagnostic)
+		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onDiagnostic)
 		if err != nil {
 			return err
 		}
@@ -103,7 +103,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			files = append(files, sf)
 		}
 
-		err = RunLinterOnProgram(program, files, workers, getRulesForFile, onDiagnostic)
+		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onDiagnostic)
 		if err != nil {
 			return err
 		}
@@ -113,7 +113,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 
 }
 
-func RunLinterOnProgram(program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
+func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
 	type checkerWorkload struct {
 		checker *checker.Checker
 		program *compiler.Program
@@ -147,6 +147,9 @@ func RunLinterOnProgram(program *compiler.Program, files []*ast.SourceFile, work
 
 			for w := range workloadQueue {
 				for file := range w.queue {
+					if logLevel == utils.LogLevelDebug {
+						log.Print(file.FileName())
+					}
 					rules := getRulesForFile(file)
 					for _, r := range rules {
 						ctx := rule.RuleContext{
