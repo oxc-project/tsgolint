@@ -43,4 +43,5 @@ type ProgramOptions = compiler.ProgramOptions
 func SortAndDeduplicateDiagnostics(diagnostics []*ast.Diagnostic) []*ast.Diagnostic
 type SourceFileMayBeEmittedHost = compiler.SourceFileMayBeEmittedHost
 type SourceMapEmitResult = compiler.SourceMapEmitResult
+type WriteFile = compiler.WriteFile
 type WriteFileData = compiler.WriteFileData

@@ -295,7 +295,7 @@ func GetNamespaceDeclarationNode(node *ast.Node) *ast.Node
 //go:linkname GetNewTargetContainer github.com/microsoft/typescript-go/internal/ast.GetNewTargetContainer
 func GetNewTargetContainer(node *ast.Node) *ast.Node
 //go:linkname GetNodeAtPosition github.com/microsoft/typescript-go/internal/ast.GetNodeAtPosition
-func GetNodeAtPosition(file *ast.SourceFile, position int, isJavaScriptFile bool) *ast.Node
+func GetNodeAtPosition(file *ast.SourceFile, position int, includeJSDoc bool) *ast.Node
 //go:linkname GetNodeId github.com/microsoft/typescript-go/internal/ast.GetNodeId
 func GetNodeId(node *ast.Node) ast.NodeId
 //go:linkname GetNonAssignedNameOfDeclaration github.com/microsoft/typescript-go/internal/ast.GetNonAssignedNameOfDeclaration
@@ -495,6 +495,8 @@ func IsClassExpression(node *ast.Node) bool
 func IsClassLike(node *ast.Node) bool
 //go:linkname IsClassMemberModifier github.com/microsoft/typescript-go/internal/ast.IsClassMemberModifier
 func IsClassMemberModifier(token ast.Kind) bool
+//go:linkname IsClassOrInterfaceLike github.com/microsoft/typescript-go/internal/ast.IsClassOrInterfaceLike
+func IsClassOrInterfaceLike(node *ast.Node) bool
 //go:linkname IsClassOrTypeElement github.com/microsoft/typescript-go/internal/ast.IsClassOrTypeElement
 func IsClassOrTypeElement(node *ast.Node) bool
 //go:linkname IsClassStaticBlockDeclaration github.com/microsoft/typescript-go/internal/ast.IsClassStaticBlockDeclaration
@@ -669,6 +671,8 @@ func IsImportEqualsDeclaration(node *ast.Node) bool
 func IsImportMeta(node *ast.Node) bool
 //go:linkname IsImportOrExportSpecifier github.com/microsoft/typescript-go/internal/ast.IsImportOrExportSpecifier
 func IsImportOrExportSpecifier(node *ast.Node) bool
+//go:linkname IsImportOrImportEqualsDeclaration github.com/microsoft/typescript-go/internal/ast.IsImportOrImportEqualsDeclaration
+func IsImportOrImportEqualsDeclaration(node *ast.Node) bool
 //go:linkname IsImportSpecifier github.com/microsoft/typescript-go/internal/ast.IsImportSpecifier
 func IsImportSpecifier(node *ast.Node) bool
 //go:linkname IsImportTypeNode github.com/microsoft/typescript-go/internal/ast.IsImportTypeNode
@@ -713,6 +717,10 @@ func IsJSDocImportTag(node *ast.Node) bool
 func IsJSDocKind(kind ast.Kind) bool
 //go:linkname IsJSDocLinkLike github.com/microsoft/typescript-go/internal/ast.IsJSDocLinkLike
 func IsJSDocLinkLike(node *ast.Node) bool
+//go:linkname IsJSDocNameReference github.com/microsoft/typescript-go/internal/ast.IsJSDocNameReference
+func IsJSDocNameReference(node *ast.Node) bool
+//go:linkname IsJSDocNameReferenceContext github.com/microsoft/typescript-go/internal/ast.IsJSDocNameReferenceContext
+func IsJSDocNameReferenceContext(node *ast.Node) bool
 //go:linkname IsJSDocNode github.com/microsoft/typescript-go/internal/ast.IsJSDocNode
 func IsJSDocNode(node *ast.Node) bool
 //go:linkname IsJSDocNonNullableType github.com/microsoft/typescript-go/internal/ast.IsJSDocNonNullableType
@@ -721,8 +729,12 @@ func IsJSDocNonNullableType(node *ast.Node) bool
 func IsJSDocNullableType(node *ast.Node) bool
 //go:linkname IsJSDocParameterTag github.com/microsoft/typescript-go/internal/ast.IsJSDocParameterTag
 func IsJSDocParameterTag(node *ast.Node) bool
+//go:linkname IsJSDocPropertyTag github.com/microsoft/typescript-go/internal/ast.IsJSDocPropertyTag
+func IsJSDocPropertyTag(node *ast.Node) bool
 //go:linkname IsJSDocReturnTag github.com/microsoft/typescript-go/internal/ast.IsJSDocReturnTag
 func IsJSDocReturnTag(node *ast.Node) bool
+//go:linkname IsJSDocSignature github.com/microsoft/typescript-go/internal/ast.IsJSDocSignature
+func IsJSDocSignature(node *ast.Node) bool
 //go:linkname IsJSDocSingleCommentNode github.com/microsoft/typescript-go/internal/ast.IsJSDocSingleCommentNode
 func IsJSDocSingleCommentNode(node *ast.Node) bool
 //go:linkname IsJSDocSingleCommentNodeComment github.com/microsoft/typescript-go/internal/ast.IsJSDocSingleCommentNodeComment
@@ -1611,16 +1623,15 @@ const ModifierFlagsExport = ast.ModifierFlagsExport
 const ModifierFlagsExportDefault = ast.ModifierFlagsExportDefault
 const ModifierFlagsHasComputedFlags = ast.ModifierFlagsHasComputedFlags
 const ModifierFlagsHasComputedJSDocModifiers = ast.ModifierFlagsHasComputedJSDocModifiers
-const ModifierFlagsImmediate = ast.ModifierFlagsImmediate
 const ModifierFlagsIn = ast.ModifierFlagsIn
 const ModifierFlagsJSDocCacheOnlyModifiers = ast.ModifierFlagsJSDocCacheOnlyModifiers
-const ModifierFlagsJSDocImmediate = ast.ModifierFlagsJSDocImmediate
 const ModifierFlagsJSDocOnlyModifiers = ast.ModifierFlagsJSDocOnlyModifiers
 const ModifierFlagsJSDocOverride = ast.ModifierFlagsJSDocOverride
 const ModifierFlagsJSDocPrivate = ast.ModifierFlagsJSDocPrivate
 const ModifierFlagsJSDocProtected = ast.ModifierFlagsJSDocProtected
 const ModifierFlagsJSDocPublic = ast.ModifierFlagsJSDocPublic
 const ModifierFlagsJSDocReadonly = ast.ModifierFlagsJSDocReadonly
+const ModifierFlagsJavaScript = ast.ModifierFlagsJavaScript
 const ModifierFlagsModifier = ast.ModifierFlagsModifier
 const ModifierFlagsNonCacheOnlyModifiers = ast.ModifierFlagsNonCacheOnlyModifiers
 const ModifierFlagsNonPublicAccessibilityModifier = ast.ModifierFlagsNonPublicAccessibilityModifier
