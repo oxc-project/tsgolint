@@ -1,115 +1,110 @@
-# ✨ tsgolint ✨
+<div align="center">
+  <h1>✨ tsgolint ✨</h1>
+</div>
 
-**tsgolint** is a TypeScript linter containing only type-aware rules, powered by [typescript-go](https://github.com/microsoft/typescript-go) adapted for [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+<div align="center">
+
+[![MIT licensed][license-badge]][license-url]
+[![Build Status][ci-badge]][ci-url]
+[![Discord chat][discord-badge]][discord-url]
+
+</div>
+
+**tsgolint** is a high-performance TypeScript linter containing only type-aware rules, powered by [typescript-go](https://github.com/microsoft/typescript-go) and designed for integration with [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+
+Key highlights:
+
+- **Performance**: 20-40x faster than ESLint + typescript-eslint
+- **Type-aware**: Comprehensive TypeScript type checking integration
+- **Parallel**: Utilizes all available CPU cores
+- **Compatible**: Implements typescript-eslint rules with consistent behavior
 
 This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint). Fork permission is granted by @auvred.
-
-> If you want faster typed linting with ESLint, see [typescript-eslint/typescript-eslint#10940 Enhancement: Use TypeScript's Go port (tsgo / typescript-go) for type information](https://github.com/typescript-eslint/typescript-eslint/issues/10940).
 
 > [!IMPORTANT]
 > **tsgolint** is a prototype in the early stages of development.
 > This is a community effort. Feel free to ask to be assigned to any of the [good first issues](https://github.com/oxc-project/tsgolint/contribute).
 
-![Running tsgolint on microsoft/typescript repo](./docs/record.gif)
+## Installation & Usage
 
-## What's been prototyped
-
-- Primitive linter engine
-- Lint rules tester
-- Source code fixer
-- 40 [type-aware](https://typescript-eslint.io/blog/typed-linting) typescript-eslint's rules
-- Basic `tsgolint` CLI
-
-Try running
+**tsgolint** is integrated into Oxlint as the type-aware backend. Install and use via Oxlint:
 
 ```shell
-npx oxlint-tsgolint --help
+# Install oxlint with type-aware support
+pnpm add -D oxlint-tsgolint@latest
+
+# Quick start
+pnpm dlx oxlint --type-aware
+
+# Or run on your project
+oxlint --type-aware
 ```
 
-to see available options.
+### Configuration
 
-### Speedup over ESLint
+Configure type-aware rules in `.oxlintrc.json`:
+
+```json
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "rules": {
+    "typescript/no-floating-promises": "error",
+    "typescript/no-misused-promises": "error"
+  }
+}
+```
+
+Over 30 TypeScript-specific type-aware rules are available. For detailed setup and configuration, see the [Oxlint Type-Aware Linting guide](https://oxc.rs/blog/2025-08-17-oxlint-type-aware.html).
+
+## Performance
 
 **tsgolint** is **20-40 times faster** than ESLint + typescript-eslint.
 
-Most of the speedup is due to the following facts:
+### Real-World Performance Examples
 
-- Native speed parsing and type-checking (thanks to [typescript-go](https://github.com/microsoft/typescript-go))
-- No more [TS AST -> ESTree AST](https://typescript-eslint.io/blog/asts-and-typescript-eslint/#ast-formats) conversions. TS AST is directly used in rules.
-- Parallel parsing, type checking and linting. **tsgolint** uses all available CPU cores.
+- **napi-rs** (144 files): 1.0s
+- **preact** (245 files): 2.7s
+- **rolldown** (314 files): 1.5s
+- **bluesky** (1152 files): 7.0s
 
-See [benchmarks](./benchmarks/README.md) for more info.
+### Speed Sources
 
-## What hasn't been prototyped
+- **Native Speed**: Go implementation with direct TypeScript compiler integration
+- **Zero Conversion**: Direct TypeScript AST usage without ESTree conversion overhead
+- **Parallel Processing**: Multi-core execution utilizing all available CPU cores
+- **Efficient Memory**: Streaming diagnostics and optimized resource usage
 
-- Non-type-aware rules
-- Editor extension
-- Rich CLI features
-- Config file
-- Plugin system
+See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
+
+## Current Status
+
+### In Development 🚧
+
+- Additional typescript-eslint rules
+- Disable Comments
+- Rule Configuration
+- IDE usage
 
 ## Architecture
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architectural documentation.
+**tsgolint** follows a clean separation between frontend and backend:
 
-## Building `tsgolint`
+- **Oxlint CLI** handles file discovery, configuration, and output formatting
+- **tsgolint backend** provides type-aware rule execution and diagnostics
+- **TypeScript integration** via typescript-go for native performance
 
-```bash
-git submodule update --init                       # init typescript-go submodule
+For detailed technical documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-cd typescript-go
-git am --3way --no-gpg-sign ../patches/*.patch    # apply typescript-go patches
-cd ..
+## Contributing
 
-go build -o tsgolint ./cmd/tsgolint
-```
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
-## Debugging
+- Development setup and building instructions
+- Testing procedures and guidelines
+- How to implement new rules
+- Code style and contribution workflow
 
-For troubleshooting and development purposes, **tsgolint** supports debug logging through the `OXC_LOG` environment variable.
-
-### Debug Logging
-
-To enable verbose debug output, set the `OXC_LOG` environment variable to `debug`:
-
-```bash
-OXC_LOG=debug tsgolint
-```
-
-Debug logging provides detailed information about the linting process, including:
-
-- File assignment to TypeScript programs
-- Worker distribution and execution
-- Performance timing information
-- Internal state details
-
-This can be helpful when:
-
-- Diagnosing performance issues
-- Understanding how files are being processed
-- Troubleshooting TypeScript configuration problems
-- Contributing to **tsgolint** development
-
-## Testing
-
-**tsgolint** includes several types of tests to ensure correctness:
-
-### Unit Tests
-
-Run Go unit tests for individual rules:
-
-```shell
-go test ./internal/...
-```
-
-### Integration Tests
-
-- `./test.sh` - End-to-end snapshot test running all 40+ rules
-  - Runs **all** tsgolint rules on all fixture files
-  - Captures diagnostic output in deterministic, sortable format
-  - Verifies output matches expected snapshot
-
-## Implemented rules (40/59)
+## Implemented Rules (40/59)
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
@@ -170,3 +165,20 @@ go test ./internal/...
 - [x] [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)
 - [x] [unbound-method](https://typescript-eslint.io/rules/unbound-method)
 - [x] [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable)
+
+## Links
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Development and contribution guidelines
+- [Benchmarks](./benchmarks/README.md) - Performance comparison data
+- [TypeScript Go](https://github.com/microsoft/typescript-go) - Underlying TypeScript compiler
+- [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) - Frontend linter integration
+
+<!-- Badge definitions -->
+
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license-url]: LICENSE
+[ci-badge]: https://github.com/oxc-project/tsgolint/actions/workflows/ci.yml/badge.svg
+[ci-url]: https://github.com/oxc-project/tsgolint/actions/workflows/ci.yml
+[discord-badge]: https://img.shields.io/discord/1079625926024900739?logo=discord&label=Discord
+[discord-url]: https://discord.gg/9uXCAwqQZW
