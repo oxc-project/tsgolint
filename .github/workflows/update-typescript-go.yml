@@ -28,10 +28,15 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Set commiter identity
+      - name: Set committer identity
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions"
+
+      - shell: bash
+        run: |
+          mkdir -p internal/collections
+          find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
 
       - run: ./tools/update-typescript-go-shims.sh
 
