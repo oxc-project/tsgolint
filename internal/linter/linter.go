@@ -147,6 +147,7 @@ func RunLinterOnProgram(program *compiler.Program, files []*ast.SourceFile, work
 
 			for w := range workloadQueue {
 				for file := range w.queue {
+					log.Print(file.FileName())
 					rules := getRulesForFile(file)
 					for _, r := range rules {
 						ctx := rule.RuleContext{
