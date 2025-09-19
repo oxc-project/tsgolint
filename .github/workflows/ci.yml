@@ -89,3 +89,21 @@ jobs:
       - uses: crate-ci/typos@85f62a8a84f939ae994ab3763f01a0296d61a7ee # v1.36.2
         with:
           files: .
+
+  typecheck-rulegen:
+    name: TypeScript Type Check (rulegen)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          persist-credentials: false
+
+      - uses: oxc-project/setup-node@fdbf0dfd334c4e6d56ceeb77d91c76339c2a0885 # v1.0.4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: tasks/rulegen
+
+      - name: Run TypeScript type check
+        run: pnpm run typecheck
+        working-directory: tasks/rulegen
