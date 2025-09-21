@@ -14,7 +14,7 @@
   },
   "pnpm": {
     "overrides": {
-      "vitest>vite": "npm:rolldown-vite@7.1.10"
+      "vitest>vite": "npm:rolldown-vite@7.1.11"
     }
   }
 }
