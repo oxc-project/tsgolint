@@ -723,6 +723,34 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "suggestions": [],
   },
   {
+    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
+    "fixes": [],
+    "message": {
+      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
+      "id": "noStrictNullCheck",
+    },
+    "range": {
+      "end": 0,
+      "pos": 0,
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+    "suggestions": [],
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
+    "fixes": [],
+    "message": {
+      "description": "Function has no 'await' expression.",
+      "id": "missingAwait",
+    },
+    "range": {
+      "end": 53,
+      "pos": 0,
+    },
+    "rule": "require-await",
+    "suggestions": [],
+  },
+  {
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
     "fixes": [],
     "message": {
@@ -4477,6 +4505,43 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     },
     "rule": "require-await",
     "suggestions": [],
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `
+[
+  {
+    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
+    "fixes": [],
+    "message": {
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler.",
+      "id": "floating",
+    },
+    "range": {
+      "end": 76,
+      "pos": 54,
+    },
+    "rule": "no-floating-promises",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 58,
+              "pos": 54,
+            },
+            "text": "await",
+          },
+        ],
+        "message": {
+          "description": "Promises must be awaited.",
+          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler.",
+          "id": "floating",
+        },
+      },
+    ],
   },
 ]
 `;

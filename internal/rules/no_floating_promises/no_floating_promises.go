@@ -1,6 +1,8 @@
 package no_floating_promises
 
 import (
+	"encoding/json"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/scanner"
@@ -16,6 +18,70 @@ type NoFloatingPromisesOptions struct {
 	CheckThenables                  *bool
 	IgnoreIIFE                      *bool
 	IgnoreVoid                      *bool
+}
+
+// parseNoFloatingPromisesOptions converts a loosely-typed options value into a
+// fully-populated NoFloatingPromisesOptions struct. Missing fields are filled
+// in with defaults, and if the input is not understood, defaults are returned.
+func parseNoFloatingPromisesOptions(raw any) NoFloatingPromisesOptions {
+	// Base defaults
+	defaults := NoFloatingPromisesOptions{
+		AllowForKnownSafeCalls:          []utils.TypeOrValueSpecifier{},
+		AllowForKnownSafeCallsInline:    []string{},
+		AllowForKnownSafePromises:       []utils.TypeOrValueSpecifier{},
+		AllowForKnownSafePromisesInline: []string{},
+		CheckThenables:                  utils.Ref(false),
+		IgnoreIIFE:                      utils.Ref(false),
+		IgnoreVoid:                      utils.Ref(true),
+	}
+
+	// Helper to normalize zero-value / nil internals
+	normalize := func(o NoFloatingPromisesOptions) NoFloatingPromisesOptions {
+		if o.AllowForKnownSafeCalls == nil {
+			o.AllowForKnownSafeCalls = defaults.AllowForKnownSafeCalls
+		}
+		if o.AllowForKnownSafeCallsInline == nil {
+			o.AllowForKnownSafeCallsInline = defaults.AllowForKnownSafeCallsInline
+		}
+		if o.AllowForKnownSafePromises == nil {
+			o.AllowForKnownSafePromises = defaults.AllowForKnownSafePromises
+		}
+		if o.AllowForKnownSafePromisesInline == nil {
+			o.AllowForKnownSafePromisesInline = defaults.AllowForKnownSafePromisesInline
+		}
+		if o.CheckThenables == nil {
+			o.CheckThenables = defaults.CheckThenables
+		}
+		if o.IgnoreIIFE == nil {
+			o.IgnoreIIFE = defaults.IgnoreIIFE
+		}
+		if o.IgnoreVoid == nil {
+			o.IgnoreVoid = defaults.IgnoreVoid
+		}
+		return o
+	}
+
+	if raw == nil {
+		return defaults
+	}
+
+	switch v := raw.(type) {
+	case NoFloatingPromisesOptions:
+		return normalize(v)
+	case map[string]any:
+		// Marshal then unmarshal to leverage JSON tag inference (field names)
+		b, err := json.Marshal(v)
+		if err != nil {
+			return defaults
+		}
+		var o NoFloatingPromisesOptions
+		if err := json.Unmarshal(b, &o); err != nil {
+			return defaults
+		}
+		return normalize(o)
+	default:
+		return defaults
+	}
 }
 
 var messageBase = "Promises must be awaited."
@@ -87,24 +153,7 @@ func buildFloatingVoidMessage() rule.RuleMessage {
 var NoFloatingPromisesRule = rule.Rule{
 	Name: "no-floating-promises",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoFloatingPromisesOptions)
-		if !ok {
-			opts = NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls:          []utils.TypeOrValueSpecifier{},
-				AllowForKnownSafeCallsInline:    []string{},
-				AllowForKnownSafePromises:       []utils.TypeOrValueSpecifier{},
-				AllowForKnownSafePromisesInline: []string{},
-			}
-		}
-		if opts.CheckThenables == nil {
-			opts.CheckThenables = utils.Ref(false)
-		}
-		if opts.IgnoreIIFE == nil {
-			opts.IgnoreIIFE = utils.Ref(false)
-		}
-		if opts.IgnoreVoid == nil {
-			opts.IgnoreVoid = utils.Ref(true)
-		}
+		opts := parseNoFloatingPromisesOptions(options)
 
 		isHigherPrecedenceThanUnary := func(node *ast.Node) bool {
 			operator := ast.KindUnknown
