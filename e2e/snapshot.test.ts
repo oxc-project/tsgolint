@@ -210,10 +210,10 @@ describe('TSGoLint E2E Snapshot Tests', () => {
               name: 'no-floating-promises',
               options: { ignoreVoid },
             },
-          ]
-        }
+          ],
+        },
       ],
-    })
+    });
 
     let output: Buffer;
     output = execFileSync(TSGOLINT_BIN, ['headless'], {

@@ -1,8 +1,7 @@
 package no_floating_promises
 
 import (
-	"encoding/json"
-
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/scanner"
@@ -11,13 +10,13 @@ import (
 )
 
 type NoFloatingPromisesOptions struct {
-	AllowForKnownSafeCalls          []utils.TypeOrValueSpecifier
-	AllowForKnownSafeCallsInline    []string
-	AllowForKnownSafePromises       []utils.TypeOrValueSpecifier
-	AllowForKnownSafePromisesInline []string
-	CheckThenables                  *bool
-	IgnoreIIFE                      *bool
-	IgnoreVoid                      *bool
+	AllowForKnownSafeCalls          []utils.TypeOrValueSpecifier `json:"allowForKnownSafeCalls"`
+	AllowForKnownSafeCallsInline    []string                     `json:"allowForKnownSafeCallsInline"`
+	AllowForKnownSafePromises       []utils.TypeOrValueSpecifier `json:"allowForKnownSafePromises"`
+	AllowForKnownSafePromisesInline []string                     `json:"allowForKnownSafePromisesInline"`
+	CheckThenables                  *bool                        `json:"checkThenables"`
+	IgnoreIIFE                      *bool                        `json:"ignoreIIFE"`
+	IgnoreVoid                      *bool                        `json:"ignoreVoid"`
 }
 
 // parseNoFloatingPromisesOptions converts a loosely-typed options value into a
