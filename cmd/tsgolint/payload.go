@@ -29,7 +29,7 @@ type headlessConfig struct {
 }
 
 type headlessRule struct {
-	Name   string `json:"name"`
+	Name    string `json:"name"`
 	Options any    `json:"options,omitempty"`
 }
 
