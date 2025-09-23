@@ -4,11 +4,11 @@ go 1.25.0
 
 require (
 	github.com/dlclark/regexp2 v1.11.5
-	github.com/microsoft/typescript-go v0.0.0-20250827194408-bcb8510f109a
+	github.com/microsoft/typescript-go v0.0.0-20250923153221-865ec14fd475
 )
 
 require (
-	github.com/go-json-experiment/json v0.0.0-20250811204210-4789234c3ea1 // indirect
-	golang.org/x/sync v0.16.0 // indirect
-	golang.org/x/text v0.28.0 // indirect
+	github.com/go-json-experiment/json v0.0.0-20250813233538-9b1f9ea2e11b // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
 )
