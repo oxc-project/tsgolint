@@ -10,6 +10,10 @@ import "github.com/microsoft/typescript-go/internal/tspath"
 import _ "unsafe"
 
 type AccessExpression = ast.AccessExpression
+type AccessKind = ast.AccessKind
+const AccessKindRead = ast.AccessKindRead
+const AccessKindReadWrite = ast.AccessKindReadWrite
+const AccessKindWrite = ast.AccessKindWrite
 type AccessorDeclaration = ast.AccessorDeclaration
 type AccessorDeclarationBase = ast.AccessorDeclarationBase
 type AnyValidImportOrReExport = ast.AnyValidImportOrReExport
@@ -427,6 +431,8 @@ func IsAnyImportSyntax(node *ast.Node) bool
 func IsArrayBindingPattern(node *ast.Node) bool
 //go:linkname IsArrayLiteralExpression github.com/microsoft/typescript-go/internal/ast.IsArrayLiteralExpression
 func IsArrayLiteralExpression(node *ast.Node) bool
+//go:linkname IsArrayLiteralOrObjectLiteralDestructuringPattern github.com/microsoft/typescript-go/internal/ast.IsArrayLiteralOrObjectLiteralDestructuringPattern
+func IsArrayLiteralOrObjectLiteralDestructuringPattern(node *ast.Node) bool
 //go:linkname IsArrowFunction github.com/microsoft/typescript-go/internal/ast.IsArrowFunction
 func IsArrowFunction(node *ast.Node) bool
 //go:linkname IsAssertionExpression github.com/microsoft/typescript-go/internal/ast.IsAssertionExpression
@@ -1049,6 +1055,8 @@ func IsThisInTypeQuery(node *ast.Node) bool
 func IsThisParameter(node *ast.Node) bool
 //go:linkname IsThisTypeNode github.com/microsoft/typescript-go/internal/ast.IsThisTypeNode
 func IsThisTypeNode(node *ast.Node) bool
+//go:linkname IsThrowStatement github.com/microsoft/typescript-go/internal/ast.IsThrowStatement
+func IsThrowStatement(node *ast.Node) bool
 //go:linkname IsTokenKind github.com/microsoft/typescript-go/internal/ast.IsTokenKind
 func IsTokenKind(token ast.Kind) bool
 //go:linkname IsTrivia github.com/microsoft/typescript-go/internal/ast.IsTrivia
@@ -1123,6 +1131,14 @@ func IsVariableStatement(node *ast.Node) bool
 func IsVoidExpression(node *ast.Node) bool
 //go:linkname IsWhitespaceOnlyJsxText github.com/microsoft/typescript-go/internal/ast.IsWhitespaceOnlyJsxText
 func IsWhitespaceOnlyJsxText(node *ast.Node) bool
+//go:linkname IsWriteAccess github.com/microsoft/typescript-go/internal/ast.IsWriteAccess
+func IsWriteAccess(node *ast.Node) bool
+//go:linkname IsWriteAccessForReference github.com/microsoft/typescript-go/internal/ast.IsWriteAccessForReference
+func IsWriteAccessForReference(node *ast.Node) bool
+//go:linkname IsWriteOnlyAccess github.com/microsoft/typescript-go/internal/ast.IsWriteOnlyAccess
+func IsWriteOnlyAccess(node *ast.Node) bool
+//go:linkname IsYieldExpression github.com/microsoft/typescript-go/internal/ast.IsYieldExpression
+func IsYieldExpression(node *ast.Node) bool
 type JSDeclarationKind = ast.JSDeclarationKind
 const JSDeclarationKindExportsProperty = ast.JSDeclarationKindExportsProperty
 const JSDeclarationKindModuleExports = ast.JSDeclarationKindModuleExports
