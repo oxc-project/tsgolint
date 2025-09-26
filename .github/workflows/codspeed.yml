@@ -1,0 +1,41 @@
+name: CodSpeed
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  benchmarks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # required for git am --3way to work properly
+          submodules: true
+          persist-credentials: false
+
+      - uses: oxc-project/setup-node@f42e3bda950c7454575e78ee4eaac880a077700c # v1.0.0
+
+      - uses: ./.github/actions/setup
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install codspeed-go-runner from git
+        run: cargo install --git https://github.com/codSpeedHQ/codspeed-go.git codspeed-go-runner
+
+      - name: Run benchmarks
+        uses: CodSpeedHQ/action@v4
+        with:
+          mode: walltime
+          run: go test -bench=BenchmarkHeadlessVueCore ./cmd/tsgolint
+          token: ${{ secrets.CODSPEED_TOKEN }}

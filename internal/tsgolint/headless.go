@@ -1,4 +1,4 @@
-package main
+package tsgolint
 
 import (
 	"bufio"
@@ -18,6 +18,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/tspath"
+	"github.com/microsoft/typescript-go/shim/vfs"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
@@ -98,61 +99,8 @@ func writeErrorMessage(text string) error {
 	})
 }
 
-func runHeadless(args []string) int {
-	logLevel := utils.GetLogLevel()
-
-	var (
-		traceOut   string
-		cpuprofOut string
-		heapOut    string
-		allocsOut  string
-	)
-	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
-	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
-	flag.StringVar(&heapOut, "heap", "", "file to put heap profiling to")
-	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
-	flag.CommandLine.Parse(args)
-
-	log.SetOutput(os.Stderr)
-	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
-	if logLevel == utils.LogLevelDebug {
-		log.Printf("Starting tsgolint")
-	}
-
-	if done, err := recordTrace(traceOut); err != nil {
-		os.Stderr.WriteString(err.Error())
-		return 1
-	} else {
-		defer done()
-	}
-	if done, err := recordCpuprof(cpuprofOut); err != nil {
-		os.Stderr.WriteString(err.Error())
-		return 1
-	} else {
-		defer done()
-	}
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
-		return 1
-	}
-
-	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
-
-	configRaw, err := io.ReadAll(os.Stdin)
-	if err != nil {
-		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
-		return 1
-	}
-
-	payload, err := deserializePayload(configRaw)
-
-	if err != nil {
-		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
-		return 1
-	}
-
+// prepareWorkload prepares the workload from the payload
+func prepareWorkload(payload *headlessPayload, fs vfs.FS, cwd string, logLevel utils.LogLevel) (linter.Workload, map[string][]headlessRule) {
 	workload := linter.Workload{
 		Programs:       make(map[string][]string),
 		UnmatchedFiles: []string{},
@@ -162,12 +110,12 @@ func runHeadless(args []string) int {
 	for _, config := range payload.Configs {
 		totalFileCount += len(config.FilePaths)
 	}
+
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
 	}
 
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
-
 	fileConfigs := make(map[string][]headlessRule, totalFileCount)
 
 	idx := 0
@@ -208,16 +156,122 @@ func runHeadless(args []string) int {
 		}
 	}
 
-	allRulesByName := make(map[string]rule.Rule, len(allRules))
-	for _, r := range allRules {
-		allRulesByName[r.Name] = r
-	}
-
 	for _, files := range workload.Programs {
 		slices.SortFunc(files, func(a, b string) int {
 			return len(b) - len(a)
 		})
 	}
+
+	return workload, fileConfigs
+}
+
+func createRuleGetter(fileConfigs map[string][]headlessRule) func(*ast.SourceFile) []linter.ConfiguredRule {
+	allRulesByName := make(map[string]rule.Rule, len(AllRules))
+	for _, r := range AllRules {
+		allRulesByName[r.Name] = r
+	}
+
+	return func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
+		cfg := fileConfigs[sourceFile.FileName()]
+		rules := make([]linter.ConfiguredRule, 0, len(cfg))
+
+		for _, headlessRule := range cfg {
+			r, ok := allRulesByName[headlessRule.Name]
+			if !ok {
+				panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
+			}
+			capturedRule := r // capture for closure
+			rules = append(rules, linter.ConfiguredRule{
+				Name: capturedRule.Name,
+				Run: func(ctx rule.RuleContext) rule.RuleListeners {
+					return capturedRule.Run(ctx, nil)
+				},
+			})
+		}
+
+		return rules
+	}
+}
+
+func runHeadlessWithPayload(payload *headlessPayload, cwd string, diagnosticsCallback func(rule.RuleDiagnostic)) error {
+	logLevel := utils.GetLogLevel()
+	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
+
+	workload, fileConfigs := prepareWorkload(payload, fs, cwd, logLevel)
+
+	if logLevel == utils.LogLevelDebug {
+		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
+		log.Printf("Workload distribution: %d programs", len(workload.Programs))
+	}
+
+	err := linter.RunLinter(
+		logLevel,
+		cwd,
+		workload,
+		runtime.GOMAXPROCS(0),
+		createRuleGetter(fileConfigs),
+		diagnosticsCallback,
+	)
+
+	return err
+}
+
+func RunHeadless(args []string) int {
+	logLevel := utils.GetLogLevel()
+
+	var (
+		traceOut   string
+		cpuprofOut string
+		heapOut    string
+		allocsOut  string
+	)
+	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
+	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
+	flag.StringVar(&heapOut, "heap", "", "file to put heap profiling to")
+	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
+	flag.CommandLine.Parse(args)
+
+	log.SetOutput(os.Stderr)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	if logLevel == utils.LogLevelDebug {
+		log.Printf("Starting tsgolint")
+	}
+
+	if done, err := RecordTrace(traceOut); err != nil {
+		os.Stderr.WriteString(err.Error())
+		return 1
+	} else {
+		defer done()
+	}
+	if done, err := RecordCpuprof(cpuprofOut); err != nil {
+		os.Stderr.WriteString(err.Error())
+		return 1
+	} else {
+		defer done()
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
+		return 1
+	}
+
+	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
+
+	configRaw, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
+		return 1
+	}
+
+	payload, err := deserializePayload(configRaw)
+
+	if err != nil {
+		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
+		return 1
+	}
+
+	workload, fileConfigs := prepareWorkload(payload, fs, cwd, logLevel)
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
@@ -274,25 +328,7 @@ func runHeadless(args []string) int {
 		cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
-		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			cfg := fileConfigs[sourceFile.FileName()]
-			rules := make([]linter.ConfiguredRule, len(cfg))
-
-			for i, headlessRule := range cfg {
-				r, ok := allRulesByName[headlessRule.Name]
-				if !ok {
-					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
-				}
-				rules[i] = linter.ConfiguredRule{
-					Name: r.Name,
-					Run: func(ctx rule.RuleContext) rule.RuleListeners {
-						return r.Run(ctx, nil)
-					},
-				}
-			}
-
-			return rules
-		},
+		createRuleGetter(fileConfigs),
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- d
 		},
@@ -311,7 +347,7 @@ func runHeadless(args []string) int {
 		log.Printf("Linting Complete")
 	}
 
-	writeMemProfiles(heapOut, allocsOut)
+	WriteMemProfiles(heapOut, allocsOut)
 
 	return 0
 }

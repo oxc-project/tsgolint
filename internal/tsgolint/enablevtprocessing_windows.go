@@ -1,10 +1,10 @@
-package main
+package tsgolint
 
 import (
 	"golang.org/x/sys/windows"
 )
 
-func enableVirtualTerminalProcessing() {
+func EnableVirtualTerminalProcessing() {
 	h, err := windows.GetStdHandle(windows.STD_OUTPUT_HANDLE)
 	if err != nil || h == windows.InvalidHandle {
 		return
