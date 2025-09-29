@@ -252,7 +252,7 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 }
 
 func checkNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions) {
-	nodeType := ctx.TypeChecker.GetTypeAtLocation(node)
+	nodeType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node)
 	checkCondition(ctx, node, nodeType, opts)
 }
 
@@ -264,9 +264,8 @@ func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpressi
 func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions, isCondition bool) {
 	if node.Kind == ast.KindBinaryExpression {
 		binExpr := node.AsBinaryExpression()
-		switch binExpr.OperatorToken.Kind {
-		case ast.KindAmpersandAmpersandToken, ast.KindBarBarToken:
-			traverseLogicalExpression(ctx, binExpr, opts, true)
+		if binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
+			traverseLogicalExpression(ctx, binExpr, opts, false)
 		}
 	}
 
@@ -313,28 +312,24 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 		info.isUnion = true
 		parts := utils.UnionTypeParts(t)
 		variants := make(map[typeVariant]bool)
-		hasNullish := false
-		hasEnum := false
 
 		for _, part := range parts {
 			partInfo := analyzeTypePart(typeChecker, part)
 			variants[partInfo.variant] = true
 			if partInfo.variant == typeVariantNullish {
-				hasNullish = true
+				info.isNullable = true
 			}
 			if partInfo.isEnum {
-				hasEnum = true
+				info.isEnum = true
 			}
+			info.isTruthy = partInfo.isTruthy
 		}
-
-		info.isNullable = hasNullish
-		info.isEnum = hasEnum
 
 		if len(variants) == 1 {
 			for v := range variants {
 				info.variant = v
 			}
-		} else if len(variants) == 2 && hasNullish {
+		} else if len(variants) == 2 && info.isNullable {
 			for v := range variants {
 				if v != typeVariantNullish {
 					info.variant = v
@@ -350,14 +345,26 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 
 	if utils.IsIntersectionType(t) {
 		info.isIntersection = true
-		info.variant = typeVariantObject
+		types := t.Types()
+		isBoolean := false
+		for _, t2 := range types {
+			if analyzeTypePart(typeChecker, t2).variant == typeVariantBoolean {
+				isBoolean = true
+				break
+			}
+		}
+		if isBoolean {
+			info.variant = typeVariantBoolean
+		} else {
+			info.variant = typeVariantObject
+		}
 		return info
 	}
 
 	return analyzeTypePart(typeChecker, t)
 }
 
-func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
+func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	info := typeInfo{}
 	flags := checker.Type_flags(t)
 
@@ -386,7 +393,10 @@ func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 		return info
 	}
 
-	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral) != 0 {
+	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral|checker.TypeFlagsBooleanLike) != 0 {
+		if flags&checker.TypeFlagsBooleanLike != 0 && t.AsIntrinsicType().IntrinsicName() == "true" {
+			info.isTruthy = true
+		}
 		info.variant = typeVariantBoolean
 		return info
 	}
@@ -430,9 +440,7 @@ func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 		return info
 	}
 
-	if flags&checker.TypeFlagsObject != 0 ||
-		flags&checker.TypeFlagsNonPrimitive != 0 ||
-		utils.IsObjectType(t) {
+	if flags&(checker.TypeFlagsObject|checker.TypeFlagsNonPrimitive) != 0 {
 		info.variant = typeVariantObject
 		return info
 	}

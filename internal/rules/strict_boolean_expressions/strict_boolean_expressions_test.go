@@ -1,3 +1,5 @@
+// Code generated from strict-boolean-expressions.test.ts - DO NOT EDIT.
+
 package strict_boolean_expressions
 
 import (
@@ -9,176 +11,59 @@ import (
 )
 
 func TestStrictBooleanExpressionsRule(t *testing.T) {
-	// Test with strictNullChecks enabled (in fixtures/tsconfig.json)
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &StrictBooleanExpressionsRule, []rule_tester.ValidTestCase{
-		// ============================================
-		// BOOLEAN TYPES - Always Valid
-		// ============================================
-
-		// Boolean literals
+		// ========================================
+		// BOOLEAN IN BOOLEAN CONTEXT
+		// ========================================
 		{Code: `true ? 'a' : 'b';`},
-		{Code: `false ? 'a' : 'b';`},
-		{Code: `if (true) {}`},
 		{Code: `if (false) {}`},
 		{Code: `while (true) {}`},
-		{Code: `do {} while (true);`},
-		{Code: `for (; true; ) {}`},
+		{Code: `for (; false; ) {}`},
 		{Code: `!true;`},
+		{Code: `false || 123;`},
+		{Code: `true && 'foo';`},
+		{Code: `!(false || true);`},
+		{Code: `true && false ? true : false;`},
+		{Code: `(false && true) || false;`},
+		{Code: `(false && true) || [];`},
+		{Code: `(false && 1) || (true && 2);`},
+		{Code: `declare const x: boolean; if (x) {}`},
+		{Code: `(x: boolean) => !x;`},
+		{Code: `<T extends boolean>(x: T) => (x ? 1 : 0);`},
+		{Code: `declare const x: never; if (x) {}`},
 
-		// Boolean variables
-		{Code: `const b = true; if (b) {}`},
-		{Code: `const b = false; if (!b) {}`},
-		{Code: `declare const b: boolean; if (b) {}`},
-
-		// Boolean expressions
-		{Code: `if (true && false) {}`},
-		{Code: `if (true || false) {}`},
-		{Code: `true && 'a';`},
-		{Code: `false || 'a';`},
-
-		// Comparison operators return boolean
-		{Code: `1 > 2 ? 'a' : 'b';`},
-		{Code: `1 < 2 ? 'a' : 'b';`},
-		{Code: `1 >= 2 ? 'a' : 'b';`},
-		{Code: `1 <= 2 ? 'a' : 'b';`},
-		{Code: `1 == 2 ? 'a' : 'b';`},
-		{Code: `1 != 2 ? 'a' : 'b';`},
-		{Code: `1 === 2 ? 'a' : 'b';`},
-		{Code: `1 !== 2 ? 'a' : 'b';`},
-
-		// Type guards
-		{Code: `declare const x: string | number; if (typeof x === 'string') {}`},
-		{Code: `declare const x: any; if (x instanceof Error) {}`},
-		{Code: `declare const x: any; if ('prop' in x) {}`},
-
-		// Function returning boolean
-		{Code: `function test(): boolean { return true; } if (test()) {}`},
-		{Code: `declare function test(): boolean; if (test()) {}`},
-
-		// ============================================
-		// STRING TYPES - Valid with Default Options
-		// ============================================
-
-		{Code: `'' ? 'a' : 'b';`},
-		{Code: `'foo' ? 'a' : 'b';`},
-		{Code: "`` ? 'a' : 'b';"},
-		{Code: "`foo` ? 'a' : 'b';"},
-		{Code: "`foo${bar}` ? 'a' : 'b';"},
+		// ========================================
+		// STRING IN BOOLEAN CONTEXT
+		// ========================================
 		{Code: `if ('') {}`},
-		{Code: `if ('foo') {}`},
-		{Code: `while ('') {}`},
-		{Code: `do {} while ('foo');`},
-		{Code: `for (; 'foo'; ) {}`},
-		{Code: `!!'foo';`},
-		{Code: `declare const s: string; if (s) {}`},
+		{Code: `while ('x') {}`},
+		{Code: `for (; ''; ) {}`},
+		{Code: `('' && '1') || x;`},
+		{Code: `declare const x: string; if (x) {}`},
+		{Code: `(x: string) => !x;`},
+		{Code: `<T extends string>(x: T) => (x ? 1 : 0);`},
 
-		// String with logical operators
-		{Code: `'' || 'foo';`},
-		{Code: `'foo' && 'bar';`},
-		{Code: `declare const s: string; s || 'default';`},
-
-		// ============================================
-		// NUMBER TYPES - Valid with Default Options
-		// ============================================
-
-		{Code: `0 ? 'a' : 'b';`},
-		{Code: `1 ? 'a' : 'b';`},
-		{Code: `-1 ? 'a' : 'b';`},
-		{Code: `0.5 ? 'a' : 'b';`},
-		{Code: `NaN ? 'a' : 'b';`},
+		// ========================================
+		// NUMBER IN BOOLEAN CONTEXT
+		// ========================================
 		{Code: `if (0) {}`},
-		{Code: `if (1) {}`},
-		{Code: `while (0) {}`},
-		{Code: `do {} while (1);`},
-		{Code: `for (; 1; ) {}`},
-		{Code: `declare const n: number; if (n) {}`},
+		{Code: `while (1n) {}`},
+		{Code: `for (; Infinity; ) {}`},
+		{Code: `(0 / 0 && 1 + 2) || x;`},
+		{Code: `declare const x: number; if (x) {}`},
+		{Code: `(x: bigint) => !x;`},
+		{Code: `<T extends number>(x: T) => (x ? 1 : 0);`},
 
-		// Number with logical operators
-		{Code: `0 || 1;`},
-		{Code: `1 && 2;`},
-		{Code: `declare const n: number; n || 0;`},
+		// ========================================
+		// NULLABLE OBJECT IN BOOLEAN CONTEXT
+		// ========================================
+		{Code: `declare const x: null | object; if (x) {}`},
+		{Code: `(x?: { a: any }) => !x;`},
+		{Code: `<T extends {} | null | undefined>(x: T) => (x ? 1 : 0);`},
 
-		// BigInt
-		{Code: `0n ? 'a' : 'b';`},
-		{Code: `1n ? 'a' : 'b';`},
-		{Code: `if (0n) {}`},
-		{Code: `if (1n) {}`},
-		{Code: `declare const b: bigint; if (b) {}`},
-
-		// ============================================
-		// ANY TYPE - Valid with Option
-		// ============================================
-
-		{
-			Code: `declare const x: any; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: any; x ? 'a' : 'b';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: any; x && 'a';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: any; x || 'a';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: any; !x;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-
-		// ============================================
-		// UNKNOWN TYPE - Valid with Option
-		// ============================================
-
-		{
-			Code: `declare const x: unknown; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: unknown; x ? 'a' : 'b';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: unknown; x && 'a';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: unknown; x || 'a';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: unknown; !x;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowAny: utils.Ref(true),
-			},
-		},
-
-		// ============================================
-		// NULLABLE BOOLEAN - Valid with Option
-		// ============================================
-
+		// ========================================
+		// NULLABLE BOOLEAN IN BOOLEAN CONTEXT
+		// ========================================
 		{
 			Code: `declare const x: boolean | null; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
@@ -186,40 +71,27 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 		},
 		{
-			Code: `declare const x: boolean | undefined; if (x) {}`,
+			Code: `(x?: boolean) => !x;`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableBoolean: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: boolean | null | undefined; if (x) {}`,
+			Code: `<T extends boolean | null>(x: T) => (x ? 1 : 0);`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableBoolean: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: true | null; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableBoolean: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: false | undefined; if (x) {}`,
+			Code: `declare const test?: boolean; if (test ?? false) {}`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableBoolean: utils.Ref(true),
 			},
 		},
 
-		// ============================================
-		// NULLABLE STRING - Valid with Option
-		// ============================================
-
-		{
-			Code: `declare const x: string | null; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableString: utils.Ref(true),
-			},
-		},
+		// ========================================
+		// NULLABLE STRING IN BOOLEAN CONTEXT
+		// ========================================
 		{
 			Code: `declare const x: string | undefined; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
@@ -227,34 +99,27 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 		},
 		{
-			Code: `declare const x: string | null | undefined; if (x) {}`,
+			Code: `(x?: string) => !x;`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableString: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: '' | null; if (x) {}`,
+			Code: `<T extends string | null>(x: T) => (x ? 1 : 0);`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableString: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: 'foo' | undefined; if (x) {}`,
+			Code: `'string' != null ? 'asd' : '';`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableString: utils.Ref(true),
 			},
 		},
 
-		// ============================================
-		// NULLABLE NUMBER - Valid with Option
-		// ============================================
-
-		{
-			Code: `declare const x: number | null; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableNumber: utils.Ref(true),
-			},
-		},
+		// ========================================
+		// NULLABLE NUMBER IN BOOLEAN CONTEXT
+		// ========================================
 		{
 			Code: `declare const x: number | undefined; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
@@ -262,453 +127,558 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 		},
 		{
-			Code: `declare const x: number | null | undefined; if (x) {}`,
+			Code: `(x?: number) => !x;`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableNumber: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: 0 | null; if (x) {}`,
+			Code: `<T extends number | null>(x: T) => (x ? 1 : 0);`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableNumber: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: 1 | undefined; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableNumber: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: bigint | null; if (x) {}`,
+			Code: `declare const x: bigint | undefined; if (x ?? 0n) {}`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableNumber: utils.Ref(true),
 			},
 		},
 
-		// ============================================
-		// NULLABLE OBJECT - Valid with Option
-		// ============================================
-
+		// ========================================
+		// ANY TYPE IN BOOLEAN CONTEXT
+		// ========================================
 		{
-			Code: `declare const x: object | null; if (x) {}`,
+			Code: `declare const x: any; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowNullableObject: utils.Ref(true),
+				AllowAny: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: object | undefined; if (x) {}`,
+			Code: `(x?: any) => !x;`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowNullableObject: utils.Ref(true),
+				AllowAny: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: object | null | undefined; if (x) {}`,
+			Code: `<T extends any>(x: T) => (x ? 1 : 0);`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowNullableObject: utils.Ref(true),
+				AllowAny: utils.Ref(true),
 			},
 		},
 		{
-			Code: `declare const x: {} | null; if (x) {}`,
+			Code: `const foo: undefined | any = 0; if (foo) {}`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowNullableObject: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: [] | undefined; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableObject: utils.Ref(true),
-			},
-		},
-		{
-			Code: `declare const x: symbol | null; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableObject: utils.Ref(true),
+				AllowAny: utils.Ref(true),
 			},
 		},
 
-		// ============================================
-		// ARRAY METHOD PREDICATES
-		// ============================================
-
-		{Code: `[1, 2, 3].every(x => x > 0);`},
-		{Code: `[1, 2, 3].some(x => x > 0);`},
-		{Code: `[1, 2, 3].filter(x => x > 0);`},
-		{Code: `declare const arr: string[]; arr.find(x => x === 'foo');`},
-		{Code: `declare const arr: string[]; arr.findIndex(x => x === 'foo');`},
-
-		// With nullable predicates and options
+		// ========================================
+		// UNKNOWN TYPE IN BOOLEAN CONTEXT
+		// ========================================
 		{
-			Code: `[1, 2, 3].filter(x => x);`,
+			Code: `declare const x: unknown; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(true),
+				AllowAny: utils.Ref(true),
 			},
 		},
 		{
-			Code: `['', 'foo'].filter(x => x);`,
+			Code: `<T extends unknown>(x: T) => (x ? 1 : 0);`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(true),
+				AllowAny: utils.Ref(true),
 			},
 		},
 
-		// ============================================
-		// ASSERT FUNCTIONS AND TYPE PREDICATES
-		// ============================================
-
-		{Code: `function isString(x: unknown): x is string { return typeof x === 'string'; }`},
-		{Code: `declare function isString(x: unknown): x is string; if (isString(value)) {}`},
+		// ========================================
+		// NULLABLE ENUM IN BOOLEAN CONTEXT
+		// ========================================
 		{
 			Code: `
+				enum E { A, B }
+				declare const x: E | null;
+				if (x) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(true),
+			},
+		},
+		{
+			Code: `
+				enum E { A = 'a', B = 'b' }
+				declare const x: E | undefined;
+				if (x) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(true),
+			},
+		},
+
+		// ========================================
+		// ALLOW RULE TO RUN WITHOUT STRICT NULL CHECKS
+		// ========================================
+		{
+			Code: `if (true) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true),
+			},
+		},
+
+		// ========================================
+		// COMPLEX BOOLEAN EXPRESSIONS
+		// ========================================
+		{Code: `(x?: boolean) => x ?? false ? true : false;`},
+		{Code: `<T extends boolean | null>(x: T) => x ?? false;`},
+		{
+			Code: `(x?: string) => x ?? false;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableString: utils.Ref(true),
+			},
+		},
+		{
+			Code: `(x?: number) => x ?? false;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableNumber: utils.Ref(true),
+			},
+		},
+
+		// ========================================
+		// ASSERT FUNCTIONS
+		// ========================================
+		{Code: `
+			declare function assert(condition: unknown): asserts condition;
+			declare const x: string | null;
+			assert(x);
+		`},
+		{Code: `
 			declare function assert(a: number, b: unknown): asserts a;
 			declare const nullableString: string | null;
 			declare const boo: boolean;
 			assert(boo, nullableString);
-    		`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			declare function assert(a: boolean, b: unknown): asserts b is string;
 			declare const nullableString: string | null;
 			declare const boo: boolean;
 			assert(boo, nullableString);
-	    	`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			declare function assert(a: number, b: unknown): asserts b;
 			declare const nullableString: string | null;
 			declare const boo: boolean;
 			assert(nullableString, boo);
-    	`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			declare function assert(a: number, b: unknown): asserts b;
 			declare const nullableString: string | null;
 			declare const boo: boolean;
 			assert(...nullableString, nullableString);
-    		`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			declare function assert(
-			  this: object,
-			  a: number,
-			  b?: unknown,
-			  c?: unknown,
+				this: object,
+				a: number,
+				b?: unknown,
+				c?: unknown,
 			): asserts c;
 			declare const nullableString: string | null;
 			declare const foo: number;
-			const o: { assert: typeof assert } = {
-			  assert,
-			};
+			const o: { assert: typeof assert } = { assert };
 			o.assert(foo, nullableString);
-    		`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			declare function assert(x: unknown): x is string;
 			declare const nullableString: string | null;
 			assert(nullableString);
-      		`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			class ThisAsserter {
-			  assertThis(this: unknown, arg2: unknown): asserts this {}
+				assertThis(this: unknown, arg2: unknown): asserts this {}
 			}
-
 			declare const lol: string | number | unknown | null;
-
 			const thisAsserter: ThisAsserter = new ThisAsserter();
 			thisAsserter.assertThis(lol);
-      		`,
-		},
-		{
-			Code: `
+		`},
+		{Code: `
 			function assert(this: object, a: number, b: unknown): asserts b;
 			function assert(a: bigint, b: unknown): asserts b;
 			function assert(this: object, a: string, two: string): asserts two;
 			function assert(
-			  this: object,
-			  a: string,
-			  assertee: string,
-			  c: bigint,
-			  d: object,
+				this: object,
+				a: string,
+				assertee: string,
+				c: bigint,
+				d: object,
 			): asserts assertee;
 			function assert(...args: any[]): void;
-			
 			function assert(...args: any[]) {
-			  throw new Error('lol');
+				throw new Error('lol');
 			}
-			
 			declare const nullableString: string | null;
 			assert(3 as any, nullableString);
-      		`,
-		},
-		// Intentional use of `any` to test a function call with no call signatures.
-		{
-			Code: `
+		`},
+		{Code: `
 			declare const assert: any;
 			declare const nullableString: string | null;
 			assert(nullableString);
-    		`,
+		`},
+
+		// ========================================
+		// ARRAY PREDICATE FUNCTIONS
+		// ========================================
+		{Code: `['one', 'two', ''].some(x => x);`},
+		{Code: `['one', 'two', ''].find(x => x);`},
+		{Code: `['one', 'two', ''].every(x => x);`},
+		{Code: `['one', 'two', ''].filter((x): boolean => x);`},
+		{Code: `['one', 'two', ''].filter(x => Boolean(x));`},
+		{Code: `['one', 'two', ''].filter(function (x): boolean { if (x) { return true; } });`},
+		{Code: `['one', 'two', ''].filter(function (x): boolean { if (x) { return true; } throw new Error('oops'); });`},
+		{Code: `declare const predicate: (string) => boolean; ['one', 'two', ''].filter(predicate);`},
+		{Code: `declare function notNullish<T>(x: T): x is NonNullable<T>; ['one', null].filter(notNullish);`},
+		{Code: `declare function predicate(x: string | null): x is string; ['one', null].filter(predicate);`},
+		{Code: `declare function predicate<T extends boolean>(x: string | null): T; ['one', null].filter(predicate);`},
+		{Code: `declare function f(x: number): boolean; declare function f(x: string | null): boolean; [35].filter(f);`},
+
+		// ========================================
+		// SPECIAL CASES
+		// ========================================
+		{Code: `for (let x = 0; ; x++) { break; }`},
+	}, []rule_tester.InvalidTestCase{
+		// ========================================
+		// NON-BOOLEAN IN RHS OF TEST EXPRESSION
+		// ========================================
+		{
+			Code: `if (true && 1 + 1) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unexpectedNumber",
+					Line:      1,
+					Column:    13,
+				},
+			},
 		},
-		// Coverage for absent "test expression".
-		// Ensure that no crash or false positive occurs
+		{
+			Code: `while (false || 'a' + 'b') {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unexpectedString",
+					Line:      1,
+					Column:    17,
+				},
+			},
+		},
+		{
+			Code: `(x: object) => (true || false || x ? true : false);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unexpectedObjectContext",
+					Line:      1,
+					Column:    34,
+				},
+			},
+		},
+
+		// ========================================
+		// CHECK OUTERMOST OPERANDS
+		// ========================================
+		{
+			Code: `if (('' && {}) || (0 && void 0)) { }`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedString", Line: 1, Column: 6},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 12},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 20},
+				{MessageId: "unexpectedNullish", Line: 1, Column: 25},
+			},
+		},
+
+		// ========================================
+		// ARRAY PREDICATE WITH NON-BOOLEAN
+		// ========================================
+		{
+			Code: `declare const array: string[]; array.some(x => x);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableBoolean: utils.Ref(true),
+				AllowString:          utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedString", Line: 1},
+			},
+		},
+
+		// ========================================
+		// BRANDED TYPES
+		// ========================================
 		{
 			Code: `
-      		for (let x = 0; ; x++) {
-        		break;
-      		}
-    		`,
-		},
-
-		// ============================================
-		// DOUBLE NEGATION - Always Valid
-		// ============================================
-
-		{Code: `!!true;`},
-		{Code: `!!false;`},
-		{Code: `!!'';`},
-		{Code: `!!0;`},
-
-		// ============================================
-		// BOOLEAN CONSTRUCTOR - Always Valid
-		// ============================================
-
-		{Code: `Boolean(true);`},
-		{Code: `Boolean(false);`},
-		{Code: `Boolean('');`},
-		{Code: `Boolean(0);`},
-		{Code: `Boolean({});`},
-		{Code: `Boolean([]);`},
-		{Code: `declare const x: any; Boolean(x);`},
-		{Code: `declare const x: unknown; Boolean(x);`},
-
-		// ============================================
-		// COMPLEX LOGICAL EXPRESSIONS
-		// ============================================
-
-		{Code: `true && true && true;`},
-		{Code: `true || false || true;`},
-		{Code: `(true && false) || (false && true);`},
-		{Code: `true ? (false || true) : (true && false);`},
-
-		// Mixed types with default options
-		{Code: `'' || 0 || false;`},
-		{Code: `'foo' && 1 && true;`},
-
-		// ============================================
-		// SPECIAL CASES
-		// ============================================
-
-		// Always allow boolean in right side of logical operators
-		{Code: `'foo' && true;`},
-		{Code: `0 || false;`},
-
-		// Template literals
-		{Code: "declare const x: string; `foo${x}` ? 'a' : 'b';"},
-		{Code: "declare const x: number; `foo${x}` ? 'a' : 'b';"},
-
-		// Parenthesized expressions
-		{Code: `(true) ? 'a' : 'b';`},
-		{Code: `((true)) ? 'a' : 'b';`},
-		{Code: `if ((true)) {}`},
-
-		// Comma operator
-		{Code: `(0, true) ? 'a' : 'b';`},
-		{Code: `('', false) ? 'a' : 'b';`},
-
-		// Assignment expressions
-		{Code: `let x; (x = true) ? 'a' : 'b';`},
-		{Code: `let x; if (x = false) {}`},
-
-		// Never type - allowed per TypeScript ESLint
-		{Code: `declare const x: never; if (x) {}`},
-		{Code: `declare const x: never; x ? 'a' : 'b';`},
-		{Code: `declare const x: never; !x;`},
-	}, []rule_tester.InvalidTestCase{
-		// ============================================
-		// ANY TYPE - Invalid without Option
-		// ============================================
-
-		{
-			Code: `declare const x: any; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; x ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; while (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; do {} while (x);`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; for (; x; ) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; x && 'a';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; x || 'a';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: any; !x;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedAny", Line: 1},
-			},
-		},
-
-		// ============================================
-		// NULLISH VALUES - Always Invalid
-		// ============================================
-
-		{
-			Code: `if (null) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `if (undefined) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `null ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `undefined ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `while (null) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `do {} while (undefined);`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `for (; null; ) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `!null;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `!undefined;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `null && 'a';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-		{
-			Code: `undefined || 'a';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
-			},
-		},
-
-		// ============================================
-		// STRING TYPE - Invalid with allowString: false
-		// ============================================
-
-		{
-			Code: `if ('') {}`,
+				declare const foo: true & { __BRAND: 'Foo' };
+				if (('' && foo) || (0 && void 0)) { }
+			`,
 			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedString", Line: 3, Column: 6},
+				{MessageId: "unexpectedNumber", Line: 3, Column: 21},
+				{MessageId: "unexpectedNullish", Line: 3, Column: 26},
+			},
+		},
+		{
+			Code: `
+				declare const foo: false & { __BRAND: 'Foo' };
+				if (('' && {}) || (foo && void 0)) { }
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedString", Line: 3, Column: 6},
+				{MessageId: "unexpectedObjectContext", Line: 3, Column: 12},
+				{MessageId: "unexpectedNullish", Line: 3, Column: 27},
+			},
+		},
+
+		// ========================================
+		// LOGICAL OPERANDS FOR CONTROL FLOW
+		// ========================================
+		{
+			Code: `'asd' && 123 && [] && null;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1, Column: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 10},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 17},
 			},
 		},
 		{
-			Code: `if ('foo') {}`,
+			Code: `'asd' || 123 || [] || null;`,
 			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1, Column: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 10},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 17},
 			},
 		},
 		{
-			Code: `'' ? 'a' : 'b';`,
+			Code: `let x = (1 && 'a' && null) || 0 || '' || {};`,
 			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 10},
+				{MessageId: "unexpectedString", Line: 1, Column: 15},
+				{MessageId: "unexpectedNullish", Line: 1, Column: 22},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 31},
+				{MessageId: "unexpectedString", Line: 1, Column: 36},
 			},
 		},
 		{
-			Code: `'foo' ? 'a' : 'b';`,
+			Code: `return (1 || 'a' || null) && 0 && '' && {};`,
 			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 9},
+				{MessageId: "unexpectedString", Line: 1, Column: 14},
+				{MessageId: "unexpectedNullish", Line: 1, Column: 21},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 30},
+				{MessageId: "unexpectedString", Line: 1, Column: 35},
 			},
 		},
+		{
+			Code: `console.log((1 && []) || ('a' && {}));`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+				AllowString: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 14},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 19},
+				{MessageId: "unexpectedString", Line: 1, Column: 27},
+			},
+		},
+
+		// ========================================
+		// CONDITIONALS WITH ALL OPERANDS CHECKED
+		// ========================================
+		{
+			Code: `if ((1 && []) || ('a' && {})) void 0;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+				AllowString: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 6},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 11},
+				{MessageId: "unexpectedString", Line: 1, Column: 19},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 26},
+			},
+		},
+		{
+			Code: `let x = null || 0 || 'a' || [] ? {} : undefined;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+				AllowString: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 9},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 17},
+				{MessageId: "unexpectedString", Line: 1, Column: 22},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 29},
+			},
+		},
+		{
+			Code: `return !(null || 0 || 'a' || []);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+				AllowString: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 10},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 18},
+				{MessageId: "unexpectedString", Line: 1, Column: 23},
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 30},
+			},
+		},
+
+		// ========================================
+		// NULLISH VALUES IN BOOLEAN CONTEXT
+		// ========================================
+		{
+			Code: `null || {};`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 1},
+			},
+		},
+		{
+			Code: `undefined && [];`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 1},
+			},
+		},
+		{
+			Code: `declare const x: null; if (x) {}`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1},
+			},
+		},
+		{
+			Code: `(x: undefined) => !x;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 20},
+			},
+		},
+		{
+			Code: `<T extends null | undefined>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 40},
+			},
+		},
+		{
+			Code: `<T extends null>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 28},
+			},
+		},
+		{
+			Code: `<T extends undefined>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullish", Line: 1, Column: 33},
+			},
+		},
+
+		// ========================================
+		// OBJECT IN BOOLEAN CONTEXT
+		// ========================================
+		{
+			Code: `[] || 1;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 1},
+			},
+		},
+		{
+			Code: `({}) && 'a';`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 2},
+			},
+		},
+		{
+			Code: `declare const x: symbol; if (x) {}`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1},
+			},
+		},
+		{
+			Code: `(x: () => void) => !x;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 21},
+			},
+		},
+		{
+			Code: `<T extends object>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 30},
+			},
+		},
+		{
+			Code: `<T extends Object | Function>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 41},
+			},
+		},
+		{
+			Code: `<T extends { a: number }>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 37},
+			},
+		},
+		{
+			Code: `<T extends () => void>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 34},
+			},
+		},
+
+		// ========================================
+		// STRING IN BOOLEAN CONTEXT WITH ALLOWSTRING: FALSE
+		// ========================================
 		{
 			Code: `while ('') {}`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-		{
-			Code: `do {} while ('foo');`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1, Column: 8},
 			},
 		},
 		{
@@ -717,11 +687,11 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1, Column: 8},
 			},
 		},
 		{
-			Code: `!'foo';`,
+			Code: `declare const x: string; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowString: utils.Ref(false),
 			},
@@ -730,75 +700,420 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 		},
 		{
-			Code: `'foo' && 'bar';`,
+			Code: `(x: string) => !x;`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1, Column: 17},
 			},
 		},
 		{
-			Code: `'' || 'default';`,
+			Code: `<T extends string>(x: T) => (x ? 1 : 0);`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowString: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-		{
-			Code: `declare const s: string; if (s) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedString", Line: 1, Column: 30},
 			},
 		},
 
-		// Template literals
+		// ========================================
+		// NUMBER IN BOOLEAN CONTEXT WITH ALLOWNUMBER: FALSE
+		// ========================================
 		{
-			Code: "`` ? 'a' : 'b';",
+			Code: `while (0n) {}`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
+				AllowNumber: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 8},
 			},
 		},
 		{
-			Code: "`foo` ? 'a' : 'b';",
+			Code: `for (; 123; ) {}`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
+				AllowNumber: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 8},
 			},
 		},
 		{
-			Code: "declare const x: string; `foo${x}` ? 'a' : 'b';",
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-
-		// ============================================
-		// NUMBER TYPE - Invalid with allowNumber: false
-		// ============================================
-
-		{
-			Code: `if (0) {}`,
+			Code: `declare const x: number; if (x) {}`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNumber: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedNumber", Line: 1},
+			},
+		},
+		{
+			Code: `(x: bigint) => !x;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 17},
+			},
+		},
+		{
+			Code: `<T extends number>(x: T) => (x ? 1 : 0);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 30},
+			},
+		},
+		{
+			Code: `![]['length'];`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 2},
+			},
+		},
+		{
+			Code: `declare const a: any[] & { notLength: number }; if (a.notLength) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1},
+			},
+		},
+
+		// ========================================
+		// ARRAY.LENGTH IN BOOLEAN CONTEXT
+		// ========================================
+		{
+			Code: `if (![].length) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 6},
+			},
+		},
+		{
+			Code: `(a: number[]) => a.length && '...';`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 18},
+			},
+		},
+		{
+			Code: `<T extends unknown[]>(...a: T) => a.length || 'empty';`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNumber", Line: 1, Column: 35},
+			},
+		},
+
+		// ========================================
+		// MIXED STRING | NUMBER VALUE IN BOOLEAN CONTEXT
+		// ========================================
+		{
+			Code: `declare const x: string | number; if (x) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(true),
+				AllowString: utils.Ref(true),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 1},
+			},
+		},
+		{
+			Code: `(x: bigint | string) => !x;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(true),
+				AllowString: utils.Ref(true),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 1, Column: 26},
+			},
+		},
+		{
+			Code: `<T extends number | bigint | string>(x: T) => (x ? 1 : 0);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(true),
+				AllowString: utils.Ref(true),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 1, Column: 48},
+			},
+		},
+
+		// ========================================
+		// NULLABLE BOOLEAN WITHOUT OPTION
+		// ========================================
+		{
+			Code: `declare const x: boolean | null; if (x) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableBoolean: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableBoolean", Line: 1},
+			},
+		},
+		{
+			Code: `(x?: boolean) => !x;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableBoolean: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableBoolean", Line: 1, Column: 19},
+			},
+		},
+		{
+			Code: `<T extends boolean | null | undefined>(x: T) => (x ? 1 : 0);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableBoolean: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableBoolean", Line: 1, Column: 50},
+			},
+		},
+
+		// ========================================
+		// NULLABLE OBJECT WITHOUT OPTION
+		// ========================================
+		{
+			Code: `declare const x: object | null; if (x) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableObject", Line: 1},
+			},
+		},
+		{
+			Code: `(x?: { a: number }) => !x;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableObject", Line: 1, Column: 25},
+			},
+		},
+		{
+			Code: `<T extends {} | null | undefined>(x: T) => (x ? 1 : 0);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableObject", Line: 1, Column: 45},
+			},
+		},
+
+		// ========================================
+		// NULLABLE STRING WITHOUT OPTION
+		// ========================================
+		{
+			Code: `declare const x: string | null; if (x) {}`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 1},
+			},
+		},
+		{
+			Code: `(x?: string) => !x;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 1, Column: 18},
+			},
+		},
+		{
+			Code: `<T extends string | null | undefined>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 1, Column: 49},
+			},
+		},
+		{
+			Code: `function foo(x: '' | 'bar' | null) { if (!x) {} }`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 1},
+			},
+		},
+
+		// ========================================
+		// NULLABLE NUMBER WITHOUT OPTION
+		// ========================================
+		{
+			Code: `declare const x: number | null; if (x) {}`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 1},
+			},
+		},
+		{
+			Code: `(x?: number) => !x;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 1, Column: 18},
+			},
+		},
+		{
+			Code: `<T extends number | null | undefined>(x: T) => (x ? 1 : 0);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 1, Column: 49},
+			},
+		},
+		{
+			Code: `function foo(x: 0 | 1 | null) { if (!x) {} }`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 1},
+			},
+		},
+
+		// ========================================
+		// NULLABLE ENUM WITHOUT OPTION
+		// ========================================
+		{
+			Code: `
+				enum ExampleEnum { This = 0, That = 1 }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 4},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = 0, That = 1 }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (!theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 4},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This, That }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (!theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 4},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = '', That = 'a' }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (!theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 4},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = '', That = 0 }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (!theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 4},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = 'one', That = 'two' }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (!theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableString", Line: 4},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = 1, That = 2 }
+				const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+				if (!theEnum) {}
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedNullableNumber", Line: 4},
+			},
+		},
+
+		// ========================================
+		// NULLABLE MIXED ENUM WITHOUT OPTION
+		// ========================================
+		{
+			Code: `
+				enum ExampleEnum { This = 0, That = 'one' }
+				(value?: ExampleEnum) => (value ? 1 : 0);
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 3},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = '', That = 1 }
+				(value?: ExampleEnum) => (!value ? 1 : 0);
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 3},
+			},
+		},
+		{
+			Code: `
+				enum ExampleEnum { This = 'this', That = 1 }
+				(value?: ExampleEnum) => (value ? 1 : 0);
+			`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableEnum: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedMixedCondition", Line: 3},
+			},
+		},
+
+		// ========================================
+		// ANY WITHOUT OPTION
+		// ========================================
+		{
+			Code: `if ((Boolean(x) || {}) || (typeof x === 'string' && x)) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowString: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedObjectContext", Line: 1, Column: 20},
+				{MessageId: "unexpectedString", Line: 1, Column: 53},
 			},
 		},
 		{
@@ -807,609 +1122,73 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				AllowNumber: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `0 ? 'a' : 'b';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `1 ? 'a' : 'b';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `NaN ? 'a' : 'b';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `while (0) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `do {} while (1);`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `for (; 1; ) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `!0;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `1 && 2;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `0 || 1;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare const n: number; if (n) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1, Column: 5},
 			},
 		},
 
-		// BigInt
-		{
-			Code: `if (0n) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `if (1n) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `0n ? 'a' : 'b';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare const b: bigint; if (b) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-
-		// ============================================
-		// OBJECT TYPE - Always Invalid (Always Truthy)
-		// ============================================
-
-		{
-			Code: `if ({}) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `if ([]) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `({}) ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `[] ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `while ({}) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `do {} while ([]);`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `for (; {}; ) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `!{};`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `![];`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `({}) && 'a';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `[] || 'a';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `declare const o: object; if (o) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `declare const o: {}; if (o) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-
-		// Functions
-		{
-			Code: `function foo() {}; if (foo) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `const foo = () => {}; if (foo) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-
-		// ============================================
-		// ASSERT FUNCTIONS AND TYPE PREDICATES
-		// ============================================
-
+		// ========================================
+		// ASSERT FUNCTIONS
+		// ========================================
 		{
 			Code: `
-			declare function assert(a: boolean, b: unknown): asserts b;
-			declare function assert({ a }: { a: boolean }, b: unknown): asserts b;
-			declare const nullableString: string | null;
-			declare const boo: boolean;
-			assert(boo, nullableString);
-	    	`,
+				declare function assert(a: boolean, b: unknown): asserts b;
+				declare function assert({ a }: { a: boolean }, b: unknown): asserts b;
+				declare const nullableString: string | null;
+				declare const boo: boolean;
+				assert(boo, nullableString);
+			`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedNullableString", Line: 6},
 			},
 		},
 
-		// Symbols
+		// ========================================
+		// ARRAY FILTER PREDICATES
+		// ========================================
 		{
-			Code: `if (Symbol()) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
+			Code: `declare const nullOrBool: boolean | null; [true, false, null].filter(x => nullOrBool);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableBoolean: utils.Ref(false),
 			},
-		},
-		{
-			Code: `declare const s: symbol; if (s) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-
-		// ============================================
-		// NULLABLE BOOLEAN - Invalid without Option
-		// ============================================
-
-		{
-			Code: `declare const x: boolean | null; if (x) {}`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedNullableBoolean", Line: 1},
 			},
 		},
 		{
-			Code: `declare const x: boolean | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableBoolean", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: boolean | null | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableBoolean", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: true | null; x ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableBoolean", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: false | undefined; !x;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableBoolean", Line: 1},
-			},
-		},
-
-		// ============================================
-		// NULLABLE STRING - Invalid without Option
-		// ============================================
-
-		{
-			Code: `declare const x: string | null; if (x) {}`,
+			Code: `declare const nullOrString: string | null; ['', 'foo', null].filter(x => nullOrString);`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedNullableString", Line: 1},
 			},
 		},
 		{
-			Code: `declare const x: string | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableString", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: string | null | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableString", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: '' | null; x ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableString", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: 'foo' | undefined; !x;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableString", Line: 1},
-			},
-		},
-
-		// ============================================
-		// NULLABLE NUMBER - Invalid without Option
-		// ============================================
-
-		{
-			Code: `declare const x: number | null; if (x) {}`,
+			Code: `declare const nullOrNumber: number | null; [0, null].filter(x => nullOrNumber);`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedNullableNumber", Line: 1},
 			},
 		},
 		{
-			Code: `declare const x: number | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: number | null | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: 0 | null; x ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: 1 | undefined; !x;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: bigint | null; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableNumber", Line: 1},
-			},
-		},
-
-		// ============================================
-		// NULLABLE OBJECT - Invalid without Option
-		// ============================================
-
-		{
-			Code: `declare const x: object | null; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableObject", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: object | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableObject", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: object | null | undefined; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableObject", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: {} | null; x ? 'a' : 'b';`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableObject", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: [] | undefined; !x;`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableObject", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: symbol | null; if (x) {}`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableObject", Line: 1},
-			},
-		},
-
-		// ============================================
-		// MIXED TYPES - Invalid
-		// ============================================
-
-		{
-			Code: `declare const x: string | number; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedMixedCondition", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: string | boolean; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedMixedCondition", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: number | boolean; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedMixedCondition", Line: 1},
-			},
-		},
-		{
-			Code: `declare const x: string | number | boolean; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedMixedCondition", Line: 1},
-			},
-		},
-
-		// ============================================
-		// ENUM TYPES
-		// ============================================
-
-		{
-			Code: `enum E { A = 0, B = 1 } declare const x: E; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `enum E { A = '', B = 'foo' } declare const x: E; if (x) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-
-		// ============================================
-		// ARRAY METHOD PREDICATES - Invalid
-		// ============================================
-
-		{
-			Code: `[1, 2, 3].filter(x => x);`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `['', 'foo'].filter(x => x);`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-		{
-			Code: `[{}, []].filter(x => x);`,
+			Code: `const objectValue: object = {}; [{ a: 0 }, {}].filter(x => objectValue);`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedObjectContext", Line: 1},
 			},
 		},
-
-		// ============================================
-		// COMPLEX LOGICAL EXPRESSIONS - Invalid
-		// ============================================
-
 		{
-			Code: `'foo' && 1;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-		{
-			Code: `0 || 'bar';`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `({}) && [];`,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedObjectContext", Line: 1},
-				{MessageId: "unexpectedObjectContext", Line: 1},
-			},
-		},
-		{
-			Code: `'' || 0;`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-
-		// ============================================
-		// SPECIAL CASES - Invalid
-		// ============================================
-
-		// Array.length
-		{
-			Code: `declare const arr: string[]; if (arr.length) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-
-		// Function calls returning non-boolean
-		{
-			Code: `declare function getString(): string; if (getString()) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
-			},
-		},
-		{
-			Code: `declare function getNumber(): number; if (getNumber()) {}`,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 1},
-			},
-		},
-		{
-			Code: `declare function getObject(): object; if (getObject()) {}`,
+			Code: `const objectValue: object = {}; [{ a: 0 }, {}].filter(x => { return objectValue; });`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unexpectedObjectContext", Line: 1},
 			},
 		},
-
-		// Property access
 		{
-			Code: `declare const obj: { prop: string }; if (obj.prop) {}`,
+			Code: `declare const nullOrObject: object | null; [{ a: 0 }, null].filter(x => nullOrObject);`,
 			Options: StrictBooleanExpressionsOptions{
-				AllowString: utils.Ref(false),
+				AllowNullableObject: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedNullableObject", Line: 1},
 			},
 		},
 		{
-			Code: `declare const obj: { prop: number }; if (obj.prop) {}`,
+			Code: `const numbers: number[] = [1]; [1, 2].filter(x => numbers.length);`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNumber: utils.Ref(false),
 			},
@@ -1417,18 +1196,71 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				{MessageId: "unexpectedNumber", Line: 1},
 			},
 		},
-
-		// Void type
 		{
-			Code: `declare const x: void; if (x) {}`,
+			Code: `const numberValue: number = 1; [1, 2].filter(x => numberValue);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1},
 			},
 		},
 		{
-			Code: `void 0 ? 'a' : 'b';`,
+			Code: `const stringValue: string = 'hoge'; ['hoge', 'foo'].filter(x => stringValue);`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowString: utils.Ref(false),
+			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullish", Line: 1},
+				{MessageId: "unexpectedString", Line: 1},
+			},
+		},
+
+		// ========================================
+		// UNKNOWN TYPE WITHOUT OPTION
+		// ========================================
+		{
+			Code: `declare const x: unknown; if (x) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowAny: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedAny", Line: 1},
+			},
+		},
+		{
+			Code: `declare const x: unknown; x ? 'a' : 'b';`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowAny: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedAny", Line: 1},
+			},
+		},
+		{
+			Code: `declare const x: unknown; x && 'a';`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowAny: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedAny", Line: 1},
+			},
+		},
+		{
+			Code: `declare const x: unknown; x || 'a';`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowAny: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedAny", Line: 1},
+			},
+		},
+		{
+			Code: `declare const x: unknown; !x;`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowAny: utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unexpectedAny", Line: 1},
 			},
 		},
 	})
