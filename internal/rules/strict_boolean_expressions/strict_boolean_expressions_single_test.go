@@ -11,6 +11,6 @@ import (
 
 func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &StrictBooleanExpressionsRule, []rule_tester.ValidTestCase{
-		{Code: `declare const x: null | object; if (x) {}`},
+		{Code: `declare const test?: boolean; if (test ?? false) {}`},
 	}, []rule_tester.InvalidTestCase{})
 }
