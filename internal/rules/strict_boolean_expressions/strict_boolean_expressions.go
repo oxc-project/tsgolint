@@ -335,7 +335,6 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 			if partInfo.isEnum {
 				info.isEnum = true
 			}
-			info.isTruthy = partInfo.isTruthy
 		}
 
 		if len(variants) == 1 {
@@ -414,6 +413,16 @@ func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 		return info
 	}
 
+	if flags&(checker.TypeFlagsEnum|checker.TypeFlagsEnumLiteral|checker.TypeFlagsEnumLike) != 0 {
+		if flags&checker.TypeFlagsStringLiteral != 0 {
+			info.variant = typeVariantString
+		} else {
+			info.variant = typeVariantNumber
+		}
+		info.isEnum = true
+		return info
+	}
+
 	if flags&(checker.TypeFlagsString|checker.TypeFlagsStringLiteral) != 0 {
 		info.variant = typeVariantString
 		if flags&checker.TypeFlagsStringLiteral != 0 && t.AsLiteralType().Value() != "" {
@@ -427,16 +436,6 @@ func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 		if flags&checker.TypeFlagsNumberLiteral != 0 && t.AsLiteralType().Value() != 0 {
 			info.isTruthy = true
 		}
-		return info
-	}
-
-	if flags&(checker.TypeFlagsEnum|checker.TypeFlagsEnumLiteral) != 0 {
-		if flags&checker.TypeFlagsStringLiteral != 0 {
-			info.variant = typeVariantString
-		} else {
-			info.variant = typeVariantNumber
-		}
-		info.isEnum = true
 		return info
 	}
 
