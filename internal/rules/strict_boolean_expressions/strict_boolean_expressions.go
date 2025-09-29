@@ -390,9 +390,27 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	return analyzeTypePart(typeChecker, t)
 }
 
-func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
+func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	info := typeInfo{}
 	flags := checker.Type_flags(t)
+
+	if utils.IsIntersectionType(t) {
+		info.isIntersection = true
+		types := t.Types()
+		isBoolean := false
+		for _, t2 := range types {
+			if analyzeTypePart(typeChecker, t2).variant == typeVariantBoolean {
+				isBoolean = true
+				break
+			}
+		}
+		if isBoolean {
+			info.variant = typeVariantBoolean
+		} else {
+			info.variant = typeVariantObject
+		}
+		return info
+	}
 
 	if flags&checker.TypeFlagsTypeParameter != 0 {
 		info.variant = typeVariantGeneric
