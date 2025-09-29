@@ -76,9 +76,9 @@ func buildUnexpectedNumber() rule.RuleMessage {
 	}
 }
 
-func buildUnexpectedObjectContext() rule.RuleMessage {
+func buildUnexpectedObject() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedObjectContext",
+		Id:          "unexpectedObject",
 		Description: "Unexpected object value in conditional. The condition is always true.",
 	}
 }
@@ -331,6 +331,8 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 		parts := utils.UnionTypeParts(t)
 		variants := make(map[typeVariant]bool)
 
+		metNotTruthy := false
+
 		for _, part := range parts {
 			partInfo := analyzeTypePart(typeChecker, part)
 			variants[partInfo.variant] = true
@@ -339,6 +341,13 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 			}
 			if partInfo.isEnum {
 				info.isEnum = true
+			}
+			if partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString {
+				if metNotTruthy {
+					continue
+				}
+				info.isTruthy = partInfo.isTruthy
+				metNotTruthy = !partInfo.isTruthy
 			}
 		}
 
@@ -428,26 +437,36 @@ func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 		return info
 	}
 
-	if flags&(checker.TypeFlagsString|checker.TypeFlagsStringLiteral) != 0 {
+	if flags&(checker.TypeFlagsString|checker.TypeFlagsStringLiteral|checker.TypeFlagsStringLike) != 0 {
 		info.variant = typeVariantString
-		if flags&checker.TypeFlagsStringLiteral != 0 && t.AsLiteralType().Value() != "" {
-			info.isTruthy = true
+		if t.IsStringLiteral() {
+			literal := t.AsLiteralType()
+			if literal != nil && literal.Value() != "" {
+				println(literal.Value())
+				info.isTruthy = true
+			}
 		}
 		return info
 	}
 
-	if flags&(checker.TypeFlagsNumber|checker.TypeFlagsNumberLiteral) != 0 {
+	if flags&(checker.TypeFlagsNumber|checker.TypeFlagsNumberLiteral|checker.TypeFlagsNumberLike) != 0 {
 		info.variant = typeVariantNumber
-		if flags&checker.TypeFlagsNumberLiteral != 0 && t.AsLiteralType().Value() != 0 {
-			info.isTruthy = true
+		if t.IsNumberLiteral() {
+			literal := t.AsLiteralType()
+			if literal != nil && literal.String() != "0" {
+				info.isTruthy = true
+			}
 		}
 		return info
 	}
 
 	if flags&(checker.TypeFlagsBigInt|checker.TypeFlagsBigIntLiteral) != 0 {
 		info.variant = typeVariantBigInt
-		if flags&checker.TypeFlagsBigIntLiteral != 0 && t.AsLiteralType().Value() != 0 {
-			info.isTruthy = true
+		if t.IsBigIntLiteral() {
+			literal := t.AsLiteralType()
+			if literal != nil && literal.String() != "0" {
+				info.isTruthy = true
+			}
 		}
 		return info
 	}
@@ -499,6 +518,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 			ctx.ReportNode(node, buildUnexpectedString())
 		}
 	case typeVariantNumber:
+		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
 		if *opts.AllowNumber && info.isTruthy {
 			return
 		}
@@ -524,9 +544,15 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 		if info.isNullable && !*opts.AllowNullableObject {
 			ctx.ReportNode(node, buildUnexpectedNullableObject())
 		} else if !info.isNullable {
-			ctx.ReportNode(node, buildUnexpectedObjectContext())
+			ctx.ReportNode(node, buildUnexpectedObject())
 		}
 	case typeVariantMixed:
+		if info.isEnum {
+			if info.isNullable && !*opts.AllowNullableEnum {
+				ctx.ReportNode(node, buildUnexpectedNullableNumber())
+			}
+			return
+		}
 		ctx.ReportNode(node, buildUnexpectedMixedCondition())
 	case typeVariantBigInt:
 		if info.isNullable && !*opts.AllowNullableNumber {
