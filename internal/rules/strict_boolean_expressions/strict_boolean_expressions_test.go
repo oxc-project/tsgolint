@@ -197,20 +197,72 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			// ========================================
 			{
 				Code: `
-				enum E { A, B }
-				declare const x: E | null;
-				if (x) {}
-			`,
+        enum ExampleEnum {
+          This = 0,
+          That = 1,
+        }
+        const rand = Math.random();
+        let theEnum: ExampleEnum | null = null;
+        if (rand < 0.3) {
+          theEnum = ExampleEnum.This;
+        }
+        if (theEnum) {
+        }
+      `,
 				Options: StrictBooleanExpressionsOptions{
 					AllowNullableEnum: utils.Ref(true),
 				},
 			},
 			{
 				Code: `
-				enum E { A = 'a', B = 'b' }
-				declare const x: E | undefined;
-				if (x) {}
-			`,
+        enum ExampleEnum {
+          This = 0,
+          That = 1,
+        }
+        const rand = Math.random();
+        let theEnum: ExampleEnum | null = null;
+        if (rand < 0.3) {
+          theEnum = ExampleEnum.This;
+        }
+        if (!theEnum) {
+        }
+      `,
+				Options: StrictBooleanExpressionsOptions{
+					AllowNullableEnum: utils.Ref(true),
+				},
+			},
+			{
+				Code: `
+        enum ExampleEnum {
+          This = 1,
+          That = 2,
+        }
+        const rand = Math.random();
+        let theEnum: ExampleEnum | null = null;
+        if (rand < 0.3) {
+          theEnum = ExampleEnum.This;
+        }
+        if (!theEnum) {
+        }
+      `,
+				Options: StrictBooleanExpressionsOptions{
+					AllowNullableEnum: utils.Ref(true),
+				},
+			},
+			{
+				Code: `
+        enum ExampleEnum {
+          This = 'one',
+          That = 'two',
+        }
+        const rand = Math.random();
+        let theEnum: ExampleEnum | null = null;
+        if (rand < 0.3) {
+          theEnum = ExampleEnum.This;
+        }
+        if (!theEnum) {
+        }
+      `,
 				Options: StrictBooleanExpressionsOptions{
 					AllowNullableEnum: utils.Ref(true),
 				},
