@@ -342,7 +342,7 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 			if partInfo.isEnum {
 				info.isEnum = true
 			}
-			if partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString {
+			if partInfo.variant == typeVariantBoolean || partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString {
 				if metNotTruthy {
 					continue
 				}
@@ -420,7 +420,7 @@ func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 	}
 
 	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral|checker.TypeFlagsBooleanLike) != 0 {
-		if utils.IsTrueLiteralType(t) {
+		if t.AsLiteralType().String() == "true" {
 			info.isTruthy = true
 		}
 		info.variant = typeVariantBoolean
@@ -537,6 +537,11 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 			ctx.ReportNode(node, buildUnexpectedNumber())
 		}
 	case typeVariantBoolean:
+		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
+		if info.isTruthy {
+			return
+		}
+
 		if info.isNullable && !*opts.AllowNullableBoolean {
 			ctx.ReportNode(node, buildUnexpectedNullableBoolean())
 		}

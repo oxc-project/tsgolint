@@ -11,18 +11,13 @@ import (
 
 func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &StrictBooleanExpressionsRule, []rule_tester.ValidTestCase{
-
-	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
-      function foo(x: 0 | 1 | null) {
-      if (!x) {
-    }
+    declare const foo: boolean & { __BRAND: 'Foo' };
+    if (foo) {
     }
     `,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableNumber", Line: 3},
-			}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */
 		},
+	}, []rule_tester.InvalidTestCase{
 	})
 }
