@@ -489,13 +489,15 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     function f(arg: 'a' | null) {
       if (arg) console.log(arg);
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     function f(arg: 'a' | 'b' | null) {
       if (arg) console.log(arg);
     }
-    `},
+    `,
+			},
 			{
 				Code: `
       declare const x: 1 | null;
@@ -514,13 +516,15 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     function f(arg: 1 | null) {
       if (arg) console.log(arg);
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     function f(arg: 1 | 2 | null) {
       if (arg) console.log(arg);
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     interface Options {
@@ -530,13 +534,15 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     function f(opts: Options): void {
       if (opts.enableSomething) console.log('Do something');
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     declare const x: true | null;
     if (x) {
     }
-    `},
+    `,
+			},
 			{
 				Code: `
       declare const x: 'a' | null;
@@ -555,47 +561,54 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     declare const foo: boolean & { __BRAND: 'Foo' };
     if (foo) {
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     declare const foo: true & { __BRAND: 'Foo' };
     if (foo) {
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     declare const foo: false & { __BRAND: 'Foo' };
     if (foo) {
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function assert(a: number, b: unknown): asserts a;
     declare const nullableString: string | null;
     declare const boo: boolean;
     assert(boo, nullableString);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function assert(a: boolean, b: unknown): asserts b is string;
     declare const nullableString: string | null;
     declare const boo: boolean;
     assert(boo, nullableString);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function assert(a: number, b: unknown): asserts b;
     declare const nullableString: string | null;
     declare const boo: boolean;
     assert(nullableString, boo);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function assert(a: number, b: unknown): asserts b;
     declare const nullableString: string | null;
     declare const boo: boolean;
     assert(...nullableString, nullableString);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function assert(
@@ -610,13 +623,15 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
       assert,
     };
     o.assert(foo, nullableString);
-    `},
+    `,
+			},
 			{
 				Code: `
       declare function assert(x: unknown): x is string;
       declare const nullableString: string | null;
       assert(nullableString);
-      `},
+      `,
+			},
 			{
 				Code: `
       class ThisAsserter {
@@ -627,7 +642,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 
     const thisAsserter: ThisAsserter = new ThisAsserter();
     thisAsserter.assertThis(lol);
-    `},
+    `,
+			},
 			{
 				Code: `
       function assert(this: object, a: number, b: unknown): asserts b;
@@ -648,55 +664,64 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 
     declare const nullableString: string | null;
     assert(3 as any, nullableString);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare const assert: any;
     declare const nullableString: string | null;
     assert(nullableString);
-    `},
+    `,
+			},
 			{
 				Code: `
     for (let x = 0; ; x++) {
       break;
     }
-    `},
+    `,
+			},
 			{
 				Code: `
     [true, false].some(function (x) {
       return x;
     });
-    `},
+    `,
+			},
 			{
 				Code: `
     [true, false].some(function check(x) {
       return x;
     });
-    `},
+    `,
+			},
 			{
 				Code: `
     [true, false].some(x => {
       return x;
     });
-    `},
+    `,
+			},
 			{
 				Code: `
     [1, null].filter(function (x) {
       return x != null;
     });
-    `},
+    `,
+			},
 			{
 				Code: `
     ['one', 'two', ''].filter(function (x) {
       return !!x;
     });
-    `},
+    `,
+			},
 			{
 				Code: `
     ['one', 'two', ''].filter(function (x): boolean {
       return !!x;
     });
-    `},
+    `,
+			},
 			{
 				Code: `
     ['one', 'two', ''].filter(function (x): boolean {
@@ -704,7 +729,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
       return true;
     }
   });
-    `},
+    `,
+			},
 			{
 				Code: `
     ['one', 'two', ''].filter(function (x): boolean {
@@ -714,34 +740,40 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 
     throw new Error('oops');
   });
-    `},
+    `,
+			},
 			{
 				Code: `
     declare const predicate: (string) => boolean;
     ['one', 'two', ''].filter(predicate);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function notNullish<T>(x: T): x is NonNullable<T>;
     ['one', null].filter(notNullish);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function predicate(x: string | null): x is string;
     ['one', null].filter(predicate);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function predicate<T extends boolean>(x: string | null): T;
     ['one', null].filter(predicate);
-    `},
+    `,
+			},
 			{
 				Code: `
     declare function f(x: number): boolean;
     declare function f(x: string | null): boolean;
 
     [35].filter(f);
-    `},
+    `,
+			},
 		}, []rule_tester.InvalidTestCase{
 			{
 				Code: `
