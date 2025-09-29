@@ -7,10 +7,26 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &StrictBooleanExpressionsRule, []rule_tester.ValidTestCase{
-		{Code: `declare const test?: boolean; if (test ?? false) {}`},
-	}, []rule_tester.InvalidTestCase{})
+	}, []rule_tester.InvalidTestCase{
+		{
+			Code: `if (true && 1 + 1) {}`,
+			Options: StrictBooleanExpressionsOptions{
+				AllowNullableObject: utils.Ref(false),
+				AllowNumber:         utils.Ref(false),
+				AllowString:         utils.Ref(false),
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unexpectedNumber",
+					Line:      1,
+					Column:    13,
+				},
+			},
+		},
+	})
 }

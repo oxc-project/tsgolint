@@ -83,7 +83,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 			},
 		},
 		{
-			Code: `declare const test?: boolean; if (test ?? false) {}`,
+			Code: `const a: (undefined | boolean | null)[] = [true, undefined, null]; a.some(x => x);`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableBoolean: utils.Ref(true),
 			},
