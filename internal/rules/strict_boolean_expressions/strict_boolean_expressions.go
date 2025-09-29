@@ -274,6 +274,11 @@ func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpres
 	}
 	traversedNodes.Add(node)
 
+	if node.Kind == ast.KindParenthesizedExpression {
+		traverseNode(ctx, node.AsParenthesizedExpression().Expression, opts, isCondition)
+		return
+	}
+
 	if node.Kind == ast.KindBinaryExpression {
 		binExpr := node.AsBinaryExpression()
 		if ast.IsLogicalExpression(node) && binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
