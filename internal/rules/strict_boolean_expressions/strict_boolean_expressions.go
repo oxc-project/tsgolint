@@ -97,6 +97,8 @@ func buildNoStrictNullCheck() rule.RuleMessage {
 	}
 }
 
+var traversedNodes = utils.Set[*ast.Node]{}
+
 var StrictBooleanExpressionsRule = rule.Rule{
 	Name: "strict-boolean-expressions",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -121,7 +123,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			opts.AllowNullableEnum = utils.Ref(false)
 		}
 		if opts.AllowNullableObject == nil {
-			opts.AllowNullableObject = utils.Ref(false)
+			opts.AllowNullableObject = utils.Ref(true)
 		}
 		if opts.AllowString == nil {
 			opts.AllowString = utils.Ref(true)
@@ -167,7 +169,10 @@ var StrictBooleanExpressionsRule = rule.Rule{
 				traverseNode(ctx, condExpr.Condition, opts, true)
 			},
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				traverseNode(ctx, node, opts, false)
+				binExpr := node.AsBinaryExpression()
+				if binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
+					traverseLogicalExpression(ctx, binExpr, opts, false)
+				}
 			},
 			ast.KindCallExpression: func(node *ast.Node) {
 				callExpr := node.AsCallExpression()
@@ -262,10 +267,16 @@ func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpressi
 }
 
 func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions, isCondition bool) {
+	if traversedNodes.Has(node) {
+		return
+	}
+	traversedNodes.Add(node)
+
 	if node.Kind == ast.KindBinaryExpression {
 		binExpr := node.AsBinaryExpression()
 		if binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
-			traverseLogicalExpression(ctx, binExpr, opts, false)
+			traverseLogicalExpression(ctx, binExpr, opts, isCondition)
+			return
 		}
 	}
 
@@ -364,7 +375,7 @@ func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	return analyzeTypePart(typeChecker, t)
 }
 
-func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
+func analyzeTypePart(_ *checker.Checker, t *checker.Type) typeInfo {
 	info := typeInfo{}
 	flags := checker.Type_flags(t)
 
@@ -394,7 +405,7 @@ func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	}
 
 	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral|checker.TypeFlagsBooleanLike) != 0 {
-		if flags&checker.TypeFlagsBooleanLike != 0 && t.AsIntrinsicType().IntrinsicName() == "true" {
+		if utils.IsTrueLiteralType(t) {
 			info.isTruthy = true
 		}
 		info.variant = typeVariantBoolean
@@ -450,10 +461,6 @@ func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 }
 
 func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts StrictBooleanExpressionsOptions) {
-	if isBooleanType(t) {
-		return
-	}
-
 	info := analyzeType(ctx.TypeChecker, t)
 
 	switch info.variant {
