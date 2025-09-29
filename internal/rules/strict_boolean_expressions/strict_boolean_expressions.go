@@ -97,6 +97,13 @@ func buildNoStrictNullCheck() rule.RuleMessage {
 	}
 }
 
+func buildPredicateCannotBeAsync() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "predicateCannotBeAsync",
+		Description: "Predicate function should not be 'async'; expected a boolean return type.",
+	}
+}
+
 var traversedNodes = utils.Set[*ast.Node]{}
 
 var StrictBooleanExpressionsRule = rule.Rule{
@@ -170,7 +177,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			},
 			ast.KindBinaryExpression: func(node *ast.Node) {
 				binExpr := node.AsBinaryExpression()
-				if binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
+				if ast.IsLogicalExpression(node) && binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
 					traverseLogicalExpression(ctx, binExpr, opts, false)
 				}
 			},
@@ -182,33 +189,28 @@ var StrictBooleanExpressionsRule = rule.Rule{
 					traverseNode(ctx, assertedArgument, opts, true)
 				}
 
-				if callExpr.Expression != nil && callExpr.Expression.Kind == ast.KindPropertyAccessExpression {
-					propAccess := callExpr.Expression.AsPropertyAccessExpression()
-					if propAccess == nil {
-						return
-					}
-					methodName := propAccess.Name().Text()
-
-					switch methodName {
-					case "filter", "find", "some", "every", "findIndex", "findLast", "findLastIndex":
-						if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-							arg := callExpr.Arguments.Nodes[0]
-							if arg != nil && (arg.Kind == ast.KindArrowFunction || arg.Kind == ast.KindFunctionExpression) {
-								funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
-								signatures := ctx.TypeChecker.GetCallSignatures(funcType)
-								for _, signature := range signatures {
-									returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
-									typeFlags := checker.Type_flags(returnType)
-									if typeFlags&checker.TypeFlagsTypeParameter != 0 {
-										constraint := ctx.TypeChecker.GetConstraintOfTypeParameter(returnType)
-										if constraint != nil {
-											returnType = constraint
-										}
+				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
+					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+						arg := callExpr.Arguments.Nodes[0]
+						if arg != nil && (arg.Kind == ast.KindArrowFunction || arg.Kind == ast.KindFunctionExpression || arg.Kind == ast.KindFunctionDeclaration) {
+							if checker.GetFunctionFlags(arg)&checker.FunctionFlagsAsync != 0 {
+								ctx.ReportNode(arg, buildPredicateCannotBeAsync())
+								return
+							}
+							funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
+							signatures := ctx.TypeChecker.GetCallSignatures(funcType)
+							for _, signature := range signatures {
+								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
+								typeFlags := checker.Type_flags(returnType)
+								if typeFlags&checker.TypeFlagsTypeParameter != 0 {
+									constraint := ctx.TypeChecker.GetConstraintOfTypeParameter(returnType)
+									if constraint != nil {
+										returnType = constraint
 									}
+								}
 
-									if returnType != nil && !isBooleanType(returnType) {
-										checkCondition(ctx, node, returnType, opts)
-									}
+								if returnType != nil && !isBooleanType(returnType) {
+									checkCondition(ctx, node, returnType, opts)
 								}
 							}
 						}
@@ -229,7 +231,7 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 	var checkableArguments []*ast.Node
 	for _, argument := range callExpr.Arguments.Nodes {
 		if argument.Kind == ast.KindSpreadElement {
-			continue
+			break
 		}
 		checkableArguments = append(checkableArguments, argument)
 	}
@@ -245,12 +247,12 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 	if firstTypePredicateResult == nil {
 		return nil
 	}
-	if checker.TypePredicate_kind(firstTypePredicateResult) != checker.TypePredicateKindAssertsIdentifier ||
-		checker.TypePredicate_t(firstTypePredicateResult) != nil {
+	if !(checker.TypePredicate_kind(firstTypePredicateResult) == checker.TypePredicateKindAssertsIdentifier &&
+		checker.TypePredicate_t(firstTypePredicateResult) == nil) {
 		return nil
 	}
 	parameterIndex := checker.TypePredicate_parameterIndex(firstTypePredicateResult)
-	if parameterIndex >= int32(len(checkableArguments)) {
+	if int(parameterIndex) >= len(checkableArguments) {
 		return nil
 	}
 	return checkableArguments[parameterIndex]
@@ -274,7 +276,7 @@ func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpres
 
 	if node.Kind == ast.KindBinaryExpression {
 		binExpr := node.AsBinaryExpression()
-		if binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
+		if ast.IsLogicalExpression(node) && binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
 			traverseLogicalExpression(ctx, binExpr, opts, isCondition)
 			return
 		}

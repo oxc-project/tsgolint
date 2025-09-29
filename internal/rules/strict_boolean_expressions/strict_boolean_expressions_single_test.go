@@ -14,18 +14,17 @@ func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &StrictBooleanExpressionsRule, []rule_tester.ValidTestCase{
 	}, []rule_tester.InvalidTestCase{
 		{
-			Code: `if (true && 1 + 1) {}`,
+			Code: `if (('' && {}) || (0 && void 0)) { }`,
 			Options: StrictBooleanExpressionsOptions{
 				AllowNullableObject: utils.Ref(false),
 				AllowNumber:         utils.Ref(false),
 				AllowString:         utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "unexpectedNumber",
-					Line:      1,
-					Column:    13,
-				},
+				{MessageId: "unexpectedString", Line: 1},
+				{MessageId: "unexpectedObjectContext", Line: 1},
+				{MessageId: "unexpectedNumber", Line: 1},
+				{MessageId: "unexpectedNullish", Line: 1},
 			},
 		},
 	})
