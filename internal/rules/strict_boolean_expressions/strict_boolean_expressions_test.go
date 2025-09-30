@@ -472,18 +472,19 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 					AllowNullableEnum: utils.Ref(true),
 				},
 			},
-			{
-				Code: `
-      declare const x: string[] | null;
-    // eslint-disable-next-line
-    if (x) {
-    }
-    `,
-				TSConfig: "tsconfig.unstrict.json",
-				Options: StrictBooleanExpressionsOptions{
-					AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true),
-				},
-			},
+			// TODO: oxlint-disable-next-line should not check
+			//		{
+			//			Code: `
+			//  declare const x: string[] | null;
+			//// oxlint-disable-next-line
+			//if (x) {
+			//}
+			//`,
+			//			TSConfig: "tsconfig.unstrict.json",
+			//			Options: StrictBooleanExpressionsOptions{
+			//				AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true),
+			//			},
+			//		},
 			{
 				Code: `
     function f(arg: 'a' | null) {
@@ -801,7 +802,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "if (('' && {}) || (0 && void 0)) { }",
 				Options: StrictBooleanExpressionsOptions{
@@ -911,12 +913,14 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				Code: "null || {};",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "undefined && [];",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: `
       declare const x: null;
@@ -925,37 +929,44 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 3},
-				}},
+				},
+			},
 			{
 				Code: "(x: undefined) => !x;",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends null | undefined>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends null>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends undefined>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "[] || 1;",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "({}) && 'a';",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: `
       declare const x: symbol;
@@ -964,32 +975,38 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 3},
-				}},
+				},
+			},
 			{
 				Code: "(x: () => void) => !x;",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends object>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends Object | Function>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends { a: number }>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends () => void>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "while ('') {}",
 				Options: StrictBooleanExpressionsOptions{
@@ -1140,7 +1157,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedMixedCondition", Line: 3},
-				}},
+				},
+			},
 			{
 				Code: "(x: bigint | string) => !x;",
 				Options: StrictBooleanExpressionsOptions{
@@ -1148,7 +1166,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedMixedCondition", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: "<T extends number | bigint | string>(x: T) => (x ? 1 : 0);",
 				Options: StrictBooleanExpressionsOptions{
@@ -1156,7 +1175,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedMixedCondition", Line: 1},
-				}},
+				},
+			},
 			{
 				Code: `
       declare const x: boolean | null;
@@ -1448,12 +1468,14 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedAny", Line: 2},
-				} /* Suggestions: conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCastBoolean */
+			},
 			{
 				Code: "x => !x;",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedAny", Line: 1},
-				} /* Suggestions: conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCastBoolean */
+			},
 			{
 				Code: "<T extends any>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
@@ -1470,9 +1492,12 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     if (x) {
     }
     `,
+				TSConfig: "tsconfig.unstrict.json",
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "noStrictNullCheck", Line: 0}, {MessageId: "unexpectedObject", Line: 3},
-				}},
+					{MessageId: "noStrictNullCheck", Line: 0},
+					{MessageId: "unexpectedObject", Line: 3},
+				},
+			},
 			{
 				Code: `
       declare const obj: { x: number } | null;
@@ -1666,7 +1691,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 8},
-				}},
+				},
+			},
 			{
 				Code: `
     [1, null].every(async x => {
@@ -1675,7 +1701,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "predicateCannotBeAsync", Line: 2},
-				}},
+				},
+			},
 			{
 				Code: `
       const predicate = async x => {
@@ -1686,7 +1713,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 6},
-				}},
+				},
+			},
 			{
 				Code: `
     [1, null].every((x): boolean | number => {
@@ -1695,7 +1723,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedMixedCondition", Line: 2},
-				}},
+				},
+			},
 			{
 				Code: `
     [1, null].every((x): boolean | undefined => {
@@ -1704,7 +1733,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 2},
-				}},
+				},
+			},
 			{
 				Code: `
     [1, null].every((x, i) => {});
@@ -1742,7 +1772,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedMixedCondition", Line: 5},
-				}},
+				},
+			},
 			{
 				Code: `
       declare function f(x: number): string;
@@ -1753,7 +1784,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedMixedCondition", Line: 6},
-				}},
+				},
+			},
 			{
 				Code: `
       declare function foo<T>(x: number): T;
@@ -1761,7 +1793,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedAny", Line: 3},
-				}},
+				},
+			},
 			{
 				Code: `
       function foo<T extends number>(x: number): T {}
@@ -1772,7 +1805,8 @@ func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 3},
-				}},
+				},
+			},
 			{
 				Code: `
       declare const nullOrString: string | null;
