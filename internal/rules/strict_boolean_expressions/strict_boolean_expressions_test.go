@@ -8,7 +8,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestStrictBooleanExpressionsRule_Generated(t *testing.T) {
+func TestStrictBooleanExpressionsRule(t *testing.T) {
 	rule_tester.RunRuleTester(
 		fixtures.GetRootDir(),
 		"tsconfig.json",
