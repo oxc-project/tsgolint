@@ -374,7 +374,7 @@ func analyzeTypeParts(typeChecker *checker.Checker, types []*checker.Type) typeI
 	return info
 }
 
-func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
+func analyzeTypePart(_typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	info := typeInfo{}
 	flags := checker.Type_flags(t)
 
@@ -383,7 +383,7 @@ func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 		types := t.Types()
 		isBoolean := false
 		for _, t2 := range types {
-			if analyzeTypePart(typeChecker, t2).variant == typeVariantBoolean {
+			if analyzeTypePart(_typeChecker, t2).variant == typeVariantBoolean {
 				isBoolean = true
 				break
 			}
@@ -567,22 +567,4 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 			ctx.ReportNode(node, buildUnexpectedNumber())
 		}
 	}
-}
-
-func isBooleanType(t *checker.Type) bool {
-	flags := checker.Type_flags(t)
-
-	if flags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral) != 0 {
-		if utils.IsUnionType(t) {
-			for _, part := range utils.UnionTypeParts(t) {
-				partFlags := checker.Type_flags(part)
-				if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
-					return false
-				}
-			}
-		}
-		return true
-	}
-
-	return false
 }
