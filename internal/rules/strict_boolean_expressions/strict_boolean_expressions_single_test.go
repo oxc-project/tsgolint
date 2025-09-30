@@ -16,15 +16,18 @@ func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
-      function foo<T extends number>(x: number): T {}
-    [1, null].every(foo);
+      enum ExampleEnum {
+      This = 0,
+      That = 'one',
+    }
+    (value?: ExampleEnum) => (value ? 1 : 0);
     `,
 			Options: StrictBooleanExpressionsOptions{
-				AllowNumber: utils.Ref(false),
+				AllowNullableEnum: utils.Ref(false),
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNumber", Line: 3},
-			},
+				{MessageId: "unexpectedNullableEnum", Line: 6},
+			}, /* Suggestions: conditionFixCompareNullish */
 		},
 	})
 }
