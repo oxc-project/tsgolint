@@ -1609,6 +1609,12 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
 			},
 			{
+				// This should be checkable, but the TS API doesn't currently report
+				// `someAssert(maybeString)` as a type predicate call, which appears to be
+				// a bug.
+				//
+				// See https://github.com/microsoft/TypeScript/issues/59707
+				Skip: true,
 				Code: `
       function asserts1(x: string | number | undefined): asserts x {}
     function asserts2(x: string | number | undefined): asserts x {}

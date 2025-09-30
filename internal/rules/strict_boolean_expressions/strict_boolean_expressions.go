@@ -208,6 +208,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 						}
 						funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
 						signatures := ctx.TypeChecker.GetCallSignatures(funcType)
+						var types []*checker.Type
 						for _, signature := range signatures {
 							returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
 							typeFlags := checker.Type_flags(returnType)
@@ -218,10 +219,9 @@ var StrictBooleanExpressionsRule = rule.Rule{
 								}
 							}
 
-							if returnType != nil && !isBooleanType(returnType) {
-								checkCondition(ctx, node, returnType, opts)
-							}
+							types = append(types, utils.UnionTypeParts(returnType)...)
 						}
+						checkCondition(ctx, node, types, opts)
 					}
 				}
 			},
@@ -268,7 +268,7 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 
 func checkNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions) {
 	nodeType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node)
-	checkCondition(ctx, node, nodeType, opts)
+	checkCondition(ctx, node, utils.UnionTypeParts(nodeType), opts)
 }
 
 func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpression, opts StrictBooleanExpressionsOptions, isCondition bool) {
@@ -329,73 +329,49 @@ type typeInfo struct {
 	isEnum         bool
 }
 
-func analyzeType(typeChecker *checker.Checker, t *checker.Type) typeInfo {
+func analyzeTypeParts(typeChecker *checker.Checker, types []*checker.Type) typeInfo {
 	info := typeInfo{
-		types: []*checker.Type{t},
+		isUnion: len(types) > 1,
+		types:   types,
+	}
+	variants := make(map[typeVariant]bool)
+
+	metNotTruthy := false
+
+	for _, part := range info.types {
+		partInfo := analyzeTypePart(typeChecker, part)
+		variants[partInfo.variant] = true
+		if partInfo.variant == typeVariantNullish {
+			info.isNullable = true
+		}
+		if partInfo.isEnum {
+			info.isEnum = true
+		}
+		if partInfo.variant == typeVariantBoolean || partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString {
+			if metNotTruthy {
+				continue
+			}
+			info.isTruthy = partInfo.isTruthy
+			metNotTruthy = !partInfo.isTruthy
+		}
 	}
 
-	if utils.IsUnionType(t) {
-		info.isUnion = true
-		parts := utils.UnionTypeParts(t)
-		variants := make(map[typeVariant]bool)
-
-		metNotTruthy := false
-
-		for _, part := range parts {
-			partInfo := analyzeTypePart(typeChecker, part)
-			variants[partInfo.variant] = true
-			if partInfo.variant == typeVariantNullish {
-				info.isNullable = true
-			}
-			if partInfo.isEnum {
-				info.isEnum = true
-			}
-			if partInfo.variant == typeVariantBoolean || partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString {
-				if metNotTruthy {
-					continue
-				}
-				info.isTruthy = partInfo.isTruthy
-				metNotTruthy = !partInfo.isTruthy
-			}
+	if len(variants) == 1 {
+		for v := range variants {
+			info.variant = v
 		}
-
-		if len(variants) == 1 {
-			for v := range variants {
+	} else if len(variants) == 2 && info.isNullable {
+		for v := range variants {
+			if v != typeVariantNullish {
 				info.variant = v
-			}
-		} else if len(variants) == 2 && info.isNullable {
-			for v := range variants {
-				if v != typeVariantNullish {
-					info.variant = v
-					break
-				}
-			}
-		} else {
-			info.variant = typeVariantMixed
-		}
-
-		return info
-	}
-
-	if utils.IsIntersectionType(t) {
-		info.isIntersection = true
-		types := t.Types()
-		isBoolean := false
-		for _, t2 := range types {
-			if analyzeTypePart(typeChecker, t2).variant == typeVariantBoolean {
-				isBoolean = true
 				break
 			}
 		}
-		if isBoolean {
-			info.variant = typeVariantBoolean
-		} else {
-			info.variant = typeVariantObject
-		}
-		return info
+	} else {
+		info.variant = typeVariantMixed
 	}
 
-	return analyzeTypePart(typeChecker, t)
+	return info
 }
 
 func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
@@ -510,8 +486,8 @@ func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	return info
 }
 
-func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts StrictBooleanExpressionsOptions) {
-	info := analyzeType(ctx.TypeChecker, t)
+func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type, opts StrictBooleanExpressionsOptions) {
+	info := analyzeTypeParts(ctx.TypeChecker, types)
 
 	switch info.variant {
 	case typeVariantAny, typeVariantUnknown, typeVariantGeneric:
