@@ -786,7 +786,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 2},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "while (false || 'a' + 'b') {}",
 				Options: StrictBooleanExpressionsOptions{
@@ -794,7 +795,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "(x: object) => (true || false || x ? true : false);",
 				Options: StrictBooleanExpressionsOptions{
@@ -811,7 +813,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedNullish", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const array: string[];
@@ -822,7 +825,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString"},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       declare const foo: true & { __BRAND: 'Foo' };
@@ -833,7 +837,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 3}, {MessageId: "unexpectedNumber", Line: 3}, {MessageId: "unexpectedNullish", Line: 3},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const foo: false & { __BRAND: 'Foo' };
@@ -844,7 +849,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 3}, {MessageId: "unexpectedObject", Line: 3}, {MessageId: "unexpectedNullish", Line: 3},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "'asd' && 123 && [] && null;",
 				Options: StrictBooleanExpressionsOptions{
@@ -852,7 +858,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "'asd' || 123 || [] || null;",
 				Options: StrictBooleanExpressionsOptions{
@@ -860,7 +867,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "let x = (1 && 'a' && null) || 0 || '' || {};",
 				Options: StrictBooleanExpressionsOptions{
@@ -868,7 +876,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "return (1 || 'a' || null) && 0 && '' && {};",
 				Options: StrictBooleanExpressionsOptions{
@@ -876,7 +885,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "console.log((1 && []) || ('a' && {}));",
 				Options: StrictBooleanExpressionsOptions{
@@ -884,7 +894,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1}, {MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "if ((1 && []) || ('a' && {})) void 0;",
 				Options: StrictBooleanExpressionsOptions{
@@ -892,7 +903,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "let x = null || 0 || 'a' || [] ? {} : undefined;",
 				Options: StrictBooleanExpressionsOptions{
@@ -900,7 +912,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "return !(null || 0 || 'a' || []);",
 				Options: StrictBooleanExpressionsOptions{
@@ -908,7 +921,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "null || {};",
 				Errors: []rule_tester.InvalidTestCaseError{
@@ -1014,7 +1028,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "for (; 'foo'; ) {}",
 				Options: StrictBooleanExpressionsOptions{
@@ -1022,7 +1037,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const x: string;
@@ -1034,7 +1050,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 3},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "(x: string) => !x;",
 				Options: StrictBooleanExpressionsOptions{
@@ -1042,7 +1059,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "<T extends string>(x: T) => (x ? 1 : 0);",
 				Options: StrictBooleanExpressionsOptions{
@@ -1050,7 +1068,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 1},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "while (0n) {}",
 				Options: StrictBooleanExpressionsOptions{
@@ -1058,7 +1077,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "for (; 123; ) {}",
 				Options: StrictBooleanExpressionsOptions{
@@ -1066,7 +1086,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const x: number;
@@ -1078,7 +1099,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 3},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "(x: bigint) => !x;",
 				Options: StrictBooleanExpressionsOptions{
@@ -1086,7 +1108,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "<T extends number>(x: T) => (x ? 1 : 0);",
 				Options: StrictBooleanExpressionsOptions{
@@ -1094,7 +1117,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: "![]['length']; // doesn't count as array.length when computed",
 				Options: StrictBooleanExpressionsOptions{
@@ -1102,7 +1126,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const a: any[] & { notLength: number };
@@ -1114,7 +1139,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 3},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       if (![].length) {
@@ -1125,7 +1151,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 2},
-				} /* Suggestions: conditionFixCompareArrayLengthZero */},
+				}, /* Suggestions: conditionFixCompareArrayLengthZero */
+			},
 			{
 				Code: `
       (a: number[]) => a.length && '...';
@@ -1135,7 +1162,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 2},
-				} /* Suggestions: conditionFixCompareArrayLengthNonzero */},
+				}, /* Suggestions: conditionFixCompareArrayLengthNonzero */
+			},
 			{
 				Code: `
       <T extends unknown[]>(...a: T) => a.length || 'empty';
@@ -1145,7 +1173,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 2},
-				} /* Suggestions: conditionFixCompareArrayLengthNonzero */},
+				}, /* Suggestions: conditionFixCompareArrayLengthNonzero */
+			},
 			{
 				Code: `
       declare const x: string | number;
@@ -1188,7 +1217,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 3},
-				} /* Suggestions: conditionFixDefaultFalse, conditionFixCompareTrue */},
+				}, /* Suggestions: conditionFixDefaultFalse, conditionFixCompareTrue */
+			},
 			{
 				Code: "(x?: boolean) => !x;",
 				Options: StrictBooleanExpressionsOptions{
@@ -1196,7 +1226,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 1},
-				} /* Suggestions: conditionFixDefaultFalse, conditionFixCompareFalse */},
+				}, /* Suggestions: conditionFixDefaultFalse, conditionFixCompareFalse */
+			},
 			{
 				Code: "<T extends boolean | null | undefined>(x: T) => (x ? 1 : 0);",
 				Options: StrictBooleanExpressionsOptions{
@@ -1204,7 +1235,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 1},
-				} /* Suggestions: conditionFixDefaultFalse, conditionFixCompareTrue */},
+				}, /* Suggestions: conditionFixDefaultFalse, conditionFixCompareTrue */
+			},
 			{
 				Code: `
       declare const x: object | null;
@@ -1216,7 +1248,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableObject", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: "(x?: { a: number }) => !x;",
 				Options: StrictBooleanExpressionsOptions{
@@ -1224,7 +1257,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableObject", Line: 1},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: "<T extends {} | null | undefined>(x: T) => (x ? 1 : 0);",
 				Options: StrictBooleanExpressionsOptions{
@@ -1232,7 +1266,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableObject", Line: 1},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       declare const x: string | null;
@@ -1241,17 +1276,20 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "(x?: string) => !x;",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 1},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: "<T extends string | null | undefined>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 1},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       function foo(x: '' | 'bar' | null) {
@@ -1261,7 +1299,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const x: number | null;
@@ -1270,17 +1309,20 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableNumber", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */
+			},
 			{
 				Code: "(x?: number) => !x;",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */
+			},
 			{
 				Code: "<T extends number | null | undefined>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableNumber", Line: 1},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       function foo(x: 0 | 1 | null) {
@@ -1324,7 +1366,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1340,7 +1383,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1356,7 +1400,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1372,7 +1417,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1388,7 +1434,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1404,7 +1451,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1418,7 +1466,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 6},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1432,7 +1481,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 6},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1446,7 +1496,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 6},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1460,7 +1511,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 6},
-				} /* Suggestions: conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish */
+			},
 			{
 				Code: `
       if (x) {
@@ -1480,12 +1532,14 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				Code: "<T extends any>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedAny", Line: 1},
-				} /* Suggestions: conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCastBoolean */
+			},
 			{
 				Code: "<T,>(x: T) => (x ? 1 : 0);",
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedAny", Line: 1},
-				} /* Suggestions: conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const x: string[] | null;
@@ -1511,7 +1565,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableObject", Line: 3}, {MessageId: "unexpectedNullableObject", Line: 4}, {MessageId: "unexpectedNullableObject", Line: 5}, {MessageId: "unexpectedNullableObject", Line: 6},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixCompareNullish, conditionFixCompareNullish, conditionFixCompareNullish */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixCompareNullish, conditionFixCompareNullish, conditionFixCompareNullish */
+			},
 			{
 				Code: `
       declare function assert(x: unknown): asserts x;
@@ -1520,7 +1575,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 4},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare function assert(a: number, b: unknown): asserts b;
@@ -1529,7 +1585,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 4},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare function assert(a: number, b: unknown): asserts b;
@@ -1539,7 +1596,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 5},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare function assert(this: object, a: number, b: unknown): asserts b;
@@ -1548,7 +1606,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 4},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       function asserts1(x: string | number | undefined): asserts x {}
@@ -1563,7 +1622,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString"},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       function assert(this: object, a: number, b: unknown): asserts b;
@@ -1586,7 +1646,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 18},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       function assert(this: object, a: number, b: unknown): asserts b;
@@ -1610,7 +1671,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 19},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare function assert(a: boolean, b: unknown): asserts b;
@@ -1621,7 +1683,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 6},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       function assert(one: unknown): asserts one;
@@ -1634,7 +1697,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 8},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
     ['one', 'two', ''].find(x => {
@@ -1646,7 +1710,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
     ['one', 'two', ''].find(x => {
@@ -1655,7 +1720,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
     ['one', 'two', ''].findLast(x => {
@@ -1664,7 +1730,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
     ['one', 'two', ''].find(x => {
@@ -1675,7 +1742,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
       const predicate = (x: string) => {
@@ -1741,28 +1809,32 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
     [() => {}, null].every((x: () => void) => {});
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
     [() => {}, null].every(function (x: () => void) {});
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
     [() => {}, null].every(() => {});
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullish", Line: 2},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
       declare function f(x: number): string;
@@ -1814,7 +1886,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       declare const nullOrString: string | null;
@@ -1822,7 +1895,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableString", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
+			},
 			{
 				Code: `
       declare const anyValue: any;
@@ -1830,7 +1904,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedAny", Line: 3},
-				} /* Suggestions: conditionFixCastBoolean, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCastBoolean, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       declare const nullOrBoolean: boolean | null;
@@ -1838,7 +1913,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableBoolean", Line: 3},
-				} /* Suggestions: conditionFixDefaultFalse, conditionFixCompareTrue, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixDefaultFalse, conditionFixCompareTrue, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       enum ExampleEnum {
@@ -1850,7 +1926,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableEnum", Line: 7},
-				} /* Suggestions: conditionFixCompareNullish, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareNullish, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       declare const nullOrNumber: number | null;
@@ -1858,7 +1935,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableNumber", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultZero, conditionFixCastBoolean, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       const objectValue: object = {};
@@ -1866,7 +1944,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 3},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
       const objectValue: object = {};
@@ -1876,7 +1955,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
     `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedObject", Line: 3},
-				} /* Suggestions: explicitBooleanReturnType */},
+				}, /* Suggestions: explicitBooleanReturnType */
+			},
 			{
 				Code: `
       declare const nullOrObject: object | null;
@@ -1887,7 +1967,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNullableObject", Line: 3},
-				} /* Suggestions: conditionFixCompareNullish, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareNullish, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       const numbers: number[] = [1];
@@ -1898,7 +1979,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 3},
-				} /* Suggestions: conditionFixCompareArrayLengthNonzero, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareArrayLengthNonzero, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       const numberValue: number = 1;
@@ -1909,7 +1991,8 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedNumber", Line: 3},
-				} /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, explicitBooleanReturnType */
+			},
 			{
 				Code: `
       const stringValue: string = 'hoge';
@@ -1920,6 +2003,7 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "unexpectedString", Line: 3},
-				} /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, explicitBooleanReturnType */},
+				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, explicitBooleanReturnType */
+			},
 		})
 }

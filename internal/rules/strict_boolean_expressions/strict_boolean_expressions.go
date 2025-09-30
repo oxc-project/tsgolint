@@ -580,7 +580,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 	case typeVariantMixed:
 		if info.isEnum {
 			if info.isNullable && !*opts.AllowNullableEnum {
-				ctx.ReportNode(node, buildUnexpectedNullableNumber())
+				ctx.ReportNode(node, buildUnexpectedNullableEnum())
 			}
 			return
 		}
