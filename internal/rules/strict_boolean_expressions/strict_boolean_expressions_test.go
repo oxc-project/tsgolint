@@ -812,7 +812,10 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedNullish", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedNullish", Line: 1},
 				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
 			},
 			{
@@ -836,7 +839,9 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedString", Line: 3}, {MessageId: "unexpectedNumber", Line: 3}, {MessageId: "unexpectedNullish", Line: 3},
+					{MessageId: "unexpectedString", Line: 3},
+					{MessageId: "unexpectedNumber", Line: 3},
+					{MessageId: "unexpectedNullish", Line: 3},
 				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
 			},
 			{
@@ -848,7 +853,9 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedString", Line: 3}, {MessageId: "unexpectedObject", Line: 3}, {MessageId: "unexpectedNullish", Line: 3},
+					{MessageId: "unexpectedString", Line: 3},
+					{MessageId: "unexpectedObject", Line: 3},
+					{MessageId: "unexpectedNullish", Line: 3},
 				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -857,7 +864,9 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
 				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
 			},
 			{
@@ -866,7 +875,9 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
 				}, /* Suggestions: conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean */
 			},
 			{
@@ -875,7 +886,11 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNullish", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
 				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -884,7 +899,11 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNullish", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
 				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean, conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -893,7 +912,9 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1}, {MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
 				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -902,7 +923,10 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedObject", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
 				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -911,7 +935,10 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedNullish", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
 				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -920,7 +947,10 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNumber: utils.Ref(false), AllowString: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNullish", Line: 1}, {MessageId: "unexpectedNumber", Line: 1}, {MessageId: "unexpectedString", Line: 1}, {MessageId: "unexpectedObject", Line: 1},
+					{MessageId: "unexpectedNullish", Line: 1},
+					{MessageId: "unexpectedNumber", Line: 1},
+					{MessageId: "unexpectedString", Line: 1},
+					{MessageId: "unexpectedObject", Line: 1},
 				}, /* Suggestions: conditionFixCompareZero, conditionFixCompareNaN, conditionFixCastBoolean, conditionFixCompareStringLength, conditionFixCompareEmptyString, conditionFixCastBoolean */
 			},
 			{
@@ -1564,7 +1594,10 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNullableObject: utils.Ref(false),
 				},
 				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "unexpectedNullableObject", Line: 3}, {MessageId: "unexpectedNullableObject", Line: 4}, {MessageId: "unexpectedNullableObject", Line: 5}, {MessageId: "unexpectedNullableObject", Line: 6},
+					{MessageId: "unexpectedNullableObject", Line: 3},
+					{MessageId: "unexpectedNullableObject", Line: 4},
+					{MessageId: "unexpectedNullableObject", Line: 5},
+					{MessageId: "unexpectedNullableObject", Line: 6},
 				}, /* Suggestions: conditionFixCompareNullish, conditionFixCompareNullish, conditionFixCompareNullish, conditionFixCompareNullish */
 			},
 			{
