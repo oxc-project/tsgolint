@@ -468,7 +468,6 @@ func analyzeTypePart(typeChecker *checker.Checker, t *checker.Type) typeInfo {
 		if t.IsStringLiteral() {
 			literal := t.AsLiteralType()
 			if literal != nil && literal.Value() != "" {
-				println(literal.Value())
 				info.isTruthy = true
 			}
 		}
