@@ -472,19 +472,20 @@ func TestStrictBooleanExpressionsRule(t *testing.T) {
 					AllowNullableEnum: utils.Ref(true),
 				},
 			},
-			// TODO: oxlint-disable-next-line should not check
-			//		{
-			//			Code: `
-			//  declare const x: string[] | null;
-			//// oxlint-disable-next-line
-			//if (x) {
-			//}
-			//`,
-			//			TSConfig: "tsconfig.unstrict.json",
-			//			Options: StrictBooleanExpressionsOptions{
-			//				AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true),
-			//			},
-			//		},
+			//TODO: oxlint-disable-next-line should not check
+			{
+				Skip: true,
+				Code: `
+			 declare const x: string[] | null;
+			// oxlint-disable-next-line
+			if (x) {
+			}
+			`,
+				TSConfig: "tsconfig.unstrict.json",
+				Options: StrictBooleanExpressionsOptions{
+					AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true),
+				},
+			},
 			{
 				Code: `
     function f(arg: 'a' | null) {
