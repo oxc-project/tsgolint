@@ -12,29 +12,18 @@ import (
 
 func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &StrictBooleanExpressionsRule, []rule_tester.ValidTestCase{
-		{
-			Code: `
-      declare const x: string[] | null;
-    // oxlint-disable-next-line
-    if (x) {
-    }
-    `,
-			TSConfig: "tsconfig.unstrict.json",
-			Options: StrictBooleanExpressionsOptions{
-				AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true),
-			},
-		},
+
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
-      declare const x: string[] | null;
-    if (x) {
-    }
+      function foo<T extends number>(x: number): T {}
+    [1, null].every(foo);
     `,
-			TSConfig: "tsconfig.unstrict.json",
+			Options: StrictBooleanExpressionsOptions{
+				AllowNumber: utils.Ref(false),
+			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "noStrictNullCheck", Line: 0},
-				{MessageId: "unexpectedObject", Line: 3},
+				{MessageId: "unexpectedNumber", Line: 3},
 			},
 		},
 	})

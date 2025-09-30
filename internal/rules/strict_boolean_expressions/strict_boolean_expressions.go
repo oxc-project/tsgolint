@@ -48,6 +48,13 @@ func buildUnexpectedNullableNumber() rule.RuleMessage {
 	}
 }
 
+func buildUnexpectedNullableEnum() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "unexpectedNullableEnum",
+		Description: "Unexpected nullable enum value in conditional. Please handle the nullish case explicitly.",
+	}
+}
+
 func buildUnexpectedNullableObject() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unexpectedNullableObject",
@@ -191,26 +198,28 @@ var StrictBooleanExpressionsRule = rule.Rule{
 				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
 					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
 						arg := callExpr.Arguments.Nodes[0]
-						if arg != nil && (arg.Kind == ast.KindArrowFunction || arg.Kind == ast.KindFunctionExpression || arg.Kind == ast.KindFunctionDeclaration) {
-							if checker.GetFunctionFlags(arg)&checker.FunctionFlagsAsync != 0 {
-								ctx.ReportNode(arg, buildPredicateCannotBeAsync())
-								return
+						if arg == nil {
+							return
+						}
+						isFunction := arg.Kind&(ast.KindArrowFunction|ast.KindFunctionExpression|ast.KindFunctionDeclaration) != 0
+						if isFunction && checker.GetFunctionFlags(arg)&checker.FunctionFlagsAsync != 0 {
+							ctx.ReportNode(arg, buildPredicateCannotBeAsync())
+							return
+						}
+						funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
+						signatures := ctx.TypeChecker.GetCallSignatures(funcType)
+						for _, signature := range signatures {
+							returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
+							typeFlags := checker.Type_flags(returnType)
+							if typeFlags&checker.TypeFlagsTypeParameter != 0 {
+								constraint := ctx.TypeChecker.GetConstraintOfTypeParameter(returnType)
+								if constraint != nil {
+									returnType = constraint
+								}
 							}
-							funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
-							signatures := ctx.TypeChecker.GetCallSignatures(funcType)
-							for _, signature := range signatures {
-								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
-								typeFlags := checker.Type_flags(returnType)
-								if typeFlags&checker.TypeFlagsTypeParameter != 0 {
-									constraint := ctx.TypeChecker.GetConstraintOfTypeParameter(returnType)
-									if constraint != nil {
-										returnType = constraint
-									}
-								}
 
-								if returnType != nil && !isBooleanType(returnType) {
-									checkCondition(ctx, node, returnType, opts)
-								}
+							if returnType != nil && !isBooleanType(returnType) {
+								checkCondition(ctx, node, returnType, opts)
 							}
 						}
 					}
@@ -524,7 +533,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 		if info.isNullable {
 			if info.isEnum {
 				if !*opts.AllowNullableEnum {
-					ctx.ReportNode(node, buildUnexpectedNullableString())
+					ctx.ReportNode(node, buildUnexpectedNullableEnum())
 				}
 			} else {
 				if !*opts.AllowNullableString {
@@ -543,7 +552,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, t *checker.Type, opts 
 		if info.isNullable {
 			if info.isEnum {
 				if !*opts.AllowNullableEnum {
-					ctx.ReportNode(node, buildUnexpectedNullableNumber())
+					ctx.ReportNode(node, buildUnexpectedNullableEnum())
 				}
 			} else {
 				if !*opts.AllowNullableNumber {
