@@ -92,7 +92,7 @@ func buildUnexpectedMixedCondition() rule.RuleMessage {
 
 func buildNoStrictNullCheck() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "msgNoStrictNullCheck",
+		Id:          "noStrictNullCheck",
 		Description: "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
 	}
 }
@@ -149,7 +149,6 @@ var StrictBooleanExpressionsRule = rule.Rule{
 				core.NewTextRange(0, 0),
 				buildNoStrictNullCheck(),
 			)
-			return rule.RuleListeners{}
 		}
 
 		return rule.RuleListeners{
