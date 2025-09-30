@@ -7,7 +7,7 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
+	//"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
@@ -16,18 +16,19 @@ func TestStrictBooleanExpressionsSingleRule(t *testing.T) {
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
-      enum ExampleEnum {
-      This = 0,
-      That = 'one',
-    }
-    (value?: ExampleEnum) => (value ? 1 : 0);
+      function asserts1(x: string | number | undefined): asserts x {}
+    function asserts2(x: string | number | undefined): asserts x {}
+
+    const maybeString = Math.random() ? 'string'.slice() : undefined;
+
+    const someAssert: typeof asserts1 | typeof asserts2 =
+    Math.random() > 0.5 ? asserts1 : asserts2;
+
+    someAssert(maybeString);
     `,
-			Options: StrictBooleanExpressionsOptions{
-				AllowNullableEnum: utils.Ref(false),
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unexpectedNullableEnum", Line: 6},
-			}, /* Suggestions: conditionFixCompareNullish */
+				{MessageId: "unexpectedNullableString"},
+			}, /* Suggestions: conditionFixCompareNullish, conditionFixDefaultEmptyString, conditionFixCastBoolean */
 		},
 	})
 }
