@@ -58,6 +58,7 @@ const ModuleKindES2022 = core.ModuleKindES2022
 const ModuleKindESNext = core.ModuleKindESNext
 const ModuleKindNode16 = core.ModuleKindNode16
 const ModuleKindNode18 = core.ModuleKindNode18
+const ModuleKindNode20 = core.ModuleKindNode20
 const ModuleKindNodeNext = core.ModuleKindNodeNext
 const ModuleKindNone = core.ModuleKindNone
 const ModuleKindPreserve = core.ModuleKindPreserve
