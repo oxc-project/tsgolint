@@ -25,20 +25,20 @@ const EscapeSequenceScanningFlagsRegularExpression = scanner.EscapeSequenceScann
 const EscapeSequenceScanningFlagsReportErrors = scanner.EscapeSequenceScanningFlagsReportErrors
 const EscapeSequenceScanningFlagsReportInvalidEscapeErrors = scanner.EscapeSequenceScanningFlagsReportInvalidEscapeErrors
 const EscapeSequenceScanningFlagsString = scanner.EscapeSequenceScanningFlagsString
-//go:linkname GetEndLinePosition github.com/microsoft/typescript-go/internal/scanner.GetEndLinePosition
-func GetEndLinePosition(sourceFile *ast.SourceFile, line int) int
+//go:linkname GetECMAEndLinePosition github.com/microsoft/typescript-go/internal/scanner.GetECMAEndLinePosition
+func GetECMAEndLinePosition(sourceFile *ast.SourceFile, line int) int
+//go:linkname GetECMALineAndCharacterOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndCharacterOfPosition
+func GetECMALineAndCharacterOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, character int)
+//go:linkname GetECMALineStarts github.com/microsoft/typescript-go/internal/scanner.GetECMALineStarts
+func GetECMALineStarts(sourceFile ast.SourceFileLike) []core.TextPos
+//go:linkname GetECMAPositionOfLineAndCharacter github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndCharacter
+func GetECMAPositionOfLineAndCharacter(sourceFile *ast.SourceFile, line int, character int) int
 //go:linkname GetErrorRangeForNode github.com/microsoft/typescript-go/internal/scanner.GetErrorRangeForNode
 func GetErrorRangeForNode(sourceFile *ast.SourceFile, node *ast.Node) core.TextRange
 //go:linkname GetIdentifierToken github.com/microsoft/typescript-go/internal/scanner.GetIdentifierToken
 func GetIdentifierToken(str string) ast.Kind
 //go:linkname GetLeadingCommentRanges github.com/microsoft/typescript-go/internal/scanner.GetLeadingCommentRanges
 func GetLeadingCommentRanges(f *ast.NodeFactory, text string, pos int) iter.Seq[ast.CommentRange]
-//go:linkname GetLineAndCharacterOfPosition github.com/microsoft/typescript-go/internal/scanner.GetLineAndCharacterOfPosition
-func GetLineAndCharacterOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, character int)
-//go:linkname GetLineStarts github.com/microsoft/typescript-go/internal/scanner.GetLineStarts
-func GetLineStarts(sourceFile ast.SourceFileLike) []core.TextPos
-//go:linkname GetPositionOfLineAndCharacter github.com/microsoft/typescript-go/internal/scanner.GetPositionOfLineAndCharacter
-func GetPositionOfLineAndCharacter(sourceFile *ast.SourceFile, line int, character int) int
 //go:linkname GetRangeOfTokenAtPosition github.com/microsoft/typescript-go/internal/scanner.GetRangeOfTokenAtPosition
 func GetRangeOfTokenAtPosition(sourceFile *ast.SourceFile, pos int) core.TextRange
 //go:linkname GetScannerForSourceFile github.com/microsoft/typescript-go/internal/scanner.GetScannerForSourceFile

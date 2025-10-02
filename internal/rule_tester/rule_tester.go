@@ -168,9 +168,9 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 					t.Errorf("Invalid message id %v. Expected %v", diagnostic.Message.Id, expected.MessageId)
 				}
 
-				lineIndex, columnIndex := scanner.GetLineAndCharacterOfPosition(diagnostic.SourceFile, diagnostic.Range.Pos())
+				lineIndex, columnIndex := scanner.GetECMALineAndCharacterOfPosition(diagnostic.SourceFile, diagnostic.Range.Pos())
 				line, column := lineIndex+1, columnIndex+1
-				endLineIndex, endColumnIndex := scanner.GetLineAndCharacterOfPosition(diagnostic.SourceFile, diagnostic.Range.End())
+				endLineIndex, endColumnIndex := scanner.GetECMALineAndCharacterOfPosition(diagnostic.SourceFile, diagnostic.Range.End())
 				endLine, endColumn := endLineIndex+1, endColumnIndex+1
 
 				if expected.Line != 0 && expected.Line != line {
