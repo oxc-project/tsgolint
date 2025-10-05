@@ -13,6 +13,8 @@ import _ "unsafe"
 func ComputeLineOfPosition(lineStarts []core.TextPos, pos int) int
 //go:linkname ComputePositionOfLineAndCharacter github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndCharacter
 func ComputePositionOfLineAndCharacter(lineStarts []core.TextPos, line int, character int) int
+//go:linkname ComputePositionOfLineAndCharacterEx github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndCharacterEx
+func ComputePositionOfLineAndCharacterEx(lineStarts []core.TextPos, line int, character int, text *string, allowEdits bool) int
 //go:linkname DeclarationNameToString github.com/microsoft/typescript-go/internal/scanner.DeclarationNameToString
 func DeclarationNameToString(name *ast.Node) string
 type ErrorCallback = scanner.ErrorCallback

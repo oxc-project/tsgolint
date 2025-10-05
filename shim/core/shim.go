@@ -19,9 +19,10 @@ type BreadthFirstSearchResult[N any] = core.BreadthFirstSearchResult[N]
 type BuildOptions = core.BuildOptions
 type CompilerOptions = core.CompilerOptions
 //go:linkname ComputeECMALineStarts github.com/microsoft/typescript-go/internal/core.ComputeECMALineStarts
-func ComputeECMALineStarts(text string) []core.TextPos
+func ComputeECMALineStarts(text string) core.ECMALineStarts
 //go:linkname ComputeECMALineStartsSeq github.com/microsoft/typescript-go/internal/core.ComputeECMALineStartsSeq
 func ComputeECMALineStartsSeq(text string) iter.Seq[core.TextPos]
+type ECMALineStarts = core.ECMALineStarts
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
 //go:linkname GetLocale github.com/microsoft/typescript-go/internal/core.GetLocale
 func GetLocale(ctx context.Context) language.Tag
