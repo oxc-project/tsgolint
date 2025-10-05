@@ -75,7 +75,7 @@ type SnapshotChange = project.SnapshotChange
 type SnapshotFSBuilder = project.SnapshotFSBuilder
 
 //go:linkname TsGoLintNewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.TsGoLintNewSnapshotFSBuilder
-func TsGoLintNewSnapshotFSBuilder(fs vfs.FS) *project.SnapshotFSBuilder
+func TsGoLintNewSnapshotFSBuilder(fs vfs.FS, currentDirectory string) *project.SnapshotFSBuilder
 
 type UpdateReason = project.UpdateReason
 

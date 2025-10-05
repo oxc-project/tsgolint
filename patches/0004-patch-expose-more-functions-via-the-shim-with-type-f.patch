@@ -1,4 +1,4 @@
-From 015d422565080bbe3f60613c236450a4856ad3a7 Mon Sep 17 00:00:00 2001
+From 547ed5f78099eff4a90b9c77801c09f36e65c769 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 29 Aug 2025 17:49:17 +0100
 Subject: [PATCH] patch: expose more functions via the shim with type fixes
@@ -12,10 +12,10 @@ Subject: [PATCH] patch: expose more functions via the shim with type fixes
  internal/project/project.go                   |   8 +-
  internal/project/projectcollectionbuilder.go  |  52 +++----
  internal/project/session.go                   |  12 +-
- internal/project/snapshot.go                  |  14 +-
- internal/project/snapshotfs.go                |  62 +++++---
+ internal/project/snapshot.go                  |  16 +-
+ internal/project/snapshotfs.go                |  59 +++++---
  internal/vfs/utilities.go                     |  18 +--
- 11 files changed, 190 insertions(+), 176 deletions(-)
+ 11 files changed, 187 insertions(+), 178 deletions(-)
 
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
 index d58b3522b..2721abb15 100644
@@ -901,7 +901,7 @@ index 0b6e537d5..cbd71bac6 100644
  		},
  	)
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index 8d41e426c..131bafcd2 100644
+index 8d41e426c..5a936ce19 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
 @@ -44,7 +44,7 @@ func NewSnapshot(
@@ -913,6 +913,15 @@ index 8d41e426c..131bafcd2 100644
  	configFileRegistry *ConfigFileRegistry,
  	compilerOptionsForInferredProjects *core.CompilerOptions,
  	toPath func(fileName string) tspath.Path,
+@@ -173,7 +173,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 	}
+ 
+ 	start := time.Now()
+-	fs := newSnapshotFSBuilder(session.fs.fs, overlays, s.fs.diskFiles, session.options.PositionEncoding, s.toPath)
++	fs := NewSnapshotFSBuilder(session.fs.fs, overlays, s.fs.diskFiles, session.options.PositionEncoding, s.toPath)
+ 	fs.markDirtyFiles(change.fileChanges)
+ 
+ 	compilerOptionsForInferredProjects := s.compilerOptionsForInferredProjects
 @@ -229,7 +229,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  		if changedFiles {
  			cleanFilesStart := time.Now()
@@ -948,7 +957,7 @@ index 8d41e426c..131bafcd2 100644
  			}
  		}
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 1b45acf0a..a1c579f5f 100644
+index 1b45acf0a..8ddf5263a 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -18,7 +18,7 @@ type FileSource interface {
@@ -997,7 +1006,8 @@ index 1b45acf0a..a1c579f5f 100644
  	toPath    func(string) tspath.Path
  }
  
- func newSnapshotFSBuilder(
+-func newSnapshotFSBuilder(
++func NewSnapshotFSBuilder(
  	fs vfs.FS,
  	overlays map[tspath.Path]*overlay,
 -	diskFiles map[tspath.Path]*diskFile,
@@ -1074,7 +1084,7 @@ index 1b45acf0a..a1c579f5f 100644
  				file.needsReload = true
  			})
  		}
-@@ -136,9 +136,23 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
+@@ -136,9 +136,18 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
  	for uri := range change.Deleted.Keys() {
  		path := s.toPath(uri.FileName())
  		if entry, ok := s.diskFiles.Load(path); ok {
@@ -1086,18 +1096,13 @@ index 1b45acf0a..a1c579f5f 100644
  	}
  }
 +
-+func TsGoLintNewSnapshotFSBuilder(
-+	fs vfs.FS,
-+) *SnapshotFSBuilder {
-+	cachedFS := cachedvfs.From(fs)
-+	cachedFS.Enable()
-+	toPath := func(fileName string) tspath.Path { return tspath.ToPath(fileName, "", fs.UseCaseSensitiveFileNames()) }
-+	return &SnapshotFSBuilder{
-+		Fs:        cachedFS,
-+		overlays:  make(map[tspath.Path]*overlay),
-+		diskFiles: dirty.NewSyncMap[tspath.Path, *DiskFile](nil, nil),
-+		toPath:    toPath,
++// TsGoLintNewSnapshotFSBuilder creates a SnapshotFSBuilder with sensible defaults for TSGolint use.
++// This is a convenience wrapper around NewSnapshotFSBuilder.
++func TsGoLintNewSnapshotFSBuilder(fs vfs.FS, currentDirectory string) *SnapshotFSBuilder {
++	toPath := func(fileName string) tspath.Path {
++		return tspath.ToPath(fileName, currentDirectory, fs.UseCaseSensitiveFileNames())
 +	}
++	return NewSnapshotFSBuilder(fs, nil, nil, lsproto.PositionEncodingKindUTF16, toPath)
 +}
 diff --git a/internal/vfs/utilities.go b/internal/vfs/utilities.go
 index 9eb2698b4..cf0e0e118 100644
