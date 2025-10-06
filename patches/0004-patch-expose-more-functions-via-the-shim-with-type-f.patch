@@ -1,7 +1,7 @@
-From c0aae26eba85f1c1255f2108af390b567f786f1b Mon Sep 17 00:00:00 2001
+From 547ed5f78099eff4a90b9c77801c09f36e65c769 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 29 Aug 2025 17:49:17 +0100
-Subject: [PATCH 4/4] patch: expose more functions via the shim with type fixes
+Subject: [PATCH] patch: expose more functions via the shim with type fixes
 
 ---
  internal/project/compilerhost.go              |   4 +-
@@ -12,16 +12,16 @@ Subject: [PATCH 4/4] patch: expose more functions via the shim with type fixes
  internal/project/project.go                   |   8 +-
  internal/project/projectcollectionbuilder.go  |  52 +++----
  internal/project/session.go                   |  12 +-
- internal/project/snapshot.go                  |  14 +-
- internal/project/snapshotfs.go                |  57 ++++---
+ internal/project/snapshot.go                  |  16 +-
+ internal/project/snapshotfs.go                |  59 +++++---
  internal/vfs/utilities.go                     |  18 +--
- 11 files changed, 187 insertions(+), 174 deletions(-)
+ 11 files changed, 187 insertions(+), 178 deletions(-)
 
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
-index 36cf2dfc4..3670cfb49 100644
+index d58b3522b..2721abb15 100644
 --- a/internal/project/compilerhost.go
 +++ b/internal/project/compilerhost.go
-@@ -20,7 +20,7 @@ type compilerHost struct {
+@@ -19,7 +19,7 @@ type compilerHost struct {
  	currentDirectory string
  	sessionOptions   *SessionOptions
 
@@ -30,7 +30,7 @@ index 36cf2dfc4..3670cfb49 100644
  	compilerFS         *compilerFS
  	configFileRegistry *ConfigFileRegistry
  	seenFiles          *collections.SyncSet[tspath.Path]
-@@ -32,7 +32,7 @@ type compilerHost struct {
+@@ -31,7 +31,7 @@ type compilerHost struct {
 
  type builderFileSource struct {
  	seenFiles         *collections.SyncSet[tspath.Path]
@@ -561,11 +561,11 @@ index 38654c55a..bf4e62758 100644
  	entry.mu.Lock()
  	if existing, loaded := c.entries.LoadOrStore(path, entry); loaded {
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index a59e1a74d..493c02764 100644
+index 47ec2d95f..c3b6fbade 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
-@@ -55,13 +55,13 @@ func (f *fileBase) LineMap() *ls.LineMap {
- 	return f.lineMap
+@@ -67,13 +67,13 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
+ 	return f.lineInfo
  }
 
 -type diskFile struct {
@@ -581,7 +581,7 @@ index a59e1a74d..493c02764 100644
  		fileBase: fileBase{
  			fileName: fileName,
  			content:  content,
-@@ -70,26 +70,26 @@ func newDiskFile(fileName string, content string) *diskFile {
+@@ -82,26 +82,26 @@ func newDiskFile(fileName string, content string) *diskFile {
  	}
  }
 
@@ -616,10 +616,10 @@ index a59e1a74d..493c02764 100644
  			fileName: f.fileName,
  			content:  f.content,
 diff --git a/internal/project/project.go b/internal/project/project.go
-index f2ee08235..1aebd3806 100644
+index f476d3ab9..13da19d5e 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
-@@ -124,7 +124,7 @@ func NewInferredProject(
+@@ -121,7 +121,7 @@ func NewInferredProject(
  		compilerOptions,
  		rootFileNames,
  		tspath.ComparePathsOptions{
@@ -628,7 +628,7 @@ index f2ee08235..1aebd3806 100644
  			CurrentDirectory:          currentDirectory,
  		},
  	)
-@@ -148,17 +148,17 @@ func NewProject(
+@@ -145,17 +145,17 @@ func NewProject(
  		dirty:            true,
  	}
 
@@ -858,7 +858,7 @@ index 771701690..8c5c327ba 100644
  		})
  		changed := b.inferredProject.ChangeIf(
 diff --git a/internal/project/session.go b/internal/project/session.go
-index 4e78c2888..585ab380a 100644
+index 0b6e537d5..cbd71bac6 100644
 --- a/internal/project/session.go
 +++ b/internal/project/session.go
 @@ -73,7 +73,7 @@ type Session struct {
@@ -901,10 +901,10 @@ index 4e78c2888..585ab380a 100644
  		},
  	)
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index b5d7d1722..5f0af2cbc 100644
+index 8d41e426c..5a936ce19 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
-@@ -43,7 +43,7 @@ func NewSnapshot(
+@@ -44,7 +44,7 @@ func NewSnapshot(
  	fs *snapshotFS,
  	sessionOptions *SessionOptions,
  	parseCache *ParseCache,
@@ -913,7 +913,16 @@ index b5d7d1722..5f0af2cbc 100644
  	configFileRegistry *ConfigFileRegistry,
  	compilerOptionsForInferredProjects *core.CompilerOptions,
  	toPath func(fileName string) tspath.Path,
-@@ -209,7 +209,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -173,7 +173,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 	}
+
+ 	start := time.Now()
+-	fs := newSnapshotFSBuilder(session.fs.fs, overlays, s.fs.diskFiles, session.options.PositionEncoding, s.toPath)
++	fs := NewSnapshotFSBuilder(session.fs.fs, overlays, s.fs.diskFiles, session.options.PositionEncoding, s.toPath)
+ 	fs.markDirtyFiles(change.fileChanges)
+
+ 	compilerOptionsForInferredProjects := s.compilerOptionsForInferredProjects
+@@ -229,7 +229,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  		if changedFiles {
  			cleanFilesStart := time.Now()
  			removedFiles := 0
@@ -922,7 +931,7 @@ index b5d7d1722..5f0af2cbc 100644
  				for _, project := range projectCollection.Projects() {
  					if project.host.seenFiles.Has(entry.Key()) {
  						return true
-@@ -261,10 +261,10 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -281,10 +281,10 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  		}
  	}
  	for path, config := range newSnapshot.ConfigFileRegistry.configs {
@@ -936,7 +945,7 @@ index b5d7d1722..5f0af2cbc 100644
  						// Ref count extended configs that were already loaded in the previous snapshot.
  						// New/changed ones were handled during config file registry building.
  						session.extendedConfigCache.Ref(s.toPath(file))
-@@ -295,8 +295,8 @@ func (s *Snapshot) dispose(session *Session) {
+@@ -315,8 +315,8 @@ func (s *Snapshot) dispose(session *Session) {
  		}
  	}
  	for _, config := range s.ConfigFileRegistry.configs {
@@ -948,10 +957,10 @@ index b5d7d1722..5f0af2cbc 100644
  			}
  		}
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 29b51a1df..7e2271c6b 100644
+index 1b45acf0a..8ddf5263a 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
-@@ -15,7 +15,7 @@ type FileSource interface {
+@@ -18,7 +18,7 @@ type FileSource interface {
  }
 
  var (
@@ -960,16 +969,30 @@ index 29b51a1df..7e2271c6b 100644
  	_ FileSource = (*snapshotFS)(nil)
  )
 
-@@ -23,7 +23,7 @@ type snapshotFS struct {
+@@ -26,11 +26,11 @@ type snapshotFS struct {
  	toPath    func(fileName string) tspath.Path
  	fs        vfs.FS
  	overlays  map[tspath.Path]*overlay
 -	diskFiles map[tspath.Path]*diskFile
 +	diskFiles map[tspath.Path]*DiskFile
+ 	readFiles collections.SyncMap[tspath.Path, memoizedDiskFile]
  }
 
+-type memoizedDiskFile func() *diskFile
++type memoizedDiskFile func() *DiskFile
+
  func (s *snapshotFS) FS() vfs.FS {
-@@ -40,59 +40,72 @@ func (s *snapshotFS) GetFile(fileName string) FileHandle {
+ 	return s.fs
+@@ -43,7 +43,7 @@ func (s *snapshotFS) GetFile(fileName string) FileHandle {
+ 	if file, ok := s.diskFiles[s.toPath(fileName)]; ok {
+ 		return file
+ 	}
+-	newEntry := memoizedDiskFile(sync.OnceValue(func() *diskFile {
++	newEntry := memoizedDiskFile(sync.OnceValue(func() *DiskFile {
+ 		if contents, ok := s.fs.ReadFile(fileName); ok {
+ 			return newDiskFile(fileName, contents)
+ 		}
+@@ -55,59 +55,59 @@ func (s *snapshotFS) GetFile(fileName string) FileHandle {
  	return nil
  }
 
@@ -983,7 +1006,8 @@ index 29b51a1df..7e2271c6b 100644
  	toPath    func(string) tspath.Path
  }
 
- func newSnapshotFSBuilder(
+-func newSnapshotFSBuilder(
++func NewSnapshotFSBuilder(
  	fs vfs.FS,
  	overlays map[tspath.Path]*overlay,
 -	diskFiles map[tspath.Path]*diskFile,
@@ -1006,19 +1030,6 @@ index 29b51a1df..7e2271c6b 100644
 
 -func (s *snapshotFSBuilder) FS() vfs.FS {
 -	return s.fs
-+func TsGoLintNewSnapshotFSBuilder(
-+	fs vfs.FS,
-+) *SnapshotFSBuilder {
-+	cachedFS := cachedvfs.From(fs)
-+	cachedFS.Enable()
-+	return &SnapshotFSBuilder{
-+		Fs:        cachedFS,
-+		overlays:  make(map[tspath.Path]*overlay),
-+		diskFiles: dirty.NewSyncMap[tspath.Path, *DiskFile](nil, nil),
-+		toPath:    func(fileName string) tspath.Path { return tspath.ToPath(fileName, "", fs.UseCaseSensitiveFileNames()) },
-+	}
-+}
-+
 +func (s *SnapshotFSBuilder) FS() vfs.FS {
 +	return s.Fs
  }
@@ -1059,7 +1070,7 @@ index 29b51a1df..7e2271c6b 100644
  						file.content = content
  						file.hash = xxh3.Hash128([]byte(content))
  						file.needsReload = false
-@@ -109,11 +122,11 @@ func (s *snapshotFSBuilder) GetFileByPath(fileName string, path tspath.Path) Fil
+@@ -124,11 +124,11 @@ func (s *snapshotFSBuilder) GetFileByPath(fileName string, path tspath.Path) Fil
  	return entry.Value()
  }
 
@@ -1073,7 +1084,7 @@ index 29b51a1df..7e2271c6b 100644
  				file.needsReload = true
  			})
  		}
-@@ -121,7 +134,7 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
+@@ -136,9 +136,18 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
  	for uri := range change.Deleted.Keys() {
  		path := s.toPath(uri.FileName())
  		if entry, ok := s.diskFiles.Load(path); ok {
@@ -1082,6 +1093,17 @@ index 29b51a1df..7e2271c6b 100644
  				file.needsReload = true
  			})
  		}
+ 	}
+ }
++
++// TsGoLintNewSnapshotFSBuilder creates a SnapshotFSBuilder with sensible defaults for TSGolint use.
++// This is a convenience wrapper around NewSnapshotFSBuilder.
++func TsGoLintNewSnapshotFSBuilder(fs vfs.FS, currentDirectory string) *SnapshotFSBuilder {
++	toPath := func(fileName string) tspath.Path {
++		return tspath.ToPath(fileName, currentDirectory, fs.UseCaseSensitiveFileNames())
++	}
++	return NewSnapshotFSBuilder(fs, nil, nil, lsproto.PositionEncodingKindUTF16, toPath)
++}
 diff --git a/internal/vfs/utilities.go b/internal/vfs/utilities.go
 index 9eb2698b4..cf0e0e118 100644
 --- a/internal/vfs/utilities.go
@@ -1144,5 +1166,5 @@ index 9eb2698b4..cf0e0e118 100644
  ) string {
  	matcher = wildcardMatchers[usage]
 --
-2.39.5 (Apple Git-154)
+2.50.1 (Apple Git-155)
 
