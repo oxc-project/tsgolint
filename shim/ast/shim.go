@@ -1297,6 +1297,7 @@ const KindDeclareKeyword = ast.KindDeclareKeyword
 const KindDecorator = ast.KindDecorator
 const KindDefaultClause = ast.KindDefaultClause
 const KindDefaultKeyword = ast.KindDefaultKeyword
+const KindDeferKeyword = ast.KindDeferKeyword
 const KindDeleteExpression = ast.KindDeleteExpression
 const KindDeleteKeyword = ast.KindDeleteKeyword
 const KindDoKeyword = ast.KindDoKeyword
