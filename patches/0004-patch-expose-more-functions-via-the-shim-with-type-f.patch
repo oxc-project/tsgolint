@@ -1,4 +1,4 @@
-From 547ed5f78099eff4a90b9c77801c09f36e65c769 Mon Sep 17 00:00:00 2001
+From f56e69492ac040e205bdfd8ac1f945fb9de35c06 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 29 Aug 2025 17:49:17 +0100
 Subject: [PATCH] patch: expose more functions via the shim with type fixes
@@ -8,14 +8,15 @@ Subject: [PATCH] patch: expose more functions via the shim with type fixes
  internal/project/configfileregistry.go        |  22 +--
  internal/project/configfileregistrybuilder.go | 142 +++++++++---------
  internal/project/extendedconfigcache.go       |  12 +-
- internal/project/overlayfs.go                 |  20 +--
+ internal/project/overlayfs.go                 |  64 ++++----
+ internal/project/overlayfs_test.go            |   8 +-
  internal/project/project.go                   |   8 +-
  internal/project/projectcollectionbuilder.go  |  52 +++----
- internal/project/session.go                   |  12 +-
- internal/project/snapshot.go                  |  16 +-
- internal/project/snapshotfs.go                |  59 +++++---
+ internal/project/session.go                   |  24 +--
+ internal/project/snapshot.go                  |  18 +--
+ internal/project/snapshotfs.go                |  65 ++++----
  internal/vfs/utilities.go                     |  18 +--
- 11 files changed, 187 insertions(+), 178 deletions(-)
+ 12 files changed, 223 insertions(+), 214 deletions(-)
 
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
 index d58b3522b..2721abb15 100644
@@ -561,7 +562,7 @@ index 38654c55a..bf4e62758 100644
  	entry.mu.Lock()
  	if existing, loaded := c.entries.LoadOrStore(path, entry); loaded {
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index 47ec2d95f..c3b6fbade 100644
+index 47ec2d95f..d9378155b 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
 @@ -67,13 +67,13 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
@@ -615,6 +616,174 @@ index 47ec2d95f..c3b6fbade 100644
  		fileBase: fileBase{
  			fileName: f.fileName,
  			content:  f.content,
+@@ -110,17 +110,17 @@ func (f *diskFile) Clone() *diskFile {
+ 	}
+ }
+
+-var _ FileHandle = (*overlay)(nil)
++var _ FileHandle = (*Overlay)(nil)
+
+-type overlay struct {
++type Overlay struct {
+ 	fileBase
+ 	version         int32
+ 	kind            core.ScriptKind
+ 	matchesDiskText bool
+ }
+
+-func newOverlay(fileName string, content string, version int32, kind core.ScriptKind) *overlay {
+-	return &overlay{
++func NewOverlay(fileName string, content string, version int32, kind core.ScriptKind) *Overlay {
++	return &Overlay{
+ 		fileBase: fileBase{
+ 			fileName: fileName,
+ 			content:  content,
+@@ -131,21 +131,21 @@ func newOverlay(fileName string, content string, version int32, kind core.Script
+ 	}
+ }
+
+-func (o *overlay) Version() int32 {
++func (o *Overlay) Version() int32 {
+ 	return o.version
+ }
+
+-func (o *overlay) Text() string {
++func (o *Overlay) Text() string {
+ 	return o.content
+ }
+
+ // MatchesDiskText may return false negatives, but never false positives.
+-func (o *overlay) MatchesDiskText() bool {
++func (o *Overlay) MatchesDiskText() bool {
+ 	return o.matchesDiskText
+ }
+
+ // !!! optimization: incorporate mtime
+-func (o *overlay) computeMatchesDiskText(fs vfs.FS) bool {
++func (o *Overlay) computeMatchesDiskText(fs vfs.FS) bool {
+ 	if isDynamicFileName(o.fileName) {
+ 		return false
+ 	}
+@@ -156,25 +156,25 @@ func (o *overlay) computeMatchesDiskText(fs vfs.FS) bool {
+ 	return xxh3.Hash128([]byte(diskContent)) == o.hash
+ }
+
+-func (o *overlay) IsOverlay() bool {
++func (o *Overlay) IsOverlay() bool {
+ 	return true
+ }
+
+-func (o *overlay) Kind() core.ScriptKind {
++func (o *Overlay) Kind() core.ScriptKind {
+ 	return o.kind
+ }
+
+-type overlayFS struct {
++type OverlayFS struct {
+ 	toPath           func(string) tspath.Path
+ 	fs               vfs.FS
+ 	positionEncoding lsproto.PositionEncodingKind
+
+ 	mu       sync.RWMutex
+-	overlays map[tspath.Path]*overlay
++	overlays map[tspath.Path]*Overlay
+ }
+
+-func newOverlayFS(fs vfs.FS, overlays map[tspath.Path]*overlay, positionEncoding lsproto.PositionEncodingKind, toPath func(string) tspath.Path) *overlayFS {
+-	return &overlayFS{
++func NewOverlayFS(fs vfs.FS, overlays map[tspath.Path]*Overlay, positionEncoding lsproto.PositionEncodingKind, toPath func(string) tspath.Path) *OverlayFS {
++	return &OverlayFS{
+ 		fs:               fs,
+ 		positionEncoding: positionEncoding,
+ 		overlays:         overlays,
+@@ -182,13 +182,13 @@ func newOverlayFS(fs vfs.FS, overlays map[tspath.Path]*overlay, positionEncoding
+ 	}
+ }
+
+-func (fs *overlayFS) Overlays() map[tspath.Path]*overlay {
++func (fs *OverlayFS) Overlays() map[tspath.Path]*Overlay {
+ 	fs.mu.RLock()
+ 	defer fs.mu.RUnlock()
+ 	return fs.overlays
+ }
+
+-func (fs *overlayFS) getFile(fileName string) FileHandle {
++func (fs *OverlayFS) getFile(fileName string) FileHandle {
+ 	fs.mu.RLock()
+ 	overlays := fs.overlays
+ 	fs.mu.RUnlock()
+@@ -205,7 +205,7 @@ func (fs *overlayFS) getFile(fileName string) FileHandle {
+ 	return newDiskFile(fileName, content)
+ }
+
+-func (fs *overlayFS) processChanges(changes []FileChange) (FileChangeSummary, map[tspath.Path]*overlay) {
++func (fs *OverlayFS) processChanges(changes []FileChange) (FileChangeSummary, map[tspath.Path]*Overlay) {
+ 	fs.mu.Lock()
+ 	defer fs.mu.Unlock()
+
+@@ -295,7 +295,7 @@ func (fs *overlayFS) processChanges(changes []FileChange) (FileChangeSummary, ma
+ 				panic("can only process one file open event at a time")
+ 			}
+ 			result.Opened = uri
+-			newOverlays[path] = newOverlay(
++			newOverlays[path] = NewOverlay(
+ 				uri.FileName(),
+ 				events.openChange.Content,
+ 				events.openChange.Version,
+@@ -317,7 +317,7 @@ func (fs *overlayFS) processChanges(changes []FileChange) (FileChangeSummary, ma
+ 				result.Changed.Add(uri)
+ 			} else if o != nil && !events.saved {
+ 				if matchesDiskText := o.computeMatchesDiskText(fs.fs); matchesDiskText != o.MatchesDiskText() {
+-					o = newOverlay(o.FileName(), o.Content(), o.Version(), o.kind)
++					o = NewOverlay(o.FileName(), o.Content(), o.Version(), o.kind)
+ 					o.matchesDiskText = matchesDiskText
+ 					newOverlays[path] = o
+ 				}
+@@ -336,9 +336,9 @@ func (fs *overlayFS) processChanges(changes []FileChange) (FileChangeSummary, ma
+ 				for _, textChange := range change.Changes {
+ 					if partialChange := textChange.Partial; partialChange != nil {
+ 						newContent := converters.FromLSPTextChange(o, partialChange).ApplyTo(o.content)
+-						o = newOverlay(o.fileName, newContent, change.Version, o.kind)
++						o = NewOverlay(o.fileName, newContent, change.Version, o.kind)
+ 					} else if wholeChange := textChange.WholeDocument; wholeChange != nil {
+-						o = newOverlay(o.fileName, wholeChange.Text, change.Version, o.kind)
++						o = NewOverlay(o.fileName, wholeChange.Text, change.Version, o.kind)
+ 					}
+ 				}
+ 				if len(change.Changes) > 0 {
+@@ -354,7 +354,7 @@ func (fs *overlayFS) processChanges(changes []FileChange) (FileChangeSummary, ma
+ 			if o == nil {
+ 				panic("overlay not found for saved file: " + uri)
+ 			}
+-			o = newOverlay(o.FileName(), o.Content(), o.Version(), o.kind)
++			o = NewOverlay(o.FileName(), o.Content(), o.Version(), o.kind)
+ 			o.matchesDiskText = true
+ 			newOverlays[path] = o
+ 		}
+diff --git a/internal/project/overlayfs_test.go b/internal/project/overlayfs_test.go
+index 5f044bcac..d53f1817f 100644
+--- a/internal/project/overlayfs_test.go
++++ b/internal/project/overlayfs_test.go
+@@ -11,15 +11,15 @@ import (
+
+ func TestProcessChanges(t *testing.T) {
+ 	t.Parallel()
+-	// Helper to create test overlayFS
+-	createOverlayFS := func() *overlayFS {
++	// Helper to create test OverlayFS
++	createOverlayFS := func() *OverlayFS {
+ 		testFS := vfstest.FromMap(map[string]string{
+ 			"/test1.ts": "// existing content",
+ 			"/test2.ts": "// existing content",
+ 		}, false /* useCaseSensitiveFileNames */)
+-		return newOverlayFS(
++		return NewOverlayFS(
+ 			testFS,
+-			make(map[tspath.Path]*overlay),
++			make(map[tspath.Path]*Overlay),
+ 			lsproto.PositionEncodingKindUTF16,
+ 			func(fileName string) tspath.Path {
+ 				return tspath.Path(fileName)
 diff --git a/internal/project/project.go b/internal/project/project.go
 index f476d3ab9..13da19d5e 100644
 --- a/internal/project/project.go
@@ -858,10 +1027,18 @@ index 771701690..8c5c327ba 100644
  		})
  		changed := b.inferredProject.ChangeIf(
 diff --git a/internal/project/session.go b/internal/project/session.go
-index 0b6e537d5..cbd71bac6 100644
+index 0b6e537d5..f8f1ffd44 100644
 --- a/internal/project/session.go
 +++ b/internal/project/session.go
-@@ -73,7 +73,7 @@ type Session struct {
+@@ -66,14 +66,14 @@ type Session struct {
+ 	client      Client
+ 	logger      logging.Logger
+ 	npmExecutor ata.NpmExecutor
+-	fs          *overlayFS
++	fs          *OverlayFS
+
+ 	// parseCache is the ref-counted cache of source files used when
+ 	// creating programs during snapshot cloning.
  	parseCache *ParseCache
  	// extendedConfigCache is the ref-counted cache of tsconfig ASTs
  	// that are used in the "extends" of another tsconfig.
@@ -870,7 +1047,13 @@ index 0b6e537d5..cbd71bac6 100644
  	// programCounter counts how many snapshots reference a program.
  	// When a program is no longer referenced, its source files are
  	// released from the parseCache.
-@@ -121,7 +121,7 @@ func NewSession(init *SessionInit) *Session {
+@@ -116,12 +116,12 @@ func NewSession(init *SessionInit) *Session {
+ 	toPath := func(fileName string) tspath.Path {
+ 		return tspath.ToPath(fileName, currentDirectory, useCaseSensitiveFileNames)
+ 	}
+-	overlayFS := newOverlayFS(init.FS, make(map[tspath.Path]*overlay), init.Options.PositionEncoding, toPath)
++	OverlayFS := NewOverlayFS(init.FS, make(map[tspath.Path]*Overlay), init.Options.PositionEncoding, toPath)
+ 	parseCache := init.ParseCache
  	if parseCache == nil {
  		parseCache = &ParseCache{}
  	}
@@ -879,6 +1062,24 @@ index 0b6e537d5..cbd71bac6 100644
 
  	session := &Session{
  		options:             init.Options,
+@@ -129,7 +129,7 @@ func NewSession(init *SessionInit) *Session {
+ 		client:              init.Client,
+ 		logger:              init.Logger,
+ 		npmExecutor:         init.NpmExecutor,
+-		fs:                  overlayFS,
++		fs:                  OverlayFS,
+ 		parseCache:          parseCache,
+ 		extendedConfigCache: extendedConfigCache,
+ 		programCounter:      &programCounter{},
+@@ -370,7 +370,7 @@ func (s *Session) GetLanguageService(ctx context.Context, uri lsproto.DocumentUr
+ 	return ls.NewLanguageService(project.GetProgram(), snapshot), nil
+ }
+
+-func (s *Session) UpdateSnapshot(ctx context.Context, overlays map[tspath.Path]*overlay, change SnapshotChange) *Snapshot {
++func (s *Session) UpdateSnapshot(ctx context.Context, overlays map[tspath.Path]*Overlay, change SnapshotChange) *Snapshot {
+ 	s.snapshotMu.Lock()
+ 	oldSnapshot := s.snapshot
+ 	newSnapshot := oldSnapshot.Clone(ctx, change, overlays, s)
 @@ -449,16 +449,16 @@ func (s *Session) updateWatches(oldSnapshot *Snapshot, newSnapshot *Snapshot) er
  	core.DiffMapsFunc(
  		oldSnapshot.ConfigFileRegistry.configs,
@@ -900,8 +1101,26 @@ index 0b6e537d5..cbd71bac6 100644
  			errors = append(errors, updateWatch(ctx, s.client, s.logger, oldEntry.rootFilesWatch, newEntry.rootFilesWatch)...)
  		},
  	)
+@@ -506,7 +506,7 @@ func (s *Session) Close() {
+ 	s.backgroundQueue.Close()
+ }
+
+-func (s *Session) flushChanges(ctx context.Context) (FileChangeSummary, map[tspath.Path]*overlay, map[tspath.Path]*ATAStateChange) {
++func (s *Session) flushChanges(ctx context.Context) (FileChangeSummary, map[tspath.Path]*Overlay, map[tspath.Path]*ATAStateChange) {
+ 	s.pendingFileChangesMu.Lock()
+ 	defer s.pendingFileChangesMu.Unlock()
+ 	s.pendingATAChangesMu.Lock()
+@@ -518,7 +518,7 @@ func (s *Session) flushChanges(ctx context.Context) (FileChangeSummary, map[tspa
+ }
+
+ // flushChangesLocked should only be called with s.pendingFileChangesMu held.
+-func (s *Session) flushChangesLocked(ctx context.Context) (FileChangeSummary, map[tspath.Path]*overlay) {
++func (s *Session) flushChangesLocked(ctx context.Context) (FileChangeSummary, map[tspath.Path]*Overlay) {
+ 	if len(s.pendingFileChanges) == 0 {
+ 		return FileChangeSummary{}, s.fs.Overlays()
+ 	}
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index 8d41e426c..5a936ce19 100644
+index 8d41e426c..dd332c609 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
 @@ -44,7 +44,7 @@ func NewSnapshot(
@@ -913,6 +1132,15 @@ index 8d41e426c..5a936ce19 100644
  	configFileRegistry *ConfigFileRegistry,
  	compilerOptionsForInferredProjects *core.CompilerOptions,
  	toPath func(fileName string) tspath.Path,
+@@ -143,7 +143,7 @@ type ATAStateChange struct {
+ 	Logs                *logging.LogTree
+ }
+
+-func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays map[tspath.Path]*overlay, session *Session) *Snapshot {
++func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays map[tspath.Path]*Overlay, session *Session) *Snapshot {
+ 	var logger *logging.LogTree
+
+ 	// Print in-progress logs immediately if cloning fails
 @@ -173,7 +173,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  	}
 
@@ -957,10 +1185,10 @@ index 8d41e426c..5a936ce19 100644
  			}
  		}
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 1b45acf0a..8ddf5263a 100644
+index 441299e31..7141c99ec 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
-@@ -18,7 +18,7 @@ type FileSource interface {
+@@ -18,19 +18,19 @@ type FileSource interface {
  }
 
  var (
@@ -969,16 +1197,17 @@ index 1b45acf0a..8ddf5263a 100644
  	_ FileSource = (*snapshotFS)(nil)
  )
 
-@@ -26,11 +26,11 @@ type snapshotFS struct {
+ type snapshotFS struct {
  	toPath    func(fileName string) tspath.Path
  	fs        vfs.FS
- 	overlays  map[tspath.Path]*overlay
+-	overlays  map[tspath.Path]*overlay
 -	diskFiles map[tspath.Path]*diskFile
++	overlays  map[tspath.Path]*Overlay
 +	diskFiles map[tspath.Path]*DiskFile
  	readFiles collections.SyncMap[tspath.Path, memoizedDiskFile]
  }
 
--type memoizedDiskFile func() *diskFile
+-type memoizedDiskFile func() FileHandle
 +type memoizedDiskFile func() *DiskFile
 
  func (s *snapshotFS) FS() vfs.FS {
@@ -987,21 +1216,22 @@ index 1b45acf0a..8ddf5263a 100644
  	if file, ok := s.diskFiles[s.toPath(fileName)]; ok {
  		return file
  	}
--	newEntry := memoizedDiskFile(sync.OnceValue(func() *diskFile {
+-	newEntry := memoizedDiskFile(sync.OnceValue(func() FileHandle {
 +	newEntry := memoizedDiskFile(sync.OnceValue(func() *DiskFile {
  		if contents, ok := s.fs.ReadFile(fileName); ok {
  			return newDiskFile(fileName, contents)
  		}
-@@ -55,59 +55,59 @@ func (s *snapshotFS) GetFile(fileName string) FileHandle {
- 	return nil
+@@ -53,59 +53,59 @@ func (s *snapshotFS) GetFile(fileName string) FileHandle {
+ 	return entry()
  }
 
 -type snapshotFSBuilder struct {
 -	fs        vfs.FS
+-	overlays  map[tspath.Path]*overlay
+-	diskFiles *dirty.SyncMap[tspath.Path, *diskFile]
 +type SnapshotFSBuilder struct {
 +	Fs        vfs.FS
- 	overlays  map[tspath.Path]*overlay
--	diskFiles *dirty.SyncMap[tspath.Path, *diskFile]
++	overlays  map[tspath.Path]*Overlay
 +	diskFiles *dirty.SyncMap[tspath.Path, *DiskFile]
  	toPath    func(string) tspath.Path
  }
@@ -1009,8 +1239,9 @@ index 1b45acf0a..8ddf5263a 100644
 -func newSnapshotFSBuilder(
 +func NewSnapshotFSBuilder(
  	fs vfs.FS,
- 	overlays map[tspath.Path]*overlay,
+-	overlays map[tspath.Path]*overlay,
 -	diskFiles map[tspath.Path]*diskFile,
++	overlays map[tspath.Path]*Overlay,
 +	diskFiles map[tspath.Path]*DiskFile,
  	positionEncoding lsproto.PositionEncodingKind,
  	toPath func(fileName string) tspath.Path,
@@ -1070,7 +1301,7 @@ index 1b45acf0a..8ddf5263a 100644
  						file.content = content
  						file.hash = xxh3.Hash128([]byte(content))
  						file.needsReload = false
-@@ -124,11 +124,11 @@ func (s *snapshotFSBuilder) GetFileByPath(fileName string, path tspath.Path) Fil
+@@ -122,11 +122,11 @@ func (s *snapshotFSBuilder) GetFileByPath(fileName string, path tspath.Path) Fil
  	return entry.Value()
  }
 
@@ -1084,7 +1315,7 @@ index 1b45acf0a..8ddf5263a 100644
  				file.needsReload = true
  			})
  		}
-@@ -136,9 +136,18 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
+@@ -134,9 +134,18 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
  	for uri := range change.Deleted.Keys() {
  		path := s.toPath(uri.FileName())
  		if entry, ok := s.diskFiles.Load(path); ok {
