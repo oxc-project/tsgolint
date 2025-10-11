@@ -226,6 +226,8 @@ func GetCombinedModifierFlags(node *ast.Node) ast.ModifierFlags
 func GetCombinedNodeFlags(node *ast.Node) ast.NodeFlags
 //go:linkname GetContainingClass github.com/microsoft/typescript-go/internal/ast.GetContainingClass
 func GetContainingClass(node *ast.Node) *ast.Node
+//go:linkname GetContainingFunction github.com/microsoft/typescript-go/internal/ast.GetContainingFunction
+func GetContainingFunction(node *ast.Node) *ast.Node
 //go:linkname GetDeclarationContainer github.com/microsoft/typescript-go/internal/ast.GetDeclarationContainer
 func GetDeclarationContainer(node *ast.Node) *ast.Node
 //go:linkname GetDeclarationOfKind github.com/microsoft/typescript-go/internal/ast.GetDeclarationOfKind
@@ -355,6 +357,8 @@ func HasDynamicName(declaration *ast.Node) bool
 type HasFileName = ast.HasFileName
 //go:linkname HasInitializer github.com/microsoft/typescript-go/internal/ast.HasInitializer
 func HasInitializer(node *ast.Node) bool
+//go:linkname HasModifier github.com/microsoft/typescript-go/internal/ast.HasModifier
+func HasModifier(node *ast.Node, flags ast.ModifierFlags) bool
 //go:linkname HasQuestionToken github.com/microsoft/typescript-go/internal/ast.HasQuestionToken
 func HasQuestionToken(node *ast.Node) bool
 //go:linkname HasResolutionModeOverride github.com/microsoft/typescript-go/internal/ast.HasResolutionModeOverride
@@ -583,6 +587,8 @@ func IsEnumDeclaration(node *ast.Node) bool
 func IsEnumMember(node *ast.Node) bool
 //go:linkname IsExclusivelyTypeOnlyImportOrExport github.com/microsoft/typescript-go/internal/ast.IsExclusivelyTypeOnlyImportOrExport
 func IsExclusivelyTypeOnlyImportOrExport(node *ast.Node) bool
+//go:linkname IsExpandoInitializer github.com/microsoft/typescript-go/internal/ast.IsExpandoInitializer
+func IsExpandoInitializer(initializer *ast.Node) bool
 //go:linkname IsExportAssignment github.com/microsoft/typescript-go/internal/ast.IsExportAssignment
 func IsExportAssignment(node *ast.Node) bool
 //go:linkname IsExportDeclaration github.com/microsoft/typescript-go/internal/ast.IsExportDeclaration
@@ -799,6 +805,8 @@ func IsJsxTagName(node *ast.Node) bool
 func IsJsxText(node *ast.Node) bool
 //go:linkname IsJumpStatementTarget github.com/microsoft/typescript-go/internal/ast.IsJumpStatementTarget
 func IsJumpStatementTarget(node *ast.Node) bool
+//go:linkname IsKeyword github.com/microsoft/typescript-go/internal/ast.IsKeyword
+func IsKeyword(token ast.Kind) bool
 //go:linkname IsKeywordKind github.com/microsoft/typescript-go/internal/ast.IsKeywordKind
 func IsKeywordKind(token ast.Kind) bool
 //go:linkname IsLabelName github.com/microsoft/typescript-go/internal/ast.IsLabelName
@@ -885,6 +893,8 @@ func IsNamespaceImport(node *ast.Node) bool
 func IsNewExpression(node *ast.Node) bool
 //go:linkname IsNodeDescendantOf github.com/microsoft/typescript-go/internal/ast.IsNodeDescendantOf
 func IsNodeDescendantOf(node *ast.Node, ancestor *ast.Node) bool
+//go:linkname IsNonContextualKeyword github.com/microsoft/typescript-go/internal/ast.IsNonContextualKeyword
+func IsNonContextualKeyword(token ast.Kind) bool
 //go:linkname IsNonLocalAlias github.com/microsoft/typescript-go/internal/ast.IsNonLocalAlias
 func IsNonLocalAlias(symbol *ast.Symbol, excludes ast.SymbolFlags) bool
 //go:linkname IsNonNullExpression github.com/microsoft/typescript-go/internal/ast.IsNonNullExpression

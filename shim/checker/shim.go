@@ -536,8 +536,6 @@ func GetDeclarationModifierFlagsFromSymbol(s *ast.Symbol) ast.ModifierFlags
 func GetResolvedSignatureForSignatureHelp(node *ast.Node, argumentCount int, c *checker.Checker) (*checker.Signature, []*checker.Signature)
 //go:linkname GetSingleVariableOfVariableStatement github.com/microsoft/typescript-go/internal/checker.GetSingleVariableOfVariableStatement
 func GetSingleVariableOfVariableStatement(node *ast.Node) *ast.Node
-//go:linkname HasModifier github.com/microsoft/typescript-go/internal/checker.HasModifier
-func HasModifier(node *ast.Node, flags ast.ModifierFlags) bool
 type Host = checker.Host
 type IndexFlags = checker.IndexFlags
 const IndexFlagsNoIndexSignatures = checker.IndexFlagsNoIndexSignatures
@@ -883,7 +881,6 @@ const SignatureKindConstruct = checker.SignatureKindConstruct
 type SignatureLinks = checker.SignatureLinks
 type SignatureToSignatureDeclarationOptions = checker.SignatureToSignatureDeclarationOptions
 type SimpleTypeMapper = checker.SimpleTypeMapper
-type SingleSignatureType = checker.SingleSignatureType
 //go:linkname SkipAlias github.com/microsoft/typescript-go/internal/checker.SkipAlias
 func SkipAlias(symbol *ast.Symbol, checker *checker.Checker) *ast.Symbol
 //go:linkname SkipTypeChecking github.com/microsoft/typescript-go/internal/checker.SkipTypeChecking
