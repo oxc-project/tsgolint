@@ -101,7 +101,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 				// For composite projects, we can get an early negative result.
 				// !!! what about declaration files in node_modules? wouldn't it be better to
 				//     check project inclusion if the project is already loaded?
-				if !config.MatchesFileName(fileName) {
+				if !config.PossiblyMatchesFileName(fileName) {
 					return false, false
 				}
 			}

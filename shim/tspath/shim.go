@@ -60,6 +60,8 @@ func GetAnyExtensionFromPath(path string, extensions []string, ignoreCase bool) 
 func GetBaseFileName(path string) string
 //go:linkname GetCanonicalFileName github.com/microsoft/typescript-go/internal/tspath.GetCanonicalFileName
 func GetCanonicalFileName(fileName string, useCaseSensitiveFileNames bool) string
+//go:linkname GetCommonParents github.com/microsoft/typescript-go/internal/tspath.GetCommonParents
+func GetCommonParents(paths []string, minComponents int, getPathComponents func(path string, currentDirectory string) []string, options tspath.ComparePathsOptions) (parents []string, ignored map[string]struct{})
 //go:linkname GetDeclarationEmitExtensionForPath github.com/microsoft/typescript-go/internal/tspath.GetDeclarationEmitExtensionForPath
 func GetDeclarationEmitExtensionForPath(path string) string
 //go:linkname GetDeclarationFileExtension github.com/microsoft/typescript-go/internal/tspath.GetDeclarationFileExtension
