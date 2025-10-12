@@ -15,8 +15,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/compiler"
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/tspath"
-	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
-	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
+	"github.com/microsoft/typescript-go/shim/vfs"
 )
 
 type ConfiguredRule struct {
@@ -29,9 +28,7 @@ type Workload struct {
 	UnmatchedFiles []string
 }
 
-func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Workload, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
-	// TODO(camc314): pass in via argument??
-	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
+func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Workload, workers int, fs vfs.FS, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
 
 	idx := 0
 	for configFileName, filePaths := range workload.Programs {

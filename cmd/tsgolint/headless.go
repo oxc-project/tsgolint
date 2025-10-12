@@ -274,6 +274,7 @@ func runHeadless(args []string) int {
 		cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
+		fs,
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			cfg := fileConfigs[sourceFile.FileName()]
 			rules := make([]linter.ConfiguredRule, len(cfg))
