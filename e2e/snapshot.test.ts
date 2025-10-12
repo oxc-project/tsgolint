@@ -292,4 +292,74 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     expect(v1Diagnostics).toStrictEqual(v2Diagnostics);
   });
+
+  it('should use source overrides instead of reading from disk', async () => {
+    const testFiles = await getTestFiles('source-overrides');
+    expect(testFiles.length).toBeGreaterThan(0);
+    const testFile = testFiles[0];
+
+    const overriddenContent = `const promise = new Promise((resolve, _reject) => resolve("value"));
+promise;
+`;
+
+    const config = {
+      version: 2,
+      configs: [
+        {
+          file_paths: [testFile],
+          rules: [{ name: 'no-floating-promises' }],
+        },
+      ],
+      source_overrides: {
+        [testFile]: overriddenContent,
+      },
+    };
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config),
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics.length).toBe(1);
+    expect(diagnostics[0].rule).toBe('no-floating-promises');
+    expect(diagnostics[0].file_path).toContain('original.ts');
+  });
+
+  it('should not report errors when source override is valid', async () => {
+    const testFiles = await getTestFiles('source-overrides');
+    expect(testFiles.length).toBeGreaterThan(0);
+    const testFile = testFiles[0];
+
+    const validOverride = `// Valid code with no errors
+const x: number = 42;
+console.log(x);
+`;
+
+    const config = {
+      version: 2,
+      configs: [
+        {
+          file_paths: [testFile],
+          rules: [{ name: 'no-floating-promises' }, { name: 'no-unsafe-assignment' }],
+        },
+      ],
+      source_overrides: {
+        [testFile]: validOverride,
+      },
+    };
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config),
+      env,
+    });
+
+    const diagnostics = parseHeadlessOutput(output);
+
+    expect(diagnostics.length).toBe(0);
+  });
 });
