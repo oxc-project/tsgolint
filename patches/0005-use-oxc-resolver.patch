@@ -1,0 +1,247 @@
+From ac0b16a4bb421f75534847541fa8634b4726f586 Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Tue, 14 Oct 2025 15:55:50 +0100
+Subject: [PATCH] use oxc resolver
+
+---
+ internal/module/resolver_factory.go |  48 ++++++++
+ internal/module/resolver_oxc.go     | 172 ++++++++++++++++++++++++++++
+ 2 files changed, 220 insertions(+)
+ create mode 100644 internal/module/resolver_factory.go
+ create mode 100644 internal/module/resolver_oxc.go
+
+diff --git a/internal/module/resolver_factory.go b/internal/module/resolver_factory.go
+new file mode 100644
+index 000000000..198b6fe96
+--- /dev/null
++++ b/internal/module/resolver_factory.go
+@@ -0,0 +1,48 @@
++package module
++
++import (
++	"os"
++
++	"github.com/microsoft/typescript-go/internal/core"
++)
++
++type ModuleResolver interface {
++	ResolveModuleName(
++		moduleName string,
++		containingFile string,
++		resolutionMode core.ResolutionMode,
++		redirectedReference ResolvedProjectReference,
++	) (*ResolvedModule, []string)
++
++	ResolveTypeReferenceDirective(
++		typeReferenceDirectiveName string,
++		containingFile string,
++		resolutionMode core.ResolutionMode,
++		redirectedReference ResolvedProjectReference,
++	) (*ResolvedTypeReferenceDirective, []string)
++}
++
++// NewModuleResolver creates a resolver based on OXC_RESOLVER_KIND environment variable
++// Values: "oxc" for oxc-resolver, "legacy" or empty for built-in resolver
++func NewModuleResolver(
++	host ResolutionHost,
++	options *core.CompilerOptions,
++	typingsLocation string,
++	projectName string,
++) ModuleResolver {
++	kind := os.Getenv("OXC_RESOLVER_KIND")
++
++	switch kind {
++	case "oxc":
++		// Try to create oxc-resolver
++		oxcResolver := NewOxcResolver(host, options, typingsLocation, projectName)
++		if oxcResolver != nil {
++			return oxcResolver
++		}
++		// Fall back to legacy resolver on error
++		fallthrough
++	default:
++		// Use legacy resolver (default)
++		return NewResolver(host, options, typingsLocation, projectName)
++	}
++}
+diff --git a/internal/module/resolver_oxc.go b/internal/module/resolver_oxc.go
+new file mode 100644
+index 000000000..a9423aa70
+--- /dev/null
++++ b/internal/module/resolver_oxc.go
+@@ -0,0 +1,172 @@
++package module
++
++import (
++	"path/filepath"
++	"strings"
++
++	"github.com/microsoft/typescript-go/internal/core"
++	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/tspath"
++	"github.com/typescript-eslint/tsgolint/pkg/oxc"
++)
++
++// OxcResolver wraps oxc-resolver for TypeScript module resolution
++type OxcResolver struct {
++	resolver        *oxc.Resolver
++	host            ResolutionHost
++	compilerOptions *core.CompilerOptions
++	typingsLocation string
++	projectName     string
++	caches          caches
++}
++
++// NewOxcResolver creates a new OxcResolver
++func NewOxcResolver(
++	host ResolutionHost,
++	options *core.CompilerOptions,
++	typingsLocation string,
++	projectName string,
++) *OxcResolver {
++	// Build oxc resolver options from compiler options
++	oxcOpts := &oxc.ResolveOptions{
++		Extensions:    []string{".ts", ".tsx", ".mts", ".cts", ".d.ts", ".d.mts", ".d.cts", ".js", ".jsx", ".mjs", ".cjs"},
++		MainFields:    []string{"types", "typings", "module", "main"},
++		ExportsFields: []string{"exports"},
++		Symlinks:      true,
++	}
++
++	// Pass tsconfig path if available
++	if options.ConfigFilePath != "" {
++		oxcOpts.TsconfigPath = options.ConfigFilePath
++	}
++
++	resolver, err := oxc.NewResolver(oxcOpts)
++	if err != nil {
++		// Fallback to nil, caller should check
++		return nil
++	}
++
++	return &OxcResolver{
++		resolver:        resolver,
++		host:            host,
++		compilerOptions: options,
++		typingsLocation: typingsLocation,
++		projectName:     projectName,
++		caches:          newCaches(host.GetCurrentDirectory(), host.FS().UseCaseSensitiveFileNames(), options),
++	}
++}
++
++// ResolveModuleName resolves a module name
++func (r *OxcResolver) ResolveModuleName(
++	moduleName string,
++	containingFile string,
++	resolutionMode core.ResolutionMode,
++	redirectedReference ResolvedProjectReference,
++) (*ResolvedModule, []string) {
++	if r.resolver == nil {
++		return &ResolvedModule{}, nil
++	}
++
++	// Get containing directory
++	containingDirectory := tspath.GetDirectoryPath(containingFile)
++
++	// Resolve using oxc
++	resolution, err := r.resolver.Resolve(containingDirectory, moduleName)
++	if err != nil {
++		// Resolution failed
++		return &ResolvedModule{
++			LookupLocations: LookupLocations{
++				FailedLookupLocations: []string{filepath.Join(containingDirectory, moduleName)},
++			},
++		}, nil
++	}
++
++	// Validate that the resolved file has a valid TypeScript/JavaScript extension
++	ext := tspath.TryGetExtensionFromPath(resolution.Path)
++	if ext == "" {
++		// oxc-resolver found a file, but it's not a valid TS/JS file
++		return &ResolvedModule{
++			LookupLocations: LookupLocations{
++				FailedLookupLocations: []string{resolution.Path},
++			},
++		}, nil
++	}
++
++	// Convert oxc resolution to ResolvedModule
++	result := &ResolvedModule{
++		ResolvedFileName:         resolution.Path,
++		Extension:                ext,
++		ResolvedUsingTsExtension: resolution.ResolvedUsingTsExtension,
++		IsExternalLibraryImport:  strings.Contains(resolution.Path, "/node_modules/"),
++	}
++
++	traces := []string{}
++	return result, traces
++}
++
++// ResolveTypeReferenceDirective resolves a type reference directive
++func (r *OxcResolver) ResolveTypeReferenceDirective(
++	typeReferenceDirectiveName string,
++	containingFile string,
++	resolutionMode core.ResolutionMode,
++	redirectedReference ResolvedProjectReference,
++) (*ResolvedTypeReferenceDirective, []string) {
++	if r.resolver == nil {
++		return &ResolvedTypeReferenceDirective{}, nil
++	}
++
++	traces := []string{}
++
++	// Resolve using oxc's type reference resolution
++	resolution, err := r.resolver.ResolveTypeReferenceDirective(containingFile, typeReferenceDirectiveName)
++	if err != nil {
++		return &ResolvedTypeReferenceDirective{}, traces
++	}
++
++	// Determine if this is a primary resolution (from @types)
++	isPrimary := strings.Contains(resolution.Path, "/@types/")
++
++	return &ResolvedTypeReferenceDirective{
++		ResolvedFileName:        resolution.Path,
++		Primary:                 isPrimary,
++		IsExternalLibraryImport: strings.Contains(resolution.Path, "/node_modules/"),
++	}, traces
++}
++
++// GetPackageScopeForPath returns the package.json scope for a path
++func (r *OxcResolver) GetPackageScopeForPath(directory string) *packagejson.InfoCacheEntry {
++	result, _ := tspath.ForEachAncestorDirectory(
++		directory,
++		func(dir string) (*packagejson.InfoCacheEntry, bool) {
++			packageJsonPath := filepath.Join(dir, "package.json")
++			if cached := r.caches.packageJsonInfoCache.Get(packageJsonPath); cached != nil {
++				return cached, true
++			}
++
++			// Check if package.json exists
++			if r.host.FS().FileExists(packageJsonPath) {
++				// Parse and cache it
++				contents, exists := r.host.FS().ReadFile(packageJsonPath)
++				if exists {
++					fields, _ := packagejson.Parse([]byte(contents))
++					entry := &packagejson.InfoCacheEntry{
++						PackageDirectory: dir,
++						DirectoryExists:  true,
++						Contents:         &packagejson.PackageJson{Fields: fields},
++					}
++					return r.caches.packageJsonInfoCache.Set(packageJsonPath, entry), true
++				}
++			}
++			return nil, false
++		},
++	)
++	return result
++}
++
++// Free releases the resolver resources
++func (r *OxcResolver) Free() {
++	if r.resolver != nil {
++		r.resolver.Free()
++		r.resolver = nil
++	}
++}
+-- 
+2.50.1 (Apple Git-155)
+

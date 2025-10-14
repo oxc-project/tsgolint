@@ -1,0 +1,19 @@
+language = "C"
+include_guard = "OXC_RESOLVER_H"
+pragma_once = true
+cpp_compat = true
+documentation = true
+documentation_style = "c"
+
+[export]
+# Include all items
+include = ["CResolver", "CResolution", "CResolveOptions"]
+
+[export.rename]
+# Keep our naming as-is
+
+[defines]
+
+[layout]
+packed = false
+aligned_n = 8
