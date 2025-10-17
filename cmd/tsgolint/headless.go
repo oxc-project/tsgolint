@@ -138,8 +138,6 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
-
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
@@ -152,6 +150,12 @@ func runHeadless(args []string) int {
 		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
 		return 1
 	}
+
+	baseFS := osvfs.FS()
+	if len(payload.SourceOverrides) > 0 {
+		baseFS = newOverlayFS(baseFS, payload.SourceOverrides)
+	}
+	fs := bundled.WrapFS(cachedvfs.From(baseFS))
 
 	workload := linter.Workload{
 		Programs:       make(map[string][]string),
