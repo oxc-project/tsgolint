@@ -1,0 +1,19 @@
+[package]
+name = "oxc-resolver-ffi"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["staticlib", "cdylib"]
+
+[dependencies]
+oxc_resolver = { git = "https://github.com/oxc-project/oxc-resolver.git", features = ["typescript"], branch = "c/experiment" }
+
+[build-dependencies]
+cbindgen = "0.27"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+strip = true
