@@ -189,7 +189,6 @@ type extra_Checker struct {
   argumentsSymbol *ast.Symbol
   requireSymbol *ast.Symbol
   unknownSymbol *ast.Symbol
-  resolvingSymbol *ast.Symbol
   unresolvedSymbols map[string]*ast.Symbol
   errorTypes map[string]*checker.Type
   globalThisSymbol *ast.Symbol
@@ -1154,6 +1153,7 @@ type TypeReference = checker.TypeReference
 type TypeResolution = checker.TypeResolution
 type TypeSystemEntity = checker.TypeSystemEntity
 type TypeSystemPropertyName = checker.TypeSystemPropertyName
+const TypeSystemPropertyNameAliasTarget = checker.TypeSystemPropertyNameAliasTarget
 const TypeSystemPropertyNameDeclaredType = checker.TypeSystemPropertyNameDeclaredType
 const TypeSystemPropertyNameInitializerIsUndefined = checker.TypeSystemPropertyNameInitializerIsUndefined
 const TypeSystemPropertyNameResolvedBaseConstraint = checker.TypeSystemPropertyNameResolvedBaseConstraint
