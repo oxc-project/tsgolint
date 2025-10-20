@@ -413,7 +413,6 @@ const InternalSymbolNameModuleExports = ast.InternalSymbolNameModuleExports
 const InternalSymbolNameNew = ast.InternalSymbolNameNew
 const InternalSymbolNameObject = ast.InternalSymbolNameObject
 const InternalSymbolNamePrefix = ast.InternalSymbolNamePrefix
-const InternalSymbolNameResolving = ast.InternalSymbolNameResolving
 const InternalSymbolNameThis = ast.InternalSymbolNameThis
 const InternalSymbolNameType = ast.InternalSymbolNameType
 type IntersectionTypeNode = ast.IntersectionTypeNode
