@@ -1,0 +1,34 @@
+From 9996736562885c214bb53b09148e8f080fd875db Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Wed, 22 Oct 2025 09:32:18 +0100
+Subject: [PATCH] feat: improve panic message for extracting TS extension
+
+---
+ internal/checker/checker.go | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/internal/checker/checker.go b/internal/checker/checker.go
+index da46eb8d9..4c4b7a1f1 100644
+--- a/internal/checker/checker.go
++++ b/internal/checker/checker.go
+@@ -14659,7 +14659,7 @@ func (c *Checker) resolveExternalModule(location *ast.Node, moduleReference stri
+ 				if ast.FindAncestor(location, ast.IsEmittableImport) != nil {
+ 					tsExtension := tspath.TryExtractTSExtension(moduleReference)
+ 					if tsExtension == "" {
+-						panic("should be able to extract TS extension from string that passes IsDeclarationFileName")
++						panic(fmt.Sprintf("should be able to extract TS extension from string that passes IsDeclarationFileName: `%s`", moduleReference))
+ 					}
+ 					c.error(
+ 						errorNode,
+@@ -14671,7 +14671,7 @@ func (c *Checker) resolveExternalModule(location *ast.Node, moduleReference stri
+ 				if ast.FindAncestor(location, ast.IsEmittableImport) != nil {
+ 					tsExtension := tspath.TryExtractTSExtension(moduleReference)
+ 					if tsExtension == "" {
+-						panic("should be able to extract TS extension from string that passes IsDeclarationFileName")
++						panic(fmt.Sprintf("should be able to extract TS extension from string that passes IsDeclarationFileName: `%s`", moduleReference))
+ 					}
+ 					c.error(
+ 						errorNode,
+-- 
+2.50.1 (Apple Git-155)
+
