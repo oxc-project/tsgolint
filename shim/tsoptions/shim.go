@@ -76,6 +76,8 @@ func NewParsedCommandLine(compilerOptions *core.CompilerOptions, rootFileNames [
 //go:linkname NewTsconfigSourceFileFromFilePath github.com/microsoft/typescript-go/internal/tsoptions.NewTsconfigSourceFileFromFilePath
 func NewTsconfigSourceFileFromFilePath(configFileName string, configPath tspath.Path, configSourceText string) *tsoptions.TsConfigSourceFile
 var OptionsDeclarations = tsoptions.OptionsDeclarations
+var OptionsForBuild = tsoptions.OptionsForBuild
+var OptionsForWatch = tsoptions.OptionsForWatch
 //go:linkname ParseBuildCommandLine github.com/microsoft/typescript-go/internal/tsoptions.ParseBuildCommandLine
 func ParseBuildCommandLine(commandLine []string, host tsoptions.ParseConfigHost) *tsoptions.ParsedBuildCommandLine
 //go:linkname ParseBuildOptions github.com/microsoft/typescript-go/internal/tsoptions.ParseBuildOptions

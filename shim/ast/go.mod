@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/ast
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251021154135-62fcda71d91e
+require github.com/microsoft/typescript-go v0.0.0-20251022192033-48b739ce833d
 
 require (
 	github.com/go-json-experiment/json v0.0.0-20250910080747-cc2cfa0554c3 // indirect
