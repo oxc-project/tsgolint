@@ -20,91 +20,91 @@ type StrictBooleanExpressionsOptions struct {
 	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing *bool
 }
 
-func buildUnexpectedAny() rule.RuleMessage {
+func buildConditionErrorNumberMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedAny",
-		Description: "Unexpected any value in conditional. An explicit comparison or type cast is required.",
+		Id:          "conditionErrorNumber",
+		Description: "Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.",
 	}
 }
 
-func buildUnexpectedNullableBoolean() rule.RuleMessage {
+func buildConditionErrorStringMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedNullableBoolean",
+		Id:          "conditionErrorString",
+		Description: "Unexpected string value in conditional. A string can be falsy (empty string) or truthy.",
+	}
+}
+
+func buildConditionErrorObjectMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "conditionErrorObject",
+		Description: "Unexpected object value in conditional. An object is always truthy.",
+	}
+}
+
+func buildConditionErrorNullishMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "conditionErrorNullish",
+		Description: "Unexpected nullish value in conditional. The expression is always falsy.",
+	}
+}
+
+func buildConditionErrorOtherMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "conditionErrorOther",
+		Description: "Unexpected value in conditional. A union of different types has inconsistent truthiness.",
+	}
+}
+
+func buildConditionErrorNullableBooleanMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "conditionErrorNullableBoolean",
 		Description: "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
 	}
 }
 
-func buildUnexpectedNullableString() rule.RuleMessage {
+func buildConditionErrorNullableObjectMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedNullableString",
-		Description: "Unexpected nullable string value in conditional. Please handle the nullish case explicitly.",
+		Id:          "conditionErrorNullableObject",
+		Description: "Unexpected nullable object value in conditional. Please handle the nullish case explicitly.",
 	}
 }
 
-func buildUnexpectedNullableNumber() rule.RuleMessage {
+func buildConditionErrorNullableStringMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedNullableNumber",
-		Description: "Unexpected nullable number value in conditional. Please handle the nullish case explicitly.",
+		Id:          "conditionErrorNullableString",
+		Description: "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
 	}
 }
 
-func buildUnexpectedNullableEnum() rule.RuleMessage {
+func buildConditionErrorNullableNumberMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedNullableEnum",
-		Description: "Unexpected nullable enum value in conditional. Please handle the nullish case explicitly.",
+		Id:          "conditionErrorNullableNumber",
+		Description: "Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.",
 	}
 }
 
-func buildUnexpectedNullableObject() rule.RuleMessage {
+func buildConditionErrorNullableEnumMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedNullableObject",
-		Description: "Unexpected nullable object value in conditional. An explicit null check is required.",
+		Id:          "conditionErrorNullableEnum",
+		Description: "Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.",
 	}
 }
 
-func buildUnexpectedNullish() rule.RuleMessage {
+func buildConditionErrorAnyMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unexpectedNullish",
-		Description: "Unexpected nullish value in conditional. An explicit null check is required.",
+		Id:          "conditionErrorAny",
+		Description: "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
 	}
 }
 
-func buildUnexpectedString() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "unexpectedString",
-		Description: "Unexpected string value in conditional. An explicit empty string check is required.",
-	}
-}
-
-func buildUnexpectedNumber() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "unexpectedNumber",
-		Description: "Unexpected number value in conditional. An explicit zero/NaN check is required.",
-	}
-}
-
-func buildUnexpectedObject() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "unexpectedObject",
-		Description: "Unexpected object value in conditional. The condition is always true.",
-	}
-}
-
-func buildUnexpectedMixedCondition() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "unexpectedMixedCondition",
-		Description: "Unexpected mixed type in conditional. The constituent types do not have a best common type.",
-	}
-}
-
-func buildNoStrictNullCheck() rule.RuleMessage {
+func buildNoStrictNullCheckMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noStrictNullCheck",
 		Description: "This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.",
 	}
 }
 
-func buildPredicateCannotBeAsync() rule.RuleMessage {
+func buildPredicateCannotBeAsyncMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "predicateCannotBeAsync",
 		Description: "Predicate function should not be 'async'; expected a boolean return type.",
@@ -154,7 +154,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			!utils.IsStrictCompilerOptionEnabled(compilerOptions, compilerOptions.StrictNullChecks) {
 			ctx.ReportRange(
 				core.NewTextRange(0, 0),
-				buildNoStrictNullCheck(),
+				buildNoStrictNullCheckMessage(),
 			)
 		}
 
@@ -203,7 +203,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 						}
 						isFunction := arg.Kind&(ast.KindArrowFunction|ast.KindFunctionExpression|ast.KindFunctionDeclaration) != 0
 						if isFunction && checker.GetFunctionFlags(arg)&checker.FunctionFlagsAsync != 0 {
-							ctx.ReportNode(arg, buildPredicateCannotBeAsync())
+							ctx.ReportNode(arg, buildPredicateCannotBeAsyncMessage())
 							return
 						}
 						funcType := ctx.TypeChecker.GetTypeAtLocation(arg)
@@ -246,15 +246,63 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 	if len(checkableArguments) == 0 {
 		return nil
 	}
+
+	calleeType := typeChecker.GetTypeAtLocation(callExpr.Expression)
+	if calleeType == nil {
+		return nil
+	}
+
+	unionTypes := utils.UnionTypeParts(calleeType)
+	isUnionType := len(unionTypes) > 1
+
 	node := callExpr.AsNode()
 	signature := typeChecker.GetResolvedSignature(node)
+
 	if signature == nil {
+		if !isUnionType {
+			return nil
+		}
+
+		for _, t := range unionTypes {
+			signatures := typeChecker.GetCallSignatures(t)
+			for _, sig := range signatures {
+				typePredicate := typeChecker.GetTypePredicateOfSignature(sig)
+				if typePredicate != nil &&
+					checker.TypePredicate_kind(typePredicate) == checker.TypePredicateKindAssertsIdentifier &&
+					checker.TypePredicate_t(typePredicate) == nil {
+					parameterIndex := checker.TypePredicate_parameterIndex(typePredicate)
+					if int(parameterIndex) < len(checkableArguments) {
+						return checkableArguments[parameterIndex]
+					}
+				}
+			}
+		}
 		return nil
 	}
+
 	firstTypePredicateResult := typeChecker.GetTypePredicateOfSignature(signature)
 	if firstTypePredicateResult == nil {
+		if !isUnionType {
+			return nil
+		}
+
+		for _, t := range unionTypes {
+			signatures := typeChecker.GetCallSignatures(t)
+			for _, sig := range signatures {
+				typePredicate := typeChecker.GetTypePredicateOfSignature(sig)
+				if typePredicate != nil &&
+					checker.TypePredicate_kind(typePredicate) == checker.TypePredicateKindAssertsIdentifier &&
+					checker.TypePredicate_t(typePredicate) == nil {
+					parameterIndex := checker.TypePredicate_parameterIndex(typePredicate)
+					if int(parameterIndex) < len(checkableArguments) {
+						return checkableArguments[parameterIndex]
+					}
+				}
+			}
+		}
 		return nil
 	}
+
 	if !(checker.TypePredicate_kind(firstTypePredicateResult) == checker.TypePredicateKindAssertsIdentifier &&
 		checker.TypePredicate_t(firstTypePredicateResult) == nil) {
 		return nil
@@ -347,7 +395,7 @@ func analyzeTypeParts(typeChecker *checker.Checker, types []*checker.Type) typeI
 		if partInfo.isEnum {
 			info.isEnum = true
 		}
-		if partInfo.variant == typeVariantBoolean || partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString {
+		if partInfo.variant == typeVariantBoolean || partInfo.variant == typeVariantNumber || partInfo.variant == typeVariantString || partInfo.variant == typeVariantBigInt {
 			if metNotTruthy {
 				continue
 			}
@@ -492,13 +540,13 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 	switch info.variant {
 	case typeVariantAny, typeVariantUnknown, typeVariantGeneric:
 		if !*opts.AllowAny {
-			ctx.ReportNode(node, buildUnexpectedAny())
+			ctx.ReportNode(node, buildConditionErrorAnyMessage())
 		}
 		return
 	case typeVariantNever:
 		return
 	case typeVariantNullish:
-		ctx.ReportNode(node, buildUnexpectedNullish())
+		ctx.ReportNode(node, buildConditionErrorNullishMessage())
 	case typeVariantString:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
 		if *opts.AllowString && info.isTruthy {
@@ -508,15 +556,15 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 		if info.isNullable {
 			if info.isEnum {
 				if !*opts.AllowNullableEnum {
-					ctx.ReportNode(node, buildUnexpectedNullableEnum())
+					ctx.ReportNode(node, buildConditionErrorNullableEnumMessage())
 				}
 			} else {
 				if !*opts.AllowNullableString {
-					ctx.ReportNode(node, buildUnexpectedNullableString())
+					ctx.ReportNode(node, buildConditionErrorNullableStringMessage())
 				}
 			}
 		} else if !*opts.AllowString {
-			ctx.ReportNode(node, buildUnexpectedString())
+			ctx.ReportNode(node, buildConditionErrorStringMessage())
 		}
 	case typeVariantNumber:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
@@ -527,15 +575,15 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 		if info.isNullable {
 			if info.isEnum {
 				if !*opts.AllowNullableEnum {
-					ctx.ReportNode(node, buildUnexpectedNullableEnum())
+					ctx.ReportNode(node, buildConditionErrorNullableEnumMessage())
 				}
 			} else {
 				if !*opts.AllowNullableNumber {
-					ctx.ReportNode(node, buildUnexpectedNullableNumber())
+					ctx.ReportNode(node, buildConditionErrorNullableNumberMessage())
 				}
 			}
 		} else if !*opts.AllowNumber {
-			ctx.ReportNode(node, buildUnexpectedNumber())
+			ctx.ReportNode(node, buildConditionErrorNumberMessage())
 		}
 	case typeVariantBoolean:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
@@ -544,27 +592,27 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 		}
 
 		if info.isNullable && !*opts.AllowNullableBoolean {
-			ctx.ReportNode(node, buildUnexpectedNullableBoolean())
+			ctx.ReportNode(node, buildConditionErrorNullableBooleanMessage())
 		}
 	case typeVariantObject:
 		if info.isNullable && !*opts.AllowNullableObject {
-			ctx.ReportNode(node, buildUnexpectedNullableObject())
+			ctx.ReportNode(node, buildConditionErrorNullableObjectMessage())
 		} else if !info.isNullable {
-			ctx.ReportNode(node, buildUnexpectedObject())
+			ctx.ReportNode(node, buildConditionErrorObjectMessage())
 		}
 	case typeVariantMixed:
 		if info.isEnum {
 			if info.isNullable && !*opts.AllowNullableEnum {
-				ctx.ReportNode(node, buildUnexpectedNullableEnum())
+				ctx.ReportNode(node, buildConditionErrorNullableEnumMessage())
 			}
 			return
 		}
-		ctx.ReportNode(node, buildUnexpectedMixedCondition())
+		ctx.ReportNode(node, buildConditionErrorOtherMessage())
 	case typeVariantBigInt:
 		if info.isNullable && !*opts.AllowNullableNumber {
-			ctx.ReportNode(node, buildUnexpectedNullableNumber())
+			ctx.ReportNode(node, buildConditionErrorNullableNumberMessage())
 		} else if !info.isNullable && !*opts.AllowNumber {
-			ctx.ReportNode(node, buildUnexpectedNumber())
+			ctx.ReportNode(node, buildConditionErrorNumberMessage())
 		}
 	}
 }
