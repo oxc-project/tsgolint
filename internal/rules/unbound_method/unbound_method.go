@@ -241,7 +241,7 @@ var UnboundMethodRule = rule.Rule{
 			if ast.IsComputedPropertyName(propertyName) {
 				return
 			}
-			
+
 			if initNode != nil {
 				if !isNativelyBound(initNode, propertyName) {
 					reported := checkIfMethodAndReport(propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(initNode), propertyName.Text()))
