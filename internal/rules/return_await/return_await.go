@@ -250,7 +250,7 @@ var ReturnAwaitRule = rule.Rule{
 						return
 					}
 
-					ctx.ReportNodeWithFixes(node, buildNonPromiseAwaitMessage(), removeAwaitFix(node))
+					ctx.ReportNodeWithFixes(node, buildNonPromiseAwaitMessage(), func() []rule.RuleFix { return []rule.RuleFix{removeAwaitFix(node)} })
 				}
 				return
 			}

@@ -410,20 +410,25 @@ var NoFloatingPromisesRule = rule.Rule{
 						msg = buildFloatingVoidMessage()
 					}
 
-					ctx.ReportNodeWithSuggestions(node, msg, rule.RuleSuggestion{
-						Message: buildFloatingFixVoidMessage(),
-						FixesArr: (func() []rule.RuleFix {
-							if isHigherPrecedenceThanUnary(exprStatement.Expression) {
-								return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, node, "void ")}
-							}
-							return []rule.RuleFix{
-								rule.RuleFixInsertBefore(ctx.SourceFile, node, "void ("),
-								rule.RuleFixInsertAfter(expression, ")"),
-							}
-						})(),
-					}, rule.RuleSuggestion{
-						Message:  buildFloatingFixAwaitMessage(),
-						FixesArr: addAwait(expression, exprStatement),
+					ctx.ReportNodeWithSuggestions(node, msg, func() []rule.RuleSuggestion {
+						return []rule.RuleSuggestion{
+							{
+								Message: buildFloatingFixVoidMessage(),
+								FixesArr: func() []rule.RuleFix {
+									if isHigherPrecedenceThanUnary(exprStatement.Expression) {
+										return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, node, "void ")}
+									}
+									return []rule.RuleFix{
+										rule.RuleFixInsertBefore(ctx.SourceFile, node, "void ("),
+										rule.RuleFixInsertAfter(expression, ")"),
+									}
+								}(),
+							},
+							{
+								Message:  buildFloatingFixAwaitMessage(),
+								FixesArr: addAwait(expression, exprStatement),
+							},
+						}
 					})
 				} else {
 					var msg rule.RuleMessage
@@ -432,9 +437,11 @@ var NoFloatingPromisesRule = rule.Rule{
 					} else {
 						msg = buildFloatingMessage()
 					}
-					ctx.ReportNodeWithSuggestions(node, msg, rule.RuleSuggestion{
-						Message:  buildFloatingFixAwaitMessage(),
-						FixesArr: addAwait(expression, exprStatement),
+					ctx.ReportNodeWithSuggestions(node, msg, func() []rule.RuleSuggestion {
+						return []rule.RuleSuggestion{{
+							Message:  buildFloatingFixAwaitMessage(),
+							FixesArr: addAwait(expression, exprStatement),
+						}}
 					})
 				}
 			},

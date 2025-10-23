@@ -114,19 +114,21 @@ type RuleContext struct {
 	Program                    *compiler.Program
 	TypeChecker                *checker.Checker
 	ReportRange                func(textRange core.TextRange, msg RuleMessage)
-	ReportRangeWithSuggestions func(textRange core.TextRange, msg RuleMessage, suggestions ...RuleSuggestion)
+	ReportRangeWithSuggestions func(textRange core.TextRange, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
 	ReportNode                 func(node *ast.Node, msg RuleMessage)
-	ReportNodeWithFixes        func(node *ast.Node, msg RuleMessage, fixes ...RuleFix)
-	ReportNodeWithSuggestions  func(node *ast.Node, msg RuleMessage, suggestions ...RuleSuggestion)
+	ReportNodeWithFixes        func(node *ast.Node, msg RuleMessage, fixesFn func() []RuleFix)
+	ReportNodeWithSuggestions  func(node *ast.Node, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
 }
 
 func ReportNodeWithFixesOrSuggestions(ctx RuleContext, node *ast.Node, fix bool, msg RuleMessage, suggestionMsg RuleMessage, fixes ...RuleFix) {
 	if fix {
-		ctx.ReportNodeWithFixes(node, msg, fixes...)
+		ctx.ReportNodeWithFixes(node, msg, func() []RuleFix { return fixes })
 	} else {
-		ctx.ReportNodeWithSuggestions(node, msg, RuleSuggestion{
-			Message:  suggestionMsg,
-			FixesArr: fixes,
+		ctx.ReportNodeWithSuggestions(node, msg, func() []RuleSuggestion {
+			return []RuleSuggestion{{
+				Message:  suggestionMsg,
+				FixesArr: fixes,
+			}}
 		})
 	}
 }
