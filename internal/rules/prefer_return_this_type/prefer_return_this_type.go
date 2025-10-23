@@ -98,7 +98,7 @@ var PreferReturnThisTypeRule = rule.Rule{
 				}
 			}
 
-			ctx.ReportNodeWithFixes(node, buildUseThisTypeMessage(), rule.RuleFixReplace(ctx.SourceFile, node, "this"))
+			ctx.ReportNodeWithFixes(node, buildUseThisTypeMessage(), func() []rule.RuleFix { return []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, node, "this")} })
 		}
 
 		return rule.RuleListeners{

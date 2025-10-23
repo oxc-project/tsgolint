@@ -139,7 +139,7 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			} else {
 				removeRange = arg.Loc.WithPos(arguments.Nodes[i-1].End())
 			}
-			ctx.ReportNodeWithFixes(arg, buildUnnecessaryTypeParameterMessage(), rule.RuleFixRemoveRange(removeRange))
+			ctx.ReportNodeWithFixes(arg, buildUnnecessaryTypeParameterMessage(), func() []rule.RuleFix { return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange)} })
 
 		}
 

@@ -161,7 +161,8 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 									SourceFile: file,
 								})
 							},
-							ReportRangeWithSuggestions: func(textRange core.TextRange, msg rule.RuleMessage, suggestions ...rule.RuleSuggestion) {
+							ReportRangeWithSuggestions: func(textRange core.TextRange, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
+								suggestions := suggestionsFn()
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:    r.Name,
 									Range:       textRange,
@@ -178,7 +179,8 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 									SourceFile: file,
 								})
 							},
-							ReportNodeWithFixes: func(node *ast.Node, msg rule.RuleMessage, fixes ...rule.RuleFix) {
+							ReportNodeWithFixes: func(node *ast.Node, msg rule.RuleMessage, fixesFn func() []rule.RuleFix) {
+								fixes := fixesFn()
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:   r.Name,
 									Range:      utils.TrimNodeTextRange(file, node),
@@ -188,7 +190,8 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 								})
 							},
 
-							ReportNodeWithSuggestions: func(node *ast.Node, msg rule.RuleMessage, suggestions ...rule.RuleSuggestion) {
+							ReportNodeWithSuggestions: func(node *ast.Node, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
+								suggestions := suggestionsFn()
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:    r.Name,
 									Range:       utils.TrimNodeTextRange(file, node),

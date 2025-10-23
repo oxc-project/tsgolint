@@ -227,9 +227,11 @@ var NoMisusedSpreadRule = rule.Rule{
 			}
 
 			if isPromise(ctx.Program, ctx.TypeChecker, t) {
-				ctx.ReportNodeWithSuggestions(node, buildNoPromiseSpreadInObjectMessage(), rule.RuleSuggestion{
-					Message:  buildAddAwaitMessage(),
-					FixesArr: insertAwaitFix(ast.SkipParentheses(argument)),
+				ctx.ReportNodeWithSuggestions(node, buildNoPromiseSpreadInObjectMessage(), func() []rule.RuleSuggestion {
+					return []rule.RuleSuggestion{{
+						Message:  buildAddAwaitMessage(),
+						FixesArr: insertAwaitFix(ast.SkipParentheses(argument)),
+					}}
 				})
 
 				return
@@ -242,7 +244,7 @@ var NoMisusedSpreadRule = rule.Rule{
 			}
 
 			if isMap(ctx.Program, ctx.TypeChecker, t) {
-				ctx.ReportNodeWithSuggestions(node, buildNoMapSpreadInObjectMessage(), getMapSpreadSuggestions(node, argument, t)...)
+				ctx.ReportNodeWithSuggestions(node, buildNoMapSpreadInObjectMessage(), func() []rule.RuleSuggestion { return getMapSpreadSuggestions(node, argument, t) })
 
 				return
 			}
