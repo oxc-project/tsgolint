@@ -1,9 +1,0 @@
-{
-  "ExtraMethods": {
-    "ConfigFileRegistryBuilder": [
-      "ComputeConfigFileName",
-      "FindOrAcquireConfigForOpenFile",
-      "GetAncestorConfigFileName"
-    ]
-  }
-}
