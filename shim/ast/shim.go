@@ -756,6 +756,10 @@ func IsJSDocSingleCommentNodeList(nodeList *ast.NodeList) bool
 func IsJSDocTag(node *ast.Node) bool
 //go:linkname IsJSDocTemplateTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTemplateTag
 func IsJSDocTemplateTag(n *ast.Node) bool
+//go:linkname IsJSDocTypeExpression github.com/microsoft/typescript-go/internal/ast.IsJSDocTypeExpression
+func IsJSDocTypeExpression(node *ast.Node) bool
+//go:linkname IsJSDocTypeLiteral github.com/microsoft/typescript-go/internal/ast.IsJSDocTypeLiteral
+func IsJSDocTypeLiteral(node *ast.Node) bool
 //go:linkname IsJSDocTypeTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTypeTag
 func IsJSDocTypeTag(node *ast.Node) bool
 //go:linkname IsJSDocTypedefTag github.com/microsoft/typescript-go/internal/ast.IsJSDocTypedefTag
@@ -1048,14 +1052,20 @@ func IsSyntheticReferenceExpression(node *ast.Node) bool
 func IsTaggedTemplateExpression(node *ast.Node) bool
 //go:linkname IsTemplateExpression github.com/microsoft/typescript-go/internal/ast.IsTemplateExpression
 func IsTemplateExpression(node *ast.Node) bool
+//go:linkname IsTemplateHead github.com/microsoft/typescript-go/internal/ast.IsTemplateHead
+func IsTemplateHead(node *ast.Node) bool
 //go:linkname IsTemplateLiteralKind github.com/microsoft/typescript-go/internal/ast.IsTemplateLiteralKind
 func IsTemplateLiteralKind(kind ast.Kind) bool
 //go:linkname IsTemplateLiteralToken github.com/microsoft/typescript-go/internal/ast.IsTemplateLiteralToken
 func IsTemplateLiteralToken(node *ast.Node) bool
 //go:linkname IsTemplateLiteralTypeSpan github.com/microsoft/typescript-go/internal/ast.IsTemplateLiteralTypeSpan
 func IsTemplateLiteralTypeSpan(node *ast.Node) bool
+//go:linkname IsTemplateMiddle github.com/microsoft/typescript-go/internal/ast.IsTemplateMiddle
+func IsTemplateMiddle(node *ast.Node) bool
 //go:linkname IsTemplateSpan github.com/microsoft/typescript-go/internal/ast.IsTemplateSpan
 func IsTemplateSpan(node *ast.Node) bool
+//go:linkname IsTemplateTail github.com/microsoft/typescript-go/internal/ast.IsTemplateTail
+func IsTemplateTail(node *ast.Node) bool
 //go:linkname IsThisIdentifier github.com/microsoft/typescript-go/internal/ast.IsThisIdentifier
 func IsThisIdentifier(node *ast.Node) bool
 //go:linkname IsThisInTypeQuery github.com/microsoft/typescript-go/internal/ast.IsThisInTypeQuery
