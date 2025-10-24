@@ -210,17 +210,19 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 					return
 				}
 
-				var fixes []rule.RuleFix
-				body := invalidAncestor.Body()
-				if !ast.IsBlock(body) && canFix(body) {
-					withoutParens := ast.SkipParentheses(body)
-					fixes = []rule.RuleFix{
-						rule.RuleFixReplaceRange(body.Loc.WithEnd(withoutParens.Pos()), "{ "),
-						rule.RuleFixReplaceRange(body.Loc.WithPos(withoutParens.End()), "; }"),
+				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprArrowMessage(), func() []rule.RuleFix {
+					var fixes []rule.RuleFix
+					body := invalidAncestor.Body()
+					if !ast.IsBlock(body) && canFix(body) {
+						withoutParens := ast.SkipParentheses(body)
+						fixes = []rule.RuleFix{
+							rule.RuleFixReplaceRange(body.Loc.WithEnd(withoutParens.Pos()), "{ "),
+							rule.RuleFixReplaceRange(body.Loc.WithPos(withoutParens.End()), "; }"),
+						}
 					}
-				}
 
-				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprArrowMessage(), func() []rule.RuleFix { return fixes })
+					return fixes
+				})
 				return
 			}
 
@@ -239,40 +241,44 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 				}
 
 				if isFinalReturn(invalidAncestor) {
-					expr := invalidAncestor.AsReturnStatement().Expression
-					var fixes []rule.RuleFix
-					if canFix(expr) {
-						replaceText := ""
-						nextToken := scanner.ScanTokenAtPosition(ctx.SourceFile, expr.Pos())
-						if nextToken == ast.KindOpenParenToken || nextToken == ast.KindOpenBracketToken || nextToken == ast.KindBacktickToken {
-							replaceText = ";"
+					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnLastMessage(), func() []rule.RuleFix {
+						expr := invalidAncestor.AsReturnStatement().Expression
+						var fixes []rule.RuleFix
+						if canFix(expr) {
+							replaceText := ""
+							nextToken := scanner.ScanTokenAtPosition(ctx.SourceFile, expr.Pos())
+							if nextToken == ast.KindOpenParenToken || nextToken == ast.KindOpenBracketToken || nextToken == ast.KindBacktickToken {
+								replaceText = ";"
+							}
+							returnToken := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, invalidAncestor.Pos())
+							fixes = append(fixes, rule.RuleFixReplaceRange(returnToken, replaceText))
 						}
-						returnToken := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, invalidAncestor.Pos())
-						fixes = append(fixes, rule.RuleFixReplaceRange(returnToken, replaceText))
-					}
 
-					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnLastMessage(), func() []rule.RuleFix { return fixes })
+						return fixes
+					})
 					return
 				}
 
-				var fixes []rule.RuleFix
-				replaceText := ""
-				nextToken := scanner.ScanTokenAtPosition(ctx.SourceFile, invalidAncestor.AsReturnStatement().Expression.Pos())
-				if nextToken == ast.KindOpenParenToken || nextToken == ast.KindOpenBracketToken || nextToken == ast.KindBacktickToken {
-					replaceText = ";"
-				}
-				returnToken := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, invalidAncestor.Pos())
-				fixes = append(fixes, rule.RuleFixReplaceRange(returnToken, replaceText), rule.RuleFixInsertAfter(invalidAncestor, "; return;"))
+				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnMessage(), func() []rule.RuleFix {
+					var fixes []rule.RuleFix
+					replaceText := ""
+					nextToken := scanner.ScanTokenAtPosition(ctx.SourceFile, invalidAncestor.AsReturnStatement().Expression.Pos())
+					if nextToken == ast.KindOpenParenToken || nextToken == ast.KindOpenBracketToken || nextToken == ast.KindBacktickToken {
+						replaceText = ";"
+					}
+					returnToken := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, invalidAncestor.Pos())
+					fixes = append(fixes, rule.RuleFixReplaceRange(returnToken, replaceText), rule.RuleFixInsertAfter(invalidAncestor, "; return;"))
 
-				if !ast.IsBlock(invalidAncestor.Parent) {
-					// e.g. `if (cond) return console.error();`
-					// add braces if not inside a block
-					fixes = append(fixes,
-						rule.RuleFixInsertBefore(ctx.SourceFile, invalidAncestor, "{ "),
-						rule.RuleFixInsertAfter(invalidAncestor, " }"),
-					)
-				}
-				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnMessage(), func() []rule.RuleFix { return fixes })
+					if !ast.IsBlock(invalidAncestor.Parent) {
+						// e.g. `if (cond) return console.error();`
+						// add braces if not inside a block
+						fixes = append(fixes,
+							rule.RuleFixInsertBefore(ctx.SourceFile, invalidAncestor, "{ "),
+							rule.RuleFixInsertAfter(invalidAncestor, " }"),
+						)
+					}
+					return fixes
+				})
 				return
 			}
 
