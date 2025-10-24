@@ -111,8 +111,6 @@ func buildPredicateCannotBeAsyncMessage() rule.RuleMessage {
 	}
 }
 
-var traversedNodes = utils.Set[*ast.Node]{}
-
 var StrictBooleanExpressionsRule = rule.Rule{
 	Name: "strict-boolean-expressions",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -158,33 +156,35 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			)
 		}
 
+		traversedNodes := utils.Set[*ast.Node]{}
+
 		return rule.RuleListeners{
 			ast.KindIfStatement: func(node *ast.Node) {
 				ifStmt := node.AsIfStatement()
-				traverseNode(ctx, ifStmt.Expression, opts, true)
+				traverseNode(ctx, ifStmt.Expression, opts, &traversedNodes, true)
 			},
 			ast.KindWhileStatement: func(node *ast.Node) {
 				whileStmt := node.AsWhileStatement()
-				traverseNode(ctx, whileStmt.Expression, opts, true)
+				traverseNode(ctx, whileStmt.Expression, opts, &traversedNodes, true)
 			},
 			ast.KindDoStatement: func(node *ast.Node) {
 				doStmt := node.AsDoStatement()
-				traverseNode(ctx, doStmt.Expression, opts, true)
+				traverseNode(ctx, doStmt.Expression, opts, &traversedNodes, true)
 			},
 			ast.KindForStatement: func(node *ast.Node) {
 				forStmt := node.AsForStatement()
 				if forStmt.Condition != nil {
-					traverseNode(ctx, forStmt.Condition, opts, true)
+					traverseNode(ctx, forStmt.Condition, opts, &traversedNodes, true)
 				}
 			},
 			ast.KindConditionalExpression: func(node *ast.Node) {
 				condExpr := node.AsConditionalExpression()
-				traverseNode(ctx, condExpr.Condition, opts, true)
+				traverseNode(ctx, condExpr.Condition, opts, &traversedNodes, true)
 			},
 			ast.KindBinaryExpression: func(node *ast.Node) {
 				binExpr := node.AsBinaryExpression()
 				if ast.IsLogicalExpression(node) && binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
-					traverseLogicalExpression(ctx, binExpr, opts, false)
+					traverseLogicalExpression(ctx, binExpr, opts, &traversedNodes, false)
 				}
 			},
 			ast.KindCallExpression: func(node *ast.Node) {
@@ -192,7 +192,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 
 				assertedArgument := findTruthinessAssertedArgument(ctx.TypeChecker, callExpr)
 				if assertedArgument != nil {
-					traverseNode(ctx, assertedArgument, opts, true)
+					traverseNode(ctx, assertedArgument, opts, &traversedNodes, true)
 				}
 
 				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
@@ -228,7 +228,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
 				unaryExpr := node.AsPrefixUnaryExpression()
 				if unaryExpr.Operator == ast.KindExclamationToken {
-					traverseNode(ctx, unaryExpr.Operand, opts, true)
+					traverseNode(ctx, unaryExpr.Operand, opts, &traversedNodes, true)
 				}
 			},
 		}
@@ -319,26 +319,26 @@ func checkNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressio
 	checkCondition(ctx, node, utils.UnionTypeParts(nodeType), opts)
 }
 
-func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpression, opts StrictBooleanExpressionsOptions, isCondition bool) {
-	traverseNode(ctx, binExpr.Left, opts, true)
-	traverseNode(ctx, binExpr.Right, opts, isCondition)
+func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpression, opts StrictBooleanExpressionsOptions, traversedNodes *utils.Set[*ast.Node], isCondition bool) {
+	traverseNode(ctx, binExpr.Left, opts, traversedNodes, true)
+	traverseNode(ctx, binExpr.Right, opts, traversedNodes, isCondition)
 }
 
-func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions, isCondition bool) {
+func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions, traversedNodes *utils.Set[*ast.Node], isCondition bool) {
 	if traversedNodes.Has(node) {
 		return
 	}
 	traversedNodes.Add(node)
 
 	if node.Kind == ast.KindParenthesizedExpression {
-		traverseNode(ctx, node.AsParenthesizedExpression().Expression, opts, isCondition)
+		traverseNode(ctx, node.AsParenthesizedExpression().Expression, opts, traversedNodes, isCondition)
 		return
 	}
 
 	if node.Kind == ast.KindBinaryExpression {
 		binExpr := node.AsBinaryExpression()
 		if ast.IsLogicalExpression(node) && binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
-			traverseLogicalExpression(ctx, binExpr, opts, isCondition)
+			traverseLogicalExpression(ctx, binExpr, opts, traversedNodes, isCondition)
 			return
 		}
 	}
