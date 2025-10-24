@@ -3,10 +3,10 @@
 
 package project
 
-import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "github.com/microsoft/typescript-go/internal/project"
 import "github.com/microsoft/typescript-go/internal/project/logging"
+import "github.com/microsoft/typescript-go/internal/tsoptions"
 import "github.com/microsoft/typescript-go/internal/tspath"
 import "github.com/microsoft/typescript-go/internal/vfs"
 import _ "unsafe"
@@ -14,9 +14,15 @@ import _ "unsafe"
 type APISnapshotRequest = project.APISnapshotRequest
 type ATAStateChange = project.ATAStateChange
 type Client = project.Client
-type ConfigFileEntry = project.ConfigFileEntry
+type Config = project.Config
 type ConfigFileRegistry = project.ConfigFileRegistry
 type ConfigFileRegistryBuilder = project.ConfigFileRegistryBuilder
+//go:linkname ConfigFileRegistryBuilder_FindOrAcquireConfigForOpenFile github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).FindOrAcquireConfigForOpenFile
+func ConfigFileRegistryBuilder_FindOrAcquireConfigForOpenFile(recv *project.ConfigFileRegistryBuilder, configFileName string, configFilePath tspath.Path, openFilePath tspath.Path, loadKind project.ProjectLoadKind, logger *logging.LogTree) *tsoptions.ParsedCommandLine
+//go:linkname ConfigFileRegistryBuilder_ComputeConfigFileName github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).ComputeConfigFileName
+func ConfigFileRegistryBuilder_ComputeConfigFileName(recv *project.ConfigFileRegistryBuilder, fileName string, skipSearchInDirectoryOfFile bool, logger *logging.LogTree) string
+//go:linkname ConfigFileRegistryBuilder_GetAncestorConfigFileName github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).GetAncestorConfigFileName
+func ConfigFileRegistryBuilder_GetAncestorConfigFileName(recv *project.ConfigFileRegistryBuilder, fileName string, path tspath.Path, configFileName string, logger *logging.LogTree) string
 type CreateProgramResult = project.CreateProgramResult
 type DiskFile = project.DiskFile
 type ExtendedConfigCache = project.ExtendedConfigCache
@@ -36,20 +42,13 @@ type FileSource = project.FileSource
 type Kind = project.Kind
 const KindConfigured = project.KindConfigured
 const KindInferred = project.KindInferred
-//go:linkname NewConfigFileEntry github.com/microsoft/typescript-go/internal/project.NewConfigFileEntry
-func NewConfigFileEntry(fileName string) *project.ConfigFileEntry
 //go:linkname NewConfigFileRegistryBuilder github.com/microsoft/typescript-go/internal/project.NewConfigFileRegistryBuilder
 func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
-//go:linkname NewOverlay github.com/microsoft/typescript-go/internal/project.NewOverlay
-func NewOverlay(fileName string, content string, version int32, kind core.ScriptKind) *project.Overlay
-//go:linkname NewOverlayFS github.com/microsoft/typescript-go/internal/project.NewOverlayFS
-func NewOverlayFS(fs vfs.FS, overlays map[tspath.Path]*project.Overlay, positionEncoding lsproto.PositionEncodingKind, toPath func(string) tspath.Path) *project.OverlayFS
 //go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
 func NewSession(init *project.SessionInit) *project.Session
 //go:linkname NewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.NewSnapshotFSBuilder
 func NewSnapshotFSBuilder(fs vfs.FS, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
 type Overlay = project.Overlay
-type OverlayFS = project.OverlayFS
 type ParseCache = project.ParseCache
 type ParseCacheOptions = project.ParseCacheOptions
 type PendingReload = project.PendingReload
