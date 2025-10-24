@@ -97,6 +97,10 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 
 				diagnostics = append(diagnostics, diagnostic)
 			},
+			linter.Fixes{
+				Fix:            true,
+				FixSuggestions: true,
+			},
 		)
 
 		assert.NilError(t, err, "error running linter. code:\n", code)

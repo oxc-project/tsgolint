@@ -28,7 +28,12 @@ type Workload struct {
 	UnmatchedFiles []string
 }
 
-func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Workload, workers int, fs vfs.FS, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
+type Fixes struct {
+	Fix            bool
+	FixSuggestions bool
+}
+
+func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Workload, workers int, fs vfs.FS, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), fixState Fixes) error {
 
 	idx := 0
 	for configFileName, filePaths := range workload.Programs {
@@ -75,7 +80,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onDiagnostic)
+		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onDiagnostic, fixState)
 		if err != nil {
 			return err
 		}
@@ -100,7 +105,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			files = append(files, sf)
 		}
 
-		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onDiagnostic)
+		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onDiagnostic, fixState)
 		if err != nil {
 			return err
 		}
@@ -110,7 +115,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 
 }
 
-func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic)) error {
+func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), fixState Fixes) error {
 	type checkerWorkload struct {
 		checker *checker.Checker
 		program *compiler.Program
@@ -162,7 +167,10 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 								})
 							},
 							ReportRangeWithSuggestions: func(textRange core.TextRange, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
-								suggestions := suggestionsFn()
+								var suggestions []rule.RuleSuggestion = nil
+								if fixState.FixSuggestions {
+									suggestions = suggestionsFn()
+								}
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:    r.Name,
 									Range:       textRange,
@@ -180,7 +188,10 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 								})
 							},
 							ReportNodeWithFixes: func(node *ast.Node, msg rule.RuleMessage, fixesFn func() []rule.RuleFix) {
-								fixes := fixesFn()
+								var fixes []rule.RuleFix = nil
+								if fixState.Fix {
+									fixes = fixesFn()
+								}
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:   r.Name,
 									Range:      utils.TrimNodeTextRange(file, node),
