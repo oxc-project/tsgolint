@@ -1,59 +1,62 @@
-import { execFileSync } from 'node:child_process';
-import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { execFileSync } from "node:child_process";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { glob } from 'fast-glob';
-import { describe, expect, it } from 'vitest';
+import { glob } from "fast-glob";
+import { describe, expect, it } from "vitest";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const ROOT_DIR = resolve(__dirname, '..');
+const ROOT_DIR = resolve(__dirname, "..");
 const E2E_DIR = __dirname;
-const FIXTURES_DIR = join(E2E_DIR, 'fixtures');
-const TSGOLINT_BIN = join(ROOT_DIR, `tsgolint${process.platform === 'win32' ? '.exe' : ''}`);
+const FIXTURES_DIR = join(E2E_DIR, "fixtures");
+const TSGOLINT_BIN = join(
+  ROOT_DIR,
+  `tsgolint${process.platform === "win32" ? ".exe" : ""}`
+);
 
 const ALL_RULES = [
-  'await-thenable',
-  'no-array-delete',
-  'no-base-to-string',
-  'no-confusing-void-expression',
-  'no-duplicate-type-constituents',
-  'no-floating-promises',
-  'no-for-in-array',
-  'no-implied-eval',
-  'no-meaningless-void-operator',
-  'no-misused-promises',
-  'no-misused-spread',
-  'no-mixed-enums',
-  'no-redundant-type-constituents',
-  'no-unnecessary-boolean-literal-compare',
-  'no-unnecessary-template-expression',
-  'no-unnecessary-type-arguments',
-  'no-unnecessary-type-assertion',
-  'no-unsafe-argument',
-  'no-unsafe-assignment',
-  'no-unsafe-call',
-  'no-unsafe-enum-comparison',
-  'no-unsafe-member-access',
-  'no-unsafe-return',
-  'no-unsafe-type-assertion',
-  'no-unsafe-unary-minus',
-  'non-nullable-type-assertion-style',
-  'only-throw-error',
-  'prefer-promise-reject-errors',
-  'prefer-reduce-type-parameter',
-  'prefer-return-this-type',
-  'promise-function-async',
-  'related-getter-setter-pairs',
-  'require-array-sort-compare',
-  'require-await',
-  'restrict-plus-operands',
-  'restrict-template-expressions',
-  'return-await',
-  'switch-exhaustiveness-check',
-  'unbound-method',
-  'use-unknown-in-catch-callback-variable',
+  "await-thenable",
+  "no-array-delete",
+  "no-base-to-string",
+  "no-confusing-void-expression",
+  "no-duplicate-type-constituents",
+  "no-floating-promises",
+  "no-for-in-array",
+  "no-implied-eval",
+  "no-meaningless-void-operator",
+  "no-misused-promises",
+  "no-misused-spread",
+  "no-mixed-enums",
+  "no-redundant-type-constituents",
+  "no-unnecessary-boolean-literal-compare",
+  "no-unnecessary-template-expression",
+  "no-unnecessary-type-arguments",
+  "no-unnecessary-type-assertion",
+  "no-unsafe-argument",
+  "no-unsafe-assignment",
+  "no-unsafe-call",
+  "no-unsafe-enum-comparison",
+  "no-unsafe-member-access",
+  "no-unsafe-return",
+  "no-unsafe-type-assertion",
+  "no-unsafe-unary-minus",
+  "non-nullable-type-assertion-style",
+  "only-throw-error",
+  "prefer-promise-reject-errors",
+  "prefer-reduce-type-parameter",
+  "prefer-return-this-type",
+  "promise-function-async",
+  "related-getter-setter-pairs",
+  "require-array-sort-compare",
+  "require-await",
+  "restrict-plus-operands",
+  "restrict-template-expressions",
+  "return-await",
+  "switch-exhaustiveness-check",
+  "unbound-method",
+  "use-unknown-in-catch-callback-variable",
 ] as const;
 
 interface Diagnostic {
@@ -91,11 +94,12 @@ function parseHeadlessOutput(data: Buffer): Diagnostic[] {
     // Only process diagnostic messages (type 1)
     if (msgType === 1) {
       try {
-        const diagnostic = JSON.parse(payload.toString('utf-8'));
+        const diagnostic = JSON.parse(payload.toString("utf-8"));
         // Make file paths relative to fixtures/ for deterministic snapshots
-        const filePath = diagnostic.file_path || '';
-        if (filePath.includes('fixtures/')) {
-          diagnostic.file_path = 'fixtures/' + filePath.split('fixtures/').pop();
+        const filePath = diagnostic.file_path || "";
+        if (filePath.includes("fixtures/")) {
+          diagnostic.file_path =
+            "fixtures/" + filePath.split("fixtures/").pop();
         }
         diagnostics.push(diagnostic);
       } catch {
@@ -109,12 +113,12 @@ function parseHeadlessOutput(data: Buffer): Diagnostic[] {
 
 function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
   diagnostics.sort((a, b) => {
-    const aFilePath = a.file_path || '';
-    const bFilePath = b.file_path || '';
+    const aFilePath = a.file_path || "";
+    const bFilePath = b.file_path || "";
     if (aFilePath !== bFilePath) return aFilePath.localeCompare(bFilePath);
 
-    const aRule = a.rule || '';
-    const bRule = b.rule || '';
+    const aRule = a.rule || "";
+    const bRule = b.rule || "";
     if (aRule !== bRule) return aRule.localeCompare(bRule);
 
     const aPos = (a.range && a.range.pos) || 0;
@@ -130,14 +134,19 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
 }
 
 async function getTestFiles(testPath: string): Promise<string[]> {
-  const patterns = [`${testPath}/**/*.ts`, `${testPath}/**/*.tsx`, `${testPath}/**/*.mts`, `${testPath}/**/*.cts`];
+  const patterns = [
+    `${testPath}/**/*.ts`,
+    `${testPath}/**/*.tsx`,
+    `${testPath}/**/*.mts`,
+    `${testPath}/**/*.cts`,
+  ];
   const allFiles: string[] = [];
 
   for (const pattern of patterns) {
     const files = await glob(pattern, {
       cwd: FIXTURES_DIR,
       absolute: true,
-      ignore: ['**/node_modules/**', '**/*.json'],
+      ignore: ["**/node_modules/**", "**/*.json"],
     });
     allFiles.push(...files);
   }
@@ -145,7 +154,10 @@ async function getTestFiles(testPath: string): Promise<string[]> {
   return allFiles;
 }
 
-function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES): string {
+function generateConfig(
+  files: string[],
+  rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES
+): string {
   // Headless payload format:
   // ```json
   // {
@@ -169,22 +181,26 @@ function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[numb
   return JSON.stringify(config);
 }
 
-describe('TSGoLint E2E Snapshot Tests', () => {
-  it('should generate consistent diagnostics snapshot', async () => {
-    const testFiles = await getTestFiles('basic');
+describe("TSGoLint E2E Snapshot Tests", () => {
+  it("should generate consistent diagnostics snapshot", async () => {
+    const testFiles = await getTestFiles("basic");
     expect(testFiles.length).toBeGreaterThan(0);
 
     const config = generateConfig(testFiles);
 
     // Run tsgolint in headless mode with single thread for deterministic results
     // Set GOMAXPROCS=1 for single-threaded execution
-    const env = { ...process.env, GOMAXPROCS: '1' };
+    const env = { ...process.env, GOMAXPROCS: "1" };
 
     let output: Buffer;
-    output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
+    output = execFileSync(
+      TSGOLINT_BIN,
+      ["headless", "-fix", "-fix-suggestions"],
+      {
+        input: config,
+        env,
+      }
+    );
 
     let diagnostics = parseHeadlessOutput(output);
     diagnostics = sortDiagnostics(diagnostics);
@@ -194,39 +210,45 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(diagnostics).toMatchSnapshot();
   });
 
-  it.runIf(process.platform === 'win32')(
-    'should not panic with mixed forward/backslash paths from Rust (issue #143)',
+  it.runIf(process.platform === "win32")(
+    "should not panic with mixed forward/backslash paths from Rust (issue #143)",
     async () => {
       // Regression test for https://github.com/oxc-project/tsgolint/issues/143
       // This test reproduces the issue where Rust sends paths with backslashes
       // but TypeScript program has forward slashes, causing:
       // "panic: Expected file 'E:\oxc\...\index.ts' to be in program"
 
-      const testFile = join(FIXTURES_DIR, 'basic', 'rules', 'no-floating-promises', 'index.ts');
+      const testFile = join(
+        FIXTURES_DIR,
+        "basic",
+        "rules",
+        "no-floating-promises",
+        "index.ts"
+      );
 
       // On Windows, convert forward slashes to backslashes to simulate Rust input
-      const rustStylePath = testFile.replace(/\//g, '\\');
+      const rustStylePath = testFile.replace(/\//g, "\\");
 
       expect(() => {
-        execFileSync(TSGOLINT_BIN, ['headless'], {
-          input: generateConfig([rustStylePath], ['no-floating-promises']),
-          env: { ...process.env, GOMAXPROCS: '1' },
+        execFileSync(TSGOLINT_BIN, ["headless"], {
+          input: generateConfig([rustStylePath], ["no-floating-promises"]),
+          env: { ...process.env, GOMAXPROCS: "1" },
         });
       }).not.toThrow();
-    },
+    }
   );
 
-  it('should correctly evaluate project references', async () => {
-    const testFiles = await getTestFiles('project-references');
+  it("should correctly evaluate project references", async () => {
+    const testFiles = await getTestFiles("project-references");
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(testFiles, ['no-unsafe-argument']);
+    const config = generateConfig(testFiles, ["no-unsafe-argument"]);
 
     // Run tsgolint in headless mode with single thread for deterministic results
     // Set GOMAXPROCS=1 for single-threaded execution
-    const env = { ...process.env, GOMAXPROCS: '1' };
+    const env = { ...process.env, GOMAXPROCS: "1" };
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+    const output = execFileSync(TSGOLINT_BIN, ["headless"], {
       input: config,
       env,
     });
@@ -237,15 +259,15 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(diagnostics).toMatchSnapshot();
   });
 
-  it('should correctly lint files not inside a project', async () => {
-    const testFiles = await getTestFiles('with-unmatched-files');
+  it("should correctly lint files not inside a project", async () => {
+    const testFiles = await getTestFiles("with-unmatched-files");
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(testFiles, ['no-unsafe-argument']);
+    const config = generateConfig(testFiles, ["no-unsafe-argument"]);
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
+    const env = { ...process.env, GOMAXPROCS: "1" };
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+    const output = execFileSync(TSGOLINT_BIN, ["headless"], {
       input: config,
       env,
     });
@@ -256,10 +278,10 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(diagnostics).toMatchSnapshot();
   });
 
-  it('should work with the old version of the headless payload', async () => {
+  it("should work with the old version of the headless payload", async () => {
     function generateV1HeadlessPayload(
       files: string[],
-      rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES,
+      rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES
     ): string {
       const config = {
         files: files.map((filePath) => ({
@@ -272,16 +294,16 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     function getDiagnostics(config: string): Diagnostic[] {
       let output: Buffer;
-      output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      output = execFileSync(TSGOLINT_BIN, ["headless"], {
         input: config,
-        env: { ...process.env, GOMAXPROCS: '1' },
+        env: { ...process.env, GOMAXPROCS: "1" },
       });
 
       const diagnostics = parseHeadlessOutput(output);
       return sortDiagnostics(diagnostics);
     }
 
-    const testFiles = await getTestFiles('basic');
+    const testFiles = await getTestFiles("basic");
     expect(testFiles.length).toBeGreaterThan(0);
 
     const v1Config = generateV1HeadlessPayload(testFiles);
