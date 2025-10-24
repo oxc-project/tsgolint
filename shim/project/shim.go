@@ -6,7 +6,6 @@ package project
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "github.com/microsoft/typescript-go/internal/project"
 import "github.com/microsoft/typescript-go/internal/project/logging"
-import "github.com/microsoft/typescript-go/internal/tsoptions"
 import "github.com/microsoft/typescript-go/internal/tspath"
 import "github.com/microsoft/typescript-go/internal/vfs"
 import _ "unsafe"
@@ -17,12 +16,6 @@ type Client = project.Client
 type Config = project.Config
 type ConfigFileRegistry = project.ConfigFileRegistry
 type ConfigFileRegistryBuilder = project.ConfigFileRegistryBuilder
-//go:linkname ConfigFileRegistryBuilder_FindOrAcquireConfigForOpenFile github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).FindOrAcquireConfigForOpenFile
-func ConfigFileRegistryBuilder_FindOrAcquireConfigForOpenFile(recv *project.ConfigFileRegistryBuilder, configFileName string, configFilePath tspath.Path, openFilePath tspath.Path, loadKind project.ProjectLoadKind, logger *logging.LogTree) *tsoptions.ParsedCommandLine
-//go:linkname ConfigFileRegistryBuilder_ComputeConfigFileName github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).ComputeConfigFileName
-func ConfigFileRegistryBuilder_ComputeConfigFileName(recv *project.ConfigFileRegistryBuilder, fileName string, skipSearchInDirectoryOfFile bool, logger *logging.LogTree) string
-//go:linkname ConfigFileRegistryBuilder_GetAncestorConfigFileName github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).GetAncestorConfigFileName
-func ConfigFileRegistryBuilder_GetAncestorConfigFileName(recv *project.ConfigFileRegistryBuilder, fileName string, path tspath.Path, configFileName string, logger *logging.LogTree) string
 type CreateProgramResult = project.CreateProgramResult
 type DiskFile = project.DiskFile
 type ExtendedConfigCache = project.ExtendedConfigCache
