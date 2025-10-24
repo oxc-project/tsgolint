@@ -65,14 +65,14 @@ var NoArrayDeleteRule = rule.Rule{
 					return
 				}
 
-				expressionRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.Expression)
-				argumentRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.ArgumentExpression)
-
-				deleteTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())
-				leftBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, expressionRange.End())
-				rightBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, argumentRange.End())
-
 				ctx.ReportNodeWithSuggestions(node, buildNoArrayDeleteMessage(), func() []rule.RuleSuggestion {
+					expressionRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.Expression)
+					argumentRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.ArgumentExpression)
+
+					deleteTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())
+					leftBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, expressionRange.End())
+					rightBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, argumentRange.End())
+
 					return []rule.RuleSuggestion{{
 						Message: buildUseSpliceMessage(),
 						FixesArr: []rule.RuleFix{
