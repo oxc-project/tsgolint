@@ -470,6 +470,10 @@ func runMain() int {
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- d
 		},
+		linter.Fixes{
+			Fix:            true,
+			FixSuggestions: true,
+		},
 	)
 
 	close(diagnosticsChan)

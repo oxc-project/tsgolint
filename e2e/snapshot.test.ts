@@ -11,7 +11,10 @@ const __dirname = dirname(__filename);
 const ROOT_DIR = resolve(__dirname, '..');
 const E2E_DIR = __dirname;
 const FIXTURES_DIR = join(E2E_DIR, 'fixtures');
-const TSGOLINT_BIN = join(ROOT_DIR, `tsgolint${process.platform === 'win32' ? '.exe' : ''}`);
+const TSGOLINT_BIN = join(
+  ROOT_DIR,
+  `tsgolint${process.platform === 'win32' ? '.exe' : ''}`,
+);
 
 const ALL_RULES = [
   'await-thenable',
@@ -130,7 +133,12 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
 }
 
 async function getTestFiles(testPath: string): Promise<string[]> {
-  const patterns = [`${testPath}/**/*.ts`, `${testPath}/**/*.tsx`, `${testPath}/**/*.mts`, `${testPath}/**/*.cts`];
+  const patterns = [
+    `${testPath}/**/*.ts`,
+    `${testPath}/**/*.tsx`,
+    `${testPath}/**/*.mts`,
+    `${testPath}/**/*.cts`,
+  ];
   const allFiles: string[] = [];
 
   for (const pattern of patterns) {
@@ -145,7 +153,10 @@ async function getTestFiles(testPath: string): Promise<string[]> {
   return allFiles;
 }
 
-function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES): string {
+function generateConfig(
+  files: string[],
+  rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES,
+): string {
   // Headless payload format:
   // ```json
   // {
@@ -181,10 +192,14 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     const env = { ...process.env, GOMAXPROCS: '1' };
 
     let output: Buffer;
-    output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
+    output = execFileSync(
+      TSGOLINT_BIN,
+      ['headless', '-fix', '-fix-suggestions'],
+      {
+        input: config,
+        env,
+      },
+    );
 
     let diagnostics = parseHeadlessOutput(output);
     diagnostics = sortDiagnostics(diagnostics);
@@ -202,7 +217,13 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       // but TypeScript program has forward slashes, causing:
       // "panic: Expected file 'E:\oxc\...\index.ts' to be in program"
 
-      const testFile = join(FIXTURES_DIR, 'basic', 'rules', 'no-floating-promises', 'index.ts');
+      const testFile = join(
+        FIXTURES_DIR,
+        'basic',
+        'rules',
+        'no-floating-promises',
+        'index.ts',
+      );
 
       // On Windows, convert forward slashes to backslashes to simulate Rust input
       const rustStylePath = testFile.replace(/\//g, '\\');
