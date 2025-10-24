@@ -147,7 +147,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 		}
 	}
 
-	if ancestorConfigName := r.configFileRegistryBuilder.GetAncestorConfigFileName(fileName, path, configFileName, project.ProjectLoadKindCreate, nil); ancestorConfigName != "" {
+	if ancestorConfigName := r.configFileRegistryBuilder.GetAncestorConfigFileName(fileName, path, configFileName, nil); ancestorConfigName != "" {
 		return r.findConfigWithReferences(
 			fileName,
 			path,

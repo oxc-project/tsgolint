@@ -25,6 +25,5 @@ func IsImplicitGlob(lastPathComponent string) bool
 func ReadDirectory(host vfs.FS, currentDir string, path string, extensions []string, excludes []string, includes []string, depth *int) []string
 var SkipAll = vfs.SkipAll
 var SkipDir = vfs.SkipDir
-type Usage = vfs.Usage
 type WalkDirFunc = vfs.WalkDirFunc
 type WildcardMatcher = vfs.WildcardMatcher
