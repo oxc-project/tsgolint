@@ -166,18 +166,22 @@ var UseUnknownInCatchCallbackVariableRule = rule.Rule{
 
 					if catchParam.DotDotDotToken != nil {
 						if catchTypeAnnotation == nil {
-							ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), rule.RuleSuggestion{
-								Message:  buildAddUnknownRestTypeAnnotationSuggestionMessage(),
-								FixesArr: []rule.RuleFix{rule.RuleFixInsertAfter(catchVariable, ": [unknown]")},
+							ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), func() []rule.RuleSuggestion {
+								return []rule.RuleSuggestion{{
+									Message:  buildAddUnknownRestTypeAnnotationSuggestionMessage(),
+									FixesArr: []rule.RuleFix{rule.RuleFixInsertAfter(catchVariable, ": [unknown]")},
+								}}
 							})
 							continue
 						}
 
-						ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), rule.RuleSuggestion{
-							Message: buildWrongRestTypeAnnotationSuggestionMessage(),
-							FixesArr: []rule.RuleFix{
-								rule.RuleFixReplace(ctx.SourceFile, catchTypeAnnotation, "[unknown]"),
-							},
+						ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), func() []rule.RuleSuggestion {
+							return []rule.RuleSuggestion{{
+								Message: buildWrongRestTypeAnnotationSuggestionMessage(),
+								FixesArr: []rule.RuleFix{
+									rule.RuleFixReplace(ctx.SourceFile, catchTypeAnnotation, "[unknown]"),
+								},
+							}}
 						})
 						continue
 					}
@@ -201,15 +205,19 @@ var UseUnknownInCatchCallbackVariableRule = rule.Rule{
 								}
 							}
 
-							ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), rule.RuleSuggestion{
-								Message:  buildAddUnknownTypeAnnotationSuggestionMessage(),
-								FixesArr: fixes,
+							ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), func() []rule.RuleSuggestion {
+								return []rule.RuleSuggestion{{
+									Message:  buildAddUnknownTypeAnnotationSuggestionMessage(),
+									FixesArr: fixes,
+								}}
 							})
 							break
 						}
-						ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), rule.RuleSuggestion{
-							Message:  buildWrongTypeAnnotationSuggestionMessage(),
-							FixesArr: []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, catchTypeAnnotation, "unknown")},
+						ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), func() []rule.RuleSuggestion {
+							return []rule.RuleSuggestion{{
+								Message:  buildWrongTypeAnnotationSuggestionMessage(),
+								FixesArr: []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, catchTypeAnnotation, "unknown")},
+							}}
 						})
 					case ast.KindArrayBindingPattern:
 						ctx.ReportNode(catchParamNode, buildUseUnknownArrayDestructuringPatternMessage(method))

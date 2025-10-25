@@ -166,7 +166,7 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 					}
 				}
 			}
-			ctx.ReportNodeWithFixes(constituentNode, message, fixes...)
+			ctx.ReportNodeWithFixes(constituentNode, message, func() []rule.RuleFix { return fixes })
 		}
 
 		var checkDuplicateRecursively func(

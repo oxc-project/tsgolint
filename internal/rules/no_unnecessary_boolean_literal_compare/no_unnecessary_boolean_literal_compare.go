@@ -204,7 +204,7 @@ var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 					fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "("), rule.RuleFixInsertAfter(mutatedNode, " ?? true)"))
 				}
 
-				ctx.ReportNodeWithFixes(node, msg, fixes...)
+				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix { return fixes })
 			},
 		}
 	},

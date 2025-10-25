@@ -222,7 +222,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
 				asKeywordRange := s.TokenRange()
 
-				ctx.ReportNodeWithFixes(node, msg, rule.RuleFixRemoveRange(asKeywordRange), rule.RuleFixRemove(ctx.SourceFile, typeNode))
+				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
+					return []rule.RuleFix{rule.RuleFixRemoveRange(asKeywordRange), rule.RuleFixRemove(ctx.SourceFile, typeNode)}
+				})
 			} else {
 				s := scanner.GetScannerForSourceFile(ctx.SourceFile, node.Pos())
 				openingAngleBracket := s.TokenRange()
@@ -230,7 +232,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				s.Scan()
 				closingAngleBracket := s.TokenRange()
 
-				ctx.ReportNodeWithFixes(node, msg, rule.RuleFixRemoveRange(openingAngleBracket.WithEnd(closingAngleBracket.End())))
+				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
+					return []rule.RuleFix{rule.RuleFixRemoveRange(openingAngleBracket.WithEnd(closingAngleBracket.End()))}
+				})
 			}
 			// TODO - add contextually unnecessary check for this
 		}
@@ -249,7 +253,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 				if ast.IsAssignmentExpression(node.Parent, true) {
 					if node.Parent.AsBinaryExpression().Left == node {
-						ctx.ReportNodeWithFixes(node, buildContextuallyUnnecessaryMessage(), buildRemoveExclamationFix())
+						ctx.ReportNodeWithFixes(node, buildContextuallyUnnecessaryMessage(), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix()} })
 					}
 					// for all other = assignments we ignore non-null checks
 					// this is because non-null assertions can change the type-flow of the code
@@ -272,7 +276,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					if ast.IsIdentifier(expression) && isPossiblyUsedBeforeAssigned(expression) {
 						return
 					}
-					ctx.ReportNodeWithFixes(node, buildUnnecessaryAssertionMessage(), buildRemoveExclamationFix())
+					ctx.ReportNodeWithFixes(node, buildUnnecessaryAssertionMessage(), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix()} })
 				} else {
 					// we know it's a nullable type
 					// so figure out if the variable is used in a place that accepts nullable types
@@ -304,7 +308,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 						isValidVoid := !typeIncludesVoid || contextualTypeIncludesVoid
 
 						if isValidUndefined && isValidNull && isValidVoid {
-							ctx.ReportNodeWithFixes(node, buildContextuallyUnnecessaryMessage(), buildRemoveExclamationFix())
+							ctx.ReportNodeWithFixes(node, buildContextuallyUnnecessaryMessage(), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix()} })
 						}
 					}
 				}

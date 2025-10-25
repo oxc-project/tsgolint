@@ -53,11 +53,13 @@ var NoMeaninglessVoidOperatorRule = rule.Rule{
 				}
 
 				if mask&checker.TypeFlagsVoidLike != 0 {
-					ctx.ReportNodeWithFixes(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), fixRemoveVoidKeyword())
+					ctx.ReportNodeWithFixes(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), func() []rule.RuleFix { return []rule.RuleFix{fixRemoveVoidKeyword()} })
 				} else if *opts.CheckNever && mask&checker.TypeFlagsNever != 0 {
-					ctx.ReportNodeWithSuggestions(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), rule.RuleSuggestion{
-						Message:  buildRemoveVoidMessage(),
-						FixesArr: []rule.RuleFix{fixRemoveVoidKeyword()},
+					ctx.ReportNodeWithSuggestions(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), func() []rule.RuleSuggestion {
+						return []rule.RuleSuggestion{{
+							Message:  buildRemoveVoidMessage(),
+							FixesArr: []rule.RuleFix{fixRemoveVoidKeyword()},
+						}}
 					})
 				}
 			},

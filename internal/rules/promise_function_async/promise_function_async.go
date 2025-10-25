@@ -133,7 +133,9 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				insertAsyncBeforeNode = node.Name()
 			}
 			// TODO(port): getFunctionHeadLoc
-			ctx.ReportNodeWithFixes(node, buildMissingAsyncMessage(), rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async "))
+			ctx.ReportNodeWithFixes(node, buildMissingAsyncMessage(), func() []rule.RuleFix {
+				return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")}
+			})
 		}
 
 		if *opts.CheckArrowFunctions {

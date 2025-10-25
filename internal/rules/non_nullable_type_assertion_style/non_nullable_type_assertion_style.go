@@ -91,9 +91,13 @@ var NonNullableTypeAssertionStyleRule = rule.Rule{
 				removeRange = node.Loc.WithEnd(expression.Pos())
 			}
 			if higherPrecedenceThanUnary {
-				ctx.ReportNodeWithFixes(node, buildPreferNonNullAssertionMessage(), rule.RuleFixRemoveRange(removeRange), rule.RuleFixInsertAfter(expression, "!"))
+				ctx.ReportNodeWithFixes(node, buildPreferNonNullAssertionMessage(), func() []rule.RuleFix {
+					return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange), rule.RuleFixInsertAfter(expression, "!")}
+				})
 			} else {
-				ctx.ReportNodeWithFixes(node, buildPreferNonNullAssertionMessage(), rule.RuleFixRemoveRange(removeRange), rule.RuleFixInsertBefore(ctx.SourceFile, expression, "("), rule.RuleFixInsertAfter(expression, ")!"))
+				ctx.ReportNodeWithFixes(node, buildPreferNonNullAssertionMessage(), func() []rule.RuleFix {
+					return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange), rule.RuleFixInsertBefore(ctx.SourceFile, expression, "("), rule.RuleFixInsertAfter(expression, ")!")}
+				})
 			}
 		}
 
