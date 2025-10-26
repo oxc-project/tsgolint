@@ -1,13 +1,13 @@
 github.com/dlclark/regexp2 v1.11.5 h1:Q/sSnsKerHeCkc/jSTNq1oCm7KiVgUMZRDUoRu0JQZQ=
 github.com/dlclark/regexp2 v1.11.5/go.mod h1:DHkYz0B9wPfa6wondMfaivmHpzrQ3v9q8cnmRbL6yW8=
-github.com/go-json-experiment/json v0.0.0-20250910080747-cc2cfa0554c3 h1:02WINGfSX5w0Mn+F28UyRoSt9uvMhKguwWMlOAh6U/0=
-github.com/go-json-experiment/json v0.0.0-20250910080747-cc2cfa0554c3/go.mod h1:uNVvRXArCGbZ508SxYYTC5v1JWoz2voff5pm25jU1Ok=
+github.com/go-json-experiment/json v0.0.0-20251024212118-8a0206d3c796 h1:GeGdEsbIgwxgT1MtbU6xmm8bJRJFGypRWIYj7RZgfH0=
+github.com/go-json-experiment/json v0.0.0-20251024212118-8a0206d3c796/go.mod h1:uNVvRXArCGbZ508SxYYTC5v1JWoz2voff5pm25jU1Ok=
 github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
 github.com/klauspost/cpuid/v2 v2.0.9 h1:lgaqFMSdTdQYdZ04uHyN2d/eKdOMyi2YLSvlQIBFYa4=
 github.com/klauspost/cpuid/v2 v2.0.9/go.mod h1:FInQzS24/EEf25PyTYn52gqo7WaD8xa0213Md/qVLRg=
-github.com/microsoft/typescript-go v0.0.0-20251024214849-d461fade87bc h1:vipirrPEKYS5O4ddaOroreMD7iWgwmvMAbyalz6/QkM=
-github.com/microsoft/typescript-go v0.0.0-20251024214849-d461fade87bc/go.mod h1:/yWoZzcFKn2eQjB4E+kfEhQ/iGVrFKYswH1ZW+jWZu8=
+github.com/microsoft/typescript-go v0.0.0-20251025231344-b7840c2d132f h1:TFfvX30uhZzkCbKJ/buev7wCaHqV+6F2DABsGIh9oug=
+github.com/microsoft/typescript-go v0.0.0-20251025231344-b7840c2d132f/go.mod h1:/yWoZzcFKn2eQjB4E+kfEhQ/iGVrFKYswH1ZW+jWZu8=
 github.com/peter-evans/patience v0.3.0 h1:rX0JdJeepqdQl1Sk9c9uvorjYYzL2TfgLX1adqYm9cA=
 github.com/peter-evans/patience v0.3.0/go.mod h1:Kmxu5sY1NmBLFSStvXjX1wS9mIv7wMcP/ubucyMOAu0=
 github.com/zeebo/assert v1.3.0 h1:g7C04CbJuIDKNPFHmsk4hwZDO5O+kntRxzaUoNXj+IQ=
