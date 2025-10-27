@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/lsp/lsproto
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251025231344-b7840c2d132f
+require github.com/microsoft/typescript-go v0.0.0-20251027153846-33eeaf3aaad9
 
 require (
 	github.com/go-json-experiment/json v0.0.0-20250910080747-cc2cfa0554c3 // indirect
