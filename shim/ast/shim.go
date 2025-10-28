@@ -858,6 +858,8 @@ func IsMemberName(node *ast.Node) bool
 func IsMetaProperty(node *ast.Node) bool
 //go:linkname IsMethodDeclaration github.com/microsoft/typescript-go/internal/ast.IsMethodDeclaration
 func IsMethodDeclaration(node *ast.Node) bool
+//go:linkname IsMethodOrAccessor github.com/microsoft/typescript-go/internal/ast.IsMethodOrAccessor
+func IsMethodOrAccessor(node *ast.Node) bool
 //go:linkname IsMethodSignatureDeclaration github.com/microsoft/typescript-go/internal/ast.IsMethodSignatureDeclaration
 func IsMethodSignatureDeclaration(node *ast.Node) bool
 //go:linkname IsModifier github.com/microsoft/typescript-go/internal/ast.IsModifier

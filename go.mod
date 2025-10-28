@@ -49,6 +49,6 @@ require (
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/go-json-experiment/json v0.0.0-20251024212118-8a0206d3c796
-	github.com/microsoft/typescript-go v0.0.0-20251027233807-a4fa408e0a3f // indirect
+	github.com/microsoft/typescript-go v0.0.0-20251028150231-ca68e0b51674 // indirect
 	golang.org/x/text v0.30.0
 )
