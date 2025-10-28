@@ -1,0 +1,369 @@
+name: Benchmark PR
+
+permissions:
+  pull-requests: write
+  contents: read
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+jobs:
+  benchmark:
+    if: (github.event.action == 'labeled' && github.event.label.name == 'bench' || github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'bench')) && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: oxc-project/setup-node@fdbf0dfd334c4e6d56ceeb77d91c76339c2a0885 # v1.0.4
+
+      - uses: ./.github/actions/setup
+
+      - name: Install required tools for benchmarking
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            jq \
+            valgrind \
+            kcachegrind \
+            graphviz
+
+      - name: Verify tool installations
+        run: |
+          echo "Tool versions:"
+          valgrind --version
+          callgrind_annotate --version || echo "callgrind_annotate is part of valgrind"
+          cg_diff --version 2>&1 | head -1 || echo "cg_diff is part of valgrind"
+          jq --version
+
+      - name: Clone vscode for benchmarking
+        run: |
+          mkdir -p benchmarks
+          cd benchmarks
+          # Clone vscode at pinned commit (v1.99.0 release)
+          git clone --depth 1 --single-branch --branch 1.99.0 https://github.com/microsoft/vscode
+
+      - name: Setup vscode for benchmarking
+        run: |
+          cd benchmarks/vscode
+          # Install minimal dependencies needed for TypeScript compilation
+          npm install --ignore-scripts
+
+      - name: Build PR binary
+        run: just build
+
+      - name: Generate headless payload for vscode
+        run: |
+          mkdir -p benchmark-results/pr
+          # Generate payload with all TypeScript files in vscode/src (using absolute paths)
+          find "$(pwd)/benchmarks/vscode/src" -type f \( -name "*.ts" -o -name "*.tsx" \) | \
+          jq -R -s '
+            split("\n")[:-1] |
+            {
+              version: 2,
+              configs: [
+                {
+                  file_paths: .,
+                  rules: [
+                    { name: "await-thenable" },
+                    { name: "no-array-delete" },
+                    { name: "no-base-to-string" },
+                    { name: "no-confusing-void-expression" },
+                    { name: "no-duplicate-type-constituents" },
+                    { name: "no-floating-promises" },
+                    { name: "no-for-in-array" },
+                    { name: "no-implied-eval" },
+                    { name: "no-meaningless-void-operator" },
+                    { name: "no-misused-promises" },
+                    { name: "no-unnecessary-type-assertion" },
+                    { name: "no-unsafe-argument" },
+                    { name: "no-unsafe-assignment" },
+                    { name: "no-unsafe-call" },
+                    { name: "no-unsafe-member-access" },
+                    { name: "no-unsafe-return" }
+                  ]
+                }
+              ]
+            }
+          ' > benchmark-results/pr/payload.json
+          echo "Generated payload with $(jq '.configs[0].file_paths | length' benchmark-results/pr/payload.json) files"
+
+      - name: Run PR benchmark with CPU profiling
+        run: |
+          ./tsgolint headless -cpuprof benchmark-results/pr/cpu.prof < benchmark-results/pr/payload.json
+
+      - name: Generate PR profile summary
+        run: |
+          go tool pprof -top benchmark-results/pr/cpu.prof > benchmark-results/pr/profile.txt
+
+      - name: Run PR benchmark with Valgrind (Callgrind)
+        run: |
+          valgrind --tool=callgrind \
+            --callgrind-out-file=benchmark-results/pr/callgrind.out \
+            --cache-sim=yes \
+            --branch-sim=yes \
+            --simulate-hwpref=yes \
+            --simulate-wb=yes \
+            ./tsgolint headless < benchmark-results/pr/payload.json
+
+      - name: Generate PR Valgrind summary
+        run: |
+          # Generate human-readable summary
+          callgrind_annotate --auto=yes benchmark-results/pr/callgrind.out > benchmark-results/pr/callgrind.txt
+
+      - name: Checkout base branch
+        run: |
+          git fetch origin "${{ github.event.pull_request.base.ref }}"
+          git checkout "origin/${{ github.event.pull_request.base.ref }}"
+          git submodule update --init --recursive
+
+      - name: Apply typescript-go patches for base
+        run: |
+          pushd typescript-go
+          git am --3way --no-gpg-sign ../patches/*.patch
+          popd
+
+      - name: Expose typescript-go collections package for base
+        run: |
+          mkdir -p internal/collections
+          find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
+
+      - name: Build base binary
+        run: just build
+
+      - name: Generate headless payload for vscode (base)
+        run: |
+          mkdir -p benchmark-results/base
+          # Generate payload with all TypeScript files in vscode/src (using absolute paths)
+          find "$(pwd)/benchmarks/vscode/src" -type f \( -name "*.ts" -o -name "*.tsx" \) | \
+          jq -R -s '
+            split("\n")[:-1] |
+            {
+              version: 2,
+              configs: [
+                {
+                  file_paths: .,
+                  rules: [
+                    { name: "await-thenable" },
+                    { name: "no-array-delete" },
+                    { name: "no-base-to-string" },
+                    { name: "no-confusing-void-expression" },
+                    { name: "no-duplicate-type-constituents" },
+                    { name: "no-floating-promises" },
+                    { name: "no-for-in-array" },
+                    { name: "no-implied-eval" },
+                    { name: "no-meaningless-void-operator" },
+                    { name: "no-misused-promises" },
+                    { name: "no-unnecessary-type-assertion" },
+                    { name: "no-unsafe-argument" },
+                    { name: "no-unsafe-assignment" },
+                    { name: "no-unsafe-call" },
+                    { name: "no-unsafe-member-access" },
+                    { name: "no-unsafe-return" }
+                  ]
+                }
+              ]
+            }
+          ' > benchmark-results/base/payload.json
+          echo "Generated payload with $(jq '.configs[0].file_paths | length' benchmark-results/base/payload.json) files"
+
+      - name: Run base benchmark with CPU profiling
+        run: |
+          ./tsgolint headless -cpuprof benchmark-results/base/cpu.prof < benchmark-results/base/payload.json
+
+      - name: Generate base profile summary
+        run: |
+          go tool pprof -top benchmark-results/base/cpu.prof > benchmark-results/base/profile.txt
+
+      - name: Run base benchmark with Valgrind (Callgrind)
+        run: |
+          valgrind --tool=callgrind \
+            --callgrind-out-file=benchmark-results/base/callgrind.out \
+            --cache-sim=yes \
+            --branch-sim=yes \
+            --simulate-hwpref=yes \
+            --simulate-wb=yes \
+            ./tsgolint headless < benchmark-results/base/payload.json
+
+      - name: Generate base Valgrind summary
+        run: |
+          # Generate human-readable summary
+          callgrind_annotate --auto=yes benchmark-results/base/callgrind.out > benchmark-results/base/callgrind.txt
+
+      - name: Compare profiles
+        id: compare
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          HEAD_REF="${{ github.event.pull_request.head.ref }}"
+
+          echo "## Benchmark Results" > benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "**Benchmark Mode:** Headless ($(jq '.configs[0].file_paths | length' benchmark-results/pr/payload.json) files, $(jq '.configs[0].rules | length' benchmark-results/pr/payload.json) rules)" >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "### CPU Profile Comparison" >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "#### Base Branch ($BASE_REF)" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          head -n 20 benchmark-results/base/profile.txt >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "#### PR Branch ($HEAD_REF)" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          head -n 20 benchmark-results/pr/profile.txt >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "### Differential Profile" >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "Comparing PR against base (positive values = PR is slower):" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          go tool pprof -top -base benchmark-results/base/cpu.prof benchmark-results/pr/cpu.prof | head -n 25 >> benchmark-results/comment.md || echo "No significant differences found" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "### Valgrind (Callgrind) Performance Analysis" >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "CPU simulation with cache and branch prediction modeling:" >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "#### Base Branch ($BASE_REF)" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          head -n 30 benchmark-results/base/callgrind.txt >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "#### PR Branch ($HEAD_REF)" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          head -n 30 benchmark-results/pr/callgrind.txt >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "#### Instruction Count Comparison" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          # Extract instruction counts for comparison
+          BASE_IR=$(grep -E "^[ ]*[0-9,]+ +\*?PROGRAM TOTALS" benchmark-results/base/callgrind.txt | awk '{gsub(/,/,"",$1); print $1}')
+          PR_IR=$(grep -E "^[ ]*[0-9,]+ +\*?PROGRAM TOTALS" benchmark-results/pr/callgrind.txt | awk '{gsub(/,/,"",$1); print $1}')
+          if [ -n "$BASE_IR" ] && [ -n "$PR_IR" ]; then
+            DIFF=$((PR_IR - BASE_IR))
+            PERCENT=$(awk "BEGIN {printf \"%.2f\", ($DIFF / $BASE_IR) * 100}")
+            echo "Base:    $(printf "%'d" $BASE_IR) instructions" >> benchmark-results/comment.md
+            echo "PR:      $(printf "%'d" $PR_IR) instructions" >> benchmark-results/comment.md
+            echo "Diff:    $(printf "%'d" $DIFF) instructions ($PERCENT%)" >> benchmark-results/comment.md
+          else
+            echo "Unable to extract instruction counts" >> benchmark-results/comment.md
+          fi
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "<details>" >> benchmark-results/comment.md
+          echo "<summary>View CPU Profiles</summary>" >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "**Note:** Download the benchmark artifacts to analyze CPU profiles locally with pprof." >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo '```bash' >> benchmark-results/comment.md
+          echo "# Interactive analysis" >> benchmark-results/comment.md
+          echo "go tool pprof -http=:8080 -base base/cpu.prof pr/cpu.prof" >> benchmark-results/comment.md
+          echo '```' >> benchmark-results/comment.md
+          echo "" >> benchmark-results/comment.md
+          echo "</details>" >> benchmark-results/comment.md
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.0
+        with:
+          name: benchmark-profiles
+          path: benchmark-results/
+          retention-days: 30
+
+      - name: Post benchmark results
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const fs = require('fs');
+            const comment = fs.readFileSync('benchmark-results/comment.md', 'utf8');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('## Benchmark Results')
+            );
+
+            const commentBody = comment + '\n\n---\n\n📊 Download the [benchmark artifacts](' +
+              `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}` +
+              ') to view flame graphs and detailed profiles.';
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: commentBody
+              });
+            }
+
+      - name: Generate profile comparison report
+        run: |
+          echo "## Profile Analysis" > benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "### Instructions for Viewing Flame Graphs" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "1. Download the benchmark-profiles artifact from this workflow run" >> benchmark-results/analysis.md
+          echo "2. Extract the archive" >> benchmark-results/analysis.md
+          echo "3. Open \`base/flamegraph.svg\` and \`pr/flamegraph.svg\` in a browser" >> benchmark-results/analysis.md
+          echo "4. Compare the two flame graphs side by side" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "### Using pprof for Interactive Analysis" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo '```bash' >> benchmark-results/analysis.md
+          echo "# View differential profile interactively" >> benchmark-results/analysis.md
+          echo "go tool pprof -http=:8080 -base base/cpu.prof pr/cpu.prof" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "# Generate diff flame graph" >> benchmark-results/analysis.md
+          echo "go tool pprof -svg -base base/cpu.prof pr/cpu.prof > diff.svg" >> benchmark-results/analysis.md
+          echo '```' >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "### Using Valgrind/Callgrind for Detailed CPU Simulation" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "Valgrind's Callgrind tool provides detailed instruction-level analysis with cache simulation:" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo '```bash' >> benchmark-results/analysis.md
+          echo "# View callgrind output with KCachegrind (Linux/Mac)" >> benchmark-results/analysis.md
+          echo "kcachegrind base/callgrind.out" >> benchmark-results/analysis.md
+          echo "kcachegrind pr/callgrind.out" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "# Or use QCachegrind on macOS" >> benchmark-results/analysis.md
+          echo "qcachegrind base/callgrind.out" >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "# Compare callgrind outputs directly" >> benchmark-results/analysis.md
+          echo "cg_diff base/callgrind.out pr/callgrind.out > diff.callgrind" >> benchmark-results/analysis.md
+          echo "callgrind_annotate diff.callgrind" >> benchmark-results/analysis.md
+          echo '```' >> benchmark-results/analysis.md
+          echo "" >> benchmark-results/analysis.md
+          echo "Callgrind provides:" >> benchmark-results/analysis.md
+          echo "- Instruction count (deterministic, platform-independent)" >> benchmark-results/analysis.md
+          echo "- Cache miss simulation (L1/L2/LL data/instruction caches)" >> benchmark-results/analysis.md
+          echo "- Branch prediction simulation" >> benchmark-results/analysis.md
+          echo "- Hardware prefetch simulation" >> benchmark-results/analysis.md
+          echo "- Write-back cache simulation" >> benchmark-results/analysis.md
+          echo '```' >> benchmark-results/analysis.md
+
+          cat benchmark-results/analysis.md
+
+      - name: Upload analysis instructions
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.0
+        with:
+          name: analysis-instructions
+          path: benchmark-results/analysis.md
+          retention-days: 30
