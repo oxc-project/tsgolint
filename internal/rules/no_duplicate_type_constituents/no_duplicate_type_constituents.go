@@ -80,93 +80,97 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 				ctx.ReportNode(constituentNode, message)
 				return
 			}
-			kind := ast.KindUnionType
-			if unionOrIntersection == unionOrIntersection_Intersection {
-				kind = ast.KindIntersectionType
-			}
 
-			parent := unwindedParentType(constituentNode, kind)
-			s := scanner.GetScannerForSourceFile(ctx.SourceFile, parent.Pos())
-			foundBefore := false
-			prevStart := 0
-			bracketBeforeTokens := []core.TextRange{}
+			ctx.ReportNodeWithFixes(constituentNode, message, func() []rule.RuleFix {
+				kind := ast.KindUnionType
+				if unionOrIntersection == unionOrIntersection_Intersection {
+					kind = ast.KindIntersectionType
+				}
 
-			for {
-				if s.TokenStart() >= constituentNode.Pos() {
-					break
-				}
-				if s.Token() == ast.KindAmpersandToken || s.Token() == ast.KindBarToken {
-					foundBefore = true
-					prevStart = s.TokenStart()
-					bracketBeforeTokens = bracketBeforeTokens[:0]
-				} else if s.Token() == ast.KindOpenParenToken {
-					bracketBeforeTokens = append(bracketBeforeTokens, s.TokenRange())
-				}
-				s.Scan()
-			}
-			fixes := []rule.RuleFix{
-				rule.RuleFixRemoveRange(utils.TrimNodeTextRange(ctx.SourceFile, constituentNode)),
-			}
-			if foundBefore {
-				fixes = append(fixes, rule.RuleFixRemoveRange(core.NewTextRange(prevStart, prevStart+1)))
-				for _, before := range bracketBeforeTokens {
-					fixes = append(fixes, rule.RuleFixRemoveRange(before))
-				}
-				s.ResetPos(constituentNode.End())
-				for range bracketBeforeTokens {
-					s.Scan()
-					if s.Token() != ast.KindCloseParenToken {
-						panic(fmt.Sprintf("expected next scanned token to be ')', got '%v'", s.Token()))
-					}
-					fixes = append(fixes, rule.RuleFixRemoveRange(s.TokenRange()))
-				}
-			} else {
-				s.ResetPos(constituentNode.End())
+				parent := unwindedParentType(constituentNode, kind)
+				s := scanner.GetScannerForSourceFile(ctx.SourceFile, parent.Pos())
+				foundBefore := false
+				prevStart := 0
+				bracketBeforeTokens := []core.TextRange{}
 
-				closingParensCount := 0
 				for {
-					s.Scan()
-
-					if s.TokenStart() >= parent.End() {
-						panic("couldn't find '&' or '|' token")
+					if s.TokenStart() >= constituentNode.Pos() {
+						break
 					}
-
 					if s.Token() == ast.KindAmpersandToken || s.Token() == ast.KindBarToken {
-						fixes = append(fixes, rule.RuleFixRemoveRange(s.TokenRange()))
-						break
+						foundBefore = true
+						prevStart = s.TokenStart()
+						bracketBeforeTokens = bracketBeforeTokens[:0]
+					} else if s.Token() == ast.KindOpenParenToken {
+						bracketBeforeTokens = append(bracketBeforeTokens, s.TokenRange())
 					}
-					if s.Token() != ast.KindCloseParenToken {
-						panic(fmt.Sprintf("expected next scanned token to be ')', got '%v'", s.Token()))
-					}
-					closingParensCount++
-					fixes = append(fixes, rule.RuleFixRemoveRange(s.TokenRange()))
-				}
-
-				openingParens := make([]core.TextRange, 0, closingParensCount)
-				s.ResetPos(parent.Pos())
-				for range closingParensCount {
 					s.Scan()
-					if s.Token() == ast.KindOpenParenToken {
-						if len(openingParens) < closingParensCount {
-							openingParens = append(openingParens, s.TokenRange())
+				}
+				fixes := []rule.RuleFix{
+					rule.RuleFixRemoveRange(utils.TrimNodeTextRange(ctx.SourceFile, constituentNode)),
+				}
+				if foundBefore {
+					fixes = append(fixes, rule.RuleFixRemoveRange(core.NewTextRange(prevStart, prevStart+1)))
+					for _, before := range bracketBeforeTokens {
+						fixes = append(fixes, rule.RuleFixRemoveRange(before))
+					}
+					s.ResetPos(constituentNode.End())
+					for range bracketBeforeTokens {
+						s.Scan()
+						if s.Token() != ast.KindCloseParenToken {
+							panic(fmt.Sprintf("expected next scanned token to be ')', got '%v'", s.Token()))
 						}
-					} else {
-						openingParens = openingParens[:0]
+						fixes = append(fixes, rule.RuleFixRemoveRange(s.TokenRange()))
+					}
+				} else {
+					s.ResetPos(constituentNode.End())
+
+					closingParensCount := 0
+					for {
+						s.Scan()
+
+						if s.TokenStart() >= parent.End() {
+							panic("couldn't find '&' or '|' token")
+						}
+
+						if s.Token() == ast.KindAmpersandToken || s.Token() == ast.KindBarToken {
+							fixes = append(fixes, rule.RuleFixRemoveRange(s.TokenRange()))
+							break
+						}
+						if s.Token() != ast.KindCloseParenToken {
+							panic(fmt.Sprintf("expected next scanned token to be ')', got '%v'", s.Token()))
+						}
+						closingParensCount++
+						fixes = append(fixes, rule.RuleFixRemoveRange(s.TokenRange()))
 					}
 
-					if s.TokenStart() == constituentNode.Pos() {
-						if len(openingParens) != closingParensCount {
-							panic(fmt.Sprintf("expected to find %v opening parens, found only %v", closingParensCount, len(openingParens)))
+					openingParens := make([]core.TextRange, 0, closingParensCount)
+					s.ResetPos(parent.Pos())
+					for range closingParensCount {
+						s.Scan()
+						if s.Token() == ast.KindOpenParenToken {
+							if len(openingParens) < closingParensCount {
+								openingParens = append(openingParens, s.TokenRange())
+							}
+						} else {
+							openingParens = openingParens[:0]
 						}
-						break
-					}
 
-					for _, openingParenRange := range openingParens {
-						fixes = append(fixes, rule.RuleFixRemoveRange(openingParenRange))
+						if s.TokenStart() == constituentNode.Pos() {
+							if len(openingParens) != closingParensCount {
+								panic(fmt.Sprintf("expected to find %v opening parens, found only %v", closingParensCount, len(openingParens)))
+							}
+							break
+						}
+
+						for _, openingParenRange := range openingParens {
+							fixes = append(fixes, rule.RuleFixRemoveRange(openingParenRange))
+						}
 					}
 				}
-			}
-			ctx.ReportNodeWithFixes(constituentNode, message, func() []rule.RuleFix { return fixes })
+
+				return fixes
+			})
 		}
 
 		var checkDuplicateRecursively func(
