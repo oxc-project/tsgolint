@@ -56,15 +56,46 @@ const ALL_RULES = [
   'use-unknown-in-catch-callback-variable',
 ] as const;
 
-interface Diagnostic {
-  file_path?: string;
-  rule?: string;
-  range?: {
+enum DiagnosticKind {
+  Rule,
+  Internal,
+}
+
+interface BaseDiagnostic {
+  kind: DiagnosticKind;
+  file_path: string;
+  range: {
     pos: number;
     end: number;
   };
-  [key: string]: any;
+  message: {
+    id: string;
+    description: string;
+    help?: string;
+  };
 }
+
+interface RuleDiagnostic extends BaseDiagnostic {
+  kind: DiagnosticKind.Rule;
+  rule: string;
+  fixes?: Array<{
+    text: string;
+    range: { pos: number; end: number };
+  }>;
+  suggestions?: {
+    message: { id: string; description: string; help?: string };
+    fixes: Array<{
+      text: string;
+      range: { pos: number; end: number };
+    }>;
+  }[];
+}
+
+interface InternalDiagnostic extends BaseDiagnostic {
+  kind: DiagnosticKind.Internal;
+}
+
+type Diagnostic = RuleDiagnostic | InternalDiagnostic;
 
 function parseHeadlessOutput(data: Buffer): Diagnostic[] {
   let offset = 0;
@@ -113,8 +144,8 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
     const bFilePath = b.file_path || '';
     if (aFilePath !== bFilePath) return aFilePath.localeCompare(bFilePath);
 
-    const aRule = a.rule || '';
-    const bRule = b.rule || '';
+    const aRule = 'rule' in a ? a.rule || '' : '';
+    const bRule = 'rule' in b ? b.rule || '' : '';
     if (aRule !== bRule) return aRule.localeCompare(bRule);
 
     const aPos = (a.range && a.range.pos) || 0;
@@ -325,7 +356,7 @@ promise;
     diagnostics = sortDiagnostics(diagnostics);
 
     expect(diagnostics.length).toBe(1);
-    expect(diagnostics[0].rule).toBe('no-floating-promises');
+    expect(diagnostics[0].kind == DiagnosticKind.Rule && diagnostics[0].rule).toBe('no-floating-promises');
     expect(diagnostics[0].file_path).toContain('original.ts');
   });
 
@@ -361,5 +392,24 @@ console.log(x);
     const diagnostics = parseHeadlessOutput(output);
 
     expect(diagnostics.length).toBe(0);
+  });
+
+  it('should handle tsconfig diagnostics when TypeScript reports them', async () => {
+    const testFiles = await getTestFiles('with-invalid-tsconfig-json');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-floating-promises']);
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
   });
 });

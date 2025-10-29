@@ -59,13 +59,25 @@ type headlessSuggestion struct {
 	Message headlessRuleMessage `json:"message"`
 	Fixes   []headlessFix       `json:"fixes"`
 }
+
+// Diagnostic kind discriminator
+type headlessDiagnosticKind uint8
+
+const (
+	headlessDiagnosticKindRule headlessDiagnosticKind = iota
+	headlessDiagnosticKindTsconfig
+)
+
 type headlessDiagnostic struct {
-	Range       headlessRange        `json:"range"`
-	Rule        string               `json:"rule"`
-	Message     headlessRuleMessage  `json:"message"`
+	Kind     headlessDiagnosticKind `json:"kind"`
+	Range    headlessRange          `json:"range"`
+	Message  headlessRuleMessage    `json:"message"`
+	FilePath *string                `json:"file_path"`
+
+	// Only for kind="rule"
+	Rule        *string              `json:"rule,omitempty"`
 	Fixes       []headlessFix        `json:"fixes,omitempty"`
 	Suggestions []headlessSuggestion `json:"suggestions,omitempty"`
-	FilePath    string               `json:"file_path"`
 }
 
 type headlessMessageType uint8
@@ -77,6 +89,20 @@ const (
 
 type headlessMessagePayloadError struct {
 	Error string `json:"error"`
+}
+
+// Unified diagnostic type for channel
+type anyDiagnostic struct {
+	ruleDiagnostic     *rule.RuleDiagnostic
+	internalDiagnostic *linter.InternalDiagnostic
+}
+
+func ruleToAny(d rule.RuleDiagnostic) anyDiagnostic {
+	return anyDiagnostic{ruleDiagnostic: &d}
+}
+
+func internalToAny(d linter.InternalDiagnostic) anyDiagnostic {
+	return anyDiagnostic{internalDiagnostic: &d}
 }
 
 func writeMessage(w io.Writer, messageType headlessMessageType, payload any) error {
@@ -234,44 +260,71 @@ func runHeadless(args []string) int {
 
 	var wg sync.WaitGroup
 
-	diagnosticsChan := make(chan rule.RuleDiagnostic, 4096)
+	diagnosticsChan := make(chan anyDiagnostic, 4096)
 
+	// Handle all diagnostics
 	wg.Go(func() {
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
 		for d := range diagnosticsChan {
-			hd := headlessDiagnostic{
-				Range:       headlessRangeFromRange(d.Range),
-				Rule:        d.RuleName,
-				Message:     headlessRuleMessageFromRuleMessage(d.Message),
-				Fixes:       nil,
-				Suggestions: nil,
-				FilePath:    d.SourceFile.FileName(),
-			}
-			if fix {
-				hd.Fixes = make([]headlessFix, len(d.Fixes()))
-				for i, fix := range d.Fixes() {
-					hd.Fixes[i] = headlessFix{
-						Text:  fix.Text,
-						Range: headlessRangeFromRange(fix.Range),
-					}
+			var hd headlessDiagnostic
+
+			if d.ruleDiagnostic != nil {
+				// Rule diagnostic
+				rd := d.ruleDiagnostic
+				filePath := rd.SourceFile.FileName()
+				hd = headlessDiagnostic{
+					Kind:        headlessDiagnosticKindRule,
+					Range:       headlessRangeFromRange(rd.Range),
+					Rule:        &rd.RuleName,
+					Message:     headlessRuleMessageFromRuleMessage(rd.Message),
+					Fixes:       nil,
+					Suggestions: nil,
+					FilePath:    &filePath,
 				}
-			}
-			if fixSuggestions {
-				hd.Suggestions = make([]headlessSuggestion, len(d.GetSuggestions()))
-				for i, suggestion := range d.GetSuggestions() {
-					hd.Suggestions[i] = headlessSuggestion{
-						Message: headlessRuleMessageFromRuleMessage(d.Message),
-						Fixes:   make([]headlessFix, len(suggestion.Fixes())),
-					}
-					for j, fix := range suggestion.Fixes() {
-						hd.Suggestions[i].Fixes[j] = headlessFix{
+
+				if fix {
+					hd.Fixes = make([]headlessFix, len(rd.Fixes()))
+					for i, fix := range rd.Fixes() {
+						hd.Fixes[i] = headlessFix{
 							Text:  fix.Text,
 							Range: headlessRangeFromRange(fix.Range),
 						}
 					}
 				}
+				if fixSuggestions {
+					hd.Suggestions = make([]headlessSuggestion, len(rd.GetSuggestions()))
+					for i, suggestion := range rd.GetSuggestions() {
+						hd.Suggestions[i] = headlessSuggestion{
+							Message: headlessRuleMessageFromRuleMessage(rd.Message),
+							Fixes:   make([]headlessFix, len(suggestion.Fixes())),
+						}
+						for j, fix := range suggestion.Fixes() {
+							hd.Suggestions[i].Fixes[j] = headlessFix{
+								Text:  fix.Text,
+								Range: headlessRangeFromRange(fix.Range),
+							}
+						}
+					}
+				}
+			} else if d.internalDiagnostic != nil {
+				// Internal diagnostic (tsconfig, type error, etc.)
+				internalDiagnostic := d.internalDiagnostic
+
+				hd = headlessDiagnostic{
+					Kind:  headlessDiagnosticKindTsconfig,
+					Range: headlessRange{},
+					Rule:  nil, // Internal diagnostics don't have a rule
+					Message: headlessRuleMessage{
+						Id:          internalDiagnostic.Id,
+						Description: internalDiagnostic.Description,
+					},
+					Fixes:       nil,
+					Suggestions: nil,
+					FilePath:    nil,
+				}
 			}
+
 			writeMessage(w, headlessMessageTypeDiagnostic, hd)
 			if w.Available() < 4096 {
 				w.Flush()
@@ -309,7 +362,10 @@ func runHeadless(args []string) int {
 			return rules
 		},
 		func(d rule.RuleDiagnostic) {
-			diagnosticsChan <- d
+			diagnosticsChan <- ruleToAny(d)
+		},
+		func(d linter.InternalDiagnostic) {
+			diagnosticsChan <- internalToAny(d)
 		},
 		linter.Fixes{
 			Fix:            fix,

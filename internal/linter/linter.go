@@ -33,7 +33,17 @@ type Fixes struct {
 	FixSuggestions bool
 }
 
-func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Workload, workers int, fs vfs.FS, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), fixState Fixes) error {
+func RunLinter(
+	logLevel utils.LogLevel,
+	currentDirectory string,
+	workload Workload,
+	workers int,
+	fs vfs.FS,
+	getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule,
+	onRuleDiagnostic func(diagnostic rule.RuleDiagnostic),
+	onInternalDiagnostic func(diagnostic InternalDiagnostic),
+	fixState Fixes,
+) error {
 
 	idx := 0
 	for configFileName, filePaths := range workload.Programs {
@@ -44,10 +54,23 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
-		program, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host)
+		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host)
 
 		if err != nil {
 			return err
+		}
+
+		if len(diagnostics) > 0 {
+			for _, d := range diagnostics {
+				loc := d.Loc()
+				onInternalDiagnostic(InternalDiagnostic{
+					Range:       core.NewTextRange(loc.Pos(), loc.End()),
+					Id:          "tsconfig-error",
+					Description: d.Message(),
+				})
+			}
+			idx++
+			continue
 		}
 
 		fileSet := make(map[string]struct{}, len(filePaths))
@@ -80,7 +103,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onDiagnostic, fixState)
+		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, fixState)
 		if err != nil {
 			return err
 		}
@@ -90,10 +113,21 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 
 	{
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
-		program, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
+		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
 
 		if err != nil {
 			return err
+		}
+
+		if len(diagnostics) > 0 {
+			for _, d := range diagnostics {
+				loc := d.Loc()
+				onInternalDiagnostic(InternalDiagnostic{
+					Range:       core.NewTextRange(loc.Pos(), loc.End()),
+					Id:          "tsconfig-error",
+					Description: d.Message(),
+				})
+			}
 		}
 
 		files := make([]*ast.SourceFile, 0, len(workload.UnmatchedFiles))
@@ -105,7 +139,7 @@ func RunLinter(logLevel utils.LogLevel, currentDirectory string, workload Worklo
 			files = append(files, sf)
 		}
 
-		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onDiagnostic, fixState)
+		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, fixState)
 		if err != nil {
 			return err
 		}
