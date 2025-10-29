@@ -63,8 +63,8 @@ type headlessDiagnostic struct {
 	Range       headlessRange        `json:"range"`
 	Rule        string               `json:"rule"`
 	Message     headlessRuleMessage  `json:"message"`
-	Fixes       []headlessFix        `json:"fixes"`
-	Suggestions []headlessSuggestion `json:"suggestions"`
+	Fixes       []headlessFix        `json:"fixes,omitempty"`
+	Suggestions []headlessSuggestion `json:"suggestions,omitempty"`
 	FilePath    string               `json:"file_path"`
 }
 
@@ -102,15 +102,19 @@ func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 
 	var (
-		traceOut   string
-		cpuprofOut string
-		heapOut    string
-		allocsOut  string
+		traceOut       string
+		cpuprofOut     string
+		heapOut        string
+		allocsOut      string
+		fix            bool
+		fixSuggestions bool
 	)
 	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
 	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
 	flag.StringVar(&heapOut, "heap", "", "file to put heap profiling to")
 	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
+	flag.BoolVar(&fix, "fix", false, "generate fixes for code problems")
+	flag.BoolVar(&fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
 	flag.CommandLine.Parse(args)
 
 	log.SetOutput(os.Stderr)
@@ -240,25 +244,31 @@ func runHeadless(args []string) int {
 				Range:       headlessRangeFromRange(d.Range),
 				Rule:        d.RuleName,
 				Message:     headlessRuleMessageFromRuleMessage(d.Message),
-				Fixes:       make([]headlessFix, len(d.Fixes())),
-				Suggestions: make([]headlessSuggestion, len(d.GetSuggestions())),
+				Fixes:       nil,
+				Suggestions: nil,
 				FilePath:    d.SourceFile.FileName(),
 			}
-			for i, fix := range d.Fixes() {
-				hd.Fixes[i] = headlessFix{
-					Text:  fix.Text,
-					Range: headlessRangeFromRange(fix.Range),
-				}
-			}
-			for i, suggestion := range d.GetSuggestions() {
-				hd.Suggestions[i] = headlessSuggestion{
-					Message: headlessRuleMessageFromRuleMessage(d.Message),
-					Fixes:   make([]headlessFix, len(suggestion.Fixes())),
-				}
-				for j, fix := range suggestion.Fixes() {
-					hd.Suggestions[i].Fixes[j] = headlessFix{
+			if fix {
+				hd.Fixes = make([]headlessFix, len(d.Fixes()))
+				for i, fix := range d.Fixes() {
+					hd.Fixes[i] = headlessFix{
 						Text:  fix.Text,
 						Range: headlessRangeFromRange(fix.Range),
+					}
+				}
+			}
+			if fixSuggestions {
+				hd.Suggestions = make([]headlessSuggestion, len(d.GetSuggestions()))
+				for i, suggestion := range d.GetSuggestions() {
+					hd.Suggestions[i] = headlessSuggestion{
+						Message: headlessRuleMessageFromRuleMessage(d.Message),
+						Fixes:   make([]headlessFix, len(suggestion.Fixes())),
+					}
+					for j, fix := range suggestion.Fixes() {
+						hd.Suggestions[i].Fixes[j] = headlessFix{
+							Text:  fix.Text,
+							Range: headlessRangeFromRange(fix.Range),
+						}
 					}
 				}
 			}
@@ -300,6 +310,10 @@ func runHeadless(args []string) int {
 		},
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- d
+		},
+		linter.Fixes{
+			Fix:            fix,
+			FixSuggestions: fixSuggestions,
 		},
 	)
 

@@ -6,7 +6,6 @@ exports[`TSGoLint E2E Snapshot Tests > should correctly lint files not inside a 
 [
   {
     "file_path": "fixtures/with-unmatched-files/src/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe argument of type any assigned to a parameter of type string.",
       "id": "unsafeArgument",
@@ -16,11 +15,9 @@ exports[`TSGoLint E2E Snapshot Tests > should correctly lint files not inside a 
       "pos": 36,
     },
     "rule": "no-unsafe-argument",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/with-unmatched-files/test.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe argument of type any assigned to a parameter of type string.",
       "id": "unsafeArgument",
@@ -30,7 +27,6 @@ exports[`TSGoLint E2E Snapshot Tests > should correctly lint files not inside a 
       "pos": 36,
     },
     "rule": "no-unsafe-argument",
-    "suggestions": [],
   },
 ]
 `;
@@ -39,7 +35,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
 [
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
       "id": "await",
@@ -69,7 +64,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
       "id": "await",
@@ -99,7 +93,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
       "id": "await",
@@ -129,7 +122,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -139,11 +131,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -153,11 +143,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 65,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -167,11 +155,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 133,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-array-delete/index.ts",
-    "fixes": [],
     "message": {
       "description": "Using the \`delete\` operator with an array expression is unsafe.",
       "id": "noArrayDelete",
@@ -215,7 +201,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-array-delete/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -225,11 +210,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
-    "fixes": [],
     "message": {
       "description": "'// Examples of incorrect code for no-base-to-string rule
 
@@ -242,11 +225,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 102,
     },
     "rule": "no-base-to-string",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
-    "fixes": [],
     "message": {
       "description": "'
 ({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
@@ -257,11 +238,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 119,
     },
     "rule": "no-base-to-string",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
-    "fixes": [],
     "message": {
       "description": "'
 ({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
@@ -272,11 +251,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 146,
     },
     "rule": "no-base-to-string",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -286,11 +263,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -300,7 +275,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
@@ -329,7 +303,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 87,
     },
     "rule": "no-duplicate-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
@@ -358,11 +331,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 210,
     },
     "rule": "no-duplicate-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
       "id": "errorTypeOverrides",
@@ -372,11 +343,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 103,
     },
     "rule": "no-redundant-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
       "id": "errorTypeOverrides",
@@ -386,11 +355,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 107,
     },
     "rule": "no-redundant-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "'B' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
       "id": "errorTypeOverrides",
@@ -400,11 +367,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 111,
     },
     "rule": "no-redundant-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -414,7 +379,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
@@ -443,11 +407,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 50,
     },
     "rule": "no-confusing-void-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -495,7 +457,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -543,7 +504,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -591,7 +551,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -639,7 +598,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
@@ -650,11 +608,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 238,
     },
     "rule": "no-floating-promises",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -664,11 +620,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -678,11 +632,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 168,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -692,11 +644,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 202,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -706,11 +656,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 79,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -720,11 +668,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 252,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
-    "fixes": [],
     "message": {
       "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
       "id": "forInViolation",
@@ -734,11 +680,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 80,
     },
     "rule": "no-for-in-array",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
-    "fixes": [],
     "message": {
       "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
       "id": "forInViolation",
@@ -748,11 +692,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 129,
     },
     "rule": "no-for-in-array",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -762,11 +704,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "Implied eval. Consider passing a function.",
       "id": "noImpliedEvalError",
@@ -776,11 +716,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 67,
     },
     "rule": "no-implied-eval",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "Implied eval. Consider passing a function.",
       "id": "noImpliedEvalError",
@@ -790,11 +728,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 103,
     },
     "rule": "no-implied-eval",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "Implied eval. Consider passing a function.",
       "id": "noImpliedEvalError",
@@ -804,11 +740,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 140,
     },
     "rule": "no-implied-eval",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "Implied eval. Consider passing a function.",
       "id": "noImpliedEvalError",
@@ -818,11 +752,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 176,
     },
     "rule": "no-implied-eval",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "Implied eval. Consider passing a function.",
       "id": "noImpliedEvalError",
@@ -832,11 +764,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 214,
     },
     "rule": "no-implied-eval",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "Implied eval. Do not use the Function constructor to create functions.",
       "id": "noFunctionConstructor",
@@ -846,11 +776,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 244,
     },
     "rule": "no-implied-eval",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -860,7 +788,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
@@ -882,11 +809,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 161,
     },
     "rule": "no-meaningless-void-operator",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -896,11 +821,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected a non-Promise value to be spread in an object.",
       "id": "spread",
@@ -910,11 +833,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 67,
     },
     "rule": "no-misused-promises",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "fixes": [],
     "message": {
       "description": "Using the spread operator on Promise in an object can cause unexpected behavior. Did you forget to await the promise?",
       "id": "noPromiseSpreadInObject",
@@ -944,7 +865,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "fixes": [],
     "message": {
       "description": "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?",
       "id": "noFunctionSpreadInObject",
@@ -954,11 +874,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 160,
     },
     "rule": "no-misused-spread",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "fixes": [],
     "message": {
       "description": "Using the spread operator on a Map in an object will result in an empty object. Did you mean to use \`Object.fromEntries(map)\` instead?",
       "id": "noMapSpreadInObject",
@@ -1009,7 +927,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "fixes": [],
     "message": {
       "description": "Using the spread operator on a string can mishandle special characters, as can \`.split("")\`.
 '- \`...\` produces Unicode code points, which will decompose complex emojis into individual emojis- .split("") produces UTF-16 code units, which breaks rich characters in many languagesConsider using \`Intl.Segmenter\` for locale-aware string decomposition.Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option.",
@@ -1020,11 +937,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 300,
     },
     "rule": "no-misused-spread",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1034,11 +949,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
-    "fixes": [],
     "message": {
       "description": "Mixing number and string enums can be confusing.",
       "id": "mixed",
@@ -1048,11 +961,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 92,
     },
     "rule": "no-mixed-enums",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
-    "fixes": [],
     "message": {
       "description": "Mixing number and string enums can be confusing.",
       "id": "mixed",
@@ -1062,11 +973,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 144,
     },
     "rule": "no-mixed-enums",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1076,11 +985,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "'unknown' overrides all other types in this union type.",
       "id": "overrides",
@@ -1090,11 +997,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 124,
     },
     "rule": "no-redundant-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "'any' overrides all other types in this union type.",
       "id": "overrides",
@@ -1104,11 +1009,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 183,
     },
     "rule": "no-redundant-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "'never' is overridden by other types in this union type.",
       "id": "overridden",
@@ -1118,11 +1021,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 240,
     },
     "rule": "no-redundant-type-constituents",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1132,11 +1033,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-boolean-literal-compare/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1146,7 +1045,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-boolean-literal-compare/index.ts",
@@ -1168,7 +1066,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 122,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-boolean-literal-compare/index.ts",
@@ -1197,11 +1094,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 164,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1211,11 +1106,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
-    "fixes": [],
     "message": {
       "description": "Template literal expression is unnecessary and can be simplified.",
       "id": "noUnnecessaryTemplateExpression",
@@ -1225,11 +1118,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 202,
     },
     "rule": "no-unnecessary-template-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
-    "fixes": [],
     "message": {
       "description": "Template literal expression is unnecessary and can be simplified.",
       "id": "noUnnecessaryTemplateExpression",
@@ -1239,11 +1130,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 213,
     },
     "rule": "no-unnecessary-template-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-arguments/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1253,7 +1142,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-arguments/index.ts",
@@ -1275,11 +1163,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 207,
     },
     "rule": "no-unnecessary-type-arguments",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1289,7 +1175,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-assertion/index.ts",
@@ -1318,7 +1203,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 117,
     },
     "rule": "no-unnecessary-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-assertion/index.ts",
@@ -1347,7 +1231,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 237,
     },
     "rule": "no-unnecessary-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-assertion/index.ts",
@@ -1376,11 +1259,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 350,
     },
     "rule": "no-unnecessary-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1390,11 +1271,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe argument of type any assigned to a parameter of type string.",
       "id": "unsafeArgument",
@@ -1404,11 +1283,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 173,
     },
     "rule": "no-unsafe-argument",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe argument of type any assigned to a parameter of type number.",
       "id": "unsafeArgument",
@@ -1418,11 +1295,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 273,
     },
     "rule": "no-unsafe-argument",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1432,7 +1307,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
@@ -1461,11 +1335,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 220,
     },
     "rule": "no-unnecessary-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1475,11 +1347,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 97,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1489,11 +1359,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 160,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1503,11 +1371,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 214,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1517,11 +1383,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1531,11 +1395,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 154,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1545,11 +1407,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 85,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1559,11 +1419,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 113,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1573,11 +1431,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 163,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1587,11 +1443,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 222,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1601,11 +1455,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 222,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1615,11 +1467,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 222,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .then on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1629,11 +1479,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 233,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .catch on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1643,11 +1491,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 240,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
-    "fixes": [],
     "message": {
       "description": "Mixing number and string enums can be confusing.",
       "id": "mixed",
@@ -1657,11 +1503,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 89,
     },
     "rule": "no-mixed-enums",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1671,11 +1515,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1685,11 +1527,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1699,11 +1539,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 240,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -1713,11 +1551,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 249,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .foo on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1727,11 +1563,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 103,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .bar on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1741,11 +1575,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 142,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access ['key'] on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1755,11 +1587,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 192,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .method on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1769,11 +1599,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 258,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1783,11 +1611,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
@@ -1797,11 +1623,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 120,
     },
     "rule": "no-unsafe-return",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
@@ -1811,11 +1635,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 189,
     },
     "rule": "no-unsafe-return",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
@@ -1825,11 +1647,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 275,
     },
     "rule": "no-unsafe-return",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1839,11 +1659,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1853,11 +1671,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 102,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -1867,11 +1683,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 265,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .someProperty on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -1881,11 +1695,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 320,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
@@ -1895,11 +1707,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 303,
     },
     "rule": "no-unsafe-return",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
@@ -1909,11 +1719,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 108,
     },
     "rule": "no-unsafe-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
@@ -1923,11 +1731,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 160,
     },
     "rule": "no-unsafe-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
@@ -1937,11 +1743,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 160,
     },
     "rule": "no-unsafe-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
@@ -1951,11 +1755,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 277,
     },
     "rule": "no-unsafe-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -1965,11 +1767,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "fixes": [],
     "message": {
       "description": "Argument of unary negation should be assignable to number | bigint but is unknown instead.",
       "id": "unaryMinus",
@@ -1979,11 +1779,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 104,
     },
     "rule": "no-unsafe-unary-minus",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "fixes": [],
     "message": {
       "description": "Argument of unary negation should be assignable to number | bigint but is string instead.",
       "id": "unaryMinus",
@@ -1993,11 +1791,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 173,
     },
     "rule": "no-unsafe-unary-minus",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "fixes": [],
     "message": {
       "description": "Argument of unary negation should be assignable to number | bigint but is false instead.",
       "id": "unaryMinus",
@@ -2007,11 +1803,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 245,
     },
     "rule": "no-unsafe-unary-minus",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "fixes": [],
     "message": {
       "description": "Argument of unary negation should be assignable to number | bigint but is { prop: any; } instead.",
       "id": "unaryMinus",
@@ -2021,11 +1815,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 317,
     },
     "rule": "no-unsafe-unary-minus",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2035,7 +1827,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
@@ -2064,11 +1855,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 261,
     },
     "rule": "no-unnecessary-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe type assertion: type 'string' is more narrow than the original type.",
       "id": "unsafeTypeAssertion",
@@ -2078,11 +1867,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 186,
     },
     "rule": "no-unsafe-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2092,11 +1879,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected an error object to be thrown.",
       "id": "object",
@@ -2106,11 +1891,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 63,
     },
     "rule": "only-throw-error",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected an error object to be thrown.",
       "id": "object",
@@ -2120,11 +1903,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 98,
     },
     "rule": "only-throw-error",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected an error object to be thrown.",
       "id": "object",
@@ -2134,11 +1915,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 128,
     },
     "rule": "only-throw-error",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected an error object to be thrown.",
       "id": "object",
@@ -2148,11 +1927,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 161,
     },
     "rule": "only-throw-error",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected an error object to be thrown.",
       "id": "object",
@@ -2162,11 +1939,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 215,
     },
     "rule": "only-throw-error",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -2214,7 +1989,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -2262,7 +2036,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -2310,7 +2083,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -2358,7 +2130,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -2406,7 +2177,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2416,11 +2186,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -2430,11 +2198,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 69,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -2444,11 +2210,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 120,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -2458,11 +2222,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 166,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -2472,11 +2234,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 215,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -2486,11 +2246,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 285,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2500,7 +2258,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
@@ -2529,7 +2286,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 131,
     },
     "rule": "no-unnecessary-type-assertion",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
@@ -2558,11 +2314,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 330,
     },
     "rule": "prefer-reduce-type-parameter",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-return-this-type/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2572,7 +2326,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/prefer-return-this-type/index.ts",
@@ -2594,11 +2347,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 138,
     },
     "rule": "prefer-return-this-type",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2608,7 +2359,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
@@ -2630,7 +2380,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 107,
     },
     "rule": "promise-function-async",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
@@ -2652,7 +2401,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 180,
     },
     "rule": "promise-function-async",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
@@ -2674,7 +2422,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 267,
     },
     "rule": "promise-function-async",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
@@ -2696,11 +2443,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 328,
     },
     "rule": "promise-function-async",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/related-getter-setter-pairs/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2710,11 +2455,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/related-getter-setter-pairs/index.ts",
-    "fixes": [],
     "message": {
       "description": "\`get()\` type should be assignable to its equivalent \`set()\` type.",
       "id": "mismatch",
@@ -2724,11 +2467,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 179,
     },
     "rule": "related-getter-setter-pairs",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-array-sort-compare/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2738,11 +2479,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-array-sort-compare/index.ts",
-    "fixes": [],
     "message": {
       "description": "Require 'compare' argument.",
       "id": "requireCompare",
@@ -2752,11 +2491,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 100,
     },
     "rule": "require-array-sort-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-array-sort-compare/index.ts",
-    "fixes": [],
     "message": {
       "description": "Require 'compare' argument.",
       "id": "requireCompare",
@@ -2766,11 +2503,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 265,
     },
     "rule": "require-array-sort-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2780,11 +2515,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
@@ -2794,11 +2527,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 228,
     },
     "rule": "no-unsafe-call",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .map on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -2808,11 +2539,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 237,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
@@ -2822,11 +2551,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 221,
     },
     "rule": "no-unsafe-return",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -2836,11 +2563,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 205,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2850,11 +2575,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
@@ -2864,11 +2587,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 4,
     },
     "rule": "no-unsafe-assignment",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
-    "fixes": [],
     "message": {
       "description": "Numeric '+' operations must either be both bigints or both numbers. Got \`bigint\` + \`number\`.",
       "id": "bigintAndNumber",
@@ -2878,11 +2599,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 10,
     },
     "rule": "restrict-plus-operands",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
-    "fixes": [],
     "message": {
       "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`. Got \`never\`.",
       "id": "invalid",
@@ -2892,11 +2611,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 56,
     },
     "rule": "restrict-plus-operands",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "fixes": [],
     "message": {
       "description": "'obj' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
@@ -2906,11 +2623,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 244,
     },
     "rule": "no-base-to-string",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2920,11 +2635,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "fixes": [],
     "message": {
       "description": "Invalid type "{ prop: any; }" of template literal expression.",
       "id": "invalidType",
@@ -2934,11 +2647,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 244,
     },
     "rule": "restrict-template-expressions",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "fixes": [],
     "message": {
       "description": "Invalid type "symbol" of template literal expression.",
       "id": "invalidType",
@@ -2948,11 +2659,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 316,
     },
     "rule": "restrict-template-expressions",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "fixes": [],
     "message": {
       "description": "Invalid type "Function" of template literal expression.",
       "id": "invalidType",
@@ -2962,11 +2671,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 398,
     },
     "rule": "restrict-template-expressions",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "fixes": [],
     "message": {
       "description": "Invalid type "number[]" of template literal expression.",
       "id": "invalidType",
@@ -2976,11 +2683,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 465,
     },
     "rule": "restrict-template-expressions",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/return-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -2990,11 +2695,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/return-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "Returning an awaited promise is required in this context.",
       "id": "requiredPromiseAwait",
@@ -3024,7 +2727,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/return-await/index.ts",
-    "fixes": [],
     "message": {
       "description": "Returning an awaited promise is required in this context.",
       "id": "requiredPromiseAwait",
@@ -3054,7 +2756,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -3064,11 +2765,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "fixes": [],
     "message": {
       "description": "The case statement does not have a shared enum type with the switch predicate.",
       "id": "mismatchedCase",
@@ -3078,11 +2777,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 184,
     },
     "rule": "no-unsafe-enum-comparison",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "fixes": [],
     "message": {
       "description": "The case statement does not have a shared enum type with the switch predicate.",
       "id": "mismatchedCase",
@@ -3092,11 +2789,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 241,
     },
     "rule": "no-unsafe-enum-comparison",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "fixes": [],
     "message": {
       "description": "Switch is not exhaustive",
       "id": "switchIsNotExhaustive",
@@ -3106,11 +2801,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 170,
     },
     "rule": "switch-exhaustiveness-check",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -3120,11 +2813,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "fixes": [],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
 If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3135,11 +2826,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 328,
     },
     "rule": "unbound-method",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "fixes": [],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
 If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3150,11 +2839,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 440,
     },
     "rule": "unbound-method",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "fixes": [],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
 If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3165,11 +2852,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 557,
     },
     "rule": "unbound-method",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "fixes": [],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
 If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3180,11 +2865,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 647,
     },
     "rule": "unbound-method",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/use-unknown-in-catch-callback-variable/index.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -3194,11 +2877,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/use-unknown-in-catch-callback-variable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .message on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -3208,11 +2889,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 218,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/use-unknown-in-catch-callback-variable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Unsafe member access .message on an \`any\` value.",
       "id": "unsafeMemberExpression",
@@ -3222,11 +2901,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 499,
     },
     "rule": "no-unsafe-member-access",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/rules/use-unknown-in-catch-callback-variable/index.ts",
-    "fixes": [],
     "message": {
       "description": "Prefer the safe \`: unknown\` for a \`catch\` callback variable.",
       "id": "useUnknown",
@@ -3281,11 +2958,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 50,
     },
     "rule": "no-confusing-void-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3333,7 +3008,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3381,7 +3055,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3429,7 +3102,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3477,7 +3149,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
@@ -3488,11 +3159,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 238,
     },
     "rule": "no-floating-promises",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -3502,11 +3171,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -3516,11 +3183,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 168,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -3530,11 +3195,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 202,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -3544,11 +3207,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 79,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -3558,7 +3219,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 252,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
@@ -3587,11 +3247,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 50,
     },
     "rule": "no-confusing-void-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3639,7 +3297,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3687,7 +3344,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3735,7 +3391,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3783,7 +3438,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
@@ -3794,11 +3448,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 238,
     },
     "rule": "no-floating-promises",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -3808,11 +3460,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -3822,11 +3472,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 168,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -3836,11 +3484,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 202,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -3850,11 +3496,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 79,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -3864,7 +3508,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 252,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
@@ -3893,11 +3536,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 50,
     },
     "rule": "no-confusing-void-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3945,7 +3586,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -3993,7 +3633,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -4041,7 +3680,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -4089,7 +3727,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
@@ -4100,11 +3737,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 238,
     },
     "rule": "no-floating-promises",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -4114,11 +3749,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -4128,11 +3761,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 168,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -4142,11 +3773,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 202,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -4156,11 +3785,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 79,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -4170,7 +3797,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 252,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
@@ -4199,11 +3825,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 50,
     },
     "rule": "no-confusing-void-expression",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -4251,7 +3875,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -4299,7 +3922,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -4347,7 +3969,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Promises must be awaited.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
@@ -4395,7 +4016,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
@@ -4406,11 +4026,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 238,
     },
     "rule": "no-floating-promises",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
       "id": "noStrictNullCheck",
@@ -4420,11 +4038,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 0,
     },
     "rule": "no-unnecessary-boolean-literal-compare",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -4434,11 +4050,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 168,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
@@ -4448,11 +4062,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 202,
     },
     "rule": "prefer-promise-reject-errors",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -4462,11 +4074,9 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 79,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
-    "fixes": [],
     "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
@@ -4476,7 +4086,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 252,
     },
     "rule": "require-await",
-    "suggestions": [],
   },
 ]
 `;

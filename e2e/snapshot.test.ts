@@ -181,7 +181,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     const env = { ...process.env, GOMAXPROCS: '1' };
 
     let output: Buffer;
-    output = execFileSync(TSGOLINT_BIN, ['headless'], {
+    output = execFileSync(TSGOLINT_BIN, ['headless', '-fix', '-fix-suggestions'], {
       input: config,
       env,
     });
