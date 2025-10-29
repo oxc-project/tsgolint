@@ -72,13 +72,15 @@ var NoArrayDeleteRule = rule.Rule{
 				leftBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, expressionRange.End())
 				rightBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, argumentRange.End())
 
-				ctx.ReportNodeWithSuggestions(node, buildNoArrayDeleteMessage(), rule.RuleSuggestion{
-					Message: buildUseSpliceMessage(),
-					FixesArr: []rule.RuleFix{
-						rule.RuleFixRemoveRange(deleteTokenRange),
-						rule.RuleFixReplaceRange(leftBracketTokenRange, ".splice("),
-						rule.RuleFixReplaceRange(rightBracketTokenRange, ", 1)"),
-					},
+				ctx.ReportNodeWithSuggestions(node, buildNoArrayDeleteMessage(), func() []rule.RuleSuggestion {
+					return []rule.RuleSuggestion{{
+						Message: buildUseSpliceMessage(),
+						FixesArr: []rule.RuleFix{
+							rule.RuleFixRemoveRange(deleteTokenRange),
+							rule.RuleFixReplaceRange(leftBracketTokenRange, ".splice("),
+							rule.RuleFixReplaceRange(rightBracketTokenRange, ", 1)"),
+						},
+					}}
 				})
 			},
 		}

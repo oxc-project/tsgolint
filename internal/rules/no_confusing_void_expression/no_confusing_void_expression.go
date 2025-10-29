@@ -206,7 +206,7 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 				}
 
 				if opts.IgnoreVoidOperator {
-					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprArrowWrapVoidMessage(), insertVoidFix())
+					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprArrowWrapVoidMessage(), func() []rule.RuleFix { return []rule.RuleFix{insertVoidFix()} })
 					return
 				}
 
@@ -220,7 +220,7 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 					}
 				}
 
-				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprArrowMessage(), fixes...)
+				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprArrowMessage(), func() []rule.RuleFix { return fixes })
 				return
 			}
 
@@ -234,7 +234,7 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 				}
 
 				if opts.IgnoreVoidOperator {
-					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnWrapVoidMessage(), insertVoidFix())
+					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnWrapVoidMessage(), func() []rule.RuleFix { return []rule.RuleFix{insertVoidFix()} })
 					return
 				}
 
@@ -251,7 +251,7 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 						fixes = append(fixes, rule.RuleFixReplaceRange(returnToken, replaceText))
 					}
 
-					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnLastMessage(), fixes...)
+					ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnLastMessage(), func() []rule.RuleFix { return fixes })
 					return
 				}
 
@@ -272,14 +272,16 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 						rule.RuleFixInsertAfter(invalidAncestor, " }"),
 					)
 				}
-				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnMessage(), fixes...)
+				ctx.ReportNodeWithFixes(node, buildInvalidVoidExprReturnMessage(), func() []rule.RuleFix { return fixes })
 				return
 			}
 
 			if opts.IgnoreVoidOperator {
-				ctx.ReportNodeWithSuggestions(node, buildInvalidVoidExprWrapVoidMessage(), rule.RuleSuggestion{
-					Message:  buildVoidExprWrapVoidMessage(),
-					FixesArr: []rule.RuleFix{insertVoidFix()},
+				ctx.ReportNodeWithSuggestions(node, buildInvalidVoidExprWrapVoidMessage(), func() []rule.RuleSuggestion {
+					return []rule.RuleSuggestion{{
+						Message:  buildVoidExprWrapVoidMessage(),
+						FixesArr: []rule.RuleFix{insertVoidFix()},
+					}}
 				})
 				return
 			}

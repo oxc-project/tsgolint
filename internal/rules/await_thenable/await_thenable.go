@@ -52,11 +52,13 @@ var AwaitThenableRule = rule.Rule{
 				certainty := utils.NeedsToBeAwaited(ctx.TypeChecker, awaitArgument, awaitArgumentType)
 
 				if certainty == utils.TypeAwaitableNever {
-					ctx.ReportNodeWithSuggestions(node, buildAwaitMessage(), rule.RuleSuggestion{
-						Message: buildRemoveAwaitMessage(),
-						FixesArr: []rule.RuleFix{
-							rule.RuleFixRemoveRange(scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())),
-						},
+					ctx.ReportNodeWithSuggestions(node, buildAwaitMessage(), func() []rule.RuleSuggestion {
+						return []rule.RuleSuggestion{{
+							Message: buildRemoveAwaitMessage(),
+							FixesArr: []rule.RuleFix{
+								rule.RuleFixRemoveRange(scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())),
+							},
+						}}
 					})
 				}
 			},
@@ -80,13 +82,15 @@ var AwaitThenableRule = rule.Rule{
 				ctx.ReportRangeWithSuggestions(
 					utils.GetForStatementHeadLoc(ctx.SourceFile, node),
 					buildForAwaitOfNonAsyncIterableMessage(),
-					// Note that this suggestion causes broken code for sync iterables
-					// of promises, since the loop variable is not awaited.
-					rule.RuleSuggestion{
-						Message: buildConvertToOrdinaryForMessage(),
-						FixesArr: []rule.RuleFix{
-							rule.RuleFixRemove(ctx.SourceFile, stmt.AwaitModifier),
-						},
+					func() []rule.RuleSuggestion {
+						// Note that this suggestion causes broken code for sync iterables
+						// of promises, since the loop variable is not awaited.
+						return []rule.RuleSuggestion{{
+							Message: buildConvertToOrdinaryForMessage(),
+							FixesArr: []rule.RuleFix{
+								rule.RuleFixRemove(ctx.SourceFile, stmt.AwaitModifier),
+							},
+						}}
 					},
 				)
 			},
@@ -126,7 +130,7 @@ var AwaitThenableRule = rule.Rule{
 						})
 					}
 
-					ctx.ReportNodeWithSuggestions(init, buildAwaitUsingOfNonAsyncDisposableMessage(), suggestions...)
+					ctx.ReportNodeWithSuggestions(init, buildAwaitUsingOfNonAsyncDisposableMessage(), func() []rule.RuleSuggestion { return suggestions })
 				}
 			},
 		}
