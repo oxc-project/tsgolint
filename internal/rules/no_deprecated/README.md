@@ -28,15 +28,16 @@ The rule uses `ast.GetCombinedModifierFlags(decl) & ast.ModifierFlagsDeprecated`
 - Checks all declarations of a symbol for the deprecated flag
 - Follows alias chains to detect deprecation on imported/exported symbols
 
-## Current Limitation
+## Deprecation Reason Extraction
 
-The deprecation **reason** (the text after `@deprecated` in JSDoc) is not currently extracted. This would require:
+The rule now extracts the deprecation reason from JSDoc comments following the `Parser.withJSDoc` approach:
 
-1. Accessing the JSDoc comments from the node using `node.JSDoc(sourceFile)`
-2. Finding the `JSDocDeprecatedTag` node
-3. Extracting the comment text
+1. Gets leading comment ranges for the node
+2. Filters for JSDoc comments (/** ... */)
+3. Parses the comment text to find the @deprecated tag
+4. Extracts the reason text after @deprecated
 
-This functionality could be added in the future if needed.
+This allows the rule to report both simple deprecation and deprecation with custom messages.
 
 ## Testing
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 )
 
@@ -53,16 +54,76 @@ var NoDeprecatedRule = rule.Rule{
 		}
 
 		// Extract the deprecation reason from JSDoc comments
+		// This implementation is based on Parser.withJSDoc approach:
+		// - Get leading comment ranges
+		// - Filter for JSDoc comments (/** ... */)
+		// - Parse the comment text to find @deprecated tag
+		// - Extract the reason text after @deprecated
 		getDeprecationReason := func(node *ast.Node) string {
 			// Check if node has JSDoc
 			if node.Flags&ast.NodeFlagsHasJSDoc == 0 {
 				return ""
 			}
 
-			// Get JSDoc comments - need to use the internal method
-			// For now, we'll return empty string as extracting text from JSDoc
-			// requires more complex parsing
-			// TODO: Implement JSDoc text extraction if needed
+			// Get the source text
+			sourceText := ctx.SourceFile.Text()
+
+			// Get leading comments for this node
+			for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, node.Pos()) {
+				// Check if this is a JSDoc comment (starts with /**)
+				start := commentRange.Pos()
+				end := commentRange.End()
+
+				if end <= start+3 {
+					continue
+				}
+
+				// Check for /** but not /**/ (which is not JSDoc)
+				if sourceText[start+1] != '*' || sourceText[start+2] != '*' || sourceText[start+3] == '/' {
+					continue
+				}
+
+				// Extract comment text
+				commentText := sourceText[start:end]
+
+				// Look for @deprecated tag
+				deprecatedIndex := strings.Index(commentText, "@deprecated")
+				if deprecatedIndex == -1 {
+					continue
+				}
+
+				// Extract the reason after @deprecated
+				// Skip past "@deprecated" and any whitespace
+				reasonStart := deprecatedIndex + len("@deprecated")
+
+				// Find the end of the reason (next @ tag or end of comment)
+				reasonText := commentText[reasonStart:]
+
+				// Trim whitespace and extract until next tag or end
+				lines := strings.Split(reasonText, "\n")
+				var reasonParts []string
+
+				for _, line := range lines {
+					// Remove leading * and whitespace
+					line = strings.TrimSpace(line)
+					line = strings.TrimPrefix(line, "*")
+					line = strings.TrimSpace(line)
+
+					// Stop at next @ tag or end of comment
+					if strings.HasPrefix(line, "@") || strings.HasPrefix(line, "*/") {
+						break
+					}
+
+					if line != "" {
+						reasonParts = append(reasonParts, line)
+					}
+				}
+
+				if len(reasonParts) > 0 {
+					return strings.Join(reasonParts, " ")
+				}
+			}
+
 			return ""
 		}
 
