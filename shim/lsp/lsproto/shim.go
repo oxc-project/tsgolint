@@ -138,6 +138,10 @@ type ColorPresentationResponse = lsproto.ColorPresentationResponse
 type Command = lsproto.Command
 type CommandOrCodeAction = lsproto.CommandOrCodeAction
 type CommandOrCodeActionArrayOrNull = lsproto.CommandOrCodeActionArrayOrNull
+//go:linkname ComparePositions github.com/microsoft/typescript-go/internal/lsp/lsproto.ComparePositions
+func ComparePositions(pos lsproto.Position, other lsproto.Position) int
+//go:linkname CompareRanges github.com/microsoft/typescript-go/internal/lsp/lsproto.CompareRanges
+func CompareRanges(lsRange *lsproto.Range, other *lsproto.Range) int
 type CompletionClientCapabilities = lsproto.CompletionClientCapabilities
 type CompletionContext = lsproto.CompletionContext
 type CompletionItem = lsproto.CompletionItem
