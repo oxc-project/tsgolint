@@ -26,32 +26,34 @@ var NoDeprecatedRule = rule.Rule{
 	Name: "no-deprecated",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		// Get the JSDoc deprecation tag for a symbol or signature
-		getJsDocDeprecation := func(symbol *checker.Symbol) string {
+		// NOTE: This requires Symbol.GetJsDocTags() to be exposed in the typescript-go shim
+		// The method exists in TypeScript's compiler API: symbol.getJsDocTags(checker)
+		getJsDocDeprecation := func(symbol *ast.Symbol) string {
 			if symbol == nil {
 				return ""
 			}
 
-			tags := symbol.GetJsDocTags(ctx.TypeChecker)
-			if tags == nil {
+			// TODO: This method needs to be added to the typescript-go shim
+			// For now, this is a placeholder implementation
+			// The actual TypeScript API is: symbol.getJsDocTags(checker)
+			// which returns an array of JSDocTagInfo objects
+			
+			// Check each declaration of the symbol for JSDoc comments
+			if symbol.Declarations == nil {
 				return ""
 			}
 
-			for _, tag := range tags {
-				if tag.Name() == "deprecated" {
-					// Get the text of the deprecated tag
-					text := tag.Text()
-					if text == nil || len(text) == 0 {
-						return ""
-					}
-					// Convert display parts to string
-					var parts []string
-					for _, part := range text {
-						parts = append(parts, part.Text())
-					}
-					result := strings.Join(parts, "")
-					return result
+			for _, decl := range symbol.Declarations {
+				if decl == nil {
+					continue
 				}
+				
+				// TODO: Parse JSDoc comments from the declaration
+				// This would involve using parser.GetJSDocCommentRanges
+				// and then parsing the comment text for @deprecated tag
+				// For now, this is incomplete and needs the shim to be updated
 			}
+
 			return ""
 		}
 
