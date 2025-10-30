@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/dlclark/regexp2 v1.11.5
-	github.com/microsoft/typescript-go v0.0.0-20251030154517-d891e4f6265e
+	github.com/microsoft/typescript-go v0.0.0-20251030175919-8ac309261b2e
 )
 
 require (
