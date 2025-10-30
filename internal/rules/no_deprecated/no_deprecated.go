@@ -25,35 +25,44 @@ func buildDeprecatedWithReasonMessage(name string, reason string) rule.RuleMessa
 var NoDeprecatedRule = rule.Rule{
 	Name: "no-deprecated",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		// Get the JSDoc deprecation tag for a symbol or signature
-		// NOTE: This requires Symbol.GetJsDocTags() to be exposed in the typescript-go shim
-		// The method exists in TypeScript's compiler API: symbol.getJsDocTags(checker)
-		getJsDocDeprecation := func(symbol *ast.Symbol) string {
-			if symbol == nil {
-				return ""
+		// Check if a symbol is deprecated and optionally get the deprecation reason
+		// This approach is based on typescript-go's symbol_display.go implementation
+		// Returns: (isDeprecated bool, reason string)
+		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
+			if symbol == nil || len(symbol.Declarations) == 0 {
+				return false, ""
 			}
 
-			// TODO: This method needs to be added to the typescript-go shim
-			// For now, this is a placeholder implementation
-			// The actual TypeScript API is: symbol.getJsDocTags(checker)
-			// which returns an array of JSDocTagInfo objects
-			
-			// Check each declaration of the symbol for JSDoc comments
-			if symbol.Declarations == nil {
-				return ""
-			}
-
+			// Check if any declaration has the deprecated flag
+			// Following the typescript-go approach: GetCombinedModifierFlags includes JSDoc node flags
 			for _, decl := range symbol.Declarations {
 				if decl == nil {
 					continue
 				}
-				
-				// TODO: Parse JSDoc comments from the declaration
-				// This would involve using parser.GetJSDocCommentRanges
-				// and then parsing the comment text for @deprecated tag
-				// For now, this is incomplete and needs the shim to be updated
+				if ast.IsDeclaration(decl) {
+					flags := ast.GetCombinedModifierFlags(decl)
+					if flags&ast.ModifierFlagsDeprecated != 0 {
+						// Found deprecation, now try to extract the reason from JSDoc
+						reason := getDeprecationReason(decl)
+						return true, reason
+					}
+				}
 			}
 
+			return false, ""
+		}
+
+		// Extract the deprecation reason from JSDoc comments
+		getDeprecationReason := func(node *ast.Node) string {
+			// Check if node has JSDoc
+			if node.Flags&ast.NodeFlagsHasJSDoc == 0 {
+				return ""
+			}
+
+			// Get JSDoc comments - need to use the internal method
+			// For now, we'll return empty string as extracting text from JSDoc
+			// requires more complex parsing
+			// TODO: Implement JSDoc text extraction if needed
 			return ""
 		}
 
@@ -151,30 +160,31 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			// Check for deprecation through the alias chain
+			var isDeprecated bool
 			var deprecationReason string
 
 			// Check if the symbol is an alias and follow the chain
 			if checker.IsSymbolFlagSet(symbol, checker.SymbolFlagsAlias) {
 				// Check the alias itself
-				deprecationReason = getJsDocDeprecation(symbol)
+				isDeprecated, deprecationReason = checkDeprecation(symbol)
 
 				// If not deprecated, check the aliased symbol
-				if deprecationReason == "" {
+				if !isDeprecated {
 					aliasedSymbol := ctx.TypeChecker.GetAliasedSymbol(symbol)
 					if aliasedSymbol != nil {
-						deprecationReason = getJsDocDeprecation(aliasedSymbol)
+						isDeprecated, deprecationReason = checkDeprecation(aliasedSymbol)
 					}
 				}
 			} else {
 				// Not an alias, check the symbol directly
-				deprecationReason = getJsDocDeprecation(symbol)
+				isDeprecated, deprecationReason = checkDeprecation(symbol)
 			}
 
 			// If deprecated, report it
-			if deprecationReason != "" {
+			if isDeprecated {
 				name := node.Text(ctx.SourceFile)
 
-				if deprecationReason == " " || deprecationReason == "" {
+				if deprecationReason == "" {
 					ctx.ReportNode(node, buildDeprecatedMessage(name))
 				} else {
 					ctx.ReportNode(node, buildDeprecatedWithReasonMessage(name, strings.TrimSpace(deprecationReason)))
@@ -205,9 +215,9 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			// Check if deprecated
-			deprecationReason := getJsDocDeprecation(propertySymbol)
-			if deprecationReason != "" {
-				if deprecationReason == " " || deprecationReason == "" {
+			isDeprecated, deprecationReason := checkDeprecation(propertySymbol)
+			if isDeprecated {
+				if deprecationReason == "" {
 					ctx.ReportNode(property, buildDeprecatedMessage(propertyName))
 				} else {
 					ctx.ReportNode(property, buildDeprecatedWithReasonMessage(propertyName, strings.TrimSpace(deprecationReason)))
@@ -224,21 +234,16 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			// Check if the signature is deprecated
-			deprecationReason := ""
-			if signature != nil {
-				// Try to get JSDoc from the signature
-				// Note: TypeScript's signature interface may have GetJsDocTags method
-				// but we need to check the symbol instead
-				symbol := ctx.TypeChecker.GetSymbolAtLocation(callExpr.Expression)
-				if symbol != nil {
-					deprecationReason = getJsDocDeprecation(symbol)
-				}
+			// Check if the function is deprecated
+			symbol := ctx.TypeChecker.GetSymbolAtLocation(callExpr.Expression)
+			if symbol == nil {
+				return
 			}
 
-			if deprecationReason != "" {
+			isDeprecated, deprecationReason := checkDeprecation(symbol)
+			if isDeprecated {
 				exprText := callExpr.Expression.Text(ctx.SourceFile)
-				if deprecationReason == " " || deprecationReason == "" {
+				if deprecationReason == "" {
 					ctx.ReportNode(callExpr.Expression, buildDeprecatedMessage(exprText))
 				} else {
 					ctx.ReportNode(callExpr.Expression, buildDeprecatedWithReasonMessage(exprText, strings.TrimSpace(deprecationReason)))
@@ -261,10 +266,10 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			deprecationReason := getJsDocDeprecation(symbol)
-			if deprecationReason != "" {
+			isDeprecated, deprecationReason := checkDeprecation(symbol)
+			if isDeprecated {
 				exprText := newExpr.Expression.Text(ctx.SourceFile)
-				if deprecationReason == " " || deprecationReason == "" {
+				if deprecationReason == "" {
 					ctx.ReportNode(newExpr.Expression, buildDeprecatedMessage(exprText))
 				} else {
 					ctx.ReportNode(newExpr.Expression, buildDeprecatedWithReasonMessage(exprText, strings.TrimSpace(deprecationReason)))

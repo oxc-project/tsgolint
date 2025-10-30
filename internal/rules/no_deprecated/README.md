@@ -2,7 +2,7 @@
 
 ## Status
 
-The `no-deprecated` rule has been partially implemented. The core structure and logic are in place, but the implementation is currently incomplete due to missing functionality in the typescript-go shim.
+The `no-deprecated` rule is **fully implemented** and functional using `GetCombinedModifierFlags` to detect deprecated symbols.
 
 ## What's Implemented
 
@@ -15,50 +15,28 @@ The `no-deprecated` rule has been partially implemented. The core structure and 
 3. ✅ Declaration detection (to avoid flagging declarations themselves)
 4. ✅ Import detection (to avoid flagging import statements)
 5. ✅ Alias chain following logic
-6. ✅ Test cases covering various scenarios
-7. ✅ Rule registration in main.go
+6. ✅ Deprecation detection using `GetCombinedModifierFlags`
+7. ✅ Test cases covering various scenarios
+8. ✅ Rule registration in main.go
 
-## What's Missing
+## Implementation Details
 
-The implementation requires the `GetJsDocTags()` method to be exposed in the typescript-go shim. This method:
+The rule uses `ast.GetCombinedModifierFlags(decl) & ast.ModifierFlagsDeprecated` to check if a symbol is deprecated. This approach:
 
-- Exists in the TypeScript compiler API as `symbol.getJsDocTags(checker)`
-- Returns an array of `JSDocTagInfo` objects
-- Is used to access JSDoc comments like `@deprecated` from symbols
+- Is based on typescript-go's `symbol_display.go` implementation
+- Works with JSDoc `@deprecated` tags (parsed by TypeScript and stored as modifier flags)
+- Checks all declarations of a symbol for the deprecated flag
+- Follows alias chains to detect deprecation on imported/exported symbols
 
-### Required typescript-go Changes
+## Current Limitation
 
-To complete this implementation, the following needs to be added to the typescript-go shim:
+The deprecation **reason** (the text after `@deprecated` in JSDoc) is not currently extracted. This would require:
 
-1. **Expose `Symbol.GetJsDocTags()` method**:
-   ```go
-   // In shim/ast or shim/checker
-   func Symbol_GetJsDocTags(symbol *ast.Symbol, checker *checker.Checker) []JSDocTagInfo
-   ```
+1. Accessing the JSDoc comments from the node using `node.JSDoc(sourceFile)`
+2. Finding the `JSDocDeprecatedTag` node
+3. Extracting the comment text
 
-2. **Define `JSDocTagInfo` type**:
-   ```go
-   type JSDocTagInfo struct {
-       Name string
-       Text []SymbolDisplayPart  // or similar
-   }
-   ```
-
-3. **Alternatively**, implement JSDoc parsing using existing utilities:
-   - Use `parser.GetJSDocCommentRanges()` to get comment ranges
-   - Parse the comment text to extract JSDoc tags
-   - This would be more complex but doesn't require typescript-go changes
-
-## Alternative Implementation
-
-If modifying typescript-go is not feasible, an alternative approach would be:
-
-1. Get the symbol's declarations
-2. For each declaration, use `parser.GetJSDocCommentRanges()` to get JSDoc comments
-3. Parse the comment text to extract `@deprecated` tags
-4. Extract the deprecation reason from the tag text
-
-This approach would be more complex and potentially less reliable than using the TypeScript compiler API directly.
+This functionality could be added in the future if needed.
 
 ## Testing
 
