@@ -175,36 +175,37 @@ var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 					msg = buildDirectMessage()
 				}
 
-				parent := node.Parent
-				for ast.IsParenthesizedExpression(parent) {
-					parent = parent.Parent
-				}
-				isUnaryNegation := ast.IsPrefixUnaryExpression(parent) && parent.AsPrefixUnaryExpression().Operator == ast.KindExclamationToken
-
-				shouldNegate := comparison.negated != comparison.literalBooleanInComparison
-
-				mutatedNode := node
-				if isUnaryNegation {
-					mutatedNode = parent
-				}
-
-				fixes := make([]rule.RuleFix, 0, 6)
-
-				fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, mutatedNode, ctx.SourceFile.Text()[comparison.expression.Pos():comparison.expression.End()]))
-
-				if shouldNegate == isUnaryNegation {
-					fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "!"))
-
-					if !utils.IsStrongPrecedenceNode(comparison.expression) {
-						fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "("), rule.RuleFixInsertAfter(mutatedNode, ")"))
+				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
+					parent := node.Parent
+					for ast.IsParenthesizedExpression(parent) {
+						parent = parent.Parent
 					}
-				}
+					isUnaryNegation := ast.IsPrefixUnaryExpression(parent) && parent.AsPrefixUnaryExpression().Operator == ast.KindExclamationToken
 
-				if comparison.expressionIsNullableBoolean && !comparison.literalBooleanInComparison {
-					fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "("), rule.RuleFixInsertAfter(mutatedNode, " ?? true)"))
-				}
+					shouldNegate := comparison.negated != comparison.literalBooleanInComparison
 
-				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix { return fixes })
+					mutatedNode := node
+					if isUnaryNegation {
+						mutatedNode = parent
+					}
+
+					fixes := make([]rule.RuleFix, 0, 6)
+
+					fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, mutatedNode, ctx.SourceFile.Text()[comparison.expression.Pos():comparison.expression.End()]))
+
+					if shouldNegate == isUnaryNegation {
+						fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "!"))
+
+						if !utils.IsStrongPrecedenceNode(comparison.expression) {
+							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "("), rule.RuleFixInsertAfter(mutatedNode, ")"))
+						}
+					}
+
+					if comparison.expressionIsNullableBoolean && !comparison.literalBooleanInComparison {
+						fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, mutatedNode, "("), rule.RuleFixInsertAfter(mutatedNode, " ?? true)"))
+					}
+					return fixes
+				})
 			},
 		}
 	},
