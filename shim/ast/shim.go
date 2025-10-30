@@ -1010,6 +1010,8 @@ func IsResolutionModeOverrideHost(node *ast.Node) bool
 func IsRestTypeNode(node *ast.Node) bool
 //go:linkname IsReturnStatement github.com/microsoft/typescript-go/internal/ast.IsReturnStatement
 func IsReturnStatement(node *ast.Node) bool
+//go:linkname IsRightSideOfPropertyAccess github.com/microsoft/typescript-go/internal/ast.IsRightSideOfPropertyAccess
+func IsRightSideOfPropertyAccess(node *ast.Node) bool
 //go:linkname IsRightSideOfQualifiedNameOrPropertyAccess github.com/microsoft/typescript-go/internal/ast.IsRightSideOfQualifiedNameOrPropertyAccess
 func IsRightSideOfQualifiedNameOrPropertyAccess(node *ast.Node) bool
 //go:linkname IsSatisfiesExpression github.com/microsoft/typescript-go/internal/ast.IsSatisfiesExpression

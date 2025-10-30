@@ -14,6 +14,8 @@ func ChangeExtension(path string, newExtension string) string
 func ChangeFullExtension(path string, newExtension string) string
 //go:linkname CombinePaths github.com/microsoft/typescript-go/internal/tspath.CombinePaths
 func CombinePaths(firstPath string, paths ...string) string
+//go:linkname CompareNumberOfDirectorySeparators github.com/microsoft/typescript-go/internal/tspath.CompareNumberOfDirectorySeparators
+func CompareNumberOfDirectorySeparators(path1 string, path2 string) int
 //go:linkname ComparePaths github.com/microsoft/typescript-go/internal/tspath.ComparePaths
 func ComparePaths(a string, b string, options tspath.ComparePathsOptions) int
 //go:linkname ComparePathsCaseInsensitive github.com/microsoft/typescript-go/internal/tspath.ComparePathsCaseInsensitive
