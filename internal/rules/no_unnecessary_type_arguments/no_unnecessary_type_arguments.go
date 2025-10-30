@@ -133,13 +133,15 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 				return
 			}
 
-			var removeRange core.TextRange
-			if i == 0 {
-				removeRange = scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, arguments.End()).WithPos(arguments.Pos() - 1)
-			} else {
-				removeRange = arg.Loc.WithPos(arguments.Nodes[i-1].End())
-			}
-			ctx.ReportNodeWithFixes(arg, buildUnnecessaryTypeParameterMessage(), func() []rule.RuleFix { return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange)} })
+			ctx.ReportNodeWithFixes(arg, buildUnnecessaryTypeParameterMessage(), func() []rule.RuleFix {
+				var removeRange core.TextRange
+				if i == 0 {
+					removeRange = scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, arguments.End()).WithPos(arguments.Pos() - 1)
+				} else {
+					removeRange = arg.Loc.WithPos(arguments.Nodes[i-1].End())
+				}
+				return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange)}
+			})
 
 		}
 
