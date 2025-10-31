@@ -34,67 +34,106 @@ var NoDeprecatedRule = rule.Rule{
 		// - Parse the comment text to find @deprecated tag
 		// - Extract the reason text after @deprecated
 		getDeprecationReason := func(node *ast.Node) string {
-			// Check if node has JSDoc
-			if node.Flags&ast.NodeFlagsHasJSDoc == 0 {
+			if node == nil {
 				return ""
 			}
 
 			// Get the source text
 			sourceText := ctx.SourceFile.Text()
 
-			// Get leading comments for this node
-			for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, node.Pos()) {
-				// Check if this is a JSDoc comment (starts with /**)
-				start := commentRange.Pos()
-				end := commentRange.End()
+			// Collect nodes to check: node and its ancestors up to certain boundaries
+			// JSDoc comments can be on various parent nodes depending on the declaration type
+			nodesToCheck := []*ast.Node{}
+			current := node
+			for current != nil {
+				nodesToCheck = append(nodesToCheck, current)
 
-				if end <= start+3 {
+				// Stop at certain boundaries
+				kind := current.Kind
+				if kind == ast.KindSourceFile || kind == ast.KindBlock {
+					break
+				}
+				// For variable declarations, check up to the statement
+				if kind == ast.KindVariableStatement {
+					break
+				}
+				// For other declarations, stop at the declaration itself
+				if ast.IsDeclaration(current) && current != node {
+					break
+				}
+
+				current = current.Parent
+			}
+
+			for _, checkNode := range nodesToCheck {
+				if checkNode == nil {
 					continue
 				}
 
-				// Check for /** but not /**/ (which is not JSDoc)
-				if sourceText[start+1] != '*' || sourceText[start+2] != '*' || sourceText[start+3] == '/' {
+				// Skip if node doesn't have JSDoc flag
+				if checkNode.Flags&ast.NodeFlagsHasJSDoc == 0 {
 					continue
 				}
 
-				// Extract comment text
-				commentText := sourceText[start:end]
+				// Get leading comments for this node
+				for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, checkNode.Pos()) {
+					// Check if this is a JSDoc comment (starts with /**)
+					start := commentRange.Pos()
+					end := commentRange.End()
 
-				// Look for @deprecated tag
-				deprecatedIndex := strings.Index(commentText, "@deprecated")
-				if deprecatedIndex == -1 {
-					continue
-				}
-
-				// Extract the reason after @deprecated
-				// Skip past "@deprecated" and any whitespace
-				reasonStart := deprecatedIndex + len("@deprecated")
-
-				// Find the end of the reason (next @ tag or end of comment)
-				reasonText := commentText[reasonStart:]
-
-				// Trim whitespace and extract until next tag or end
-				lines := strings.Split(reasonText, "\n")
-				var reasonParts []string
-
-				for _, line := range lines {
-					// Remove leading * and whitespace
-					line = strings.TrimSpace(line)
-					line = strings.TrimPrefix(line, "*")
-					line = strings.TrimSpace(line)
-
-					// Stop at next @ tag or end of comment
-					if strings.HasPrefix(line, "@") || strings.HasPrefix(line, "*/") {
-						break
+					if end <= start+3 || end > len(sourceText) || start < 0 {
+						continue
 					}
 
-					if line != "" {
-						reasonParts = append(reasonParts, line)
+					// Check for /** but not /**/ (which is not JSDoc)
+					if sourceText[start+1] != '*' || sourceText[start+2] != '*' || sourceText[start+3] == '/' {
+						continue
 					}
-				}
 
-				if len(reasonParts) > 0 {
-					return strings.Join(reasonParts, " ")
+					// Extract comment text
+					commentText := sourceText[start:end]
+
+					// Look for @deprecated tag
+					deprecatedIndex := strings.Index(commentText, "@deprecated")
+					if deprecatedIndex == -1 {
+						continue
+					}
+
+					// Extract the reason after @deprecated
+					// Skip past "@deprecated" and any whitespace
+					reasonStart := deprecatedIndex + len("@deprecated")
+
+					// Find the end of the reason (next @ tag or end of comment)
+					reasonText := commentText[reasonStart:]
+
+					// Trim whitespace and extract until next tag or end
+					lines := strings.Split(reasonText, "\n")
+					var reasonParts []string
+
+					for _, line := range lines {
+						// Trim leading whitespace
+						line = strings.TrimSpace(line)
+
+						// Stop at next @ tag or end of comment
+						if strings.HasPrefix(line, "@") || strings.HasPrefix(line, "*/") {
+							break
+						}
+
+						// Remove leading * and whitespace
+						line = strings.TrimPrefix(line, "*")
+						line = strings.TrimSpace(line)
+
+						if line != "" {
+							reasonParts = append(reasonParts, line)
+						}
+					}
+
+					if len(reasonParts) > 0 {
+						return strings.Join(reasonParts, " ")
+					}
+
+					// Found @deprecated tag but no reason
+					return ""
 				}
 			}
 
@@ -103,18 +142,55 @@ var NoDeprecatedRule = rule.Rule{
 
 		// Check if a node has a @deprecated JSDoc tag (fallback method)
 		hasDeprecatedTag := func(node *ast.Node) bool {
+			if node == nil {
+				return false
+			}
+
 			sourceText := ctx.SourceFile.Text()
-			for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, node.Pos()) {
-				start := commentRange.Pos()
-				end := commentRange.End()
-				if end <= start+3 {
+
+			// Collect nodes to check: node and its ancestors
+			nodesToCheck := []*ast.Node{}
+			current := node
+			for current != nil {
+				nodesToCheck = append(nodesToCheck, current)
+
+				// Stop at certain boundaries
+				kind := current.Kind
+				if kind == ast.KindSourceFile || kind == ast.KindBlock {
+					break
+				}
+				if kind == ast.KindVariableStatement {
+					break
+				}
+				if ast.IsDeclaration(current) && current != node {
+					break
+				}
+
+				current = current.Parent
+			}
+
+			for _, checkNode := range nodesToCheck {
+				if checkNode == nil {
 					continue
 				}
-				// Check for JSDoc style comment
-				if sourceText[start+1] == '*' && sourceText[start+2] == '*' && sourceText[start+3] != '/' {
-					commentText := sourceText[start:end]
-					if strings.Contains(commentText, "@deprecated") {
-						return true
+
+				// Skip if node doesn't have JSDoc flag
+				if checkNode.Flags&ast.NodeFlagsHasJSDoc == 0 {
+					continue
+				}
+
+				for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, checkNode.Pos()) {
+					start := commentRange.Pos()
+					end := commentRange.End()
+					if end <= start+3 || end > len(sourceText) || start < 0 {
+						continue
+					}
+					// Check for JSDoc style comment
+					if sourceText[start+1] == '*' && sourceText[start+2] == '*' && sourceText[start+3] != '/' {
+						commentText := sourceText[start:end]
+						if strings.Contains(commentText, "@deprecated") {
+							return true
+						}
 					}
 				}
 			}
@@ -122,30 +198,29 @@ var NoDeprecatedRule = rule.Rule{
 		}
 
 		// Check if a symbol is deprecated and optionally get the deprecation reason
-		// This approach checks both modifier flags and JSDoc comments directly
+		// This approach parses JSDoc comments directly following Parser.withJSDoc
 		// Returns: (isDeprecated bool, reason string)
 		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil || len(symbol.Declarations) == 0 {
 				return false, ""
 			}
 
-			// Check each declaration for deprecation
+			// Check each declaration for deprecation by parsing JSDoc
 			for _, decl := range symbol.Declarations {
 				if decl == nil {
 					continue
 				}
 
-				// First try GetCombinedModifierFlags which should include JSDoc modifiers
-				flags := ast.GetCombinedModifierFlags(decl)
-				if flags&ast.ModifierFlagsDeprecated != 0 {
-					reason := getDeprecationReason(decl)
+				// Parse JSDoc comments to find @deprecated tag
+				reason := getDeprecationReason(decl)
+				if reason != "" {
+					// Found @deprecated with a reason
 					return true, reason
 				}
 
-				// Fallback: parse JSDoc comments directly
-				reason := getDeprecationReason(decl)
-				if reason != "" || hasDeprecatedTag(decl) {
-					return true, reason
+				// Check if @deprecated tag exists without a reason
+				if hasDeprecatedTag(decl) {
+					return true, ""
 				}
 			}
 
@@ -330,7 +405,8 @@ var NoDeprecatedRule = rule.Rule{
 
 			isDeprecated, deprecationReason := checkDeprecation(symbol)
 			if isDeprecated {
-				exprText := callExpr.Expression.Text()
+				// Use the symbol name instead of expression text to avoid issues with complex expressions
+				exprText := symbol.Name
 				if deprecationReason == "" {
 					ctx.ReportNode(callExpr.Expression, buildDeprecatedMessage(exprText))
 				} else {
@@ -356,7 +432,8 @@ var NoDeprecatedRule = rule.Rule{
 
 			isDeprecated, deprecationReason := checkDeprecation(symbol)
 			if isDeprecated {
-				exprText := newExpr.Expression.Text()
+				// Use the symbol name instead of expression text to avoid issues with complex expressions
+				exprText := symbol.Name
 				if deprecationReason == "" {
 					ctx.ReportNode(newExpr.Expression, buildDeprecatedMessage(exprText))
 				} else {
