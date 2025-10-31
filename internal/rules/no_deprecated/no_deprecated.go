@@ -7,6 +7,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func buildDeprecatedMessage(name string) rule.RuleMessage {
@@ -26,33 +27,6 @@ func buildDeprecatedWithReasonMessage(name string, reason string) rule.RuleMessa
 var NoDeprecatedRule = rule.Rule{
 	Name: "no-deprecated",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		// Check if a symbol is deprecated and optionally get the deprecation reason
-		// This approach is based on typescript-go's symbol_display.go implementation
-		// Returns: (isDeprecated bool, reason string)
-		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
-			if symbol == nil || len(symbol.Declarations) == 0 {
-				return false, ""
-			}
-
-			// Check if any declaration has the deprecated flag
-			// Following the typescript-go approach: GetCombinedModifierFlags includes JSDoc node flags
-			for _, decl := range symbol.Declarations {
-				if decl == nil {
-					continue
-				}
-				if ast.IsDeclaration(decl) {
-					flags := ast.GetCombinedModifierFlags(decl)
-					if flags&ast.ModifierFlagsDeprecated != 0 {
-						// Found deprecation, now try to extract the reason from JSDoc
-						reason := getDeprecationReason(decl)
-						return true, reason
-					}
-				}
-			}
-
-			return false, ""
-		}
-
 		// Extract the deprecation reason from JSDoc comments
 		// This implementation is based on Parser.withJSDoc approach:
 		// - Get leading comment ranges
@@ -127,6 +101,33 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
+		// Check if a symbol is deprecated and optionally get the deprecation reason
+		// This approach is based on typescript-go's symbol_display.go implementation
+		// Returns: (isDeprecated bool, reason string)
+		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
+			if symbol == nil || len(symbol.Declarations) == 0 {
+				return false, ""
+			}
+
+			// Check if any declaration has the deprecated flag
+			// Following the typescript-go approach: GetCombinedModifierFlags includes JSDoc node flags
+			for _, decl := range symbol.Declarations {
+				if decl == nil {
+					continue
+				}
+				if ast.IsDeclaration(decl) {
+					flags := ast.GetCombinedModifierFlags(decl)
+					if flags&ast.ModifierFlagsDeprecated != 0 {
+						// Found deprecation, now try to extract the reason from JSDoc
+						reason := getDeprecationReason(decl)
+						return true, reason
+					}
+				}
+			}
+
+			return false, ""
+		}
+
 		// Check if a node is a declaration (should not report on declarations)
 		isDeclaration := func(node *ast.Node) bool {
 			parent := node.Parent
@@ -138,11 +139,11 @@ var NoDeprecatedRule = rule.Rule{
 			case ast.KindVariableDeclaration:
 				// Check if this is the name of the variable being declared
 				varDecl := parent.AsVariableDeclaration()
-				return varDecl.Name == node
+				return varDecl.Name() == node
 
 			case ast.KindParameter:
-				param := parent.AsParameter()
-				return param.Name == node
+				param := parent.AsParameterDeclaration()
+				return param.Name() == node
 
 			case ast.KindFunctionDeclaration,
 				ast.KindMethodDeclaration,
@@ -154,19 +155,19 @@ var NoDeprecatedRule = rule.Rule{
 
 			case ast.KindClassDeclaration:
 				classDecl := parent.AsClassDeclaration()
-				return classDecl.Name == node
+				return classDecl.Name() == node
 
 			case ast.KindInterfaceDeclaration:
 				interfaceDecl := parent.AsInterfaceDeclaration()
-				return interfaceDecl.Name == node
+				return interfaceDecl.Name() == node
 
 			case ast.KindTypeAliasDeclaration:
 				typeAlias := parent.AsTypeAliasDeclaration()
-				return typeAlias.Name == node
+				return typeAlias.Name() == node
 
 			case ast.KindEnumDeclaration:
 				enumDecl := parent.AsEnumDeclaration()
-				return enumDecl.Name == node
+				return enumDecl.Name() == node
 
 			case ast.KindPropertyDeclaration,
 				ast.KindPropertySignature:
@@ -225,7 +226,7 @@ var NoDeprecatedRule = rule.Rule{
 			var deprecationReason string
 
 			// Check if the symbol is an alias and follow the chain
-			if checker.IsSymbolFlagSet(symbol, checker.SymbolFlagsAlias) {
+			if utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsAlias) {
 				// Check the alias itself
 				isDeprecated, deprecationReason = checkDeprecation(symbol)
 
@@ -254,10 +255,10 @@ var NoDeprecatedRule = rule.Rule{
 		}
 
 		checkMemberExpression := func(node *ast.Node) {
-			memberExpr := node.AsMemberExpression()
+			memberExpr := node.AsPropertyAccessExpression()
 
 			// For property access (a.b), check if 'b' is deprecated
-			property := memberExpr.Name
+			property := memberExpr.Name()
 			if property == nil {
 				return
 			}
@@ -270,7 +271,7 @@ var NoDeprecatedRule = rule.Rule{
 
 			// Get the property symbol
 			propertyName := property.Text()
-			propertySymbol := objectType.GetProperty(propertyName)
+			propertySymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, objectType, propertyName)
 			if propertySymbol == nil {
 				return
 			}
