@@ -41,23 +41,23 @@ Flags:
 
       */
 
-import { execSync } from "child_process";
-import fs from "fs";
-import path from "path";
+import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 // ensure go-jsonschema is installed
 try {
-  execSync("go-jsonschema -h", { stdio: "ignore" });
-  console.log("go-jsonschema is installed.");
+  execSync('go-jsonschema -h', { stdio: 'ignore' });
+  console.log('go-jsonschema is installed.');
 } catch (e) {
-  console.log("go-jsonschema is not installed. Please install it first.");
+  console.log('go-jsonschema is not installed. Please install it first.');
   process.exit(1);
 }
 
-console.log("Generating Go structs from JSON schemas...");
+console.log('Generating Go structs from JSON schemas...');
 
 // find every directory in internal/rules that contains schema.json and generate Go struct
-const rulesDir = path.join(process.cwd(), "internal", "rules");
+const rulesDir = path.join(process.cwd(), 'internal', 'rules');
 
 function findSchemaDirs(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -67,7 +67,7 @@ function findSchemaDirs(dir) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       schemaDirs.push(...findSchemaDirs(fullPath));
-    } else if (entry.isFile() && entry.name === "schema.json") {
+    } else if (entry.isFile() && entry.name === 'schema.json') {
       schemaDirs.push(dir);
     }
   }
@@ -78,18 +78,20 @@ function findSchemaDirs(dir) {
 const schemaDirs = findSchemaDirs(rulesDir);
 
 for (const schemaDir of schemaDirs) {
-  const schemaPath = path.join(schemaDir, "schema.json");
-  const outputPath = path.join(schemaDir, "options.go");
+  const schemaPath = path.join(schemaDir, 'schema.json');
+  const outputPath = path.join(schemaDir, 'options.go');
 
   console.log(
-    `Generating Go struct for schema: ${schemaPath} and outputting to: ${outputPath}`
+    `Generating Go struct for schema: ${schemaPath} and outputting to: ${outputPath}`,
   );
   try {
     execSync(
-      `go-jsonschema "${schemaPath}" -o "${outputPath}" -p ${path.basename(
-        schemaDir
-      )} --tags json`,
-      { stdio: "inherit" }
+      `go-jsonschema "${schemaPath}" -o "${outputPath}" -p ${
+        path.basename(
+          schemaDir,
+        )
+      } --tags json`,
+      { stdio: 'inherit' },
     );
   } catch (e) {
     console.error(`Failed to generate Go struct for schema: ${schemaPath}`, e);
