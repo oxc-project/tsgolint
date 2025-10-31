@@ -101,27 +101,51 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
+		// Check if a node has a @deprecated JSDoc tag (fallback method)
+		hasDeprecatedTag := func(node *ast.Node) bool {
+			sourceText := ctx.SourceFile.Text()
+			for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, node.Pos()) {
+				start := commentRange.Pos()
+				end := commentRange.End()
+				if end <= start+3 {
+					continue
+				}
+				// Check for JSDoc style comment
+				if sourceText[start+1] == '*' && sourceText[start+2] == '*' && sourceText[start+3] != '/' {
+					commentText := sourceText[start:end]
+					if strings.Contains(commentText, "@deprecated") {
+						return true
+					}
+				}
+			}
+			return false
+		}
+
 		// Check if a symbol is deprecated and optionally get the deprecation reason
-		// This approach is based on typescript-go's symbol_display.go implementation
+		// This approach checks both modifier flags and JSDoc comments directly
 		// Returns: (isDeprecated bool, reason string)
 		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil || len(symbol.Declarations) == 0 {
 				return false, ""
 			}
 
-			// Check if any declaration has the deprecated flag
-			// Following the typescript-go approach: GetCombinedModifierFlags includes JSDoc node flags
+			// Check each declaration for deprecation
 			for _, decl := range symbol.Declarations {
 				if decl == nil {
 					continue
 				}
-				if ast.IsDeclaration(decl) {
-					flags := ast.GetCombinedModifierFlags(decl)
-					if flags&ast.ModifierFlagsDeprecated != 0 {
-						// Found deprecation, now try to extract the reason from JSDoc
-						reason := getDeprecationReason(decl)
-						return true, reason
-					}
+
+				// First try GetCombinedModifierFlags which should include JSDoc modifiers
+				flags := ast.GetCombinedModifierFlags(decl)
+				if flags&ast.ModifierFlagsDeprecated != 0 {
+					reason := getDeprecationReason(decl)
+					return true, reason
+				}
+
+				// Fallback: parse JSDoc comments directly
+				reason := getDeprecationReason(decl)
+				if reason != "" || hasDeprecatedTag(decl) {
+					return true, reason
 				}
 			}
 
@@ -218,6 +242,8 @@ var NoDeprecatedRule = rule.Rule{
 			// Get the symbol for this identifier
 			symbol := ctx.TypeChecker.GetSymbolAtLocation(node)
 			if symbol == nil {
+				// Debug: print when symbol is nil
+				// fmt.Printf("DEBUG: No symbol for identifier '%s' at line %d\n", node.Text(), ctx.SourceFile.GetLineAndCharacterOfPosition(node.Pos()).Line+1)
 				return
 			}
 
