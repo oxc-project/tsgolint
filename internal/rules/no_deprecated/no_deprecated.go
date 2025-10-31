@@ -232,6 +232,11 @@ var NoDeprecatedRule = rule.Rule{
 				// Property declarations
 				return true
 
+			case ast.KindPropertyAssignment:
+				// Property in object literal - check if this is the name
+				propAssignment := parent.AsPropertyAssignment()
+				return propAssignment.Name() == node
+
 			case ast.KindImportSpecifier,
 				ast.KindImportClause:
 				// Import declarations
@@ -271,6 +276,16 @@ var NoDeprecatedRule = rule.Rule{
 			// Skip if inside an import
 			if isInsideImport(node) {
 				return
+			}
+
+			// Skip if this identifier is the property name part of a property access (a.b)
+			// The property access handler will check it instead
+			if node.Parent != nil && node.Parent.Kind == ast.KindPropertyAccessExpression {
+				propAccess := node.Parent.AsPropertyAccessExpression()
+				if propAccess.Name() == node {
+					// This is the property name, not the object - skip it
+					return
+				}
 			}
 
 			// Get the symbol for this identifier
@@ -401,11 +416,142 @@ var NoDeprecatedRule = rule.Rule{
 			}
 		}
 
+		checkJsxAttribute := func(node *ast.Node) {
+			jsxAttr := node.AsJsxAttribute()
+			
+			// Get the property name
+			attrName := jsxAttr.Name()
+			if attrName == nil {
+				return
+			}
+
+			// Get the parent JSX element
+			parent := node.Parent
+			if parent == nil || parent.Kind != ast.KindJsxAttributes {
+				return
+			}
+
+			// Get the JSX opening element
+			jsxAttrsParent := parent.Parent
+			if jsxAttrsParent == nil {
+				return
+			}
+
+			var tagName *ast.Node
+			var jsxElement *ast.Node
+			switch jsxAttrsParent.Kind {
+			case ast.KindJsxOpeningElement:
+				openingElem := jsxAttrsParent.AsJsxOpeningElement()
+				tagName = openingElem.TagName
+				jsxElement = jsxAttrsParent
+			case ast.KindJsxSelfClosingElement:
+				selfClosing := jsxAttrsParent.AsJsxSelfClosingElement()
+				tagName = selfClosing.TagName
+				jsxElement = jsxAttrsParent
+			default:
+				return
+			}
+
+			if tagName == nil {
+				return
+			}
+
+			// Try to get the symbol for the attribute directly
+			// TypeScript resolves JSX attributes to the props interface properties
+			attrSymbol := ctx.TypeChecker.GetSymbolAtLocation(attrName)
+			if attrSymbol != nil {
+				// Check if this attribute symbol is deprecated
+				isDeprecated, deprecationReason := checkDeprecation(attrSymbol)
+				if isDeprecated {
+					propName := attrName.Text()
+					if deprecationReason == "" {
+						ctx.ReportNode(attrName, buildDeprecatedMessage(propName))
+					} else {
+						ctx.ReportNode(attrName, buildDeprecatedWithReasonMessage(propName, strings.TrimSpace(deprecationReason)))
+					}
+					return
+				}
+			}
+
+			// Fallback: Get the type of the JSX element and check its properties
+			jsxType := ctx.TypeChecker.GetTypeAtLocation(jsxElement)
+			if jsxType == nil {
+				return
+			}
+
+			// Get the props type by looking for a "props" or checking type properties
+			propName := attrName.Text()
+			propertySymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, jsxType, propName)
+			if propertySymbol == nil {
+				return
+			}
+
+			// Check if deprecated
+			isDeprecated, deprecationReason := checkDeprecation(propertySymbol)
+			if isDeprecated {
+				if deprecationReason == "" {
+					ctx.ReportNode(attrName, buildDeprecatedMessage(propName))
+				} else {
+					ctx.ReportNode(attrName, buildDeprecatedWithReasonMessage(propName, strings.TrimSpace(deprecationReason)))
+				}
+			}
+		}
+
+		checkShorthandPropertyAssignment := func(node *ast.Node) {
+			shorthand := node.AsShorthandPropertyAssignment()
+			
+			// Get the name of the shorthand property
+			name := shorthand.Name()
+			if name == nil {
+				return
+			}
+
+			// Get the symbol for this identifier
+			symbol := ctx.TypeChecker.GetSymbolAtLocation(name)
+			if symbol == nil {
+				return
+			}
+
+			// Check for deprecation through the alias chain
+			var isDeprecated bool
+			var deprecationReason string
+
+			// Check if the symbol is an alias and follow the chain
+			if utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsAlias) {
+				// Check the alias itself
+				isDeprecated, deprecationReason = checkDeprecation(symbol)
+
+				// If not deprecated, check the aliased symbol
+				if !isDeprecated {
+					aliasedSymbol := ctx.TypeChecker.GetAliasedSymbol(symbol)
+					if aliasedSymbol != nil {
+						isDeprecated, deprecationReason = checkDeprecation(aliasedSymbol)
+					}
+				}
+			} else {
+				// Not an alias, check the symbol directly
+				isDeprecated, deprecationReason = checkDeprecation(symbol)
+			}
+
+			// If deprecated, report it
+			if isDeprecated {
+				nameText := name.Text()
+
+				if deprecationReason == "" {
+					ctx.ReportNode(name, buildDeprecatedMessage(nameText))
+				} else {
+					ctx.ReportNode(name, buildDeprecatedWithReasonMessage(nameText, strings.TrimSpace(deprecationReason)))
+				}
+			}
+		}
+
 		return rule.RuleListeners{
-			ast.KindIdentifier:               checkIdentifier,
-			ast.KindPropertyAccessExpression: checkMemberExpression,
-			ast.KindCallExpression:           checkCallExpression,
-			ast.KindNewExpression:            checkNewExpression,
+			ast.KindIdentifier:                    checkIdentifier,
+			ast.KindPropertyAccessExpression:      checkMemberExpression,
+			ast.KindCallExpression:                checkCallExpression,
+			ast.KindNewExpression:                 checkNewExpression,
+			ast.KindJsxAttribute:                  checkJsxAttribute,
+			ast.KindShorthandPropertyAssignment:   checkShorthandPropertyAssignment,
 		}
 	},
 }
