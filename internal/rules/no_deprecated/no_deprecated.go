@@ -545,6 +545,64 @@ var NoDeprecatedRule = rule.Rule{
 			}
 		}
 
+		checkJsxOpeningElement := func(node *ast.Node) {
+			openingElem := node.AsJsxOpeningElement()
+			tagName := openingElem.TagName
+			if tagName == nil {
+				return
+			}
+
+			// Get the symbol for the tag (component)
+			symbol := ctx.TypeChecker.GetSymbolAtLocation(tagName)
+			if symbol == nil {
+				return
+			}
+
+			// Check if deprecated
+			isDeprecated, deprecationReason := checkDeprecation(symbol)
+			if isDeprecated {
+				// Use symbol name to avoid issues with complex tag names
+				tagNameText := symbol.Name
+				if tagNameText == "" {
+					tagNameText = tagName.Text()
+				}
+				if deprecationReason == "" {
+					ctx.ReportNode(tagName, buildDeprecatedMessage(tagNameText))
+				} else {
+					ctx.ReportNode(tagName, buildDeprecatedWithReasonMessage(tagNameText, strings.TrimSpace(deprecationReason)))
+				}
+			}
+		}
+
+		checkJsxSelfClosingElement := func(node *ast.Node) {
+			selfClosing := node.AsJsxSelfClosingElement()
+			tagName := selfClosing.TagName
+			if tagName == nil {
+				return
+			}
+
+			// Get the symbol for the tag (component)
+			symbol := ctx.TypeChecker.GetSymbolAtLocation(tagName)
+			if symbol == nil {
+				return
+			}
+
+			// Check if deprecated
+			isDeprecated, deprecationReason := checkDeprecation(symbol)
+			if isDeprecated {
+				// Use symbol name to avoid issues with complex tag names
+				tagNameText := symbol.Name
+				if tagNameText == "" {
+					tagNameText = tagName.Text()
+				}
+				if deprecationReason == "" {
+					ctx.ReportNode(tagName, buildDeprecatedMessage(tagNameText))
+				} else {
+					ctx.ReportNode(tagName, buildDeprecatedWithReasonMessage(tagNameText, strings.TrimSpace(deprecationReason)))
+				}
+			}
+		}
+
 		return rule.RuleListeners{
 			ast.KindIdentifier:                    checkIdentifier,
 			ast.KindPropertyAccessExpression:      checkMemberExpression,
@@ -552,6 +610,8 @@ var NoDeprecatedRule = rule.Rule{
 			ast.KindNewExpression:                 checkNewExpression,
 			ast.KindJsxAttribute:                  checkJsxAttribute,
 			ast.KindShorthandPropertyAssignment:   checkShorthandPropertyAssignment,
+			ast.KindJsxOpeningElement:             checkJsxOpeningElement,
+			ast.KindJsxSelfClosingElement:         checkJsxSelfClosingElement,
 		}
 	},
 }
