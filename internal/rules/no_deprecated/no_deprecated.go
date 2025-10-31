@@ -10,6 +10,11 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+type NoDeprecatedOptions struct {
+	Allow []utils.TypeOrValueSpecifier `json:"allow"`
+}
+
+
 func buildDeprecatedMessage(name string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "deprecated",
