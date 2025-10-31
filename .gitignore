@@ -2,3 +2,6 @@
 internal/collections/
 e2e/node_modules/
 node_modules/
+# Generated npm packages
+/npm/
+/build/
