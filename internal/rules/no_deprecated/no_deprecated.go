@@ -129,12 +129,12 @@ var NoDeprecatedRule = rule.Rule{
 
 		// Check if a node is a declaration (should not report on declarations)
 		isDeclaration := func(node *ast.Node) bool {
-			parent := node.Parent()
+			parent := node.Parent
 			if parent == nil {
 				return false
 			}
 
-			switch parent.Kind() {
+			switch parent.Kind {
 			case ast.KindVariableDeclaration:
 				// Check if this is the name of the variable being declared
 				varDecl := parent.AsVariableDeclaration()
@@ -187,7 +187,7 @@ var NoDeprecatedRule = rule.Rule{
 		isInsideImport := func(node *ast.Node) bool {
 			current := node
 			for current != nil {
-				kind := current.Kind()
+				kind := current.Kind
 				if kind == ast.KindImportDeclaration {
 					return true
 				}
@@ -198,7 +198,7 @@ var NoDeprecatedRule = rule.Rule{
 					kind == ast.KindClassDeclaration {
 					return false
 				}
-				current = current.Parent()
+				current = current.Parent
 			}
 			return false
 		}
@@ -243,7 +243,7 @@ var NoDeprecatedRule = rule.Rule{
 
 			// If deprecated, report it
 			if isDeprecated {
-				name := node.Text(ctx.SourceFile)
+				name := node.Text()
 
 				if deprecationReason == "" {
 					ctx.ReportNode(node, buildDeprecatedMessage(name))
@@ -269,7 +269,7 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			// Get the property symbol
-			propertyName := property.Text(ctx.SourceFile)
+			propertyName := property.Text()
 			propertySymbol := objectType.GetProperty(propertyName)
 			if propertySymbol == nil {
 				return
@@ -303,7 +303,7 @@ var NoDeprecatedRule = rule.Rule{
 
 			isDeprecated, deprecationReason := checkDeprecation(symbol)
 			if isDeprecated {
-				exprText := callExpr.Expression.Text(ctx.SourceFile)
+				exprText := callExpr.Expression.Text()
 				if deprecationReason == "" {
 					ctx.ReportNode(callExpr.Expression, buildDeprecatedMessage(exprText))
 				} else {
@@ -329,7 +329,7 @@ var NoDeprecatedRule = rule.Rule{
 
 			isDeprecated, deprecationReason := checkDeprecation(symbol)
 			if isDeprecated {
-				exprText := newExpr.Expression.Text(ctx.SourceFile)
+				exprText := newExpr.Expression.Text()
 				if deprecationReason == "" {
 					ctx.ReportNode(newExpr.Expression, buildDeprecatedMessage(exprText))
 				} else {

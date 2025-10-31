@@ -649,10 +649,7 @@ func TestNoDeprecated(t *testing.T) {
 				},
 			},
 			"deprecated const in template literal": {
-				Code: `
-					/** @deprecated */ const a = 'foo';
-					import(\`./path/\${a}.js\`);
-				`,
+				Code: "/** @deprecated */ const a = 'foo';\nimport(`./path/${a}.js`);",
 				Errors: []rule_tester.ExpectedError{
 					{
 						MessageId: "deprecated",
@@ -1499,11 +1496,7 @@ func TestNoDeprecated(t *testing.T) {
 				},
 			},
 			"deprecated tagged template": {
-				Code: `
-					/** @deprecated */
-					declare function a(...args: unknown[]): string;
-					a\`\`;
-				`,
+				Code: "/** @deprecated */\ndeclare function a(...args: unknown[]): string;\na``;",
 				Errors: []rule_tester.ExpectedError{
 					{
 						MessageId: "deprecated",
@@ -1864,14 +1857,7 @@ func TestNoDeprecated(t *testing.T) {
 				},
 			},
 			"deprecated computed property with template": {
-				Code: `
-					const a = {
-						/** @deprecated */
-						b: 'string',
-					};
-					const key = \`b\`;
-					const c = a[key];
-				`,
+				Code: "const a = {\n\t/** @deprecated */\n\tb: 'string',\n};\nconst key = `b`;\nconst c = a[key];",
 				Errors: []rule_tester.ExpectedError{
 					{
 						MessageId: "deprecated",
