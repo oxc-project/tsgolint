@@ -104,82 +104,25 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
-		// Check if a node has a @deprecated JSDoc tag
-		hasDeprecatedTag := func(node *ast.Node) bool {
-			if node == nil {
-				return false
-			}
-
-			// Collect nodes to check: node and its ancestors
-			nodesToCheck := []*ast.Node{}
-			current := node
-			for current != nil {
-				nodesToCheck = append(nodesToCheck, current)
-
-				// Stop at certain boundaries
-				kind := current.Kind
-				if kind == ast.KindSourceFile || kind == ast.KindBlock {
-					break
-				}
-				if kind == ast.KindVariableStatement {
-					break
-				}
-				if ast.IsDeclaration(current) && current != node {
-					break
-				}
-
-				current = current.Parent
-			}
-
-			// Check each node for JSDoc comments
-			for _, checkNode := range nodesToCheck {
-				if checkNode == nil {
-					continue
-				}
-
-				// Get JSDoc comments using the built-in method
-				jsdocs := checkNode.JSDoc(ctx.SourceFile)
-				for _, jsdoc := range jsdocs {
-					jsDocNode := jsdoc.AsJSDoc()
-					if jsDocNode.Tags == nil {
-						continue
-					}
-
-					// Look for @deprecated tag
-					for _, tag := range jsDocNode.Tags.Nodes {
-						if ast.IsJSDocDeprecatedTag(tag) {
-							return true
-						}
-					}
-				}
-			}
-			return false
-		}
-
 		// Check if a symbol is deprecated and optionally get the deprecation reason
-		// This approach parses JSDoc comments directly following Parser.withJSDoc
+		// Uses ctx.TypeChecker.IsDeprecatedDeclaration for reliable deprecation detection
 		// Returns: (isDeprecated bool, reason string)
 		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil || len(symbol.Declarations) == 0 {
 				return false, ""
 			}
 
-			// Check each declaration for deprecation by parsing JSDoc
+			// Check each declaration for deprecation using TypeChecker
 			for _, decl := range symbol.Declarations {
 				if decl == nil {
 					continue
 				}
 
-				// Parse JSDoc comments to find @deprecated tag
-				reason := getDeprecationReason(decl)
-				if reason != "" {
-					// Found @deprecated with a reason
+				// Use TypeChecker's IsDeprecatedDeclaration method which checks NodeFlags
+				if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, decl) {
+					// Declaration is deprecated, try to get the reason from JSDoc
+					reason := getDeprecationReason(decl)
 					return true, reason
-				}
-
-				// Check if @deprecated tag exists without a reason
-				if hasDeprecatedTag(decl) {
-					return true, ""
 				}
 			}
 
