@@ -50,6 +50,11 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, program_diagnostics, nil
 	}
 
+	programDiagnostics := program.GetProgramDiagnostics()
+	if len(programDiagnostics) != 0 {
+		return nil, fmt.Errorf("found %v configuration errors. Run `tsgo --noEmit` to see details", len(programDiagnostics))
+	}
+
 	// TODO: report syntactic diagnostics?
 
 	program.BindSourceFiles()
