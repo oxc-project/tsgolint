@@ -1,11 +1,11 @@
 package no_deprecated
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
-	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -13,7 +13,6 @@ import (
 type NoDeprecatedOptions struct {
 	Allow []utils.TypeOrValueSpecifier `json:"allow"`
 }
-
 
 func buildDeprecatedMessage(name string) rule.RuleMessage {
 	return rule.RuleMessage{
@@ -29,6 +28,47 @@ func buildDeprecatedWithReasonMessage(name string, reason string) rule.RuleMessa
 	}
 }
 
+func isNodeCalleeOfParent(node *ast.Node) bool {
+	if node.Parent == nil {
+		return false
+	}
+	switch node.Parent.Kind {
+	case ast.KindNewExpression:
+		newExpr := node.Parent.AsNewExpression()
+		return newExpr.Expression == node
+	case ast.KindCallExpression:
+		callExpr := node.Parent.AsCallExpression()
+		return callExpr.Expression == node
+	case ast.KindTaggedTemplateExpression:
+		taggedTemplate := node.Parent.AsTaggedTemplateExpression()
+		return taggedTemplate.Tag == node
+	case ast.KindJsxOpeningElement:
+		jsxOpening := node.Parent.AsJsxOpeningElement()
+		return jsxOpening.TagName == node
+	default:
+		return false
+	}
+}
+
+func getCallLikeNode(node *ast.Node) *ast.Node {
+	callee := node
+
+	for {
+		if callee.Parent == nil {
+			break
+		}
+		if callee.Parent.Kind != ast.KindPropertyAccessExpression {
+			break
+		}
+		callee = callee.Parent
+	}
+
+	if isNodeCalleeOfParent(callee) {
+		return callee
+	}
+	return nil
+}
+
 var NoDeprecatedRule = rule.Rule{
 	Name: "no-deprecated",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -38,76 +78,141 @@ var NoDeprecatedRule = rule.Rule{
 		// - Filter for JSDoc comments (/** ... */)
 		// - Parse the comment text to find @deprecated tag
 		// - Extract the reason text after @deprecated
-		getDeprecationReason := func(node *ast.Node) string {
-			// Check if node has JSDoc
-			if node.Flags&ast.NodeFlagsHasJSDoc == 0 {
-				return ""
+		getDeprecationReason := func(node *ast.Node) (bool, string) {
+			// TODO
+
+			callLikeNode := getCallLikeNode(node)
+			if callLikeNode != nil {
+				return getCallLikeDeprecation(callLikeNode)
 			}
 
-			// Get the source text
-			sourceText := ctx.SourceFile.Text()
-
-			// Get leading comments for this node
-			for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, node.Pos()) {
-				// Check if this is a JSDoc comment (starts with /**)
-				start := commentRange.Pos()
-				end := commentRange.End()
-
-				if end <= start+3 {
-					continue
-				}
-
-				// Check for /** but not /**/ (which is not JSDoc)
-				if sourceText[start+1] != '*' || sourceText[start+2] != '*' || sourceText[start+3] == '/' {
-					continue
-				}
-
-				// Extract comment text
-				commentText := sourceText[start:end]
-
-				// Look for @deprecated tag
-				deprecatedIndex := strings.Index(commentText, "@deprecated")
-				if deprecatedIndex == -1 {
-					continue
-				}
-
-				// Extract the reason after @deprecated
-				// Skip past "@deprecated" and any whitespace
-				reasonStart := deprecatedIndex + len("@deprecated")
-
-				// Find the end of the reason (next @ tag or end of comment)
-				reasonText := commentText[reasonStart:]
-
-				// Trim whitespace and extract until next tag or end
-				lines := strings.Split(reasonText, "\n")
-				var reasonParts []string
-
-				for _, line := range lines {
-					// Remove leading * and whitespace
-					line = strings.TrimSpace(line)
-					line = strings.TrimPrefix(line, "*")
-					line = strings.TrimSpace(line)
-
-					// Stop at next @ tag or end of comment
-					if strings.HasPrefix(line, "@") || strings.HasPrefix(line, "*/") {
-						break
-					}
-
-					if line != "" {
-						reasonParts = append(reasonParts, line)
-					}
-				}
-
-				if len(reasonParts) > 0 {
-					return strings.Join(reasonParts, " ")
-				}
+			if node.Parent != nil && node.Parent.Kind == ast.KindJsxAttribute && node.Kind != ast.KindSuperKeyword {
+				return getJSXAttributeDeprecation(node.Parent.Parent, node.Name())
 			}
 
-			return ""
+			if node.Parent != nil && node.Parent.Kind == ast.KindShorthandPropertyAssignment && node.Kind != ast.KindSuperKeyword {
+
+
+
+    //     const property = services
+    //       .getTypeAtLocation(node.parent.parent)
+    //       .getProperty(node.name);
+    //     const propertySymbol = services.getSymbolAtLocation(node);
+    //     const valueSymbol = checker.getShorthandAssignmentValueSymbol(
+    //       propertySymbol?.valueDeclaration,
+    //     );
+    //     return (
+    //       searchForDeprecationInAliasesChain(propertySymbol, true) ??
+    //       getJsDocDeprecation(property) ??
+    //       getJsDocDeprecation(propertySymbol) ??
+    //       getJsDocDeprecation(valueSymbol)
+    //     );
+			}
+
+			return searchForDeprecationInAliasesChain(
+			ctx.TypeChecker.GetSymbolAtLocation(node),
+			true,
+		)
+
+	// 		      if (
+    //     node.parent.type === AST_NODE_TYPES.Property &&
+    //     node.type !== AST_NODE_TYPES.Super
+    //   ) {
+
+    //   }
+
+    //   return searchForDeprecationInAliasesChain(
+    //     services.getSymbolAtLocation(node),
+    //     true,
+    //   );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			// // Check if node has JSDoc
+			// if node.Flags&ast.NodeFlagsHasJSDoc == 0 {
+			// 	// 	return ""
+			// }
+
+			// // Get the source text
+			// sourceText := ctx.SourceFile.Text()
+
+			// // Get leading comments for this node
+			// for commentRange := range scanner.GetLeadingCommentRanges(nil, sourceText, node.Pos()) {
+
+			// 	// Check if this is a JSDoc comment (starts with /**)
+			// 	start := commentRange.Pos()
+			// 	end := commentRange.End()
+
+			// 	if end <= start+3 {
+			// 		continue
+			// 	}
+
+			// 	// Check for /** but not /**/ (which is not JSDoc)
+			// 	if sourceText[start+1] != '*' || sourceText[start+2] != '*' || sourceText[start+3] == '/' {
+			// 		continue
+			// 	}
+
+			// 	// Extract comment text
+			// 	commentText := sourceText[start:end]
+
+			// 	// Look for @deprecated tag
+			// 	deprecatedIndex := strings.Index(commentText, "@deprecated")
+			// 	if deprecatedIndex == -1 {
+			// 		continue
+			// 	}
+
+			// 	// Extract the reason after @deprecated
+			// 	// Skip past "@deprecated" and any whitespace
+			// 	reasonStart := deprecatedIndex + len("@deprecated")
+
+			// 	// Find the end of the reason (next @ tag or end of comment)
+			// 	reasonText := commentText[reasonStart:]
+
+			// 	// Remove trailing */ if present
+			// 	reasonText = strings.TrimSuffix(reasonText, "*/")
+			// 	reasonText = strings.TrimSpace(reasonText)
+
+			// 	// For multi-line JSDoc, process line by line
+			// 	lines := strings.Split(reasonText, "\n")
+			// 	var reasonParts []string
+
+			// 	for _, line := range lines {
+			// 		// Remove leading * and whitespace
+			// 		line = strings.TrimSpace(line)
+			// 		line = strings.TrimPrefix(line, "*")
+			// 		line = strings.TrimSpace(line)
+
+			// 		// Stop at next @ tag
+			// 		if strings.HasPrefix(line, "@") {
+			// 			break
+			// 		}
+
+			// 		if line != "" {
+			// 			reasonParts = append(reasonParts, line)
+			// 		}
+			// 	}
+
+			// 	if len(reasonParts) > 0 {
+			// 		return strings.Join(reasonParts, " ")
+			// 	}
+			// }
+
+			// return ""
 		}
 
 		// Check if a symbol is deprecated and optionally get the deprecation reason
-		// This approach is based on typescript-go's symbol_display.go implementation
+		// Use TypeScript's IsDeprecatedDeclaration API which properly checks for @deprecated JSDoc tags
 		// Returns: (isDeprecated bool, reason string)
 		checkDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil || len(symbol.Declarations) == 0 {
@@ -115,14 +220,12 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			// Check if any declaration has the deprecated flag
-			// Following the typescript-go approach: GetCombinedModifierFlags includes JSDoc node flags
 			for _, decl := range symbol.Declarations {
 				if decl == nil {
 					continue
 				}
 				if ast.IsDeclaration(decl) {
-					flags := ast.GetCombinedModifierFlags(decl)
-					if flags&ast.ModifierFlagsDeprecated != 0 {
+					if ctx.TypeChecker.IsDeprecatedDeclaration(decl) {
 						// Found deprecation, now try to extract the reason from JSDoc
 						reason := getDeprecationReason(decl)
 						return true, reason
@@ -176,8 +279,14 @@ var NoDeprecatedRule = rule.Rule{
 
 			case ast.KindPropertyDeclaration,
 				ast.KindPropertySignature:
-				// Property declarations
+				// Property declarations (in classes and interfaces)
 				return true
+
+			case ast.KindPropertyAssignment:
+				// For property assignments in object literals, only the name is a declaration
+				// The value is a reference
+				propAssign := parent.AsPropertyAssignment()
+				return propAssign.Name() == node
 
 			case ast.KindImportSpecifier,
 				ast.KindImportClause:
@@ -210,145 +319,85 @@ var NoDeprecatedRule = rule.Rule{
 		}
 
 		checkIdentifier := func(node *ast.Node) {
-			// Skip if this is a declaration
-			if isDeclaration(node) {
+			fmt.Println("check ident")
+			if isDeclaration(node) || isInsideImport(node) {
 				return
 			}
 
-			// Skip if inside an import
-			if isInsideImport(node) {
+			isDeprecated, deprecationReason := getDeprecationReason(node)
+
+			if !isDeprecated {
 				return
 			}
 
-			// Get the symbol for this identifier
-			symbol := ctx.TypeChecker.GetSymbolAtLocation(node)
-			if symbol == nil {
-				return
-			}
+			ty := ctx.TypeChecker.GetTypeAtLocation(node)
 
-			// Check for deprecation through the alias chain
-			var isDeprecated bool
-			var deprecationReason string
+			// TODO: if type OR value is allowed, skip
 
-			// Check if the symbol is an alias and follow the chain
-			if utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsAlias) {
-				// Check the alias itself
-				isDeprecated, deprecationReason = checkDeprecation(symbol)
-
-				// If not deprecated, check the aliased symbol
-				if !isDeprecated {
-					aliasedSymbol := ctx.TypeChecker.GetAliasedSymbol(symbol)
-					if aliasedSymbol != nil {
-						isDeprecated, deprecationReason = checkDeprecation(aliasedSymbol)
-					}
-				}
+			if deprecationReason == "" {
+				ctx.ReportNode(node, buildDeprecatedMessage(node.Text()))
 			} else {
-				// Not an alias, check the symbol directly
-				isDeprecated, deprecationReason = checkDeprecation(symbol)
+				ctx.ReportNode(node, buildDeprecatedWithReasonMessage(node.Text(), strings.TrimSpace(deprecationReason)))
 			}
 
-			// If deprecated, report it
-			if isDeprecated {
-				name := node.Text()
 
-				if deprecationReason == "" {
-					ctx.ReportNode(node, buildDeprecatedMessage(name))
-				} else {
-					ctx.ReportNode(node, buildDeprecatedWithReasonMessage(name, strings.TrimSpace(deprecationReason)))
-				}
-			}
+			return
 		}
 
-		checkMemberExpression := func(node *ast.Node) {
-			memberExpr := node.AsPropertyAccessExpression()
+		checkComputedPropertyName := func(node *ast.Node) {
+			computedPropertyName := node.AsComputedPropertyName()
 
-			// For property access (a.b), check if 'b' is deprecated
-			property := memberExpr.Name()
-			if property == nil {
+			propertyType := ctx.TypeChecker.GetTypeAtLocation(computedPropertyName.Expression)
+
+			if propertyType == nil {
 				return
 			}
 
-			// Get the type of the object
-			objectType := ctx.TypeChecker.GetTypeAtLocation(memberExpr.Expression)
-			if objectType == nil {
-				return
-			}
+			if utils.IsTypeFlagSet(propertyType, checker.TypeFlagsStringLiteral | checker.TypeFlagsNumberLiteral | checker.TypeFlagsBigIntLiteral ) {
+				// objectType := ctx.TypeChecker.GetTypeAtLocation(computed)
 
-			// Get the property symbol
-			propertyName := property.Text()
-			propertySymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, objectType, propertyName)
-			if propertySymbol == nil {
-				return
-			}
+			 	// var propertyName string
+				// if propertyType.IsStringLiteral() {
+				// 	 propertyName = propertyType.AsLiteralType().String()
+				// } else if propertyType.IsNumberLiteral() {
+				// 	 propertyName = fmt.Sprintf("%v", propertyType.AsLiteralType().Value())
+				// } else if propertyType.IsBigIntLiteral() {
+				// 	 propertyName = propertyType.AsBigIntLiteralType().Text()
+				// } else {
+				// 	 return
+				// }
 
-			// Check if deprecated
-			isDeprecated, deprecationReason := checkDeprecation(propertySymbol)
-			if isDeprecated {
-				if deprecationReason == "" {
-					ctx.ReportNode(property, buildDeprecatedMessage(propertyName))
-				} else {
-					ctx.ReportNode(property, buildDeprecatedWithReasonMessage(propertyName, strings.TrimSpace(deprecationReason)))
-				}
-			}
-		}
-
-		checkCallExpression := func(node *ast.Node) {
-			callExpr := node.AsCallExpression()
-
-			// Get the signature of the call
-			signature := ctx.TypeChecker.GetResolvedSignature(node)
-			if signature == nil {
-				return
-			}
-
-			// Check if the function is deprecated
-			symbol := ctx.TypeChecker.GetSymbolAtLocation(callExpr.Expression)
-			if symbol == nil {
-				return
-			}
-
-			isDeprecated, deprecationReason := checkDeprecation(symbol)
-			if isDeprecated {
-				exprText := callExpr.Expression.Text()
-				if deprecationReason == "" {
-					ctx.ReportNode(callExpr.Expression, buildDeprecatedMessage(exprText))
-				} else {
-					ctx.ReportNode(callExpr.Expression, buildDeprecatedWithReasonMessage(exprText, strings.TrimSpace(deprecationReason)))
-				}
-			}
-		}
-
-		checkNewExpression := func(node *ast.Node) {
-			newExpr := node.AsNewExpression()
-
-			// Get the signature of the constructor call
-			signature := ctx.TypeChecker.GetResolvedSignature(node)
-			if signature == nil {
-				return
-			}
-
-			// Check if the constructor or class is deprecated
-			symbol := ctx.TypeChecker.GetSymbolAtLocation(newExpr.Expression)
-			if symbol == nil {
-				return
-			}
-
-			isDeprecated, deprecationReason := checkDeprecation(symbol)
-			if isDeprecated {
-				exprText := newExpr.Expression.Text()
-				if deprecationReason == "" {
-					ctx.ReportNode(newExpr.Expression, buildDeprecatedMessage(exprText))
-				} else {
-					ctx.ReportNode(newExpr.Expression, buildDeprecatedWithReasonMessage(exprText, strings.TrimSpace(deprecationReason)))
-				}
+				// TODO
 			}
 		}
 
 		return rule.RuleListeners{
-			ast.KindIdentifier:               checkIdentifier,
+			ast.KindIdentifier: func(node *ast.Node) {
+				if node.Parent != nil {
+					return
+				}
+				if node.Parent.Kind == ast.KindExportDeclaration {
+					return
+				}
+				if node.Parent.Kind == ast.KindExportSpecifier {
+					// only deal with the alias (exported) side, not the local binding
+        //   if (parent.exported != node) {
+        //     return;
+        //   }
+
+					symbol := ctx.TypeChecker.GetSymbolAtLocation(node)
+        // aliasDeprecation := getJsDocDeprecation(symbol)
+					if aliasDeprecation != nil {
+						return
+					}
+				}
+
+				checkIdentifier(node)
+			},
+			ast.KindComputedPropertyName:     checkComputedPropertyName,
 			ast.KindPropertyAccessExpression: checkMemberExpression,
-			ast.KindCallExpression:           checkCallExpression,
-			ast.KindNewExpression:            checkNewExpression,
+			ast.KindPrivateIdentifier:        checkIdentifier,
+			ast.KindSuperKeyword:             checkIdentifier,
 		}
 	},
 }

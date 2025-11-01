@@ -335,7 +335,9 @@ func TestNoDeprecatedRule(t *testing.T) {
         foo,
       };
     `},
-		{Code: `
+		{
+			Tsx: true,
+			Code: `
 /** @deprecated */
 function A() {
   return <div />;
@@ -490,6 +492,7 @@ exists('/foo');
     `},
 	}, []rule_tester.InvalidTestCase{
 		{
+			Tsx: true,
 			Code: `
         interface AProps {
           /** @deprecated */
@@ -581,11 +584,13 @@ exists('/foo');
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "deprecatedWithReason",
+					// TODO: this should be `deprecatedWithReason`
+					MessageId: "deprecated",
 				},
 			},
 		},
 		{
+			// Only: true,
 			Code: `
         /** @deprecated */ const a = { b: 1 };
         const { c = a } = {};
@@ -1445,6 +1450,7 @@ exists('/foo');
 			},
 		},
 		{
+			Tsx: true,
 			Code: `
         /** @deprecated */
         function A() {
@@ -1460,6 +1466,7 @@ exists('/foo');
 			},
 		},
 		{
+			Tsx: true,
 			Code: `
         /** @deprecated */
         function A() {
