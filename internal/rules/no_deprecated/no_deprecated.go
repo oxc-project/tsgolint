@@ -227,6 +227,10 @@ var NoDeprecatedRule = rule.Rule{
 				enumDecl := parent.AsEnumDeclaration()
 				return enumDecl.Name() == node
 
+			case ast.KindEnumMember:
+				// Enum member declaration - the identifier is the name
+				return true
+
 			case ast.KindPropertyDeclaration,
 				ast.KindPropertySignature:
 				// Property declarations
