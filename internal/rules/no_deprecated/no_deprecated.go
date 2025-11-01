@@ -288,6 +288,15 @@ var NoDeprecatedRule = rule.Rule{
 		checkMemberExpression := func(node *ast.Node) {
 			memberExpr := node.AsPropertyAccessExpression()
 
+			// Skip if this member expression is part of a call expression
+			// The call expression handler will check it
+			if node.Parent != nil && node.Parent.Kind == ast.KindCallExpression {
+				callExpr := node.Parent.AsCallExpression()
+				if callExpr.Expression == node {
+					return
+				}
+			}
+
 			// For property access (a.b), check if 'b' is deprecated
 			property := memberExpr.Name()
 			if property == nil {
