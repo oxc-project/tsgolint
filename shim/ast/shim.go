@@ -1709,6 +1709,7 @@ const ModuleInstanceStateNonInstantiated = ast.ModuleInstanceStateNonInstantiate
 const ModuleInstanceStateUnknown = ast.ModuleInstanceStateUnknown
 type ModuleName = ast.ModuleName
 type ModuleReference = ast.ModuleReference
+type MutableNode = ast.MutableNode
 type NamedExportBindings = ast.NamedExportBindings
 type NamedExports = ast.NamedExports
 type NamedExportsNode = ast.NamedExportsNode
