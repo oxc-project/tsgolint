@@ -29,7 +29,8 @@
       "getBaseTypeOfLiteralType",
       "getWidenedType",
       "isTypeAssignableTo",
-      "isTypeStrictSubtypeOf"
+      "isTypeStrictSubtypeOf",
+      "IsDeprecatedDeclaration"
     ]
   },
   "ExtraFields": {

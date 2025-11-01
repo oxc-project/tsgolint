@@ -24,6 +24,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_array_delete"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_base_to_string"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_confusing_void_expression"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_deprecated"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_duplicate_type_constituents"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_floating_promises"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_for_in_array"
@@ -124,6 +125,7 @@ var allRules = []rule.Rule{
 	no_array_delete.NoArrayDeleteRule,
 	no_base_to_string.NoBaseToStringRule,
 	no_confusing_void_expression.NoConfusingVoidExpressionRule,
+	no_deprecated.NoDeprecatedRule,
 	no_duplicate_type_constituents.NoDuplicateTypeConstituentsRule,
 	no_floating_promises.NoFloatingPromisesRule,
 	no_for_in_array.NoForInArrayRule,
