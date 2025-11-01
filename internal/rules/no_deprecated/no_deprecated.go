@@ -194,12 +194,12 @@ var NoDeprecatedRule = rule.Rule{
 			}
 		}
 
-		// Check if we're inside an import statement
-		isInsideImport := func(node *ast.Node) bool {
+		// Check if we're inside an import or export statement
+		isInsideImportOrExport := func(node *ast.Node) bool {
 			current := node
 			for current != nil {
 				kind := current.Kind
-				if kind == ast.KindImportDeclaration {
+				if kind == ast.KindImportDeclaration || kind == ast.KindExportDeclaration || kind == ast.KindExportSpecifier {
 					return true
 				}
 				// Stop at certain boundaries
@@ -220,8 +220,8 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			// Skip if inside an import
-			if isInsideImport(node) {
+			// Skip if inside an import or export
+			if isInsideImportOrExport(node) {
 				return
 			}
 
@@ -231,6 +231,15 @@ var NoDeprecatedRule = rule.Rule{
 				propAccess := node.Parent.AsPropertyAccessExpression()
 				if propAccess.Name() == node {
 					// This is the property name, not the object - skip it
+					return
+				}
+			}
+
+			// Skip if this identifier is part of a call/new expression
+			// Those will be handled by dedicated handlers
+			if node.Parent != nil {
+				parentKind := node.Parent.Kind
+				if parentKind == ast.KindCallExpression || parentKind == ast.KindNewExpression {
 					return
 				}
 			}
@@ -550,6 +559,42 @@ var NoDeprecatedRule = rule.Rule{
 			}
 		}
 
+		checkSuperKeyword := func(node *ast.Node) {
+			// Check if super() is calling a deprecated constructor
+			// We need to find the parent call expression
+			parent := node.Parent
+			if parent == nil || parent.Kind != ast.KindCallExpression {
+				return
+			}
+
+			callExpr := parent.AsCallExpression()
+			if callExpr.Expression != node {
+				return
+			}
+
+			// Get the signature of the super() call
+			signature := ctx.TypeChecker.GetResolvedSignature(parent)
+			if signature == nil {
+				return
+			}
+
+			// Get the declaration node
+			decl := signature.Declaration()
+			if decl == nil {
+				return
+			}
+
+			// Check if the constructor is deprecated
+			if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, decl) {
+				deprecationReason := getDeprecationReason(decl)
+				if deprecationReason == "" {
+					ctx.ReportNode(node, buildDeprecatedMessage("super"))
+				} else {
+					ctx.ReportNode(node, buildDeprecatedWithReasonMessage("super", strings.TrimSpace(deprecationReason)))
+				}
+			}
+		}
+
 		return rule.RuleListeners{
 			ast.KindIdentifier:                    checkIdentifier,
 			ast.KindPropertyAccessExpression:      checkMemberExpression,
@@ -559,6 +604,7 @@ var NoDeprecatedRule = rule.Rule{
 			ast.KindShorthandPropertyAssignment:   checkShorthandPropertyAssignment,
 			ast.KindJsxOpeningElement:             checkJsxOpeningElement,
 			ast.KindJsxSelfClosingElement:         checkJsxSelfClosingElement,
+			ast.KindSuperKeyword:                  checkSuperKeyword,
 		}
 	},
 }

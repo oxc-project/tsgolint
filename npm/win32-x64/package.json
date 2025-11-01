@@ -1,0 +1,22 @@
+{
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "auvred <aauvred@gmail.com>",
+  "repository": "github:oxc-project/tsgolint",
+  "bugs": "https://github.com/oxc-project/tsgolint/issues",
+  "homepage": "https://github.com/oxc-project/tsgolint#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "name": "@oxlint-tsgolint/win32-x64",
+  "preferUnplugged": true,
+  "files": [
+    "tsgolint.exe"
+  ],
+  "os": [
+    "win32"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}

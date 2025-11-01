@@ -5,7 +5,6 @@ package checker
 
 import "context"
 import "github.com/microsoft/typescript-go/internal/ast"
-import "github.com/microsoft/typescript-go/internal/binder"
 import "github.com/microsoft/typescript-go/internal/checker"
 import "github.com/microsoft/typescript-go/internal/collections"
 import "github.com/microsoft/typescript-go/internal/core"
@@ -79,6 +78,8 @@ const CheckModeTypeOnly = checker.CheckModeTypeOnly
 type Checker = checker.Checker
 //go:linkname Checker_getResolvedSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getResolvedSignature
 func Checker_getResolvedSignature(recv *checker.Checker, node *ast.Node, candidatesOutArray *[]*checker.Signature, checkMode checker.CheckMode) *checker.Signature
+//go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
+func Checker_IsDeprecatedDeclaration(recv *checker.Checker, declaration *ast.Node) bool
 //go:linkname Checker_getTypeOfSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfSymbol
 func Checker_getTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) *checker.Type
 //go:linkname Checker_getWidenedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getWidenedType
@@ -125,8 +126,6 @@ func Checker_getPropertyNameForKnownSymbolName(recv *checker.Checker, symbolName
 func Checker_isTypeAssignableTo(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
 //go:linkname Checker_isTypeStrictSubtypeOf github.com/microsoft/typescript-go/internal/checker.(*Checker).isTypeStrictSubtypeOf
 func Checker_isTypeStrictSubtypeOf(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
-//go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
-func Checker_IsDeprecatedDeclaration(recv *checker.Checker, declaration *ast.Node) bool
 type extra_Checker struct {
   id uint32
   program checker.Program
@@ -418,7 +417,7 @@ type extra_Checker struct {
   couldContainTypeVariables func(*checker.Type) bool
   isStringIndexSignatureOnlyType func(*checker.Type) bool
   markNodeAssignments func(*ast.Node) bool
-  emitResolver extra_emitResolver
+  emitResolver *checker.EmitResolver
   emitResolverOnce sync.Once
   _jsxNamespace string
   _jsxFactoryEntity *ast.Node
@@ -429,16 +428,6 @@ type extra_Checker struct {
   activeTypeMappersCaches []map[string]*checker.Type
   ambientModulesOnce sync.Once
   ambientModules []*ast.Symbol
-}
-type extra_emitResolver struct {
-  checker *checker.Checker
-  checkerMu sync.Mutex
-  isValueAliasDeclaration func(node *ast.Node) bool
-  aliasMarkingVisitor func(node *ast.Node) bool
-  referenceResolver binder.ReferenceResolver
-  jsxLinks core.LinkStore[*ast.Node, checker.JSXLinks]
-  declarationLinks core.LinkStore[*ast.Node, checker.DeclarationLinks]
-  declarationFileLinks core.LinkStore[*ast.Node, checker.DeclarationFileLinks]
 }
 func Checker_numberType(v *checker.Checker) *checker.Type {
   return ((*extra_Checker)(unsafe.Pointer(v))).numberType
@@ -497,6 +486,7 @@ const ElementFlagsRequired = checker.ElementFlagsRequired
 const ElementFlagsRest = checker.ElementFlagsRest
 const ElementFlagsVariable = checker.ElementFlagsVariable
 const ElementFlagsVariadic = checker.ElementFlagsVariadic
+type EmitResolver = checker.EmitResolver
 type EnumLiteralKey = checker.EnumLiteralKey
 type EnumMemberLinks = checker.EnumMemberLinks
 type EnumRelationKey = checker.EnumRelationKey
@@ -703,6 +693,7 @@ func NewNodeBuilder(ch *checker.Checker, e *printer.EmitContext) *checker.NodeBu
 func NewSymbolTrackerImpl(context *checker.NodeBuilderContext, tracker nodebuilder.SymbolTracker, tchost checker.Host) *checker.SymbolTrackerImpl
 type NodeBuilder = checker.NodeBuilder
 type NodeBuilderContext = checker.NodeBuilderContext
+type NodeBuilderImpl = checker.NodeBuilderImpl
 type NodeBuilderLinks = checker.NodeBuilderLinks
 type NodeBuilderSymbolLinks = checker.NodeBuilderSymbolLinks
 type NodeCheckFlags = checker.NodeCheckFlags
