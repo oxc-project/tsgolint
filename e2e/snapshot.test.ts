@@ -176,6 +176,10 @@ async function getTestFiles(testPath: string): Promise<string[]> {
   return allFiles;
 }
 
+function resolveTestFilePath(relativePath: string): string {
+  return join(FIXTURES_DIR, relativePath);
+}
+
 function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES): string {
   // Headless payload format:
   // ```json
@@ -223,6 +227,43 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(diagnostics.length).toBeGreaterThan(0);
 
     expect(diagnostics).toMatchSnapshot();
+  });
+
+  it('supports passing rule config', async () => {
+    const testFile = resolveTestFilePath('basic/rules/no-floating-promises/void.ts');
+    const config = (ignoreVoid: boolean) => ({
+      version: 2,
+      configs: [
+        {
+          file_paths: [testFile],
+          rules: [
+            {
+              name: 'no-floating-promises',
+              options: { ignoreVoid },
+            },
+          ],
+        },
+      ],
+    });
+
+    let output: Buffer;
+    output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config(false)),
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics.length).toBeGreaterThan(0);
+    expect(diagnostics).toMatchSnapshot();
+
+    // Re-run with ignoreVoid=true, should have no diagnostics
+    output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config(true)),
+    });
+
+    diagnostics = parseHeadlessOutput(output);
+    expect(diagnostics.length).toBe(0);
   });
 
   it.runIf(process.platform === 'win32')(

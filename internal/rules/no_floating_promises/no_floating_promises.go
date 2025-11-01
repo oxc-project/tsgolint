@@ -1,6 +1,8 @@
 package no_floating_promises
 
 import (
+	"encoding/json"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/scanner"
@@ -8,15 +10,15 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type NoFloatingPromisesOptions struct {
-	AllowForKnownSafeCalls          []utils.TypeOrValueSpecifier
-	AllowForKnownSafeCallsInline    []string
-	AllowForKnownSafePromises       []utils.TypeOrValueSpecifier
-	AllowForKnownSafePromisesInline []string
-	CheckThenables                  *bool
-	IgnoreIIFE                      *bool
-	IgnoreVoid                      *bool
-}
+// type NoFloatingPromisesOptions struct {
+// 	AllowForKnownSafeCalls          []utils.TypeOrValueSpecifier
+// 	AllowForKnownSafeCallsInline    []string
+// 	AllowForKnownSafePromises       []utils.TypeOrValueSpecifier
+// 	AllowForKnownSafePromisesInline []string
+// 	CheckThenables                  *bool
+// 	IgnoreIIFE                      *bool
+// 	IgnoreVoid                      *bool
+// }
 
 var messageBase = "Promises must be awaited."
 
@@ -87,23 +89,15 @@ func buildFloatingVoidMessage() rule.RuleMessage {
 var NoFloatingPromisesRule = rule.Rule{
 	Name: "no-floating-promises",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoFloatingPromisesOptions)
-		if !ok {
-			opts = NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls:          []utils.TypeOrValueSpecifier{},
-				AllowForKnownSafeCallsInline:    []string{},
-				AllowForKnownSafePromises:       []utils.TypeOrValueSpecifier{},
-				AllowForKnownSafePromisesInline: []string{},
+		// if this is already an options struct, use it directly:
+		var opts NoFloatingPromisesOptions
+		if casted, ok := options.(NoFloatingPromisesOptions); ok {
+			opts = casted
+		} else {
+			// otherwise, try to unmarshal from map[string]interface{}
+			if jsonBytes, err := json.Marshal(options); err == nil {
+				_ = opts.UnmarshalJSON(jsonBytes)
 			}
-		}
-		if opts.CheckThenables == nil {
-			opts.CheckThenables = utils.Ref(false)
-		}
-		if opts.IgnoreIIFE == nil {
-			opts.IgnoreIIFE = utils.Ref(false)
-		}
-		if opts.IgnoreVoid == nil {
-			opts.IgnoreVoid = utils.Ref(true)
 		}
 
 		isHigherPrecedenceThanUnary := func(node *ast.Node) bool {
@@ -165,7 +159,7 @@ var NoFloatingPromisesRule = rule.Rule{
 			// The highest priority is to allow anything allowlisted
 			if utils.TypeMatchesSomeSpecifier(
 				t,
-				opts.AllowForKnownSafePromises,
+				opts.AllowForKnownSafeCalls,
 				opts.AllowForKnownSafePromisesInline,
 				ctx.Program,
 			) {
