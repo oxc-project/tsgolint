@@ -404,9 +404,31 @@ func runMain() int {
 		UseCaseSensitiveFileNames: host.FS().UseCaseSensitiveFileNames(),
 	}
 
-	program, _, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host)
+	program, diagnostics, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating TS program: %v", err)
+		return 1
+	}
+
+	if program == nil {
+		// Handle diagnostics from program creation
+		fmt.Fprintf(os.Stderr, "error creating TS program:\n")
+		for _, diag := range diagnostics {
+			if diag.File() != nil {
+				// TODO use diagnostic printer
+				fmt.Fprintf(
+					os.Stderr,
+					"  %s: %s\n",
+					diag.File().FileName(),
+					diag.Message(),
+				)
+			} else {
+				fmt.Fprintf(os.Stderr, "  %s\n", diag.Message())
+			}
+		}
+		if len(diagnostics) == 0 {
+			fmt.Fprintf(os.Stderr, "  unknown error creating program\n")
+		}
 		return 1
 	}
 
