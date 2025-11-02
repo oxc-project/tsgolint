@@ -666,6 +666,8 @@ func IsIdentifier(node *ast.Node) bool
 func IsIdentifierName(node *ast.Node) bool
 //go:linkname IsIfStatement github.com/microsoft/typescript-go/internal/ast.IsIfStatement
 func IsIfStatement(node *ast.Node) bool
+//go:linkname IsImplicitlyExportedJSTypeAlias github.com/microsoft/typescript-go/internal/ast.IsImplicitlyExportedJSTypeAlias
+func IsImplicitlyExportedJSTypeAlias(node *ast.Node) bool
 //go:linkname IsImportAttributes github.com/microsoft/typescript-go/internal/ast.IsImportAttributes
 func IsImportAttributes(node *ast.Node) bool
 //go:linkname IsImportCall github.com/microsoft/typescript-go/internal/ast.IsImportCall
