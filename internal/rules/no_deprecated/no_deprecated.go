@@ -2,16 +2,17 @@
 //
 // This rule disallows using code marked as @deprecated in JSDoc comments.
 //
-// Implementation Status: 194/219 tests passing (88.6%)
+// Implementation Status: 197/219 tests passing (90.0%)
 //
 // Known limitations:
-// - Export specifiers with deprecated identifiers not detected (5 tests)
+// - Type-only export specifiers (export type { T }) not fully supported (2 tests)
 // - Reexported/aliased imports with deprecation tags on the alias (9 tests)
 // - JSX attribute deprecation not implemented (2 tests)
+// - JSX component closing tags reporting duplicate errors (2 tests)
 // - Template literal keys in element access not supported (1 test)
 // - Node.js module imports (node:*) deprecation checking (2 tests)
 // - Nested destructuring patterns not fully supported (2 tests)
-// - Miscellaneous edge cases (4 tests)
+// - Miscellaneous edge cases (2 tests)
 package no_deprecated
 
 import (
@@ -613,16 +614,46 @@ var NoDeprecatedRule = rule.Rule{
 				if node.Parent == nil {
 					return
 				}
+
+				// Skip identifiers directly in export declarations (not in specifiers)
 				if node.Parent.Kind == ast.KindExportDeclaration {
 					return
 				}
+
+				// Handle export specifiers: export { foo } or export { foo as bar }
 				if node.Parent.Kind == ast.KindExportSpecifier {
-					// TODO: TypeScript implementation checks if this is the exported alias vs local binding.
-					// It only checks the exported side (parent.exported === node), and if the alias itself
-					// has a deprecation tag, it returns early. We currently don't distinguish between
-					// the local and exported identifiers in export specifiers, which may cause issues
-					// with export { /** @deprecated */ foo as bar } scenarios.
-					return
+					exportSpec := node.Parent.AsExportSpecifier()
+
+					// Only deal with the exported side (the alias), not the local binding
+					// In "export { foo as bar }":
+					//   - PropertyName points to "foo" (the local)
+					//   - Name() returns "bar" (the exported)
+					// In "export { foo }":
+					//   - PropertyName is nil
+					//   - Name() returns "foo"
+
+					// If PropertyName exists and this node is it, skip (it's the local binding)
+					if exportSpec.PropertyName != nil {
+						// There's an alias, check if we're looking at the local name
+						propertyNameNode := exportSpec.PropertyName.AsNode()
+						if propertyNameNode == node {
+							// This is the local binding (foo in "export { foo as bar }")
+							return
+						}
+					}
+
+					// This is the exported identifier
+					// Check if the alias itself has a deprecation tag
+					symbol := ctx.TypeChecker.GetSymbolAtLocation(node)
+					isDeprecated, _ := getJsDocDeprecation(symbol)
+
+					if isDeprecated {
+						// The alias itself is deprecated (e.g., export { /** @deprecated */ foo as bar })
+						// Don't report on re-exporting with a deprecation
+						return
+					}
+
+					// Otherwise, fall through to check if the thing being exported is deprecated
 				}
 
 				checkIdentifier(node)
