@@ -219,20 +219,18 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			msg := buildUnnecessaryAssertionMessage()
 
 			if node.Kind == ast.KindAsExpression {
-				s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
-				asKeywordRange := s.TokenRange()
-
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
+					s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
+					asKeywordRange := s.TokenRange()
 					return []rule.RuleFix{rule.RuleFixRemoveRange(asKeywordRange), rule.RuleFixRemove(ctx.SourceFile, typeNode)}
 				})
 			} else {
-				s := scanner.GetScannerForSourceFile(ctx.SourceFile, node.Pos())
-				openingAngleBracket := s.TokenRange()
-				s.ResetPos(typeNode.End())
-				s.Scan()
-				closingAngleBracket := s.TokenRange()
-
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
+					s := scanner.GetScannerForSourceFile(ctx.SourceFile, node.Pos())
+					openingAngleBracket := s.TokenRange()
+					s.ResetPos(typeNode.End())
+					s.Scan()
+					closingAngleBracket := s.TokenRange()
 					return []rule.RuleFix{rule.RuleFixRemoveRange(openingAngleBracket.WithEnd(closingAngleBracket.End()))}
 				})
 			}
