@@ -624,7 +624,7 @@ exists('/foo');
 			},
 		},
 		{
-			Code: "\n        /** @deprecated */ const a = 'foo';\n        import(\\`./path/\\${a}.js\\`);\n      ",
+			Code: "\n        /** @deprecated */ const a = 'foo';\n        import(`./path/${a}.js`);\n      ",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "deprecated",
@@ -1424,6 +1424,7 @@ exists('/foo');
 			},
 		},
 		{
+			Tsx: true,
 			Code: `
         /** @deprecated */
         const A = () => <div />;
@@ -1437,6 +1438,7 @@ exists('/foo');
 			},
 		},
 		{
+			Tsx: true,
 			Code: `
         /** @deprecated */
         const A = () => <div />;
@@ -2165,6 +2167,7 @@ class B extends A {
 			},
 		},
 		{
+			Tsx: true,
 			Code: `const a = <div aria-grabbed></div>;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
@@ -2195,6 +2198,7 @@ class B extends A {
 			},
 		},
 		{
+			Tsx: true,
 			Code: `
         import * as React from 'react';
 
