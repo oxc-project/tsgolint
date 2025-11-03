@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/compiler"
@@ -16,6 +17,14 @@ import (
 func CreateCompilerHost(cwd string, fs vfs.FS) compiler.CompilerHost {
 	defaultLibraryPath := bundled.LibPath()
 	return compiler.NewCompilerHost(cwd, fs, defaultLibraryPath, nil, nil)
+}
+
+func enhanceHelpDiagnosticMessage(msg string) string {
+	if strings.Contains(msg, "Please remove it from your configuration.") {
+		return msg + "\n" + "See https://github.com/oxc-project/tsgolint/issues/351 for more information."
+
+	}
+	return msg
 }
 
 func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost) (*compiler.Program, []diagnostic.Internal, error) {
@@ -93,7 +102,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 				Range:       core.NewTextRange(loc.Pos(), loc.End()),
 				Id:          "tsconfig-error",
 				Description: "Invalid tsconfig",
-				Help:        d.Message(),
+				Help:        enhanceHelpDiagnosticMessage(d.Message()),
 				FilePath:    &filePath,
 			}
 		}

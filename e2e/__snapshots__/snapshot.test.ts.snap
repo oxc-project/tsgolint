@@ -7,7 +7,8 @@ exports[`TSGoLint E2E Snapshot Tests > should correctly evaluate project referen
     "kind": 1,
     "message": {
       "description": "Invalid tsconfig",
-      "help": "Option 'baseUrl' has been removed. Please remove it from your configuration.",
+      "help": "Option 'baseUrl' has been removed. Please remove it from your configuration.
+See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "id": "tsconfig-error",
     },
     "range": {
@@ -4337,7 +4338,8 @@ exports[`TSGoLint E2E Snapshot Tests > should handle tsconfig diagnostics when T
     "kind": 1,
     "message": {
       "description": "Invalid tsconfig",
-      "help": "Option 'baseUrl' has been removed. Please remove it from your configuration.",
+      "help": "Option 'baseUrl' has been removed. Please remove it from your configuration.
+See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "id": "tsconfig-error",
     },
     "range": {
