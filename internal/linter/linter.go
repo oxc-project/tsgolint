@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 
@@ -41,7 +42,7 @@ func RunLinter(
 	fs vfs.FS,
 	getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule,
 	onRuleDiagnostic func(diagnostic rule.RuleDiagnostic),
-	onInternalDiagnostic func(diagnostic InternalDiagnostic),
+	onInternalDiagnostic func(d diagnostic.Internal),
 	fixState Fixes,
 ) error {
 
@@ -62,12 +63,7 @@ func RunLinter(
 
 		if len(diagnostics) > 0 {
 			for _, d := range diagnostics {
-				loc := d.Loc()
-				onInternalDiagnostic(InternalDiagnostic{
-					Range:       core.NewTextRange(loc.Pos(), loc.End()),
-					Id:          "tsconfig-error",
-					Description: d.Message(),
-				})
+				onInternalDiagnostic(d)
 			}
 			idx++
 			continue
@@ -121,12 +117,7 @@ func RunLinter(
 
 		if len(diagnostics) > 0 {
 			for _, d := range diagnostics {
-				loc := d.Loc()
-				onInternalDiagnostic(InternalDiagnostic{
-					Range:       core.NewTextRange(loc.Pos(), loc.End()),
-					Id:          "tsconfig-error",
-					Description: d.Message(),
-				})
+				onInternalDiagnostic(d)
 			}
 		}
 

@@ -4,13 +4,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/compiler"
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/tsoptions"
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs"
+	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 )
 
 func CreateCompilerHost(cwd string, fs vfs.FS) compiler.CompilerHost {
@@ -18,7 +18,7 @@ func CreateCompilerHost(cwd string, fs vfs.FS) compiler.CompilerHost {
 	return compiler.NewCompilerHost(cwd, fs, defaultLibraryPath, nil, nil)
 }
 
-func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost) (*compiler.Program, []*ast.Diagnostic, error) {
+func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost) (*compiler.Program, []diagnostic.Internal, error) {
 	resolvedConfigPath := tspath.ResolvePath(cwd, tsconfigPath)
 	if !fs.FileExists(resolvedConfigPath) {
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
@@ -27,7 +27,41 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, &core.CompilerOptions{}, host, nil)
 
 	if len(diagnostics) > 0 {
-		return nil, diagnostics, nil
+		internalDiags := make([]diagnostic.Internal, len(diagnostics))
+		for i, d := range diagnostics {
+			loc := d.Loc()
+			var filePath string
+			if d.File() != nil {
+				filePath = d.File().FileName()
+			}
+			internalDiags[i] = diagnostic.Internal{
+				Range:       core.NewTextRange(loc.Pos(), loc.End()),
+				Id:          "tsconfig-error",
+				Description: "Invalid tsconfig",
+				Help:        d.Message(),
+				FilePath:    &filePath,
+			}
+		}
+		return nil, internalDiags, nil
+	}
+
+	if len(configParseResult.Errors) > 0 {
+		internalDiags := make([]diagnostic.Internal, len(configParseResult.Errors))
+		for i, e := range configParseResult.Errors {
+			loc := e.Loc()
+			var filePath string
+			if e.File() != nil {
+				filePath = e.File().FileName()
+			}
+			internalDiags[i] = diagnostic.Internal{
+				Range:       core.NewTextRange(loc.Pos(), loc.End()),
+				Id:          "tsconfig-error",
+				Description: "Invalid tsconfig",
+				Help:        e.Message(),
+				FilePath:    &filePath,
+			}
+		}
+		return nil, internalDiags, nil
 	}
 
 	opts := compiler.ProgramOptions{
@@ -47,7 +81,23 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 
 	program_diagnostics := program.GetProgramDiagnostics()
 	if len(program_diagnostics) > 0 {
-		return nil, program_diagnostics, nil
+		// Convert ast.Diagnostic to diagnostic.Internal
+		internalDiags := make([]diagnostic.Internal, len(program_diagnostics))
+		for i, d := range program_diagnostics {
+			loc := d.Loc()
+			var filePath string
+			if d.File() != nil {
+				filePath = d.File().FileName()
+			}
+			internalDiags[i] = diagnostic.Internal{
+				Range:       core.NewTextRange(loc.Pos(), loc.End()),
+				Id:          "tsconfig-error",
+				Description: "Invalid tsconfig",
+				Help:        d.Message(),
+				FilePath:    &filePath,
+			}
+		}
+		return nil, internalDiags, nil
 	}
 
 	// TODO: report syntactic diagnostics?
@@ -57,7 +107,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	return program, nil, nil
 }
 
-func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, host compiler.CompilerHost, fileNames []string) (*compiler.Program, []*ast.Diagnostic, error) {
+func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, host compiler.CompilerHost, fileNames []string) (*compiler.Program, []diagnostic.Internal, error) {
 	program := compiler.NewProgram(compiler.ProgramOptions{
 		Config: &tsoptions.ParsedCommandLine{
 			ParsedConfig: &core.ParsedOptions{

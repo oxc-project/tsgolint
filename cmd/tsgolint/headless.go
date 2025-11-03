@@ -20,6 +20,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
+	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -94,14 +95,14 @@ type headlessMessagePayloadError struct {
 // Unified diagnostic type for channel
 type anyDiagnostic struct {
 	ruleDiagnostic     *rule.RuleDiagnostic
-	internalDiagnostic *linter.InternalDiagnostic
+	internalDiagnostic *diagnostic.Internal
 }
 
 func ruleToAny(d rule.RuleDiagnostic) anyDiagnostic {
 	return anyDiagnostic{ruleDiagnostic: &d}
 }
 
-func internalToAny(d linter.InternalDiagnostic) anyDiagnostic {
+func internalToAny(d diagnostic.Internal) anyDiagnostic {
 	return anyDiagnostic{internalDiagnostic: &d}
 }
 
@@ -318,10 +319,11 @@ func runHeadless(args []string) int {
 					Message: headlessRuleMessage{
 						Id:          internalDiagnostic.Id,
 						Description: internalDiagnostic.Description,
+						Help:        internalDiagnostic.Help,
 					},
 					Fixes:       nil,
 					Suggestions: nil,
-					FilePath:    nil,
+					FilePath:    internalDiagnostic.FilePath,
 				}
 			}
 
@@ -364,7 +366,7 @@ func runHeadless(args []string) int {
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- ruleToAny(d)
 		},
-		func(d linter.InternalDiagnostic) {
+		func(d diagnostic.Internal) {
 			diagnosticsChan <- internalToAny(d)
 		},
 		linter.Fixes{

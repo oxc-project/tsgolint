@@ -395,6 +395,25 @@ console.log(x);
   });
 
   it('should handle tsconfig diagnostics when TypeScript reports them', async () => {
+    const testFiles = await getTestFiles('with-invalid-tsconfig-option');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-floating-promises']);
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
+
+  it('should report an error if the tsconfig.json could not be parsed', async () => {
     const testFiles = await getTestFiles('with-invalid-tsconfig-json');
     expect(testFiles.length).toBeGreaterThan(0);
 
