@@ -2,10 +2,9 @@
 //
 // This rule disallows using code marked as @deprecated in JSDoc comments.
 //
-// Implementation Status: 191/219 tests passing (87.2%)
+// Implementation Status: 194/219 tests passing (88.6%)
 //
 // Known limitations:
-// - Allow options may not work correctly in all scenarios (3 tests)
 // - Export specifiers with deprecated identifiers not detected (5 tests)
 // - Reexported/aliased imports with deprecation tags on the alias (9 tests)
 // - JSX attribute deprecation not implemented (2 tests)
