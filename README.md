@@ -124,7 +124,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
-- [ ] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
+- [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
 - [x] [no-base-to-string](https://typescript-eslint.io/rules/no-base-to-string)

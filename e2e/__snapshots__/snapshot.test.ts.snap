@@ -3,10 +3,12 @@
 exports[`TSGoLint E2E Snapshot Tests > should correctly evaluate project references 1`] = `
 [
   {
-    "file_path": null,
+    "file_path": "",
     "kind": 1,
     "message": {
-      "description": "Option 'baseUrl' has been removed. Please remove it from your configuration.",
+      "description": "Invalid tsconfig",
+      "help": "Option 'baseUrl' has been removed. Please remove it from your configuration.
+See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "id": "tsconfig-error",
     },
     "range": {
@@ -4332,10 +4334,30 @@ If your function does not access \`this\`, you can annotate it with \`this: void
 exports[`TSGoLint E2E Snapshot Tests > should handle tsconfig diagnostics when TypeScript reports them 1`] = `
 [
   {
-    "file_path": null,
+    "file_path": "fixtures/with-invalid-tsconfig-option/tsconfig.json",
     "kind": 1,
     "message": {
-      "description": "Option 'baseUrl' has been removed. Please remove it from your configuration.",
+      "description": "Invalid tsconfig",
+      "help": "Option 'baseUrl' has been removed. Please remove it from your configuration.
+See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
+      "id": "tsconfig-error",
+    },
+    "range": {
+      "end": 0,
+      "pos": 0,
+    },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.json could not be parsed 1`] = `
+[
+  {
+    "file_path": "fixtures/with-invalid-tsconfig-json/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Invalid tsconfig",
+      "help": "Unterminated string literal.",
       "id": "tsconfig-error",
     },
     "range": {
