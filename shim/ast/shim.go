@@ -770,6 +770,8 @@ func IsJSDocTypedefTag(node *ast.Node) bool
 func IsJSDocUnknownTag(node *ast.Node) bool
 //go:linkname IsJSExportAssignment github.com/microsoft/typescript-go/internal/ast.IsJSExportAssignment
 func IsJSExportAssignment(node *ast.Node) bool
+//go:linkname IsJSImportDeclaration github.com/microsoft/typescript-go/internal/ast.IsJSImportDeclaration
+func IsJSImportDeclaration(node *ast.Node) bool
 //go:linkname IsJSTypeAliasDeclaration github.com/microsoft/typescript-go/internal/ast.IsJSTypeAliasDeclaration
 func IsJSTypeAliasDeclaration(node *ast.Node) bool
 //go:linkname IsJsonSourceFile github.com/microsoft/typescript-go/internal/ast.IsJsonSourceFile
