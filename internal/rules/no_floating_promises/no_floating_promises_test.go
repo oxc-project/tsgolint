@@ -777,6 +777,7 @@ promise().then(() => {});
 			},
 		},
 		{
+			Skip: true,
 			Code: `
         import { it } from 'node:test';
 

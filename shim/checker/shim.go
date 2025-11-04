@@ -76,8 +76,14 @@ const CheckModeSkipContextSensitive = checker.CheckModeSkipContextSensitive
 const CheckModeSkipGenericFunctions = checker.CheckModeSkipGenericFunctions
 const CheckModeTypeOnly = checker.CheckModeTypeOnly
 type Checker = checker.Checker
+//go:linkname Checker_getImmediateAliasedSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getImmediateAliasedSymbol
+func Checker_getImmediateAliasedSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Symbol
 //go:linkname Checker_getResolvedSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getResolvedSignature
 func Checker_getResolvedSignature(recv *checker.Checker, node *ast.Node, candidatesOutArray *[]*checker.Signature, checkMode checker.CheckMode) *checker.Signature
+//go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
+func Checker_IsDeprecatedDeclaration(recv *checker.Checker, declaration *ast.Node) bool
+//go:linkname Checker_getDeclarationOfAliasSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getDeclarationOfAliasSymbol
+func Checker_getDeclarationOfAliasSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Node
 //go:linkname Checker_getTypeOfSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfSymbol
 func Checker_getTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) *checker.Type
 //go:linkname Checker_getWidenedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getWidenedType
@@ -124,6 +130,8 @@ func Checker_getPropertyNameForKnownSymbolName(recv *checker.Checker, symbolName
 func Checker_isTypeAssignableTo(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
 //go:linkname Checker_isTypeStrictSubtypeOf github.com/microsoft/typescript-go/internal/checker.(*Checker).isTypeStrictSubtypeOf
 func Checker_isTypeStrictSubtypeOf(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
+//go:linkname Checker_GetShorthandAssignmentValueSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).GetShorthandAssignmentValueSymbol
+func Checker_GetShorthandAssignmentValueSymbol(recv *checker.Checker, location *ast.Node) *ast.Symbol
 type extra_Checker struct {
   id uint32
   program checker.Program

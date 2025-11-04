@@ -29,7 +29,11 @@
       "getBaseTypeOfLiteralType",
       "getWidenedType",
       "isTypeAssignableTo",
-      "isTypeStrictSubtypeOf"
+      "isTypeStrictSubtypeOf",
+      "IsDeprecatedDeclaration",
+      "GetShorthandAssignmentValueSymbol",
+      "getImmediateAliasedSymbol",
+      "getDeclarationOfAliasSymbol"
     ]
   },
   "ExtraFields": {

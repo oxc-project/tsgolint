@@ -203,3 +203,95 @@ func TypeMatchesSomeSpecifier(
 	}
 	return false
 }
+
+func valueMatchesSpecifier(
+	node *ast.Node,
+	specifier TypeOrValueSpecifier,
+	program *compiler.Program,
+	t *checker.Type,
+) bool {
+	// Get the name of the node
+	nodeName := node.Text()
+
+	// For private identifiers, strip the # prefix for comparison
+	if node.Kind == ast.KindPrivateIdentifier {
+		nodeName = strings.TrimPrefix(nodeName, "#")
+	}
+
+	// Check if the name matches
+	if !slices.Contains(specifier.Name, nodeName) {
+		return false
+	}
+
+	// Get the source file of the node
+	sourceFile := ast.GetSourceFileOfNode(node)
+	if sourceFile == nil {
+		return false
+	}
+
+	switch specifier.From {
+	case TypeOrValueSpecifierFromFile:
+		// Check if declared in the specified file (or current file if path is empty)
+		cwd := program.Host().GetCurrentDirectory()
+		if specifier.Path == "" {
+			// Empty path means current file (local to the file being linted)
+			return strings.HasPrefix(sourceFile.FileName(), cwd)
+		}
+		absPath := tspath.GetNormalizedAbsolutePath(specifier.Path, cwd)
+		return sourceFile.FileName() == absPath
+
+	case TypeOrValueSpecifierFromLib:
+		// Check if from a lib file
+		return IsSourceFileDefaultLibrary(program, sourceFile)
+
+	case TypeOrValueSpecifierFromPackage:
+		// Check if from the specified package
+		// For imports, we need to check the module specifier
+		// Walk up to find import declaration
+		current := node
+		for current != nil {
+			if current.Kind == ast.KindImportDeclaration {
+				importDecl := current.AsImportDeclaration()
+				if importDecl.ModuleSpecifier != nil {
+					moduleSpec := importDecl.ModuleSpecifier.Text()
+					// Strip quotes
+					moduleSpec = strings.Trim(moduleSpec, "\"'")
+					return moduleSpec == specifier.Package
+				}
+			}
+			current = current.Parent
+		}
+
+		// Also check if the type's declarations are from a declare module
+		if t != nil {
+			symbol := checker.Type_symbol(t)
+			if symbol != nil && len(symbol.Declarations) > 0 {
+				return typeDeclaredInDeclareModule(specifier.Package, symbol.Declarations)
+			}
+		}
+
+		return false
+
+	default:
+		panic(fmt.Sprintf("unknown value specifier from: %v", specifier.From))
+	}
+}
+
+func ValueMatchesSomeSpecifier(
+	node *ast.Node,
+	specifiers []TypeOrValueSpecifier,
+	program *compiler.Program,
+	ty *checker.Type,
+) bool {
+	for _, s := range specifiers {
+		if valueMatchesSpecifier(
+			node,
+			s,
+			program,
+			ty,
+		) {
+			return true
+		}
+	}
+	return false
+}
