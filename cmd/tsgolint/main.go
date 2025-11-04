@@ -410,6 +410,11 @@ func runMain() int {
 		return 1
 	}
 
+	if program == nil {
+		fmt.Fprintf(os.Stderr, "error creating TS program")
+		return 1
+	}
+
 	files := []*ast.SourceFile{}
 	cwdPath := string(tspath.ToPath("", currentDirectory, program.Host().FS().UseCaseSensitiveFileNames()).EnsureTrailingDirectorySeparator())
 	var matchedFiles strings.Builder
