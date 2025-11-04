@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@types/node':
+        specifier: ^24.10.0
+        version: 24.10.0
       dprint:
         specifier: ^0.50.1
         version: 0.50.2
@@ -59,9 +62,15 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@types/node@24.10.0':
+    resolution: {integrity: sha512-qzQZRBqkFsYyaSWXuEHc2WR9c0a0CXwiE5FWUvn7ZM+vdy1uZLfCunD38UzhuB7YN/J11ndbDBcTmOdxJo9Q7A==}
+
   dprint@0.50.2:
     resolution: {integrity: sha512-+0Fzg+17jsMMUouK00/Fara5YtGOuE76EAJINHB8VpkXHd0n00rMXtw/03qorOgz23eo8Y0UpYvNZBJJo3aNtw==}
     hasBin: true
+
+  undici-types@7.16.0:
+    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
 snapshots:
 
@@ -92,6 +101,10 @@ snapshots:
   '@dprint/win32-x64@0.50.2':
     optional: true
 
+  '@types/node@24.10.0':
+    dependencies:
+      undici-types: 7.16.0
+
   dprint@0.50.2:
     optionalDependencies:
       '@dprint/darwin-arm64': 0.50.2
@@ -103,3 +116,5 @@ snapshots:
       '@dprint/linux-x64-musl': 0.50.2
       '@dprint/win32-arm64': 0.50.2
       '@dprint/win32-x64': 0.50.2
+
+  undici-types@7.16.0: {}

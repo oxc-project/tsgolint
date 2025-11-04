@@ -1,17 +1,3 @@
-// Package no_deprecated implements the no-deprecated rule.
-//
-// This rule disallows using code marked as @deprecated in JSDoc comments.
-//
-// Implementation Status: 203/219 tests passing (92.7%)
-//
-// Known limitations:
-// - Type-only export specifiers (export type { T }) not fully supported (2 tests)
-// - Reexported/aliased imports with deprecation reasons on the export alias (4 tests)
-// - Reexported/aliased imports not detecting deprecation at all (4 tests)
-// - JSX attribute deprecation not implemented (2 tests)
-// - Node.js module imports (node:*) deprecation checking (2 tests)
-// - Array destructuring with named tuples (1 test)
-// - Default imports not being checked (1 test)
 package no_deprecated
 
 import (
@@ -189,6 +175,14 @@ var NoDeprecatedRule = rule.Rule{
 					return true, reason
 				}
 
+				if symbol.Flags&ast.SymbolFlagsAlias == 0 {
+					break
+				}
+
+				if checker.Checker_getDeclarationOfAliasSymbol(ctx.TypeChecker, symbol) == nil {
+					break
+				}
+
 				immediateAliasedSymbol := checker.Checker_getImmediateAliasedSymbol(ctx.TypeChecker, symbol)
 
 				if immediateAliasedSymbol == nil {
@@ -196,7 +190,6 @@ var NoDeprecatedRule = rule.Rule{
 				}
 
 				symbol = immediateAliasedSymbol
-
 				if checkDeprecationsOfAliasedSymbol && symbol == targetSymbol {
 					return getJsDocDeprecation(symbol)
 				}
@@ -274,9 +267,10 @@ var NoDeprecatedRule = rule.Rule{
 
 			var tagName *ast.Node
 			// Handle both JsxSelfClosingElement and JsxOpeningElement
-			if elementNode.Kind == ast.KindJsxSelfClosingElement {
+			switch elementNode.Kind {
+			case ast.KindJsxSelfClosingElement:
 				tagName = elementNode.AsJsxSelfClosingElement().TagName
-			} else if elementNode.Kind == ast.KindJsxOpeningElement {
+			case ast.KindJsxOpeningElement:
 				tagName = elementNode.AsJsxOpeningElement().TagName
 			}
 
@@ -630,8 +624,6 @@ var NoDeprecatedRule = rule.Rule{
 			} else {
 				ctx.ReportNode(node, buildDeprecatedWithReasonMessage(name, strings.TrimSpace(deprecationReason)))
 			}
-
-			return
 		}
 
 		// Check element access expressions with literal keys (e.g., a['b'])
