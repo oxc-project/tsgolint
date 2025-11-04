@@ -108,7 +108,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - How to implement new rules
 - Code style and contribution workflow
 
-## Implemented Rules (42/59)
+## Implemented Rules (43/59)
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
@@ -120,7 +120,6 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [ ] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [ ] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
-- [ ] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
 - [ ] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
 - [ ] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
 - [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
@@ -155,7 +154,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [x] [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
-- [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
+- [x] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)
@@ -166,6 +165,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [x] [restrict-plus-operands](https://typescript-eslint.io/rules/restrict-plus-operands)
 - [x] [restrict-template-expressions](https://typescript-eslint.io/rules/restrict-template-expressions)
 - [x] [return-await](https://typescript-eslint.io/rules/return-await)
+- [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
 - [x] [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)
 - [x] [unbound-method](https://typescript-eslint.io/rules/unbound-method)
 - [x] [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable)
