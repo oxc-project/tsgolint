@@ -30,23 +30,31 @@ var PreferIncludesRule = rule.Rule{
 	Name: "prefer-includes",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 
-		// Escape special characters in a string for use in string literal
-		escapeReplacer := strings.NewReplacer(
-			"\x00", "\\0",
-			"\t", "\\t",
-			"\n", "\\n",
-			"\v", "\\v",
-			"\f", "\\f",
-			"\r", "\\r",
-			"'", "\\'",
-			"\\", "\\\\",
-		)
-		escapeString := escapeReplacer.Replace
+		// Escape special characters for string literal
+		// The pattern from regex already has escape sequences, we only need to escape apostrophes
+		escapeString := func(s string) string {
+			return strings.ReplaceAll(s, "'", "\\'")
+		}
 
-		// Parse a RegExp literal to extract a simple string pattern
-		// Returns empty string if the regex is not a simple literal pattern
-		// Only accepts patterns with literal characters (no quantifiers, alternation, etc.)
-		parseRegExp := func(node *ast.Node) string {
+		// Check if a pattern string contains only simple literal characters
+		// The TypeScript version uses a proper ECMAScript regex parser (@eslint-community/regexpp),
+		// but we just check for unescaped metacharacters.
+		isSimpleLiteralPattern := func(pattern string) bool {
+			prevRune := rune(0)
+			for _, ch := range pattern {
+				if prevRune != '\\' {
+					switch ch {
+					case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
+						return false
+					}
+				}
+				prevRune = ch
+			}
+			return true
+		}
+
+		// Extract pattern from regex literal: /bar/ -> "bar"
+		extractRegexLiteralPattern := func(node *ast.Node) string {
 			if node.Kind != ast.KindRegularExpressionLiteral {
 				return ""
 			}
@@ -79,75 +87,64 @@ var PreferIncludesRule = rule.Rule{
 				return ""
 			}
 
-			// Use regexp2 with ECMAScript mode to validate the pattern compiles
-			// This gives us proper JavaScript regex semantics
-			_, err := regexp2.Compile(pattern, regexp2.ECMAScript)
-			if err != nil {
-				return "" // Invalid regex
+			// Validate pattern compiles and is simple literal
+			if _, err := regexp2.Compile(pattern, regexp2.ECMAScript); err != nil {
+				return ""
 			}
 
-			// Check if the pattern is a simple literal by rejecting patterns with
-			// unescaped regex metacharacters. This is conservative but safe.
-			//
-			// Note: The TypeScript version uses @eslint-community/regexpp which
-			// properly parses the regex AST and checks if all elements are simple
-			// Character nodes. Our approach is more conservative - we iterate
-			// runes and reject any regex metacharacters that aren't escaped.
-			//
-			// Limitations: This doesn't handle all escape sequences (e.g., \x20,
-			// \u0020, \\) perfectly, but it's safe - we'll just skip some valid
-			// cases rather than incorrectly transforming complex patterns.
-			prevRune := rune(0)
-			for _, ch := range pattern {
-				// Check for unescaped metacharacters
-				if prevRune != '\\' {
-					switch ch {
-					case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
-						return ""
-					}
-				}
-				prevRune = ch
-			} // Pattern is a simple literal
+			if !isSimpleLiteralPattern(pattern) {
+				return ""
+			}
+
 			return pattern
 		}
 
-		// Resolve a regex pattern from a node, handling:
-		// 1. Direct regex literal: /bar/
-		// 2. Variable reference: const p = /bar/; p.test(...)
-		// 3. RegExp constructor: new RegExp('bar')
-		//
-		// Note: The TypeScript ESLint version uses getStaticValue() from ESLint's
-		// utility library, which evaluates expressions at compile time and handles
-		// more complex cases (e.g., string concatenation, imported constants).
-		// In Go/typescript-go, we'd need to either:
-		// - Build our own constant evaluation engine
-		// - Add GetConstantValue() to the type checker shim
-		// - Use typescript-go's constant folding if exposed
-		// For now, we manually resolve the most common patterns.
-		resolveRegexPattern := func(node *ast.Node) string {
-			// Try direct regex literal first
-			if pattern := parseRegExp(node); pattern != "" {
-				return pattern
+		// Extract pattern from RegExp constructor: new RegExp('bar') -> "bar"
+		extractRegExpConstructorPattern := func(node *ast.Node) string {
+			if node.Kind != ast.KindNewExpression {
+				return ""
 			}
 
-			// Try to resolve identifier to its initializer
+			newExpr := node.AsNewExpression()
+			if newExpr.Expression.Kind != ast.KindIdentifier {
+				return ""
+			}
+
+			if newExpr.Expression.AsIdentifier().Text != "RegExp" {
+				return ""
+			}
+
+			args := node.Arguments()
+			if len(args) == 0 || args[0].Kind != ast.KindStringLiteral {
+				return ""
+			}
+
+			pattern := args[0].AsStringLiteral().Text
+
+			// Validate pattern compiles and is simple literal
+			if _, err := regexp2.Compile(pattern, regexp2.ECMAScript); err != nil {
+				return ""
+			}
+
+			if !isSimpleLiteralPattern(pattern) {
+				return ""
+			}
+
+			return pattern
+		}
+
+		// Resolve pattern from variable: const p = /bar/; p.test(...) -> "bar"
+		resolveVariablePattern := func(node *ast.Node) string {
 			if !ast.IsIdentifier(node) {
 				return ""
 			}
 
-			// Get the symbol for this identifier
 			symbol := ctx.TypeChecker.GetSymbolAtLocation(node)
-			if symbol == nil {
-				return ""
-			}
-
-			if symbol.ValueDeclaration == nil {
+			if symbol == nil || symbol.ValueDeclaration == nil {
 				return ""
 			}
 
 			valueDecl := symbol.ValueDeclaration
-
-			// Handle variable declaration: const pattern = /bar/;
 			if valueDecl.Kind != ast.KindVariableDeclaration {
 				return ""
 			}
@@ -157,65 +154,34 @@ var PreferIncludesRule = rule.Rule{
 				return ""
 			}
 
-			initializer := varDecl.Initializer
-
-			// Case 1: const pattern = /bar/;
-			if pattern := parseRegExp(initializer); pattern != "" {
+			// Try regex literal: const p = /bar/
+			if pattern := extractRegexLiteralPattern(varDecl.Initializer); pattern != "" {
 				return pattern
 			}
 
-			// Case 2: const pattern = new RegExp('bar');
-			if initializer.Kind != ast.KindNewExpression {
-				return ""
+			// Try RegExp constructor: const p = new RegExp('bar')
+			return extractRegExpConstructorPattern(varDecl.Initializer)
+		}
+
+		// Resolve a regex pattern from a node, handling:
+		// 1. Direct regex literal: /bar/
+		// 2. Variable reference: const p = /bar/; p.test(...)
+		// 3. RegExp constructor: new RegExp('bar')
+		//
+		// The TypeScript ESLint version uses getStaticValue() from ESLint to evaluate
+		// more complex cases like string concatenation. We handle the common patterns
+		// by resolving symbols to their initializers.
+		resolveRegexPattern := func(node *ast.Node) string {
+			// Try direct regex literal
+			if pattern := extractRegexLiteralPattern(node); pattern != "" {
+				return pattern
 			}
 
-			newExpr := initializer.AsNewExpression()
-			if newExpr.Expression.Kind != ast.KindIdentifier {
-				return ""
-			}
+			// Try variable reference
+			return resolveVariablePattern(node)
+		}
 
-			constructorName := newExpr.Expression.AsIdentifier().Text
-			if constructorName != "RegExp" {
-				return ""
-			}
-
-			// Get the first argument (the pattern string)
-			args := initializer.Arguments()
-			if len(args) == 0 {
-				return ""
-			}
-
-			firstArg := args[0]
-
-			// Extract string literal value
-			if firstArg.Kind != ast.KindStringLiteral {
-				return ""
-			}
-
-			stringLit := firstArg.AsStringLiteral()
-			// The Text field does not include quotes, it's the actual string value
-			pattern := stringLit.Text
-
-			// Validate it's a simple pattern using parseRegExp logic
-			_, err := regexp2.Compile(pattern, regexp2.ECMAScript)
-			if err != nil {
-				return ""
-			}
-
-			// Check for metacharacters (same logic as parseRegExp)
-			prevRune := rune(0)
-			for _, ch := range pattern {
-				if prevRune != '\\' {
-					switch ch {
-					case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
-						return ""
-					}
-				}
-				prevRune = ch
-			}
-
-			return pattern
-		} // Check if two function declarations have matching parameter signatures
+		// Check if two function declarations have matching parameter signatures
 		// Compares the full text of each parameter (name, type annotation, and optionality)
 		hasSameParameters := func(declA, declB *ast.Node) bool {
 			if !ast.IsFunctionLike(declA) || !ast.IsFunctionLike(declB) {
@@ -348,7 +314,7 @@ var PreferIncludesRule = rule.Rule{
 		}
 
 		return rule.RuleListeners{
-			// Handle: /regex/.test(str) → str.includes('literal')
+			// Handle: /regex/.test(str) -> str.includes('literal')
 			ast.KindCallExpression: func(node *ast.Node) {
 				if node.Kind != ast.KindCallExpression {
 					return
@@ -365,12 +331,7 @@ var PreferIncludesRule = rule.Rule{
 
 				// Check if the method name is "test"
 				nameNode := propAccess.Name()
-				if !ast.IsIdentifier(nameNode) {
-					return
-				}
-
-				methodName := nameNode.AsIdentifier()
-				if methodName.Text != "test" {
+				if !ast.IsIdentifier(nameNode) || nameNode.AsIdentifier().Text != "test" {
 					return
 				}
 
@@ -400,16 +361,53 @@ var PreferIncludesRule = rule.Rule{
 					return
 				}
 
-				// Report the issue
-				// TODO: Implement auto-fix with proper parentheses handling for complex expressions
-				// The fix should transform: /pattern/.test(arg) → arg.includes('pattern')
-				// Need to handle parentheses for: BinaryExpression, SequenceExpression, etc.
-				_ = escapeString(pattern) // Will be used when implementing the fix
+				fixes := []rule.RuleFix{}
 
-				ctx.ReportNode(node, buildPreferStringIncludesMessage())
+				// Check if argument needs wrapping in parentheses for .includes() call
+				// Member access (.) has high precedence, so we only need parens for expressions
+				// that would parse incorrectly, like: a + b.includes() vs (a + b).includes()
+				// Safe types: literals, identifiers, member/element access, calls, already-parenthesized
+				needsParens := false
+				switch argument.Kind {
+				case ast.KindIdentifier, ast.KindStringLiteral, ast.KindNumericLiteral,
+					ast.KindNoSubstitutionTemplateLiteral, ast.KindPropertyAccessExpression,
+					ast.KindCallExpression, ast.KindElementAccessExpression, ast.KindParenthesizedExpression:
+					needsParens = false
+				default:
+					needsParens = true
+				}
+
+				// Use TrimNodeTextRange to preserve leading whitespace
+				callExprRange := utils.TrimNodeTextRange(ctx.SourceFile, node)
+
+				// Remove everything before the argument
+				fixes = append(fixes, rule.RuleFixRemoveRange(core.NewTextRange(callExprRange.Pos(), argument.Pos())))
+
+				// Remove everything after the argument
+				fixes = append(fixes, rule.RuleFixRemoveRange(core.NewTextRange(argument.End(), callExprRange.End())))
+
+				// Add parentheses if needed
+				if needsParens {
+					fixes = append(fixes, rule.RuleFix{
+						Range: core.NewTextRange(argument.Pos(), argument.Pos()),
+						Text:  "(",
+					})
+					fixes = append(fixes, rule.RuleFix{
+						Range: core.NewTextRange(argument.End(), argument.End()),
+						Text:  ")",
+					})
+				}
+
+				// Add .includes('pattern') after the argument
+				escapedPattern := escapeString(pattern)
+				fixes = append(fixes, rule.RuleFix{
+					Range: core.NewTextRange(argument.End(), argument.End()),
+					Text:  ".includes('" + escapedPattern + "')",
+				})
+
+				ctx.ReportNodeWithFixes(node, buildPreferStringIncludesMessage(), fixes...)
 			},
-
-			// Handle: array.indexOf(item) !== -1 → array.includes(item)
+			// Handle: array.indexOf(item) !== -1 -> array.includes(item)
 			ast.KindBinaryExpression: func(node *ast.Node) {
 				if node.Kind != ast.KindBinaryExpression {
 					return
@@ -435,12 +433,7 @@ var PreferIncludesRule = rule.Rule{
 
 				// Check if the method name is "indexOf"
 				nameNode := propAccess.Name()
-				if !ast.IsIdentifier(nameNode) {
-					return
-				}
-
-				methodName := nameNode.AsIdentifier()
-				if methodName.Text != "indexOf" {
+				if !ast.IsIdentifier(nameNode) || nameNode.AsIdentifier().Text != "indexOf" {
 					return
 				}
 
@@ -463,7 +456,6 @@ var PreferIncludesRule = rule.Rule{
 					return
 				}
 
-				// Report the issue
 				fixes := []rule.RuleFix{}
 
 				// Replace "indexOf" with "includes"
@@ -485,10 +477,7 @@ var PreferIncludesRule = rule.Rule{
 					})
 				}
 
-				ctx.ReportNodeWithSuggestions(node, buildPreferIncludesMessage(), rule.RuleSuggestion{
-					Message:  buildPreferIncludesMessage(),
-					FixesArr: fixes,
-				})
+				ctx.ReportNodeWithFixes(node, buildPreferIncludesMessage(), fixes...)
 			},
 		}
 	},
