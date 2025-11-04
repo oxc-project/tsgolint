@@ -601,5 +601,89 @@ func TestPreferIncludesRule(t *testing.T) {
 				},
 			},
 		},
+		// Variable reference to regex literal
+		{
+			Code: `
+        const pattern = /bar/;
+        function f(a: string): void {
+          pattern.test(a);
+        }
+      `,
+			Output: []string{`
+        const pattern = /bar/;
+        function f(a: string): void {
+          a.includes('bar');
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+					Line:      4,
+					Column:    11,
+				},
+			},
+		},
+		// Method call as argument - no parens needed
+		{
+			Code: `
+        function getString(): string { return "test"; }
+        function f(): void {
+          /bar/.test(getString());
+        }
+      `,
+			Output: []string{`
+        function getString(): string { return "test"; }
+        function f(): void {
+          getString().includes('bar');
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+					Line:      4,
+					Column:    11,
+				},
+			},
+		},
+		// Property access as argument - no parens needed
+		{
+			Code: `
+        function f(obj: { value: string }): void {
+          /bar/.test(obj.value);
+        }
+      `,
+			Output: []string{`
+        function f(obj: { value: string }): void {
+          obj.value.includes('bar');
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+					Line:      3,
+					Column:    11,
+				},
+			},
+		},
+		// Element access as argument - no parens needed
+		{
+			Code: `
+        function f(arr: string[]): void {
+          /bar/.test(arr[0]);
+        }
+      `,
+			Output: []string{`
+        function f(arr: string[]): void {
+          arr[0].includes('bar');
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+					Line:      3,
+					Column:    11,
+				},
+			},
+		},
 	})
 }
