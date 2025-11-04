@@ -78,7 +78,6 @@ func getCallLikeNode(node *ast.Node) *ast.Node {
 	return nil
 }
 
-// Helper to get the reported name for a node
 func getReportedNodeName(node *ast.Node) string {
 	if node.Kind == ast.KindSuperKeyword {
 		return "super"
@@ -86,7 +85,6 @@ func getReportedNodeName(node *ast.Node) string {
 	if node.Kind == ast.KindPrivateIdentifier {
 		return "#" + node.Text()
 	}
-	// For most identifiers, use Text()
 	return node.Text()
 }
 
@@ -130,18 +128,11 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
-		// Helper to check if a symbol or its declarations are deprecated
 		getJsDocDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil {
 				return false, ""
 			}
 
-			// TODO: TypeScript implementation uses symbol.getJsDocTags(checker) which includes
-			// JSDoc tags from all symbol declarations combined. We currently check each declaration
-			// individually using the Checker_IsDeprecatedDeclaration helper instead.
-			// This may miss some edge cases where JSDoc tags are inherited differently.
-
-			// Check all declarations for @deprecated tag
 			for _, decl := range symbol.Declarations {
 				if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, decl) {
 					reason := getJsDocDeprecationFromNode(decl)
@@ -211,9 +202,6 @@ var NoDeprecatedRule = rule.Rule{
 				return false, ""
 			}
 
-			// Check if the signature itself is deprecated
-			// TODO: TypeScript implementation also calls signature.getJsDocTags() to get JSDoc deprecation
-			// on the signature object itself. We rely on checking the signature's declaration node instead.
 			signatureDecl := signature.Declaration()
 			if signatureDecl != nil {
 				if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, signatureDecl) {
