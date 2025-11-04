@@ -3,22 +3,15 @@
 
 package project
 
-import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/project"
-import "github.com/microsoft/typescript-go/internal/project/logging"
-import "github.com/microsoft/typescript-go/internal/tspath"
-import "github.com/microsoft/typescript-go/internal/vfs"
 import _ "unsafe"
 
 type APISnapshotRequest = project.APISnapshotRequest
 type ATAStateChange = project.ATAStateChange
-type CheckerPool = project.CheckerPool
 type Client = project.Client
 type Config = project.Config
 type ConfigFileRegistry = project.ConfigFileRegistry
-type ConfigFileRegistryBuilder = project.ConfigFileRegistryBuilder
 type CreateProgramResult = project.CreateProgramResult
-type ExtendedConfigCache = project.ExtendedConfigCache
 type FileChange = project.FileChange
 type FileChangeKind = project.FileChangeKind
 const FileChangeKindChange = project.FileChangeKindChange
@@ -35,22 +28,10 @@ type FileSource = project.FileSource
 type Kind = project.Kind
 const KindConfigured = project.KindConfigured
 const KindInferred = project.KindInferred
-//go:linkname NewConfigFileRegistryBuilder github.com/microsoft/typescript-go/internal/project.NewConfigFileRegistryBuilder
-func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
-//go:linkname NewConfiguredProject github.com/microsoft/typescript-go/internal/project.NewConfiguredProject
-func NewConfiguredProject(configFileName string, configFilePath tspath.Path, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
-//go:linkname NewInferredProject github.com/microsoft/typescript-go/internal/project.NewInferredProject
-func NewInferredProject(currentDirectory string, compilerOptions *core.CompilerOptions, rootFileNames []string, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
-//go:linkname NewProject github.com/microsoft/typescript-go/internal/project.NewProject
-func NewProject(configFileName string, kind project.Kind, currentDirectory string, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
 //go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
 func NewSession(init *project.SessionInit) *project.Session
-//go:linkname NewSnapshot github.com/microsoft/typescript-go/internal/project.NewSnapshot
-func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.SessionOptions, parseCache *project.ParseCache, extendedConfigCache *project.ExtendedConfigCache, configFileRegistry *project.ConfigFileRegistry, compilerOptionsForInferredProjects *core.CompilerOptions, config project.Config, toPath func(fileName string) tspath.Path) *project.Snapshot
-type Overlay = project.Overlay
 type ParseCache = project.ParseCache
 type ParseCacheOptions = project.ParseCacheOptions
-type PatternsAndIgnored = project.PatternsAndIgnored
 type PendingReload = project.PendingReload
 const PendingReloadFileNames = project.PendingReloadFileNames
 const PendingReloadFull = project.PendingReloadFull
@@ -62,19 +43,11 @@ const ProgramUpdateKindNone = project.ProgramUpdateKindNone
 const ProgramUpdateKindSameFileNames = project.ProgramUpdateKindSameFileNames
 type Project = project.Project
 type ProjectCollection = project.ProjectCollection
-type ProjectCollectionBuilder = project.ProjectCollectionBuilder
-type ProjectLoadKind = project.ProjectLoadKind
-const ProjectLoadKindCreate = project.ProjectLoadKindCreate
-const ProjectLoadKindFind = project.ProjectLoadKindFind
 type Session = project.Session
 type SessionInit = project.SessionInit
 type SessionOptions = project.SessionOptions
 type Snapshot = project.Snapshot
 type SnapshotChange = project.SnapshotChange
-type SnapshotFS = project.SnapshotFS
-type SnapshotFSBuilder = project.SnapshotFSBuilder
-//go:linkname TsGoLintNewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.TsGoLintNewSnapshotFSBuilder
-func TsGoLintNewSnapshotFSBuilder(fs vfs.FS, currentDirectory string) *project.SnapshotFSBuilder
 type UpdateReason = project.UpdateReason
 const UpdateReasonDidChangeCompilerOptionsForInferredProjects = project.UpdateReasonDidChangeCompilerOptionsForInferredProjects
 const UpdateReasonDidOpenFile = project.UpdateReasonDidOpenFile

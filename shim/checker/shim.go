@@ -5,6 +5,7 @@ package checker
 
 import "context"
 import "github.com/microsoft/typescript-go/internal/ast"
+import "github.com/microsoft/typescript-go/internal/binder"
 import "github.com/microsoft/typescript-go/internal/checker"
 import "github.com/microsoft/typescript-go/internal/collections"
 import "github.com/microsoft/typescript-go/internal/core"
@@ -423,7 +424,7 @@ type extra_Checker struct {
   couldContainTypeVariables func(*checker.Type) bool
   isStringIndexSignatureOnlyType func(*checker.Type) bool
   markNodeAssignments func(*ast.Node) bool
-  emitResolver *checker.EmitResolver
+  emitResolver extra_emitResolver
   emitResolverOnce sync.Once
   _jsxNamespace string
   _jsxFactoryEntity *ast.Node
@@ -434,6 +435,16 @@ type extra_Checker struct {
   activeTypeMappersCaches []map[string]*checker.Type
   ambientModulesOnce sync.Once
   ambientModules []*ast.Symbol
+}
+type extra_emitResolver struct {
+  checker *checker.Checker
+  checkerMu sync.Mutex
+  isValueAliasDeclaration func(node *ast.Node) bool
+  aliasMarkingVisitor func(node *ast.Node) bool
+  referenceResolver binder.ReferenceResolver
+  jsxLinks core.LinkStore[*ast.Node, checker.JSXLinks]
+  declarationLinks core.LinkStore[*ast.Node, checker.DeclarationLinks]
+  declarationFileLinks core.LinkStore[*ast.Node, checker.DeclarationFileLinks]
 }
 func Checker_numberType(v *checker.Checker) *checker.Type {
   return ((*extra_Checker)(unsafe.Pointer(v))).numberType
@@ -492,7 +503,6 @@ const ElementFlagsRequired = checker.ElementFlagsRequired
 const ElementFlagsRest = checker.ElementFlagsRest
 const ElementFlagsVariable = checker.ElementFlagsVariable
 const ElementFlagsVariadic = checker.ElementFlagsVariadic
-type EmitResolver = checker.EmitResolver
 type EnumLiteralKey = checker.EnumLiteralKey
 type EnumMemberLinks = checker.EnumMemberLinks
 type EnumRelationKey = checker.EnumRelationKey
@@ -699,7 +709,6 @@ func NewNodeBuilder(ch *checker.Checker, e *printer.EmitContext) *checker.NodeBu
 func NewSymbolTrackerImpl(context *checker.NodeBuilderContext, tracker nodebuilder.SymbolTracker, tchost checker.Host) *checker.SymbolTrackerImpl
 type NodeBuilder = checker.NodeBuilder
 type NodeBuilderContext = checker.NodeBuilderContext
-type NodeBuilderImpl = checker.NodeBuilderImpl
 type NodeBuilderLinks = checker.NodeBuilderLinks
 type NodeBuilderSymbolLinks = checker.NodeBuilderSymbolLinks
 type NodeCheckFlags = checker.NodeCheckFlags

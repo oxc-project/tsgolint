@@ -666,8 +666,6 @@ func IsIdentifier(node *ast.Node) bool
 func IsIdentifierName(node *ast.Node) bool
 //go:linkname IsIfStatement github.com/microsoft/typescript-go/internal/ast.IsIfStatement
 func IsIfStatement(node *ast.Node) bool
-//go:linkname IsImplicitlyExportedJSTypeAlias github.com/microsoft/typescript-go/internal/ast.IsImplicitlyExportedJSTypeAlias
-func IsImplicitlyExportedJSTypeAlias(node *ast.Node) bool
 //go:linkname IsImportAttributes github.com/microsoft/typescript-go/internal/ast.IsImportAttributes
 func IsImportAttributes(node *ast.Node) bool
 //go:linkname IsImportCall github.com/microsoft/typescript-go/internal/ast.IsImportCall
@@ -770,8 +768,6 @@ func IsJSDocTypedefTag(node *ast.Node) bool
 func IsJSDocUnknownTag(node *ast.Node) bool
 //go:linkname IsJSExportAssignment github.com/microsoft/typescript-go/internal/ast.IsJSExportAssignment
 func IsJSExportAssignment(node *ast.Node) bool
-//go:linkname IsJSImportDeclaration github.com/microsoft/typescript-go/internal/ast.IsJSImportDeclaration
-func IsJSImportDeclaration(node *ast.Node) bool
 //go:linkname IsJSTypeAliasDeclaration github.com/microsoft/typescript-go/internal/ast.IsJSTypeAliasDeclaration
 func IsJSTypeAliasDeclaration(node *ast.Node) bool
 //go:linkname IsJsonSourceFile github.com/microsoft/typescript-go/internal/ast.IsJsonSourceFile
@@ -1713,7 +1709,6 @@ const ModuleInstanceStateNonInstantiated = ast.ModuleInstanceStateNonInstantiate
 const ModuleInstanceStateUnknown = ast.ModuleInstanceStateUnknown
 type ModuleName = ast.ModuleName
 type ModuleReference = ast.ModuleReference
-type MutableNode = ast.MutableNode
 type NamedExportBindings = ast.NamedExportBindings
 type NamedExports = ast.NamedExports
 type NamedExportsNode = ast.NamedExportsNode

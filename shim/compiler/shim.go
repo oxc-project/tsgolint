@@ -23,7 +23,6 @@ const EmitOnlyForcedDts = compiler.EmitOnlyForcedDts
 const EmitOnlyJs = compiler.EmitOnlyJs
 type EmitOptions = compiler.EmitOptions
 type EmitResult = compiler.EmitResult
-type FileIncludeReason = compiler.FileIncludeReason
 //go:linkname FilterNoEmitSemanticDiagnostics github.com/microsoft/typescript-go/internal/compiler.FilterNoEmitSemanticDiagnostics
 func FilterNoEmitSemanticDiagnostics(diagnostics []*ast.Diagnostic, options *core.CompilerOptions) []*ast.Diagnostic
 //go:linkname GetDiagnosticsOfAnyProgram github.com/microsoft/typescript-go/internal/compiler.GetDiagnosticsOfAnyProgram
