@@ -104,7 +104,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - How to implement new rules
 - Code style and contribution workflow
 
-## Implemented Rules (40/59)
+## Implemented Rules (41/59)
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
