@@ -40,7 +40,7 @@ fmt:
   gofmt -w internal cmd tools
 
 shim:
-  ./tools/gen-npm-packages.mjs
+  go run tools/gen_shims/main.go
 
 pull:
   pushd typescript-go && git reset --hard origin/main
