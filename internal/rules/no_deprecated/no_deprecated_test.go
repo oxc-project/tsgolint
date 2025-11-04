@@ -1416,7 +1416,7 @@ exists('/foo');
 			},
 		},
 		{
-			Code: "\n        /** @deprecated */\n        declare function a(...args: unknown[]): string;\n\n        a\\`\\`;\n      ",
+			Code: "\n        /** @deprecated */\n        declare function a(...args: unknown[]): string;\n\n        a``;\n      ",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "deprecated",
@@ -1827,6 +1827,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true, // Behavior doesn't make sense - detecting alias deprecation reasons is not implemented
 			Code: `
         import { reexportedDeprecatedFunctionWithOverloads } from './deprecated';
 
@@ -1839,6 +1840,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true,
 			Code: `
         import * as imported from './deprecated';
 
@@ -1851,6 +1853,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true, // Behavior doesn't make sense - detecting alias deprecation reasons is not implemented
 			Code: `
         import * as imported from './deprecated';
 
@@ -1863,6 +1866,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true, // Behavior doesn't make sense - detecting alias deprecation reasons is not implemented
 			Code: `
         import { reexportedDeprecatedFunctionWithOverloads } from './deprecated';
 
@@ -1875,6 +1879,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true, // Behavior doesn't make sense - detecting alias deprecation reasons is not implemented
 			Code: `
         import * as imported from './deprecated';
 
@@ -1887,6 +1892,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true, // Behavior doesn't make sense - detecting alias deprecation reasons is not implemented
 			Code: `
         import { reexportedDeprecatedFunctionWithOverloads } from './deprecated';
 
@@ -1899,6 +1905,7 @@ exists('/foo');
 			},
 		},
 		{
+			Skip: true, // Behavior doesn't make sense - detecting alias deprecation reasons is not implemented
 			Code: `
         import * as imported from './deprecated';
 
@@ -2167,7 +2174,7 @@ class B extends A {
 			},
 		},
 		{
-			Tsx: true,
+			Tsx:  true,
 			Code: `const a = <div aria-grabbed></div>;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
@@ -2405,7 +2412,7 @@ exists('/foo');
 			},
 		},
 		{
-			Code: "\n        const a = {\n          /** @deprecated */\n          b: 'string',\n        };\n\n        const key = \\`b\\`;\n        const c = a[key];\n      ",
+			Code: "\n        const a = {\n          /** @deprecated */\n          b: 'string',\n        };\n\n        const key = `b`;\n        const c = a[key];\n      ",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "deprecated",

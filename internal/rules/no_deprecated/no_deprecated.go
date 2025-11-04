@@ -2,17 +2,16 @@
 //
 // This rule disallows using code marked as @deprecated in JSDoc comments.
 //
-// Implementation Status: 197/219 tests passing (90.0%)
+// Implementation Status: 203/219 tests passing (92.7%)
 //
 // Known limitations:
 // - Type-only export specifiers (export type { T }) not fully supported (2 tests)
-// - Reexported/aliased imports with deprecation tags on the alias (9 tests)
+// - Reexported/aliased imports with deprecation reasons on the export alias (4 tests)
+// - Reexported/aliased imports not detecting deprecation at all (4 tests)
 // - JSX attribute deprecation not implemented (2 tests)
-// - JSX component closing tags reporting duplicate errors (2 tests)
-// - Template literal keys in element access not supported (1 test)
 // - Node.js module imports (node:*) deprecation checking (2 tests)
-// - Nested destructuring patterns not fully supported (2 tests)
-// - Miscellaneous edge cases (2 tests)
+// - Array destructuring with named tuples (1 test)
+// - Default imports not being checked (1 test)
 package no_deprecated
 
 import (
@@ -297,6 +296,96 @@ var NoDeprecatedRule = rule.Rule{
 			return getJsDocDeprecation(symbol)
 		}
 
+		// Helper to get the source type for a binding pattern by walking up the tree
+		// This is declared as a variable to allow recursive calls
+		var getBindingPatternSourceType func(bindingPattern *ast.Node) *checker.Type
+		getBindingPatternSourceType = func(bindingPattern *ast.Node) *checker.Type {
+			current := bindingPattern
+
+			for current != nil {
+				switch current.Kind {
+				case ast.KindVariableDeclaration:
+					varDecl := current.AsVariableDeclaration()
+					if varDecl.Initializer != nil {
+						return ctx.TypeChecker.GetTypeAtLocation(varDecl.Initializer)
+					}
+					return nil
+
+				case ast.KindParameter:
+					return ctx.TypeChecker.GetTypeAtLocation(current)
+
+				case ast.KindBindingElement:
+					// For nested destructuring like { bar: { anchor } }
+					// We need to get the type of the parent property
+					bindingElem := current.AsBindingElement()
+
+					// Get the parent binding pattern
+					if current.Parent != nil {
+						parentPattern := current.Parent
+
+						// Get the source type of the parent pattern
+						parentSourceType := getBindingPatternSourceType(parentPattern)
+						if parentSourceType == nil {
+							return nil
+						}
+
+						// Get the property name for this binding element
+						propertyName := ""
+						if bindingElem.PropertyName != nil {
+							propertyName = bindingElem.PropertyName.Text()
+						} else if bindingElem.Name() != nil {
+							name := bindingElem.Name()
+							// The name might be a binding pattern for nested destructuring
+							// For example: const [{ anchor }] = x where x is a tuple
+							if name.Kind == ast.KindObjectBindingPattern || name.Kind == ast.KindArrayBindingPattern {
+								// Special case: when destructuring from an array/tuple
+								// e.g., const [{ anchor }] = x where x: [item: Props]
+								// We can't get a property name, so we need to use the type checker differently
+								// Return nil for now - the caller will need to use TypeChecker.GetTypeAtLocation
+								return nil
+							} else {
+								propertyName = name.Text()
+							}
+						}
+
+						if propertyName == "" {
+							return nil
+						}
+
+						// Get the type of this property
+						property := checker.Checker_getPropertyOfType(ctx.TypeChecker, parentSourceType, propertyName)
+						if property != nil {
+							return ctx.TypeChecker.GetTypeOfSymbolAtLocation(property, current)
+						}
+					}
+					return nil
+
+				case ast.KindArrayBindingPattern:
+					// For array destructuring, get the source type
+					parentSourceType := getBindingPatternSourceType(current.Parent)
+					if parentSourceType == nil {
+						return nil
+					}
+					// For arrays/tuples, try to get the first element type (index 0)
+					// Try getting property "0" for tuple types
+					property := checker.Checker_getPropertyOfType(ctx.TypeChecker, parentSourceType, "0")
+					if property != nil {
+						return ctx.TypeChecker.GetTypeOfSymbolAtLocation(property, current)
+					}
+					return parentSourceType
+
+				case ast.KindObjectBindingPattern:
+					// Continue walking up
+					current = current.Parent
+					continue
+				}
+
+				current = current.Parent
+			}
+
+			return nil
+		}
+
 		// Extract the deprecation reason from JSDoc comments
 		getDeprecationReason := func(node *ast.Node) (bool, string) {
 			callLikeNode := getCallLikeNode(node)
@@ -318,25 +407,16 @@ var NoDeprecatedRule = rule.Rule{
 				// Handle BindingElement in object destructuring: const { b } = a
 				if parent.Kind == ast.KindBindingElement {
 					bindingElem := parent.AsBindingElement()
-					// The binding element's parent should be an ObjectBindingPattern
-					if parent.Parent != nil && parent.Parent.Kind == ast.KindObjectBindingPattern {
-						// Get the type of the object being destructured
-						// We need to find the variable declaration or parameter that contains this binding pattern
-						objBindingPattern := parent.Parent
+					// The binding element's parent should be an ObjectBindingPattern or ArrayBindingPattern
+					if parent.Parent != nil && (parent.Parent.Kind == ast.KindObjectBindingPattern || parent.Parent.Kind == ast.KindArrayBindingPattern) {
+						// Get the type of the object/array being destructured
+						bindingPattern := parent.Parent
+						sourceType := getBindingPatternSourceType(bindingPattern)
 
-						// Find what's being destructured by looking up the tree
-						var sourceType *checker.Type
-						if objBindingPattern.Parent != nil {
-							switch objBindingPattern.Parent.Kind {
-							case ast.KindVariableDeclaration:
-								varDecl := objBindingPattern.Parent.AsVariableDeclaration()
-								if varDecl.Initializer != nil {
-									sourceType = ctx.TypeChecker.GetTypeAtLocation(varDecl.Initializer)
-								}
-							case ast.KindParameter:
-								// For parameters, get the type directly
-								sourceType = ctx.TypeChecker.GetTypeAtLocation(objBindingPattern.Parent)
-							}
+						// If getBindingPatternSourceType returns nil (e.g., for nested destructuring),
+						// try using TypeChecker.GetTypeAtLocation as a fallback
+						if sourceType == nil {
+							sourceType = ctx.TypeChecker.GetTypeAtLocation(bindingPattern)
 						}
 
 						if sourceType != nil {
@@ -454,7 +534,15 @@ var NoDeprecatedRule = rule.Rule{
 				return parent.Name() == node
 
 			case ast.KindPropertyAssignment:
-				// Property in object literal is a declaration
+				// Property keys in object literals are declarations
+				// But property values are uses (not declarations)
+				propAssign := parent.AsPropertyAssignment()
+				// Check if node is the value (initializer)
+				if propAssign.Initializer == node {
+					// This is the value side (e.g., test in { prop: test })
+					return false
+				}
+				// This is the key side - it's a declaration if parent is ObjectLiteralExpression
 				return parent.Parent != nil && parent.Parent.Kind == ast.KindObjectLiteralExpression
 
 			case ast.KindArrowFunction:
@@ -615,8 +703,19 @@ var NoDeprecatedRule = rule.Rule{
 					return
 				}
 
+				// Skip JSX closing elements to avoid duplicate reports
+				if node.Parent.Kind == ast.KindJsxClosingElement {
+					return
+				}
+
 				// Skip identifiers directly in export declarations (not in specifiers)
 				if node.Parent.Kind == ast.KindExportDeclaration {
+					return
+				}
+
+				// Skip namespace exports like: export * as ns from 'module'
+				// The identifier 'ns' is the export name, not a usage
+				if node.Parent.Kind == ast.KindNamespaceExport {
 					return
 				}
 
@@ -624,44 +723,54 @@ var NoDeprecatedRule = rule.Rule{
 				if node.Parent.Kind == ast.KindExportSpecifier {
 					exportSpec := node.Parent.AsExportSpecifier()
 
-					// Only deal with the exported side (the alias), not the local binding
 					// In "export { foo as bar }":
-					//   - PropertyName points to "foo" (the local)
-					//   - Name() returns "bar" (the exported)
+					//   - PropertyName points to "foo" (the local symbol being exported)
+					//   - Name() returns "bar" (the exported name)
 					// In "export { foo }":
 					//   - PropertyName is nil
 					//   - Name() returns "foo"
 
-					// If PropertyName exists and this node is it, skip (it's the local binding)
-					if exportSpec.PropertyName != nil {
-						// There's an alias, check if we're looking at the local name
-						propertyNameNode := exportSpec.PropertyName.AsNode()
-						if propertyNameNode == node {
-							// This is the local binding (foo in "export { foo as bar }")
-							return
-						}
-					}
+					// Check which identifier we're looking at
+					isPropertyName := exportSpec.PropertyName != nil && exportSpec.PropertyName.AsNode() == node
 
-					// This is the exported identifier
-					// Check if the alias itself has a deprecation tag
-					symbol := ctx.TypeChecker.GetSymbolAtLocation(node)
-					isDeprecated, _ := getJsDocDeprecation(symbol)
-
-					if isDeprecated {
-						// The alias itself is deprecated (e.g., export { /** @deprecated */ foo as bar })
-						// Don't report on re-exporting with a deprecation
+					if isPropertyName {
+						// This is the local binding (foo in "export { foo as bar }")
+						// We should NOT report on the local name, only on the export
 						return
 					}
 
-					// Otherwise, fall through to check if the thing being exported is deprecated
+					// This is the exported identifier (the alias)
+					// Check if the export specifier itself has a @deprecated tag
+					// If so, we should NOT report (the re-export is explicitly marked as deprecated)
+					jsdocs := node.Parent.JSDoc(nil)
+					hasDeprecatedTag := false
+					for _, jsdoc := range jsdocs {
+						tags := jsdoc.AsJSDoc().Tags
+						if tags == nil {
+							continue
+						}
+						for _, tag := range tags.Nodes {
+							if ast.IsJSDocDeprecatedTag(tag) {
+								hasDeprecatedTag = true
+								break
+							}
+						}
+						if hasDeprecatedTag {
+							break
+						}
+					}
+
+					if hasDeprecatedTag {
+						// The export specifier itself is marked deprecated
+						// Don't report - this is intentional documentation of the deprecation
+						return
+					}
+
+					// Fall through to check if the underlying symbol is deprecated
 				}
 
 				checkIdentifier(node)
 			},
-			// TODO: TypeScript implementation has a JSXIdentifier listener separate from Identifier.
-			// In TypeScript AST, JSX identifiers may be represented differently than in ESTree.
-			// We currently handle JSX through the Identifier listener and parent kind checks.
-			// This works for most cases but may miss some JSX-specific scenarios.
 
 			// TODO: TypeScript implementation listens to MemberExpression for computed property access.
 			// We have checkElementAccessExpression registered to handle element access with literal keys.

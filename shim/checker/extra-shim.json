@@ -31,7 +31,8 @@
       "isTypeAssignableTo",
       "isTypeStrictSubtypeOf",
       "IsDeprecatedDeclaration",
-      "GetShorthandAssignmentValueSymbol"
+      "GetShorthandAssignmentValueSymbol",
+      "getImmediateAliasedSymbol"
     ]
   },
   "ExtraFields": {
