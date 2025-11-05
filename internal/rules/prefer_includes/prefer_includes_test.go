@@ -64,7 +64,7 @@ func TestPreferIncludesRule(t *testing.T) {
         a.indexOf(b) !== -1;
       }
     `},
-		// RegExp patterns (not yet implemented - future work)
+		// Unsupported RegExp patterns
 		{Code: `
       function f(a: string): void {
         /bar/i.test(a);
