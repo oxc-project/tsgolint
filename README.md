@@ -104,13 +104,12 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - How to implement new rules
 - Code style and contribution workflow
 
-## Implemented Rules (40/59)
+## Implemented Rules (42/59)
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
-- [ ] [no-deprecated](https://typescript-eslint.io/rules/no-deprecated)
 - [ ] [no-unnecessary-condition](https://typescript-eslint.io/rules/no-unnecessary-condition)
 - [ ] [no-unnecessary-qualifier](https://typescript-eslint.io/rules/no-unnecessary-qualifier)
 - [ ] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
@@ -124,11 +123,11 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
-- [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
 - [x] [no-base-to-string](https://typescript-eslint.io/rules/no-base-to-string)
 - [x] [no-confusing-void-expression](https://typescript-eslint.io/rules/no-confusing-void-expression)
+- [x] [no-deprecated](https://typescript-eslint.io/rules/no-deprecated)
 - [x] [no-duplicate-type-constituents](https://typescript-eslint.io/rules/no-duplicate-type-constituents)
 - [x] [no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises)
 - [x] [no-for-in-array](https://typescript-eslint.io/rules/no-for-in-array)
@@ -152,6 +151,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [x] [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
+- [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)
