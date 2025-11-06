@@ -314,6 +314,9 @@ var NoDeprecatedRule = rule.Rule{
 						// Get the property name for this binding element
 						propertyName := ""
 						if bindingElem.PropertyName != nil {
+							if bindingElem.PropertyName.Kind == ast.KindComputedPropertyName {
+								return nil
+							}
 							propertyName = bindingElem.PropertyName.Text()
 						} else if bindingElem.Name() != nil {
 							name := bindingElem.Name()
@@ -405,6 +408,9 @@ var NoDeprecatedRule = rule.Rule{
 							// Get the property name being destructured
 							propertyName := node.Text()
 							if bindingElem.PropertyName != nil {
+								if bindingElem.PropertyName.Kind == ast.KindComputedPropertyName {
+									return false, ""
+								}
 								propertyName = bindingElem.PropertyName.Text()
 							}
 

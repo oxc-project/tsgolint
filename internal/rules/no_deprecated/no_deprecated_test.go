@@ -487,9 +487,18 @@ exists('/foo');
         b: 'string',
       };
 
-      const key = null;
-      const c = a[key as any];
-    `},
+		const key = null;
+		const c = a[key as any];
+	`},
+		{Code: `
+		interface MyInterface {
+			/** @deprecated */
+			prop: string;
+		}
+		const obj: MyInterface = { prop: 'value' };
+		const key = 'prop';
+		const { [key]: value } = obj;
+	`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
