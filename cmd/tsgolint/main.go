@@ -36,6 +36,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_mixed_enums"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_redundant_type_constituents"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_boolean_literal_compare"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_condition"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_template_expression"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_arguments"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_assertion"
@@ -139,6 +140,7 @@ var allRules = []rule.Rule{
 	no_mixed_enums.NoMixedEnumsRule,
 	no_redundant_type_constituents.NoRedundantTypeConstituentsRule,
 	no_unnecessary_boolean_literal_compare.NoUnnecessaryBooleanLiteralCompareRule,
+	no_unnecessary_condition.NoUnnecessaryConditionRule,
 	no_unnecessary_template_expression.NoUnnecessaryTemplateExpressionRule,
 	no_unnecessary_type_arguments.NoUnnecessaryTypeArgumentsRule,
 	no_unnecessary_type_assertion.NoUnnecessaryTypeAssertionRule,
