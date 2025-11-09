@@ -7,6 +7,7 @@
 [![MIT licensed][license-badge]][license-url]
 [![Build Status][ci-badge]][ci-url]
 [![Discord chat][discord-badge]][discord-url]
+[![npm version][npm-badge]][npm-url]
 
 </div>
 
@@ -176,6 +177,8 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 <!-- Badge definitions -->
 
+[npm-badge]: https://img.shields.io/npm/v/oxlint-tsgolint.svg
+[npm-url]: https://www.npmjs.com/package/oxlint-tsgolint
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: LICENSE
 [ci-badge]: https://github.com/oxc-project/tsgolint/actions/workflows/ci.yml/badge.svg
