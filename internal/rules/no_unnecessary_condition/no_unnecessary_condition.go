@@ -29,6 +29,13 @@ func buildAlwaysFalsyMessage() rule.RuleMessage {
 	}
 }
 
+func buildNeverMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "never",
+		Description: "Unnecessary conditional, value is `never`.",
+	}
+}
+
 func buildAlwaysTruthyFuncMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "alwaysTruthyFunc",
@@ -64,6 +71,20 @@ func buildNoStrictNullCheckMessage() rule.RuleMessage {
 	}
 }
 
+func buildLiteralBinaryExpressionMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "comparisonBetweenLiteralTypes",
+		Description: "Unnecessary comparison between literal values.",
+	}
+}
+
+func buildNoOverlapMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "noOverlapBooleanExpression",
+		Description: "This condition will always return the same value since the types have no overlap.",
+	}
+}
+
 var NoUnnecessaryConditionRule = rule.Rule{
 	Name: "no-unnecessary-condition",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -94,7 +115,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
-		// Parse AllowConstantLoopConditions which can be string, *string, or boolean
+		// Parse AllowConstantLoopConditions which can be string, *string, bool, or *bool
 		var loopConditionMode string
 		switch v := opts.AllowConstantLoopConditions.(type) {
 		case string:
@@ -107,6 +128,12 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		case bool:
 			if v {
+				loopConditionMode = "always"
+			} else {
+				loopConditionMode = "never"
+			}
+		case *bool:
+			if v != nil && *v {
 				loopConditionMode = "always"
 			} else {
 				loopConditionMode = "never"
@@ -165,11 +192,39 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
+			// Skip array/tuple element access without noUncheckedIndexedAccess
+			// Without this option, arr[i] has type T instead of T|undefined, but can still be undefined at runtime
+			// Only skip for actual array/tuple types, not for Record/object with index signatures
+			if skipNode.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+				elemAccess := skipNode.AsElementAccessExpression()
+				baseType := getResolvedType(elemAccess.Expression)
+				if baseType != nil {
+					// Check if it's a tuple type
+					if checker.IsTupleType(baseType) {
+						return
+					}
+					// Check if it's an array type by looking at the symbol
+					if baseType.Symbol() != nil {
+						symbolName := baseType.Symbol().Name
+						// Array and ReadonlyArray are the built-in array type symbols
+						if symbolName == "Array" || symbolName == "ReadonlyArray" {
+							return
+						}
+					}
+				}
+			}
+
 			isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, nodeType)
 			if isTruthy {
 				ctx.ReportNode(node, buildAlwaysTruthyMessage())
 			} else if isFalsy {
-				ctx.ReportNode(node, buildAlwaysFalsyMessage())
+				// Check if it's specifically the never type
+				flags := checker.Type_flags(nodeType)
+				if flags&checker.TypeFlagsNever != 0 {
+					ctx.ReportNode(node, buildNeverMessage())
+				} else {
+					ctx.ReportNode(node, buildAlwaysFalsyMessage())
+				}
 			}
 		}
 
@@ -198,9 +253,45 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
+			// Skip if the expression itself is an optional chain
+			// This handles chained optional accesses like foo?.bar?.baz
+			if expression.Kind == ast.KindPropertyAccessExpression {
+				propAccess := expression.AsPropertyAccessExpression()
+				if propAccess.QuestionDotToken != nil {
+					return
+				}
+			} else if expression.Kind == ast.KindElementAccessExpression {
+				elemAccess := expression.AsElementAccessExpression()
+				if elemAccess.QuestionDotToken != nil {
+					return
+				}
+			} else if expression.Kind == ast.KindCallExpression {
+				callExpr := expression.AsCallExpression()
+				if callExpr.QuestionDotToken != nil {
+					return
+				}
+			}
+
 			exprType := getResolvedType(expression)
 			if exprType == nil {
 				return
+			}
+
+			// Allow optional chain on any/unknown/type parameter/indexed access types since we can't determine if they're nullish
+			// This includes types like T, T[K], keyof T, etc.
+			flags := checker.Type_flags(exprType)
+			if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+				return
+			}
+
+			// Also allow if it's a union that includes a type parameter or indexed access type
+			if utils.IsUnionType(exprType) {
+				for _, part := range exprType.Types() {
+					partFlags := checker.Type_flags(part)
+					if partFlags&(checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+						return
+					}
+				}
 			}
 
 			if !isNullishType(ctx.TypeChecker, exprType) {
@@ -250,9 +341,145 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			},
 			ast.KindBinaryExpression: func(node *ast.Node) {
 				binExpr := node.AsBinaryExpression()
-				if binExpr.OperatorToken.Kind == ast.KindAmpersandAmpersandToken ||
-					binExpr.OperatorToken.Kind == ast.KindBarBarToken {
+				opKind := binExpr.OperatorToken.Kind
+
+				// Check nullish coalescing operator (??)
+				if opKind == ast.KindQuestionQuestionToken {
+					leftType := getResolvedType(binExpr.Left)
+					if leftType != nil {
+						// Don't report on types we can't determine (any, unknown, type parameters, etc.)
+						flags := checker.Type_flags(leftType)
+						if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+							return
+						}
+						if !isNullishType(ctx.TypeChecker, leftType) {
+							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
+						}
+					}
+					return
+				}
+
+				// Check nullish coalescing assignment operator (??=)
+				if opKind == ast.KindQuestionQuestionEqualsToken {
+					leftType := getResolvedType(binExpr.Left)
+					if leftType != nil {
+						// Don't report on types we can't determine (any, unknown, type parameters, etc.)
+						flags := checker.Type_flags(leftType)
+						if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+							return
+						}
+						if !isNullishType(ctx.TypeChecker, leftType) {
+							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
+						}
+					}
+					return
+				}
+
+				// Check logical operators (&&, ||) and logical assignment operators (&&=, ||=)
+				if opKind == ast.KindAmpersandAmpersandToken ||
+					opKind == ast.KindBarBarToken ||
+					opKind == ast.KindAmpersandAmpersandEqualsToken ||
+					opKind == ast.KindBarBarEqualsToken {
 					checkCondition(binExpr.Left)
+					return
+				}
+
+				// Check equality and comparison operators
+				isLooseEqualityOp := opKind == ast.KindEqualsEqualsToken ||
+					opKind == ast.KindExclamationEqualsToken
+				isStrictEqualityOp := opKind == ast.KindEqualsEqualsEqualsToken ||
+					opKind == ast.KindExclamationEqualsEqualsToken
+				isEqualityOp := isLooseEqualityOp || isStrictEqualityOp
+
+				isComparisonOp := opKind == ast.KindLessThanToken ||
+					opKind == ast.KindGreaterThanToken ||
+					opKind == ast.KindLessThanEqualsToken ||
+					opKind == ast.KindGreaterThanEqualsToken
+
+				if isEqualityOp || isComparisonOp {
+					leftType := getResolvedType(binExpr.Left)
+					rightType := getResolvedType(binExpr.Right)
+
+					if leftType == nil || rightType == nil {
+						return
+					}
+
+					// Skip if either side is any/unknown
+					leftFlags := checker.Type_flags(leftType)
+					rightFlags := checker.Type_flags(rightType)
+					if leftFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 ||
+						rightFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
+						return
+					}
+
+					// Check for literal type comparisons
+					_, leftIsLiteral := getLiteralValue(leftType)
+					_, rightIsLiteral := getLiteralValue(rightType)
+
+					if leftIsLiteral && rightIsLiteral {
+						// Both sides are literal types
+						ctx.ReportNode(node, buildLiteralBinaryExpressionMessage())
+						return
+					}
+
+					// Check for type overlap in equality/inequality operations
+					if isEqualityOp {
+						// For equality operators, check if types can ever be equal
+						// Only skip if BOTH sides are nullish OR one side is a union that includes nullish
+						hasOverlap := typesHaveOverlap(ctx.TypeChecker, leftType, rightType)
+
+						if !hasOverlap {
+							// Check if this is a valid nullish check (e.g., `a: string | null` with `a === null`)
+							// We allow it if one side is exactly null/undefined and the other contains THE SAME nullish type
+							leftIsNullish := leftFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
+							rightIsNullish := rightFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
+
+							// If one side is nullish, check if the other side could contain a matching nullish type
+							// For loose equality (==, !=), null and undefined are interchangeable
+							if leftIsNullish {
+								// Get the specific nullish flags from left
+								leftNullishFlags := leftFlags & (checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid)
+								rightParts := utils.UnionTypeParts(rightType)
+								for _, part := range rightParts {
+									partFlags := checker.Type_flags(part)
+									// For loose equality, null matches undefined (and vice versa)
+									if isLooseEqualityOp {
+										// Check if this part has ANY nullish type
+										if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
+											return
+										}
+									} else {
+										// For strict equality, check if this part has THE SAME nullish type
+										if partFlags&leftNullishFlags != 0 {
+											return
+										}
+									}
+								}
+							} else if rightIsNullish {
+								// Get the specific nullish flags from right
+								rightNullishFlags := rightFlags & (checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid)
+								leftParts := utils.UnionTypeParts(leftType)
+								for _, part := range leftParts {
+									partFlags := checker.Type_flags(part)
+									// For loose equality, null matches undefined (and vice versa)
+									if isLooseEqualityOp {
+										// Check if this part has ANY nullish type
+										if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
+											return
+										}
+									} else {
+										// For strict equality, check if this part has THE SAME nullish type
+										if partFlags&rightNullishFlags != 0 {
+											return
+										}
+									}
+								}
+							}
+
+							// Types don't overlap, report it
+							ctx.ReportNode(node, buildNoOverlapMessage())
+						}
+					}
 				}
 			},
 			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
@@ -281,6 +508,34 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					}
 				}
 			},
+			ast.KindSwitchStatement: func(node *ast.Node) {
+				switchStmt := node.AsSwitchStatement()
+				checkCondition(switchStmt.Expression)
+			},
+			ast.KindCaseClause: func(node *ast.Node) {
+				if node.Expression() != nil {
+					// Check if the case expression is a literal being compared
+					// node.Parent is the CaseBlock, node.Parent.Parent is the SwitchStatement
+					switchNode := node.Parent
+					if switchNode != nil {
+						switchNode = switchNode.Parent
+					}
+					if switchNode != nil && switchNode.Kind == ast.KindSwitchStatement {
+						discriminant := switchNode.Expression()
+						discriminantType := getResolvedType(discriminant)
+						caseType := getResolvedType(node.Expression())
+
+						if discriminantType != nil && caseType != nil {
+							_, discriminantIsLiteral := getLiteralValue(discriminantType)
+							_, caseIsLiteral := getLiteralValue(caseType)
+
+							if discriminantIsLiteral && caseIsLiteral {
+								ctx.ReportNode(node.Expression(), buildLiteralBinaryExpressionMessage())
+							}
+						}
+					}
+				}
+			},
 		}
 	},
 }
@@ -288,6 +543,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 // Helper function to check if a type is always truthy or always falsy
 func checkTypeCondition(typeChecker *checker.Checker, t *checker.Type) (isTruthy bool, isFalsy bool) {
 	flags := checker.Type_flags(t)
+
+	// Never type is always falsy (empty type, no values exist)
+	if flags&checker.TypeFlagsNever != 0 {
+		return false, true
+	}
 
 	// Handle unions - check all parts
 	if utils.IsUnionType(t) {
@@ -305,6 +565,26 @@ func checkTypeCondition(typeChecker *checker.Checker, t *checker.Type) (isTruthy
 		}
 
 		return allTruthy, allFalsy
+	}
+
+	// Handle intersections - check all parts
+	// For intersections, all parts must be truthy for the whole to be truthy
+	if utils.IsIntersectionType(t) {
+		allTruthy := true
+
+		for _, part := range t.Types() {
+			partTruthy, partFalsy := checkTypeCondition(typeChecker, part)
+			// If any part is always falsy, intersection is likely never/empty
+			if partFalsy {
+				return false, true
+			}
+			// If any part is not always truthy, we can't say the whole is always truthy
+			if !partTruthy {
+				allTruthy = false
+			}
+		}
+
+		return allTruthy, false
 	}
 
 	// Nullish types are always falsy
@@ -415,6 +695,112 @@ func isAllowedConstantLiteral(node *ast.Node) bool {
 	return false
 }
 
+// Check if two types have any overlap
+func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) bool {
+	// Handle any/unknown types - they overlap with everything
+	leftFlags := checker.Type_flags(left)
+	rightFlags := checker.Type_flags(right)
+
+	if leftFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 ||
+		rightFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
+		return true
+	}
+
+	// Handle type parameters and indexed access types - we can't determine overlap at compile time
+	// This includes T, T[K], keyof T, etc.
+	genericFlags := checker.TypeFlagsTypeParameter | checker.TypeFlagsIndexedAccess | checker.TypeFlagsIndex
+	if leftFlags&genericFlags != 0 || rightFlags&genericFlags != 0 {
+		return true
+	}
+
+	// Get union parts
+	leftParts := utils.UnionTypeParts(left)
+	rightParts := utils.UnionTypeParts(right)
+
+	// Check for overlap between any parts
+	for _, leftPart := range leftParts {
+		leftPartFlags := checker.Type_flags(leftPart)
+
+		for _, rightPart := range rightParts {
+			rightPartFlags := checker.Type_flags(rightPart)
+
+			// Check if both are the same primitive type
+			primitiveFlags := checker.TypeFlagsString | checker.TypeFlagsNumber |
+				checker.TypeFlagsBoolean | checker.TypeFlagsBigInt |
+				checker.TypeFlagsESSymbol | checker.TypeFlagsObject
+
+			if leftPartFlags&primitiveFlags != 0 && rightPartFlags&primitiveFlags != 0 {
+				if leftPartFlags&rightPartFlags&primitiveFlags != 0 {
+					return true
+				}
+			}
+
+			// Null and undefined/void overlap
+			// void is treated as undefined at runtime
+			nullishFlags := checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid
+			if leftPartFlags&nullishFlags != 0 && rightPartFlags&nullishFlags != 0 {
+				// Check if both have the same nullish type
+				if leftPartFlags&rightPartFlags&nullishFlags != 0 {
+					return true
+				}
+				// void overlaps with undefined
+				if (leftPartFlags&checker.TypeFlagsVoid != 0 && rightPartFlags&checker.TypeFlagsUndefined != 0) ||
+					(leftPartFlags&checker.TypeFlagsUndefined != 0 && rightPartFlags&checker.TypeFlagsVoid != 0) {
+					return true
+				}
+			}
+
+			// If one is nullish and the other is not, no overlap
+			if (leftPartFlags&nullishFlags != 0) != (rightPartFlags&nullishFlags != 0) {
+				continue
+			}
+
+			// Objects overlap with other objects
+			if leftPartFlags&checker.TypeFlagsObject != 0 && rightPartFlags&checker.TypeFlagsObject != 0 {
+				return true
+			}
+
+			// Literals overlap with their base types and other literals of the same type
+			// String literal vs string (base type or literal)
+			if (leftPartFlags&checker.TypeFlagsStringLiteral != 0 && rightPartFlags&(checker.TypeFlagsString|checker.TypeFlagsStringLiteral) != 0) ||
+				(leftPartFlags&checker.TypeFlagsString != 0 && rightPartFlags&checker.TypeFlagsStringLiteral != 0) {
+				return true
+			}
+			// Number literal vs number (base type or literal)
+			if (leftPartFlags&checker.TypeFlagsNumberLiteral != 0 && rightPartFlags&(checker.TypeFlagsNumber|checker.TypeFlagsNumberLiteral) != 0) ||
+				(leftPartFlags&checker.TypeFlagsNumber != 0 && rightPartFlags&checker.TypeFlagsNumberLiteral != 0) {
+				return true
+			}
+			// BigInt literal vs bigint (base type or literal)
+			if (leftPartFlags&checker.TypeFlagsBigIntLiteral != 0 && rightPartFlags&(checker.TypeFlagsBigInt|checker.TypeFlagsBigIntLiteral) != 0) ||
+				(leftPartFlags&checker.TypeFlagsBigInt != 0 && rightPartFlags&checker.TypeFlagsBigIntLiteral != 0) {
+				return true
+			}
+			// Boolean literal vs boolean (base type or literal)
+			if (leftPartFlags&checker.TypeFlagsBooleanLiteral != 0 && rightPartFlags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral) != 0) ||
+				(leftPartFlags&checker.TypeFlagsBoolean != 0 && rightPartFlags&checker.TypeFlagsBooleanLiteral != 0) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// Check if a comparison is between literal types
+func isLiteralTypeComparison(typeChecker *checker.Checker, left, right *checker.Type) bool {
+	leftFlags := checker.Type_flags(left)
+	rightFlags := checker.Type_flags(right)
+
+	// Check if both are literal types
+	isLeftLiteral := leftFlags&(checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|
+		checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral) != 0
+	isRightLiteral := rightFlags&(checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|
+		checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral) != 0
+
+	return isLeftLiteral && isRightLiteral
+}
+
 // Check type predicate functions for unnecessary conditions
 func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node) {
 	isFunction := funcNode.Kind&(ast.KindArrowFunction|ast.KindFunctionExpression|ast.KindFunctionDeclaration) != 0
@@ -445,4 +831,76 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node) {
 			ctx.ReportNode(funcNode, buildAlwaysFalsyFuncMessage())
 		}
 	}
+}
+
+// Get literal value from a type as string
+func getLiteralValue(t *checker.Type) (string, bool) {
+	flags := checker.Type_flags(t)
+
+	// Nullish types are also literal singleton types
+	if flags&checker.TypeFlagsNull != 0 {
+		return "null", true
+	}
+	if flags&checker.TypeFlagsUndefined != 0 {
+		return "undefined", true
+	}
+	if flags&checker.TypeFlagsVoid != 0 {
+		return "void", true
+	}
+
+	if flags&checker.TypeFlagsStringLiteral != 0 && t.IsStringLiteral() {
+		literal := t.AsLiteralType()
+		if literal != nil {
+			if val, ok := literal.Value().(string); ok {
+				return val, true
+			}
+		}
+	}
+
+	if flags&checker.TypeFlagsNumberLiteral != 0 && t.IsNumberLiteral() {
+		literal := t.AsLiteralType()
+		if literal != nil {
+			return literal.String(), true
+		}
+	}
+
+	if flags&checker.TypeFlagsBigIntLiteral != 0 && t.IsBigIntLiteral() {
+		literal := t.AsLiteralType()
+		if literal != nil {
+			return literal.String(), true
+		}
+	}
+
+	if flags&checker.TypeFlagsBooleanLiteral != 0 {
+		if utils.IsIntrinsicType(t) {
+			return t.AsIntrinsicType().IntrinsicName(), true
+		}
+		if t.AsLiteralType() != nil {
+			return t.AsLiteralType().String(), true
+		}
+	}
+
+	return "", false
+}
+
+// Check if two literal values are equal
+func literalValuesEqual(left, right string, leftType, rightType *checker.Type) bool {
+	leftFlags := checker.Type_flags(leftType)
+	rightFlags := checker.Type_flags(rightType)
+
+	// Must be same type of literal
+	if (leftFlags&checker.TypeFlagsStringLiteral != 0) != (rightFlags&checker.TypeFlagsStringLiteral != 0) {
+		return false
+	}
+	if (leftFlags&checker.TypeFlagsNumberLiteral != 0) != (rightFlags&checker.TypeFlagsNumberLiteral != 0) {
+		return false
+	}
+	if (leftFlags&checker.TypeFlagsBigIntLiteral != 0) != (rightFlags&checker.TypeFlagsBigIntLiteral != 0) {
+		return false
+	}
+	if (leftFlags&checker.TypeFlagsBooleanLiteral != 0) != (rightFlags&checker.TypeFlagsBooleanLiteral != 0) {
+		return false
+	}
+
+	return left == right
 }
