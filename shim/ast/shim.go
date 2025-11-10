@@ -39,6 +39,7 @@ type BreakOrContinueStatement = ast.BreakOrContinueStatement
 type BreakStatement = ast.BreakStatement
 type CallExpression = ast.CallExpression
 type CallLikeExpression = ast.CallLikeExpression
+type CallOrNewExpression = ast.CallOrNewExpression
 type CallSignatureDeclaration = ast.CallSignatureDeclaration
 //go:linkname CanHaveDecorators github.com/microsoft/typescript-go/internal/ast.CanHaveDecorators
 func CanHaveDecorators(node *ast.Node) bool
@@ -204,6 +205,7 @@ type FunctionDeclaration = ast.FunctionDeclaration
 type FunctionDeclarationNode = ast.FunctionDeclarationNode
 type FunctionExpression = ast.FunctionExpression
 type FunctionLikeBase = ast.FunctionLikeBase
+type FunctionLikeDeclaration = ast.FunctionLikeDeclaration
 type FunctionLikeWithBodyBase = ast.FunctionLikeWithBodyBase
 type FunctionOrConstructorTypeNodeBase = ast.FunctionOrConstructorTypeNodeBase
 type FunctionTypeNode = ast.FunctionTypeNode
@@ -350,6 +352,8 @@ func GetTypeAnnotationNode(node *ast.Node) *ast.TypeNode
 func GetTypeNodePrecedence(n *ast.TypeNode) ast.TypePrecedence
 //go:linkname HasAccessorModifier github.com/microsoft/typescript-go/internal/ast.HasAccessorModifier
 func HasAccessorModifier(node *ast.Node) bool
+//go:linkname HasContextSensitiveParameters github.com/microsoft/typescript-go/internal/ast.HasContextSensitiveParameters
+func HasContextSensitiveParameters(node *ast.Node) bool
 //go:linkname HasDecorators github.com/microsoft/typescript-go/internal/ast.HasDecorators
 func HasDecorators(node *ast.Node) bool
 //go:linkname HasDynamicName github.com/microsoft/typescript-go/internal/ast.HasDynamicName
@@ -704,6 +708,8 @@ func IsIndexSignatureDeclaration(node *ast.Node) bool
 func IsIndexedAccessTypeNode(node *ast.Node) bool
 //go:linkname IsInferTypeNode github.com/microsoft/typescript-go/internal/ast.IsInferTypeNode
 func IsInferTypeNode(node *ast.Node) bool
+//go:linkname IsInfinityOrNaNString github.com/microsoft/typescript-go/internal/ast.IsInfinityOrNaNString
+func IsInfinityOrNaNString(name string) bool
 //go:linkname IsInitializedProperty github.com/microsoft/typescript-go/internal/ast.IsInitializedProperty
 func IsInitializedProperty(member *ast.ClassElement) bool
 //go:linkname IsInstanceOfExpression github.com/microsoft/typescript-go/internal/ast.IsInstanceOfExpression
@@ -2164,6 +2170,7 @@ const TypePrecedencePostfix = ast.TypePrecedencePostfix
 const TypePrecedenceTypeOperator = ast.TypePrecedenceTypeOperator
 const TypePrecedenceUnion = ast.TypePrecedenceUnion
 type TypePredicateNode = ast.TypePredicateNode
+type TypePredicateNodeNode = ast.TypePredicateNodeNode
 type TypePredicateParameterName = ast.TypePredicateParameterName
 type TypeQueryNode = ast.TypeQueryNode
 type TypeReferenceNode = ast.TypeReferenceNode
@@ -2177,6 +2184,8 @@ type VariableDeclarationList = ast.VariableDeclarationList
 type VariableDeclarationListNode = ast.VariableDeclarationListNode
 type VariableDeclarationNode = ast.VariableDeclarationNode
 type VariableDeclarationNodeList = ast.VariableDeclarationNodeList
+type VariableOrParameterDeclaration = ast.VariableOrParameterDeclaration
+type VariableOrPropertyDeclaration = ast.VariableOrPropertyDeclaration
 type VariableStatement = ast.VariableStatement
 type Visitor = ast.Visitor
 type VoidExpression = ast.VoidExpression
