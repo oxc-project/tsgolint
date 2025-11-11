@@ -148,29 +148,22 @@ OXC_LOG=debug go test ./internal/rules/no_unsafe_argument
 Each rule follows a consistent interface pattern:
 
 ```go
-package rule_name
+package example_rule
 
 import (
-    "github.com/oxc-project/tsgolint/internal/rule"
-    "github.com/oxc-project/tsgolint/shim/ast"
+   "github.com/oxc-project/tsgolint/internal/rule"
+	"github.com/oxc-project/tsgolint/shim/ast"
 )
 
-type RuleName struct{}
-
-func NewRuleName() *RuleName {
-    return &RuleName{}
-}
-
-func (r *RuleName) Name() string {
-    return "rule-name"
-}
-
-func (r *RuleName) Run(ctx rule.Context) rule.Listeners {
-    return rule.Listeners{
-        ast.NodeKind: func(node *ast.Node) {
-            // Rule implementation
-        },
-    }
+var ExampleRule = rule.Rule{
+   Name: "example-rule",
+   Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+      return rule.RuleListeners{
+         ast.KindExpressionStatement: func(node *ast.Node) {
+            // Handle ExpressionStatement nodes
+         }
+      }
+   }
 }
 ```
 
@@ -200,6 +193,61 @@ func (r *RuleName) Run(ctx rule.Context) rule.Listeners {
 4. **Update documentation:**
    - Add rule to README.md rule list
    - Update rule count if implementing a new rule
+
+#### Adding Options to Rules
+
+Rules can define options by creating a JSON schema file that describes the options. Create a file named `schema.json` in the rule's directory. For example:
+
+```text
+rules/
+  name_of_rule/
+    name_of_rule.go
+    name_of_rule_test.go
+    schema.json
+```
+
+To generate the Go struct for the options, run:
+
+```bash
+node tools/gen-json-schemas.mjs
+```
+
+This should create an `options.go` file in the same directory as the `schema.json` file. Then, you can use the generated JSON schema code to parse options in your rule implementation:
+
+```go
+import (
+   "github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
+)
+
+var ExampleRule = rule.Rule{
+   Name: "example-rule",
+   Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+      opts := utils.UnmarshalOptions[ExampleRuleOptions](options, "example-rule")
+
+      // ... rest of rule here ...
+   }
+}
+```
+
+Here is an example [JSON schema](https://json-schema.org/):
+
+```json
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "example_rule_options": {
+      "type": "object",
+      "properties": {
+        "ignoreSomething": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}
+```
 
 ### Test Fixtures
 
