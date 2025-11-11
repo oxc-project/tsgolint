@@ -11,7 +11,7 @@ import (
 func TestStrictBooleanExpressionsRule(t *testing.T) {
 	rule_tester.RunRuleTester(
 		fixtures.GetRootDir(),
-		"tsconfig.json",
+		"tsconfig.minimal.json",
 		t,
 		&StrictBooleanExpressionsRule,
 		[]rule_tester.ValidTestCase{

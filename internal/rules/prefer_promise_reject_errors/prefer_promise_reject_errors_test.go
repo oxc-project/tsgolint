@@ -8,8 +8,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestPreferPromiseRejectErrorsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferPromiseRejectErrorsRule, []rule_tester.ValidTestCase{
+func TestPreferPromiseRejectErrors(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &PreferPromiseRejectErrorsRule, []rule_tester.ValidTestCase{
 		{Code: "Promise.resolve(5);"},
 		{
 			Code:    "Promise.reject();",

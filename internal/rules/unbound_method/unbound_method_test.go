@@ -42,8 +42,9 @@ func addContainsMethodsClassInvalid(code ...string) []rule_tester.InvalidTestCas
 	})
 }
 
-func TestUnboundMethodRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &UnboundMethodRule, slices.Concat([]rule_tester.ValidTestCase{
+func TestUnboundMethod(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &UnboundMethodRule, slices.Concat([]rule_tester.ValidTestCase{
 		{Code: "Promise.resolve().then(console.log);"},
 		{Code: "['1', '2', '3'].map(Number.parseInt);"},
 		{Code: "[5.2, 7.1, 3.6].map(Math.floor);"},

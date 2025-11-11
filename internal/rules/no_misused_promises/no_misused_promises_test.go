@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoMisusedPromisesRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoMisusedPromisesRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMisusedPromisesRule, []rule_tester.ValidTestCase{
 		{Code: `
 if (true) {
 }

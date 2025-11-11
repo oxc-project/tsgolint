@@ -7,8 +7,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestNoUnnecessaryTypeAssertionRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnnecessaryTypeAssertionRule, []rule_tester.ValidTestCase{
+func TestNoUnnecessaryTypeAssertion(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 import { TSESTree } from '@typescript-eslint/utils';
 declare const member: TSESTree.TSEnumMember;

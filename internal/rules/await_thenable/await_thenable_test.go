@@ -7,8 +7,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestAwaitThenableRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &AwaitThenableRule, []rule_tester.ValidTestCase{
+func TestAwaitThenable(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &AwaitThenableRule, []rule_tester.ValidTestCase{
 		{Code: `
 async function test() {
   await Promise.resolve('value');

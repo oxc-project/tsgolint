@@ -9,7 +9,7 @@ import (
 )
 
 func TestSwitchExhaustivenessCheckRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &SwitchExhaustivenessCheckRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &SwitchExhaustivenessCheckRule, []rule_tester.ValidTestCase{
 		{Code: `
 type Day =
   | 'Monday'

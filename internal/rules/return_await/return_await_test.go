@@ -8,8 +8,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestReturnAwaitRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &ReturnAwaitRule, []rule_tester.ValidTestCase{
+func TestReturnAwait(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &ReturnAwaitRule, []rule_tester.ValidTestCase{
 		{Code: "return;"},
 		{Code: `
       function test() {
