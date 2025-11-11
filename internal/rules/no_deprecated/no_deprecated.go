@@ -9,10 +9,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type NoDeprecatedOptions struct {
-	Allow []utils.TypeOrValueSpecifier `json:"allow"`
-}
-
 func buildDeprecatedMessage(name string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "deprecated",
@@ -91,12 +87,14 @@ func getReportedNodeName(node *ast.Node) string {
 var NoDeprecatedRule = rule.Rule{
 	Name: "no-deprecated",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoDeprecatedOptions)
-		if !ok {
-			opts = NoDeprecatedOptions{}
-		}
-		if opts.Allow == nil {
-			opts.Allow = []utils.TypeOrValueSpecifier{}
+		opts := utils.UnmarshalOptions[NoDeprecatedOptions](options, "no-deprecated")
+
+		// Convert generated options to utils.TypeOrValueSpecifier
+		allow := make([]utils.TypeOrValueSpecifier, 0, len(opts.Allow))
+		for _, spec := range opts.Allow {
+			if converted, ok := utils.ConvertTypeOrValueSpecifier(spec); ok {
+				allow = append(allow, converted)
+			}
 		}
 
 		// Helper to extract deprecation reason from a JSDoc deprecated tag
@@ -611,8 +609,8 @@ var NoDeprecatedRule = rule.Rule{
 
 			// TODO: if type OR value is allowed, skip
 
-			if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, []string{}, ctx.Program) ||
-				utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ty) {
+			if utils.TypeMatchesSomeSpecifierInterface(ty, opts.Allow, ctx.Program) ||
+				utils.ValueMatchesSomeSpecifier(node, allow, ctx.Program, ty) {
 				return
 			}
 
@@ -675,7 +673,7 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			if utils.TypeMatchesSomeSpecifier(objectType, opts.Allow, []string{}, ctx.Program) {
+			if utils.TypeMatchesSomeSpecifierInterface(objectType, opts.Allow, ctx.Program) {
 				return
 			}
 
