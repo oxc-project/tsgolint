@@ -210,8 +210,6 @@ type FunctionLikeWithBodyBase = ast.FunctionLikeWithBodyBase
 type FunctionOrConstructorTypeNodeBase = ast.FunctionOrConstructorTypeNodeBase
 type FunctionTypeNode = ast.FunctionTypeNode
 type GetAccessorDeclaration = ast.GetAccessorDeclaration
-//go:linkname GetAssertedTypeNode github.com/microsoft/typescript-go/internal/ast.GetAssertedTypeNode
-func GetAssertedTypeNode(node *ast.Node) *ast.Node
 //go:linkname GetAssignmentDeclarationKind github.com/microsoft/typescript-go/internal/ast.GetAssignmentDeclarationKind
 func GetAssignmentDeclarationKind(bin *ast.BinaryExpression) ast.JSDeclarationKind
 //go:linkname GetAssignmentTarget github.com/microsoft/typescript-go/internal/ast.GetAssignmentTarget
@@ -332,8 +330,6 @@ func GetSourceFileAffectingCompilerOptions(fileName string, options *core.Compil
 func GetSourceFileOfModule(module *ast.Symbol) *ast.SourceFile
 //go:linkname GetSourceFileOfNode github.com/microsoft/typescript-go/internal/ast.GetSourceFileOfNode
 func GetSourceFileOfNode(node *ast.Node) *ast.SourceFile
-//go:linkname GetStatementsOfBlock github.com/microsoft/typescript-go/internal/ast.GetStatementsOfBlock
-func GetStatementsOfBlock(block *ast.Node) *ast.StatementList
 //go:linkname GetSuperContainer github.com/microsoft/typescript-go/internal/ast.GetSuperContainer
 func GetSuperContainer(node *ast.Node, stopOnFunctions bool) *ast.Node
 //go:linkname GetSymbolId github.com/microsoft/typescript-go/internal/ast.GetSymbolId
@@ -1179,7 +1175,6 @@ const JSDeclarationKindExportsProperty = ast.JSDeclarationKindExportsProperty
 const JSDeclarationKindModuleExports = ast.JSDeclarationKindModuleExports
 const JSDeclarationKindNone = ast.JSDeclarationKindNone
 const JSDeclarationKindProperty = ast.JSDeclarationKindProperty
-const JSDeclarationKindPrototypeProperty = ast.JSDeclarationKindPrototypeProperty
 const JSDeclarationKindThisProperty = ast.JSDeclarationKindThisProperty
 type JSDoc = ast.JSDoc
 type JSDocAllType = ast.JSDocAllType
