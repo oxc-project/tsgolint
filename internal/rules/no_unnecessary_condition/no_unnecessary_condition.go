@@ -413,8 +413,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					}
 
 					// Check for literal type comparisons
-					_, leftIsLiteral := getLiteralValue(leftType)
-					_, rightIsLiteral := getLiteralValue(rightType)
+					leftIsLiteral := isLiteralValue(leftType)
+					rightIsLiteral := isLiteralValue(rightType)
 
 					if leftIsLiteral && rightIsLiteral {
 						// Both sides are literal types
@@ -526,8 +526,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						caseType := getResolvedType(node.Expression())
 
 						if discriminantType != nil && caseType != nil {
-							_, discriminantIsLiteral := getLiteralValue(discriminantType)
-							_, caseIsLiteral := getLiteralValue(caseType)
+							discriminantIsLiteral := isLiteralValue(discriminantType)
+							caseIsLiteral := isLiteralValue(caseType)
 
 							if discriminantIsLiteral && caseIsLiteral {
 								ctx.ReportNode(node.Expression(), buildLiteralBinaryExpressionMessage())
@@ -834,25 +834,25 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node) {
 }
 
 // Get literal value from a type as string
-func getLiteralValue(t *checker.Type) (string, bool) {
+func isLiteralValue(t *checker.Type) bool {
 	flags := checker.Type_flags(t)
 
 	// Nullish types are also literal singleton types
 	if flags&checker.TypeFlagsNull != 0 {
-		return "null", true
+		return true
 	}
 	if flags&checker.TypeFlagsUndefined != 0 {
-		return "undefined", true
+		return true
 	}
 	if flags&checker.TypeFlagsVoid != 0 {
-		return "void", true
+		return true
 	}
 
 	if flags&checker.TypeFlagsStringLiteral != 0 && t.IsStringLiteral() {
 		literal := t.AsLiteralType()
 		if literal != nil {
-			if val, ok := literal.Value().(string); ok {
-				return val, true
+			if _, ok := literal.Value().(string); ok {
+				return true
 			}
 		}
 	}
@@ -860,47 +860,25 @@ func getLiteralValue(t *checker.Type) (string, bool) {
 	if flags&checker.TypeFlagsNumberLiteral != 0 && t.IsNumberLiteral() {
 		literal := t.AsLiteralType()
 		if literal != nil {
-			return literal.String(), true
-		}
+			return true
+		}	
 	}
 
 	if flags&checker.TypeFlagsBigIntLiteral != 0 && t.IsBigIntLiteral() {
 		literal := t.AsLiteralType()
 		if literal != nil {
-			return literal.String(), true
+			return true
 		}
 	}
 
 	if flags&checker.TypeFlagsBooleanLiteral != 0 {
 		if utils.IsIntrinsicType(t) {
-			return t.AsIntrinsicType().IntrinsicName(), true
+			return true
 		}
 		if t.AsLiteralType() != nil {
-			return t.AsLiteralType().String(), true
+			return true
 		}
 	}
 
-	return "", false
-}
-
-// Check if two literal values are equal
-func literalValuesEqual(left, right string, leftType, rightType *checker.Type) bool {
-	leftFlags := checker.Type_flags(leftType)
-	rightFlags := checker.Type_flags(rightType)
-
-	// Must be same type of literal
-	if (leftFlags&checker.TypeFlagsStringLiteral != 0) != (rightFlags&checker.TypeFlagsStringLiteral != 0) {
-		return false
-	}
-	if (leftFlags&checker.TypeFlagsNumberLiteral != 0) != (rightFlags&checker.TypeFlagsNumberLiteral != 0) {
-		return false
-	}
-	if (leftFlags&checker.TypeFlagsBigIntLiteral != 0) != (rightFlags&checker.TypeFlagsBigIntLiteral != 0) {
-		return false
-	}
-	if (leftFlags&checker.TypeFlagsBooleanLiteral != 0) != (rightFlags&checker.TypeFlagsBooleanLiteral != 0) {
-		return false
-	}
-
-	return left == right
+	return false
 }
