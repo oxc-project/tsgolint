@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoMeaninglessVoidOperatorRule(t *testing.T) {
@@ -63,7 +62,7 @@ function bar(x: never) {
   void x;
 }
       `,
-			Options: NoMeaninglessVoidOperatorOptions{CheckNever: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoMeaninglessVoidOperatorOptions](`{"checkNever": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "meaninglessVoidOperator",

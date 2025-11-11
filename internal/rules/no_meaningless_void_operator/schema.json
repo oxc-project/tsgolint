@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "no_meaningless_void_operator_options": {
+      "type": "object",
+      "properties": {
+        "checkNever": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}
