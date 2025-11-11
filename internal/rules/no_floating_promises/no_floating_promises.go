@@ -8,16 +8,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type NoFloatingPromisesOptions struct {
-	AllowForKnownSafeCalls          []utils.TypeOrValueSpecifier
-	AllowForKnownSafeCallsInline    []string
-	AllowForKnownSafePromises       []utils.TypeOrValueSpecifier
-	AllowForKnownSafePromisesInline []string
-	CheckThenables                  *bool
-	IgnoreIIFE                      *bool
-	IgnoreVoid                      *bool
-}
-
 var messageBase = "Promises must be awaited."
 
 var messageBaseHelp = "The promise must end with a call to .catch, or end with a call to .then with a rejection handler."
@@ -87,24 +77,7 @@ func buildFloatingVoidMessage() rule.RuleMessage {
 var NoFloatingPromisesRule = rule.Rule{
 	Name: "no-floating-promises",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoFloatingPromisesOptions)
-		if !ok {
-			opts = NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls:          []utils.TypeOrValueSpecifier{},
-				AllowForKnownSafeCallsInline:    []string{},
-				AllowForKnownSafePromises:       []utils.TypeOrValueSpecifier{},
-				AllowForKnownSafePromisesInline: []string{},
-			}
-		}
-		if opts.CheckThenables == nil {
-			opts.CheckThenables = utils.Ref(false)
-		}
-		if opts.IgnoreIIFE == nil {
-			opts.IgnoreIIFE = utils.Ref(false)
-		}
-		if opts.IgnoreVoid == nil {
-			opts.IgnoreVoid = utils.Ref(true)
-		}
+		opts := utils.UnmarshalOptions[NoFloatingPromisesOptions](options, "no-floating-promises")
 
 		isHigherPrecedenceThanUnary := func(node *ast.Node) bool {
 			operator := ast.KindUnknown
@@ -163,10 +136,9 @@ var NoFloatingPromisesRule = rule.Rule{
 			}
 
 			// The highest priority is to allow anything allowlisted
-			if utils.TypeMatchesSomeSpecifier(
+			if utils.TypeMatchesSomeSpecifierInterface(
 				t,
 				opts.AllowForKnownSafePromises,
-				opts.AllowForKnownSafePromisesInline,
 				ctx.Program,
 			) {
 				return false
@@ -181,7 +153,7 @@ var NoFloatingPromisesRule = rule.Rule{
 			}
 
 			// ...and only check all Thenables if explicitly told to
-			if !*opts.CheckThenables {
+			if !opts.CheckThenables {
 				return false
 			}
 
@@ -237,10 +209,9 @@ var NoFloatingPromisesRule = rule.Rule{
 
 			t := ctx.TypeChecker.GetTypeAtLocation(node.AsCallExpression().Expression)
 
-			return utils.TypeMatchesSomeSpecifier(
+			return utils.TypeMatchesSomeSpecifierInterface(
 				t,
 				opts.AllowForKnownSafeCalls,
-				opts.AllowForKnownSafeCallsInline,
 				ctx.Program,
 			)
 		}
@@ -290,7 +261,7 @@ var NoFloatingPromisesRule = rule.Rule{
 				return isUnhandledPromise(expr.Right)
 			}
 
-			if !*opts.IgnoreVoid && ast.IsVoidExpression(node) {
+			if !opts.IgnoreVoid && ast.IsVoidExpression(node) {
 				// Similarly, a `void` expression always returns undefined, so we need to
 				// see what's inside it without checking the type of the overall expression.
 				return isUnhandledPromise(node.Expression())
@@ -379,7 +350,7 @@ var NoFloatingPromisesRule = rule.Rule{
 			ast.KindExpressionStatement: func(node *ast.Node) {
 				exprStatement := node.AsExpressionStatement()
 
-				if *opts.IgnoreIIFE && isAsyncIife(exprStatement) {
+				if opts.IgnoreIIFE && isAsyncIife(exprStatement) {
 					return
 				}
 
@@ -396,13 +367,13 @@ var NoFloatingPromisesRule = rule.Rule{
 				}
 				if promiseArray {
 					var msg rule.RuleMessage
-					if *opts.IgnoreVoid {
+					if opts.IgnoreVoid {
 						msg = buildFloatingPromiseArrayVoidMessage()
 					} else {
 						msg = buildFloatingPromiseArrayMessage()
 					}
 					ctx.ReportNode(node, msg)
-				} else if *opts.IgnoreVoid {
+				} else if opts.IgnoreVoid {
 					var msg rule.RuleMessage
 					if nonFunctionHandler {
 						msg = buildFloatingUselessRejectionHandlerVoidMessage()

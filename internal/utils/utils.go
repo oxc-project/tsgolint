@@ -5,6 +5,7 @@ import (
 	"slices"
 	"unicode"
 
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -177,4 +178,22 @@ func IsStrWhiteSpace(r rune) bool {
 
 	// WhiteSpace
 	return unicode.Is(unicode.Zs, r)
+}
+
+// UnmarshalOptions unmarshals rule options with proper JSON default handling.
+// It accepts options as either the target type T or as any, and ensures that
+// JSON unmarshalling occurs to apply default values defined in UnmarshalJSON.
+func UnmarshalOptions[T any](options any, ruleName string) T {
+	var result T
+
+	// Always marshal and unmarshal to ensure defaults are applied via UnmarshalJSON
+	optsBytes, err := json.Marshal(options)
+	if err != nil {
+		panic(ruleName + ": failed to marshal options: " + err.Error())
+	}
+	if err := json.Unmarshal(optsBytes, &result); err != nil {
+		panic(ruleName + ": failed to unmarshal options: " + err.Error())
+	}
+
+	return result
 }

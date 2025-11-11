@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "no_floating_promises_options": {
+      "type": "object",
+      "properties": {
+        "allowForKnownSafeCalls": {
+          "type": "array",
+          "items": {
+            "$ref": "../shared_schemas.json#/definitions/typeOrValueSpecifier"
+          },
+          "default": []
+        },
+        "allowForKnownSafePromises": {
+          "type": "array",
+          "items": {
+            "$ref": "../shared_schemas.json#/definitions/typeOrValueSpecifier"
+          },
+          "default": []
+        },
+        "checkThenables": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreIIFE": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreVoid": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

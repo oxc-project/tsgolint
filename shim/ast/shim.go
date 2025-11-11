@@ -256,6 +256,8 @@ func GetExternalModuleImportEqualsDeclarationExpression(node *ast.Node) *ast.Nod
 func GetExternalModuleIndicatorOptions(fileName string, options *core.CompilerOptions, metadata ast.SourceFileMetaData) ast.ExternalModuleIndicatorOptions
 //go:linkname GetExternalModuleName github.com/microsoft/typescript-go/internal/ast.GetExternalModuleName
 func GetExternalModuleName(node *ast.Node) *ast.Expression
+//go:linkname GetFirstConstructorWithBody github.com/microsoft/typescript-go/internal/ast.GetFirstConstructorWithBody
+func GetFirstConstructorWithBody(node *ast.Node) *ast.Node
 //go:linkname GetFirstIdentifier github.com/microsoft/typescript-go/internal/ast.GetFirstIdentifier
 func GetFirstIdentifier(node *ast.Node) *ast.Node
 //go:linkname GetHeritageClause github.com/microsoft/typescript-go/internal/ast.GetHeritageClause

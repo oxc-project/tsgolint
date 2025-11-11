@@ -6,6 +6,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/microsoft/typescript-go/shim/tspath"
@@ -211,4 +212,14 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			}
 		})
 	}
+}
+
+// OptionsFromJSON unmarshals JSON options for use in test cases.
+// This is a test helper that ensures options are properly unmarshalled with defaults.
+func OptionsFromJSON[T any](jsonStr string) T {
+	var opts T
+	if err := json.Unmarshal([]byte(jsonStr), &opts); err != nil {
+		panic("OptionsFromJSON: failed to unmarshal options: " + err.Error())
+	}
+	return opts
 }
