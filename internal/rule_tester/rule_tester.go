@@ -55,6 +55,20 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 	onlyMode := slices.ContainsFunc(validTestCases, func(c ValidTestCase) bool { return c.Only }) ||
 		slices.ContainsFunc(invalidTestCases, func(c InvalidTestCase) bool { return c.Only })
 
+	// Track test statistics
+	var statsMu sync.Mutex
+	failedCount := 0
+	totalCount := len(validTestCases) + len(invalidTestCases)
+
+	// Print summary if any tests failed
+	t.Cleanup(func() {
+		statsMu.Lock()
+		defer statsMu.Unlock()
+		if failedCount > 0 {
+			t.Logf("❌ Failed: %d/%d test cases", failedCount, totalCount)
+		}
+	})
+
 	runLinter := func(t *testing.T, code string, options any, tsconfigPathOverride string, tsx bool) []rule.RuleDiagnostic {
 		var diagnosticsMu sync.Mutex
 		diagnostics := make([]rule.RuleDiagnostic, 0, 3)
@@ -116,6 +130,15 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 				t.SkipNow()
 			}
 
+			// Track if this test fails
+			t.Cleanup(func() {
+				if t.Failed() {
+					statsMu.Lock()
+					failedCount++
+					statsMu.Unlock()
+				}
+			})
+
 			diagnostics := runLinter(t, testCase.Code, testCase.Options, testCase.TSConfig, testCase.Tsx)
 			if len(diagnostics) != 0 {
 				// TODO: pretty errors
@@ -134,6 +157,15 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			if (onlyMode && !testCase.Only) || testCase.Skip {
 				t.SkipNow()
 			}
+
+			// Track if this test fails
+			t.Cleanup(func() {
+				if t.Failed() {
+					statsMu.Lock()
+					failedCount++
+					statsMu.Unlock()
+				}
+			})
 
 			var initialDiagnostics []rule.RuleDiagnostic
 			outputs := make([]string, 0, 1)
