@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "typeOrValueSpecifier": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Universal string specifier - matches all types and values with this name regardless of declaration source. Not recommended - will be removed in a future major version."
+        },
+        {
+          "$ref": "#/definitions/fileSpecifier"
+        },
+        {
+          "$ref": "#/definitions/libSpecifier"
+        },
+        {
+          "$ref": "#/definitions/packageSpecifier"
+        }
+      ]
+    },
+    "fileSpecifier": {
+      "type": "object",
+      "description": "Describes specific types or values declared in local files.",
+      "properties": {
+        "from": {
+          "type": "string",
+          "const": "file"
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "description": "The name(s) of the type or value to match"
+        },
+        "path": {
+          "type": "string",
+          "description": "Optional file path to specify where the types or values must be declared. If omitted, all files will be matched."
+        }
+      },
+      "required": ["from", "name"],
+      "additionalProperties": false
+    },
+    "libSpecifier": {
+      "type": "object",
+      "description": "Describes specific types or values declared in TypeScript's built-in lib.*.d.ts types.",
+      "properties": {
+        "from": {
+          "type": "string",
+          "const": "lib"
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "description": "The name(s) of the lib type or value to match"
+        }
+      },
+      "required": ["from", "name"],
+      "additionalProperties": false
+    },
+    "packageSpecifier": {
+      "type": "object",
+      "description": "Describes specific types or values imported from packages.",
+      "properties": {
+        "from": {
+          "type": "string",
+          "const": "package"
+        },
+        "name": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          ],
+          "description": "The name(s) of the type or value to match"
+        },
+        "package": {
+          "type": "string",
+          "description": "The package name to match"
+        }
+      },
+      "required": ["from", "name", "package"],
+      "additionalProperties": false
+    }
+  }
+}

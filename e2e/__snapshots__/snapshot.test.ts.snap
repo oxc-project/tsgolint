@@ -719,6 +719,32 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "require-await",
   },
   {
+    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
+    "kind": 0,
+    "message": {
+      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
+      "id": "noStrictNullCheck",
+    },
+    "range": {
+      "end": 0,
+      "pos": 0,
+    },
+    "rule": "no-unnecessary-boolean-literal-compare",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
+    "kind": 0,
+    "message": {
+      "description": "Function has no 'await' expression.",
+      "id": "missingAwait",
+    },
+    "range": {
+      "end": 53,
+      "pos": 0,
+    },
+    "rule": "require-await",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
     "kind": 0,
     "message": {
@@ -4364,6 +4390,25 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
       "end": 0,
       "pos": 0,
     },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `
+[
+  {
+    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
+    "kind": 0,
+    "message": {
+      "description": "Promises must be awaited.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler.",
+      "id": "floating",
+    },
+    "range": {
+      "end": 76,
+      "pos": 54,
+    },
+    "rule": "no-floating-promises",
   },
 ]
 `;

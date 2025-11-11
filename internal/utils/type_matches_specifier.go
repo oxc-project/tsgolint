@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"reflect"
 	"slices"
 	"strings"
 
@@ -185,6 +186,88 @@ func typeMatchesSpecifier(
 	}
 }
 
+// ConvertTypeOrValueSpecifier converts an interface{} (from JSON schema) to a TypeOrValueSpecifier struct.
+// The input can be:
+// - A string (universal string specifier - matches all names)
+// - A map with "from" field indicating file/lib/package specifier
+func ConvertTypeOrValueSpecifier(spec interface{}) (TypeOrValueSpecifier, bool) {
+	// Handle string specifier
+	if str, ok := spec.(string); ok {
+		return TypeOrValueSpecifier{
+			From: TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
+			Name: []string{str},
+		}, true
+	}
+
+	// Handle object specifier
+	specMap, ok := spec.(map[string]interface{})
+	if !ok {
+		return TypeOrValueSpecifier{}, false
+	}
+
+	fromStr, ok := specMap["from"].(string)
+	if !ok {
+		return TypeOrValueSpecifier{}, false
+	}
+
+	var from TypeOrValueSpecifierFrom
+	switch fromStr {
+	case "file":
+		from = TypeOrValueSpecifierFromFile
+	case "lib":
+		from = TypeOrValueSpecifierFromLib
+	case "package":
+		from = TypeOrValueSpecifierFromPackage
+	default:
+		return TypeOrValueSpecifier{}, false
+	}
+
+	// Extract name(s)
+	var names []string
+	switch nameVal := specMap["name"].(type) {
+	case string:
+		names = []string{nameVal}
+	case []interface{}:
+		names = make([]string, 0, len(nameVal))
+		for _, n := range nameVal {
+			if str, ok := n.(string); ok {
+				names = append(names, str)
+			}
+		}
+	default:
+		return TypeOrValueSpecifier{}, false
+	}
+
+	result := TypeOrValueSpecifier{
+		From: from,
+		Name: names,
+	}
+
+	// Extract optional path (for file specifiers)
+	if pathVal, ok := specMap["path"].(string); ok {
+		result.Path = pathVal
+	}
+
+	// Extract optional package (for package specifiers)
+	if pkgVal, ok := specMap["package"].(string); ok {
+		result.Package = pkgVal
+	}
+
+	return result, true
+}
+
+// ConvertTypeOrValueSpecifiers converts a slice of interface{} to TypeOrValueSpecifier structs,
+// filtering out any invalid entries.
+func ConvertTypeOrValueSpecifiers(specs []interface{}) []TypeOrValueSpecifier {
+	result := make([]TypeOrValueSpecifier, 0, len(specs))
+	for _, spec := range specs {
+		if converted, ok := ConvertTypeOrValueSpecifier(spec); ok {
+			result = append(result, converted)
+		}
+	}
+	return result
+}
+
 func TypeMatchesSomeSpecifier(
 	t *checker.Type,
 	specifiers []TypeOrValueSpecifier,
@@ -294,4 +377,52 @@ func ValueMatchesSomeSpecifier(
 		}
 	}
 	return false
+}
+
+// TypeMatchesSomeSpecifierInterface is a convenience wrapper that accepts interface{} specifiers
+// and converts them before matching. This is useful when working with JSON-deserialized options.
+// The specifiers parameter can be either []interface{} or any slice type whose elements can be
+// used as interface{}.
+func TypeMatchesSomeSpecifierInterface(
+	t *checker.Type,
+	specifiers any,
+	program *compiler.Program,
+) bool {
+	// Convert specifiers to []interface{}
+	var specsSlice []interface{}
+
+	if specs, ok := specifiers.([]interface{}); ok {
+		specsSlice = specs
+	} else {
+		// For typed slices like []SomeTypeAlias where SomeTypeAlias is interface{},
+		// we need to convert them element by element
+		specsSlice = convertToInterfaceSlice(specifiers)
+	}
+
+	converted := ConvertTypeOrValueSpecifiers(specsSlice)
+	return TypeMatchesSomeSpecifier(t, converted, nil, program)
+}
+
+// convertToInterfaceSlice converts any value to []interface{} by iterating if it's a slice
+func convertToInterfaceSlice(val any) []interface{} {
+	if val == nil {
+		return []interface{}{}
+	}
+
+	// Try direct conversion first
+	if s, ok := val.([]interface{}); ok {
+		return s
+	}
+
+	// Use reflection to handle typed slices like []SomeTypeAlias
+	rv := reflect.ValueOf(val)
+	if rv.Kind() != reflect.Slice {
+		return []interface{}{}
+	}
+
+	result := make([]interface{}, rv.Len())
+	for i := range rv.Len() {
+		result[i] = rv.Index(i).Interface()
+	}
+	return result
 }

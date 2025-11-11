@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoFloatingPromisesRule(t *testing.T) {
@@ -34,7 +33,7 @@ async function test() {
   void Promise.resolve('value');
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": true}`),
 		},
 		{Code: `
 async function test() {
@@ -339,7 +338,7 @@ void doSomething();
           await something();
         })();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 		},
 		{
 			Code: `
@@ -347,11 +346,11 @@ void doSomething();
           something();
         })();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 		},
 		{
 			Code:    "(async function foo() {})();",
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 		},
 		{
 			Code: `
@@ -359,7 +358,7 @@ void doSomething();
           (async function bar() {})();
         }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 		},
 		{
 			Code: `
@@ -370,7 +369,7 @@ void doSomething();
             })();
           });
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 		},
 		{
 			Code: `
@@ -378,7 +377,7 @@ void doSomething();
           await res(1);
         })();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 		},
 		{
 			Code: `
@@ -397,7 +396,7 @@ async function foo() {
   await (condition && myPromise());
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 		},
 		{
 			Code: `
@@ -416,7 +415,7 @@ async function foo() {
   condition && (await myPromise());
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 		},
 		{
 			Code: `
@@ -429,14 +428,14 @@ async function foo() {
   condition ?? myPromise();
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 		},
 		{
 			Code: `
 declare const definitelyCallable: () => void;
 Promise.reject().catch(definitelyCallable);
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 		},
 		{
 			Code: `
@@ -452,7 +451,7 @@ Promise.reject()
   .finally(() => {})
   .finally(() => {});
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 		},
 		{
 			Code: `
@@ -478,7 +477,7 @@ void promiseArray;
 			Code: `
 [1, 2, void Promise.reject(), 3];
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 		},
 		{
 			Code: `
@@ -502,9 +501,7 @@ interface SafeThenable<T> {
 let promise: SafeThenable<number> = Promise.resolve(5);
 0, promise;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafeThenable"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafeThenable"}]}`),
 		},
 		{
 			Code: `
@@ -523,9 +520,7 @@ interface SafeThenable<T> {
 let promise: SafeThenable<number> = Promise.resolve(5);
 0 ? promise : 3;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafeThenable"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafeThenable"}]}`),
 		},
 		{
 			Code: `
@@ -533,9 +528,7 @@ class SafePromise<T> extends Promise<T> {}
 let promise: { a: SafePromise<number> } = { a: Promise.resolve(5) };
 promise.a;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 		},
 		{
 			Code: `
@@ -543,9 +536,7 @@ class SafePromise<T> extends Promise<T> {}
 let promise: SafePromise<number> = Promise.resolve(5);
 promise;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 		},
 		{
 			Code: `
@@ -553,7 +544,7 @@ type Foo = Promise<number> & { hey?: string };
 let promise: Foo = Promise.resolve(5);
 0 || promise;
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 		},
 		{
 			Code: `
@@ -561,7 +552,7 @@ type Foo = Promise<number> & { hey?: string };
 let promise: Foo = Promise.resolve(5);
 promise.finally();
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 		},
 		{
 			Code: `
@@ -580,9 +571,7 @@ interface SafeThenable<T> {
 let promise: () => SafeThenable<number> = () => Promise.resolve(5);
 0, promise();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafeThenable"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafeThenable"}]}`),
 		},
 		{
 			Code: `
@@ -601,9 +590,7 @@ interface SafeThenable<T> {
 let promise: () => SafeThenable<number> = () => Promise.resolve(5);
 0 ? promise() : 3;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafeThenable"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafeThenable"}]}`),
 		},
 		{
 			Code: `
@@ -611,7 +598,7 @@ type Foo = Promise<number> & { hey?: string };
 let promise: () => Foo = () => Promise.resolve(5);
 promise();
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 		},
 		{
 			Code: `
@@ -619,7 +606,7 @@ type Foo = Promise<number> & { hey?: string };
 let promise: () => Foo = async () => 5;
 promise().finally();
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 		},
 		{
 			Code: `
@@ -627,9 +614,7 @@ class SafePromise<T> extends Promise<T> {}
 let promise: () => SafePromise<number> = async () => 5;
 0 || promise();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 		},
 		{
 			Code: `
@@ -637,16 +622,14 @@ class SafePromise<T> extends Promise<T> {}
 let promise: () => SafePromise<number> = async () => 5;
 null ?? promise();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 		},
 		{
 			Code: `
 let promise: () => PromiseLike<number> = () => Promise.resolve(5);
 promise();
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromLib, Name: []string{"PromiseLike"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "lib", "name": "PromiseLike"}]}`),
 		},
 		{
 			Code: `
@@ -654,7 +637,7 @@ type Foo<T> = Promise<T> & { hey?: string };
 declare const arrayOrPromiseTuple: Foo<unknown>[];
 arrayOrPromiseTuple;
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 		},
 		{
 			Code: `
@@ -662,7 +645,7 @@ type Foo<T> = Promise<T> & { hey?: string };
 declare const arrayOrPromiseTuple: [Foo<unknown>, 5];
 arrayOrPromiseTuple;
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 		},
 		{
 			Code: `
@@ -670,9 +653,7 @@ type SafePromise = Promise<number> & { __linterBrands?: string };
 declare const myTag: (strings: TemplateStringsArray) => SafePromise;
 myTag` + "`" + `abc` + "`" + `;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 		},
 		{
 			Code: `
@@ -680,9 +661,7 @@ myTag` + "`" + `abc` + "`" + `;
 
         it('...', () => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"it"}, Path: "file.ts"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "file", "name": "it", "path": "file.ts"}]}`),
 		},
 		{
 			Code: `
@@ -749,9 +728,7 @@ interface SafeThenable<T> {
 let promise: () => SafeThenable<number> = () => Promise.resolve(5);
 promise().then(() => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafeThenable"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafeThenable"}]}`),
 		},
 		{
 			Code: `
@@ -760,9 +737,7 @@ promise().then(() => {});
         }
         it('...', () => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"it"}, Package: "abc"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "package", "name": "it", "package": "abc"}]}`),
 		},
 		{
 			Code: `
@@ -772,9 +747,7 @@ promise().then(() => {});
 
         it('...', () => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"it"}, Package: "abc"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "package", "name": "it", "package": "abc"}]}`),
 		},
 		{
 			Skip: true,
@@ -783,9 +756,7 @@ promise().then(() => {});
 
         it('...', () => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"it"}, Package: "node:test"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "package", "name": "it", "package": "node:test"}]}`),
 		},
 		{
 			Code: `
@@ -796,10 +767,10 @@ interface SafePromise<T> extends Promise<T> {
 declare const createSafePromise: () => SafePromise<string>;
 createSafePromise();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-				CheckThenables:            utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{
+				"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}],
+				"checkThenables": true}
+			`),
 		},
 		{Code: `
 declare const createPromiseLike: () => PromiseLike<number>;
@@ -1503,7 +1474,7 @@ async function test() {
   Promise.resolve('value');
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -2037,7 +2008,7 @@ async function test() {
   void Promise.resolve();
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -2062,7 +2033,7 @@ async function test() {
   promise;
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -2088,7 +2059,7 @@ async function returnsPromise() {
 }
 void returnsPromise();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -2114,7 +2085,7 @@ async function returnsPromise() {
 }
 void /* ... */ returnsPromise();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -2140,7 +2111,7 @@ async function returnsPromise() {
 }
 1, returnsPromise();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -2166,7 +2137,7 @@ async function returnsPromise() {
 }
 bool ? returnsPromise() : null;
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -2697,7 +2668,7 @@ async function test() {
   thenable.then(() => {});
 }
       `,
-			Options: NoFloatingPromisesOptions{CheckThenables: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"checkThenables": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -3160,7 +3131,7 @@ async function test() {
           Promise.resolve();
         })();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -3196,7 +3167,7 @@ declare const promiseIntersection: Promise<number> & number;
   promiseIntersection.finally();
 })();
       `,
-			Options: NoFloatingPromisesOptions{IgnoreIIFE: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreIIFE": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -3369,7 +3340,7 @@ async function foo() {
   (await condition) && myPromise();
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -3518,7 +3489,7 @@ async function foo() {
   condition && myPromise;
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -3546,7 +3517,7 @@ async function foo() {
   condition || myPromise;
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -3574,7 +3545,7 @@ async function foo() {
   condition ?? myPromise;
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -4018,7 +3989,7 @@ await (Promise.reject() || 3);
 			Code: `
 void Promise.resolve().then(() => {}, undefined);
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingUselessRejectionHandler",
@@ -4039,7 +4010,7 @@ await Promise.resolve().then(() => {}, undefined);
 declare const maybeCallable: string | (() => void);
 Promise.resolve().then(() => {}, maybeCallable);
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingUselessRejectionHandler",
@@ -4072,7 +4043,7 @@ Promise.resolve().catch(3);
 Promise.resolve().catch(maybeCallable);
 Promise.resolve().catch(definitelyCallable);
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingUselessRejectionHandler",
@@ -4272,7 +4243,7 @@ Promise.resolve().catch(definitelyCallable);
 			Code: `
 Promise.reject() || 3;
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -4319,7 +4290,7 @@ Promise.reject()
   .finally(() => {})
   .finally(() => {});
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floating",
@@ -4598,7 +4569,7 @@ array.map(() => Promise.reject());
 declare const promiseArray: Array<Promise<unknown>>;
 void promiseArray;
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingPromiseArray",
@@ -4613,7 +4584,7 @@ async function f() {
   await promiseArray;
 }
       `,
-			Options: NoFloatingPromisesOptions{IgnoreVoid: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingPromiseArray",
@@ -4793,10 +4764,10 @@ interface UnsafeThenable<T> {
 let promise: UnsafeThenable<number> = Promise.resolve(5);
 promise;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafeThenable"}}},
-				CheckThenables:            utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{
+				"allowForKnownSafePromises": [{"from": "file", "name": "SafeThenable"}],
+				"checkThenables": true
+			}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -4850,9 +4821,7 @@ class SafePromise<T> extends Promise<T> {}
 let promise: SafePromise<number> = Promise.resolve(5);
 promise.catch();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -4884,9 +4853,7 @@ class UnsafePromise<T> extends Promise<T> {}
 let promise: () => UnsafePromise<number> = async () => 5;
 promise().finally();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -4918,9 +4885,7 @@ type UnsafePromise = Promise<number> & { hey?: string };
 let promise: UnsafePromise = Promise.resolve(5);
 0 ? promise.catch() : 2;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -4952,9 +4917,7 @@ type UnsafePromise = Promise<number> & { hey?: string };
 let promise: () => UnsafePromise = async () => 5;
 null ?? promise().catch();
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -4986,7 +4949,7 @@ type Foo<T> = Promise<T> & { hey?: string };
 declare const arrayOrPromiseTuple: Foo<unknown>[];
 arrayOrPromiseTuple;
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Bar"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Bar"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingPromiseArrayVoid",
@@ -5001,9 +4964,7 @@ let foo: SafePromise = Promise.resolve(1);
 let bar = [Promise.resolve(2), foo];
 bar;
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"SafePromise"}}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingPromiseArrayVoid",
@@ -5017,7 +4978,7 @@ type Foo<T> = Promise<T> & { hey?: string };
 declare const arrayOrPromiseTuple: [Foo<unknown>, 5];
 arrayOrPromiseTuple;
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Bar"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Bar"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingPromiseArrayVoid",
@@ -5031,7 +4992,7 @@ type SafePromise = Promise<number> & { __linterBrands?: string };
 declare const myTag: (strings: TemplateStringsArray) => SafePromise;
 myTag` + "`" + `abc` + "`" + `;
       `,
-			Options: NoFloatingPromisesOptions{AllowForKnownSafePromises: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"Foo"}}}},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "Foo"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -5063,9 +5024,7 @@ await myTag` + "`" + `abc` + "`" + `;
 
         unsafe('...', () => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"it"}, Path: "tests/fixtures/file.ts"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "file", "name": "it", "path": "tests/fixtures/file.ts"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -5097,9 +5056,7 @@ await myTag` + "`" + `abc` + "`" + `;
 
         it('...', () => {}).then(() => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"it"}, Path: "tests/fixtures/file.ts"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "file", "name": "it", "path": "tests/fixtures/file.ts"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -5131,9 +5088,7 @@ await myTag` + "`" + `abc` + "`" + `;
 
         it('...', () => {}).finally(() => {});
       `,
-			Options: NoFloatingPromisesOptions{
-				AllowForKnownSafeCalls: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"it"}, Path: "tests/fixtures/file.ts"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "file", "name": "it", "path": "tests/fixtures/file.ts"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -5164,7 +5119,7 @@ await myTag` + "`" + `abc` + "`" + `;
 declare const createPromise: () => PromiseLike<number>;
 createPromise();
       `,
-			Options: NoFloatingPromisesOptions{CheckThenables: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"checkThenables": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -5198,7 +5153,7 @@ declare function createMyThenable(): MyThenable;
 
 createMyThenable();
       `,
-			Options: NoFloatingPromisesOptions{CheckThenables: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"checkThenables": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
@@ -5299,7 +5254,7 @@ class MyPromise<T> extends Promise<T> {
 declare const createMyPromise: () => MyPromise<number>;
 createMyPromise();
       `,
-			Options: NoFloatingPromisesOptions{CheckThenables: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"checkThenables": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "floatingVoid",
