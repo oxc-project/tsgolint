@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoDuplicateTypeConstituentsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoDuplicateTypeConstituentsRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoDuplicateTypeConstituentsRule, []rule_tester.ValidTestCase{
 		{
 			Code: "type T = 1 | 2;",
 		},

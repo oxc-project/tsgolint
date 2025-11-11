@@ -9,7 +9,7 @@ import (
 )
 
 func TestNoUnnecessaryBooleanLiteralCompareRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnnecessaryBooleanLiteralCompareRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryBooleanLiteralCompareRule, []rule_tester.ValidTestCase{
 		{Code: `
       declare const varAny: any;
       varAny === true;

@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoMeaninglessVoidOperatorRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoMeaninglessVoidOperatorRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMeaninglessVoidOperatorRule, []rule_tester.ValidTestCase{
 		{Code: `
 (() => {})();
 
