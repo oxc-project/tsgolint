@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoMisusedPromisesRule(t *testing.T) {
@@ -19,7 +18,7 @@ if (true) {
 if (Promise.resolve()) {
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: `
 if (true) {
@@ -34,28 +33,28 @@ if (Promise.resolve()) {
 } else {
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "for (;;) {}"},
 		{Code: "for (let i; i < 10; i++) {}"},
 		{
 			Code:    "for (let i; Promise.resolve(); i++) {}",
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "do {} while (true);"},
 		{
 			Code:    "do {} while (Promise.resolve());",
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "while (true) {}"},
 		{
 			Code:    "while (Promise.resolve()) {}",
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "true ? 123 : 456;"},
 		{
 			Code:    "Promise.resolve() ? 123 : 456;",
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: `
 if (!true) {
@@ -66,17 +65,17 @@ if (!true) {
 if (!Promise.resolve()) {
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "(await Promise.resolve()) || false;"},
 		{
 			Code:    "Promise.resolve() || false;",
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "(true && (await Promise.resolve())) || false;"},
 		{
 			Code:    "(true && Promise.resolve()) || false;",
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": false}`),
 		},
 		{Code: "false || (true && Promise.resolve());"},
 		{Code: "(true && Promise.resolve()) || false;"},
@@ -110,12 +109,12 @@ if (value) {
 		{Code: "[1, 2, 3].forEach(val => {});"},
 		{
 			Code:    "[1, 2, 3].forEach(async val => {});",
-			Options: NoMisusedPromisesOptions{ChecksVoidReturn: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": false}`),
 		},
 		{Code: "new Promise((resolve, reject) => resolve());"},
 		{
 			Code:    "new Promise(async (resolve, reject) => resolve());",
-			Options: NoMisusedPromisesOptions{ChecksVoidReturn: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": false}`),
 		},
 		{Code: `
 Promise.all(
@@ -346,7 +345,7 @@ console.log([...(await Promise.resolve(42))]);
 			Code: `
 console.log({ ...Promise.resolve({ key: 42 }) });
       `,
-			Options: NoMisusedPromisesOptions{ChecksSpreads: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksSpreads": false}`),
 		},
 		{
 			Code: `
@@ -357,7 +356,7 @@ console.log({
   ...getData(),
 });
       `,
-			Options: NoMisusedPromisesOptions{ChecksSpreads: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksSpreads": false}`),
 		},
 		{
 			Code: `
@@ -368,14 +367,14 @@ console.log({ ...(condition || Promise.resolve({ key: 42 })) });
 console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
 console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
       `,
-			Options: NoMisusedPromisesOptions{ChecksSpreads: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksSpreads": false}`),
 		},
 		{
 			Code: `
 // This is invalid Typescript, but it shouldn't trigger this linter specifically
 console.log([...Promise.resolve(42)]);
       `,
-			Options: NoMisusedPromisesOptions{ChecksSpreads: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksSpreads": false}`),
 		},
 		{Code: `
 function spreadAny(..._args: any): void {}
@@ -476,7 +475,7 @@ class Bar extends Foo {
   [key: string]: Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{Code: `
 function restTuple(...args: []): void;
@@ -538,7 +537,7 @@ foo(bar);
         <ASTViewer onSelectNode={onSelectFn} />;
       `,
 			Tsx:     true,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{Attributes: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"attributes": true}}`),
 		},
 		{
 			Code: `
@@ -554,7 +553,7 @@ class MySubclassExtendsMyClass extends MyClass {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -570,7 +569,7 @@ class MySubclassExtendsMyClass extends MyClass {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -586,7 +585,7 @@ class MySubclassExtendsMyClass extends MyClass {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -600,7 +599,7 @@ abstract class MyAbstractClassExtendsMyClass extends MyClass {
   abstract setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -614,7 +613,7 @@ abstract class MyAbstractClassExtendsMyClass extends MyClass {
   abstract setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -628,7 +627,7 @@ interface MyInterfaceExtendsMyClass extends MyClass {
   setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -642,7 +641,7 @@ interface MyInterfaceExtendsMyClass extends MyClass {
   setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -656,7 +655,7 @@ class MySubclassExtendsMyAbstractClass extends MyAbstractClass {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -670,7 +669,7 @@ class MySubclassExtendsMyAbstractClass extends MyAbstractClass {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -682,7 +681,7 @@ abstract class MyAbstractSubclassExtendsMyAbstractClass extends MyAbstractClass 
   abstract setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -694,7 +693,7 @@ abstract class MyAbstractSubclassExtendsMyAbstractClass extends MyAbstractClass 
   abstract setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -706,7 +705,7 @@ interface MyInterfaceExtendsMyAbstractClass extends MyAbstractClass {
   setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -718,7 +717,7 @@ interface MyInterfaceExtendsMyAbstractClass extends MyAbstractClass {
   setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -730,7 +729,7 @@ interface MySubInterfaceExtendsMyInterface extends MyInterface {
   setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -742,7 +741,7 @@ interface MySubInterfaceExtendsMyInterface extends MyInterface {
   setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -756,7 +755,7 @@ class MyClassImplementsMyInterface implements MyInterface {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -770,7 +769,7 @@ class MyClassImplementsMyInterface implements MyInterface {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -782,7 +781,7 @@ abstract class MyAbstractClassImplementsMyInterface implements MyInterface {
   abstract setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -794,7 +793,7 @@ abstract class MyAbstractClassImplementsMyInterface implements MyInterface {
   abstract setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -807,7 +806,7 @@ class MyClass implements MyTypeLiteralsIntersection {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -820,7 +819,7 @@ class MyClass implements MyTypeLiteralsIntersection {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -832,7 +831,7 @@ interface MyAsyncInterface extends MyGenericType {
   setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -844,7 +843,7 @@ interface MyAsyncInterface extends MyGenericType<false> {
   setThing(): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(false)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": false}}`),
 		},
 		{
 			Code: `
@@ -860,7 +859,7 @@ interface MyThirdInterface extends MyInterface, MyOtherInterface {
   setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -880,7 +879,7 @@ interface MyInterface extends MyClass, MyOtherClass {
   setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -904,7 +903,7 @@ class MySubclass extends MyClass implements MyInterface, MyOtherInterface {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -920,7 +919,7 @@ const MyClassExpressionExtendsMyClass = class extends MyClass {
   }
 };
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -936,7 +935,7 @@ class MyClassExtendsMyClassExpression extends MyClassExpression {
   }
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -951,7 +950,7 @@ interface MyInterfaceExtendsMyClassExpression extends MyClassExpressionType {
   setThing(): void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -964,7 +963,7 @@ interface MyAsyncInterface extends MySyncCallSignatures {
   (arg: string): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -977,7 +976,7 @@ interface ThisIsADifferentIssue extends MySyncConstructSignatures {
   new (arg: string): Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -990,7 +989,7 @@ interface ThisIsADifferentIssue extends MySyncIndexSignatures {
   [key: number]: Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -1009,7 +1008,7 @@ interface MyAsyncInterface extends MySyncInterfaceSignatures {
   [key: number]: () => Promise<void>;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{
 			Code: `
@@ -1045,7 +1044,7 @@ interface MyInterface extends MyCall, MyIndex, MyConstruct, MyMethods {
   syncMethodProperty: () => void;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{InheritedMethods: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"inheritedMethods": true}}`),
 		},
 		{Code: "const notAFn1: string = '';"},
 		{Code: "const notAFn2: number = 1;"},
@@ -1356,7 +1355,7 @@ f = async () => {
   return 3;
 };
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{Variables: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"variables": true}}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnVariable",
@@ -1424,7 +1423,7 @@ const obj: O = {
   f: async () => 'foo',
 };
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{Properties: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"properties": true}}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
@@ -1530,7 +1529,7 @@ function f(): () => void {
   return async () => 0;
 }
       `,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{Returns: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"returns": true}}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnReturnValue",
@@ -1565,7 +1564,7 @@ const Component = (obj: O) => null;
 			Tsx: true,
 			// TODO(port) getContextualTypeForJsxExpression is not yet implemented
 			Skip:    true,
-			Options: NoMisusedPromisesOptions{ChecksVoidReturnOpts: utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{Attributes: utils.Ref(true)})},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksVoidReturn": {"attributes": true}}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnAttribute",
@@ -2448,7 +2447,7 @@ array.every(() => Promise.resolve(true));
 const tuple: [number, number, number] = [1, 2, 3];
 tuple.find(() => Promise.resolve(false));
       `,
-			Options: NoMisusedPromisesOptions{ChecksConditionals: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "predicate",
