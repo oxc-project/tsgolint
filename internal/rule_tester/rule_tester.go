@@ -65,7 +65,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 		statsMu.Lock()
 		defer statsMu.Unlock()
 		if failedCount > 0 {
-			t.Logf("❌ Failed: %d/%d test cases", failedCount, totalCount)
+			t.Logf("❌ summary: %d/%d test cases passed", totalCount-failedCount, totalCount)
 		}
 	})
 
