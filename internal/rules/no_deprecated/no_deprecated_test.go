@@ -499,6 +499,14 @@ exists('/foo');
 		const key = 'prop';
 		const { [key]: value } = obj;
 	`},
+		{Code: `
+		export class Test {
+	/** @deprecated Use something else instead */
+	public get foo(): number {
+		return 42;
+	}
+}
+	`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,

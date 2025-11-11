@@ -519,6 +519,10 @@ var NoDeprecatedRule = rule.Rule{
 			case ast.KindMethodDeclaration:
 				fallthrough
 			case ast.KindPropertyDeclaration:
+				fallthrough
+			case ast.KindGetAccessor:
+				fallthrough
+			case ast.KindSetAccessor:
 				return parent.Name() == node
 
 			case ast.KindPropertyAssignment:
