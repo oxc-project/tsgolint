@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestSwitchExhaustivenessCheckRule(t *testing.T) {
@@ -157,7 +156,7 @@ switch (day) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 		{Code: `
 const day = 'Monday' as string;
@@ -211,10 +210,7 @@ switch (value) {
     return -1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -228,10 +224,7 @@ switch (value) {
     return -1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -245,10 +238,7 @@ switch (value) {
     return -1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -262,10 +252,7 @@ switch (value) {
     return -1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -278,10 +265,7 @@ switch (value) {
     return -1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -295,10 +279,7 @@ switch (value) {
     return -1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -308,10 +289,7 @@ switch (value) {
     return 0;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -321,10 +299,7 @@ switch (value) {
     return 0;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -334,10 +309,7 @@ switch (value) {
     return 0;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -349,10 +321,7 @@ switch (value) {
     return 0;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -362,10 +331,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -377,10 +343,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -394,10 +357,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -409,27 +369,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
-		},
-		{
-			Code: `
-declare const value: '1' | '2' | number;
-switch (value) {
-  case '1':
-    break;
-  case '2':
-    break;
-  default:
-    break;
-}
-      `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -443,10 +383,21 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
+		},
+		{
+			Code: `
+declare const value: '1' | '2' | number;
+switch (value) {
+  case '1':
+    break;
+  case '2':
+    break;
+  default:
+    break;
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -460,10 +411,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -477,10 +425,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -492,11 +437,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				ConsiderDefaultExhaustiveForUnions:  utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false, "considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -508,11 +449,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				ConsiderDefaultExhaustiveForUnions:  utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true, "considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -522,10 +459,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -538,10 +472,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -551,10 +482,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -562,10 +490,7 @@ declare const value: string | number;
 switch (value) {
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -575,10 +500,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -589,10 +511,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -602,10 +521,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -616,10 +532,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -632,10 +545,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -648,10 +558,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -662,11 +569,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				ConsiderDefaultExhaustiveForUnions:  utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true, "considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -678,11 +581,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				ConsiderDefaultExhaustiveForUnions:  utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true, "considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -698,10 +597,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -719,10 +615,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 		},
 		{
 			Code: `
@@ -734,10 +627,7 @@ switch (literal) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				ConsiderDefaultExhaustiveForUnions: utils.Ref(true),
-				RequireDefaultForNonUnion:          utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true, "requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -749,7 +639,7 @@ switch (literal) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -761,7 +651,7 @@ switch (literal) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false}`),
 		},
 		{
 			Code: `
@@ -783,7 +673,7 @@ switch (myEnum) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -796,7 +686,7 @@ switch (value) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -841,7 +731,7 @@ switch (value) {
       `,
 			// TODO(port): add support for DefaultCaseCommentPattern
 			Skip:    true,
-			Options: SwitchExhaustivenessCheckOptions{RequireDefaultForNonUnion: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"requireDefaultForNonUnion": true}`),
 		},
 		{
 			Code: `
@@ -854,7 +744,7 @@ switch (value) {
       `,
 			// TODO(port): add support for DefaultCaseCommentPattern
 			Skip:    true,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
 			Code: `
@@ -866,11 +756,8 @@ switch (value) {
 }
       `,
 			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip: true,
-			Options: SwitchExhaustivenessCheckOptions{
-				ConsiderDefaultExhaustiveForUnions: utils.Ref(true),
-				DefaultCaseCommentPattern:          utils.Ref("^skip\\sdefault"),
-			},
+			Skip:    true,
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -879,10 +766,7 @@ declare const value: 'literal';
 switch (value) {
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -909,10 +793,7 @@ declare const value: 'literal' & { _brand: true };
 switch (value) {
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -941,10 +822,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -975,10 +853,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1009,10 +884,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1062,10 +934,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1094,10 +963,7 @@ declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
 switch (value) {
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1146,10 +1012,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1181,10 +1044,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1216,10 +1076,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1251,10 +1108,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1288,10 +1142,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1326,10 +1177,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1359,10 +1207,7 @@ declare const value: boolean;
 switch (value) {
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1392,10 +1237,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1427,10 +1269,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1481,10 +1320,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -1521,10 +1357,7 @@ switch (value) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -2088,10 +1921,7 @@ switch (value) {
     return 1;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(true),
-				RequireDefaultForNonUnion:           utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": true, "requireDefaultForNonUnion": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",
@@ -2208,10 +2038,7 @@ switch (myUnion) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2239,10 +2066,7 @@ switch (myEnum) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2270,10 +2094,7 @@ switch (myEnum) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2294,10 +2115,7 @@ switch (myBoolean) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2318,10 +2136,7 @@ switch (myValue) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2342,10 +2157,7 @@ switch (myValue) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{
-				AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false),
-				RequireDefaultForNonUnion:           utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2370,7 +2182,7 @@ switch (myValue) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false), RequireDefaultForNonUnion: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false, "requireDefaultForNonUnion": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "dangerousDefaultCase",
@@ -2388,7 +2200,7 @@ switch (literal) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      4,
 				Column:    9,
@@ -2446,7 +2258,7 @@ switch (literal) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      4,
 				Column:    9,
@@ -2480,7 +2292,7 @@ switch (literal) {
     break;
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      4,
 				Column:    9,
@@ -2523,7 +2335,7 @@ switch (myEnum) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      10,
 				Column:    9,
@@ -2564,7 +2376,7 @@ switch (value) {
   }
 }
       `,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      3,
 				Column:    9,
@@ -2633,7 +2445,7 @@ switch (myValue) {
       `,
 			// TODO(port): add support for DefaultCaseCommentPattern
 			Skip:    true,
-			Options: SwitchExhaustivenessCheckOptions{AllowDefaultCaseForExhaustiveSwitch: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "dangerousDefaultCase",
 			},
 			},
@@ -2650,7 +2462,7 @@ switch (literal) {
       `,
 			// TODO(port): add support for DefaultCaseCommentPattern
 			Skip:    true,
-			Options: SwitchExhaustivenessCheckOptions{ConsiderDefaultExhaustiveForUnions: utils.Ref(false)}, Errors: []rule_tester.InvalidTestCaseError{{
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      4,
 				Column:    9,
@@ -2685,11 +2497,8 @@ switch (literal) {
 }
       `,
 			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip: true,
-			Options: SwitchExhaustivenessCheckOptions{
-				ConsiderDefaultExhaustiveForUnions: utils.Ref(false),
-				DefaultCaseCommentPattern:          utils.Ref("^skip\\sdefault"),
-			},
+			Skip:    true,
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",

@@ -29,13 +29,6 @@ func buildSwitchIsNotExhaustiveMessage(_missingBranches string) rule.RuleMessage
 	}
 }
 
-type SwitchExhaustivenessCheckOptions struct {
-	AllowDefaultCaseForExhaustiveSwitch *bool
-	ConsiderDefaultExhaustiveForUnions  *bool
-	DefaultCaseCommentPattern           *string
-	RequireDefaultForNonUnion           *bool
-}
-
 type SwitchMetadata struct {
 	ContainsNonLiteralType bool
 	// nil if there is no default case
@@ -48,19 +41,7 @@ type SwitchMetadata struct {
 var SwitchExhaustivenessCheckRule = rule.Rule{
 	Name: "switch-exhaustiveness-check",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(SwitchExhaustivenessCheckOptions)
-		if !ok {
-			opts = SwitchExhaustivenessCheckOptions{}
-		}
-		if opts.AllowDefaultCaseForExhaustiveSwitch == nil {
-			opts.AllowDefaultCaseForExhaustiveSwitch = utils.Ref(true)
-		}
-		if opts.ConsiderDefaultExhaustiveForUnions == nil {
-			opts.ConsiderDefaultExhaustiveForUnions = utils.Ref(false)
-		}
-		if opts.RequireDefaultForNonUnion == nil {
-			opts.RequireDefaultForNonUnion = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[SwitchExhaustivenessCheckOptions](options, "switch-exhaustiveness-check")
 
 		isLiteralLikeType := func(t *checker.Type) bool {
 			return utils.IsTypeFlagSet(
@@ -144,7 +125,7 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 		checkSwitchExhaustive := func(node *ast.SwitchStatement, switchMetadata *SwitchMetadata) {
 			// If considerDefaultExhaustiveForUnions is enabled, the presence of a default case
 			// always makes the switch exhaustive.
-			if *opts.ConsiderDefaultExhaustiveForUnions && switchMetadata.DefaultCase != nil {
+			if opts.ConsiderDefaultExhaustiveForUnions && switchMetadata.DefaultCase != nil {
 				return
 			}
 
@@ -163,7 +144,7 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 		}
 
 		checkSwitchUnnecessaryDefaultCase := func(switchMetadata *SwitchMetadata) {
-			if *opts.AllowDefaultCaseForExhaustiveSwitch {
+			if opts.AllowDefaultCaseForExhaustiveSwitch {
 				return
 			}
 
@@ -174,7 +155,7 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 			}
 		}
 		checkSwitchNoUnionDefaultCase := func(node *ast.SwitchStatement, switchMetadata *SwitchMetadata) {
-			if !*opts.RequireDefaultForNonUnion {
+			if !opts.RequireDefaultForNonUnion {
 				return
 			}
 
