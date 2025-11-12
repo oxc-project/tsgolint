@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "strict_boolean_expressions_options": {
+      "type": "object",
+      "properties": {
+        "allowAny": {
+          "type": "boolean",
+          "default": false
+        },
+        "allowNullableBoolean": {
+          "type": "boolean",
+          "default": false
+        },
+        "allowNullableNumber": {
+          "type": "boolean",
+          "default": false
+        },
+        "allowNullableString": {
+          "type": "boolean",
+          "default": false
+        },
+        "allowNullableEnum": {
+          "type": "boolean",
+          "default": false
+        },
+        "allowNullableObject": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowString": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowNumber": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

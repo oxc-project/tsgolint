@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestStrictBooleanExpressionsRule(t *testing.T) {
@@ -148,112 +147,112 @@ if (x) {
         declare const x: boolean | null;
         if (x) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": true}`)},
 			{
 				Code: `
         (x?: boolean) => !x;
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": true}`)},
 			{
 				Code: `
         <T extends boolean | null | undefined>(x: T) => (x ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": true}`)},
 			{
 				Code: `
         const a: (undefined | boolean | null)[] = [true, undefined, null];
         a.some(x => x);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": true}`)},
 			{
 				Code: `
         declare const x: string | null;
         if (x) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableString": true}`)},
 			{
 				Code: `
         (x?: string) => !x;
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableString: utils.Ref(true)},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableString": true}`),
 			},
 			{
 				Code: `
         <T extends string | null | undefined>(x: T) => (x ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableString": true}`)},
 			{
 				Code: `
         declare const x: number | null;
         if (x) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableNumber: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableNumber": true}`)},
 			{
 				Code: `
         (x?: number) => !x;
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableNumber: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableNumber": true}`)},
 			{
 				Code: `
         <T extends number | null | undefined>(x: T) => (x ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableNumber: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableNumber": true}`)},
 			{
 				Code: `
         declare const arrayOfArrays: (null | unknown[])[];
         const isAnyNonEmptyArray1 = arrayOfArrays.some(array => array?.length);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableNumber: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableNumber": true}`)},
 			{
 				Code: `
         declare const x: any;
         if (x) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowAny: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowAny": true}`)},
 			{
 				Code: `
         x => !x;
-      `, Options: StrictBooleanExpressionsOptions{AllowAny: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowAny": true}`)},
 			{
 				Code: `
         <T extends any>(x: T) => (x ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowAny: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowAny": true}`)},
 			{
 				Code: `
         declare const arrayOfArrays: any[];
         const isAnyNonEmptyArray1 = arrayOfArrays.some(array => array);
-      `, Options: StrictBooleanExpressionsOptions{AllowAny: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowAny": true}`)},
 			{
 				Code: `
         1 && true && 'x' && {};
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`)},
 			{
 				Code: `
         let x = 0 || false || '' || null;
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`)},
 			{
 				Code: `
         if (1 && true && 'x') void 0;
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`)},
 			{
 				Code: `
         if (0 || false || '') void 0;
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`)},
 			{
 				Code: `
         1 && true && 'x' ? {} : null;
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`)},
 			{
 				Code: `
         0 || false || '' ? null : {};
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`)},
 			{
 				Code: `
         declare const arrayOfArrays: string[];
         const isAnyNonEmptyArray1 = arrayOfArrays.some(array => array);
-      `, Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true}`)},
 			{
 				Code: `
         declare const arrayOfArrays: number[];
         const isAnyNonEmptyArray1 = arrayOfArrays.some(array => array);
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": true}`)},
 			{
 				Code: `
         declare const arrayOfArrays: (null | object)[];
         const isAnyNonEmptyArray1 = arrayOfArrays.some(array => array);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -267,7 +266,7 @@ if (x) {
         }
         if (theEnum) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -281,7 +280,7 @@ if (x) {
         }
         if (!theEnum) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -295,7 +294,7 @@ if (x) {
         }
         if (!theEnum) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -309,7 +308,7 @@ if (x) {
         }
         if (!theEnum) {
         }
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -317,7 +316,7 @@ if (x) {
           That = 'one',
         }
         (value?: ExampleEnum) => (value ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -325,7 +324,7 @@ if (x) {
           That = 1,
         }
         (value?: ExampleEnum) => (!value ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -333,7 +332,7 @@ if (x) {
           That = 1,
         }
         (value?: ExampleEnum) => (!value ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -341,7 +340,7 @@ if (x) {
           That = 0,
         }
         (value?: ExampleEnum) => (!value ? 1 : 0);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
         enum ExampleEnum {
@@ -350,14 +349,14 @@ if (x) {
         }
         declare const arrayOfArrays: (ExampleEnum | null)[];
         const isAnyNonEmptyArray1 = arrayOfArrays.some(array => array);
-      `, Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
 declare const x: string[] | null;
 // eslint-disable-next-line
 if (x) {
 }
-      `, Options: StrictBooleanExpressionsOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true}`)},
 			{
 				Code: `
 function f(arg: 'a' | null) {
@@ -380,7 +379,7 @@ if (x) {
 }
 if (y) {
 }
-      `, Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": true}`)},
 			{
 				Code: `
 function f(arg: 1 | null) {
@@ -421,7 +420,7 @@ if (x) {
 }
 if (y) {
 }
-      `, Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(true)}},
+      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true}`)},
 			{
 				Code: `
 declare const foo: boolean & { __BRAND: 'Foo' };
@@ -646,7 +645,7 @@ declare function f(x: string | null): boolean;
 if (true && 1 + 1) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false, "allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -678,7 +677,7 @@ if (true && 1 + 1) {
 			},
 			{
 				Code:    `while (false || 'a' + 'b') {}`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false, "allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -701,7 +700,7 @@ if (true && 1 + 1) {
 			},
 			{
 				Code:    `(x: object) => (true || false || x ? true : false);`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false, "allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorObject",
@@ -710,7 +709,7 @@ if (true && 1 + 1) {
 			},
 			{
 				Code:    `if (('' && {}) || (0 && void 0)) { }`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false, "allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -759,7 +758,7 @@ if (true && 1 + 1) {
         declare const array: string[];
         array.some(x => x);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(true), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": true, "allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -801,7 +800,7 @@ if (true && 1 + 1) {
 declare const foo: true & { __BRAND: 'Foo' };
 if (('' && foo) || (0 && void 0)) { }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false, "allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -865,7 +864,7 @@ if (('' && foo) || (0 && void 0)) { }
 declare const foo: false & { __BRAND: 'Foo' };
 if (('' && {}) || (foo && void 0)) { }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false), AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false, "allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -903,7 +902,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `'asd' && 123 && [] && null;`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -946,7 +945,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `'asd' || 123 || [] || null;`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -989,7 +988,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `let x = (1 && 'a' && null) || 0 || '' || {};`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1066,7 +1065,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `return (1 || 'a' || null) && 0 && '' && {};`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1143,7 +1142,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `console.log((1 && []) || ('a' && {}));`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1186,7 +1185,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `if ((1 && []) || ('a' && {})) void 0;`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1204,7 +1203,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `let x = null || 0 || 'a' || [] ? {} : undefined;`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullish",
@@ -1250,7 +1249,7 @@ if (('' && {}) || (foo && void 0)) { }
 			},
 			{
 				Code:    `return !(null || 0 || 'a' || []);`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false), AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullish",
@@ -1424,7 +1423,7 @@ if (x) {
 			},
 			{
 				Code:    `while ('') {}`,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -1447,7 +1446,7 @@ if (x) {
 			},
 			{
 				Code:    `for (; 'foo'; ) {}`,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -1474,7 +1473,7 @@ declare const x: string;
 if (x) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -1509,7 +1508,7 @@ if (x) {
 			},
 			{
 				Code:    `(x: string) => !x;`,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -1532,7 +1531,7 @@ if (x) {
 			},
 			{
 				Code:    `<T extends string>(x: T) => (x ? 1 : 0);`,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -1555,7 +1554,7 @@ if (x) {
 			},
 			{
 				Code:    `while (0n) {}`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1578,7 +1577,7 @@ if (x) {
 			},
 			{
 				Code:    `for (; 123; ) {}`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1605,7 +1604,7 @@ declare const x: number;
 if (x) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1640,7 +1639,7 @@ if (x) {
 			},
 			{
 				Code:    `(x: bigint) => !x;`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1663,7 +1662,7 @@ if (x) {
 			},
 			{
 				Code:    `<T extends number>(x: T) => (x ? 1 : 0);`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1686,7 +1685,7 @@ if (x) {
 			},
 			{
 				Code:    `![]['length']; // doesn't count as array.length when computed`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1713,7 +1712,7 @@ declare const a: any[] & { notLength: number };
 if (a.notLength) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1751,7 +1750,7 @@ if (a.notLength) {
 if (![].length) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1771,7 +1770,7 @@ if (![].length) {
 				Code: `
 (a: number[]) => a.length && '...';
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1790,7 +1789,7 @@ if (![].length) {
 				Code: `
 <T extends unknown[]>(...a: T) => a.length || 'empty';
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -1811,7 +1810,7 @@ declare const x: string | number;
 if (x) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorOther",
@@ -1820,7 +1819,7 @@ if (x) {
 			},
 			{
 				Code:    `(x: bigint | string) => !x;`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorOther",
@@ -1829,7 +1828,7 @@ if (x) {
 			},
 			{
 				Code:    `<T extends number | bigint | string>(x: T) => (x ? 1 : 0);`,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(true), AllowString: utils.Ref(true)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": true, "allowNumber": true}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorOther",
@@ -1842,7 +1841,7 @@ declare const x: boolean | null;
 if (x) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableBoolean",
@@ -1869,7 +1868,7 @@ if (x) {
 			},
 			{
 				Code:    `(x?: boolean) => !x;`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableBoolean",
@@ -1888,7 +1887,7 @@ if (x) {
 			},
 			{
 				Code:    `<T extends boolean | null | undefined>(x: T) => (x ? 1 : 0);`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableBoolean",
@@ -1911,7 +1910,7 @@ declare const x: object | null;
 if (x) {
 }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableObject",
@@ -1930,7 +1929,7 @@ if (x) {
 			},
 			{
 				Code:    `(x?: { a: number }) => !x;`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableObject",
@@ -1945,7 +1944,7 @@ if (x) {
 			},
 			{
 				Code:    `<T extends {} | null | undefined>(x: T) => (x ? 1 : 0);`,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableObject",
@@ -2216,7 +2215,7 @@ function foo(x: 0 | 1 | null) {
         if (theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2247,7 +2246,7 @@ function foo(x: 0 | 1 | null) {
         if (!theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2278,7 +2277,7 @@ function foo(x: 0 | 1 | null) {
         if (!theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2309,7 +2308,7 @@ function foo(x: 0 | 1 | null) {
         if (!theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2340,7 +2339,7 @@ function foo(x: 0 | 1 | null) {
         if (!theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2371,7 +2370,7 @@ function foo(x: 0 | 1 | null) {
         if (!theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2402,7 +2401,7 @@ function foo(x: 0 | 1 | null) {
         if (!theEnum) {
         }
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2431,7 +2430,7 @@ function foo(x: 0 | 1 | null) {
         }
         (value?: ExampleEnum) => (value ? 1 : 0);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2458,7 +2457,7 @@ function foo(x: 0 | 1 | null) {
         }
         (value?: ExampleEnum) => (!value ? 1 : 0);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2485,7 +2484,7 @@ function foo(x: 0 | 1 | null) {
         }
         (value?: ExampleEnum) => (!value ? 1 : 0);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2512,7 +2511,7 @@ function foo(x: 0 | 1 | null) {
         }
         (value?: ExampleEnum) => (!value ? 1 : 0);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableEnum: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableEnum",
@@ -2617,7 +2616,7 @@ if (x) {
         obj || 0
         obj && 1 || 0
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableObject",
@@ -2849,58 +2848,58 @@ const someAssert: typeof asserts1 | typeof asserts2 =
 
 someAssert(maybeString);
       `,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "conditionErrorNullableString",
-// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-// 						{
-// 							MessageId: "conditionFixCompareNullish",
-// 							Output: `
-// function asserts1(x: string | number | undefined): asserts x {}
-// function asserts2(x: string | number | undefined): asserts x {}
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorNullableString",
+						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						// 						{
+						// 							MessageId: "conditionFixCompareNullish",
+						// 							Output: `
+						// function asserts1(x: string | number | undefined): asserts x {}
+						// function asserts2(x: string | number | undefined): asserts x {}
 
-// const maybeString = Math.random() ? 'string'.slice() : undefined;
+						// const maybeString = Math.random() ? 'string'.slice() : undefined;
 
-// const someAssert: typeof asserts1 | typeof asserts2 =
-//   Math.random() > 0.5 ? asserts1 : asserts2;
+						// const someAssert: typeof asserts1 | typeof asserts2 =
+						//   Math.random() > 0.5 ? asserts1 : asserts2;
 
-// someAssert(maybeString != null);
-//       `,
-// 						},
-// 						{
-// 							MessageId: "conditionFixDefaultEmptyString",
-// 							Output: `
-// function asserts1(x: string | number | undefined): asserts x {}
-// function asserts2(x: string | number | undefined): asserts x {}
+						// someAssert(maybeString != null);
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixDefaultEmptyString",
+						// 							Output: `
+						// function asserts1(x: string | number | undefined): asserts x {}
+						// function asserts2(x: string | number | undefined): asserts x {}
 
-// const maybeString = Math.random() ? 'string'.slice() : undefined;
+						// const maybeString = Math.random() ? 'string'.slice() : undefined;
 
-// const someAssert: typeof asserts1 | typeof asserts2 =
-//   Math.random() > 0.5 ? asserts1 : asserts2;
+						// const someAssert: typeof asserts1 | typeof asserts2 =
+						//   Math.random() > 0.5 ? asserts1 : asserts2;
 
-// someAssert(maybeString ?? "");
-//       `,
-// 						},
-// 						{
-// 							MessageId: "conditionFixCastBoolean",
-// 							Output: `
-// function asserts1(x: string | number | undefined): asserts x {}
-// function asserts2(x: string | number | undefined): asserts x {}
+						// someAssert(maybeString ?? "");
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCastBoolean",
+						// 							Output: `
+						// function asserts1(x: string | number | undefined): asserts x {}
+						// function asserts2(x: string | number | undefined): asserts x {}
 
-// const maybeString = Math.random() ? 'string'.slice() : undefined;
+						// const maybeString = Math.random() ? 'string'.slice() : undefined;
 
-// const someAssert: typeof asserts1 | typeof asserts2 =
-//   Math.random() > 0.5 ? asserts1 : asserts2;
+						// const someAssert: typeof asserts1 | typeof asserts2 =
+						//   Math.random() > 0.5 ? asserts1 : asserts2;
 
-// someAssert(Boolean(maybeString));
-//       `,
-// 						},
-// 					},
+						// someAssert(Boolean(maybeString));
+						//       `,
+						// 						},
+						// 					},
+					},
 				},
 			},
-		},
-		{
-			Code: `
+			{
+				Code: `
 function assert(this: object, a: number, b: unknown): asserts b;
 function assert(a: bigint, b: unknown): asserts b;
 function assert(this: object, a: string, two: string): asserts two;
@@ -3197,7 +3196,7 @@ assert(nullableString);
   return x;
 });
       `,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
@@ -3294,7 +3293,7 @@ const predicate = (x: string) => {
 
 ['one', 'two', ''].find(predicate);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableBoolean: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableBoolean",
@@ -3466,7 +3465,7 @@ declare function foo<T>(x: number): T;
 function foo<T extends number>(x: number): T {}
 [1, null].every(foo);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -3738,7 +3737,7 @@ const objectValue: object = {};
 declare const nullOrObject: object | null;
 [{ a: 0 }, null].filter(x => nullOrObject);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNullableObject: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableObject": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNullableObject",
@@ -3766,7 +3765,7 @@ declare const nullOrObject: object | null;
 const numbers: number[] = [1];
 [1, 2].filter(x => numbers.length);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -3794,7 +3793,7 @@ const numbers: number[] = [1];
 const numberValue: number = 1;
 [1, 2].filter(x => numberValue);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowNumber: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
@@ -3836,7 +3835,7 @@ const numberValue: number = 1;
 const stringValue: string = 'hoge';
 ['hoge', 'foo'].filter(x => stringValue);
       `,
-				Options: StrictBooleanExpressionsOptions{AllowString: utils.Ref(false)},
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
