@@ -38,19 +38,6 @@ func buildRequiredPromiseAwaitSuggestionMessage() rule.RuleMessage {
 	}
 }
 
-type ReturnAwaitOption uint8
-
-const (
-	ReturnAwaitOptionAlways ReturnAwaitOption = iota
-	ReturnAwaitOptionErrorHandlingCorrectnessOnly
-	ReturnAwaitOptionInTryCatch
-	ReturnAwaitOptionNever
-)
-
-type ReturnAwaitOptions struct {
-	Option *ReturnAwaitOption
-}
-
 type scopeInfo struct {
 	hasAsync   bool
 	owningFunc *ast.Node
@@ -73,37 +60,31 @@ const (
 	whetherToAwaitNoAwait
 )
 
-func getWhetherToAwait(affectsErrorHandling bool, option ReturnAwaitOption) whetherToAwait {
+func getWhetherToAwait(affectsErrorHandling bool, option ReturnAwaitOptionsOption) whetherToAwait {
 	switch option {
-	case ReturnAwaitOptionAlways:
+	case ReturnAwaitOptionsOptionAlways:
 		return whetherToAwaitAwait
-	case ReturnAwaitOptionErrorHandlingCorrectnessOnly:
+	case ReturnAwaitOptionsOptionErrorHandlingCorrectnessOnly:
 		if affectsErrorHandling {
 			return whetherToAwaitAwait
 		}
 		return whetherToAwaitDontCare
-	case ReturnAwaitOptionInTryCatch:
+	case ReturnAwaitOptionsOptionInTryCatch:
 		if affectsErrorHandling {
 			return whetherToAwaitAwait
 		}
 		return whetherToAwaitNoAwait
-	case ReturnAwaitOptionNever:
+	case ReturnAwaitOptionsOptionNever:
 		return whetherToAwaitNoAwait
 	default:
-		panic("unexpected ReturnAwaitOption")
+		panic("unexpected ReturnAwaitOptionsOption")
 	}
 }
 
 var ReturnAwaitRule = rule.Rule{
 	Name: "return-await",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(ReturnAwaitOptions)
-		if !ok {
-			opts = ReturnAwaitOptions{}
-		}
-		if opts.Option == nil {
-			opts.Option = utils.Ref(ReturnAwaitOptionInTryCatch)
-		}
+		opts := utils.UnmarshalOptions[ReturnAwaitOptions](options, "return-await")
 
 		var scope *scopeInfo
 
@@ -259,7 +240,7 @@ var ReturnAwaitRule = rule.Rule{
 			affectsErrorHandling := affectsExplicitErrorHandling(node) || affectsExplicitResourceManagement(node)
 			useAutoFix := !affectsErrorHandling
 
-			shouldAwaitInCurrentContext := getWhetherToAwait(affectsErrorHandling, *opts.Option)
+			shouldAwaitInCurrentContext := getWhetherToAwait(affectsErrorHandling, opts.Option)
 
 			switch shouldAwaitInCurrentContext {
 			case whetherToAwaitAwait:
