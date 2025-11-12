@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "checksVoidReturnOptions": {
+      "type": "object",
+      "properties": {
+        "arguments": {
+          "type": "boolean",
+          "default": true
+        },
+        "attributes": {
+          "type": "boolean",
+          "default": true
+        },
+        "inheritedMethods": {
+          "type": "boolean",
+          "default": true
+        },
+        "properties": {
+          "type": "boolean",
+          "default": true
+        },
+        "returns": {
+          "type": "boolean",
+          "default": true
+        },
+        "variables": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "no_misused_promises_options": {
+      "type": "object",
+      "properties": {
+        "checksConditionals": {
+          "type": "boolean",
+          "default": true
+        },
+        "checksSpreads": {
+          "type": "boolean",
+          "default": true
+        },
+        "checksVoidReturn": {
+          "oneOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "$ref": "#/definitions/checksVoidReturnOptions"
+            }
+          ],
+          "default": true
+        }
+      }
+    }
+  }
+}

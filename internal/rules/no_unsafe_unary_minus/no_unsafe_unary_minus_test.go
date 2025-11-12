@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoUnsafeUnaryMinusRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeUnaryMinusRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeUnaryMinusRule, []rule_tester.ValidTestCase{
 		{Code: "+42;"},
 		{Code: "-42;"},
 		{Code: "-42n;"},

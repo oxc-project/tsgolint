@@ -5,29 +5,29 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestPreferPromiseRejectErrorsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferPromiseRejectErrorsRule, []rule_tester.ValidTestCase{
+func TestPreferPromiseRejectErrors(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &PreferPromiseRejectErrorsRule, []rule_tester.ValidTestCase{
 		{Code: "Promise.resolve(5);"},
 		{
 			Code:    "Promise.reject();",
-			Options: PreferPromiseRejectErrorsOptions{AllowEmptyReject: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowEmptyReject": true}`),
 		},
 		{
 			Code: `
         declare const someAnyValue: any;
         Promise.reject(someAnyValue);
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowThrowingAny: utils.Ref(true), AllowThrowingUnknown: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": true, "allowThrowingUnknown": false}`),
 		},
 		{
 			Code: `
         declare const someUnknownValue: unknown;
         Promise.reject(someUnknownValue);
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowThrowingAny: utils.Ref(false), AllowThrowingUnknown: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": false, "allowThrowingUnknown": true}`),
 		},
 		{Code: "Promise.reject(new Error());"},
 		{Code: "Promise.reject(new TypeError());"},
@@ -136,7 +136,7 @@ func TestPreferPromiseRejectErrorsRule(t *testing.T) {
           reject();
         });
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowEmptyReject: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowEmptyReject": true}`),
 		},
 		{Code: "new Promise((yes, no) => no(new Error()));"},
 		{Code: "new Promise();"},
@@ -285,14 +285,14 @@ func TestPreferPromiseRejectErrorsRule(t *testing.T) {
         declare const someAnyValue: any;
         Promise.reject(someAnyValue);
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowThrowingAny: utils.Ref(true), AllowThrowingUnknown: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": true, "allowThrowingUnknown": true}`),
 		},
 		{
 			Code: `
         declare const someUnknownValue: unknown;
         Promise.reject(someUnknownValue);
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowThrowingAny: utils.Ref(true), AllowThrowingUnknown: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": true, "allowThrowingUnknown": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -393,7 +393,7 @@ func TestPreferPromiseRejectErrorsRule(t *testing.T) {
 		},
 		{
 			Code:    "Promise.reject(undefined);",
-			Options: PreferPromiseRejectErrorsOptions{AllowEmptyReject: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowEmptyReject": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "rejectAnError",
@@ -1404,7 +1404,7 @@ function fun<T extends number>(t: T): void {
         declare const someAnyValue: any;
         Promise.reject(someAnyValue);
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowThrowingAny: utils.Ref(false), AllowThrowingUnknown: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": false, "allowThrowingUnknown": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "rejectAnError",
@@ -1416,7 +1416,7 @@ function fun<T extends number>(t: T): void {
         declare const someUnknownValue: unknown;
         Promise.reject(someUnknownValue);
       `,
-			Options: PreferPromiseRejectErrorsOptions{AllowThrowingAny: utils.Ref(true), AllowThrowingUnknown: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": true, "allowThrowingUnknown": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "rejectAnError",

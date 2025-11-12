@@ -37,21 +37,10 @@ const (
 	unionOrIntersection_Intersection
 )
 
-type NoDuplicateTypeConstituentsOptions struct {
-	IgnoreIntersections bool
-	IgnoreUnions        bool
-}
-
 var NoDuplicateTypeConstituentsRule = rule.Rule{
 	Name: "no-duplicate-type-constituents",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoDuplicateTypeConstituentsOptions)
-		if !ok {
-			opts = NoDuplicateTypeConstituentsOptions{
-				IgnoreIntersections: false,
-				IgnoreUnions:        false,
-			}
-		}
+		opts := utils.UnmarshalOptions[NoDuplicateTypeConstituentsOptions](options, "no-duplicate-type-constituents")
 
 		unwindedParentType := func(node *ast.Node, kind ast.Kind) *ast.Node {
 			for {

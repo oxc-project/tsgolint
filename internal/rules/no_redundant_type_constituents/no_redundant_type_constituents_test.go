@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoRedundantTypeConstituentsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoRedundantTypeConstituentsRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoRedundantTypeConstituentsRule, []rule_tester.ValidTestCase{
 		{Code: `
       type T = any;
       type U = T;

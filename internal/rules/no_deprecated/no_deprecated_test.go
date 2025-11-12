@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoDeprecatedRule(t *testing.T) {
@@ -344,38 +343,38 @@ function A() {
 }
 
 const a = <A></A>;
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"A"}}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "A"}]}`)},
 		{Code: `
 /** @deprecated */
 declare class A {}
 
 new A();
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"A"}}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "A"}]}`)},
 		{Code: `
 /** @deprecated */
 const deprecatedValue = 45;
 const bar = deprecatedValue;
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"deprecatedValue"}}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "deprecatedValue"}]}`)},
 		{Code: `
 class MyClass {
   /** @deprecated */
   #privateProp = 42;
   value = this.#privateProp;
 }
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"privateProp"}}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "privateProp"}]}`)},
 		{Code: `
 /** @deprecated */
 const deprecatedValue = 45;
 const bar = deprecatedValue;
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"deprecatedValue"}}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "deprecatedValue"}]}`)},
 		{Code: `
 import { exists } from 'fs';
 exists('/foo');
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"exists"}, Package: "fs"}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "package", "name": "exists", "package": "fs"}]}`)},
 		{Code: `
 const { exists } = import('fs');
 exists('/foo');
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"exists"}, Package: "fs"}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "package", "name": "exists", "package": "fs"}]}`)},
 		{Code: `
       declare const test: string;
       const bar = { test };
@@ -407,7 +406,7 @@ exists('/foo');
         };
 
         const value = obj['prop'];
-      `, Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"AllowedType"}}}}},
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "AllowedType"}]}`)},
 		{Code: `
       const a = {
         /** @deprecated */
@@ -498,6 +497,14 @@ exists('/foo');
 		const obj: MyInterface = { prop: 'value' };
 		const key = 'prop';
 		const { [key]: value } = obj;
+	`},
+		{Code: `
+		export class Test {
+	/** @deprecated Use something else instead */
+	public get foo(): number {
+		return 42;
+	}
+}
 	`},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -2249,7 +2256,7 @@ class B extends A {
 import { exists } from 'fs';
 exists('/foo');
       `,
-			Options: NoDeprecatedOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"exists"}, Package: "hoge"}}},
+			Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "package", "name": "exists", "package": "hoge"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "deprecatedWithReason",

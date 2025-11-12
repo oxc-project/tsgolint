@@ -57,19 +57,10 @@ func buildVoidExprWrapVoidMessage() rule.RuleMessage {
 	}
 }
 
-type NoConfusingVoidExpressionOptions struct {
-	IgnoreArrowShorthand         bool
-	IgnoreVoidOperator           bool
-	IgnoreVoidReturningFunctions bool
-}
-
 var NoConfusingVoidExpressionRule = rule.Rule{
 	Name: "no-confusing-void-expression",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoConfusingVoidExpressionOptions)
-		if !ok {
-			opts = NoConfusingVoidExpressionOptions{}
-		}
+		opts := utils.UnmarshalOptions[NoConfusingVoidExpressionOptions](options, "no-confusing-void-expression")
 
 		canFix := func(node *ast.Node) bool {
 			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node)

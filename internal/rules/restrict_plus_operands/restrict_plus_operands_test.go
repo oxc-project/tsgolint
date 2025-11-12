@@ -8,8 +8,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestRestrictPlusOperandsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &RestrictPlusOperandsRule, []rule_tester.ValidTestCase{
+func TestRestrictPlusOperands(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RestrictPlusOperandsRule, []rule_tester.ValidTestCase{
 		{Code: "let x = 5;"},
 		{Code: "let y = '10';"},
 		{Code: "let z = 8.2;"},

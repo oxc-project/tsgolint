@@ -45,12 +45,6 @@ func buildNoStrictNullCheckMessage() rule.RuleMessage {
 	}
 }
 
-type NoUnnecessaryBooleanLiteralCompareOptions struct {
-	AllowComparingNullableBooleansToFalse                  *bool
-	AllowComparingNullableBooleansToTrue                   *bool
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing *bool
-}
-
 type booleanComparison struct {
 	expression                  *ast.Expression
 	literalBooleanInComparison  bool
@@ -65,19 +59,7 @@ func isBooleanType(t *checker.Type) bool {
 var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 	Name: "no-unnecessary-boolean-literal-compare",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoUnnecessaryBooleanLiteralCompareOptions)
-		if !ok {
-			opts = NoUnnecessaryBooleanLiteralCompareOptions{}
-		}
-		if opts.AllowComparingNullableBooleansToFalse == nil {
-			opts.AllowComparingNullableBooleansToFalse = utils.Ref(true)
-		}
-		if opts.AllowComparingNullableBooleansToTrue == nil {
-			opts.AllowComparingNullableBooleansToTrue = utils.Ref(true)
-		}
-		if opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing == nil {
-			opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[NoUnnecessaryBooleanLiteralCompareOptions](options, "no-unnecessary-boolean-literal-compare")
 
 		compilerOptions := ctx.Program.Options()
 		isStrictNullChecks := utils.IsStrictCompilerOptionEnabled(
@@ -85,7 +67,7 @@ var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !*opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
@@ -154,7 +136,7 @@ var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 					return
 				}
 
-				if comparison.expressionIsNullableBoolean && ((comparison.literalBooleanInComparison && *opts.AllowComparingNullableBooleansToTrue) || (!comparison.literalBooleanInComparison && *opts.AllowComparingNullableBooleansToFalse)) {
+				if comparison.expressionIsNullableBoolean && ((comparison.literalBooleanInComparison && opts.AllowComparingNullableBooleansToTrue) || (!comparison.literalBooleanInComparison && opts.AllowComparingNullableBooleansToFalse)) {
 					return
 				}
 

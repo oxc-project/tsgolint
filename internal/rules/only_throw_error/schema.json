@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "only_throw_error_options": {
+      "type": "object",
+      "properties": {
+        "allow": {
+          "type": "array",
+          "items": {
+            "$ref": "../shared_schemas.json#/definitions/typeOrValueSpecifier"
+          },
+          "default": [],
+          "description": "An array of type or value specifiers which are allowed to be thrown"
+        },
+        "allowThrowingAny": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow throwing values typed as any"
+        },
+        "allowThrowingUnknown": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow throwing values typed as unknown"
+        }
+      }
+    }
+  }
+}

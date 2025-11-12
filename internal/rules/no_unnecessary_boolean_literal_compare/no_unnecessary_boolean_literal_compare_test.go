@@ -5,11 +5,10 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoUnnecessaryBooleanLiteralCompareRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnnecessaryBooleanLiteralCompareRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryBooleanLiteralCompareRule, []rule_tester.ValidTestCase{
 		{Code: `
       declare const varAny: any;
       varAny === true;
@@ -71,14 +70,14 @@ func TestNoUnnecessaryBooleanLiteralCompareRule(t *testing.T) {
         declare const varBooleanOrUndefined: boolean | undefined;
         varBooleanOrUndefined === true;
       `,
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToFalse: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToFalse": false}`),
 		},
 		{
 			Code: `
         declare const varBooleanOrUndefined: boolean | undefined;
         varBooleanOrUndefined === false;
       `,
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToTrue: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToTrue": false}`),
 		},
 		{
 			Code: `
@@ -89,7 +88,7 @@ func TestNoUnnecessaryBooleanLiteralCompareRule(t *testing.T) {
           }
         };
       `,
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToFalse: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToFalse": false}`),
 		},
 		{
 			Code: `
@@ -100,7 +99,7 @@ func TestNoUnnecessaryBooleanLiteralCompareRule(t *testing.T) {
           }
         };
       `,
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToTrue: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToTrue": false}`),
 		},
 		{Code: "'false' === true;"},
 		{Code: "'true' === false;"},
@@ -125,7 +124,7 @@ function test(a?: boolean): boolean {
   return a !== false;
 }
       `,
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -194,7 +193,7 @@ function test(a?: boolean): boolean {
         }
       `,
 			},
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToTrue: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToTrue": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "comparingNullableToTrueDirect",
@@ -213,7 +212,7 @@ function test(a?: boolean): boolean {
         }
       `,
 			},
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToTrue: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToTrue": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "comparingNullableToTrueNegated",
@@ -234,7 +233,7 @@ function test(a?: boolean): boolean {
         }
       `,
 			},
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToFalse: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToFalse": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "comparingNullableToFalse",
@@ -255,7 +254,7 @@ function test(a?: boolean): boolean {
         }
       `,
 			},
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToFalse: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToFalse": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "comparingNullableToFalse",
@@ -276,7 +275,7 @@ function test(a?: boolean): boolean {
         }
       `,
 			},
-			Options: NoUnnecessaryBooleanLiteralCompareOptions{AllowComparingNullableBooleansToFalse: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToFalse": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "comparingNullableToFalse",
@@ -617,7 +616,7 @@ function test(a?: boolean): boolean {
 			Code: `
 function foo(): boolean {}
       `,
-			Options:  NoUnnecessaryBooleanLiteralCompareOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(false)},
+			Options:  rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": false}`),
 			TSConfig: "tsconfig.unstrict.json",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{

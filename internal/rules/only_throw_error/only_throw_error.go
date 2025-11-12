@@ -7,13 +7,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type OnlyThrowErrorOptions struct {
-	Allow                []utils.TypeOrValueSpecifier
-	AllowInline          []string
-	AllowThrowingAny     *bool
-	AllowThrowingUnknown *bool
-}
-
 func buildObjectMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "object",
@@ -30,29 +23,14 @@ func buildUndefMessage() rule.RuleMessage {
 var OnlyThrowErrorRule = rule.Rule{
 	Name: "only-throw-error",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(OnlyThrowErrorOptions)
-		if !ok {
-			opts = OnlyThrowErrorOptions{}
-		}
-		if opts.Allow == nil {
-			opts.Allow = []utils.TypeOrValueSpecifier{}
-		}
-		if opts.AllowInline == nil {
-			opts.AllowInline = []string{}
-		}
-		if opts.AllowThrowingAny == nil {
-			opts.AllowThrowingAny = utils.Ref(true)
-		}
-		if opts.AllowThrowingUnknown == nil {
-			opts.AllowThrowingUnknown = utils.Ref(true)
-		}
+		opts := utils.UnmarshalOptions[OnlyThrowErrorOptions](options, "only-throw-error")
 
 		return rule.RuleListeners{
 			ast.KindThrowStatement: func(node *ast.Node) {
 				expr := node.Expression()
 				t := ctx.TypeChecker.GetTypeAtLocation(expr)
 
-				if utils.TypeMatchesSomeSpecifier(t, opts.Allow, opts.AllowInline, ctx.Program) {
+				if utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) {
 					return
 				}
 
@@ -61,11 +39,11 @@ var OnlyThrowErrorRule = rule.Rule{
 					return
 				}
 
-				if *opts.AllowThrowingAny && utils.IsTypeAnyType(t) {
+				if opts.AllowThrowingAny && utils.IsTypeAnyType(t) {
 					return
 				}
 
-				if *opts.AllowThrowingUnknown && utils.IsTypeUnknownType(t) {
+				if opts.AllowThrowingUnknown && utils.IsTypeUnknownType(t) {
 					return
 				}
 

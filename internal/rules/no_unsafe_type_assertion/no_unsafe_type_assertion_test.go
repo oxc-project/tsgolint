@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoUnsafeTypeAssertionRule_BasicAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const a: string;
 a as string | number;
@@ -170,7 +170,7 @@ const bar = foo as number[];
 }
 
 func TestNoUnsafeTypeAssertionRule_AnyAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const _any_: any;
 _any_ as any;
@@ -286,7 +286,7 @@ const bar = 'foo' as errorType;
 }
 
 func TestNoUnsafeTypeAssertionRule_NeverAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const _never_: never;
 _never_ as never;
@@ -330,7 +330,7 @@ _string_ as never;
 }
 
 func TestNoUnsafeTypeAssertionRule_FunctionAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const _function_: Function;
 _function_ as Function;
@@ -389,7 +389,7 @@ _function_ as never;
 }
 
 func TestNoUnsafeTypeAssertionRule_ObjectAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 // additional properties should be allowed
 export const foo = { bar: 1, bazz: 1 } as {
@@ -464,7 +464,7 @@ a as { hello: string };
 }
 
 func TestNoUnsafeTypeAssertionRule_ArrayAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const a: string[];
 a as (string | number)[];
@@ -557,7 +557,7 @@ a as never[];
 }
 
 func TestNoUnsafeTypeAssertionRule_TupleAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const a: [string];
 a as [string | number];
@@ -729,7 +729,7 @@ a as [Promise<string>];
 }
 
 func TestNoUnsafeTypeAssertionRule_PromiseAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const a: Promise<string>;
 a as Promise<string | number>;
@@ -841,7 +841,7 @@ a as Promise<never>;
 }
 
 func TestNoUnsafeTypeAssertionRule_ClassAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 class Foo {}
 declare const a: Foo;
@@ -903,7 +903,7 @@ a as Bar;
 }
 
 func TestNoUnsafeTypeAssertionRule_GenericAssertions(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 type Obj = { foo: string };
 function func<T extends Obj>(a: T) {

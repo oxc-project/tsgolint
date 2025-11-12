@@ -8,8 +8,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestRequireArraySortCompareRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &RequireArraySortCompareRule, []rule_tester.ValidTestCase{
+func TestRequireArraySortCompare(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RequireArraySortCompareRule, []rule_tester.ValidTestCase{
 		{Code: `
       function f(a: any[]) {
         a.sort(undefined);
