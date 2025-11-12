@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestRestrictPlusOperands(t *testing.T) {
@@ -170,13 +169,7 @@ const x = a + b;
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": true}`),
 		},
 		{
 			Code: `
@@ -184,143 +177,105 @@ const x = a + b;
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": true}`),
 		},
 		{
 			Code: `
 const f = (a: RegExp, b: RegExp) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowRegExp": true}`),
 		},
 		{
 			Code: `
 let foo: string | undefined;
 foo = foo + 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
 let foo: string | null;
 foo = foo + 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
 let foo: string | null | undefined;
 foo = foo + 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
 let foo = '';
 foo += 0;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:                utils.Ref(false),
-				AllowBoolean:            utils.Ref(false),
-				AllowNullish:            utils.Ref(false),
-				AllowNumberAndString:    utils.Ref(false),
-				AllowRegExp:             utils.Ref(false),
-				SkipCompoundAssignments: utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false, "skipCompoundAssignments": true}`),
 		},
 		{
 			Code: `
 let foo = 0;
 foo += '';
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:                utils.Ref(false),
-				AllowBoolean:            utils.Ref(false),
-				AllowNullish:            utils.Ref(false),
-				AllowNumberAndString:    utils.Ref(false),
-				AllowRegExp:             utils.Ref(false),
-				SkipCompoundAssignments: utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false, "skipCompoundAssignments": true}`),
 		},
 		{
 			Code: `
 const f = (a: any, b: any) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
 const f = (a: any, b: string) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
 const f = (a: any, b: bigint) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
 const f = (a: any, b: number) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
 const f = (a: any, b: boolean) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true), AllowBoolean: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true, "allowBoolean": true}`),
 		},
 		{
 			Code: `
 const f = (a: string, b: string | number) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(true),
-				AllowBoolean:         utils.Ref(true),
-				AllowNullish:         utils.Ref(true),
-				AllowNumberAndString: utils.Ref(true),
-				AllowRegExp:          utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true, "allowBoolean": true, "allowNullish": true, "allowNumberAndString": true, "allowRegExp": true}`),
 		},
 		{
 			Code: `
 const f = (a: string | number, b: number) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(true),
-				AllowBoolean:         utils.Ref(true),
-				AllowNullish:         utils.Ref(true),
-				AllowNumberAndString: utils.Ref(true),
-				AllowRegExp:          utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true, "allowBoolean": true, "allowNullish": true, "allowNumberAndString": true, "allowRegExp": true}`),
 		},
 		{
 			Code: `
 const f = (a: string | number, b: string | number) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(true),
-				AllowBoolean:         utils.Ref(true),
-				AllowNullish:         utils.Ref(true),
-				AllowNumberAndString: utils.Ref(true),
-				AllowRegExp:          utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true, "allowBoolean": true, "allowNullish": true, "allowNumberAndString": true, "allowRegExp": true}`),
 		},
 		{
 			Code:    "let foo = '1' + 1n;",
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:    "let foo = '1' + 1;",
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -330,14 +285,8 @@ const f = (a: string | number, b: string | number) => a + b;
 			},
 		},
 		{
-			Code: "let foo = '1' + 1;",
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Code:    "let foo = '1' + 1;",
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -364,14 +313,8 @@ const f = (a: string | number, b: string | number) => a + b;
 			},
 		},
 		{
-			Code: "let foo = 5 + '10';",
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Code:    "let foo = 5 + '10';",
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -432,7 +375,7 @@ const f = (a: string | number, b: string | number) => a + b;
 		},
 		{
 			Code:    "let foo = 5.5 + '5';",
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -443,7 +386,7 @@ const f = (a: string | number, b: string | number) => a + b;
 		},
 		{
 			Code:    "let foo = '5.5' + 5;",
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -458,7 +401,7 @@ let x = 5;
 let y = '10';
 let foo = x + y;
       `,
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -473,7 +416,7 @@ let x = 5;
 let y = '10';
 let foo = y + x;
       `,
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -513,13 +456,7 @@ let foo = [] + y;
 let pair = { first: 5, second: '10' };
 let foo = pair + pair;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -541,13 +478,7 @@ type Valued = { value: number };
 let value: Valued = { value: 0 };
 let combined = value + 0;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -609,13 +540,7 @@ function foo<T extends string>(a: T) {
   return a + 1;
 }
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -630,13 +555,7 @@ function foo<T extends 'a' | 'b'>(a: T) {
   return a + 1;
 }
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -651,13 +570,7 @@ function foo<T extends number>(a: T) {
   return a + '';
 }
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -672,13 +585,7 @@ function foo<T extends 1>(a: T) {
   return a + '';
 }
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -693,13 +600,7 @@ function foo<T extends 1>(a: T) {
         declare const b: number;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -714,13 +615,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -735,13 +630,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -756,13 +645,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -777,13 +660,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -798,13 +675,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -822,13 +693,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -849,13 +714,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -871,13 +730,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -892,13 +745,7 @@ function foo<T extends 1>(a: T) {
         declare const b: number;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -913,13 +760,7 @@ function foo<T extends 1>(a: T) {
         declare const b: bigint;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -934,13 +775,7 @@ function foo<T extends 1>(a: T) {
         declare const b: bigint;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -955,13 +790,7 @@ function foo<T extends 1>(a: T) {
         declare const b: bigint;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -976,13 +805,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -997,13 +820,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1018,13 +835,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1039,13 +850,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1060,13 +865,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1081,13 +880,7 @@ function foo<T extends 1>(a: T) {
         declare const b: string;
         const x = a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1101,14 +894,7 @@ function foo<T extends 1>(a: T) {
 let foo: string | undefined;
 foo += 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:                utils.Ref(false),
-				AllowBoolean:            utils.Ref(false),
-				AllowNullish:            utils.Ref(false),
-				AllowNumberAndString:    utils.Ref(false),
-				AllowRegExp:             utils.Ref(false),
-				SkipCompoundAssignments: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false, "skipCompoundAssignments": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1122,13 +908,7 @@ foo += 'some data';
 let foo: string | null;
 foo += 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1142,13 +922,7 @@ foo += 'some data';
 let foo: string = '';
 foo += 1;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -1162,13 +936,7 @@ foo += 1;
 let foo = 0;
 foo += '';
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:             utils.Ref(false),
-				AllowBoolean:         utils.Ref(false),
-				AllowNullish:         utils.Ref(false),
-				AllowNumberAndString: utils.Ref(false),
-				AllowRegExp:          utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false, "allowNullish": false, "allowNumberAndString": false, "allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
@@ -1181,7 +949,7 @@ foo += '';
 			Code: `
 const f = (a: any, b: boolean) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true), AllowBoolean: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true, "allowBoolean": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1194,7 +962,7 @@ const f = (a: any, b: boolean) => a + b;
 			Code: `
 const f = (a: any, b: []) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1207,7 +975,7 @@ const f = (a: any, b: []) => a + b;
 			Code: `
 const f = (a: any, b: boolean) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(false), AllowBoolean: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1220,7 +988,7 @@ const f = (a: any, b: boolean) => a + b;
 			Code: `
 const f = (a: any, b: any) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1238,7 +1006,7 @@ const f = (a: any, b: any) => a + b;
 			Code: `
 const f = (a: any, b: string) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1251,7 +1019,7 @@ const f = (a: any, b: string) => a + b;
 			Code: `
 const f = (a: any, b: bigint) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1264,7 +1032,7 @@ const f = (a: any, b: bigint) => a + b;
 			Code: `
 const f = (a: any, b: number) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1277,7 +1045,7 @@ const f = (a: any, b: number) => a + b;
 			Code: `
 const f = (a: any, b: boolean) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowAny: utils.Ref(false), AllowBoolean: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": false, "allowBoolean": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1295,7 +1063,7 @@ const f = (a: any, b: boolean) => a + b;
 			Code: `
 const f = (a: number, b: RegExp) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowRegExp": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1309,7 +1077,7 @@ const f = (a: number, b: RegExp) => a + b;
 let foo: string | boolean;
 foo = foo + 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{AllowBoolean: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowBoolean": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1323,7 +1091,7 @@ foo = foo + 'some data';
 let foo: boolean;
 foo = foo + 'some data';
       `,
-			Options: RestrictPlusOperandsOptions{AllowBoolean: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowBoolean": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1336,12 +1104,7 @@ foo = foo + 'some data';
 			Code: `
 const f = (a: any, b: unknown) => a + b;
       `,
-			Options: RestrictPlusOperandsOptions{
-				AllowAny:     utils.Ref(true),
-				AllowBoolean: utils.Ref(true),
-				AllowNullish: utils.Ref(true),
-				AllowRegExp:  utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowAny": true, "allowBoolean": true, "allowNullish": true, "allowRegExp": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalid",
@@ -1352,7 +1115,7 @@ const f = (a: any, b: unknown) => a + b;
 		},
 		{
 			Code:    "let foo = '1' + 1n;",
-			Options: RestrictPlusOperandsOptions{AllowNumberAndString: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictPlusOperandsOptions](`{"allowNumberAndString": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "mismatched",
