@@ -16,70 +16,25 @@ func buildInvalidTypeMessage(t string) rule.RuleMessage {
 	}
 }
 
-type RestrictTemplateExpressionsOptions struct {
-	AllowAny     *bool
-	AllowArray   *bool
-	AllowBoolean *bool
-	AllowNullish *bool
-	AllowNumber  *bool
-	AllowRegExp  *bool
-	AllowNever   *bool
-	Allow        []utils.TypeOrValueSpecifier
-	AllowInline  []string
-}
-
 var RestrictTemplateExpressionsRule = rule.Rule{
 	Name: "restrict-template-expressions",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(RestrictTemplateExpressionsOptions)
-		if !ok {
-			opts = RestrictTemplateExpressionsOptions{}
-		}
-		if opts.Allow == nil {
-			opts.Allow = []utils.TypeOrValueSpecifier{{
-				From: utils.TypeOrValueSpecifierFromLib,
-				Name: []string{"Error", "URL", "URLSearchParams"},
-			}}
-		}
-		if opts.AllowInline == nil {
-			opts.AllowInline = []string{}
-		}
-		if opts.AllowAny == nil {
-			opts.AllowAny = utils.Ref(true)
-		}
-		if opts.AllowArray == nil {
-			opts.AllowArray = utils.Ref(false)
-		}
-		if opts.AllowBoolean == nil {
-			opts.AllowBoolean = utils.Ref(true)
-		}
-		if opts.AllowNullish == nil {
-			opts.AllowNullish = utils.Ref(true)
-		}
-		if opts.AllowNumber == nil {
-			opts.AllowNumber = utils.Ref(true)
-		}
-		if opts.AllowRegExp == nil {
-			opts.AllowRegExp = utils.Ref(true)
-		}
-		if opts.AllowNever == nil {
-			opts.AllowNever = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[RestrictTemplateExpressionsOptions](options, "restrict-template-expressions")
 
 		allowedFlags := checker.TypeFlagsStringLike
-		if *opts.AllowAny {
+		if opts.AllowAny {
 			allowedFlags |= checker.TypeFlagsAny
 		}
-		if *opts.AllowBoolean {
+		if opts.AllowBoolean {
 			allowedFlags |= checker.TypeFlagsBooleanLike
 		}
-		if *opts.AllowNullish {
+		if opts.AllowNullish {
 			allowedFlags |= checker.TypeFlagsNullable
 		}
-		if *opts.AllowNumber {
+		if opts.AllowNumber {
 			allowedFlags |= checker.TypeFlagsNumberLike | checker.TypeFlagsBigIntLike
 		}
-		if *opts.AllowNever {
+		if opts.AllowNever {
 			allowedFlags |= checker.TypeFlagsNever
 		}
 
@@ -90,9 +45,9 @@ var RestrictTemplateExpressionsRule = rule.Rule{
 			return utils.Every(utils.UnionTypeParts(innerType), func(t *checker.Type) bool {
 				return utils.Some(utils.IntersectionTypeParts(t), func(t *checker.Type) bool {
 					return utils.IsTypeFlagSet(t, allowedFlags) ||
-						utils.TypeMatchesSomeSpecifier(t, opts.Allow, opts.AllowInline, ctx.Program) ||
-						(*opts.AllowArray && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, t) && isTypeAllowed(utils.GetNumberIndexType(ctx.TypeChecker, t))) ||
-						(*opts.AllowRegExp && t == globalRegexpType)
+						utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) ||
+						(opts.AllowArray && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, t) && isTypeAllowed(utils.GetNumberIndexType(ctx.TypeChecker, t))) ||
+						(opts.AllowRegExp && t == globalRegexpType)
 				})
 			})
 		}

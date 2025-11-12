@@ -59,6 +59,24 @@ for (const schemaDir of schemaDirs) {
       } --tags json`,
       { stdio: 'inherit' },
     );
+
+    // Post-process specific rules that need omitempty removed from certain fields
+    const ruleName = path.basename(schemaDir);
+    if (ruleName === 'restrict_template_expressions') {
+      // Remove omitempty from the Allow field to allow distinguishing between
+      // "not provided" (use default) and "explicitly empty" (use empty array).
+      // Without this, empty slices get omitted during JSON marshaling, causing
+      // the default to be applied when it shouldn't be.
+      let content = fs.readFileSync(outputPath, 'utf8');
+      content = content.replace(
+        /Allow \[\]RestrictTemplateExpressionsOptionsAllowElem `json:"allow,omitempty"`/,
+        'Allow []RestrictTemplateExpressionsOptionsAllowElem `json:"allow"`',
+      );
+      fs.writeFileSync(outputPath, content, 'utf8');
+      console.log(
+        `  Post-processed ${ruleName} to remove omitempty from Allow field`,
+      );
+    }
   } catch (e) {
     console.error(`Failed to generate Go struct for schema: ${schemaPath}`, e);
     process.exit(1);

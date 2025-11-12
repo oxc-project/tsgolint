@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestRestrictTemplateExpressionsRule(t *testing.T) {
@@ -43,21 +42,21 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         const arg = 123;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
         const arg = 123;
         const msg = ` + "`" + `arg = ${arg || 'default'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
         const arg = 123n;
         const msg = ` + "`" + `arg = ${arg || 'default'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
@@ -65,7 +64,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
@@ -73,7 +72,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
@@ -81,7 +80,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
@@ -89,21 +88,21 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": true}`),
 		},
 		{
 			Code: `
         const arg = true;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true}`),
 		},
 		{
 			Code: `
         const arg = true;
         const msg = ` + "`" + `arg = ${arg || 'default'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true}`),
 		},
 		{
 			Code: `
@@ -111,7 +110,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true}`),
 		},
 		{
 			Code: `
@@ -119,21 +118,21 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true}`),
 		},
 		{
 			Code: `
         const arg = [];
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
 		},
 		{
 			Code: `
         const arg = [];
         const msg = ` + "`" + `arg = ${arg || 'default'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
 		},
 		{
 			Code: `
@@ -141,21 +140,21 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
 		},
 		{
 			Code: `
         declare const arg: [number, string];
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
 		},
 		{
 			Code: `
         const arg = [1, 'a'] as const;
         const msg = ` + "`" + `arg = ${arg || 'default'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
 		},
 		{
 			Code: `
@@ -163,56 +162,56 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
 		},
 		{
 			Code: `
         declare const arg: [number | undefined, string];
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true), AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true, "allowNullish": true}`),
 		},
 		{
 			Code: `
         const arg: any = 123;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
         const arg: any = undefined;
         const msg = ` + "`" + `arg = ${arg || 'some-default'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
         const user = JSON.parse('{ "name": "foo" }');
         const msg = ` + "`" + `arg = ${user.name}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
         const user = JSON.parse('{ "name": "foo" }');
         const msg = ` + "`" + `arg = ${user.name || 'the user with no name'}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
         const arg = null;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
         declare const arg: string | null | undefined;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
@@ -220,7 +219,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
@@ -228,28 +227,28 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNullish: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNullish": true}`),
 		},
 		{
 			Code: `
         const arg = new RegExp('foo');
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": true}`),
 		},
 		{
 			Code: `
         const arg = /foo/;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": true}`),
 		},
 		{
 			Code: `
         declare const arg: string | RegExp;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": true}`),
 		},
 		{
 			Code: `
@@ -257,7 +256,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": true}`),
 		},
 		{
 			Code: `
@@ -265,21 +264,21 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": true}`),
 		},
 		{
 			Code: `
         declare const value: never;
         const stringy = ` + "`" + `${value}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNever: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNever": true}`),
 		},
 		{
 			Code: `
         const arg = 'hello';
         const msg = typeof arg === 'string' ? arg : ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNever: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNever": true}`),
 		},
 		{
 			Code: `
@@ -294,7 +293,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           }
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNever: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNever": true}`),
 		},
 		{
 			Code: `
@@ -308,7 +307,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           }
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNever: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNever": true}`),
 		},
 		{
 			Code: `
@@ -317,17 +316,11 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{
-				AllowBoolean: utils.Ref(true),
-				AllowNever:   utils.Ref(true),
-				AllowNullish: utils.Ref(true),
-				AllowNumber:  utils.Ref(true),
-				AllowRegExp:  utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true, "allowNever": true, "allowNullish": true, "allowNumber": true, "allowRegExp": true}`),
 		},
 		{
 			Code:    "const msg = `arg = ${Promise.resolve()}`;",
-			Options: RestrictTemplateExpressionsOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromLib, Name: []string{"Promise"}}}},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allow": [{"from": "lib", "name": ["Promise"]}]}`),
 		},
 		{Code: "const msg = `arg = ${new Error()}`;"},
 		{Code: "const msg = `arg = ${false}`;"},
@@ -340,7 +333,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 			Code: `
         const msg = ` + "`" + `arg = ${123}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -353,7 +346,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 			Code: `
         const msg = ` + "`" + `arg = ${false}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -366,7 +359,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 			Code: `
         const msg = ` + "`" + `arg = ${null}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNullish: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNullish": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -392,7 +385,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 			Code: `
         const msg = ` + "`" + `arg = ${[, 2]}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true), AllowNullish: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true, "allowNullish": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -411,7 +404,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 		},
 		{
 			Code:    "const msg = `arg = ${new Error()}`;",
-			Options: RestrictTemplateExpressionsOptions{Allow: []utils.TypeOrValueSpecifier{}},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allow": []}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -423,7 +416,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         declare const arg: [number | undefined, string];
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowArray: utils.Ref(true), AllowNullish: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true, "allowNullish": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -437,7 +430,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         declare const arg: number;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNumber: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNumber": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -451,7 +444,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         declare const arg: boolean;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -465,7 +458,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         const arg = {};
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(true), AllowNullish: utils.Ref(true), AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true, "allowNullish": true, "allowNumber": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -493,7 +486,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowBoolean: utils.Ref(true), AllowNullish: utils.Ref(true), AllowNumber: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowBoolean": true, "allowNullish": true, "allowNumber": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -508,12 +501,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{
-				AllowAny:     utils.Ref(false),
-				AllowBoolean: utils.Ref(true),
-				AllowNullish: utils.Ref(true),
-				AllowNumber:  utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": false, "allowBoolean": true, "allowNullish": true, "allowNumber": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -528,12 +516,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{
-				AllowAny:     utils.Ref(false),
-				AllowBoolean: utils.Ref(true),
-				AllowNullish: utils.Ref(true),
-				AllowNumber:  utils.Ref(true),
-			},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": false, "allowBoolean": true, "allowNullish": true, "allowNumber": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -547,7 +530,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         const arg = new RegExp('foo');
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -561,7 +544,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         const arg = /foo/;
         const msg = ` + "`" + `arg = ${arg}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowRegExp: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowRegExp": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -575,7 +558,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
         declare const value: never;
         const stringy = ` + "`" + `${value}` + "`" + `;
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowNever: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowNever": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
@@ -590,7 +573,7 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
           return ` + "`" + `arg = ${arg}` + "`" + `;
         }
       `,
-			Options: RestrictTemplateExpressionsOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowAny": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidType",
