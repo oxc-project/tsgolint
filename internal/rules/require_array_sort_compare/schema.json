@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "require_array_sort_compare_options": {
+      "type": "object",
+      "properties": {
+        "ignoreStringArrays": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

@@ -14,20 +14,10 @@ func buildRequireCompareMessage() rule.RuleMessage {
 	}
 }
 
-type RequireArraySortCompareOptions struct {
-	IgnoreStringArrays *bool
-}
-
 var RequireArraySortCompareRule = rule.Rule{
 	Name: "require-array-sort-compare",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(RequireArraySortCompareOptions)
-		if !ok {
-			opts = RequireArraySortCompareOptions{}
-		}
-		if opts.IgnoreStringArrays == nil {
-			opts.IgnoreStringArrays = utils.Ref(true)
-		}
+		opts := utils.UnmarshalOptions[RequireArraySortCompareOptions](options, "require-array-sort-compare")
 
 		return rule.RuleListeners{
 			ast.KindCallExpression: func(node *ast.Node) {
@@ -47,7 +37,7 @@ var RequireArraySortCompareRule = rule.Rule{
 
 				calleeObjType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, callee.Expression())
 
-				if *opts.IgnoreStringArrays && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, calleeObjType) {
+				if opts.IgnoreStringArrays && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, calleeObjType) {
 					if utils.Every(checker.Checker_getTypeArguments(ctx.TypeChecker, calleeObjType), func(t *checker.Type) bool {
 						return utils.IsTypeFlagSet(t, checker.TypeFlagsString)
 					}) {
