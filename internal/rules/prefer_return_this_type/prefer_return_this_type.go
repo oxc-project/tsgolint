@@ -77,6 +77,10 @@ var PreferReturnThisTypeRule = rule.Rule{
 						return false
 					}
 
+					if classType == nil {
+						return false
+					}
+
 					t := ctx.TypeChecker.GetTypeAtLocation(expr)
 					if classType.AsType() == t {
 						return true
@@ -92,6 +96,9 @@ var PreferReturnThisTypeRule = rule.Rule{
 					return
 				}
 			} else {
+				if classType == nil {
+					return
+				}
 				t := ctx.TypeChecker.GetTypeAtLocation(body)
 				if checker.InterfaceType_thisType(classType) != t {
 					return

@@ -100,6 +100,15 @@ const Foo = class {
   }
 };
     `},
+		{Code: `
+class A {
+  static C = class B {
+    d(): B {
+      return new B();
+    }
+  };
+}
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
