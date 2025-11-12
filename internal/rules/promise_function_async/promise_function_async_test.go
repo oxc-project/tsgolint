@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestPromiseFunctionAsyncRule(t *testing.T) {
@@ -107,7 +106,7 @@ function returnsAny(): any {
   return 0;
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
@@ -115,7 +114,7 @@ function returnsUnknown(): unknown {
   return 0;
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
@@ -200,7 +199,7 @@ function overloadingThatIncludeUnknown(a?: boolean): unknown | number {
   return Promise.resolve(5);
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": true}`),
 		},
 		{
 			Code: `
@@ -210,7 +209,7 @@ function overloadingThatIncludeAny(a?: boolean): any | number {
   return Promise.resolve(5);
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -219,7 +218,7 @@ function returnsAny(): any {
   return 0;
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -232,7 +231,7 @@ function returnsUnknown(): unknown {
   return 0;
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -433,7 +432,7 @@ class Test {
 }
       `,
 			},
-			Options: PromiseFunctionAsyncOptions{CheckArrowFunctions: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"checkArrowFunctions": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -485,7 +484,7 @@ class Test {
 }
       `,
 			},
-			Options: PromiseFunctionAsyncOptions{CheckFunctionDeclarations: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"checkFunctionDeclarations": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -537,7 +536,7 @@ class Test {
 }
       `,
 			},
-			Options: PromiseFunctionAsyncOptions{CheckFunctionExpressions: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"checkFunctionExpressions": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -589,7 +588,7 @@ class Test {
 }
       `,
 			},
-			Options: PromiseFunctionAsyncOptions{CheckMethodDeclarations: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"checkMethodDeclarations": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -617,7 +616,7 @@ class PromiseType {}
 const returnAllowedType =  async () => new PromiseType();
       `,
 			},
-			Options: PromiseFunctionAsyncOptions{AllowedPromiseNames: []string{"PromiseType"}},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowedPromiseNames": ["PromiseType"]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -643,7 +642,7 @@ interface SPromise<T> extends Promise<T> {}
 }
       `,
 			},
-			Options: PromiseFunctionAsyncOptions{AllowedPromiseNames: []string{"SPromise"}},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowedPromiseNames": ["SPromise"]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -853,7 +852,7 @@ function overloadingThatIncludeAny(a?: boolean): any | number {
   return Promise.resolve(5);
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
@@ -868,7 +867,7 @@ function overloadingThatIncludeUnknown(a?: boolean): unknown | number {
   return Promise.resolve(5);
 }
       `,
-			Options: PromiseFunctionAsyncOptions{AllowAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAsync",
