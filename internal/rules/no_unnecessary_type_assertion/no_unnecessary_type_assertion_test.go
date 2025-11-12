@@ -82,26 +82,26 @@ const bar: number = foo()!;
 type Foo = number;
 const foo = (3 + 5) as Foo;
       `,
-			Options: NoUnnecessaryTypeAssertionOptions{TypesToIgnore: []string{"Foo"}},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["Foo"]}`),
 		},
 		{
 			Code:    "const foo = (3 + 5) as any;",
-			Options: NoUnnecessaryTypeAssertionOptions{TypesToIgnore: []string{"any"}},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["any"]}`),
 		},
 		{
 			Code:    "(Syntax as any).ArrayExpression = 'foo';",
-			Options: NoUnnecessaryTypeAssertionOptions{TypesToIgnore: []string{"any"}},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["any"]}`),
 		},
 		{
 			Code:    "const foo = (3 + 5) as string;",
-			Options: NoUnnecessaryTypeAssertionOptions{TypesToIgnore: []string{"string"}},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["string"]}`),
 		},
 		{
 			Code: `
 type Foo = number;
 const foo = <Foo>(3 + 5);
       `,
-			Options: NoUnnecessaryTypeAssertionOptions{TypesToIgnore: []string{"Foo"}},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["Foo"]}`),
 		},
 		{Code: `
 let bar: number;
