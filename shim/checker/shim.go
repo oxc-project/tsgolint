@@ -615,6 +615,8 @@ func IsExternalModuleSymbol(moduleSymbol *ast.Symbol) bool
 func IsInTypeQuery(node *ast.Node) bool
 //go:linkname IsKnownSymbol github.com/microsoft/typescript-go/internal/checker.IsKnownSymbol
 func IsKnownSymbol(symbol *ast.Symbol) bool
+//go:linkname IsPrivateIdentifierSymbol github.com/microsoft/typescript-go/internal/checker.IsPrivateIdentifierSymbol
+func IsPrivateIdentifierSymbol(symbol *ast.Symbol) bool
 //go:linkname IsTupleType github.com/microsoft/typescript-go/internal/checker.IsTupleType
 func IsTupleType(t *checker.Type) bool
 //go:linkname IsTypeAny github.com/microsoft/typescript-go/internal/checker.IsTypeAny
