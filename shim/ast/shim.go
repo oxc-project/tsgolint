@@ -1750,6 +1750,8 @@ func NewNodeFactory(hooks ast.NodeFactoryHooks) *ast.NodeFactory
 func NewNodeVisitor(visit func(node *ast.Node) *ast.Node, factory *ast.NodeFactory, hooks ast.NodeVisitorHooks) *ast.NodeVisitor
 type NoSubstitutionTemplateLiteral = ast.NoSubstitutionTemplateLiteral
 type Node = ast.Node
+//go:linkname Node_Type github.com/microsoft/typescript-go/internal/ast.(*Node).Type
+func Node_Type(recv *ast.Node) *ast.Node
 type NodeBase = ast.NodeBase
 type NodeDefault = ast.NodeDefault
 type NodeFactory = ast.NodeFactory
