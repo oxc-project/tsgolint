@@ -31,6 +31,8 @@ const EscapeSequenceScanningFlagsString = scanner.EscapeSequenceScanningFlagsStr
 func GetECMAEndLinePosition(sourceFile *ast.SourceFile, line int) int
 //go:linkname GetECMALineAndCharacterOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndCharacterOfPosition
 func GetECMALineAndCharacterOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, character int)
+//go:linkname GetECMALineOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineOfPosition
+func GetECMALineOfPosition(sourceFile ast.SourceFileLike, pos int) int
 //go:linkname GetECMALineStarts github.com/microsoft/typescript-go/internal/scanner.GetECMALineStarts
 func GetECMALineStarts(sourceFile ast.SourceFileLike) []core.TextPos
 //go:linkname GetECMAPositionOfLineAndCharacter github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndCharacter

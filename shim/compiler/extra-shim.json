@@ -1,0 +1,7 @@
+{
+  "ExtraMethods": {
+    "Program": [
+      "ForEachCheckerParallel"
+    ]
+  }
+}
