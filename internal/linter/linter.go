@@ -155,11 +155,11 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 
 	close(queue)
 	program.BindSourceFiles()
-	checkers, done := program.GetTypeCheckers(core.WithRequestID(context.Background(), "__single_run__"))
-	defer done()
-	for _, ch := range checkers {
+
+	ctx := core.WithRequestID(context.Background(), "__single_run__")
+	program.ForEachCheckerParallel(ctx, func(idx int, ch *checker.Checker) {
 		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
-	}
+	})
 
 	workloadQueue := make(chan checkerWorkload, len(flatQueue))
 	for _, w := range flatQueue {

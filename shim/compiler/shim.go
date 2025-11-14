@@ -5,6 +5,7 @@ package compiler
 
 import "context"
 import "github.com/microsoft/typescript-go/internal/ast"
+import "github.com/microsoft/typescript-go/internal/checker"
 import "github.com/microsoft/typescript-go/internal/compiler"
 import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/tsoptions"
@@ -38,6 +39,8 @@ func NewCompilerHost(currentDirectory string, fs vfs.FS, defaultLibraryPath stri
 //go:linkname NewProgram github.com/microsoft/typescript-go/internal/compiler.NewProgram
 func NewProgram(opts compiler.ProgramOptions) *compiler.Program
 type Program = compiler.Program
+//go:linkname Program_ForEachCheckerParallel github.com/microsoft/typescript-go/internal/compiler.(*Program).ForEachCheckerParallel
+func Program_ForEachCheckerParallel(recv *compiler.Program, ctx context.Context, cb func(idx int, c *checker.Checker))
 type ProgramLike = compiler.ProgramLike
 type ProgramOptions = compiler.ProgramOptions
 //go:linkname SortAndDeduplicateDiagnostics github.com/microsoft/typescript-go/internal/compiler.SortAndDeduplicateDiagnostics

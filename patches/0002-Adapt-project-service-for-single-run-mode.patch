@@ -1,20 +1,20 @@
-From 70e5921f3e00d1fb3e968fc8dc5b9db1f01160b0 Mon Sep 17 00:00:00 2001
-From: auvred <aauvred@gmail.com>
-Date: Wed, 6 Aug 2025 11:39:11 +0000
-Subject: [PATCH 2/4] Adapt project service for single run mode
+From 51d6dc9aaa97e8a85bdbc0868beb86cbf70eccf3 Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Fri, 14 Nov 2025 11:09:52 +0000
+Subject: [PATCH] Adapt project service for single run mode
 
 ---
- internal/project/checkerpool.go | 9 +++++++++
- internal/project/project.go     | 3 ++-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ internal/project/checkerpool.go | 10 ++++++++++
+ internal/project/project.go     |  3 ++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/internal/project/checkerpool.go b/internal/project/checkerpool.go
-index 6bcbcc686..27dff946d 100644
+index a83a2e833..4612d6064 100644
 --- a/internal/project/checkerpool.go
 +++ b/internal/project/checkerpool.go
-@@ -94,6 +94,15 @@ func (p *checkerPool) GetAllCheckers(ctx context.Context) ([]*checker.Checker, f
+@@ -106,6 +106,16 @@ func (p *CheckerPool) ForEachCheckerParallel(ctx context.Context, cb func(idx in
  	if requestID == "" {
- 		panic("cannot call GetAllCheckers on a project.checkerPool without a request ID")
+ 		panic("cannot call ForEachCheckerParallel on a project.checkerPool without a request ID")
  	}
 +	if requestID == "__single_run__" {
 +		for i, existing := range p.checkers {
@@ -22,14 +22,15 @@ index 6bcbcc686..27dff946d 100644
 +				checker := checker.NewChecker(p.program)
 +				p.checkers[i] = checker
 +			}
++			cb(i, p.checkers[i])
 +		}
-+		return p.checkers, noop
++		return
 +	}
  
  	// A request can only access one checker
  	if c, release := p.getRequestCheckerLocked(requestID); c != nil {
 diff --git a/internal/project/project.go b/internal/project/project.go
-index 17689ce50..f2ee08235 100644
+index 77a99abf0..3fb881542 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
 @@ -2,6 +2,7 @@ package project
@@ -40,7 +41,7 @@ index 17689ce50..f2ee08235 100644
  	"strings"
  	"sync"
  
-@@ -311,7 +312,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
+@@ -307,7 +308,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
  				TypingsLocation:             typingsLocation,
  				JSDocParsingMode:            ast.JSDocParsingModeParseAll,
  				CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {
@@ -50,5 +51,5 @@ index 17689ce50..f2ee08235 100644
  				},
  			},
 -- 
-2.39.5 (Apple Git-154)
+2.50.1 (Apple Git-155)
 
