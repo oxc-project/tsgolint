@@ -66,7 +66,7 @@ func TestPreferIncludesRule(t *testing.T) {
     `},
 		{Code: `
       function f(a: string): void {
-        /ba[rz]/.test(a);
+        /foo[rz]/.test(a);
       }
     `},
 		{Code: `
