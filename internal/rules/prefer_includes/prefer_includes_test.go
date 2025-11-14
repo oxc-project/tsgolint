@@ -67,22 +67,22 @@ func TestPreferIncludesRule(t *testing.T) {
 		// Unsupported RegExp patterns
 		{Code: `
       function f(a: string): void {
-        /bar/i.test(a);
+        /word/i.test(a);
       }
     `},
 		{Code: `
       function f(a: string): void {
-        /ba[rz]/.test(a);
+        /[ws]ord/.test(a);
       }
     `},
 		{Code: `
       function f(a: string): void {
-        /foo|bar/.test(a);
+        /some|word/.test(a);
       }
     `},
 		{Code: `
       function f(a: string): void {
-        /bar/.test();
+        /word/.test();
       }
     `},
 		{Code: `
@@ -91,7 +91,7 @@ func TestPreferIncludesRule(t *testing.T) {
       }
     `},
 		{Code: `
-      const pattern = new RegExp('bar');
+      const pattern = new RegExp('word');
       function f(a) {
         return pattern.test(a);
       }
@@ -459,12 +459,12 @@ func TestPreferIncludesRule(t *testing.T) {
 		{
 			Code: `
         function f(a: string): void {
-          /bar/.test(a);
+          /word/.test(a);
         }
       `,
 			Output: []string{`
         function f(a: string): void {
-          a.includes('bar');
+          a.includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -498,15 +498,15 @@ func TestPreferIncludesRule(t *testing.T) {
 		// RegExp constructor with variable reference
 		{
 			Code: `
-        const pattern = new RegExp('bar');
+        const pattern = new RegExp('word');
         function f(a: string): void {
           pattern.test(a);
         }
       `,
 			Output: []string{`
-        const pattern = new RegExp('bar');
+        const pattern = new RegExp('word');
         function f(a: string): void {
-          a.includes('bar');
+          a.includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -520,15 +520,15 @@ func TestPreferIncludesRule(t *testing.T) {
 		// Binary expression argument
 		{
 			Code: `
-        const pattern = /bar/;
+        const pattern = /word/;
         function f(a: string, b: string): void {
           pattern.test(a + b);
         }
       `,
 			Output: []string{`
-        const pattern = /bar/;
+        const pattern = /word/;
         function f(a: string, b: string): void {
-          (a + b).includes('bar');
+          (a + b).includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -585,12 +585,12 @@ func TestPreferIncludesRule(t *testing.T) {
 		{
 			Code: `
         function f(a: string): void {
-          /bar/.test((1 + 1, a));
+          /word/.test((1 + 1, a));
         }
       `,
 			Output: []string{`
         function f(a: string): void {
-          (1 + 1, a).includes('bar');
+          (1 + 1, a).includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -604,15 +604,15 @@ func TestPreferIncludesRule(t *testing.T) {
 		// Variable reference to regex literal
 		{
 			Code: `
-        const pattern = /bar/;
+        const pattern = /word/;
         function f(a: string): void {
           pattern.test(a);
         }
       `,
 			Output: []string{`
-        const pattern = /bar/;
+        const pattern = /word/;
         function f(a: string): void {
-          a.includes('bar');
+          a.includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -628,13 +628,13 @@ func TestPreferIncludesRule(t *testing.T) {
 			Code: `
         function getString(): string { return "test"; }
         function f(): void {
-          /bar/.test(getString());
+          /word/.test(getString());
         }
       `,
 			Output: []string{`
         function getString(): string { return "test"; }
         function f(): void {
-          getString().includes('bar');
+          getString().includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -649,12 +649,12 @@ func TestPreferIncludesRule(t *testing.T) {
 		{
 			Code: `
         function f(obj: { value: string }): void {
-          /bar/.test(obj.value);
+          /word/.test(obj.value);
         }
       `,
 			Output: []string{`
         function f(obj: { value: string }): void {
-          obj.value.includes('bar');
+          obj.value.includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -669,12 +669,12 @@ func TestPreferIncludesRule(t *testing.T) {
 		{
 			Code: `
         function f(arr: string[]): void {
-          /bar/.test(arr[0]);
+          /word/.test(arr[0]);
         }
       `,
 			Output: []string{`
         function f(arr: string[]): void {
-          arr[0].includes('bar');
+          arr[0].includes('word');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
