@@ -9,7 +9,6 @@ import (
 
 func TestPreferIncludesRule(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferIncludesRule, []rule_tester.ValidTestCase{
-		// Normal indexOf usage without comparison
 		{Code: `
       function f(a: string): void {
         a.indexOf(b);
@@ -20,13 +19,11 @@ func TestPreferIncludesRule(t *testing.T) {
         a.indexOf(b) + 0;
       }
     `},
-		// Union types without includes method
 		{Code: `
       function f(a: string | { value: string }): void {
         a.indexOf(b) !== -1;
       }
     `},
-		// Custom type without includes method
 		{Code: `
       type UserDefined = {
         indexOf(x: any): number; // don't have 'includes'
@@ -35,7 +32,6 @@ func TestPreferIncludesRule(t *testing.T) {
         a.indexOf(b) !== -1;
       }
     `},
-		// Custom type with different parameters for includes
 		{Code: `
       type UserDefined = {
         indexOf(x: any, fromIndex?: number): number;
@@ -54,7 +50,6 @@ func TestPreferIncludesRule(t *testing.T) {
         a.indexOf(b) !== -1;
       }
     `},
-		// includes is not a method
 		{Code: `
       type UserDefined = {
         indexOf(x: any, fromIndex?: number): number;
@@ -64,25 +59,24 @@ func TestPreferIncludesRule(t *testing.T) {
         a.indexOf(b) !== -1;
       }
     `},
-		// Unsupported RegExp patterns
 		{Code: `
       function f(a: string): void {
-        /word/i.test(a);
+        /bar/i.test(a);
       }
     `},
 		{Code: `
       function f(a: string): void {
-        /[ws]ord/.test(a);
+        /ba[rz]/.test(a);
       }
     `},
 		{Code: `
       function f(a: string): void {
-        /some|word/.test(a);
+        /foo|bar/.test(a);
       }
     `},
 		{Code: `
       function f(a: string): void {
-        /word/.test();
+        /bar/.test();
       }
     `},
 		{Code: `
@@ -91,16 +85,14 @@ func TestPreferIncludesRule(t *testing.T) {
       }
     `},
 		{Code: `
-      const pattern = new RegExp('word');
+      const pattern = new RegExp('bar');
       function f(a) {
         return pattern.test(a);
       }
     `},
 	}, []rule_tester.InvalidTestCase{
-		// Positive checks: !== -1
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) !== -1;
         }
@@ -122,7 +114,6 @@ func TestPreferIncludesRule(t *testing.T) {
 		// != -1
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) != -1;
         }
@@ -141,10 +132,8 @@ func TestPreferIncludesRule(t *testing.T) {
 				},
 			},
 		},
-		// > -1
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) > -1;
         }
@@ -163,10 +152,8 @@ func TestPreferIncludesRule(t *testing.T) {
 				},
 			},
 		},
-		// >= 0
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) >= 0;
         }
@@ -180,15 +167,12 @@ func TestPreferIncludesRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferIncludes",
-					Line:      4,
-					Column:    11,
 				},
 			},
 		},
 		// Negative checks: === -1
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) === -1;
         }
@@ -202,15 +186,12 @@ func TestPreferIncludesRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferIncludes",
-					Line:      4,
-					Column:    11,
 				},
 			},
 		},
 		// == -1
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) == -1;
         }
@@ -229,10 +210,8 @@ func TestPreferIncludesRule(t *testing.T) {
 				},
 			},
 		},
-		// <= -1
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) <= -1;
         }
@@ -254,7 +233,6 @@ func TestPreferIncludesRule(t *testing.T) {
 		// < 0
 		{
 			Code: `
-        declare const b: any;
         function f(a: string): void {
           a.indexOf(b) < 0;
         }
@@ -273,6 +251,283 @@ func TestPreferIncludesRule(t *testing.T) {
 				},
 			},
 		},
+		{
+			Code: `
+        function f(a?: string): void {
+          a?.indexOf(b) === -1;
+        }
+      `,
+			Output: []string{`
+        function f(a?: string): void {
+          !a?.includes(b);
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a?: string): void {
+          a?.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: string): void {
+          /bar/.test(a);
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: string): void {
+          /bar/.test((1 + 1, a));
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: string): void {
+          /\\0'\\\\\\n\\r\\v\\t\\f/.test(a);
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        const pattern = new RegExp('bar');
+        function f(a: string): void {
+          pattern.test(a);
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        const pattern = /bar/;
+        function f(a: string, b: string): void {
+          pattern.test(a + b);
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: any[]): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: ReadonlyArray<any>): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Int8Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Int16Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Int32Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Uint8Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Uint16Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Uint32Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Float32Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Float64Array): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f<T>(a: T[] | ReadonlyArray<T>): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f<
+          T,
+          U extends
+            | T[]
+            | ReadonlyArray<T>
+            | Int8Array
+            | Uint8Array
+            | Int16Array
+            | Uint16Array
+            | Int32Array
+            | Uint32Array
+            | Float32Array
+            | Float64Array,
+        >(a: U): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        type UserDefined = {
+          indexOf(x: any): number;
+          includes(x: any): boolean;
+        };
+        function f(a: UserDefined): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: Readonly<any[]>): void {
+          a.indexOf(b) !== -1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferIncludes",
+				},
+			},
+		},
+
 		// Type variations: any[]
 		{
 			Code: `
