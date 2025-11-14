@@ -710,6 +710,8 @@ func IsInfinityOrNaNString(name string) bool
 func IsInitializedProperty(member *ast.ClassElement) bool
 //go:linkname IsInstanceOfExpression github.com/microsoft/typescript-go/internal/ast.IsInstanceOfExpression
 func IsInstanceOfExpression(node *ast.Node) bool
+//go:linkname IsInstantiatedModule github.com/microsoft/typescript-go/internal/ast.IsInstantiatedModule
+func IsInstantiatedModule(node *ast.Node, preserveConstEnums bool) bool
 //go:linkname IsInterfaceDeclaration github.com/microsoft/typescript-go/internal/ast.IsInterfaceDeclaration
 func IsInterfaceDeclaration(node *ast.Node) bool
 //go:linkname IsInternalModuleImportEqualsDeclaration github.com/microsoft/typescript-go/internal/ast.IsInternalModuleImportEqualsDeclaration
@@ -972,6 +974,8 @@ func IsPartOfTypeQuery(node *ast.Node) bool
 func IsPartiallyEmittedExpression(node *ast.Node) bool
 //go:linkname IsPlainJSFile github.com/microsoft/typescript-go/internal/ast.IsPlainJSFile
 func IsPlainJSFile(file *ast.SourceFile, checkJs core.Tristate) bool
+//go:linkname IsPotentiallyExecutableNode github.com/microsoft/typescript-go/internal/ast.IsPotentiallyExecutableNode
+func IsPotentiallyExecutableNode(node *ast.Node) bool
 //go:linkname IsPrefixUnaryExpression github.com/microsoft/typescript-go/internal/ast.IsPrefixUnaryExpression
 func IsPrefixUnaryExpression(node *ast.Node) bool
 //go:linkname IsPrivateIdentifier github.com/microsoft/typescript-go/internal/ast.IsPrivateIdentifier
@@ -1790,6 +1794,7 @@ const NodeFlagsSynthesized = ast.NodeFlagsSynthesized
 const NodeFlagsThisNodeHasError = ast.NodeFlagsThisNodeHasError
 const NodeFlagsThisNodeOrAnySubNodesHasError = ast.NodeFlagsThisNodeOrAnySubNodesHasError
 const NodeFlagsTypeExcludesFlags = ast.NodeFlagsTypeExcludesFlags
+const NodeFlagsUnreachable = ast.NodeFlagsUnreachable
 const NodeFlagsUsing = ast.NodeFlagsUsing
 const NodeFlagsYieldContext = ast.NodeFlagsYieldContext
 //go:linkname NodeHasKind github.com/microsoft/typescript-go/internal/ast.NodeHasKind
