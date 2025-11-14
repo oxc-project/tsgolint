@@ -405,7 +405,7 @@ var PreferIncludesRule = rule.Rule{
 					Text:  ".includes('" + escapedPattern + "')",
 				})
 
-				ctx.ReportNodeWithFixes(node, buildPreferStringIncludesMessage(), fixes...)
+				ctx.ReportNodeWithFixes(node, buildPreferStringIncludesMessage(), func() []rule.RuleFix { return fixes })
 			},
 			// Handle: array.indexOf(item) !== -1 -> array.includes(item)
 			ast.KindBinaryExpression: func(node *ast.Node) {
@@ -477,7 +477,7 @@ var PreferIncludesRule = rule.Rule{
 					})
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferIncludesMessage(), fixes...)
+				ctx.ReportNodeWithFixes(node, buildPreferIncludesMessage(), func() []rule.RuleFix { return fixes })
 			},
 		}
 	},
