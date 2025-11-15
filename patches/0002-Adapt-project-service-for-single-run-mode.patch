@@ -19,7 +19,7 @@ index a83a2e833..4612d6064 100644
 +	if requestID == "__single_run__" {
 +		for i, existing := range p.checkers {
 +			if existing == nil {
-+				checker := checker.NewChecker(p.program)
++				checker, _ := checker.NewChecker(p.program)
 +				p.checkers[i] = checker
 +			}
 +			cb(i, p.checkers[i])
