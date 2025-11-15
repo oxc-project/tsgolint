@@ -21,6 +21,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 
 	"github.com/typescript-eslint/tsgolint/internal/rules/await_thenable"
+	"github.com/typescript-eslint/tsgolint/internal/rules/consistent_return"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_array_delete"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_base_to_string"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_confusing_void_expression"
@@ -123,6 +124,7 @@ func writeMemProfiles(heapOut string, allocsOut string) {
 
 var allRules = []rule.Rule{
 	await_thenable.AwaitThenableRule,
+	consistent_return.ConsistentReturnRule,
 	no_array_delete.NoArrayDeleteRule,
 	no_base_to_string.NoBaseToStringRule,
 	no_confusing_void_expression.NoConfusingVoidExpressionRule,
