@@ -6,22 +6,14 @@ import "encoding/json"
 import "fmt"
 import "reflect"
 
-type ReturnAwaitOptions struct {
-	// Configures when to require or disallow returning awaited values: 'always'
-	// requires await, 'never' disallows it, 'in-try-catch' requires it in try/catch
-	// blocks, 'error-handling-correctness-only' requires it only when it affects
-	// error handling
-	Option ReturnAwaitOptionsOption `json:"option,omitempty"`
-}
+type ReturnAwaitOptions string
 
-type ReturnAwaitOptionsOption string
+const ReturnAwaitOptionsAlways ReturnAwaitOptions = "always"
+const ReturnAwaitOptionsErrorHandlingCorrectnessOnly ReturnAwaitOptions = "error-handling-correctness-only"
+const ReturnAwaitOptionsInTryCatch ReturnAwaitOptions = "in-try-catch"
+const ReturnAwaitOptionsNever ReturnAwaitOptions = "never"
 
-const ReturnAwaitOptionsOptionAlways ReturnAwaitOptionsOption = "always"
-const ReturnAwaitOptionsOptionErrorHandlingCorrectnessOnly ReturnAwaitOptionsOption = "error-handling-correctness-only"
-const ReturnAwaitOptionsOptionInTryCatch ReturnAwaitOptionsOption = "in-try-catch"
-const ReturnAwaitOptionsOptionNever ReturnAwaitOptionsOption = "never"
-
-var enumValues_ReturnAwaitOptionsOption = []interface{}{
+var enumValues_ReturnAwaitOptions = []interface{}{
 	"always",
 	"error-handling-correctness-only",
 	"in-try-catch",
@@ -29,39 +21,27 @@ var enumValues_ReturnAwaitOptionsOption = []interface{}{
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
-func (j *ReturnAwaitOptionsOption) UnmarshalJSON(value []byte) error {
+func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
+	// Handle null value by setting default (schema specifies "in-try-catch" as default)
+	if string(value) == "null" {
+		*j = ReturnAwaitOptionsInTryCatch
+		return nil
+	}
+
 	var v string
 	if err := json.Unmarshal(value, &v); err != nil {
 		return err
 	}
 	var ok bool
-	for _, expected := range enumValues_ReturnAwaitOptionsOption {
+	for _, expected := range enumValues_ReturnAwaitOptions {
 		if reflect.DeepEqual(v, expected) {
 			ok = true
 			break
 		}
 	}
 	if !ok {
-		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ReturnAwaitOptionsOption, v)
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ReturnAwaitOptions, v)
 	}
-	*j = ReturnAwaitOptionsOption(v)
-	return nil
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(value, &raw); err != nil {
-		return err
-	}
-	type Plain ReturnAwaitOptions
-	var plain Plain
-	if err := json.Unmarshal(value, &plain); err != nil {
-		return err
-	}
-	if v, ok := raw["option"]; !ok || v == nil {
-		plain.Option = "in-try-catch"
-	}
-	*j = ReturnAwaitOptions(plain)
+	*j = ReturnAwaitOptions(v)
 	return nil
 }

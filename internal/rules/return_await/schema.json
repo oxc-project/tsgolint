@@ -2,20 +2,15 @@
   "$schema": "https://json-schema.org/draft-07/schema#",
   "definitions": {
     "return_await_options": {
-      "type": "object",
-      "properties": {
-        "option": {
-          "type": "string",
-          "enum": [
-            "always",
-            "error-handling-correctness-only",
-            "in-try-catch",
-            "never"
-          ],
-          "default": "in-try-catch",
-          "description": "Configures when to require or disallow returning awaited values: 'always' requires await, 'never' disallows it, 'in-try-catch' requires it in try/catch blocks, 'error-handling-correctness-only' requires it only when it affects error handling"
-        }
-      }
+      "type": "string",
+      "enum": [
+        "always",
+        "error-handling-correctness-only",
+        "in-try-catch",
+        "never"
+      ],
+      "default": "in-try-catch",
+      "description": "Configures when to require or disallow returning awaited values: 'always' requires await, 'never' disallows it, 'in-try-catch' requires it in try/catch blocks, 'error-handling-correctness-only' requires it only when it affects error handling"
     }
   }
 }

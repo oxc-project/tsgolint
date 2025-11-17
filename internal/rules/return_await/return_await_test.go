@@ -87,7 +87,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "error-handling-correctness-only"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"error-handling-correctness-only"`),
 		},
 		{Code: `
       async function test() {
@@ -108,7 +108,7 @@ async function test(unknownParam: unknown) {
           return 1;
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -116,15 +116,15 @@ async function test(unknownParam: unknown) {
           return 1;
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code:    "const test = () => 1;",
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code:    "const test = async () => 1;",
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -132,7 +132,7 @@ async function test(unknownParam: unknown) {
           return Promise.resolve(1);
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -146,7 +146,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -158,7 +158,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -172,7 +172,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -188,7 +188,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -196,11 +196,11 @@ async function test(unknownParam: unknown) {
           return Promise.resolve(1);
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "never"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"never"`),
 		},
 		{
 			Code:    "const test = async () => Promise.resolve(1);",
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "never"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"never"`),
 		},
 		{
 			Code: `
@@ -214,7 +214,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "never"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"never"`),
 		},
 		{
 			Code: `
@@ -222,11 +222,11 @@ async function test(unknownParam: unknown) {
           return await Promise.resolve(1);
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 		},
 		{
 			Code:    "const test = async () => await Promise.resolve(1);",
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 		},
 		{
 			Code: `
@@ -240,7 +240,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 		},
 		{
 			Code: `
@@ -254,7 +254,7 @@ async function test(unknownParam: unknown) {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 		},
 		{
 			Code: `
@@ -371,7 +371,7 @@ async function f() {
   using something = bleh;
 }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 		},
 		{
 			Code: `
@@ -386,7 +386,7 @@ async function returnAwait() {
   return await asyncFn();
 }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -403,7 +403,7 @@ async function outerFunction() {
   }
 }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -418,7 +418,7 @@ async function outerFunction() {
   const innerFunction = async () => asyncFn();
 }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 		},
 		{
 			Code: `
@@ -586,7 +586,7 @@ class C<R extends unknown> {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "error-handling-correctness-only"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"error-handling-correctness-only"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -642,7 +642,7 @@ class C<R extends unknown> {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -698,7 +698,7 @@ class C<R extends unknown> {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -773,7 +773,7 @@ class C<R extends unknown> {
         }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "nonPromiseAwait",
@@ -784,7 +784,7 @@ class C<R extends unknown> {
 		{
 			Code:    "const test = async () => await 1;",
 			Output:  []string{"const test = async () =>  1;"},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "nonPromiseAwait",
@@ -795,7 +795,7 @@ class C<R extends unknown> {
 		{
 			Code:    "const test = async () => await Promise.resolve(1);",
 			Output:  []string{"const test = async () =>  Promise.resolve(1);"},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "disallowedPromiseAwait",
@@ -815,7 +815,7 @@ class C<R extends unknown> {
         }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "disallowedPromiseAwait",
@@ -835,7 +835,7 @@ class C<R extends unknown> {
         }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "never"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"never"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "nonPromiseAwait",
@@ -855,7 +855,7 @@ class C<R extends unknown> {
           }
         }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "never"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"never"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "disallowedPromiseAwait",
@@ -911,7 +911,7 @@ class C<R extends unknown> {
         }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "never"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"never"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "disallowedPromiseAwait",
@@ -931,7 +931,7 @@ class C<R extends unknown> {
         }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "nonPromiseAwait",
@@ -951,7 +951,7 @@ class C<R extends unknown> {
         }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -962,7 +962,7 @@ class C<R extends unknown> {
 		{
 			Code:    "const test = async () => Promise.resolve(1);",
 			Output:  []string{"const test = async () => await Promise.resolve(1);"},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -990,7 +990,7 @@ async function buzz() {
 }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1028,7 +1028,7 @@ async function buzz() {
 }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1064,7 +1064,7 @@ async function buzz() {
 }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1090,7 +1090,7 @@ async function baz() {}
 const buzz = async () => ((await foo()) ? await bar() : await baz());
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1114,7 +1114,7 @@ async function bar() {}
 const buzz = async () => ((await foo()) ?  1 : await bar());
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1548,7 +1548,7 @@ async function f() {
   }
 }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1584,7 +1584,7 @@ async function f() {
   }
 }
       `,
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1630,7 +1630,7 @@ async function f() {
 }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "always"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requiredPromiseAwait",
@@ -1668,7 +1668,7 @@ async function outerFunction() {
 }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "disallowedPromiseAwait",
@@ -1702,7 +1702,7 @@ async function outerFunction() {
 }
       `,
 			},
-			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`{"option": "in-try-catch"}`),
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "disallowedPromiseAwait",
