@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "no_misused_spread_options": {
+      "type": "object",
+      "properties": {
+        "allow": {
+          "type": "array",
+          "items": {
+            "$ref": "../shared_schemas.json#/definitions/typeOrValueSpecifier"
+          },
+          "description": "Types to allow spreading in object or array/call expressions"
+        }
+      }
+    }
+  }
+}

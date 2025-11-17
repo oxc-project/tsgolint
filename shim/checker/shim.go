@@ -434,6 +434,9 @@ type extra_Checker struct {
   activeTypeMappersCaches []map[string]*checker.Type
   ambientModulesOnce sync.Once
   ambientModules []*ast.Symbol
+  withinUnreachableCode bool
+  reportedUnreachableNodes collections.Set[*ast.Node]
+  mu sync.Mutex
 }
 func Checker_numberType(v *checker.Checker) *checker.Type {
   return ((*extra_Checker)(unsafe.Pointer(v))).numberType
@@ -615,6 +618,8 @@ func IsExternalModuleSymbol(moduleSymbol *ast.Symbol) bool
 func IsInTypeQuery(node *ast.Node) bool
 //go:linkname IsKnownSymbol github.com/microsoft/typescript-go/internal/checker.IsKnownSymbol
 func IsKnownSymbol(symbol *ast.Symbol) bool
+//go:linkname IsPrivateIdentifierSymbol github.com/microsoft/typescript-go/internal/checker.IsPrivateIdentifierSymbol
+func IsPrivateIdentifierSymbol(symbol *ast.Symbol) bool
 //go:linkname IsTupleType github.com/microsoft/typescript-go/internal/checker.IsTupleType
 func IsTupleType(t *checker.Type) bool
 //go:linkname IsTypeAny github.com/microsoft/typescript-go/internal/checker.IsTypeAny
@@ -688,7 +693,7 @@ const MinArgumentCountFlagsVoidIsNonOptional = checker.MinArgumentCountFlagsVoid
 type ModuleSymbolLinks = checker.ModuleSymbolLinks
 type NarrowedTypeKey = checker.NarrowedTypeKey
 //go:linkname NewChecker github.com/microsoft/typescript-go/internal/checker.NewChecker
-func NewChecker(program checker.Program) *checker.Checker
+func NewChecker(program checker.Program) (*checker.Checker, *sync.Mutex)
 //go:linkname NewDiagnosticChainForNode github.com/microsoft/typescript-go/internal/checker.NewDiagnosticChainForNode
 func NewDiagnosticChainForNode(chain *ast.Diagnostic, node *ast.Node, message *diagnostics.Message, args ...any) *ast.Diagnostic
 //go:linkname NewDiagnosticForNode github.com/microsoft/typescript-go/internal/checker.NewDiagnosticForNode

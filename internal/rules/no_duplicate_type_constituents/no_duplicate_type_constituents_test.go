@@ -8,7 +8,7 @@ import (
 )
 
 func TestNoDuplicateTypeConstituentsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoDuplicateTypeConstituentsRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoDuplicateTypeConstituentsRule, []rule_tester.ValidTestCase{
 		{
 			Code: "type T = 1 | 2;",
 		},
@@ -133,11 +133,11 @@ type T = Record<string, A | B>;
 		},
 		{
 			Code:    "type T = A | A;",
-			Options: NoDuplicateTypeConstituentsOptions{IgnoreUnions: true},
+			Options: rule_tester.OptionsFromJSON[NoDuplicateTypeConstituentsOptions](`{"ignoreUnions": true}`),
 		},
 		{
 			Code:    "type T = A & A;",
-			Options: NoDuplicateTypeConstituentsOptions{IgnoreIntersections: true},
+			Options: rule_tester.OptionsFromJSON[NoDuplicateTypeConstituentsOptions](`{"ignoreIntersections": true}`),
 		},
 		{
 			Code: "type T = Class<string> | Class<string>;",

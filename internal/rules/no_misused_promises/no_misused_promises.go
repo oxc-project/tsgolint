@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"slices"
 
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
@@ -65,57 +66,55 @@ func buildVoidReturnVariableMessage() rule.RuleMessage {
 	}
 }
 
-type NoMisusedPromisesChecksVoidReturnOptions struct {
-	Arguments        *bool
-	Attributes       *bool
-	InheritedMethods *bool
-	Properties       *bool
-	Returns          *bool
-	Variables        *bool
-}
-type NoMisusedPromisesOptions struct {
-	ChecksConditionals   *bool
-	ChecksSpreads        *bool
-	ChecksVoidReturn     *bool
-	ChecksVoidReturnOpts *NoMisusedPromisesChecksVoidReturnOptions
-}
-
 var NoMisusedPromisesRule = rule.Rule{
 	Name: "no-misused-promises",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoMisusedPromisesOptions)
-		if !ok {
-			opts = NoMisusedPromisesOptions{}
+		opts := utils.UnmarshalOptions[NoMisusedPromisesOptions](options, "no-misused-promises")
+
+		// Helper function to create default ChecksVoidReturnOptions
+		defaultChecksVoidReturnOpts := func() *ChecksVoidReturnOptions {
+			return &ChecksVoidReturnOptions{
+				Arguments:        true,
+				Attributes:       true,
+				InheritedMethods: true,
+				Properties:       true,
+				Returns:          true,
+				Variables:        true,
+			}
 		}
-		if opts.ChecksConditionals == nil {
-			opts.ChecksConditionals = utils.Ref(true)
-		}
-		if opts.ChecksSpreads == nil {
-			opts.ChecksSpreads = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturn == nil {
-			opts.ChecksVoidReturn = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturnOpts == nil {
-			opts.ChecksVoidReturnOpts = utils.Ref(NoMisusedPromisesChecksVoidReturnOptions{})
-		}
-		if opts.ChecksVoidReturnOpts.Arguments == nil {
-			opts.ChecksVoidReturnOpts.Arguments = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturnOpts.Attributes == nil {
-			opts.ChecksVoidReturnOpts.Attributes = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturnOpts.InheritedMethods == nil {
-			opts.ChecksVoidReturnOpts.InheritedMethods = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturnOpts.Properties == nil {
-			opts.ChecksVoidReturnOpts.Properties = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturnOpts.Returns == nil {
-			opts.ChecksVoidReturnOpts.Returns = utils.Ref(true)
-		}
-		if opts.ChecksVoidReturnOpts.Variables == nil {
-			opts.ChecksVoidReturnOpts.Variables = utils.Ref(true)
+
+		// Handle checksVoidReturn which can be either a boolean or an object
+		checksVoidReturn := true
+		var checksVoidReturnOpts *ChecksVoidReturnOptions
+
+		if opts.ChecksVoidReturn != nil {
+			switch v := opts.ChecksVoidReturn.(type) {
+			case bool:
+				checksVoidReturn = v
+				if v {
+					// If true, use default nested options
+					checksVoidReturnOpts = defaultChecksVoidReturnOpts()
+				}
+			case map[string]interface{}:
+				// It's an object, unmarshal it as ChecksVoidReturnOptions
+				checksVoidReturn = true
+				jsonBytes, err := json.Marshal(v)
+				if err != nil {
+					// If marshaling fails, use default options
+					checksVoidReturnOpts = defaultChecksVoidReturnOpts()
+					break
+				}
+				var voidReturnOpts ChecksVoidReturnOptions
+				if err := json.Unmarshal(jsonBytes, &voidReturnOpts); err == nil {
+					checksVoidReturnOpts = &voidReturnOpts
+				} else {
+					// If unmarshaling fails, use default options
+					checksVoidReturnOpts = defaultChecksVoidReturnOpts()
+				}
+			}
+		} else {
+			// Default behavior
+			checksVoidReturnOpts = defaultChecksVoidReturnOpts()
 		}
 
 		anySignatureIsThenableType := func(
@@ -736,16 +735,16 @@ var NoMisusedPromisesRule = rule.Rule{
 
 		listeners := rule.RuleListeners{
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				if *opts.ChecksConditionals {
+				if opts.ChecksConditionals {
 					checkConditional(node, false)
 				}
 
-				if *opts.ChecksVoidReturn && *opts.ChecksVoidReturnOpts.Variables && ast.IsAssignmentExpression(node, false) {
+				if checksVoidReturn && checksVoidReturnOpts != nil && checksVoidReturnOpts.Variables && ast.IsAssignmentExpression(node, false) {
 					checkAssignment(node.AsBinaryExpression())
 				}
 			},
 		}
-		if *opts.ChecksConditionals {
+		if opts.ChecksConditionals {
 			listeners[ast.KindPropertyAccessExpression] = checkArrayPredicates
 			listeners[ast.KindElementAccessExpression] = checkArrayPredicates
 
@@ -763,33 +762,33 @@ var NoMisusedPromisesRule = rule.Rule{
 			listeners[ast.KindIfStatement] = func(node *ast.Node) { checkConditional(node.Expression(), true) }
 		}
 
-		if *opts.ChecksVoidReturn {
-			if *opts.ChecksVoidReturnOpts.Arguments {
+		if checksVoidReturn && checksVoidReturnOpts != nil {
+			if checksVoidReturnOpts.Arguments {
 				listeners[ast.KindCallExpression] = checkArguments
 				listeners[ast.KindNewExpression] = checkArguments
 			}
-			if *opts.ChecksVoidReturnOpts.Attributes {
+			if checksVoidReturnOpts.Attributes {
 				listeners[ast.KindJsxAttribute] = func(node *ast.Node) { checkJSXAttribute(node.AsJsxAttribute()) }
 			}
-			if *opts.ChecksVoidReturnOpts.InheritedMethods {
+			if checksVoidReturnOpts.InheritedMethods {
 				listeners[ast.KindClassDeclaration] = checkClassLikeOrInterfaceNode
 				listeners[ast.KindClassExpression] = checkClassLikeOrInterfaceNode
 				listeners[ast.KindInterfaceDeclaration] = checkClassLikeOrInterfaceNode
 			}
-			if *opts.ChecksVoidReturnOpts.Properties {
+			if checksVoidReturnOpts.Properties {
 				listeners[ast.KindPropertyAssignment] = checkProperty
 				listeners[ast.KindMethodDeclaration] = checkProperty
 				listeners[ast.KindShorthandPropertyAssignment] = checkProperty
 			}
-			if *opts.ChecksVoidReturnOpts.Returns {
+			if checksVoidReturnOpts.Returns {
 				listeners[ast.KindReturnStatement] = func(node *ast.Node) { checkReturnStatement(node.AsReturnStatement()) }
 			}
-			if *opts.ChecksVoidReturnOpts.Variables {
+			if checksVoidReturnOpts.Variables {
 				listeners[ast.KindVariableDeclaration] = func(node *ast.Node) { checkVariableDeclaration(node.AsVariableDeclaration()) }
 			}
 
 		}
-		if *opts.ChecksSpreads {
+		if opts.ChecksSpreads {
 			listeners[ast.KindSpreadElement] = checkSpread
 			listeners[ast.KindSpreadAssignment] = checkSpread
 		}

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "promise_function_async_options": {
+      "type": "object",
+      "properties": {
+        "allowAny": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowedPromiseNames": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "checkArrowFunctions": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkFunctionDeclarations": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkFunctionExpressions": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkMethodDeclarations": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  }
+}

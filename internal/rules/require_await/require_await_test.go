@@ -8,7 +8,7 @@ import (
 )
 
 func TestRequireAwaitRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &RequireAwaitRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RequireAwaitRule, []rule_tester.ValidTestCase{
 		{Code: `
 function numberOne(): number {
   return 1;
@@ -618,7 +618,7 @@ async function* asyncGenerator() {
 }
 
 func TestRequireAwaitRuleEslintBase(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &RequireAwaitRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RequireAwaitRule, []rule_tester.ValidTestCase{
 		{Code: `
 async function foo() {
   await doSomething();

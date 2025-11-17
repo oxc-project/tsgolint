@@ -22,20 +22,10 @@ func buildRemoveVoidMessage() rule.RuleMessage {
 	}
 }
 
-type NoMeaninglessVoidOperatorOptions struct {
-	CheckNever *bool
-}
-
 var NoMeaninglessVoidOperatorRule = rule.Rule{
 	Name: "no-meaningless-void-operator",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoMeaninglessVoidOperatorOptions)
-		if !ok {
-			opts = NoMeaninglessVoidOperatorOptions{}
-		}
-		if opts.CheckNever == nil {
-			opts.CheckNever = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[NoMeaninglessVoidOperatorOptions](options, "no-meaningless-void-operator")
 
 		return rule.RuleListeners{
 			ast.KindVoidExpression: func(node *ast.Node) {
@@ -54,7 +44,7 @@ var NoMeaninglessVoidOperatorRule = rule.Rule{
 
 				if mask&checker.TypeFlagsVoidLike != 0 {
 					ctx.ReportNodeWithFixes(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), func() []rule.RuleFix { return []rule.RuleFix{fixRemoveVoidKeyword()} })
-				} else if *opts.CheckNever && mask&checker.TypeFlagsNever != 0 {
+				} else if opts.CheckNever && mask&checker.TypeFlagsNever != 0 {
 					ctx.ReportNodeWithSuggestions(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), func() []rule.RuleSuggestion {
 						return []rule.RuleSuggestion{{
 							Message:  buildRemoveVoidMessage(),

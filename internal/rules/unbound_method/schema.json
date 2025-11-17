@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "unbound_method_options": {
+      "type": "object",
+      "properties": {
+        "ignoreStatic": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

@@ -8,7 +8,7 @@ import (
 )
 
 func TestPreferReturnThisTypeRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferReturnThisTypeRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &PreferReturnThisTypeRule, []rule_tester.ValidTestCase{
 		{Code: `
 class Foo {
   f1() {}
@@ -99,6 +99,15 @@ const Foo = class {
     return this;
   }
 };
+    `},
+		{Code: `
+class A {
+  static C = class B {
+    d(): B {
+      return new B();
+    }
+  };
+}
     `},
 	}, []rule_tester.InvalidTestCase{
 		{

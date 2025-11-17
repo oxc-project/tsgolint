@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "restrict_template_expressions_options": {
+      "type": "object",
+      "properties": {
+        "allowAny": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowArray": {
+          "type": "boolean",
+          "default": false
+        },
+        "allowBoolean": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowNullish": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowNumber": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowRegExp": {
+          "type": "boolean",
+          "default": true
+        },
+        "allowNever": {
+          "type": "boolean",
+          "default": false
+        },
+        "allow": {
+          "type": "array",
+          "items": {
+            "$ref": "../shared_schemas.json#/definitions/typeOrValueSpecifier"
+          },
+          "default": [
+            {
+              "from": "lib",
+              "name": ["Error", "URL", "URLSearchParams"]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

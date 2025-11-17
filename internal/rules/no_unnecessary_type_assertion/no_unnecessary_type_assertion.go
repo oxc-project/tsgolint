@@ -24,21 +24,10 @@ func buildUnnecessaryAssertionMessage() rule.RuleMessage {
 	}
 }
 
-type NoUnnecessaryTypeAssertionOptions struct {
-	// TODO(port): maybe typeOrValueSpecifier?
-	TypesToIgnore []string
-}
-
 var NoUnnecessaryTypeAssertionRule = rule.Rule{
 	Name: "no-unnecessary-type-assertion",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoUnnecessaryTypeAssertionOptions)
-		if !ok {
-			opts = NoUnnecessaryTypeAssertionOptions{}
-		}
-		if opts.TypesToIgnore == nil {
-			opts.TypesToIgnore = []string{}
-		}
+		opts := utils.UnmarshalOptions[NoUnnecessaryTypeAssertionOptions](options, "no-unnecessary-type-assertion")
 
 		compilerOptions := ctx.Program.Options()
 		isStrictNullChecks := utils.IsStrictCompilerOptionEnabled(

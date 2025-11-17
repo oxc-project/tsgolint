@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "restrict_plus_operands_options": {
+      "type": "object",
+      "properties": {
+        "allowAny": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow `any` typed values"
+        },
+        "allowBoolean": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow `boolean` typed values"
+        },
+        "allowNullish": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow potentially `null` or `undefined` typed values"
+        },
+        "allowNumberAndString": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow mixing `number` and `string` typed values"
+        },
+        "allowRegExp": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to allow `regexp` typed values"
+        },
+        "skipCompoundAssignments": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to skip compound assignments such as `+=`"
+        }
+      }
+    }
+  }
+}

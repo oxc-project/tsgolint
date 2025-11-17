@@ -14,41 +14,10 @@ func buildMissingAsyncMessage() rule.RuleMessage {
 	}
 }
 
-type PromiseFunctionAsyncOptions struct {
-	AllowAny *bool
-	// TODO(port): TypeOrValueSpecifier
-	AllowedPromiseNames       []string
-	CheckArrowFunctions       *bool
-	CheckFunctionDeclarations *bool
-	CheckFunctionExpressions  *bool
-	CheckMethodDeclarations   *bool
-}
-
 var PromiseFunctionAsyncRule = rule.Rule{
 	Name: "promise-function-async",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(PromiseFunctionAsyncOptions)
-		if !ok {
-			opts = PromiseFunctionAsyncOptions{}
-		}
-		if opts.AllowAny == nil {
-			opts.AllowAny = utils.Ref(true)
-		}
-		if opts.AllowedPromiseNames == nil {
-			opts.AllowedPromiseNames = []string{}
-		}
-		if opts.CheckArrowFunctions == nil {
-			opts.CheckArrowFunctions = utils.Ref(true)
-		}
-		if opts.CheckFunctionDeclarations == nil {
-			opts.CheckFunctionDeclarations = utils.Ref(true)
-		}
-		if opts.CheckFunctionExpressions == nil {
-			opts.CheckFunctionExpressions = utils.Ref(true)
-		}
-		if opts.CheckMethodDeclarations == nil {
-			opts.CheckMethodDeclarations = utils.Ref(true)
-		}
+		opts := utils.UnmarshalOptions[PromiseFunctionAsyncOptions](options, "promise-function-async")
 
 		allAllowedPromiseNames := utils.NewSetWithSizeHint[string](len(opts.AllowedPromiseNames))
 		allAllowedPromiseNames.Add("Promise")
@@ -109,7 +78,7 @@ var PromiseFunctionAsyncRule = rule.Rule{
 			everySignatureReturnsPromise := true
 			for _, signature := range signatures {
 				returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature)
-				if !*opts.AllowAny && utils.IsTypeFlagSet(returnType, checker.TypeFlagsAnyOrUnknown) {
+				if !opts.AllowAny && utils.IsTypeFlagSet(returnType, checker.TypeFlagsAnyOrUnknown) {
 					// Report without auto fixer because the return type is unknown
 					// TODO(port): getFunctionHeadLoc
 					ctx.ReportNode(node, buildMissingAsyncMessage())
@@ -138,19 +107,19 @@ var PromiseFunctionAsyncRule = rule.Rule{
 			})
 		}
 
-		if *opts.CheckArrowFunctions {
+		if opts.CheckArrowFunctions {
 			listeners[ast.KindArrowFunction] = validateNode
 		}
 
-		if *opts.CheckFunctionDeclarations {
+		if opts.CheckFunctionDeclarations {
 			listeners[ast.KindFunctionDeclaration] = validateNode
 		}
 
-		if *opts.CheckFunctionExpressions {
+		if opts.CheckFunctionExpressions {
 			listeners[ast.KindFunctionExpression] = validateNode
 		}
 
-		if *opts.CheckMethodDeclarations {
+		if opts.CheckMethodDeclarations {
 			listeners[ast.KindMethodDeclaration] = func(node *ast.Node) {
 				if utils.IncludesModifier(node, ast.KindAbstractKeyword) {
 					// Abstract method can't be async

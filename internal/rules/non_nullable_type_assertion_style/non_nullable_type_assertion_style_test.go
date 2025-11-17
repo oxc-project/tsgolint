@@ -8,7 +8,7 @@ import (
 )
 
 func TestNonNullableTypeAssertionStyleRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NonNullableTypeAssertionStyleRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NonNullableTypeAssertionStyleRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const original: number | string;
 const cast = original as string;

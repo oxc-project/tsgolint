@@ -7,8 +7,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestRelatedGetterSetterPairsRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &RelatedGetterSetterPairsRule, []rule_tester.ValidTestCase{
+func TestRelatedGetterSetterPairs(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RelatedGetterSetterPairsRule, []rule_tester.ValidTestCase{
 		{Code: `
 interface Example {
   get value(): string;

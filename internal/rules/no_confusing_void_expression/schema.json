@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "no_confusing_void_expression_options": {
+      "type": "object",
+      "properties": {
+        "ignoreArrowShorthand": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreVoidOperator": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreVoidReturningFunctions": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

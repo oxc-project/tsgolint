@@ -5,11 +5,11 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func TestRequireArraySortCompareRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &RequireArraySortCompareRule, []rule_tester.ValidTestCase{
+func TestRequireArraySortCompare(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RequireArraySortCompareRule, []rule_tester.ValidTestCase{
 		{Code: `
       function f(a: any[]) {
         a.sort(undefined);
@@ -93,7 +93,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
 			Code: `
         ['foo', 'bar', 'baz'].sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
 		{
 			Code: `
@@ -102,7 +102,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
         }
         [getString(), getString()].sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
 		{
 			Code: `
@@ -111,14 +111,14 @@ func TestRequireArraySortCompareRule(t *testing.T) {
         const baz = 'baz';
         [foo, bar, baz].sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
 		{
 			Code: `
         declare const x: string[];
         x.sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
 		{
 			Code: `
@@ -158,7 +158,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
           a.sort();
         }
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",
@@ -183,7 +183,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
           if (Array.isArray(a)) a.sort();
         }
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",
@@ -278,7 +278,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
 			Code: `
         [2, 'bar', 'baz'].sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",
@@ -292,7 +292,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
         }
         [2, 3].sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",
@@ -306,7 +306,7 @@ func TestRequireArraySortCompareRule(t *testing.T) {
         const three = 3;
         [one, two, three].sort();
       `,
-			Options: RequireArraySortCompareOptions{IgnoreStringArrays: utils.Ref(true)},
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",

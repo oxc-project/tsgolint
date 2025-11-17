@@ -5,11 +5,10 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestOnlyThrowErrorRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &OnlyThrowErrorRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &OnlyThrowErrorRule, []rule_tester.ValidTestCase{
 		{Code: "throw new Error();"},
 		{Code: "throw new Error('error');"},
 		{Code: "throw Error('error');"},
@@ -139,32 +138,20 @@ function fun<T extends Error>(t: T): void {
 			Code: `
 throw undefined;
       `,
-			Options: OnlyThrowErrorOptions{
-				Allow:                []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromLib, Name: []string{"undefined"}}},
-				AllowThrowingAny:     utils.Ref(false),
-				AllowThrowingUnknown: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "lib", "name": "undefined"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
 		},
 		{
 			Code: `
 class CustomError implements Error {}
 throw new CustomError();
       `,
-			Options: OnlyThrowErrorOptions{
-				Allow:                []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"CustomError"}}},
-				AllowThrowingAny:     utils.Ref(false),
-				AllowThrowingUnknown: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "file", "name": "CustomError"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
 		},
 		{
 			Code: `
 throw new Map();
       `,
-			Options: OnlyThrowErrorOptions{
-				Allow:                []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromLib, Name: []string{"Map"}}},
-				AllowThrowingAny:     utils.Ref(false),
-				AllowThrowingUnknown: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "lib", "name": "Map"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
 		},
 		{
 			Code: `
@@ -172,12 +159,8 @@ throw new Map();
         throw createError();
       `,
 			// TODO(port): type_matches_specifier doesn't support this yet
-			Skip: true,
-			Options: OnlyThrowErrorOptions{
-				Allow:                []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"ErrorLike"}, Package: "errors"}},
-				AllowThrowingAny:     utils.Ref(false),
-				AllowThrowingUnknown: utils.Ref(false),
-			},
+			Skip:    true,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "errors"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
 		},
 		{
 			Code: `
@@ -185,9 +168,7 @@ async function foo() {
   throw await Promise.resolve(new Error('error'));
 }
       `,
-			Options: OnlyThrowErrorOptions{
-				AllowThrowingAny: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingAny": false}`),
 		},
 		{
 			Code: `
@@ -195,9 +176,7 @@ function *foo(): Generator<number, void, Error> {
   throw yield 303;
 }
       `,
-			Options: OnlyThrowErrorOptions{
-				AllowThrowingAny: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingAny": false}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -536,7 +515,7 @@ function fun(value: any) {
   throw value;
 }
       `,
-			Options: OnlyThrowErrorOptions{AllowThrowingAny: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",
@@ -549,7 +528,7 @@ function fun(value: unknown) {
   throw value;
 }
       `,
-			Options: OnlyThrowErrorOptions{AllowThrowingUnknown: utils.Ref(false)},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingUnknown": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",
@@ -573,11 +552,7 @@ function fun<T extends number>(t: T): void {
 class UnknownError implements Error {}
 throw new UnknownError();
       `,
-			Options: OnlyThrowErrorOptions{
-				Allow:                []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"CustomError"}}},
-				AllowThrowingAny:     utils.Ref(false),
-				AllowThrowingUnknown: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "file", "name": "CustomError"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",
@@ -590,9 +565,7 @@ async function foo() {
   throw await bar;
 }
 			`,
-			Options: OnlyThrowErrorOptions{
-				AllowThrowingAny: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",
@@ -617,9 +590,7 @@ function *foo(): Generator<number, void, string> {
   throw yield 303;
 }
       `,
-			Options: OnlyThrowErrorOptions{
-				AllowThrowingAny: utils.Ref(false),
-			},
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingAny": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",

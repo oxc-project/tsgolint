@@ -74,11 +74,6 @@ func buildReplaceMapSpreadInObjectMessage() rule.RuleMessage {
 	}
 }
 
-type NoMisusedSpreadOptions struct {
-	Allow       []utils.TypeOrValueSpecifier
-	AllowInline []string
-}
-
 func isString(t *checker.Type) bool {
 	return utils.TypeRecurser(t, func(t *checker.Type) bool {
 		return utils.IsTypeFlagSet(t, checker.TypeFlagsStringLike)
@@ -153,20 +148,11 @@ func isClassDeclaration(t *checker.Type) bool {
 var NoMisusedSpreadRule = rule.Rule{
 	Name: "no-misused-spread",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoMisusedSpreadOptions)
-		if !ok {
-			opts = NoMisusedSpreadOptions{}
-		}
-		if opts.Allow == nil {
-			opts.Allow = []utils.TypeOrValueSpecifier{}
-		}
-		if opts.AllowInline == nil {
-			opts.AllowInline = []string{}
-		}
+		opts := utils.UnmarshalOptions[NoMisusedSpreadOptions](options, "no-misused-spread")
 
 		checkArrayOrCallSpread := func(node *ast.Node) {
 			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node.AsSpreadElement().Expression)
-			if !utils.TypeMatchesSomeSpecifier(t, opts.Allow, opts.AllowInline, ctx.Program) && isString(t) {
+			if !utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) && isString(t) {
 				ctx.ReportNode(node, buildNoStringSpreadMessage())
 			}
 		}
@@ -222,7 +208,7 @@ var NoMisusedSpreadRule = rule.Rule{
 		checkObjectSpread := func(node *ast.Node, argument *ast.Node) {
 			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, argument)
 
-			if utils.TypeMatchesSomeSpecifier(t, opts.Allow, opts.AllowInline, ctx.Program) {
+			if utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) {
 				return
 			}
 

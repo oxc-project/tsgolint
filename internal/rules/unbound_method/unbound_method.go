@@ -24,10 +24,6 @@ func buildUnboundWithoutThisAnnotationMessage() rule.RuleMessage {
 	}
 }
 
-type UnboundMethodOptions struct {
-	IgnoreStatic *bool
-}
-
 func isNodeInsideTypeDeclaration(node *ast.Node) bool {
 	for parent := node.Parent; parent != nil; parent = parent.Parent {
 		switch parent.Kind {
@@ -183,13 +179,7 @@ func checkIfMethod(symbol *ast.Symbol, ignoreStatic bool) ( /* dangerous */ bool
 var UnboundMethodRule = rule.Rule{
 	Name: "unbound-method",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(UnboundMethodOptions)
-		if !ok {
-			opts = UnboundMethodOptions{}
-		}
-		if opts.IgnoreStatic == nil {
-			opts.IgnoreStatic = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[UnboundMethodOptions](options, "unbound-method")
 
 		isNativelyBound := func(object *ast.Node, property *ast.Node) bool {
 			// We can't rely entirely on the type-level checks made at the end of this
@@ -222,7 +212,7 @@ var UnboundMethodRule = rule.Rule{
 				return false
 			}
 
-			dangerous, firstParamIsThis := checkIfMethod(symbol, *opts.IgnoreStatic)
+			dangerous, firstParamIsThis := checkIfMethod(symbol, opts.IgnoreStatic)
 
 			if !dangerous {
 				return false

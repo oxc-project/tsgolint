@@ -8,18 +8,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-type StrictBooleanExpressionsOptions struct {
-	AllowAny                                               *bool
-	AllowNullableBoolean                                   *bool
-	AllowNullableNumber                                    *bool
-	AllowNullableString                                    *bool
-	AllowNullableEnum                                      *bool
-	AllowNullableObject                                    *bool
-	AllowString                                            *bool
-	AllowNumber                                            *bool
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing *bool
-}
-
 func buildConditionErrorNumberMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorNumber",
@@ -114,41 +102,10 @@ func buildPredicateCannotBeAsyncMessage() rule.RuleMessage {
 var StrictBooleanExpressionsRule = rule.Rule{
 	Name: "strict-boolean-expressions",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(StrictBooleanExpressionsOptions)
-		if !ok {
-			opts = StrictBooleanExpressionsOptions{}
-		}
-
-		if opts.AllowAny == nil {
-			opts.AllowAny = utils.Ref(false)
-		}
-		if opts.AllowNullableBoolean == nil {
-			opts.AllowNullableBoolean = utils.Ref(false)
-		}
-		if opts.AllowNullableNumber == nil {
-			opts.AllowNullableNumber = utils.Ref(false)
-		}
-		if opts.AllowNullableString == nil {
-			opts.AllowNullableString = utils.Ref(false)
-		}
-		if opts.AllowNullableEnum == nil {
-			opts.AllowNullableEnum = utils.Ref(false)
-		}
-		if opts.AllowNullableObject == nil {
-			opts.AllowNullableObject = utils.Ref(true)
-		}
-		if opts.AllowString == nil {
-			opts.AllowString = utils.Ref(true)
-		}
-		if opts.AllowNumber == nil {
-			opts.AllowNumber = utils.Ref(true)
-		}
-		if opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing == nil {
-			opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[StrictBooleanExpressionsOptions](options, "strict-boolean-expressions")
 
 		compilerOptions := ctx.Program.Options()
-		if !*opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing &&
+		if !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing &&
 			!utils.IsStrictCompilerOptionEnabled(compilerOptions, compilerOptions.StrictNullChecks) {
 			ctx.ReportRange(
 				core.NewTextRange(0, 0),
@@ -539,7 +496,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 
 	switch info.variant {
 	case typeVariantAny, typeVariantUnknown, typeVariantGeneric:
-		if !*opts.AllowAny {
+		if !opts.AllowAny {
 			ctx.ReportNode(node, buildConditionErrorAnyMessage())
 		}
 		return
@@ -549,40 +506,40 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 		ctx.ReportNode(node, buildConditionErrorNullishMessage())
 	case typeVariantString:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
-		if *opts.AllowString && info.isTruthy {
+		if opts.AllowString && info.isTruthy {
 			return
 		}
 
 		if info.isNullable {
 			if info.isEnum {
-				if !*opts.AllowNullableEnum {
+				if !opts.AllowNullableEnum {
 					ctx.ReportNode(node, buildConditionErrorNullableEnumMessage())
 				}
 			} else {
-				if !*opts.AllowNullableString {
+				if !opts.AllowNullableString {
 					ctx.ReportNode(node, buildConditionErrorNullableStringMessage())
 				}
 			}
-		} else if !*opts.AllowString {
+		} else if !opts.AllowString {
 			ctx.ReportNode(node, buildConditionErrorStringMessage())
 		}
 	case typeVariantNumber:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
-		if *opts.AllowNumber && info.isTruthy {
+		if opts.AllowNumber && info.isTruthy {
 			return
 		}
 
 		if info.isNullable {
 			if info.isEnum {
-				if !*opts.AllowNullableEnum {
+				if !opts.AllowNullableEnum {
 					ctx.ReportNode(node, buildConditionErrorNullableEnumMessage())
 				}
 			} else {
-				if !*opts.AllowNullableNumber {
+				if !opts.AllowNullableNumber {
 					ctx.ReportNode(node, buildConditionErrorNullableNumberMessage())
 				}
 			}
-		} else if !*opts.AllowNumber {
+		} else if !opts.AllowNumber {
 			ctx.ReportNode(node, buildConditionErrorNumberMessage())
 		}
 	case typeVariantBoolean:
@@ -591,27 +548,27 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 			return
 		}
 
-		if info.isNullable && !*opts.AllowNullableBoolean {
+		if info.isNullable && !opts.AllowNullableBoolean {
 			ctx.ReportNode(node, buildConditionErrorNullableBooleanMessage())
 		}
 	case typeVariantObject:
-		if info.isNullable && !*opts.AllowNullableObject {
+		if info.isNullable && !opts.AllowNullableObject {
 			ctx.ReportNode(node, buildConditionErrorNullableObjectMessage())
 		} else if !info.isNullable {
 			ctx.ReportNode(node, buildConditionErrorObjectMessage())
 		}
 	case typeVariantMixed:
 		if info.isEnum {
-			if info.isNullable && !*opts.AllowNullableEnum {
+			if info.isNullable && !opts.AllowNullableEnum {
 				ctx.ReportNode(node, buildConditionErrorNullableEnumMessage())
 			}
 			return
 		}
 		ctx.ReportNode(node, buildConditionErrorOtherMessage())
 	case typeVariantBigInt:
-		if info.isNullable && !*opts.AllowNullableNumber {
+		if info.isNullable && !opts.AllowNullableNumber {
 			ctx.ReportNode(node, buildConditionErrorNullableNumberMessage())
-		} else if !info.isNullable && !*opts.AllowNumber {
+		} else if !info.isNullable && !opts.AllowNumber {
 			ctx.ReportNode(node, buildConditionErrorNumberMessage())
 		}
 	}

@@ -18,7 +18,7 @@ func TestIsSymbolFromDefaultLibrary(t *testing.T) {
 		filePath := tspath.ResolvePath(rootDir, "file.ts")
 		fs := NewOverlayVFSForFile(filePath, code)
 
-		program, _, err := CreateProgram(true, fs, rootDir, "tsconfig.json", CreateCompilerHost(rootDir, fs))
+		program, _, err := CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", CreateCompilerHost(rootDir, fs))
 		assert.NilError(t, err, "couldn't create program")
 		sourceFile := program.GetSourceFile(filePath)
 		c, done := program.GetTypeChecker(t.Context())

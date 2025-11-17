@@ -7,8 +7,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestNoArrayDeleteRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoArrayDeleteRule, []rule_tester.ValidTestCase{
+func TestNoArrayDelete(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoArrayDeleteRule, []rule_tester.ValidTestCase{
 		{Code: `
       declare const obj: { a: 1; b: 2 };
       delete obj.a;

@@ -7,8 +7,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestUseUnknownInCatchCallbackVariableRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &UseUnknownInCatchCallbackVariableRule, []rule_tester.ValidTestCase{
+func TestUseUnknownInCatchCallbackVariable(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &UseUnknownInCatchCallbackVariableRule, []rule_tester.ValidTestCase{
 		{Code: `
       Promise.resolve().catch((err: unknown) => {
         throw err;

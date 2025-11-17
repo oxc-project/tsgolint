@@ -210,8 +210,6 @@ type FunctionLikeWithBodyBase = ast.FunctionLikeWithBodyBase
 type FunctionOrConstructorTypeNodeBase = ast.FunctionOrConstructorTypeNodeBase
 type FunctionTypeNode = ast.FunctionTypeNode
 type GetAccessorDeclaration = ast.GetAccessorDeclaration
-//go:linkname GetAssertedTypeNode github.com/microsoft/typescript-go/internal/ast.GetAssertedTypeNode
-func GetAssertedTypeNode(node *ast.Node) *ast.Node
 //go:linkname GetAssignmentDeclarationKind github.com/microsoft/typescript-go/internal/ast.GetAssignmentDeclarationKind
 func GetAssignmentDeclarationKind(bin *ast.BinaryExpression) ast.JSDeclarationKind
 //go:linkname GetAssignmentTarget github.com/microsoft/typescript-go/internal/ast.GetAssignmentTarget
@@ -276,8 +274,6 @@ func GetImpliedNodeFormatForEmitWorker(fileName string, emitModuleKind core.Modu
 func GetImpliedNodeFormatForFile(path string, packageJsonType string) core.ModuleKind
 //go:linkname GetImportAttributes github.com/microsoft/typescript-go/internal/ast.GetImportAttributes
 func GetImportAttributes(node *ast.Node) *ast.Node
-//go:linkname GetImportClauseOfDeclaration github.com/microsoft/typescript-go/internal/ast.GetImportClauseOfDeclaration
-func GetImportClauseOfDeclaration(declaration *ast.Declaration) *ast.ImportClause
 //go:linkname GetInitializerOfBinaryExpression github.com/microsoft/typescript-go/internal/ast.GetInitializerOfBinaryExpression
 func GetInitializerOfBinaryExpression(expr *ast.BinaryExpression) *ast.Expression
 //go:linkname GetInvokedExpression github.com/microsoft/typescript-go/internal/ast.GetInvokedExpression
@@ -332,8 +328,6 @@ func GetSourceFileAffectingCompilerOptions(fileName string, options *core.Compil
 func GetSourceFileOfModule(module *ast.Symbol) *ast.SourceFile
 //go:linkname GetSourceFileOfNode github.com/microsoft/typescript-go/internal/ast.GetSourceFileOfNode
 func GetSourceFileOfNode(node *ast.Node) *ast.SourceFile
-//go:linkname GetStatementsOfBlock github.com/microsoft/typescript-go/internal/ast.GetStatementsOfBlock
-func GetStatementsOfBlock(block *ast.Node) *ast.StatementList
 //go:linkname GetSuperContainer github.com/microsoft/typescript-go/internal/ast.GetSuperContainer
 func GetSuperContainer(node *ast.Node, stopOnFunctions bool) *ast.Node
 //go:linkname GetSymbolId github.com/microsoft/typescript-go/internal/ast.GetSymbolId
@@ -716,6 +710,8 @@ func IsInfinityOrNaNString(name string) bool
 func IsInitializedProperty(member *ast.ClassElement) bool
 //go:linkname IsInstanceOfExpression github.com/microsoft/typescript-go/internal/ast.IsInstanceOfExpression
 func IsInstanceOfExpression(node *ast.Node) bool
+//go:linkname IsInstantiatedModule github.com/microsoft/typescript-go/internal/ast.IsInstantiatedModule
+func IsInstantiatedModule(node *ast.Node, preserveConstEnums bool) bool
 //go:linkname IsInterfaceDeclaration github.com/microsoft/typescript-go/internal/ast.IsInterfaceDeclaration
 func IsInterfaceDeclaration(node *ast.Node) bool
 //go:linkname IsInternalModuleImportEqualsDeclaration github.com/microsoft/typescript-go/internal/ast.IsInternalModuleImportEqualsDeclaration
@@ -978,6 +974,8 @@ func IsPartOfTypeQuery(node *ast.Node) bool
 func IsPartiallyEmittedExpression(node *ast.Node) bool
 //go:linkname IsPlainJSFile github.com/microsoft/typescript-go/internal/ast.IsPlainJSFile
 func IsPlainJSFile(file *ast.SourceFile, checkJs core.Tristate) bool
+//go:linkname IsPotentiallyExecutableNode github.com/microsoft/typescript-go/internal/ast.IsPotentiallyExecutableNode
+func IsPotentiallyExecutableNode(node *ast.Node) bool
 //go:linkname IsPrefixUnaryExpression github.com/microsoft/typescript-go/internal/ast.IsPrefixUnaryExpression
 func IsPrefixUnaryExpression(node *ast.Node) bool
 //go:linkname IsPrivateIdentifier github.com/microsoft/typescript-go/internal/ast.IsPrivateIdentifier
@@ -1179,7 +1177,6 @@ const JSDeclarationKindExportsProperty = ast.JSDeclarationKindExportsProperty
 const JSDeclarationKindModuleExports = ast.JSDeclarationKindModuleExports
 const JSDeclarationKindNone = ast.JSDeclarationKindNone
 const JSDeclarationKindProperty = ast.JSDeclarationKindProperty
-const JSDeclarationKindPrototypeProperty = ast.JSDeclarationKindPrototypeProperty
 const JSDeclarationKindThisProperty = ast.JSDeclarationKindThisProperty
 type JSDoc = ast.JSDoc
 type JSDocAllType = ast.JSDocAllType
@@ -1755,6 +1752,8 @@ func NewNodeFactory(hooks ast.NodeFactoryHooks) *ast.NodeFactory
 func NewNodeVisitor(visit func(node *ast.Node) *ast.Node, factory *ast.NodeFactory, hooks ast.NodeVisitorHooks) *ast.NodeVisitor
 type NoSubstitutionTemplateLiteral = ast.NoSubstitutionTemplateLiteral
 type Node = ast.Node
+//go:linkname Node_Type github.com/microsoft/typescript-go/internal/ast.(*Node).Type
+func Node_Type(recv *ast.Node) *ast.Node
 type NodeBase = ast.NodeBase
 type NodeDefault = ast.NodeDefault
 type NodeFactory = ast.NodeFactory
@@ -1795,6 +1794,7 @@ const NodeFlagsSynthesized = ast.NodeFlagsSynthesized
 const NodeFlagsThisNodeHasError = ast.NodeFlagsThisNodeHasError
 const NodeFlagsThisNodeOrAnySubNodesHasError = ast.NodeFlagsThisNodeOrAnySubNodesHasError
 const NodeFlagsTypeExcludesFlags = ast.NodeFlagsTypeExcludesFlags
+const NodeFlagsUnreachable = ast.NodeFlagsUnreachable
 const NodeFlagsUsing = ast.NodeFlagsUsing
 const NodeFlagsYieldContext = ast.NodeFlagsYieldContext
 //go:linkname NodeHasKind github.com/microsoft/typescript-go/internal/ast.NodeHasKind

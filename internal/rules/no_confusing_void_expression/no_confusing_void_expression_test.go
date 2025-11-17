@@ -7,7 +7,8 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestNoConfusingVoidExpressionRule(t *testing.T) {
+func TestNoConfusingVoidExpression(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoConfusingVoidExpressionRule, []rule_tester.ValidTestCase{
 		{Code: "() => Math.random();"},
 		{Code: "console.log('foo');"},
@@ -19,85 +20,85 @@ func TestNoConfusingVoidExpressionRule(t *testing.T) {
 			Code: `
         () => console.log('foo');
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreArrowShorthand: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreArrowShorthand": true}`),
 		},
 		{
 			Code: `
         foo => foo && console.log(foo);
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreArrowShorthand: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreArrowShorthand": true}`),
 		},
 		{
 			Code: `
         foo => foo || console.log(foo);
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreArrowShorthand: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreArrowShorthand": true}`),
 		},
 		{
 			Code: `
         foo => (foo ? console.log(true) : console.log(false));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreArrowShorthand: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreArrowShorthand": true}`),
 		},
 		{
 			Code: `
         !void console.log('foo');
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         +void (foo && console.log(foo));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         -void (foo || console.log(foo));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         () => void ((foo && void console.log(true)) || console.log(false));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         const x = void (foo ? console.log(true) : console.log(false));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         !(foo && void console.log(foo));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         !!(foo || void console.log(foo));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         const x = (foo && void console.log(true)) || void console.log(false);
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         () => (foo ? void console.log(true) : void console.log(false));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{
 			Code: `
         return void console.log('foo');
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 		},
 		{Code: `
 function cool(input: string) {
@@ -119,7 +120,7 @@ function test(): void {
   return console.log('bar');
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -127,13 +128,13 @@ const test = (): void => {
   return console.log('bar');
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 const test = (): void => console.log('bar');
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -143,7 +144,7 @@ function test(): void {
   }
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -153,7 +154,7 @@ const obj = {
   },
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -163,7 +164,7 @@ class Foo {
   }
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -173,14 +174,14 @@ function test() {
   }
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 type Foo = () => void;
 const test = (() => console.log()) as Foo;
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -191,7 +192,7 @@ const test: Foo = {
   foo: () => console.log(),
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -201,7 +202,7 @@ const test = {
   foo: () => void;
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -211,7 +212,7 @@ const test: {
   foo: () => console.log(),
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -223,7 +224,7 @@ const test = {
   foo: { bar: () => console.log() },
 } as Foo;
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -235,7 +236,7 @@ const test: Foo = {
   foo: { bar: () => console.log() },
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -245,7 +246,7 @@ class App {
   private method: MethodType = () => console.log();
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -259,14 +260,14 @@ function bar(): Foo {
   };
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 type Foo = () => () => () => void;
 const x: Foo = () => () => () => console.log();
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -278,14 +279,14 @@ const test = {
   foo: () => console.log(),
 } as Foo;
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 type Foo = () => void;
 const test: Foo = () => console.log('foo');
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -297,7 +298,7 @@ declare function Component(props: Props): any;
 
 <Component onEvent={() => console.log()} />;
 			`,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Tsx:     true,
 		},
 		{
@@ -305,35 +306,35 @@ declare function Component(props: Props): any;
 declare function foo(arg: () => void): void;
 foo(() => console.log());
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 declare function foo(arg: (() => void) | (() => string)): void;
 foo(() => console.log());
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 declare function foo(arg: (() => void) | (() => string) | string): void;
 foo(() => console.log());
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 declare function foo(arg: () => void | string): void;
 foo(() => console.log());
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 declare function foo(options: { cb: () => void }): void;
 foo({ cb: () => console.log() });
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -343,7 +344,7 @@ const obj = {
   foo: { bar: () => void };
 };
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -351,7 +352,7 @@ function test(): void & void {
   return console.log('foo');
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -363,20 +364,20 @@ function test(): Foo {
   return foo();
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 type Foo = void;
 const test = (): Foo => console.log('err');
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
 const test: () => any = (): void => console.log();
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -384,7 +385,7 @@ function test(): void | string {
   return console.log('bar');
 }
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 		{
 			Code: `
@@ -403,7 +404,7 @@ test((() => {
   return console.log('123');
 }) as typeof makeDate | (() => string));
       `,
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -856,7 +857,7 @@ function notcool(input: string) {
 		{
 			Code:    "return console.log('foo');",
 			Output:  []string{"return void console.log('foo');"},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnWrapVoid",
@@ -867,7 +868,7 @@ function notcool(input: string) {
 		},
 		{
 			Code:    "console.error(console.log('foo'));",
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprWrapVoid",
@@ -884,7 +885,7 @@ function notcool(input: string) {
 		},
 		{
 			Code:    "console.log('foo') ? true : false;",
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprWrapVoid",
@@ -901,7 +902,7 @@ function notcool(input: string) {
 		},
 		{
 			Code:    "const x = foo ?? console.log('foo');",
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprWrapVoid",
@@ -919,7 +920,7 @@ function notcool(input: string) {
 		{
 			Code:    "foo => foo || console.log(foo);",
 			Output:  []string{"foo => foo || void console.log(foo);"},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrowWrapVoid",
@@ -930,7 +931,7 @@ function notcool(input: string) {
 		},
 		{
 			Code:    "!!console.log('foo');",
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidOperator: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidOperator": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprWrapVoid",
@@ -957,7 +958,7 @@ function test() {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -969,7 +970,7 @@ function test() {
 		{
 			Code:    "const test = () => console.log('foo');",
 			Output:  []string{"const test = () =>{  console.log('foo'); };"},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -990,7 +991,7 @@ const test = () => {
 };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1015,7 +1016,7 @@ function foo(): void {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1032,7 +1033,7 @@ function foo(): void {
         (): any =>{  console.log('foo'); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1049,7 +1050,7 @@ function foo(): void {
         (): unknown =>{  console.log('foo'); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1070,7 +1071,7 @@ function test(): void {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1089,7 +1090,7 @@ type Foo = any;
 (): Foo =>{  console.log(); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1108,7 +1109,7 @@ type Foo = unknown;
 (): Foo =>{  console.log(); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1129,7 +1130,7 @@ function test(): any {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1150,7 +1151,7 @@ function test(): unknown {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1171,7 +1172,7 @@ function test(): any {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1190,7 +1191,7 @@ type Foo = () => any;
 (): Foo => () =>{  console.log(); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1209,7 +1210,7 @@ type Foo = () => unknown;
 (): Foo => () =>{  console.log(); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1228,7 +1229,7 @@ type Foo = () => any;
 const test: Foo = () =>{  console.log(); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1247,7 +1248,7 @@ type Foo = () => unknown;
 const test: Foo = () =>{  console.log(); };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprArrow",
@@ -1276,7 +1277,7 @@ const foo: Foo = function () {
 };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1301,7 +1302,7 @@ const foo = function () {
 };
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1318,7 +1319,7 @@ return console.log('foo');
 {  console.log('foo');; return; }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturn",
@@ -1349,7 +1350,7 @@ function test(arg?: string): any | void {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",
@@ -1380,7 +1381,7 @@ function test(arg?: string): any | void {
 }
       `,
 			},
-			Options: NoConfusingVoidExpressionOptions{IgnoreVoidReturningFunctions: true},
+			Options: rule_tester.OptionsFromJSON[NoConfusingVoidExpressionOptions](`{"ignoreVoidReturningFunctions": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "invalidVoidExprReturnLast",

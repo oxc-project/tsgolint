@@ -80,7 +80,7 @@ func TestNoBaseToStringRule(t *testing.T) {
 		}
 	})
 
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoBaseToStringRule, slices.Concat(
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoBaseToStringRule, slices.Concat(
 		extraValid,
 		[]rule_tester.ValidTestCase{
 

@@ -7,7 +7,8 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
-func TestNoForInArrayRule(t *testing.T) {
+func TestNoForInArray(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoForInArrayRule, []rule_tester.ValidTestCase{
 		{Code: `
 for (const x of [3, 4, 5]) {

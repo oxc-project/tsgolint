@@ -14,45 +14,27 @@ func buildRejectAnErrorMessage() rule.RuleMessage {
 	}
 }
 
-type PreferPromiseRejectErrorsOptions struct {
-	AllowEmptyReject     *bool
-	AllowThrowingAny     *bool
-	AllowThrowingUnknown *bool
-}
-
 var PreferPromiseRejectErrorsRule = rule.Rule{
 	Name: "prefer-promise-reject-errors",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(PreferPromiseRejectErrorsOptions)
-		if !ok {
-			opts = PreferPromiseRejectErrorsOptions{}
-		}
-		if opts.AllowEmptyReject == nil {
-			opts.AllowEmptyReject = utils.Ref(false)
-		}
-		if opts.AllowThrowingAny == nil {
-			opts.AllowThrowingAny = utils.Ref(false)
-		}
-		if opts.AllowThrowingUnknown == nil {
-			opts.AllowThrowingUnknown = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[PreferPromiseRejectErrorsOptions](options, "prefer-promise-reject-errors")
 
 		checkRejectCall := func(callExpression *ast.CallExpression) {
 			if len(callExpression.Arguments.Nodes) != 0 {
 				argument := callExpression.Arguments.Nodes[0]
 				t := ctx.TypeChecker.GetTypeAtLocation(argument)
 
-				if *opts.AllowThrowingAny && utils.IsTypeAnyType(t) {
+				if opts.AllowThrowingAny && utils.IsTypeAnyType(t) {
 					return
 				}
-				if *opts.AllowThrowingUnknown && utils.IsTypeUnknownType(t) {
+				if opts.AllowThrowingUnknown && utils.IsTypeUnknownType(t) {
 					return
 				}
 
 				if utils.IsErrorLike(ctx.Program, ctx.TypeChecker, t) || utils.IsReadonlyErrorLike(ctx.Program, ctx.TypeChecker, t) {
 					return
 				}
-			} else if *opts.AllowEmptyReject {
+			} else if opts.AllowEmptyReject {
 				return
 			}
 			ctx.ReportNode(&callExpression.Node, buildRejectAnErrorMessage())

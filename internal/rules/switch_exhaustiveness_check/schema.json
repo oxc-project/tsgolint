@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "switch_exhaustiveness_check_options": {
+      "type": "object",
+      "properties": {
+        "allowDefaultCaseForExhaustiveSwitch": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, allow default cases on switch statements that are already exhaustive"
+        },
+        "considerDefaultExhaustiveForUnions": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, the presence of a default case makes a union type switch exhaustive"
+        },
+        "defaultCaseCommentPattern": {
+          "type": "string",
+          "description": "A regular pattern for a comment explaining why the default case is not exhaustive"
+        },
+        "requireDefaultForNonUnion": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, require a default clause for switches on non-union types"
+        }
+      }
+    }
+  }
+}

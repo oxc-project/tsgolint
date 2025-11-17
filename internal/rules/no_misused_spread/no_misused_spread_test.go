@@ -5,11 +5,10 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoMisusedSpreadRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoMisusedSpreadRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMisusedSpreadRule, []rule_tester.ValidTestCase{
 		{Code: "const a = [...[1, 2, 3]];"},
 		{Code: "const a = [...([1, 2, 3] as const)];"},
 		{Code: `
@@ -146,7 +145,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
         const promise = new Promise(() => {});
         const o = { ...promise };
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"Promise"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "lib", "name": "Promise"}]}`),
 		},
 		{Code: `
       interface A {}
@@ -163,7 +162,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
         const str: string = 'test';
         const a = [...str];
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"string"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "lib", "name": "string"}]}`),
 		},
 		{
 			Code: `
@@ -171,7 +170,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const a = { ...f };
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"f"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "f"}]}`),
 		},
 		{
 			Code: `
@@ -179,7 +178,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const a = { ...iterator };
       `,
-			Options: NoMisusedSpreadOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromLib, Name: []string{"Iterable"}}}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "lib", "name": "Iterable"}]}`),
 		},
 		{
 			Code: `
@@ -189,7 +188,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const spreadBrandedString = [...brandedString];
       `,
-			Options: NoMisusedSpreadOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"BrandedString"}}}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "BrandedString"}]}`),
 		},
 		{
 			Code: `
@@ -201,7 +200,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const a = { ...iterator };
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"CustomIterable"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "CustomIterable"}]}`),
 		},
 		{
 			Code: `
@@ -213,7 +212,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const a = { ...iterator };
       `,
-			Options: NoMisusedSpreadOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromFile, Name: []string{"CustomIterable"}}}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "CustomIterable"}]}`),
 		},
 		{
 			Code: `
@@ -229,9 +228,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const a = { ...iterator };
       `,
-			Options: NoMisusedSpreadOptions{
-				Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"CustomIterable"}, Package: "module"}},
-			},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "package", "name": "CustomIterable", "package": "module"}]}`),
 		},
 		{
 			Code: `
@@ -243,7 +240,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const o = { ...a };
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"A"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "A"}]}`),
 		},
 		{
 			Code: `
@@ -253,7 +250,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
           },
         };
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"A"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "A"}]}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -1337,7 +1334,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 
         const a = { ...iterator };
       `,
-			Options: NoMisusedSpreadOptions{AllowInline: []string{"AnotherIterable"}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "file", "name": "AnotherIterable"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noIterableSpreadInObject",
@@ -1363,7 +1360,7 @@ func TestNoMisusedSpreadRule(t *testing.T) {
       `,
 			// TODO(port): for some reason tsgo returns `error` type for iterator
 			Skip:    true,
-			Options: NoMisusedSpreadOptions{Allow: []utils.TypeOrValueSpecifier{{From: utils.TypeOrValueSpecifierFromPackage, Name: []string{"Nothing"}, Package: "module"}}},
+			Options: rule_tester.OptionsFromJSON[NoMisusedSpreadOptions](`{"allow": [{"from": "package", "name": "Nothing", "package": "module"}]}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noIterableSpreadInObject",

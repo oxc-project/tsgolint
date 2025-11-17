@@ -36,10 +36,6 @@ func buildBaseToStringMessage(name string, certainty usefulness) rule.RuleMessag
 	}
 }
 
-type NoBaseToStringOptions struct {
-	IgnoredTypeNames []string
-}
-
 type usefulness uint32
 
 const (
@@ -51,12 +47,7 @@ const (
 var NoBaseToStringRule = rule.Rule{
 	Name: "no-base-to-string",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoBaseToStringOptions)
-		if !ok {
-			opts = NoBaseToStringOptions{
-				IgnoredTypeNames: []string{"Error", "RegExp", "URL", "URLSearchParams"},
-			}
-		}
+		opts := utils.UnmarshalOptions[NoBaseToStringOptions](options, "no-base-to-string")
 
 		var collectToStringCertainty func(
 			t *checker.Type,
