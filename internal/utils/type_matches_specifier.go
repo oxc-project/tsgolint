@@ -287,18 +287,28 @@ func TypeMatchesSomeSpecifier(
 	return false
 }
 
+func getStaticName(node *ast.Node) string {
+	switch node.Kind {
+	case ast.KindIdentifier:
+		return node.AsIdentifier().Text
+	case ast.KindPrivateIdentifier:
+		return strings.TrimPrefix(node.AsPrivateIdentifier().Text, "#")
+	case ast.KindStringLiteral:
+		return node.Text()
+	default:
+		return ""
+	}
+}
+
 func valueMatchesSpecifier(
 	node *ast.Node,
 	specifier TypeOrValueSpecifier,
 	program *compiler.Program,
 	t *checker.Type,
 ) bool {
-	// Get the name of the node
-	nodeName := node.Text()
-
-	// For private identifiers, strip the # prefix for comparison
-	if node.Kind == ast.KindPrivateIdentifier {
-		nodeName = strings.TrimPrefix(nodeName, "#")
+	nodeName := getStaticName(node)
+	if nodeName == "" {
+		return false
 	}
 
 	// Check if the name matches
