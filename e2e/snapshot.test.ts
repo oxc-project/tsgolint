@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,6 +19,7 @@ const ALL_RULES = [
   'no-array-delete',
   'no-base-to-string',
   'no-confusing-void-expression',
+  'no-deprecated',
   'no-duplicate-type-constituents',
   'no-floating-promises',
   'no-for-in-array',
@@ -41,6 +43,7 @@ const ALL_RULES = [
   'no-unsafe-unary-minus',
   'non-nullable-type-assertion-style',
   'only-throw-error',
+  'prefer-includes',
   'prefer-promise-reject-errors',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
@@ -51,6 +54,7 @@ const ALL_RULES = [
   'restrict-plus-operands',
   'restrict-template-expressions',
   'return-await',
+  'strict-boolean-expressions',
   'switch-exhaustiveness-check',
   'unbound-method',
   'use-unknown-in-catch-callback-variable',
@@ -205,6 +209,29 @@ function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[numb
 }
 
 describe('TSGoLint E2E Snapshot Tests', () => {
+  it('(`ALL_RULES`) should include every available rule ', async () => {
+    const rulesDir = join(import.meta.dirname, '..', 'internal', 'rules');
+    const fileSystemRulesList = [];
+
+    // read all folders in the directory
+    for (const entry of await fs.readdir(rulesDir)) {
+      if (entry.startsWith('.') || entry === 'fixtures') {
+        continue;
+      }
+      const entryPath = join(rulesDir, entry);
+      const stat = await fs.stat(entryPath);
+      if (!stat.isDirectory()) continue;
+      const ruleFileStat = await fs.stat(join(entryPath, `${entry}.go`)).catch(() => null);
+      if (ruleFileStat?.isFile()) {
+        fileSystemRulesList.push(entry.replace(/_/g, '-'));
+      }
+    }
+
+    expect(fileSystemRulesList.sort()).toEqual(
+      [...ALL_RULES].sort(),
+    );
+  });
+
   it('should generate consistent diagnostics snapshot', async () => {
     const testFiles = await getTestFiles('basic');
     expect(testFiles.length).toBeGreaterThan(0);

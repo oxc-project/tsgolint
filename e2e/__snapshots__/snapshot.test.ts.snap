@@ -146,19 +146,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Unsafe call of a(n) \`any\` typed value.",
       "id": "unsafeCall",
     },
@@ -226,19 +213,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
   },
   {
-    "file_path": "fixtures/basic/rules/no-array-delete/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
@@ -283,30 +257,100 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-base-to-string",
   },
   {
-    "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
+      "description": "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+      "id": "invalidVoidExpr",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": 207,
+      "pos": 202,
     },
-    "rule": "no-unnecessary-boolean-literal-compare",
+    "rule": "no-confusing-void-expression",
   },
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
+      "description": "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+      "id": "invalidVoidExpr",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": 255,
+      "pos": 250,
     },
-    "rule": "no-unnecessary-boolean-literal-compare",
+    "rule": "no-confusing-void-expression",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 201,
+          "pos": 197,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
+      "id": "meaninglessVoidOperator",
+    },
+    "range": {
+      "end": 207,
+      "pos": 197,
+    },
+    "rule": "no-meaningless-void-operator",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 249,
+          "pos": 245,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
+      "id": "meaninglessVoidOperator",
+    },
+    "range": {
+      "end": 255,
+      "pos": 245,
+    },
+    "rule": "no-meaningless-void-operator",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
+      "id": "conditionErrorAny",
+    },
+    "range": {
+      "end": 194,
+      "pos": 185,
+    },
+    "rule": "strict-boolean-expressions",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unexpected nullish value in conditional. The expression is always falsy.",
+      "id": "conditionErrorNullish",
+    },
+    "range": {
+      "end": 255,
+      "pos": 245,
+    },
+    "rule": "strict-boolean-expressions",
   },
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
@@ -404,19 +448,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 111,
     },
     "rule": "no-redundant-type-constituents",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
@@ -657,19 +688,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
     },
@@ -722,19 +740,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
-    "kind": 0,
-    "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
     },
@@ -769,19 +774,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 129,
     },
     "rule": "no-for-in-array",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
@@ -862,17 +854,39 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-implied-eval",
   },
   {
-    "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
+    "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
+      "description": "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+      "id": "invalidVoidExpr",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": 115,
+      "pos": 110,
     },
-    "rule": "no-unnecessary-boolean-literal-compare",
+    "rule": "no-confusing-void-expression",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 109,
+          "pos": 105,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
+      "id": "meaninglessVoidOperator",
+    },
+    "range": {
+      "end": 115,
+      "pos": 105,
+    },
+    "rule": "no-meaningless-void-operator",
   },
   {
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
@@ -895,19 +909,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 161,
     },
     "rule": "no-meaningless-void-operator",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
@@ -1031,19 +1032,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-misused-spread",
   },
   {
-    "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
@@ -1068,19 +1056,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 144,
     },
     "rule": "no-mixed-enums",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
@@ -1120,32 +1095,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 240,
     },
     "rule": "no-redundant-type-constituents",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unnecessary-boolean-literal-compare/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-boolean-literal-compare/index.ts",
@@ -1202,19 +1151,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Template literal expression is unnecessary and can be simplified.",
       "id": "noUnnecessaryTemplateExpression",
     },
@@ -1239,19 +1175,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-arguments/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unnecessary-type-arguments/index.ts",
     "fixes": [
       {
         "range": {
@@ -1271,19 +1194,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 207,
     },
     "rule": "no-unnecessary-type-arguments",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unnecessary-type-assertion/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-assertion/index.ts",
@@ -1376,19 +1286,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Unsafe argument of type any assigned to a parameter of type string.",
       "id": "unsafeArgument",
     },
@@ -1410,19 +1307,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 273,
     },
     "rule": "no-unsafe-argument",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
@@ -1491,19 +1375,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 214,
     },
     "rule": "no-unsafe-assignment",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
@@ -1636,32 +1507,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-mixed-enums",
   },
   {
-    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
     "kind": 0,
     "message": {
@@ -1743,19 +1588,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
     },
@@ -1790,19 +1622,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 275,
     },
     "rule": "no-unsafe-return",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
@@ -1912,19 +1731,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Argument of unary negation should be assignable to number | bigint but is unknown instead.",
       "id": "unaryMinus",
     },
@@ -1977,48 +1783,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
-    "fixes": [
-      {
-        "range": {
-          "end": 269,
-          "pos": 267,
-        },
-        "text": "",
-      },
-      {
-        "range": {
-          "end": 276,
-          "pos": 270,
-        },
-        "text": "",
-      },
-    ],
-    "kind": 0,
-    "message": {
-      "description": "This assertion is unnecessary since it does not change the type of the expression.",
-      "id": "unnecessaryAssertion",
-    },
-    "range": {
-      "end": 276,
-      "pos": 261,
-    },
-    "rule": "no-unnecessary-type-assertion",
-  },
-  {
-    "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Unsafe type assertion: type 'string' is more narrow than the original type.",
       "id": "unsafeTypeAssertion",
     },
@@ -2029,17 +1793,46 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unsafe-type-assertion",
   },
   {
-    "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
+    "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
+      "description": "Unsafe type assertion: type 'number' is more narrow than the original type.",
+      "id": "unsafeTypeAssertion",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": 276,
+      "pos": 261,
     },
-    "rule": "no-unnecessary-boolean-literal-compare",
+    "rule": "no-unsafe-type-assertion",
+  },
+  {
+    "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 276,
+          "pos": 266,
+        },
+        "text": "",
+      },
+      {
+        "range": {
+          "end": 266,
+          "pos": 266,
+        },
+        "text": "!",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use a ! assertion to more succinctly remove null and undefined from the type.",
+      "id": "preferNonNullAssertion",
+    },
+    "range": {
+      "end": 276,
+      "pos": 261,
+    },
+    "rule": "non-nullable-type-assertion-style",
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",
@@ -2350,19 +2143,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
     },
@@ -2426,19 +2206,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
     "fixes": [
       {
         "range": {
@@ -2497,19 +2264,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-return-this-type/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/prefer-return-this-type/index.ts",
     "fixes": [
       {
         "range": {
@@ -2529,19 +2283,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 138,
     },
     "rule": "prefer-return-this-type",
-  },
-  {
-    "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
@@ -2635,19 +2376,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/related-getter-setter-pairs/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/related-getter-setter-pairs/index.ts",
-    "kind": 0,
-    "message": {
       "description": "\`get()\` type should be assignable to its equivalent \`set()\` type.",
       "id": "mismatch",
     },
@@ -2656,19 +2384,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 179,
     },
     "rule": "related-getter-setter-pairs",
-  },
-  {
-    "file_path": "fixtures/basic/rules/require-array-sort-compare/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/require-array-sort-compare/index.ts",
@@ -2695,19 +2410,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 265,
     },
     "rule": "require-array-sort-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/require-await/index.ts",
@@ -2765,19 +2467,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
@@ -2830,19 +2519,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Invalid type "{ prop: any; }" of template literal expression.",
       "id": "invalidType",
     },
@@ -2890,19 +2566,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 465,
     },
     "rule": "restrict-template-expressions",
-  },
-  {
-    "file_path": "fixtures/basic/rules/return-await/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/return-await/index.ts",
@@ -2968,19 +2631,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
       "description": "The case statement does not have a shared enum type with the switch predicate.",
       "id": "mismatchedCase",
     },
@@ -3015,19 +2665,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 170,
     },
     "rule": "switch-exhaustiveness-check",
-  },
-  {
-    "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
@@ -3084,19 +2721,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 647,
     },
     "rule": "unbound-method",
-  },
-  {
-    "file_path": "fixtures/basic/rules/use-unknown-in-catch-callback-variable/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/rules/use-unknown-in-catch-callback-variable/index.ts",
@@ -3393,19 +3017,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/src/a.ts",
-    "kind": 0,
-    "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
     },
@@ -3688,19 +3299,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 238,
     },
     "rule": "no-floating-promises",
-  },
-  {
-    "file_path": "fixtures/basic/src/b.mts",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
@@ -3993,19 +3591,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
     "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
-  },
-  {
-    "file_path": "fixtures/basic/src/c.cts",
-    "kind": 0,
-    "message": {
       "description": "Expected the Promise rejection reason to be an Error.",
       "id": "rejectAnError",
     },
@@ -4288,19 +3873,6 @@ If your function does not access \`this\`, you can annotate it with \`this: void
       "pos": 238,
     },
     "rule": "no-floating-promises",
-  },
-  {
-    "file_path": "fixtures/basic/src/d.tsx",
-    "kind": 0,
-    "message": {
-      "description": "This rule requires the \`strictNullChecks\` compiler option to be turned on to function correctly.",
-      "id": "noStrictNullCheck",
-    },
-    "range": {
-      "end": 0,
-      "pos": 0,
-    },
-    "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
