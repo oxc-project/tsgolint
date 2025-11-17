@@ -1,3 +1,18 @@
+// Package no_unnecessary_condition implements the no-unnecessary-condition rule.
+//
+// This rule prevents unnecessary conditions in TypeScript code by detecting expressions
+// that are always truthy, always falsy, or comparing values that have no overlap.
+//
+// The rule checks:
+// - Conditional expressions (if, while, for, ternary operators)
+// - Logical operators (&&, ||, !)
+// - Nullish coalescing operators (??, ??=)
+// - Optional chaining (?.)
+// - Comparison operators (===, !==, ==, !=, <, >, <=, >=)
+// - Type predicates and type guards
+//
+// This implementation is based on the @typescript-eslint/no-unnecessary-condition rule:
+// https://typescript-eslint.io/rules/no-unnecessary-condition/
 package no_unnecessary_condition
 
 import (
@@ -8,10 +23,23 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+// NoUnnecessaryConditionOptions configures the no-unnecessary-condition rule.
 type NoUnnecessaryConditionOptions struct {
-	// Can be: "never" | "always" | "only-allowed-literals" | boolean (or pointers to these types)
-	AllowConstantLoopConditions                            any
-	CheckTypePredicates                                    *bool
+	// AllowConstantLoopConditions controls whether constant loop conditions are allowed.
+	// Values: "never" (default) | "always" | "only-allowed-literals" | boolean
+	// - "never": Disallow all constant loop conditions
+	// - "always": Allow all constant loop conditions
+	// - "only-allowed-literals": Allow only literal true/false/0/1
+	AllowConstantLoopConditions any
+
+	// CheckTypePredicates enables checking of type predicate functions.
+	// When true, reports when type guards are used on values that already match the predicate type.
+	// Default: false
+	CheckTypePredicates *bool
+
+	// AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing allows the rule to run
+	// without strictNullChecks enabled. Not recommended.
+	// Default: false (DEPRECATED - will be removed in future versions)
 	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing *bool
 }
 
@@ -83,6 +111,54 @@ func buildNoOverlapMessage() rule.RuleMessage {
 		Id:          "noOverlapBooleanExpression",
 		Description: "This condition will always return the same value since the types have no overlap.",
 	}
+}
+
+func buildAlwaysNullishMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "alwaysNullish",
+		Description: "Unnecessary conditional, value is always nullish.",
+	}
+}
+
+func buildTypeGuardAlreadyIsTypeMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "typeGuardAlreadyIsType",
+		Description: "Type predicate is unnecessary as the parameter type already satisfies the predicate.",
+	}
+}
+
+// isIndeterminateType checks if a type cannot be determined at compile time.
+//
+// Indeterminate types include:
+// - any: explicitly typed as any
+// - unknown: could be anything
+// - type parameters: generic types like T, K
+// - indexed access types: types like T[K]
+// - index types: types like keyof T
+//
+// For these types, we cannot determine their truthiness, nullishness, or overlap
+// with other types at compile time, so we conservatively avoid reporting them.
+func isIndeterminateType(t *checker.Type) bool {
+	flags := checker.Type_flags(t)
+	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0
+}
+
+// isAlwaysNullishType checks if a type is always null, undefined, or void.
+//
+// Returns true for types that can only be nullish values:
+// - null
+// - undefined
+// - void (treated as undefined at runtime)
+//
+// Returns false for:
+// - Non-nullish types (string, number, object, etc.)
+// - Unions containing non-nullish types (string | null, number | undefined)
+//
+// Note: This is different from isNullishType which returns true if a type
+// CAN BE nullish (including unions like string | null).
+func isAlwaysNullishType(t *checker.Type) bool {
+	flags := checker.Type_flags(t)
+	return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
 }
 
 var NoUnnecessaryConditionRule = rule.Rule{
@@ -193,17 +269,30 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 
 			// Skip array/tuple element access without noUncheckedIndexedAccess
-			// Without this option, arr[i] has type T instead of T|undefined, but can still be undefined at runtime
-			// Only skip for actual array/tuple types, not for Record/object with index signatures
+			//
+			// TypeScript's type system has a soundness hole with array element access:
+			// Without noUncheckedIndexedAccess, arr[i] has type T instead of T|undefined,
+			// even though accessing an out-of-bounds index returns undefined at runtime.
+			//
+			// Examples:
+			//   const arr: number[] = [1, 2, 3]
+			//   const x = arr[10]  // type: number, runtime value: undefined
+			//
+			//   With noUncheckedIndexedAccess:
+			//   const x = arr[10]  // type: number | undefined (correct)
+			//
+			// We only skip this check for actual array/tuple types. Object types with index
+			// signatures (like Record<string, T>) are still checked because they don't have
+			// this soundness issue.
 			if skipNode.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 				elemAccess := skipNode.AsElementAccessExpression()
 				baseType := getResolvedType(elemAccess.Expression)
 				if baseType != nil {
-					// Check if it's a tuple type
+					// Check if it's a tuple type (e.g., [number, string])
 					if checker.IsTupleType(baseType) {
 						return
 					}
-					// Check if it's an array type by looking at the symbol
+					// Check if it's an array type (e.g., number[], Array<string>)
 					if baseType.Symbol() != nil {
 						symbolName := baseType.Symbol().Name
 						// Array and ReadonlyArray are the built-in array type symbols
@@ -228,10 +317,31 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
+		// checkOptionalChain validates optional chaining (?.) to detect unnecessary usage.
+		//
+		// Optional chaining is unnecessary when the expression being accessed is never nullish.
+		// This function handles the complexity of chained optional access like foo?.bar?.baz.
+		//
+		// Examples:
+		//   const obj: { foo: string } = { foo: "hello" }
+		//   obj?.foo  // unnecessary - obj is never nullish
+		//
+		//   const obj: { foo: { bar: string } } | null = getObj()
+		//   obj?.foo?.bar  // first ?. is fine, but second ?. is unnecessary
+		//                  // because when obj exists, obj.foo is never nullish
+		//
+		// Algorithm:
+		// 1. Extract the expression being accessed (e.g., for foo?.bar, extract foo)
+		// 2. For chained access (foo?.bar?.baz), we need to check the intermediate type:
+		//    - Get the type of foo (excluding nullish parts)
+		//    - Check if foo.bar can be nullish (not foo?.bar)
+		// 3. For simple access (foo?.bar), check if foo can be nullish
+		// 4. Allow indeterminate types (any, unknown, T, T[K]) since we can't determine nullishness
 		checkOptionalChain := func(node *ast.Node) {
 			var expression *ast.Node
 			var hasQuestionDot bool
 
+			// Extract the expression and check if this is optional chaining
 			switch node.Kind {
 			case ast.KindPropertyAccessExpression:
 				propAccess := node.AsPropertyAccessExpression()
@@ -253,42 +363,100 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
-			// Skip if the expression itself is an optional chain
-			// This handles chained optional accesses like foo?.bar?.baz
+			// Check if the expression is itself an optional chain (chained access)
+			// For foo?.bar?.baz, when checking the second ?.:
+			//   - node is foo?.bar?.baz
+			//   - expression is foo?.bar
+			//   - baseExpression is foo
+			var baseExpression *ast.Node
+			var isChainedAccess bool
+
 			if expression.Kind == ast.KindPropertyAccessExpression {
 				propAccess := expression.AsPropertyAccessExpression()
 				if propAccess.QuestionDotToken != nil {
-					return
+					isChainedAccess = true
+					baseExpression = propAccess.Expression
 				}
 			} else if expression.Kind == ast.KindElementAccessExpression {
 				elemAccess := expression.AsElementAccessExpression()
 				if elemAccess.QuestionDotToken != nil {
-					return
+					isChainedAccess = true
+					baseExpression = elemAccess.Expression
 				}
 			} else if expression.Kind == ast.KindCallExpression {
 				callExpr := expression.AsCallExpression()
 				if callExpr.QuestionDotToken != nil {
-					return
+					isChainedAccess = true
+					baseExpression = callExpr.Expression
 				}
 			}
 
-			exprType := getResolvedType(expression)
+			// Get the type that would result from the access (if it succeeds)
+			// For optional chains, TypeScript gives us the type including | undefined
+			// But we want to check if the property itself can be nullish, not including
+			// the undefined from the optional chain short-circuit
+			var exprType *checker.Type
+			if isChainedAccess {
+				// For chained access like foo?.bar?.baz, when checking the second ?.:
+				// expression is foo?.bar
+				// We want to check if bar can be nullish (from foo's perspective)
+
+				// Get foo's type (non-nullish parts)
+				baseType := getResolvedType(baseExpression)
+				if baseType == nil {
+					return
+				}
+
+				nonNullishBase := removeNullishFromType(ctx.TypeChecker, baseType)
+				if nonNullishBase == nil {
+					return
+				}
+
+				// Get the type of bar from foo's (non-nullish) type
+				// For PropertyAccessExpression, we can get the property name
+				if expression.Kind == ast.KindPropertyAccessExpression {
+					propAccess := expression.AsPropertyAccessExpression()
+					nameNode := propAccess.Name()
+					if nameNode != nil {
+						propName := ast.GetTextOfPropertyName(nameNode)
+						if propName != "" {
+							// Get the property type from the non-nullish base
+							prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishBase, propName)
+							if prop != nil {
+								exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
+							} else {
+								// Property doesn't exist, might be index signature
+								exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+							}
+						} else {
+							exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+						}
+					} else {
+						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+					}
+				} else {
+					// For element access or call expressions, use the full type
+					exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+				}
+			} else {
+				// For simple access like foo?.bar, check foo's type
+				exprType = getResolvedType(expression)
+			}
+
 			if exprType == nil {
 				return
 			}
 
-			// Allow optional chain on any/unknown/type parameter/indexed access types since we can't determine if they're nullish
-			// This includes types like T, T[K], keyof T, etc.
-			flags := checker.Type_flags(exprType)
-			if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+			// Allow optional chain on indeterminate types since we can't determine if they're nullish
+			// This includes types like any, unknown, T, T[K], keyof T, etc.
+			if isIndeterminateType(exprType) {
 				return
 			}
 
-			// Also allow if it's a union that includes a type parameter or indexed access type
+			// Also allow if it's a union that includes an indeterminate type
 			if utils.IsUnionType(exprType) {
 				for _, part := range exprType.Types() {
-					partFlags := checker.Type_flags(part)
-					if partFlags&(checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+					if isIndeterminateType(part) {
 						return
 					}
 				}
@@ -331,9 +499,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if isAlwaysConstantLoopCondition {
 					return
 				}
-				if isAllowedConstantLoopCondition && isAllowedConstantLiteral(forStmt.Condition) {
-					return
-				}
+				// Note: "only-allowed-literals" does NOT apply to for loops
+				// Only "always" mode skips checking for loops
 				checkCondition(forStmt.Condition)
 			},
 			ast.KindConditionalExpression: func(node *ast.Node) {
@@ -347,11 +514,24 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if opKind == ast.KindQuestionQuestionToken {
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
-						// Don't report on types we can't determine (any, unknown, type parameters, etc.)
-						flags := checker.Type_flags(leftType)
-						if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+						// Don't report on indeterminate types
+						if isIndeterminateType(leftType) {
 							return
 						}
+
+						// Check if the value is always nullish
+						if isAlwaysNullishType(leftType) {
+							// Special case for never type
+							flags := checker.Type_flags(leftType)
+							if flags&checker.TypeFlagsNever != 0 {
+								ctx.ReportNode(binExpr.Left, buildNeverMessage())
+							} else {
+								ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
+							}
+							return
+						}
+
+						// Check if the value is never nullish
 						if !isNullishType(ctx.TypeChecker, leftType) {
 							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
 						}
@@ -363,11 +543,47 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if opKind == ast.KindQuestionQuestionEqualsToken {
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
-						// Don't report on types we can't determine (any, unknown, type parameters, etc.)
-						flags := checker.Type_flags(leftType)
-						if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0 {
+						// Don't report on indeterminate types
+						if isIndeterminateType(leftType) {
 							return
 						}
+
+						// Skip optional property access - with exactOptionalPropertyTypes,
+						// the type doesn't include undefined but the property can still be absent
+						if binExpr.Left.Kind == ast.KindPropertyAccessExpression || binExpr.Left.Kind == ast.KindElementAccessExpression {
+							// Check if accessing an optional property or using indexed access with union keys
+							var propSymbol *ast.Symbol
+							if binExpr.Left.Kind == ast.KindPropertyAccessExpression {
+								propAccess := binExpr.Left.AsPropertyAccessExpression()
+								nameNode := propAccess.Name()
+								if nameNode != nil {
+									propName := ast.GetTextOfPropertyName(nameNode)
+									if propName != "" {
+										baseType := getResolvedType(propAccess.Expression)
+										if baseType != nil {
+											propSymbol = checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
+										}
+									}
+								}
+							} else if binExpr.Left.Kind == ast.KindElementAccessExpression {
+								// For element access, we can't reliably determine if the property is optional
+								// because the key might be a union type or computed at runtime
+								// So we skip the check for element access
+								return
+							}
+							// If property is optional, skip check (property may be undefined even if type doesn't show it)
+							if propSymbol != nil && propSymbol.Flags&ast.SymbolFlagsOptional != 0 {
+								return
+							}
+						}
+
+						// Check if the value is always nullish
+						if isAlwaysNullishType(leftType) {
+							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
+							return
+						}
+
+						// Check if the value is never nullish
 						if !isNullishType(ctx.TypeChecker, leftType) {
 							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
 						}
@@ -498,13 +714,64 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 
 				callExpr := node.AsCallExpression()
-				if !utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
-					return
+
+				// Check if this is a type guard or assertion function call
+				callSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, node, nil, 0)
+				if callSignature != nil {
+					typePredicate := ctx.TypeChecker.GetTypePredicateOfSignature(callSignature)
+					if typePredicate != nil {
+						// This is a type guard/assertion function call
+						if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+							paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
+
+							if paramIndex >= 0 && paramIndex < len(callExpr.Arguments.Nodes) {
+								arg := callExpr.Arguments.Nodes[paramIndex]
+								if arg != nil {
+									// Skip spread elements - their values are determined at runtime
+									if arg.Kind == ast.KindSpreadElement {
+										return
+									}
+
+									predicateKind := checker.TypePredicate_kind(typePredicate)
+									argType := ctx.TypeChecker.GetTypeAtLocation(arg)
+
+									if argType == nil {
+										return
+									}
+
+									// Handle different predicate kinds
+									if predicateKind == checker.TypePredicateKindAssertsIdentifier ||
+										predicateKind == checker.TypePredicateKindAssertsThis {
+										// For "asserts x" (no type specified), check if argument is always truthy/falsy
+										isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, argType)
+										if isTruthy {
+											ctx.ReportNode(arg, buildAlwaysTruthyMessage())
+										} else if isFalsy {
+											ctx.ReportNode(arg, buildAlwaysFalsyMessage())
+										}
+									} else if predicateKind == checker.TypePredicateKindIdentifier ||
+										predicateKind == checker.TypePredicateKindThis {
+										// For "x is Type" type guards, check if argument already satisfies the type
+										predicateType := checker.TypePredicate_t(typePredicate)
+										if predicateType != nil {
+											// Check if argType is assignable to predicateType
+											if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, argType, predicateType) {
+												ctx.ReportNode(node, buildTypeGuardAlreadyIsTypeMessage())
+											}
+										}
+									}
+								}
+							}
+						}
+					}
 				}
 
-				if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-					if arg := callExpr.Arguments.Nodes[0]; arg != nil {
-						checkPredicateFunction(ctx, arg)
+				// Check array method predicates (filter, find, etc.)
+				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
+					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+						if arg := callExpr.Arguments.Nodes[0]; arg != nil {
+							checkPredicateFunction(ctx, arg, *opts.CheckTypePredicates)
+						}
 					}
 				}
 			},
@@ -540,7 +807,34 @@ var NoUnnecessaryConditionRule = rule.Rule{
 	},
 }
 
-// Helper function to check if a type is always truthy or always falsy
+// checkTypeCondition determines if a type is always truthy or always falsy at runtime.
+//
+// Return values:
+// - (true, false): type is always truthy (e.g., objects, "hello", 1, true)
+// - (false, true): type is always falsy (e.g., null, undefined, false, 0, "", never)
+// - (false, false): type could be either (e.g., string, number, boolean)
+//
+// Examples:
+//   - { foo: string }: always truthy (objects are always truthy)
+//   - "hello": always truthy (non-empty string literal)
+//   - "": always falsy (empty string literal)
+//   - 0: always falsy (zero is falsy)
+//   - 1: always truthy (non-zero number)
+//   - true: always truthy
+//   - false: always falsy
+//   - null: always falsy
+//   - undefined: always falsy
+//   - never: always falsy (type with no possible values)
+//   - string: could be either (might be "" or "hello")
+//   - number: could be either (might be 0 or 1)
+//   - boolean: could be either (might be true or false)
+//
+// Type handling:
+// - Union types: all parts must be truthy for (true, false), all must be falsy for (false, true)
+// - Intersection types: if any part is always falsy, result is falsy; all must be truthy for truthy
+// - Literal types: evaluates the actual literal value's truthiness
+// - Object types: always truthy (even empty objects are truthy in JavaScript)
+// - Symbols: always truthy (symbols are always truthy)
 func checkTypeCondition(typeChecker *checker.Checker, t *checker.Type) (isTruthy bool, isFalsy bool) {
 	flags := checker.Type_flags(t)
 
@@ -664,7 +958,11 @@ func checkTypeCondition(typeChecker *checker.Checker, t *checker.Type) (isTruthy
 	return false, false
 }
 
-// Check if a type can be nullish
+// isNullishType checks if a type can be null, undefined, or void.
+//
+// For union types, returns true if any part of the union is nullish.
+// This is used to determine if the nullish coalescing operator (??) or
+// optional chaining (?.) might be necessary.
 func isNullishType(typeChecker *checker.Checker, t *checker.Type) bool {
 	if utils.IsUnionType(t) {
 		for _, part := range t.Types() {
@@ -679,7 +977,42 @@ func isNullishType(typeChecker *checker.Checker, t *checker.Type) bool {
 	return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
 }
 
-// Check if expression is an allowed constant literal (true, false, 0, 1)
+// removeNullishFromType removes null, undefined, and void from a union type.
+// Returns the non-nullish part of the type, or nil if the type is entirely nullish.
+func removeNullishFromType(typeChecker *checker.Checker, t *checker.Type) *checker.Type {
+	if !utils.IsUnionType(t) {
+		// Not a union - check if it's nullish
+		flags := checker.Type_flags(t)
+		if flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
+			return nil
+		}
+		return t
+	}
+
+	// For union types, filter out nullish parts
+	var nonNullishParts []*checker.Type
+	for _, part := range t.Types() {
+		if !isNullishType(typeChecker, part) {
+			nonNullishParts = append(nonNullishParts, part)
+		}
+	}
+
+	if len(nonNullishParts) == 0 {
+		return nil
+	}
+	if len(nonNullishParts) == 1 {
+		return nonNullishParts[0]
+	}
+
+	// Multiple non-nullish parts - return first one for now
+	// (TypeScript would create a new union type, but we don't have that API)
+	return nonNullishParts[0]
+}
+
+// isAllowedConstantLiteral checks if an expression is a literal that's allowed in loop conditions.
+//
+// When AllowConstantLoopConditions is set to "only-allowed-literals", only the
+// following literals are allowed in loop conditions: true, false, 0, 1
 func isAllowedConstantLiteral(node *ast.Node) bool {
 	node = ast.SkipParentheses(node)
 
@@ -695,7 +1028,26 @@ func isAllowedConstantLiteral(node *ast.Node) bool {
 	return false
 }
 
-// Check if two types have any overlap
+// typesHaveOverlap determines if two types can have any overlapping values.
+//
+// This function is used to detect comparisons that will always return the same result,
+// such as comparing a string with a number (always false) or comparing two different
+// string literals (always false).
+//
+// Examples:
+//   - string and number: no overlap (string === number is always false)
+//   - string | null and null: overlap (null can match)
+//   - string and "hello": overlap ("hello" is a string)
+//   - "hello" and "world": no overlap (different literals)
+//   - 1 and "1": no overlap (different primitive types)
+//
+// Special handling:
+// - any/unknown: always overlap with everything (could be any value)
+// - Type parameters (T, K): conservatively treated as overlapping (we don't know T at compile time)
+// - Indexed access (T[K]): conservatively treated as overlapping
+// - Nullish types: null/undefined/void overlap with each other (treated as interchangeable in some contexts)
+// - Literals and base types: overlap (e.g., "hello" overlaps with string)
+// - Union types: checked part by part (e.g., string | number overlaps with "hello")
 func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) bool {
 	// Handle any/unknown types - they overlap with everything
 	leftFlags := checker.Type_flags(left)
@@ -787,7 +1139,11 @@ func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) b
 	return false
 }
 
-// Check if a comparison is between literal types
+// isLiteralTypeComparison checks if both operands of a comparison are literal types.
+//
+// This is used to detect comparisons between literal values that can be evaluated
+// at compile time (e.g., 1 === 2, "hello" === "world", true === false).
+// Note: This function is currently unused but kept for potential future use.
 func isLiteralTypeComparison(typeChecker *checker.Checker, left, right *checker.Type) bool {
 	leftFlags := checker.Type_flags(left)
 	rightFlags := checker.Type_flags(right)
@@ -801,8 +1157,18 @@ func isLiteralTypeComparison(typeChecker *checker.Checker, left, right *checker.
 	return isLeftLiteral && isRightLiteral
 }
 
-// Check type predicate functions for unnecessary conditions
-func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node) {
+// checkPredicateFunction analyzes predicate functions used in array methods like filter/find.
+//
+// This function performs two checks:
+// 1. If checkTypeGuards is true and the function is a type guard, it checks if the
+//    parameter already satisfies the type predicate (making the guard unnecessary)
+// 2. It checks if the function's return type is always truthy or always falsy,
+//    which would make it a useless filter/find predicate
+//
+// Used for array methods like:
+// - [1, 2, 3].filter(() => true) // always truthy, returns all elements
+// - [1, 2, 3].find(() => false)  // always falsy, returns undefined
+func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeGuards bool) {
 	isFunction := funcNode.Kind&(ast.KindArrowFunction|ast.KindFunctionExpression|ast.KindFunctionDeclaration) != 0
 	if !isFunction {
 		return
@@ -812,6 +1178,42 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node) {
 	signatures := ctx.TypeChecker.GetCallSignatures(funcType)
 
 	for _, signature := range signatures {
+		// Check if this is a type predicate (type guard)
+		typePredicate := ctx.TypeChecker.GetTypePredicateOfSignature(signature)
+		if checkTypeGuards && typePredicate != nil {
+			// Check if the argument already satisfies the type predicate
+			params := checker.Signature_parameters(signature)
+			if params != nil && len(params) > 0 {
+				// Get the parameter index being guarded
+				paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
+
+				if paramIndex >= 0 && paramIndex < len(params) {
+					param := params[paramIndex]
+					if param != nil {
+						paramType := ctx.TypeChecker.GetTypeOfSymbol(param)
+						predicateKind := checker.TypePredicate_kind(typePredicate)
+
+						if paramType != nil {
+							// Only check "x is Type" predicates, not "asserts x" predicates
+							// "asserts x" predicates in functions are checked via their return type below
+							if predicateKind == checker.TypePredicateKindIdentifier ||
+								predicateKind == checker.TypePredicateKindThis {
+								predicateType := checker.TypePredicate_t(typePredicate)
+								if predicateType != nil {
+									// Check if paramType is assignable to predicateType
+									// If so, the type guard is unnecessary
+									if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, paramType, predicateType) {
+										ctx.ReportNode(funcNode, buildTypeGuardAlreadyIsTypeMessage())
+										return
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 		returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
 
 		// Handle type parameters
@@ -833,7 +1235,16 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node) {
 	}
 }
 
-// Get literal value from a type as string
+// isLiteralValue checks if a type is a literal singleton type.
+//
+// Literal types include:
+// - Nullish types: null, undefined, void
+// - String literals: "hello", ""
+// - Number literals: 1, 0, -5, NaN
+// - BigInt literals: 1n, 0n
+// - Boolean literals: true, false
+//
+// These types represent a single, specific value rather than a range of possible values.
 func isLiteralValue(t *checker.Type) bool {
 	flags := checker.Type_flags(t)
 
@@ -861,7 +1272,7 @@ func isLiteralValue(t *checker.Type) bool {
 		literal := t.AsLiteralType()
 		if literal != nil {
 			return true
-		}	
+		}
 	}
 
 	if flags&checker.TypeFlagsBigIntLiteral != 0 && t.IsBigIntLiteral() {
