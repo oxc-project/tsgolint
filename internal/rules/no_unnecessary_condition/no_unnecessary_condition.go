@@ -161,6 +161,80 @@ func isAlwaysNullishType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
 }
 
+// isSameExpression checks if two AST nodes represent the same expression.
+//
+// This is used for control flow narrowing to detect when the same expression
+// is checked multiple times (e.g., `arr[42] && arr[42]`).
+//
+// Examples of same expressions:
+// - `foo` and `foo` (same identifier)
+// - `arr[42]` and `arr[42]` (same array access with same index)
+// - `obj.prop` and `obj.prop` (same property access)
+//
+// Note: This is a shallow comparison and doesn't handle all cases.
+// For complex expressions or expressions with side effects, it may return false negatives.
+func isSameExpression(a, b *ast.Node) bool {
+	if a == nil || b == nil {
+		return false
+	}
+
+	// Must be same kind
+	if a.Kind != b.Kind {
+		return false
+	}
+
+	switch a.Kind {
+	case ast.KindIdentifier:
+		// Compare identifier names
+		aId := a.AsIdentifier()
+		bId := b.AsIdentifier()
+		return aId.Text == bId.Text
+
+	case ast.KindPropertyAccessExpression:
+		// Compare obj.prop
+		aProp := a.AsPropertyAccessExpression()
+		bProp := b.AsPropertyAccessExpression()
+		// Check if base expressions are the same and property names match
+		if !isSameExpression(aProp.Expression, bProp.Expression) {
+			return false
+		}
+		aName := aProp.Name()
+		bName := bProp.Name()
+		if aName == nil || bName == nil {
+			return false
+		}
+		return ast.GetTextOfPropertyName(aName) == ast.GetTextOfPropertyName(bName)
+
+	case ast.KindElementAccessExpression:
+		// Compare arr[index]
+		aElem := a.AsElementAccessExpression()
+		bElem := b.AsElementAccessExpression()
+		// Check if base expressions and argument expressions are the same
+		return isSameExpression(aElem.Expression, bElem.Expression) &&
+			isSameExpression(aElem.ArgumentExpression, bElem.ArgumentExpression)
+
+	case ast.KindNumericLiteral:
+		// Compare numeric literals
+		aLit := a.AsNumericLiteral()
+		bLit := b.AsNumericLiteral()
+		return aLit.Text == bLit.Text
+
+	case ast.KindStringLiteral:
+		// Compare string literals
+		aLit := a.AsStringLiteral()
+		bLit := b.AsStringLiteral()
+		return aLit.Text == bLit.Text
+
+	case ast.KindTrueKeyword, ast.KindFalseKeyword, ast.KindNullKeyword:
+		// Same keywords are always equal
+		return true
+
+	default:
+		// For other expression types, we conservatively return false
+		return false
+	}
+}
+
 var NoUnnecessaryConditionRule = rule.Rule{
 	Name: "no-unnecessary-condition",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -578,6 +652,13 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						}
 
 						// Check if the value is always nullish
+						flags := checker.Type_flags(leftType)
+						if flags&checker.TypeFlagsNever != 0 {
+							// Special case for never type
+							ctx.ReportNode(binExpr.Left, buildNeverMessage())
+							return
+						}
+
 						if isAlwaysNullishType(leftType) {
 							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
 							return
@@ -596,7 +677,50 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					opKind == ast.KindBarBarToken ||
 					opKind == ast.KindAmpersandAmpersandEqualsToken ||
 					opKind == ast.KindBarBarEqualsToken {
+
+					isAndOperator := opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindAmpersandAmpersandEqualsToken
+					isOrOperator := opKind == ast.KindBarBarToken || opKind == ast.KindBarBarEqualsToken
+
+					// Check if left is a literal boolean (true/false keyword)
+					leftSkipNode := ast.SkipParentheses(binExpr.Left)
+					leftIsLiteralTrue := leftSkipNode.Kind == ast.KindTrueKeyword
+					leftIsLiteralFalse := leftSkipNode.Kind == ast.KindFalseKeyword
+
+					// Determine if we should skip the right side based on short-circuit behavior
+					skipRight := false
+					if isAndOperator && leftIsLiteralFalse {
+						// Left is false, so right is never evaluated
+						skipRight = true
+					} else if isOrOperator && leftIsLiteralTrue {
+						// Left is true, so right is never evaluated
+						skipRight = true
+					} else {
+						// For non-literal cases, check the type
+						leftType := getResolvedType(binExpr.Left)
+						if leftType != nil {
+							leftTruthy, leftFalsy := checkTypeCondition(ctx.TypeChecker, leftType)
+							if isAndOperator && leftFalsy {
+								skipRight = true
+							} else if isOrOperator && leftTruthy {
+								skipRight = true
+							}
+						}
+					}
+
+					// Check left side
 					checkCondition(binExpr.Left)
+
+					// Check right side only if it would be evaluated
+					if !skipRight {
+						// Control flow narrowing: if left and right are the same expression
+						// and this is an &&, then right is always truthy (since we already checked left)
+						if isAndOperator && isSameExpression(binExpr.Left, binExpr.Right) {
+							// Report that the right side is always truthy
+							ctx.ReportNode(binExpr.Right, buildAlwaysTruthyMessage())
+						} else {
+							checkCondition(binExpr.Right)
+						}
+					}
 					return
 				}
 
@@ -709,11 +833,22 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			ast.KindCallExpression: func(node *ast.Node) {
 				checkOptionalChain(node)
 
+				callExpr := node.AsCallExpression()
+
+				// Check array method predicates (filter, find, etc.)
+				// This check is independent of CheckTypePredicates option
+				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
+					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+						if arg := callExpr.Arguments.Nodes[0]; arg != nil {
+							checkPredicateFunction(ctx, arg, *opts.CheckTypePredicates)
+						}
+					}
+				}
+
+				// Check type guard or assertion function calls only if CheckTypePredicates is enabled
 				if !*opts.CheckTypePredicates {
 					return
 				}
-
-				callExpr := node.AsCallExpression()
 
 				// Check if this is a type guard or assertion function call
 				callSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, node, nil, 0)
@@ -762,15 +897,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 									}
 								}
 							}
-						}
-					}
-				}
-
-				// Check array method predicates (filter, find, etc.)
-				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
-					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-						if arg := callExpr.Arguments.Nodes[0]; arg != nil {
-							checkPredicateFunction(ctx, arg, *opts.CheckTypePredicates)
 						}
 					}
 				}
@@ -1227,10 +1353,25 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeG
 
 		isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, returnType)
 
-		if isTruthy {
-			ctx.ReportNode(funcNode, buildAlwaysTruthyFuncMessage())
-		} else if isFalsy {
-			ctx.ReportNode(funcNode, buildAlwaysFalsyFuncMessage())
+		if isTruthy || isFalsy {
+			// Use different message based on whether it's a literal function or function reference
+			// Literal functions: () => true, () => false, function() { return true }
+			// Function references: truthy, falsy (identifier)
+			isLiteralFunction := funcNode.Kind == ast.KindArrowFunction || funcNode.Kind == ast.KindFunctionExpression
+
+			if isTruthy {
+				if isLiteralFunction {
+					ctx.ReportNode(funcNode, buildAlwaysTruthyMessage())
+				} else {
+					ctx.ReportNode(funcNode, buildAlwaysTruthyFuncMessage())
+				}
+			} else if isFalsy {
+				if isLiteralFunction {
+					ctx.ReportNode(funcNode, buildAlwaysFalsyMessage())
+				} else {
+					ctx.ReportNode(funcNode, buildAlwaysFalsyFuncMessage())
+				}
+			}
 		}
 	}
 }
