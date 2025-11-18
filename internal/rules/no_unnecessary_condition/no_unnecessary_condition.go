@@ -437,6 +437,76 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
+			// Helper function to check if a type is an array or tuple type
+			var isArrayOrTupleType func(*checker.Type) bool
+			isArrayOrTupleType = func(t *checker.Type) bool {
+				if t == nil {
+					return false
+				}
+
+				// Check for tuple type
+				if checker.IsTupleType(t) {
+					return true
+				}
+
+				// Check for union type - if any constituent is an array/tuple, return true
+				if utils.IsUnionType(t) {
+					for _, part := range t.Types() {
+						if isArrayOrTupleType(part) {
+							return true
+						}
+					}
+					return false
+				}
+
+				// Check for array type by symbol name
+				if t.Symbol() != nil {
+					symbolName := t.Symbol().Name
+					if symbolName == "Array" || symbolName == "ReadonlyArray" {
+						return true
+					}
+				}
+
+				return false
+			}
+
+			// Helper function to check if an expression chain contains array element access
+			// without noUncheckedIndexedAccess, which "infects" the entire chain
+			var hasArrayAccessInChain func(*ast.Node) bool
+			hasArrayAccessInChain = func(expr *ast.Node) bool {
+				if expr == nil {
+					return false
+				}
+
+				// Check if this expression is an array element access
+				if expr.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+					elemAccess := expr.AsElementAccessExpression()
+					baseType := getResolvedType(elemAccess.Expression)
+					if baseType != nil && isArrayOrTupleType(baseType) {
+						return true
+					}
+				}
+
+				// Recursively check the base expression
+				switch expr.Kind {
+				case ast.KindPropertyAccessExpression:
+					return hasArrayAccessInChain(expr.AsPropertyAccessExpression().Expression)
+				case ast.KindElementAccessExpression:
+					return hasArrayAccessInChain(expr.AsElementAccessExpression().Expression)
+				case ast.KindCallExpression:
+					return hasArrayAccessInChain(expr.AsCallExpression().Expression)
+				}
+
+				return false
+			}
+
+			// Check if expression or any part of the chain contains array element access
+			// e.g., arr[42]?.value or arr[42]?.x?.y?.z
+			// The array access "infects" the entire chain because arr[42] might be undefined
+			if hasArrayAccessInChain(expression) {
+				return
+			}
+
 			// Check if the expression is itself an optional chain (chained access)
 			// For foo?.bar?.baz, when checking the second ?.:
 			//   - node is foo?.bar?.baz
@@ -668,6 +738,44 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check nullish coalescing operator (??)
 				if opKind == ast.KindQuestionQuestionToken {
+					// Check if the left side is an array element access without noUncheckedIndexedAccess
+					// In this case, the ?? is justified even if the type appears non-nullish
+					leftSkip := ast.SkipParentheses(binExpr.Left)
+					if leftSkip.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+						elemAccess := leftSkip.AsElementAccessExpression()
+						baseType := getResolvedType(elemAccess.Expression)
+						if baseType != nil {
+							// Helper function to check if a type is an array or tuple type (reuse from checkOptionalChain)
+							var isArrayOrTupleTypeLocal func(*checker.Type) bool
+							isArrayOrTupleTypeLocal = func(t *checker.Type) bool {
+								if t == nil {
+									return false
+								}
+								if checker.IsTupleType(t) {
+									return true
+								}
+								if utils.IsUnionType(t) {
+									for _, part := range t.Types() {
+										if isArrayOrTupleTypeLocal(part) {
+											return true
+										}
+									}
+									return false
+								}
+								if t.Symbol() != nil {
+									symbolName := t.Symbol().Name
+									if symbolName == "Array" || symbolName == "ReadonlyArray" {
+										return true
+									}
+								}
+								return false
+							}
+							if isArrayOrTupleTypeLocal(baseType) {
+								return
+							}
+						}
+					}
+
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
 						// Don't report on indeterminate types
