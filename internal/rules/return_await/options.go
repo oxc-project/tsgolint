@@ -2,7 +2,7 @@
 
 package return_await
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 import "fmt"
 import "reflect"
 

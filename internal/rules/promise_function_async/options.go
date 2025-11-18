@@ -2,7 +2,7 @@
 
 package promise_function_async
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type PromiseFunctionAsyncOptions struct {
 	// AllowAny corresponds to the JSON schema field "allowAny".

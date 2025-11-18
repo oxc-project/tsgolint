@@ -136,9 +136,10 @@ var NoFloatingPromisesRule = rule.Rule{
 			}
 
 			// The highest priority is to allow anything allowlisted
-			if utils.TypeMatchesSomeSpecifierInterface(
+			if utils.TypeMatchesSomeSpecifier(
 				t,
 				opts.AllowForKnownSafePromises,
+				[]string{},
 				ctx.Program,
 			) {
 				return false
@@ -207,11 +208,23 @@ var NoFloatingPromisesRule = rule.Rule{
 				return false
 			}
 
-			t := ctx.TypeChecker.GetTypeAtLocation(node.AsCallExpression().Expression)
+			callExpression := node.AsCallExpression()
 
-			return utils.TypeMatchesSomeSpecifierInterface(
+			t := ctx.TypeChecker.GetTypeAtLocation(callExpression.Expression)
+
+			if utils.ValueMatchesSomeSpecifier(
+				callExpression.Expression,
+				opts.AllowForKnownSafeCalls,
+				ctx.Program,
+				t,
+			) {
+				return true
+			}
+
+			return utils.TypeMatchesSomeSpecifier(
 				t,
 				opts.AllowForKnownSafeCalls,
+				[]string{},
 				ctx.Program,
 			)
 		}

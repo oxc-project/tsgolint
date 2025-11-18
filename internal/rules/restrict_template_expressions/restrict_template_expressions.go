@@ -45,7 +45,7 @@ var RestrictTemplateExpressionsRule = rule.Rule{
 			return utils.Every(utils.UnionTypeParts(innerType), func(t *checker.Type) bool {
 				return utils.Some(utils.IntersectionTypeParts(t), func(t *checker.Type) bool {
 					return utils.IsTypeFlagSet(t, allowedFlags) ||
-						utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) ||
+						utils.TypeMatchesSomeSpecifier(t, opts.Allow, []string{}, ctx.Program) ||
 						(opts.AllowArray && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, t) && isTypeAllowed(utils.GetNumberIndexType(ctx.TypeChecker, t))) ||
 						(opts.AllowRegExp && t == globalRegexpType)
 				})

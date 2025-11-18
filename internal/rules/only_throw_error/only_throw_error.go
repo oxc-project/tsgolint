@@ -30,7 +30,7 @@ var OnlyThrowErrorRule = rule.Rule{
 				expr := node.Expression()
 				t := ctx.TypeChecker.GetTypeAtLocation(expr)
 
-				if utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) {
+				if utils.TypeMatchesSomeSpecifier(t, opts.Allow, []string{}, ctx.Program) {
 					return
 				}
 

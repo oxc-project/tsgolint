@@ -2,7 +2,7 @@
 
 package require_array_sort_compare
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type RequireArraySortCompareOptions struct {
 	// IgnoreStringArrays corresponds to the JSON schema field "ignoreStringArrays".

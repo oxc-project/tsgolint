@@ -2,7 +2,7 @@
 
 package no_meaningless_void_operator
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type NoMeaninglessVoidOperatorOptions struct {
 	// CheckNever corresponds to the JSON schema field "checkNever".

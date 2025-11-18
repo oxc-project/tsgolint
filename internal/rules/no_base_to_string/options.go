@@ -2,7 +2,7 @@
 
 package no_base_to_string
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type NoBaseToStringOptions struct {
 	// IgnoredTypeNames corresponds to the JSON schema field "ignoredTypeNames".
