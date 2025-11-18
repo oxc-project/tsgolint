@@ -60,24 +60,24 @@ const (
 	whetherToAwaitNoAwait
 )
 
-func getWhetherToAwait(affectsErrorHandling bool, option ReturnAwaitOptionsOption) whetherToAwait {
+func getWhetherToAwait(affectsErrorHandling bool, option ReturnAwaitOptions) whetherToAwait {
 	switch option {
-	case ReturnAwaitOptionsOptionAlways:
+	case ReturnAwaitOptionsAlways:
 		return whetherToAwaitAwait
-	case ReturnAwaitOptionsOptionErrorHandlingCorrectnessOnly:
+	case ReturnAwaitOptionsErrorHandlingCorrectnessOnly:
 		if affectsErrorHandling {
 			return whetherToAwaitAwait
 		}
 		return whetherToAwaitDontCare
-	case ReturnAwaitOptionsOptionInTryCatch:
+	case ReturnAwaitOptionsInTryCatch:
 		if affectsErrorHandling {
 			return whetherToAwaitAwait
 		}
 		return whetherToAwaitNoAwait
-	case ReturnAwaitOptionsOptionNever:
+	case ReturnAwaitOptionsNever:
 		return whetherToAwaitNoAwait
 	default:
-		panic("unexpected ReturnAwaitOptionsOption")
+		panic("unexpected ReturnAwaitOptions")
 	}
 }
 
@@ -240,7 +240,7 @@ var ReturnAwaitRule = rule.Rule{
 			affectsErrorHandling := affectsExplicitErrorHandling(node) || affectsExplicitResourceManagement(node)
 			useAutoFix := !affectsErrorHandling
 
-			shouldAwaitInCurrentContext := getWhetherToAwait(affectsErrorHandling, opts.Option)
+			shouldAwaitInCurrentContext := getWhetherToAwait(affectsErrorHandling, opts)
 
 			switch shouldAwaitInCurrentContext {
 			case whetherToAwaitAwait:

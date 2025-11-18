@@ -60,22 +60,49 @@ for (const schemaDir of schemaDirs) {
       { stdio: 'inherit' },
     );
 
-    // Post-process specific rules that need omitempty removed from certain fields
+    // Post-process specific rules that need custom modifications
     const ruleName = path.basename(schemaDir);
+    let content = fs.readFileSync(outputPath, 'utf8');
+    let modified = false;
+
     if (ruleName === 'restrict_template_expressions') {
       // Remove omitempty from the Allow field to allow distinguishing between
       // "not provided" (use default) and "explicitly empty" (use empty array).
       // Without this, empty slices get omitted during JSON marshaling, causing
       // the default to be applied when it shouldn't be.
-      let content = fs.readFileSync(outputPath, 'utf8');
       content = content.replace(
         /Allow \[\]RestrictTemplateExpressionsOptionsAllowElem `json:"allow,omitempty"`/,
         'Allow []RestrictTemplateExpressionsOptionsAllowElem `json:"allow"`',
       );
-      fs.writeFileSync(outputPath, content, 'utf8');
+      modified = true;
       console.log(
         `  Post-processed ${ruleName} to remove omitempty from Allow field`,
       );
+    }
+
+    if (ruleName === 'return_await') {
+      // go-jsonschema doesn't handle null values for string enums, but test cases
+      // that omit the Options field pass nil, which gets marshaled to null.
+      // Add null handling to use the schema's default value.
+      const originalUnmarshal =
+        /\/\/ UnmarshalJSON implements json\.Unmarshaler\.\nfunc \(j \*ReturnAwaitOptions\) UnmarshalJSON\(value \[\]byte\) error \{/;
+      const newUnmarshal = `// UnmarshalJSON implements json.Unmarshaler.
+func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
+	// Handle null value by setting default (schema specifies "in-try-catch" as default)
+	if string(value) == "null" {
+		*j = ReturnAwaitOptionsInTryCatch
+		return nil
+	}
+`;
+      content = content.replace(originalUnmarshal, newUnmarshal);
+      modified = true;
+      console.log(
+        `  Post-processed ${ruleName} to add null handling for default value`,
+      );
+    }
+
+    if (modified) {
+      fs.writeFileSync(outputPath, content, 'utf8');
     }
   } catch (e) {
     console.error(`Failed to generate Go struct for schema: ${schemaPath}`, e);
