@@ -593,15 +593,16 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 
+						// Check for never type first (never is a special case)
+						flags := checker.Type_flags(leftType)
+						if flags&checker.TypeFlagsNever != 0 {
+							ctx.ReportNode(binExpr.Left, buildNeverMessage())
+							return
+						}
+
 						// Check if the value is always nullish
 						if isAlwaysNullishType(leftType) {
-							// Special case for never type
-							flags := checker.Type_flags(leftType)
-							if flags&checker.TypeFlagsNever != 0 {
-								ctx.ReportNode(binExpr.Left, buildNeverMessage())
-							} else {
-								ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
-							}
+							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
 							return
 						}
 
