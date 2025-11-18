@@ -367,7 +367,6 @@ func ConvertTypeOrValueSpecifier(spec interface{}) (TypeOrValueSpecifier, bool) 
 func TypeMatchesSomeSpecifier(
 	t *checker.Type,
 	specifiers []TypeOrValueSpecifier,
-	inlineSpecifiers []string,
 	program *compiler.Program,
 ) bool {
 	for _, typePart := range IntersectionTypeParts(t) {
@@ -376,7 +375,7 @@ func TypeMatchesSomeSpecifier(
 		}
 		if Some(specifiers, func(s TypeOrValueSpecifier) bool {
 			return typeMatchesSpecifier(t, s, program)
-		}) || typeMatchesStringSpecifier(t, inlineSpecifiers) {
+		}) {
 			return true
 		}
 	}

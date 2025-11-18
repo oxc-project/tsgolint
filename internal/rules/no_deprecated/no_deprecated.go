@@ -601,7 +601,7 @@ var NoDeprecatedRule = rule.Rule{
 
 			// TODO: if type OR value is allowed, skip
 
-			if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, []string{}, ctx.Program) ||
+			if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, ctx.Program) ||
 				utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ty) {
 				return
 			}
@@ -665,7 +665,7 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			if utils.TypeMatchesSomeSpecifier(objectType, opts.Allow, []string{}, ctx.Program) {
+			if utils.TypeMatchesSomeSpecifier(objectType, opts.Allow, ctx.Program) {
 				return
 			}
 
