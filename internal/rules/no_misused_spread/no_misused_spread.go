@@ -152,7 +152,7 @@ var NoMisusedSpreadRule = rule.Rule{
 
 		checkArrayOrCallSpread := func(node *ast.Node) {
 			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node.AsSpreadElement().Expression)
-			if !utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) && isString(t) {
+			if !utils.TypeMatchesSomeSpecifier(t, opts.Allow, []string{}, ctx.Program) && isString(t) {
 				ctx.ReportNode(node, buildNoStringSpreadMessage())
 			}
 		}
@@ -208,7 +208,7 @@ var NoMisusedSpreadRule = rule.Rule{
 		checkObjectSpread := func(node *ast.Node, argument *ast.Node) {
 			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, argument)
 
-			if utils.TypeMatchesSomeSpecifierInterface(t, opts.Allow, ctx.Program) {
+			if utils.TypeMatchesSomeSpecifier(t, opts.Allow, []string{}, ctx.Program) {
 				return
 			}
 

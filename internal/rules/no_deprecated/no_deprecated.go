@@ -89,14 +89,6 @@ var NoDeprecatedRule = rule.Rule{
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[NoDeprecatedOptions](options, "no-deprecated")
 
-		// Convert generated options to utils.TypeOrValueSpecifier
-		allow := make([]utils.TypeOrValueSpecifier, 0, len(opts.Allow))
-		for _, spec := range opts.Allow {
-			if converted, ok := utils.ConvertTypeOrValueSpecifier(spec); ok {
-				allow = append(allow, converted)
-			}
-		}
-
 		// Helper to extract deprecation reason from a JSDoc deprecated tag
 		getJsDocDeprecationFromNode := func(node *ast.Node) string {
 			if node == nil {
@@ -609,8 +601,8 @@ var NoDeprecatedRule = rule.Rule{
 
 			// TODO: if type OR value is allowed, skip
 
-			if utils.TypeMatchesSomeSpecifierInterface(ty, opts.Allow, ctx.Program) ||
-				utils.ValueMatchesSomeSpecifier(node, allow, ctx.Program, ty) {
+			if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, []string{}, ctx.Program) ||
+				utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ty) {
 				return
 			}
 
@@ -673,7 +665,7 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			if utils.TypeMatchesSomeSpecifierInterface(objectType, opts.Allow, ctx.Program) {
+			if utils.TypeMatchesSomeSpecifier(objectType, opts.Allow, []string{}, ctx.Program) {
 				return
 			}
 

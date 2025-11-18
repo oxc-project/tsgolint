@@ -2,7 +2,7 @@
 
 package prefer_promise_reject_errors
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type PreferPromiseRejectErrorsOptions struct {
 	// AllowEmptyReject corresponds to the JSON schema field "allowEmptyReject".

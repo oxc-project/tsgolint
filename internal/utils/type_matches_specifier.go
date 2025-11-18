@@ -1,11 +1,12 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
-	"reflect"
 	"slices"
 	"strings"
 
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/compiler"
@@ -27,6 +28,113 @@ type TypeOrValueSpecifier struct {
 	Path string
 	// Can be used when From == TypeOrValueSpecifierFromPackage
 	Package string
+}
+
+// UnmarshalJSON implements json.Unmarshaler for TypeOrValueSpecifier.
+// Handles both string specifiers and object specifiers with "from" field.
+func (s *TypeOrValueSpecifier) UnmarshalJSON(data []byte) error {
+	// Try to unmarshal as a string first (universal string specifier)
+	var str string
+	if err := json.Unmarshal(data, &str); err == nil {
+		*s = TypeOrValueSpecifier{
+			From: TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
+			Name: []string{str},
+		}
+		return nil
+	}
+
+	// Otherwise, unmarshal as an object
+	var raw struct {
+		From    string      `json:"from"`
+		Name    interface{} `json:"name"` // Can be string or []string
+		Path    *string     `json:"path,omitempty"`
+		Package *string     `json:"package,omitempty"`
+	}
+
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return fmt.Errorf("TypeOrValueSpecifier must be a string or object with 'from' field: %w", err)
+	}
+
+	// Parse the "from" field
+	var from TypeOrValueSpecifierFrom
+	switch raw.From {
+	case "", "file":
+		from = TypeOrValueSpecifierFromFile
+	case "lib":
+		from = TypeOrValueSpecifierFromLib
+	case "package":
+		from = TypeOrValueSpecifierFromPackage
+	default:
+		return fmt.Errorf("invalid 'from' field: %s (must be 'file', 'lib', or 'package')", raw.From)
+	}
+
+	// Parse the "name" field (can be string or []string)
+	var names []string
+	switch nameVal := raw.Name.(type) {
+	case nil:
+		// name field is optional for some specifier types
+		names = []string{}
+	case string:
+		names = []string{nameVal}
+	case []interface{}:
+		names = make([]string, 0, len(nameVal))
+		for _, n := range nameVal {
+			if str, ok := n.(string); ok {
+				names = append(names, str)
+			} else {
+				return errors.New("name array must contain only strings")
+			}
+		}
+	default:
+		return errors.New("name must be a string or array of strings")
+	}
+
+	// Build the result
+	*s = TypeOrValueSpecifier{
+		From: from,
+		Name: names,
+	}
+
+	if raw.Path != nil {
+		s.Path = *raw.Path
+	}
+	if raw.Package != nil {
+		s.Package = *raw.Package
+	}
+
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler for TypeOrValueSpecifier.
+// Converts the struct back to JSON format compatible with UnmarshalJSON.
+func (s TypeOrValueSpecifier) MarshalJSON() ([]byte, error) {
+	// Convert From enum to string
+	var fromStr string
+	switch s.From {
+	case TypeOrValueSpecifierFromFile:
+		fromStr = "file"
+	case TypeOrValueSpecifierFromLib:
+		fromStr = "lib"
+	case TypeOrValueSpecifierFromPackage:
+		fromStr = "package"
+	default:
+		return nil, fmt.Errorf("invalid TypeOrValueSpecifierFrom value: %d", s.From)
+	}
+
+	// Build the output object
+	output := map[string]interface{}{
+		"from": fromStr,
+		"name": s.Name,
+	}
+
+	if s.Path != "" {
+		output["path"] = s.Path
+	}
+	if s.Package != "" {
+		output["package"] = s.Package
+	}
+
+	return json.Marshal(output)
 }
 
 func typeMatchesStringSpecifier(
@@ -256,18 +364,6 @@ func ConvertTypeOrValueSpecifier(spec interface{}) (TypeOrValueSpecifier, bool) 
 	return result, true
 }
 
-// ConvertTypeOrValueSpecifiers converts a slice of interface{} to TypeOrValueSpecifier structs,
-// filtering out any invalid entries.
-func ConvertTypeOrValueSpecifiers(specs []interface{}) []TypeOrValueSpecifier {
-	result := make([]TypeOrValueSpecifier, 0, len(specs))
-	for _, spec := range specs {
-		if converted, ok := ConvertTypeOrValueSpecifier(spec); ok {
-			result = append(result, converted)
-		}
-	}
-	return result
-}
-
 func TypeMatchesSomeSpecifier(
 	t *checker.Type,
 	specifiers []TypeOrValueSpecifier,
@@ -387,52 +483,4 @@ func ValueMatchesSomeSpecifier(
 		}
 	}
 	return false
-}
-
-// TypeMatchesSomeSpecifierInterface is a convenience wrapper that accepts interface{} specifiers
-// and converts them before matching. This is useful when working with JSON-deserialized options.
-// The specifiers parameter can be either []interface{} or any slice type whose elements can be
-// used as interface{}.
-func TypeMatchesSomeSpecifierInterface(
-	t *checker.Type,
-	specifiers any,
-	program *compiler.Program,
-) bool {
-	// Convert specifiers to []interface{}
-	var specsSlice []interface{}
-
-	if specs, ok := specifiers.([]interface{}); ok {
-		specsSlice = specs
-	} else {
-		// For typed slices like []SomeTypeAlias where SomeTypeAlias is interface{},
-		// we need to convert them element by element
-		specsSlice = convertToInterfaceSlice(specifiers)
-	}
-
-	converted := ConvertTypeOrValueSpecifiers(specsSlice)
-	return TypeMatchesSomeSpecifier(t, converted, nil, program)
-}
-
-// convertToInterfaceSlice converts any value to []interface{} by iterating if it's a slice
-func convertToInterfaceSlice(val any) []interface{} {
-	if val == nil {
-		return []interface{}{}
-	}
-
-	// Try direct conversion first
-	if s, ok := val.([]interface{}); ok {
-		return s
-	}
-
-	// Use reflection to handle typed slices like []SomeTypeAlias
-	rv := reflect.ValueOf(val)
-	if rv.Kind() != reflect.Slice {
-		return []interface{}{}
-	}
-
-	result := make([]interface{}, rv.Len())
-	for i := range rv.Len() {
-		result[i] = rv.Index(i).Interface()
-	}
-	return result
 }

@@ -2,7 +2,7 @@
 
 package restrict_plus_operands
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type RestrictPlusOperandsOptions struct {
 	// Whether to allow `any` typed values

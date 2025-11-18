@@ -2,7 +2,7 @@
 
 package no_duplicate_type_constituents
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type NoDuplicateTypeConstituentsOptions struct {
 	// IgnoreIntersections corresponds to the JSON schema field "ignoreIntersections".

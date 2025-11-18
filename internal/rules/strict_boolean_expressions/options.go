@@ -2,7 +2,7 @@
 
 package strict_boolean_expressions
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type StrictBooleanExpressionsOptions struct {
 	// AllowAny corresponds to the JSON schema field "allowAny".

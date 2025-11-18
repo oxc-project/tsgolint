@@ -2,7 +2,7 @@
 
 package switch_exhaustiveness_check
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type SwitchExhaustivenessCheckOptions struct {
 	// If true, allow default cases on switch statements that are already exhaustive
