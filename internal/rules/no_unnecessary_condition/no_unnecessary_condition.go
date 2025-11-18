@@ -509,8 +509,89 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					} else {
 						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 					}
+				} else if expression.Kind == ast.KindElementAccessExpression {
+					// For element access, check if we're accessing with a literal key
+					// e.g., foo?.[key] where key is 'bar' | 'foo'
+					elemAccess := expression.AsElementAccessExpression()
+					argExpr := elemAccess.ArgumentExpression
+					if argExpr != nil {
+						// Get the type of the key
+						keyType := ctx.TypeChecker.GetTypeAtLocation(argExpr)
+						if keyType != nil {
+							// Check if the key is a string literal type or union of string literals
+							keyFlags := checker.Type_flags(keyType)
+							isLiteralKey := false
+							var literalKeys []string
+
+							if keyFlags&checker.TypeFlagsStringLiteral != 0 {
+								// Single string literal
+								isLiteralKey = true
+								if keyType.IsStringLiteral() {
+									lit := keyType.AsLiteralType()
+									if lit != nil {
+										literalKeys = append(literalKeys, lit.Value().(string))
+									}
+								}
+							} else if utils.IsUnionType(keyType) {
+								// Union of string literals
+								allLiterals := true
+								for _, part := range keyType.Types() {
+									partFlags := checker.Type_flags(part)
+									if partFlags&checker.TypeFlagsStringLiteral != 0 {
+										if part.IsStringLiteral() {
+											lit := part.AsLiteralType()
+											if lit != nil {
+												literalKeys = append(literalKeys, lit.Value().(string))
+											}
+										}
+									} else {
+										allLiterals = false
+										break
+									}
+								}
+								isLiteralKey = allLiterals
+							}
+
+							// If we have literal keys, check if all of them have non-nullish property types
+							if isLiteralKey && len(literalKeys) > 0 {
+								allNonNullish := true
+								for _, key := range literalKeys {
+									prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishBase, key)
+									if prop == nil {
+										// Property doesn't exist, might be index signature
+										allNonNullish = false
+										break
+									}
+									propType := ctx.TypeChecker.GetTypeOfSymbol(prop)
+									if propType == nil || isNullishType(ctx.TypeChecker, propType) {
+										allNonNullish = false
+										break
+									}
+								}
+								if allNonNullish {
+									// All literal keys have non-nullish types
+									// Get the actual property type for the first key (they're all non-nullish)
+									prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishBase, literalKeys[0])
+									if prop != nil {
+										exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
+									} else {
+										exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+									}
+								} else {
+									exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+								}
+							} else {
+								// Not a literal key, use default behavior
+								exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+							}
+						} else {
+							exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+						}
+					} else {
+						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+					}
 				} else {
-					// For element access or call expressions, use the full type
+					// For call expressions, use the full type
 					exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 				}
 			} else {
