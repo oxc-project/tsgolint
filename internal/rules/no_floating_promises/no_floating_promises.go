@@ -139,7 +139,6 @@ var NoFloatingPromisesRule = rule.Rule{
 			if utils.TypeMatchesSomeSpecifier(
 				t,
 				opts.AllowForKnownSafePromises,
-				[]string{},
 				ctx.Program,
 			) {
 				return false
@@ -224,7 +223,6 @@ var NoFloatingPromisesRule = rule.Rule{
 			return utils.TypeMatchesSomeSpecifier(
 				t,
 				opts.AllowForKnownSafeCalls,
-				[]string{},
 				ctx.Program,
 			)
 		}
