@@ -660,13 +660,84 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					} else {
 						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 					}
+				} else if expression.Kind == ast.KindCallExpression {
+					// For call expressions in a chain, we need special handling
+					// e.g., foo?.bar()?.baz where expression is foo?.bar()
+					// or foo?.()?.baz where expression is foo?.()
+					callExpr := expression.AsCallExpression()
+
+					// For both optional and regular calls, get the function's return type
+					// The full expression type includes | undefined from the optional chain/call
+					funcType := getResolvedType(callExpr.Expression)
+					if funcType != nil {
+						// Remove nullish types to get the actual function type
+						nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
+						if nonNullishFunc != nil {
+							// Get call signatures from the function type
+							signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
+							if len(signatures) > 0 {
+								// Get the return type of the first signature
+								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
+								if returnType != nil {
+									exprType = returnType
+								} else {
+									// Can't determine return type, allow the optional chain
+									return
+								}
+							} else {
+								// No call signatures, allow the optional chain
+								return
+							}
+						} else {
+							// Function is always nullish, allow the optional chain
+							return
+						}
+					} else {
+						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+					}
 				} else {
-					// For call expressions, use the full type
+					// For other expression types, use the full type
 					exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 				}
 			} else {
 				// For simple access like foo?.bar, check foo's type
-				exprType = getResolvedType(expression)
+				// Also handle call expressions that aren't chained (e.g., foo?.bar()?.baz)
+				if expression.Kind == ast.KindCallExpression {
+					callExpr := expression.AsCallExpression()
+					// For both optional calls (foo?.()) and regular calls (foo()),
+					// get the function's return type, not the full expression type which includes undefined
+					// e.g., for foo?.bar(), get the type of foo?.bar (which is () => number | undefined)
+					// Then extract the return type (number)
+					funcType := getResolvedType(callExpr.Expression)
+					if funcType != nil {
+						// Remove nullish types to get the actual function type
+						nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
+						if nonNullishFunc != nil {
+							// Get call signatures from the function type
+							signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
+							if len(signatures) > 0 {
+								// Get the return type of the first signature
+								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
+								if returnType != nil {
+									exprType = returnType
+								} else {
+									// Can't determine return type, allow the optional chain
+									return
+								}
+							} else {
+								// No call signatures, allow the optional chain
+								return
+							}
+						} else {
+							// Function is always nullish, allow the optional chain
+							return
+						}
+					} else {
+						exprType = getResolvedType(expression)
+					}
+				} else {
+					exprType = getResolvedType(expression)
+				}
 			}
 
 			if exprType == nil {
