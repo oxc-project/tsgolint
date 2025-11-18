@@ -248,7 +248,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		if opts.CheckTypePredicates == nil {
 			opts.CheckTypePredicates = utils.Ref(false)
 		}
-		
+
 		// https://typescript-eslint.io/rules/no-unnecessary-condition/#:~:text=Default%3A%20false.-,DEPRECATED,-This%20option%20will
 		// TLDR: This option will be removed in the next major version of typescript-eslint.
 		if opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing == nil {
@@ -445,19 +445,20 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			var baseExpression *ast.Node
 			var isChainedAccess bool
 
-			if expression.Kind == ast.KindPropertyAccessExpression {
+			switch expression.Kind {
+			case ast.KindPropertyAccessExpression:
 				propAccess := expression.AsPropertyAccessExpression()
 				if propAccess.QuestionDotToken != nil {
 					isChainedAccess = true
 					baseExpression = propAccess.Expression
 				}
-			} else if expression.Kind == ast.KindElementAccessExpression {
+			case ast.KindElementAccessExpression:
 				elemAccess := expression.AsElementAccessExpression()
 				if elemAccess.QuestionDotToken != nil {
 					isChainedAccess = true
 					baseExpression = elemAccess.Expression
 				}
-			} else if expression.Kind == ast.KindCallExpression {
+			case ast.KindCallExpression:
 				callExpr := expression.AsCallExpression()
 				if callExpr.QuestionDotToken != nil {
 					isChainedAccess = true
@@ -628,7 +629,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						if binExpr.Left.Kind == ast.KindPropertyAccessExpression || binExpr.Left.Kind == ast.KindElementAccessExpression {
 							// Check if accessing an optional property or using indexed access with union keys
 							var propSymbol *ast.Symbol
-							if binExpr.Left.Kind == ast.KindPropertyAccessExpression {
+							switch binExpr.Left.Kind {
+							case ast.KindPropertyAccessExpression:
 								propAccess := binExpr.Left.AsPropertyAccessExpression()
 								nameNode := propAccess.Name()
 								if nameNode != nil {
@@ -640,7 +642,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 										}
 									}
 								}
-							} else if binExpr.Left.Kind == ast.KindElementAccessExpression {
+							case ast.KindElementAccessExpression:
 								// For element access, we can't reliably determine if the property is optional
 								// because the key might be a union type or computed at runtime
 								// So we skip the check for element access
@@ -767,7 +769,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					if isEqualityOp {
 						// For equality operators, check if types can ever be equal
 						// Only skip if BOTH sides are nullish OR one side is a union that includes nullish
-						hasOverlap := typesHaveOverlap(ctx.TypeChecker, leftType, rightType)
+						hasOverlap := typesHaveOverlap(leftType, rightType)
 
 						if !hasOverlap {
 							// Check if this is a valid nullish check (e.g., `a: string | null` with `a === null`)
@@ -876,8 +878,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 									}
 
 									// Handle different predicate kinds
-									if predicateKind == checker.TypePredicateKindAssertsIdentifier ||
-										predicateKind == checker.TypePredicateKindAssertsThis {
+									switch predicateKind {
+									case checker.TypePredicateKindAssertsIdentifier, checker.TypePredicateKindAssertsThis:
 										// For "asserts x" (no type specified), check if argument is always truthy/falsy
 										isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, argType)
 										if isTruthy {
@@ -885,8 +887,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 										} else if isFalsy {
 											ctx.ReportNode(arg, buildAlwaysFalsyMessage())
 										}
-									} else if predicateKind == checker.TypePredicateKindIdentifier ||
-										predicateKind == checker.TypePredicateKindThis {
+									case checker.TypePredicateKindIdentifier, checker.TypePredicateKindThis:
 										// For "x is Type" type guards, check if argument already satisfies the type
 										predicateType := checker.TypePredicate_t(typePredicate)
 										if predicateType != nil {
@@ -1175,7 +1176,7 @@ func isAllowedConstantLiteral(node *ast.Node) bool {
 // - Nullish types: null/undefined/void overlap with each other (treated as interchangeable in some contexts)
 // - Literals and base types: overlap (e.g., "hello" overlaps with string)
 // - Union types: checked part by part (e.g., string | number overlaps with "hello")
-func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) bool {
+func typesHaveOverlap(left, right *checker.Type) bool {
 	// Handle any/unknown types - they overlap with everything
 	leftFlags := checker.Type_flags(left)
 	rightFlags := checker.Type_flags(right)
@@ -1266,31 +1267,13 @@ func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) b
 	return false
 }
 
-// isLiteralTypeComparison checks if both operands of a comparison are literal types.
-//
-// This is used to detect comparisons between literal values that can be evaluated
-// at compile time (e.g., 1 === 2, "hello" === "world", true === false).
-// Note: This function is currently unused but kept for potential future use.
-func isLiteralTypeComparison(typeChecker *checker.Checker, left, right *checker.Type) bool {
-	leftFlags := checker.Type_flags(left)
-	rightFlags := checker.Type_flags(right)
-
-	// Check if both are literal types
-	isLeftLiteral := leftFlags&(checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|
-		checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral) != 0
-	isRightLiteral := rightFlags&(checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|
-		checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral) != 0
-
-	return isLeftLiteral && isRightLiteral
-}
-
 // checkPredicateFunction analyzes predicate functions used in array methods like filter/find.
 //
 // This function performs two checks:
-// 1. If checkTypeGuards is true and the function is a type guard, it checks if the
-//    parameter already satisfies the type predicate (making the guard unnecessary)
-// 2. It checks if the function's return type is always truthy or always falsy,
-//    which would make it a useless filter/find predicate
+//  1. If checkTypeGuards is true and the function is a type guard, it checks if the
+//     parameter already satisfies the type predicate (making the guard unnecessary)
+//  2. It checks if the function's return type is always truthy or always falsy,
+//     which would make it a useless filter/find predicate
 //
 // Used for array methods like:
 // - [1, 2, 3].filter(() => true) // always truthy, returns all elements
@@ -1310,7 +1293,7 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeG
 		if checkTypeGuards && typePredicate != nil {
 			// Check if the argument already satisfies the type predicate
 			params := checker.Signature_parameters(signature)
-			if params != nil && len(params) > 0 {
+			if len(params) > 0 {
 				// Get the parameter index being guarded
 				paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
 
