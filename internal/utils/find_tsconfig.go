@@ -75,6 +75,8 @@ func (r *TsConfigResolver) findConfigWithReferences(
 		visited = &collections.SyncSet[searchNode]{}
 	}
 
+	pathString := string(path)
+
 	search := BreadthFirstSearchParallelEx(
 		searchNode{configFileName: configFileName},
 		func(node searchNode) []searchNode {
@@ -116,17 +118,17 @@ func (r *TsConfigResolver) findConfigWithReferences(
 				// If we're on a case-insensitive FS and the strings are equal, we can return true immediately,
 				// no need to allocate and do any path conversions.
 				if r.fs.UseCaseSensitiveFileNames() {
-					if file == string(path) {
+					if file == pathString {
 						return true
 					}
 				} else {
-					if strings.EqualFold(file, string(path)) {
+					if strings.EqualFold(file, pathString) {
 						return true
 					}
 				}
 
 				// If the base names don't match, we can return false immediately.
-				pathBaseName := filepath.Base(string(path))
+				pathBaseName := filepath.Base(pathString)
 				fileBaseName := filepath.Base(file)
 				if r.fs.UseCaseSensitiveFileNames() {
 					if fileBaseName != pathBaseName {
