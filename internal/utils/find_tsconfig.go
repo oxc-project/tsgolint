@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"path/filepath"
 	"slices"
+	"strings"
 
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/project"
@@ -106,8 +108,38 @@ func (r *TsConfigResolver) findConfigWithReferences(
 				}
 			}
 
-			if slices.ContainsFunc(config.FileNames(), func(fn string) bool {
-				return r.toPath(fn) == path
+			if slices.ContainsFunc(config.FileNames(), func(file string) bool {
+				// Fast checks:
+				// 1) check if the strings happen to already be equal (subject to case sensitivity of FS)
+				// 2) check if the base names are equal (subject to case sensitivity of FS)
+
+				// If we're on a case-insensitive FS and the strings are equal, we can return true immediately,
+				// no need to allocate and do any path conversions.
+				if r.fs.UseCaseSensitiveFileNames() {
+					if file == string(path) {
+						return true
+					}
+				} else {
+					if strings.EqualFold(file, string(path)) {
+						return true
+					}
+				}
+
+				// If the base names don't match, we can return false immediately.
+				pathBaseName := filepath.Base(string(path))
+				fileBaseName := filepath.Base(file)
+				if r.fs.UseCaseSensitiveFileNames() {
+					if fileBaseName != pathBaseName {
+						return false
+					}
+				} else {
+					if !strings.EqualFold(fileBaseName, pathBaseName) {
+						return false
+					}
+				}
+
+				// Finally, do a full path conversion and comparison (note: this allocates)
+				return r.toPath(file) == path
 			}) {
 				return true, true
 			}
