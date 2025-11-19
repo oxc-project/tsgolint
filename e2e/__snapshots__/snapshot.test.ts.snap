@@ -3966,6 +3966,8 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
 ]
 `;
 
+exports[`TSGoLint E2E Snapshot Tests > should work correctly with nested module namespaces and parent module searches (\`ValueMatchesSomeSpecifier\`) (issue #135) 1`] = `[]`;
+
 exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `
 [
   {

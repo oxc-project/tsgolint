@@ -198,6 +198,11 @@ func findParentModuleDeclaration(
 	switch node.Kind {
 	case ast.KindModuleDeclaration:
 		decl := node.AsModuleDeclaration()
+		// "namespace x {...}" should be ignored here
+		if decl.Keyword == ast.KindNamespaceKeyword {
+			return findParentModuleDeclaration(node.Parent)
+		}
+
 		if ast.IsStringLiteral(decl.Name()) {
 			return decl
 		}
@@ -417,37 +422,19 @@ func valueMatchesSpecifier(
 		return false
 	}
 
-	switch specifier.From {
-	case TypeOrValueSpecifierFromFile:
-		// Check if declared in the specified file (or current file if path is empty)
-		cwd := program.Host().GetCurrentDirectory()
-		if specifier.Path == "" {
-			// Empty path means current file (local to the file being linted)
-			return strings.HasPrefix(sourceFile.FileName(), cwd)
-		}
-		absPath := tspath.GetNormalizedAbsolutePath(specifier.Path, cwd)
-		return sourceFile.FileName() == absPath
+	if specifier.From == TypeOrValueSpecifierFromPackage {
+		symbol := checker.Type_symbol(t)
+		if symbol != nil {
+			declarationFiles := Map(symbol.Declarations, func(d *ast.Node) *ast.SourceFile {
+				return ast.GetSourceFileOfNode(d)
+			})
 
-	case TypeOrValueSpecifierFromLib:
-		// Check if from a lib file
-		return IsSourceFileDefaultLibrary(program, sourceFile)
-
-	case TypeOrValueSpecifierFromPackage:
-		// Check if from the specified package
-		// For imports, we need to check the module specifier
-		// Walk up to find import declaration
-		current := node
-		for current != nil {
-			if current.Kind == ast.KindImportDeclaration {
-				importDecl := current.AsImportDeclaration()
-				if importDecl.ModuleSpecifier != nil {
-					moduleSpec := importDecl.ModuleSpecifier.Text()
-					// Strip quotes
-					moduleSpec = strings.Trim(moduleSpec, "\"'")
-					return moduleSpec == specifier.Package
-				}
-			}
-			current = current.Parent
+			return typeDeclaredInPackageDeclarationFile(
+				specifier.Package,
+				symbol.Declarations,
+				declarationFiles,
+				program,
+			)
 		}
 
 		// Also check if the type's declarations are from a declare module
@@ -460,9 +447,8 @@ func valueMatchesSpecifier(
 
 		return false
 
-	default:
-		panic(fmt.Sprintf("unknown value specifier from: %v", specifier.From))
 	}
+	return true
 }
 
 func ValueMatchesSomeSpecifier(

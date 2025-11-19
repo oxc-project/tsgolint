@@ -184,7 +184,12 @@ function resolveTestFilePath(relativePath: string): string {
   return join(FIXTURES_DIR, relativePath);
 }
 
-function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[number][] = ALL_RULES): string {
+function generateConfig(
+  files: string[],
+  rules:
+    readonly ((typeof ALL_RULES)[number] | { name: typeof ALL_RULES[number]; options: Record<string, unknown> })[] =
+      ALL_RULES,
+): string {
   // Headless payload format:
   // ```json
   // {
@@ -201,7 +206,10 @@ function generateConfig(files: string[], rules: readonly (typeof ALL_RULES)[numb
     configs: [
       {
         file_paths: files,
-        rules: rules.map((r) => ({ name: r })),
+        rules: rules.map((r): {
+          name: typeof ALL_RULES[number];
+          options?: Record<string, unknown>;
+        } => (typeof r === 'string' ? { name: r } : r)),
       },
     ],
   } as const;
@@ -492,6 +500,34 @@ console.log(x);
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,
       env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
+
+  it('should work correctly with nested module namespaces and parent module searches (`ValueMatchesSomeSpecifier`) (issue #135)', async () => {
+    const testFiles = await getTestFiles('issue-135');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, [{
+      name: 'no-floating-promises',
+      options: {
+        allowForKnownSafeCalls: [
+          {
+            from: 'package',
+            name: ['test', 'it', 'suite', 'describe'],
+            package: 'node2:test',
+          },
+        ],
+      },
+    }]);
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env: { ...process.env, GOMAXPROCS: '1' },
     });
 
     let diagnostics = parseHeadlessOutput(output);
