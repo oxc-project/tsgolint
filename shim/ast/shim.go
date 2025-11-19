@@ -1289,7 +1289,6 @@ const KindBlock = ast.KindBlock
 const KindBooleanKeyword = ast.KindBooleanKeyword
 const KindBreakKeyword = ast.KindBreakKeyword
 const KindBreakStatement = ast.KindBreakStatement
-const KindBundle = ast.KindBundle
 const KindCallExpression = ast.KindCallExpression
 const KindCallSignature = ast.KindCallSignature
 const KindCaretEqualsToken = ast.KindCaretEqualsToken

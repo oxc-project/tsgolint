@@ -2,13 +2,13 @@ module github.com/microsoft/typescript-go/shim/project
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251117153752-d7d7aa4c97bd
+require github.com/microsoft/typescript-go v0.0.0-20251119173400-b33ab79ed54a
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
-	github.com/go-json-experiment/json v0.0.0-20250910080747-cc2cfa0554c3 // indirect
+	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 )

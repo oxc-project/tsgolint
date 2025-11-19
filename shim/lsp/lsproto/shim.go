@@ -666,10 +666,6 @@ func NewBaseWriter(w io.Writer) *lsproto.BaseWriter
 func NewID(rawValue lsproto.IntegerOrString) *lsproto.ID
 //go:linkname NewIDString github.com/microsoft/typescript-go/internal/lsp/lsproto.NewIDString
 func NewIDString(str string) *lsproto.ID
-//go:linkname NewNotificationMessage github.com/microsoft/typescript-go/internal/lsp/lsproto.NewNotificationMessage
-func NewNotificationMessage(method lsproto.Method, params any) *lsproto.RequestMessage
-//go:linkname NewRequestMessage github.com/microsoft/typescript-go/internal/lsp/lsproto.NewRequestMessage
-func NewRequestMessage(method lsproto.Method, id *lsproto.ID, params any) *lsproto.RequestMessage
 type NotebookCell = lsproto.NotebookCell
 type NotebookCellArrayChange = lsproto.NotebookCellArrayChange
 type NotebookCellKind = lsproto.NotebookCellKind
