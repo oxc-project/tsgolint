@@ -113,20 +113,23 @@ func (r *TsConfigResolver) findConfigWithReferences(
 				// 1) check if the strings happen to already be equal (subject to case sensitivity of FS)
 				// 2) check if the base names are equal (subject to case sensitivity of FS)
 
+				// Convert path to string once to avoid multiple conversions
+				pathStr := string(path)
+
 				// If we're on a case-insensitive FS and the strings are equal, we can return true immediately,
 				// no need to allocate and do any path conversions.
 				if r.fs.UseCaseSensitiveFileNames() {
-					if file == string(path) {
+					if file == pathStr {
 						return true
 					}
 				} else {
-					if strings.EqualFold(file, string(path)) {
+					if strings.EqualFold(file, pathStr) {
 						return true
 					}
 				}
 
 				// If the base names don't match, we can return false immediately.
-				pathBaseName := filepath.Base(string(path))
+				pathBaseName := filepath.Base(pathStr)
 				fileBaseName := filepath.Base(file)
 				if r.fs.UseCaseSensitiveFileNames() {
 					if fileBaseName != pathBaseName {
