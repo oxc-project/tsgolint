@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/tsoptions
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251119173400-b33ab79ed54a
+require github.com/microsoft/typescript-go v0.0.0-20251120163629-c6c346e74f54
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
