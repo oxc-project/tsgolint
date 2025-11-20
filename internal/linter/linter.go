@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
@@ -34,6 +35,11 @@ type Fixes struct {
 	FixSuggestions bool
 }
 
+type TypeErrors struct {
+	ReportSyntactic bool
+	ReportSemantic  bool
+}
+
 func RunLinter(
 	logLevel utils.LogLevel,
 	currentDirectory string,
@@ -44,6 +50,7 @@ func RunLinter(
 	onRuleDiagnostic func(diagnostic rule.RuleDiagnostic),
 	onInternalDiagnostic func(d diagnostic.Internal),
 	fixState Fixes,
+	typeErrors TypeErrors,
 ) error {
 
 	idx := 0
@@ -99,7 +106,7 @@ func RunLinter(
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, fixState)
+		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
 		if err != nil {
 			return err
 		}
@@ -130,7 +137,7 @@ func RunLinter(
 			files = append(files, sf)
 		}
 
-		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, fixState)
+		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
 		if err != nil {
 			return err
 		}
@@ -140,7 +147,7 @@ func RunLinter(
 
 }
 
-func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), fixState Fixes) error {
+func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors) error {
 	type checkerWorkload struct {
 		checker *checker.Checker
 		program *compiler.Program
@@ -157,6 +164,41 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	program.BindSourceFiles()
 
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
+
+	if typeErrors.ReportSyntactic || typeErrors.ReportSemantic {
+		for _, file := range files {
+			fileName := file.FileName()
+
+			if typeErrors.ReportSyntactic {
+				syntacticDiagnostics := program.GetSyntacticDiagnostics(ctx, file)
+				for _, d := range syntacticDiagnostics {
+					if d.File() != nil && d.File().FileName() == fileName {
+						onInternalDiagnostic(diagnostic.Internal{
+							Range:       d.Loc(),
+							Id:          "TS" + strconv.Itoa(int(d.Code())),
+							Description: d.Message(),
+							FilePath:    &fileName,
+						})
+					}
+				}
+			}
+
+			if typeErrors.ReportSemantic {
+				semanticDiagnostics := program.GetSemanticDiagnostics(ctx, file)
+				for _, d := range semanticDiagnostics {
+					if d.File() != nil && d.File().FileName() == fileName {
+						onInternalDiagnostic(diagnostic.Internal{
+							Range:       d.Loc(),
+							Id:          "TS" + strconv.Itoa(int(d.Code())),
+							Description: d.Message(),
+							FilePath:    &fileName,
+						})
+					}
+				}
+			}
+		}
+	}
+
 	program.ForEachCheckerParallel(ctx, func(idx int, ch *checker.Checker) {
 		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
 	})

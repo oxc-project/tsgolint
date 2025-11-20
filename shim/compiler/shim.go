@@ -41,6 +41,10 @@ func NewProgram(opts compiler.ProgramOptions) *compiler.Program
 type Program = compiler.Program
 //go:linkname Program_ForEachCheckerParallel github.com/microsoft/typescript-go/internal/compiler.(*Program).ForEachCheckerParallel
 func Program_ForEachCheckerParallel(recv *compiler.Program, ctx context.Context, cb func(idx int, c *checker.Checker))
+//go:linkname Program_GetSyntacticDiagnostics github.com/microsoft/typescript-go/internal/compiler.(*Program).GetSyntacticDiagnostics
+func Program_GetSyntacticDiagnostics(recv *compiler.Program, ctx context.Context, sourceFile *ast.SourceFile) []*ast.Diagnostic
+//go:linkname Program_GetSemanticDiagnostics github.com/microsoft/typescript-go/internal/compiler.(*Program).GetSemanticDiagnostics
+func Program_GetSemanticDiagnostics(recv *compiler.Program, ctx context.Context, sourceFile *ast.SourceFile) []*ast.Diagnostic
 type ProgramLike = compiler.ProgramLike
 type ProgramOptions = compiler.ProgramOptions
 //go:linkname SortAndDeduplicateDiagnostics github.com/microsoft/typescript-go/internal/compiler.SortAndDeduplicateDiagnostics

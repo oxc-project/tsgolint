@@ -1,7 +1,9 @@
 {
   "ExtraMethods": {
     "Program": [
-      "ForEachCheckerParallel"
+      "ForEachCheckerParallel",
+      "GetSemanticDiagnostics",
+      "GetSyntacticDiagnostics"
     ]
   }
 }

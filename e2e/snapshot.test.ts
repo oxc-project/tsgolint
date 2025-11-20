@@ -189,6 +189,10 @@ function generateConfig(
   rules:
     readonly ((typeof ALL_RULES)[number] | { name: typeof ALL_RULES[number]; options: Record<string, unknown> })[] =
       ALL_RULES,
+  options?: {
+    reportSyntactic?: boolean;
+    reportSemantic?: boolean;
+  },
 ): string {
   // Headless payload format:
   // ```json
@@ -212,6 +216,8 @@ function generateConfig(
         } => (typeof r === 'string' ? { name: r } : r)),
       },
     ],
+    ...(options?.reportSyntactic !== undefined && { report_syntactic: options.reportSyntactic }),
+    ...(options?.reportSemantic !== undefined && { report_semantic: options.reportSemantic }),
   } as const;
   return JSON.stringify(config);
 }
@@ -524,6 +530,29 @@ console.log(x);
         ],
       },
     }]);
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
+
+  it('should report type errors', async () => {
+    const testFiles = await getTestFiles('report-type-errors');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(
+      testFiles,
+      ['no-floating-promises'],
+      {
+        reportSemantic: true,
+      },
+    );
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,

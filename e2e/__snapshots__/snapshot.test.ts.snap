@@ -3966,6 +3966,23 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
 ]
 `;
 
+exports[`TSGoLint E2E Snapshot Tests > should report type errors 1`] = `
+[
+  {
+    "file_path": "fixtures/report-type-errors/index.ts",
+    "kind": 1,
+    "message": {
+      "description": "Type 'number' is not assignable to type 'string'.",
+      "id": "TS2322",
+    },
+    "range": {
+      "end": 7,
+      "pos": 6,
+    },
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should work correctly with nested module namespaces and parent module searches (\`ValueMatchesSomeSpecifier\`) (issue #135) 1`] = `[]`;
 
 exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `

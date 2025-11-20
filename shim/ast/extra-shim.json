@@ -2,6 +2,13 @@
   "ExtraMethods": {
     "Node": [
       "Type"
+    ],
+    "Diagnostic": [
+      "File",
+      "Loc",
+      "Code",
+      "Category",
+      "Message"
     ]
   }
 }

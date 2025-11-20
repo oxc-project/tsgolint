@@ -373,6 +373,10 @@ func runHeadless(args []string) int {
 			Fix:            fix,
 			FixSuggestions: fixSuggestions,
 		},
+		linter.TypeErrors{
+			ReportSyntactic: payload.ReportSyntactic,
+			ReportSemantic:  payload.ReportSemantic,
+		},
 	)
 
 	close(diagnosticsChan)

@@ -124,6 +124,16 @@ type DeclarationName = ast.DeclarationName
 type Decorator = ast.Decorator
 type DeleteExpression = ast.DeleteExpression
 type Diagnostic = ast.Diagnostic
+//go:linkname Diagnostic_File github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).File
+func Diagnostic_File(recv *ast.Diagnostic) *ast.SourceFile
+//go:linkname Diagnostic_Loc github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Loc
+func Diagnostic_Loc(recv *ast.Diagnostic) core.TextRange
+//go:linkname Diagnostic_Code github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Code
+func Diagnostic_Code(recv *ast.Diagnostic) int32
+//go:linkname Diagnostic_Category github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Category
+func Diagnostic_Category(recv *ast.Diagnostic) diagnostics.Category
+//go:linkname Diagnostic_Message github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Message
+func Diagnostic_Message(recv *ast.Diagnostic) string
 type DiagnosticsCollection = ast.DiagnosticsCollection
 type DoStatement = ast.DoStatement
 type ElementAccessExpression = ast.ElementAccessExpression

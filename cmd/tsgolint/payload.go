@@ -21,6 +21,8 @@ type headlessPayload struct {
 	Version         int               `json:"version"` // version must be 2
 	Configs         []headlessConfig  `json:"configs"`
 	SourceOverrides map[string]string `json:"source_overrides,omitempty"`
+	ReportSyntactic bool              `json:"report_syntactic,omitempty"`
+	ReportSemantic  bool              `json:"report_semantic,omitempty"`
 }
 
 type headlessConfig struct {
