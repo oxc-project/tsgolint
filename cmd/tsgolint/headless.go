@@ -314,7 +314,7 @@ func runHeadless(args []string) int {
 
 				hd = headlessDiagnostic{
 					Kind:  headlessDiagnosticKindTsconfig,
-					Range: headlessRange{},
+					Range: headlessRangeFromRange(internalDiagnostic.Range),
 					Rule:  nil, // Internal diagnostics don't have a rule
 					Message: headlessRuleMessage{
 						Id:          internalDiagnostic.Id,

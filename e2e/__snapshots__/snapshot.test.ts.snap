@@ -12,8 +12,8 @@ See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "id": "tsconfig-error",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": -1,
+      "pos": -1,
     },
   },
 ]
@@ -3941,8 +3941,8 @@ See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "id": "tsconfig-error",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": 44,
+      "pos": 35,
     },
   },
 ]
@@ -3959,8 +3959,8 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
       "id": "tsconfig-error",
     },
     "range": {
-      "end": 0,
-      "pos": 0,
+      "end": 25,
+      "pos": 25,
     },
   },
 ]
