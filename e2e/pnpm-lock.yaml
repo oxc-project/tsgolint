@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  vitest>vite: npm:rolldown-vite@7.2.6
+  vitest>vite: npm:rolldown-vite@7.2.7
 
 importers:
 
@@ -383,8 +383,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rolldown-vite@7.2.6:
-    resolution: {integrity: sha512-u+0VLWLPJgwINLTQI18fSQlqfwgu8biRP4SY6HH4HLcEWZUOnDu5ARpwPYPyDahXPuhdSRHmWfS5G2/7CmqpJw==}
+  rolldown-vite@7.2.7:
+    resolution: {integrity: sha512-N6a9KgNZ0xgCJ6/Ej2FQ7W8D3fOzDwFw7CLWZ2ubZknVrs9NdNkx25AFEuNbSwQO76VEHp4N7YatsZwp/ST1Gg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -630,13 +630,13 @@ snapshots:
       chai: 6.2.0
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.8(rolldown-vite@7.2.6(@types/node@24.10.1))':
+  '@vitest/mocker@4.0.8(rolldown-vite@7.2.7(@types/node@24.10.1))':
     dependencies:
       '@vitest/spy': 4.0.8
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: rolldown-vite@7.2.6(@types/node@24.10.1)
+      vite: rolldown-vite@7.2.7(@types/node@24.10.1)
 
   '@vitest/pretty-format@4.0.8':
     dependencies:
@@ -799,7 +799,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rolldown-vite@7.2.6(@types/node@24.10.1):
+  rolldown-vite@7.2.7(@types/node@24.10.1):
     dependencies:
       '@oxc-project/runtime': 0.98.0
       fdir: 6.5.0(picomatch@4.0.3)
@@ -869,7 +869,7 @@ snapshots:
   vitest@4.0.8(@types/node@24.10.1):
     dependencies:
       '@vitest/expect': 4.0.8
-      '@vitest/mocker': 4.0.8(rolldown-vite@7.2.6(@types/node@24.10.1))
+      '@vitest/mocker': 4.0.8(rolldown-vite@7.2.7(@types/node@24.10.1))
       '@vitest/pretty-format': 4.0.8
       '@vitest/runner': 4.0.8
       '@vitest/snapshot': 4.0.8
@@ -886,7 +886,7 @@ snapshots:
       tinyexec: 0.3.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: rolldown-vite@7.2.6(@types/node@24.10.1)
+      vite: rolldown-vite@7.2.7(@types/node@24.10.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.10.1
