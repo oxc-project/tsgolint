@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "consistent_return_options": {
+      "type": "object",
+      "properties": {
+        "treatUndefinedAsUnspecified": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to treat `undefined` as an unspecified return value"
+        }
+      }
+    }
+  }
+}
