@@ -1,4 +1,4 @@
-From 902813a492fd948635177320b257d2d5d1a7352d Mon Sep 17 00:00:00 2001
+From 9aa648bb87eb8485be34b6dfc9f2ad12d5ce9ff2 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
 Subject: [PATCH] patch: expose more functions via the shim with type fixes
@@ -13,10 +13,10 @@ Subject: [PATCH] patch: expose more functions via the shim with type fixes
  6 files changed, 116 insertions(+), 107 deletions(-)
 
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
-index c6293c701..7eb7100f2 100644
+index 30fa7a72b..a670b2d8f 100644
 --- a/internal/project/compilerhost.go
 +++ b/internal/project/compilerhost.go
-@@ -19,7 +19,7 @@ type compilerHost struct {
+@@ -20,7 +20,7 @@ type compilerHost struct {
  	currentDirectory string
  	sessionOptions   *SessionOptions
  
@@ -25,7 +25,7 @@ index c6293c701..7eb7100f2 100644
  	compilerFS         *compilerFS
  	configFileRegistry *ConfigFileRegistry
  	seenFiles          *collections.SyncSet[tspath.Path]
-@@ -31,7 +31,7 @@ type compilerHost struct {
+@@ -32,7 +32,7 @@ type compilerHost struct {
  
  type builderFileSource struct {
  	seenFiles         *collections.SyncSet[tspath.Path]
@@ -34,7 +34,7 @@ index c6293c701..7eb7100f2 100644
  }
  
  func (c *builderFileSource) GetFile(fileName string) FileHandle {
-@@ -114,7 +114,7 @@ func (c *compilerHost) GetResolvedProjectReference(fileName string, path tspath.
+@@ -115,7 +115,7 @@ func (c *compilerHost) GetResolvedProjectReference(fileName string, path tspath.
  		return c.configFileRegistry.GetConfig(path)
  	} else {
  		c.seenFiles.Add(path)

@@ -47,7 +47,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 				Range:       core.NewTextRange(loc.Pos(), loc.End()),
 				Id:          "tsconfig-error",
 				Description: "Invalid tsconfig",
-				Help:        d.Message(),
+				Help:        GetDiagnosticMessage(d),
 				FilePath:    &filePath,
 			}
 		}
@@ -66,7 +66,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 				Range:       core.NewTextRange(loc.Pos(), loc.End()),
 				Id:          "tsconfig-error",
 				Description: "Invalid tsconfig",
-				Help:        e.Message(),
+				Help:        GetDiagnosticMessage(e),
 				FilePath:    &filePath,
 			}
 		}
@@ -102,7 +102,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 				Range:       core.NewTextRange(loc.Pos(), loc.End()),
 				Id:          "tsconfig-error",
 				Description: "Invalid tsconfig",
-				Help:        enhanceHelpDiagnosticMessage(d.Message()),
+				Help:        enhanceHelpDiagnosticMessage(GetDiagnosticMessage(d)),
 				FilePath:    &filePath,
 			}
 		}

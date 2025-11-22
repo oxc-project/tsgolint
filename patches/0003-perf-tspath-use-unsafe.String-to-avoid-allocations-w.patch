@@ -1,8 +1,8 @@
-From e3256fff5af97e08c0b8ebfcddf382d99d1323eb Mon Sep 17 00:00:00 2001
+From 23357cd285292d27cf900dbe6f2a7a5dbe5aa5c6 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 15 Aug 2025 16:06:42 +0100
-Subject: [PATCH] perf(tspath): use `unsafe.String` to avoid allocations when
- lower casing string
+Subject: [PATCH] perf(tspath): use `unsafe.String` to avoid allocations
+ when lower casing string
 
 ---
  internal/tspath/path.go | 13 ++++++++++++-

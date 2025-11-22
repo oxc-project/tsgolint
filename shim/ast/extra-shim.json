@@ -8,7 +8,9 @@
       "Loc",
       "Code",
       "Category",
-      "Message"
+      "MessageKey",
+      "MessageArgs",
+      "Localize"
     ]
   }
 }
