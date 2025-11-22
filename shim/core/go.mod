@@ -3,7 +3,7 @@ module github.com/microsoft/typescript-go/shim/core
 go 1.25.0
 
 require (
-	github.com/microsoft/typescript-go v0.0.0-20251120220840-4b4977a52f64
+	github.com/microsoft/typescript-go v0.0.0-20251122054020-733dc6a4d32c
 	golang.org/x/text v0.31.0
 )
 

@@ -2,10 +2,6 @@ module github.com/microsoft/typescript-go/shim/lsp/lsproto
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251120220840-4b4977a52f64
+require github.com/microsoft/typescript-go v0.0.0-20251122054020-733dc6a4d32c
 
-require (
-	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
-	golang.org/x/sync v0.18.0 // indirect
-	golang.org/x/text v0.31.0 // indirect
-)
+require github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
