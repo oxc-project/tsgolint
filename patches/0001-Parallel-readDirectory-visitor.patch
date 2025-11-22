@@ -1,14 +1,14 @@
-From beb5230504d73ec11bd5a9f746a9d4b6eb8a2e59 Mon Sep 17 00:00:00 2001
+From b2d2f77a37c40f81b2d9e94ae9a1964de801a9c1 Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 18 Jun 2025 15:24:34 +0300
-Subject: [PATCH 1/4] Parallel readDirectory visitor
+Subject: [PATCH] Parallel readDirectory visitor
 
 ---
  internal/vfs/utilities.go | 104 ++++++++++++++++++++++++++++----------
  1 file changed, 76 insertions(+), 28 deletions(-)
 
 diff --git a/internal/vfs/utilities.go b/internal/vfs/utilities.go
-index d86a7f0d1..9eb2698b4 100644
+index 34a5ed38e..5283284f0 100644
 --- a/internal/vfs/utilities.go
 +++ b/internal/vfs/utilities.go
 @@ -3,9 +3,11 @@ package vfs
@@ -23,7 +23,7 @@ index d86a7f0d1..9eb2698b4 100644
  
  	"github.com/dlclark/regexp2"
  	"github.com/microsoft/typescript-go/internal/collections"
-@@ -359,23 +361,71 @@ type visitor struct {
+@@ -358,23 +360,71 @@ type visitor struct {
  	useCaseSensitiveFileNames bool
  	host                      FS
  	visited                   collections.Set[string]
@@ -102,7 +102,7 @@ index d86a7f0d1..9eb2698b4 100644
  	for _, current := range files {
  		name := tspath.CombinePaths(path, current)
  		absoluteName := tspath.CombinePaths(absolutePath, current)
-@@ -386,11 +436,11 @@ func (v *visitor) visitDirectory(
+@@ -385,11 +435,11 @@ func (v *visitor) visitDirectory(
  			continue
  		}
  		if v.includeFileRegexes == nil {
@@ -116,7 +116,7 @@ index d86a7f0d1..9eb2698b4 100644
  			}
  		}
  	}
-@@ -398,18 +448,26 @@ func (v *visitor) visitDirectory(
+@@ -397,18 +447,26 @@ func (v *visitor) visitDirectory(
  	if depth != nil {
  		newDepth := *depth - 1
  		if newDepth == 0 {
@@ -145,7 +145,7 @@ index d86a7f0d1..9eb2698b4 100644
  }
  
  // path is the directory of the tsconfig.json
-@@ -431,18 +489,6 @@ func matchFiles(path string, extensions []string, excludes []string, includes []
+@@ -430,18 +488,6 @@ func matchFiles(path string, extensions []string, excludes []string, includes []
  		excludeRegex = GetRegexFromPattern(patterns.excludePattern, useCaseSensitiveFileNames)
  	}
  
@@ -164,7 +164,7 @@ index d86a7f0d1..9eb2698b4 100644
  	v := visitor{
  		useCaseSensitiveFileNames: useCaseSensitiveFileNames,
  		host:                      host,
-@@ -450,13 +496,15 @@ func matchFiles(path string, extensions []string, excludes []string, includes []
+@@ -449,13 +495,15 @@ func matchFiles(path string, extensions []string, excludes []string, includes []
  		excludeRegex:              excludeRegex,
  		includeDirectoryRegex:     includeDirectoryRegex,
  		extensions:                extensions,
@@ -186,5 +186,5 @@ index d86a7f0d1..9eb2698b4 100644
  
  func ReadDirectory(host FS, currentDir string, path string, extensions []string, excludes []string, includes []string, depth *int) []string {
 -- 
-2.39.5 (Apple Git-154)
+2.50.1 (Apple Git-155)
 
