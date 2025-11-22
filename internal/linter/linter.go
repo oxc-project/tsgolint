@@ -176,7 +176,7 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						onInternalDiagnostic(diagnostic.Internal{
 							Range:       d.Loc(),
 							Id:          "TS" + strconv.Itoa(int(d.Code())),
-							Description: d.Message(),
+							Description: utils.GetDiagnosticMessage(d),
 							FilePath:    &fileName,
 						})
 					}
@@ -190,7 +190,7 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						onInternalDiagnostic(diagnostic.Internal{
 							Range:       d.Loc(),
 							Id:          "TS" + strconv.Itoa(int(d.Code())),
-							Description: d.Message(),
+							Description: utils.GetDiagnosticMessage(d),
 							FilePath:    &fileName,
 						})
 					}

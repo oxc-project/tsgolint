@@ -1,4 +1,4 @@
-From f43fdaac5a05b83b47a6341a5f218b4be0ff34f4 Mon Sep 17 00:00:00 2001
+From bddd1fb15663894bbb584e2d6091ae3ab05179a7 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 24 Oct 2025 11:24:09 +0100
 Subject: [PATCH] fix panic when compiling wildcard directories pattern

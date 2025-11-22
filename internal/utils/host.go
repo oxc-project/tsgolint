@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/microsoft/typescript-go/shim/compiler"
 	"github.com/microsoft/typescript-go/shim/core"
 
 	"github.com/microsoft/typescript-go/shim/parser"
@@ -12,23 +13,14 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/collections"
 )
 
-type CompilerHost interface {
-	FS() vfs.FS
-	DefaultLibraryPath() string
-	GetCurrentDirectory() string
-	Trace(msg string)
-	GetSourceFile(opts ast.SourceFileParseOptions) *ast.SourceFile
-	GetResolvedProjectReference(fileName string, path tspath.Path) *tsoptions.ParsedCommandLine
-}
-
-var _ CompilerHost = (*compilerHost)(nil)
+var _ compiler.CompilerHost = (*compilerHost)(nil)
 
 type compilerHost struct {
 	currentDirectory    string
 	fs                  vfs.FS
 	defaultLibraryPath  string
 	extendedConfigCache tsoptions.ExtendedConfigCache
-	trace               func(msg string)
+	trace               func(msg *ast.DiagnosticsMessage, args ...any)
 }
 
 func NewCachedFSCompilerHost(
@@ -36,8 +28,8 @@ func NewCachedFSCompilerHost(
 	fs vfs.FS,
 	defaultLibraryPath string,
 	extendedConfigCache tsoptions.ExtendedConfigCache,
-	trace func(msg string),
-) CompilerHost {
+	trace func(msg *ast.DiagnosticsMessage, args ...any),
+) compiler.CompilerHost {
 	return NewCompilerHost(currentDirectory, cachedvfs.From(fs), defaultLibraryPath, extendedConfigCache, trace)
 }
 
@@ -46,10 +38,10 @@ func NewCompilerHost(
 	fs vfs.FS,
 	defaultLibraryPath string,
 	extendedConfigCache tsoptions.ExtendedConfigCache,
-	trace func(msg string),
-) CompilerHost {
+	trace func(msg *ast.DiagnosticsMessage, args ...any),
+) compiler.CompilerHost {
 	if trace == nil {
-		trace = func(msg string) {}
+		trace = func(msg *ast.DiagnosticsMessage, args ...any) {}
 	}
 	return &compilerHost{
 		currentDirectory:    currentDirectory,
@@ -72,8 +64,8 @@ func (h *compilerHost) GetCurrentDirectory() string {
 	return h.currentDirectory
 }
 
-func (h *compilerHost) Trace(msg string) {
-	h.trace(msg)
+func (h *compilerHost) Trace(msg *ast.DiagnosticsMessage, args ...any) {
+	h.trace(msg, args...)
 }
 
 var sourceFileCache collections.SyncMap[SourceFileCacheKey, *ast.SourceFile]

@@ -6,6 +6,7 @@ package ast
 import "github.com/microsoft/typescript-go/internal/ast"
 import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/diagnostics"
+import "github.com/microsoft/typescript-go/internal/locale"
 import "github.com/microsoft/typescript-go/internal/tspath"
 import _ "unsafe"
 
@@ -132,8 +133,12 @@ func Diagnostic_Loc(recv *ast.Diagnostic) core.TextRange
 func Diagnostic_Code(recv *ast.Diagnostic) int32
 //go:linkname Diagnostic_Category github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Category
 func Diagnostic_Category(recv *ast.Diagnostic) diagnostics.Category
-//go:linkname Diagnostic_Message github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Message
-func Diagnostic_Message(recv *ast.Diagnostic) string
+//go:linkname Diagnostic_MessageKey github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).MessageKey
+func Diagnostic_MessageKey(recv *ast.Diagnostic) diagnostics.Key
+//go:linkname Diagnostic_MessageArgs github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).MessageArgs
+func Diagnostic_MessageArgs(recv *ast.Diagnostic) []string
+//go:linkname Diagnostic_Localize github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Localize
+func Diagnostic_Localize(recv *ast.Diagnostic, locale locale.Locale) string
 type DiagnosticsCollection = ast.DiagnosticsCollection
 type DoStatement = ast.DoStatement
 type ElementAccessExpression = ast.ElementAccessExpression
@@ -1746,8 +1751,8 @@ func NewCompilerDiagnostic(message *diagnostics.Message, args ...any) *ast.Diagn
 func NewDiagnostic(file *ast.SourceFile, loc core.TextRange, message *diagnostics.Message, args ...any) *ast.Diagnostic
 //go:linkname NewDiagnosticChain github.com/microsoft/typescript-go/internal/ast.NewDiagnosticChain
 func NewDiagnosticChain(chain *ast.Diagnostic, message *diagnostics.Message, args ...any) *ast.Diagnostic
-//go:linkname NewDiagnosticWith github.com/microsoft/typescript-go/internal/ast.NewDiagnosticWith
-func NewDiagnosticWith(file *ast.SourceFile, loc core.TextRange, code int32, category diagnostics.Category, message string, messageChain []*ast.Diagnostic, relatedInformation []*ast.Diagnostic, reportsUnnecessary bool, reportsDeprecated bool, skippedOnNoEmit bool) *ast.Diagnostic
+//go:linkname NewDiagnosticFromSerialized github.com/microsoft/typescript-go/internal/ast.NewDiagnosticFromSerialized
+func NewDiagnosticFromSerialized(file *ast.SourceFile, loc core.TextRange, code int32, category diagnostics.Category, messageKey diagnostics.Key, messageArgs []string, messageChain []*ast.Diagnostic, relatedInformation []*ast.Diagnostic, reportsUnnecessary bool, reportsDeprecated bool, skippedOnNoEmit bool) *ast.Diagnostic
 type NewExpression = ast.NewExpression
 //go:linkname NewFlowReduceLabelData github.com/microsoft/typescript-go/internal/ast.NewFlowReduceLabelData
 func NewFlowReduceLabelData(target *ast.FlowLabel, antecedents *ast.FlowList) *ast.Node
