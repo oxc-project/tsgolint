@@ -11,10 +11,6 @@ exports[`TSGoLint E2E Snapshot Tests > should correctly evaluate project referen
 See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "id": "tsconfig-error",
     },
-    "range": {
-      "end": -1,
-      "pos": -1,
-    },
   },
 ]
 `;
