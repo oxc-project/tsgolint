@@ -89,7 +89,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 		func(node searchNode) (isResult bool, stop bool) {
 			configFilePath := r.toPath(node.configFileName)
 
-			config := r.configFileRegistryBuilder.FindOrAcquireConfigForOpenFile(
+			config := r.configFileRegistryBuilder.FindOrAcquireConfigForFile(
 				node.configFileName, configFilePath, path, project.ProjectLoadKindCreate, nil,
 			)
 			if config == nil {

@@ -1,26 +1,26 @@
-From d55ed5ae63cf53e04abe24f5de8574beb244d5cf Mon Sep 17 00:00:00 2001
+From e3256fff5af97e08c0b8ebfcddf382d99d1323eb Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 15 Aug 2025 16:06:42 +0100
-Subject: [PATCH 3/4] perf(tspath): use `unsafe.String` to avoid allocations
- when lower casing string
+Subject: [PATCH] perf(tspath): use `unsafe.String` to avoid allocations when
+ lower casing string
 
 ---
  internal/tspath/path.go | 13 ++++++++++++-
  1 file changed, 12 insertions(+), 1 deletion(-)
 
 diff --git a/internal/tspath/path.go b/internal/tspath/path.go
-index 7e726dfa0..a432965a4 100644
+index de0922150..2e1571ba4 100644
 --- a/internal/tspath/path.go
 +++ b/internal/tspath/path.go
-@@ -4,6 +4,7 @@ import (
- 	"cmp"
+@@ -5,6 +5,7 @@ import (
+ 	"slices"
  	"strings"
  	"unicode"
 +	"unsafe"
  
  	"github.com/microsoft/typescript-go/internal/stringutil"
  )
-@@ -606,7 +607,17 @@ func ToFileNameLowerCase(fileName string) string {
+@@ -607,7 +608,17 @@ func ToFileNameLowerCase(fileName string) string {
  			}
  			b[i] = c
  		}
@@ -40,5 +40,5 @@ index 7e726dfa0..a432965a4 100644
  
  	return strings.Map(func(r rune) rune {
 -- 
-2.39.5 (Apple Git-154)
+2.50.1 (Apple Git-155)
 
