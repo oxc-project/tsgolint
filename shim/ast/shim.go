@@ -245,6 +245,8 @@ func GetContainingClass(node *ast.Node) *ast.Node
 func GetContainingFunction(node *ast.Node) *ast.Node
 //go:linkname GetDeclarationContainer github.com/microsoft/typescript-go/internal/ast.GetDeclarationContainer
 func GetDeclarationContainer(node *ast.Node) *ast.Node
+//go:linkname GetDeclarationName github.com/microsoft/typescript-go/internal/ast.GetDeclarationName
+func GetDeclarationName(declaration *ast.Node) string
 //go:linkname GetDeclarationOfKind github.com/microsoft/typescript-go/internal/ast.GetDeclarationOfKind
 func GetDeclarationOfKind(symbol *ast.Symbol, kind ast.Kind) *ast.Node
 //go:linkname GetElementOrPropertyAccessName github.com/microsoft/typescript-go/internal/ast.GetElementOrPropertyAccessName
