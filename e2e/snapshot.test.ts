@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import fs from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -563,5 +563,268 @@ console.log(x);
     diagnostics = sortDiagnostics(diagnostics);
 
     expect(diagnostics).toMatchSnapshot();
+  });
+});
+
+const MessageType = {
+  Error: 0,
+  Diagnostic: 1,
+  EndOfResponse: 2,
+} as const;
+
+function createLengthPrefixedPayload(config: object): Buffer {
+  const json = JSON.stringify(config);
+  const jsonBuffer = Buffer.from(json, 'utf-8');
+  const lengthBuffer = Buffer.alloc(4);
+  lengthBuffer.writeUInt32LE(jsonBuffer.length);
+  return Buffer.concat([lengthBuffer, jsonBuffer]);
+}
+
+function parseServerOutput(data: Buffer): Diagnostic[][] {
+  const responses: Diagnostic[][] = [];
+  let currentResponse: Diagnostic[] = [];
+  let offset = 0;
+
+  while (offset < data.length) {
+    if (offset + 5 > data.length) {
+      break;
+    }
+
+    const length = data.readUInt32LE(offset);
+    const msgType = data[offset + 4];
+    offset += 5;
+
+    if (offset + length > data.length) {
+      break;
+    }
+
+    const payload = data.subarray(offset, offset + length);
+    offset += length;
+
+    if (msgType === MessageType.EndOfResponse) {
+      responses.push(currentResponse);
+      currentResponse = [];
+    } else if (msgType === MessageType.Diagnostic) {
+      try {
+        const diagnostic = JSON.parse(payload.toString('utf-8'));
+        const filePath = diagnostic.file_path || '';
+        if (filePath.includes('fixtures/')) {
+          diagnostic.file_path = 'fixtures/' + filePath.split('fixtures/').pop();
+        }
+        currentResponse.push(diagnostic);
+      } catch {
+        continue;
+      }
+    }
+  }
+
+  if (currentResponse.length > 0) {
+    responses.push(currentResponse);
+  }
+
+  return responses;
+}
+
+async function runServerMode(
+  requests: object[],
+  options: { timeout?: number } = {},
+): Promise<{ responses: Diagnostic[][]; exitCode: number | null }> {
+  const timeout = options.timeout ?? 10000;
+
+  return new Promise((resolve, reject) => {
+    const proc = spawn(TSGOLINT_BIN, ['headless', '--server'], {
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    const outputChunks: Buffer[] = [];
+    let timeoutId: NodeJS.Timeout;
+
+    proc.stdout.on('data', (chunk: Buffer) => {
+      outputChunks.push(chunk);
+    });
+
+    proc.stderr.on('data', (chunk: Buffer) => {
+      console.error('tsgolint stderr:', chunk.toString());
+    });
+
+    proc.on('error', (err) => {
+      clearTimeout(timeoutId);
+      reject(err);
+    });
+
+    proc.on('close', (code) => {
+      clearTimeout(timeoutId);
+      const output = Buffer.concat(outputChunks);
+      const responses = parseServerOutput(output);
+      resolve({ responses, exitCode: code });
+    });
+
+    for (const request of requests) {
+      const payload = createLengthPrefixedPayload(request);
+      proc.stdin.write(payload);
+    }
+
+    proc.stdin.end();
+
+    timeoutId = setTimeout(() => {
+      proc.kill('SIGTERM');
+      reject(new Error(`Server mode timed out after ${timeout}ms`));
+    }, timeout);
+  });
+}
+
+describe('TSGoLint Server Mode', () => {
+  it('should accept --server flag and process a single request', async () => {
+    const testFiles = await getTestFiles('basic');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const files = testFiles.slice(0, 3);
+    const request = {
+      version: 2,
+      configs: [
+        {
+          file_paths: files,
+          rules: [{ name: 'no-floating-promises' }],
+        },
+      ],
+    };
+
+    const { responses, exitCode } = await runServerMode([request]);
+
+    expect(exitCode).toBe(0);
+    expect(responses.length).toBe(1);
+    expect(Array.isArray(responses[0])).toBe(true);
+  });
+
+  it('should process multiple sequential requests', async () => {
+    const testFiles = await getTestFiles('basic');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const files = testFiles.slice(0, 2);
+
+    const request1 = {
+      version: 2,
+      configs: [
+        {
+          file_paths: files,
+          rules: [{ name: 'no-floating-promises' }],
+        },
+      ],
+    };
+
+    const request2 = {
+      version: 2,
+      configs: [
+        {
+          file_paths: files,
+          rules: [{ name: 'await-thenable' }],
+        },
+      ],
+    };
+
+    const { responses, exitCode } = await runServerMode([request1, request2]);
+
+    expect(exitCode).toBe(0);
+    expect(responses.length).toBe(2);
+    expect(Array.isArray(responses[0])).toBe(true);
+    expect(Array.isArray(responses[1])).toBe(true);
+  });
+
+  it('should send EndOfResponse marker after each request', async () => {
+    const testFiles = await getTestFiles('basic');
+    const files = testFiles.slice(0, 1);
+
+    const request = {
+      version: 2,
+      configs: [
+        {
+          file_paths: files,
+          rules: [{ name: 'no-floating-promises' }],
+        },
+      ],
+    };
+
+    const { responses } = await runServerMode([request, request]);
+
+    expect(responses.length).toBe(2);
+  });
+
+  it('should produce same diagnostics as non-server mode', async () => {
+    const testFiles = await getTestFiles('basic');
+    const files = testFiles.slice(0, 5);
+
+    const config = {
+      version: 2,
+      configs: [
+        {
+          file_paths: files,
+          rules: [{ name: 'no-floating-promises' }, { name: 'await-thenable' }],
+        },
+      ],
+    };
+
+    const normalOutput = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config),
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+    const normalDiagnostics = sortDiagnostics(parseHeadlessOutput(normalOutput));
+
+    const { responses } = await runServerMode([config]);
+    const serverDiagnostics = sortDiagnostics(responses[0] || []);
+
+    expect(serverDiagnostics).toEqual(normalDiagnostics);
+  });
+
+  it('should handle source_overrides in server mode', async () => {
+    const testFiles = await getTestFiles('source-overrides');
+    const testFile = testFiles[0];
+
+    const overriddenContent = `const promise = new Promise((resolve, _reject) => resolve("value"));
+promise;
+`;
+
+    const request = {
+      version: 2,
+      configs: [
+        {
+          file_paths: [testFile],
+          rules: [{ name: 'no-floating-promises' }],
+        },
+      ],
+      source_overrides: {
+        [testFile]: overriddenContent,
+      },
+    };
+
+    const { responses } = await runServerMode([request]);
+
+    expect(responses.length).toBe(1);
+    expect(responses[0].length).toBe(1);
+    expect(responses[0][0].kind === DiagnosticKind.Rule && responses[0][0].rule).toBe('no-floating-promises');
+  });
+
+  it('should handle errors gracefully without crashing the server', async () => {
+    const testFiles = await getTestFiles('basic');
+    const files = testFiles.slice(0, 2);
+
+    const invalidRequest = {
+      version: 2,
+      configs: [],
+    };
+
+    const validRequest = {
+      version: 2,
+      configs: [
+        {
+          file_paths: files,
+          rules: [{ name: 'no-floating-promises' }],
+        },
+      ],
+    };
+
+    const { responses, exitCode } = await runServerMode([invalidRequest, validRequest]);
+
+    expect(exitCode).toBe(0);
+    expect(responses.length).toBe(2);
   });
 });

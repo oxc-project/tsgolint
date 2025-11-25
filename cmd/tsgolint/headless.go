@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -89,10 +90,18 @@ type headlessMessageType uint8
 const (
 	headlessMessageTypeError headlessMessageType = iota
 	headlessMessageTypeDiagnostic
+	headlessMessageTypeEndOfResponse
 )
 
 type headlessMessagePayloadError struct {
 	Error string `json:"error"`
+}
+
+type headlessRunConfig struct {
+	logLevel       utils.LogLevel
+	cwd            string
+	fix            bool
+	fixSuggestions bool
 }
 
 // Unified diagnostic type for channel
@@ -138,6 +147,7 @@ func runHeadless(args []string) int {
 		allocsOut      string
 		fix            bool
 		fixSuggestions bool
+		serverMode     bool
 	)
 	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
 	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
@@ -145,6 +155,7 @@ func runHeadless(args []string) int {
 	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
 	flag.BoolVar(&fix, "fix", false, "generate fixes for code problems")
 	flag.BoolVar(&fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
+	flag.BoolVar(&serverMode, "server", false, "keep the process running and accept multiple headless requests")
 	flag.CommandLine.Parse(args)
 
 	log.SetOutput(os.Stderr)
@@ -172,6 +183,17 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
+	runCfg := headlessRunConfig{
+		logLevel:       logLevel,
+		cwd:            cwd,
+		fix:            fix,
+		fixSuggestions: fixSuggestions,
+	}
+
+	if serverMode {
+		return runHeadlessServer(runCfg)
+	}
+
 	configRaw, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
@@ -185,6 +207,17 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
+	if err := runHeadlessPayload(payload, runCfg); err != nil {
+		writeErrorMessage(err.Error())
+		return 1
+	}
+
+	writeMemProfiles(heapOut, allocsOut)
+
+	return 0
+}
+
+func runHeadlessPayload(payload *headlessPayload, cfg headlessRunConfig) error {
 	baseFS := osvfs.FS()
 	if len(payload.SourceOverrides) > 0 {
 		baseFS = newOverlayFS(baseFS, payload.SourceOverrides)
@@ -200,25 +233,24 @@ func runHeadless(args []string) int {
 	for _, config := range payload.Configs {
 		totalFileCount += len(config.FilePaths)
 	}
-	if logLevel == utils.LogLevelDebug {
+	if cfg.logLevel == utils.LogLevelDebug {
 		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
 	}
 
-	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
-
+	tsConfigResolver := utils.NewTsConfigResolver(fs, cfg.cwd)
 	fileConfigs := make(map[string][]headlessRule, totalFileCount)
 
 	idx := 0
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
-			if logLevel == utils.LogLevelDebug {
+			if cfg.logLevel == utils.LogLevelDebug {
 				log.Printf("[%d/%d] Processing file: %s", idx+1, totalFileCount, filePath)
 			}
 
 			normalizedFilePath := tspath.NormalizeSlashes(filePath)
 
 			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
-			if logLevel == utils.LogLevelDebug {
+			if cfg.logLevel == utils.LogLevelDebug {
 				tsconfigStr := "<none>"
 				if found {
 					tsconfigStr = tsconfig
@@ -236,7 +268,7 @@ func runHeadless(args []string) int {
 		}
 	}
 
-	if logLevel == utils.LogLevelDebug {
+	if cfg.logLevel == utils.LogLevelDebug {
 		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
 		for program, files := range workload.Programs {
 			log.Printf("  Program %s: %d files", program, len(files))
@@ -257,16 +289,14 @@ func runHeadless(args []string) int {
 		})
 	}
 
-	if logLevel == utils.LogLevelDebug {
+	if cfg.logLevel == utils.LogLevelDebug {
 		log.Printf("Starting linter with %d workers", runtime.GOMAXPROCS(0))
 		log.Printf("Workload distribution: %d programs", len(workload.Programs))
 	}
 
 	var wg sync.WaitGroup
-
 	diagnosticsChan := make(chan anyDiagnostic, 4096)
 
-	// Handle all diagnostics
 	wg.Go(func() {
 		w := bufio.NewWriterSize(os.Stdout, 4096*100)
 		defer w.Flush()
@@ -274,7 +304,6 @@ func runHeadless(args []string) int {
 			var hd headlessDiagnostic
 
 			if d.ruleDiagnostic != nil {
-				// Rule diagnostic
 				rd := d.ruleDiagnostic
 				filePath := rd.SourceFile.FileName()
 				hd = headlessDiagnostic{
@@ -287,7 +316,7 @@ func runHeadless(args []string) int {
 					FilePath:    &filePath,
 				}
 
-				if fix {
+				if cfg.fix {
 					hd.Fixes = make([]headlessFix, len(rd.Fixes()))
 					for i, fix := range rd.Fixes() {
 						hd.Fixes[i] = headlessFix{
@@ -296,7 +325,7 @@ func runHeadless(args []string) int {
 						}
 					}
 				}
-				if fixSuggestions {
+				if cfg.fixSuggestions {
 					hd.Suggestions = make([]headlessSuggestion, len(rd.GetSuggestions()))
 					for i, suggestion := range rd.GetSuggestions() {
 						hd.Suggestions[i] = headlessSuggestion{
@@ -312,13 +341,12 @@ func runHeadless(args []string) int {
 					}
 				}
 			} else if d.internalDiagnostic != nil {
-				// Internal diagnostic (tsconfig, type error, etc.)
 				internalDiagnostic := d.internalDiagnostic
 
 				hd = headlessDiagnostic{
 					Kind:  headlessDiagnosticKindTsconfig,
 					Range: headlessRangeFromRange(internalDiagnostic.Range),
-					Rule:  nil, // Internal diagnostics don't have a rule
+					Rule:  nil,
 					Message: headlessRuleMessage{
 						Id:          internalDiagnostic.Id,
 						Description: internalDiagnostic.Description,
@@ -337,21 +365,21 @@ func runHeadless(args []string) int {
 		}
 	})
 
-	if logLevel == utils.LogLevelDebug {
+	if cfg.logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
 	}
 
-	err = linter.RunLinter(
-		logLevel,
-		cwd,
+	err := linter.RunLinter(
+		cfg.logLevel,
+		cfg.cwd,
 		workload,
 		runtime.GOMAXPROCS(0),
 		fs,
 		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			cfg := fileConfigs[sourceFile.FileName()]
-			rules := make([]linter.ConfiguredRule, len(cfg))
+			cfgRules := fileConfigs[sourceFile.FileName()]
+			rules := make([]linter.ConfiguredRule, len(cfgRules))
 
-			for i, headlessRule := range cfg {
+			for i, headlessRule := range cfgRules {
 				r, ok := allRulesByName[headlessRule.Name]
 				if !ok {
 					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
@@ -373,8 +401,8 @@ func runHeadless(args []string) int {
 			diagnosticsChan <- internalToAny(d)
 		},
 		linter.Fixes{
-			Fix:            fix,
-			FixSuggestions: fixSuggestions,
+			Fix:            cfg.fix,
+			FixSuggestions: cfg.fixSuggestions,
 		},
 		linter.TypeErrors{
 			ReportSyntactic: payload.ReportSyntactic,
@@ -385,17 +413,78 @@ func runHeadless(args []string) int {
 	close(diagnosticsChan)
 	if err != nil {
 		log.Printf("ERROR: Linter failed: %v", err)
-		writeErrorMessage(fmt.Sprintf("error running linter: %v", err))
-		return 1
+		return fmt.Errorf("error running linter: %w", err)
 	}
 
 	wg.Wait()
 
-	if logLevel == utils.LogLevelDebug {
+	if cfg.logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")
 	}
 
-	writeMemProfiles(heapOut, allocsOut)
+	return nil
+}
+
+func runHeadlessServer(cfg headlessRunConfig) int {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		payloadBytes, err := readLengthPrefixedPayload(reader)
+		if err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			writeErrorMessage(fmt.Sprintf("error reading request: %v", err))
+			return 1
+		}
+
+		if len(payloadBytes) == 0 {
+			writeErrorMessage("received empty payload")
+			if err := writeEndOfResponse(); err != nil {
+				writeErrorMessage(fmt.Sprintf("error writing end of response: %v", err))
+				return 1
+			}
+			continue
+		}
+
+		payload, err := deserializePayload(payloadBytes)
+		if err != nil {
+			writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
+			if err := writeEndOfResponse(); err != nil {
+				writeErrorMessage(fmt.Sprintf("error writing end of response: %v", err))
+				return 1
+			}
+			continue
+		}
+
+		if err := runHeadlessPayload(payload, cfg); err != nil {
+			writeErrorMessage(err.Error())
+		}
+
+		if err := writeEndOfResponse(); err != nil {
+			writeErrorMessage(fmt.Sprintf("error writing end of response: %v", err))
+			return 1
+		}
+	}
 
 	return 0
+}
+
+func readLengthPrefixedPayload(r *bufio.Reader) ([]byte, error) {
+	lenBuf := make([]byte, 4)
+	if _, err := io.ReadFull(r, lenBuf); err != nil {
+		return nil, err
+	}
+	length := binary.LittleEndian.Uint32(lenBuf)
+	if length == 0 {
+		return []byte{}, nil
+	}
+	payload := make([]byte, length)
+	if _, err := io.ReadFull(r, payload); err != nil {
+		return nil, err
+	}
+	return payload, nil
+}
+
+func writeEndOfResponse() error {
+	return writeMessage(os.Stdout, headlessMessageTypeEndOfResponse, struct{}{})
 }
