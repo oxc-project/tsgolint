@@ -783,9 +783,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					return
 				}
 				doStmt := node.AsDoStatement()
-				if isAllowedConstantLoopCondition && isAllowedConstantLiteral(doStmt.Expression) {
-					return
-				}
+				// Note: Unlike while statements, do-while does NOT allow constant literals
+				// even in "only-allowed-literals" mode
 				checkCondition(doStmt.Expression)
 			},
 			ast.KindForStatement: func(node *ast.Node) {
@@ -811,6 +810,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if opKind == ast.KindQuestionQuestionToken {
 					// Check if the left side is an array element access without noUncheckedIndexedAccess
 					// In this case, the ?? is justified even if the type appears non-nullish
+					// EXCEPT when the element type itself is always nullish (e.g., null[])
 					leftSkip := ast.SkipParentheses(binExpr.Left)
 					if leftSkip.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 						elemAccess := leftSkip.AsElementAccessExpression()
@@ -842,7 +842,14 @@ var NoUnnecessaryConditionRule = rule.Rule{
 								return false
 							}
 							if isArrayOrTupleTypeLocal(baseType) {
-								return
+								// Check if the element type is always nullish (e.g., null[])
+								// In that case, we should still report the error
+								leftType := getResolvedType(binExpr.Left)
+								if leftType != nil && !isAlwaysNullishType(leftType) {
+									// Element type is not always nullish, so skip the check
+									return
+								}
+								// Element type is always nullish, continue to check
 							}
 						}
 					}
