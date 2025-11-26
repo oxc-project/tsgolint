@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/vfs/osvfs
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251125183540-417387a39cf5
+require github.com/microsoft/typescript-go v0.0.0-20251125215537-d1be94b3c211
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
