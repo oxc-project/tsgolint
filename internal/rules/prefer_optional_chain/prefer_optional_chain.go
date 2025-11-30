@@ -4134,6 +4134,64 @@ var PreferOptionalChainRule = rule.Rule{
 						return // Skip chains with incomplete nullish checks
 					}
 				}
+
+				// CRITICAL: Also check for OperandTypeComparison operands that are strict equality checks
+				// against null or undefined on property accesses. If the type includes BOTH null AND undefined
+				// but the check only covers one, the conversion would be unsafe.
+				// Example: foo.bar === undefined || foo.bar.baz where foo.bar has type T | null | undefined
+				//          This is unsafe because if foo.bar is null, the original throws but foo.bar?.baz doesn't
+				for _, op := range chain {
+					if op.typ == OperandTypeComparison && op.node != nil && op.comparedExpr != nil {
+						unwrapped := op.node
+						for ast.IsParenthesizedExpression(unwrapped) {
+							unwrapped = unwrapped.AsParenthesizedExpression().Expression
+						}
+						if ast.IsBinaryExpression(unwrapped) {
+							binExpr := unwrapped.AsBinaryExpression()
+							operator := binExpr.OperatorToken.Kind
+
+							// Only check strict equality operators (=== null or === undefined)
+							if operator == ast.KindEqualsEqualsEqualsToken {
+								// Check if comparing to null or undefined
+								isStrictNullCheck := binExpr.Right.Kind == ast.KindNullKeyword ||
+									binExpr.Left.Kind == ast.KindNullKeyword
+								isStrictUndefCheck := (ast.IsIdentifier(binExpr.Right) && binExpr.Right.AsIdentifier().Text == "undefined") ||
+									(ast.IsIdentifier(binExpr.Left) && binExpr.Left.AsIdentifier().Text == "undefined") ||
+									ast.IsVoidExpression(binExpr.Right) || ast.IsVoidExpression(binExpr.Left)
+
+								if isStrictNullCheck || isStrictUndefCheck {
+									// Get the type of the compared expression (property access)
+									propType := ctx.TypeChecker.GetTypeAtLocation(op.comparedExpr)
+									typeParts := utils.UnionTypeParts(propType)
+
+									// Check if type includes BOTH null and undefined
+									typeHasNull := false
+									typeHasUndefined := false
+									for _, part := range typeParts {
+										if utils.IsTypeFlagSet(part, checker.TypeFlagsNull) {
+											typeHasNull = true
+										}
+										if utils.IsTypeFlagSet(part, checker.TypeFlagsUndefined) {
+											typeHasUndefined = true
+										}
+									}
+
+									// If type has both null and undefined, but we only check one, reject
+									if typeHasNull && typeHasUndefined {
+										if isStrictNullCheck && !isStrictUndefCheck {
+											debugLog("OR chain rejected: property strict null check but type has both null and undefined")
+											return
+										}
+										if isStrictUndefCheck && !isStrictNullCheck {
+											debugLog("OR chain rejected: property strict undefined check but type has both null and undefined")
+											return
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 			}
 
 			// Check if conversion would change return type for plain operands in OR chains

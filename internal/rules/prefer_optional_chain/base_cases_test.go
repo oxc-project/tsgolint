@@ -363,8 +363,67 @@ func ReplaceOperatorWithStrictEqualUndefined(s string) string {
 	return strings.ReplaceAll(s, "||", "=== undefined ||")
 }
 
+// AddTrailingSemicolonCheck returns a function that wraps another function and adds
+// a trailing equality check to the semicolon
+// e.g., "foo;" becomes "foo === null;" for OR chains
+func AddTrailingStrictEqualNull(fn MutateFn) MutateFn {
+	return func(s string) string {
+		s = fn(s)
+		return strings.Replace(s, ";", " === null;", 1)
+	}
+}
+
+// AddTrailingStrictEqualUndefined returns a function that adds trailing "=== undefined" check
+func AddTrailingStrictEqualUndefined(fn MutateFn) MutateFn {
+	return func(s string) string {
+		s = fn(s)
+		return strings.Replace(s, ";", " === undefined;", 1)
+	}
+}
+
+// AddTrailingEqualNull returns a function that adds trailing "== null" check
+func AddTrailingEqualNull(fn MutateFn) MutateFn {
+	return func(s string) string {
+		s = fn(s)
+		return strings.Replace(s, ";", " == null;", 1)
+	}
+}
+
+// AddTrailingEqualUndefined returns a function that adds trailing "== undefined" check
+func AddTrailingEqualUndefined(fn MutateFn) MutateFn {
+	return func(s string) string {
+		s = fn(s)
+		return strings.Replace(s, ";", " == undefined;", 1)
+	}
+}
+
 // NegateExpression adds ! prefix to negate the expression for OR chains
 func NegateExpression(s string) string {
 	// This is simplified - upstream has more complex logic
 	return "!" + s
+}
+
+// NegateChainOperands negates each operand in a chain separated by the given operator
+// For example: "foo || foo.bar" becomes "!foo || !foo.bar"
+func NegateChainOperands(s string, operator string) string {
+	// Remove trailing semicolon for processing
+	hasSemicolon := strings.HasSuffix(s, ";")
+	if hasSemicolon {
+		s = s[:len(s)-1]
+	}
+
+	// Split by operator
+	parts := strings.Split(s, " "+operator+" ")
+	for i, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" && !strings.HasPrefix(part, "!") {
+			parts[i] = "!" + part
+		}
+	}
+
+	result := strings.Join(parts, " "+operator+" ")
+	if hasSemicolon {
+		result += ";"
+	}
+	return result
 }
