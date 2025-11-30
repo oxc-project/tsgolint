@@ -44,6 +44,7 @@ const ALL_RULES = [
   'non-nullable-type-assertion-style',
   'only-throw-error',
   'prefer-includes',
+  'prefer-optional-chain',
   'prefer-promise-reject-errors',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
