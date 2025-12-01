@@ -401,6 +401,10 @@ var PreferOptionalChainRule = rule.Rule{
 					ast.IsFunctionExpression(leftUnwrapped) ||
 					ast.IsArrowFunction(leftUnwrapped) ||
 					ast.IsClassExpression(leftUnwrapped) ||
+					// JSX elements are always new instances, like object/array literals
+					ast.IsJsxElement(leftUnwrapped) ||
+					ast.IsJsxSelfClosingElement(leftUnwrapped) ||
+					ast.IsJsxFragment(leftUnwrapped) ||
 					leftUnwrapped.Kind == ast.KindTemplateExpression ||
 					leftUnwrapped.Kind == ast.KindAwaitExpression {
 					return NodeInvalid

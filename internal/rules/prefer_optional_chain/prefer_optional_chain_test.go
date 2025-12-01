@@ -1645,6 +1645,95 @@ func TestHandCraftedCases(t *testing.T) {
 			// Nullish checks without property access
 			{Code: `foo != null && bar;`},
 			{Code: `foo !== undefined && bar;`},
+
+			// =============================================================================
+			// UPSTREAM EDGE CASES - Missing test coverage from typescript-eslint
+			// Source: upstream prefer-optional-chain.test.ts valid cases (lines 2861-3109)
+			// =============================================================================
+
+			// Call arguments are considered - different args means not the same call
+			{Code: `foo.bar(a) && foo.bar(a, b).baz;`},
+			// Type parameters are considered - different type args means not the same call
+			{Code: `foo.bar<a>() && foo.bar<a, b>().baz;`},
+			// Array elements are considered - different arrays are not equal
+			{Code: `[1, 2].length && [1, 2, 3].length.toFixed();`},
+			{Code: `[1,].length && [1, 2].length.toFixed();`},
+			// Short-circuiting chains are considered - (foo?.a) creates different reference
+			{Code: `(foo?.a).b && foo.a.b.c;`},
+			{Code: `(foo?.a)() && foo.a().b;`},
+			{Code: `(foo?.a)() && foo.a()();`},
+			// Looks like a chain but just a pair of strict nullish checks - not a chain
+			{Code: `foo !== null && foo !== undefined;`},
+			{Code: `x['y'] !== undefined && x['y'] !== null;`},
+			// Private properties
+			{Code: `this.#a && this.#b;`},
+			{Code: `!this.#a || !this.#b;`},
+			{Code: `a.#foo?.bar;`},
+			{Code: `!a.#foo?.bar;`},
+			{Code: `!foo().#a || a;`},
+			{Code: `!a.b.#a || a;`},
+			{Code: `!new A().#b || a;`},
+			{Code: `!(await a).#b || a;`},
+			// Type assertion cast - escape hatch
+			{Code: `!(foo as any).bar || 'anything';`},
+			// Computed properties should be interrogated and correctly ignored
+			{Code: `!foo[1 + 1] || !foo[1 + 2];`},
+			{Code: `!foo[1 + 1] || !foo[1 + 2].foo;`},
+			// Currently do not handle 'this' as the first part of a chain
+			{Code: `this && this.foo;`},
+			{Code: `!this || !this.foo;`},
+			// Non-null assertion with properties
+			{Code: `!entity.__helper!.__initialized || options.refresh;`},
+			// import.meta edge cases
+			{Code: `import.meta || true;`},
+			{Code: `import.meta || import.meta.foo;`},
+			{Code: `!import.meta && false;`},
+			{Code: `!import.meta && !import.meta.foo;`},
+			// new.target edge cases
+			{Code: `new.target || new.target.length;`},
+			{Code: `!new.target || true;`},
+			// Do not handle direct optional chaining on private properties (TS limitation)
+			{Code: `foo && foo.#bar;`},
+			{Code: `!foo || !foo.#bar;`},
+			// Weird non-constant cases are ignored - literals are always new instances
+			{Code: `({}) && {}.toString();`},
+			{Code: `[] && [].length;`},
+			{Code: `(() => {}) && (() => {}).name;`},
+			{Code: `(function () {}) && function () {}.name;`},
+			{Code: `(class Foo {}) && class Foo {}.constructor;`},
+			{Code: `new Map().get('a') && new Map().get('a').what;`},
+			// https://github.com/typescript-eslint/typescript-eslint/issues/7654
+			{Code: `data && data.value !== null;`},
+			// Computed property side effects - x++ is not constant
+			{Code: `foo[x++] && foo[x++].bar;`},
+			{Code: `foo[yield x] && foo[yield x].bar;`},
+			// Assignment in expression
+			{Code: `a = b && (a = b).wtf;`},
+			// Complex OR expression - TODO in upstream
+			{Code: `(x || y) != null && (x || y).foo;`},
+			// Await expression - TODO in upstream
+			{Code: `(await foo) && (await foo).bar;`},
+			// Different variable names (match vs match$1)
+			{Code: `match && match$1 !== undefined;`},
+			// Template literal patterns - literals are always new instances
+			{Code: "('x' as `${'x'}`) && ('x' as `${'x'}`).length;"},
+			{Code: "`x` && `x`.length;"},
+			{Code: "`x${a}` && `x${a}`.length;"},
+			// globalThis typeof pattern
+			{Code: `typeof globalThis !== 'undefined' && globalThis.Array();`},
+			// Void union type
+			{Code: `declare const x: void | (() => void); x && x();`},
+			// Falsy unions should be ignored
+			{Code: `declare const x: false | { a: string }; x && x.a;`},
+			{Code: `declare const x: false | { a: string }; !x || x.a;`},
+			{Code: `declare const x: '' | { a: string }; x && x.a;`},
+			{Code: `declare const x: '' | { a: string }; !x || x.a;`},
+			{Code: `declare const x: 0 | { a: string }; x && x.a;`},
+			{Code: `declare const x: 0 | { a: string }; !x || x.a;`},
+			{Code: `declare const x: 0n | { a: string }; x && x.a;`},
+			{Code: `declare const x: 0n | { a: string }; !x || x.a;`},
+			// Assignment in expression
+			{Code: `(x = {}) && (x.y = true) != null && x.y.toString();`},
 		},
 		// Invalid cases
 		[]rule_tester.InvalidTestCase{
@@ -2921,8 +3010,11 @@ func TestSatisfiesExpression(t *testing.T) {
 func TestJSXPatterns(t *testing.T) {
 	// Tests for JSX patterns - ensure essential whitespace isn't removed
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
-		// Valid cases
-		[]rule_tester.ValidTestCase{},
+		// Valid cases - JSX literals are always new instances, not chainable
+		[]rule_tester.ValidTestCase{
+			{Code: `<div /> && (<div />).wtf;`, Tsx: true},
+			{Code: `<></> && (<></>).wtf;`, Tsx: true},
+		},
 		// Invalid cases
 		[]rule_tester.InvalidTestCase{
 			// JSX with arrow function containing self-closing element with spaces
