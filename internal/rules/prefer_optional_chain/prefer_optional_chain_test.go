@@ -1481,26 +1481,21 @@ func TestChainEndingWithComparison(t *testing.T) {
 			{Code: `foo != null && null == foo['bar'];`},
 			{Code: `foo != null && 0 !== foo['bar'];`},
 
-			// NOTE: The following patterns are valid in upstream but our rule incorrectly flags them.
-			// These test cases document known implementation gaps that should be fixed.
-			// Uncomment when the rule implementation is fixed:
+			// OR chain patterns that should NOT be converted (valid code)
+			// These patterns have different semantics from optional chaining
 			//
-			// !foo || patterns with comparisons
-			// {Code: `!foo || foo.bar != undeclaredVar;`},
-			// {Code: `!foo || foo.bar != null;`},
-			// ... more !foo || patterns ...
+			// !foo || patterns with comparisons - unsafe because checking ALL falsy values
+			{Code: `!foo || foo.bar != undeclaredVar;`},
+			{Code: `!foo || foo.bar != null;`},
+			{Code: `!foo || foo.bar != undefined;`},
 			//
-			// foo == null || patterns
-			// {Code: `foo == null || foo.bar != undeclaredVar;`},
-			// ... more foo == null || patterns ...
+			// foo == null || patterns with comparisons involving undeclared vars
+			{Code: `foo == null || foo.bar != undeclaredVar;`},
 			//
-			// foo || patterns (should NOT be converted)
-			// {Code: `foo || foo.bar != 0;`},
-			// ... more foo || patterns ...
-			//
-			// foo != null || patterns (should NOT be converted)
-			// {Code: `foo != null || foo.bar != 0;`},
-			// ... more foo != null || patterns ...
+			// foo || patterns (plain truthy check - should NOT be converted)
+			{Code: `foo || foo.bar != 0;`},
+			{Code: `foo || foo.bar != 1;`},
+			{Code: `foo || foo.bar == 0;`},
 		},
 		// Invalid cases - should be converted
 		[]rule_tester.InvalidTestCase{
@@ -2767,6 +2762,31 @@ func TestWhitespaceVariations(t *testing.T) {
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
 			},
+			// Spacing sanity check: extra spaces within property access (`.      `)
+			// Note: the rule normalizes whitespace in the fix output
+			{
+				Code:    `foo && foo.      bar;`,
+				Output:  []string{`foo?.bar;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Spacing sanity check: newline within property access (`.\n`)
+			// Note: the rule normalizes whitespace in the fix output
+			{
+				Code: `foo && foo.
+bar;`,
+				Output:  []string{`foo?.bar;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Spacing sanity check: deep chain with extra spaces
+			// Note: the rule normalizes whitespace in the fix output
+			{
+				Code:    `foo && foo.      bar && foo.      bar.      baz;`,
+				Output:  []string{`foo?.bar?.baz;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
 		})
 }
 
@@ -2892,6 +2912,48 @@ func TestSatisfiesExpression(t *testing.T) {
 			{
 				Code:    `(foo satisfies Bar) && (foo satisfies Bar).baz;`,
 				Output:  []string{`foo satisfies Bar?.baz;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestJSXPatterns(t *testing.T) {
+	// Tests for JSX patterns - ensure essential whitespace isn't removed
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		// Valid cases
+		[]rule_tester.ValidTestCase{},
+		// Invalid cases
+		[]rule_tester.InvalidTestCase{
+			// JSX with arrow function containing self-closing element with spaces
+			// Essential whitespace must be preserved: <This Requires Spaces />
+			{
+				Code:    `foo && foo.bar(baz => <This Requires Spaces />);`,
+				Output:  []string{`foo?.bar(baz => <This Requires Spaces />);`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Tsx:     true,
+			},
+			// JSX with arrow function containing element with children
+			{
+				Code:    `foo && foo.bar(baz => <div>{baz}</div>);`,
+				Output:  []string{`foo?.bar(baz => <div>{baz}</div>);`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Tsx:     true,
+			},
+			// JSX with fragment
+			{
+				Code:    `foo && foo.bar(baz => <><span>{baz}</span></>);`,
+				Output:  []string{`foo?.bar(baz => <><span>{baz}</span></>);`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Tsx:     true,
+			},
+			// Arrow function with typeof - ensure whitespace preserved
+			{
+				Code:    `foo && foo.bar(baz => typeof baz);`,
+				Output:  []string{`foo?.bar(baz => typeof baz);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
 			},

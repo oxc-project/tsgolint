@@ -4097,6 +4097,36 @@ var PreferOptionalChainRule = rule.Rule{
 				}
 			}
 
+			// Skip OR chains starting with plain truthy check (foo || foo.bar != 0)
+			// These check ALL falsy values (0, "", false, null, undefined),
+			// while optional chaining only checks null/undefined
+			// Original: foo || foo.bar != 0 -> returns foo if falsy, otherwise foo.bar != 0
+			// Converted: foo?.bar != 0 -> returns undefined != 0 = true if foo is null/undefined
+			// This changes semantics, so skip unless the unsafe option is enabled
+			// HOWEVER, allow plain chains without comparisons (foo || foo.bar) as these are valid
+			if len(chain) >= 2 && chain[0].typ == OperandTypePlain && !opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+				firstExpr := chain[0].comparedExpr
+				if firstExpr != nil {
+					unwrappedFirst := unwrapParentheses(firstExpr)
+					// If the first plain expression is NOT a property/element/call access (i.e., it's just a simple identifier)
+					isFirstSimplePlain := !ast.IsPropertyAccessExpression(unwrappedFirst) &&
+						!ast.IsElementAccessExpression(unwrappedFirst) &&
+						!ast.IsCallExpression(unwrappedFirst)
+
+					if isFirstSimplePlain {
+						// Check if any subsequent operand is a comparison
+						// Block patterns like: foo || foo.bar != 0 (truthy + comparison)
+						// Allow patterns like: foo || foo.bar (truthy + plain property access)
+						for i := 1; i < len(chain); i++ {
+							if chain[i].typ == OperandTypeComparison {
+								debugLog("OR chain rejected: plain truthy check with trailing comparison")
+								return
+							}
+						}
+					}
+				}
+			}
+
 			// CRITICAL: Check for incomplete nullish checks in OR chains
 			// Optional chaining checks for BOTH null AND undefined
 			// If the chain only checks for null OR only for undefined (not both), it's NOT equivalent
