@@ -1846,10 +1846,11 @@ func TestHandCraftedCases(t *testing.T) {
 				},
 				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
 			},
-			// Inconsistent checks break the chain
+			// Mixed loose/strict checks - full conversion is safe since optional chain
+			// handles both null and undefined at every level
 			{
 				Code:    `foo && foo.bar != null && foo.bar.baz !== undefined && foo.bar.baz.buzz;`,
-				Output:  []string{`foo?.bar?.baz !== undefined && foo.bar.baz.buzz;`},
+				Output:  []string{`foo?.bar?.baz?.buzz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
 			},
@@ -2290,6 +2291,37 @@ func TestTwoErrorCases(t *testing.T) {
 			{
 				Code:   `cond ? foo && foo.bar : baz && baz.qux;`,
 				Output: []string{`cond ? foo?.bar : baz?.qux;`},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "preferOptionalChain"},
+					{MessageId: "preferOptionalChain"},
+				},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// https://github.com/typescript-eslint/typescript-eslint/issues/6332
+			// Chain preceded by unrelated nullish check - only the foo chain should convert
+			{
+				Code:   `unrelated != null && foo != null && foo.bar != null;`,
+				Output: []string{`unrelated != null && foo?.bar != null;`},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+			},
+			{
+				Code:   `unrelated1 != null && unrelated2 != null && foo != null && foo.bar != null;`,
+				Output: []string{`unrelated1 != null && unrelated2 != null && foo?.bar != null;`},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+			},
+			// https://github.com/typescript-eslint/typescript-eslint/issues/1461
+			// Two independent chains in one expression (both should be converted)
+			{
+				Code:   `foo1 != null && foo1.bar != null && foo2 != null && foo2.bar != null;`,
+				Output: []string{`foo1?.bar != null && foo2?.bar != null;`},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "preferOptionalChain"},
+					{MessageId: "preferOptionalChain"},
+				},
+			},
+			{
+				Code:   `foo && foo.a && bar && bar.a;`,
+				Output: []string{`foo?.a && bar?.a;`},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
@@ -2876,6 +2908,17 @@ bar;`,
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
 			},
+			// should preserve comments in a call expression
+			{
+				Code: `foo && foo.bar(/* comment */a,
+            // comment2
+            b, );`,
+				Output: []string{`foo?.bar(/* comment */a,
+            // comment2
+            b, );`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
 		})
 }
 
@@ -3046,6 +3089,408 @@ func TestJSXPatterns(t *testing.T) {
 			{
 				Code:    `foo && foo.bar(baz => typeof baz);`,
 				Output:  []string{`foo?.bar(baz => typeof baz);`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+// =============================================================================
+// Additional test cases from upstream typescript-eslint
+// =============================================================================
+
+func TestMultiLevelYodaChains(t *testing.T) {
+	// Tests for multi-level Yoda style chains (value on left side of comparison)
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// Multi-level Yoda chain with null checks and string comparison
+			{
+				Code:    `foo != null && null != foo.bar && '123' == foo.bar.baz;`,
+				Output:  []string{`'123' == foo?.bar?.baz;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// All Yoda style with different operators
+			{
+				Code:    `null != foo && null != foo.bar && null != foo.bar.baz;`,
+				Output:  []string{`null != foo?.bar?.baz;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Mixed Yoda and normal style
+			{
+				Code:    `foo != null && null !== foo.bar && foo.bar.baz !== null;`,
+				Output:  []string{`foo?.bar?.baz !== null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Yoda with undefined
+			{
+				Code:    `undefined !== foo && undefined !== foo.bar && foo.bar.baz;`,
+				Output:  []string{`foo?.bar?.baz;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestRandomlyPlacedOptionalChainTokens(t *testing.T) {
+	// Tests for chains that already have some optional chain tokens
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// Chain with existing optional tokens in the middle
+			{
+				Code:    `foo?.bar?.baz != null && foo.bar.baz.bam != null;`,
+				Output:  []string{`foo?.bar?.baz?.bam != null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Optional tokens at the start of chain
+			{
+				Code:    `foo?.bar != null && foo.bar.baz != null && foo.bar.baz.bam;`,
+				Output:  []string{`foo?.bar?.baz?.bam;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Interleaved optional tokens
+			{
+				Code:    `foo?.bar?.baz != null && foo.bar.baz?.bam != null && foo.bar.baz.bam.qux;`,
+				Output:  []string{`foo?.bar?.baz?.bam?.qux;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestRandomlyPlacedNonNullAssertions(t *testing.T) {
+	// Tests for chains that have non-null assertions
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// Chain with non-null assertions
+			{
+				Code:    `foo!.bar!.baz != null && foo.bar.baz.bam != null;`,
+				Output:  []string{`foo!.bar!.baz?.bam != null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Non-null assertions at various positions
+			{
+				Code:    `foo!.bar != null && foo.bar!.baz != null;`,
+				Output:  []string{`foo!.bar?.baz != null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Mixed non-null and optional chain
+			{
+				Code:    `foo!.bar?.baz != null && foo.bar.baz.bam;`,
+				Output:  []string{`foo!.bar?.baz?.bam;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestMixedBinaryChecksLongChain(t *testing.T) {
+	// Tests for very long chains with mixed binary check types
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// 10-part chain with mixed nullish checks
+			{
+				Code: `a &&
+a.b != null &&
+a.b.c !== null &&
+a.b.c.d != undefined &&
+a.b.c.d.e !== undefined &&
+a.b.c.d.e.f != null &&
+a.b.c.d.e.f.g !== null &&
+a.b.c.d.e.f.g.h != undefined &&
+a.b.c.d.e.f.g.h.i !== undefined &&
+a.b.c.d.e.f.g.h.i.j;`,
+				Output:  []string{`a?.b?.c?.d?.e?.f?.g?.h?.i?.j;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Mixed binary and typeof checks
+			{
+				Code: `typeof foo !== 'undefined' &&
+foo != null &&
+typeof foo.bar !== 'undefined' &&
+foo.bar != null &&
+foo.bar.baz;`,
+				Output:  []string{`foo?.bar?.baz;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestSplitStrictEqualsAsLastOperand(t *testing.T) {
+	// Tests for split strict equals pattern (!== null && typeof !== 'undefined')
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// Split strict equals at end of chain
+			{
+				Code:    `foo?.bar?.baz !== null && typeof foo.bar.baz !== 'undefined';`,
+				Output:  []string{`foo?.bar?.baz != null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Split strict equals without preceding optional chain
+			{
+				Code:    `foo !== null && typeof foo !== 'undefined' && foo.bar !== null && typeof foo.bar !== 'undefined';`,
+				Output:  []string{`foo?.bar != null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Reversed split strict equals
+			{
+				Code:    `typeof foo !== 'undefined' && foo !== null && typeof foo.bar !== 'undefined' && foo.bar !== null;`,
+				Output:  []string{`foo?.bar != null;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestCallableUndefinedUnion(t *testing.T) {
+	// Tests for callable undefined union types
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// Callable with undefined union - from upstream
+			{
+				Code: `
+declare const foo: { bar: undefined | (() => void) };
+foo.bar && foo.bar();
+`,
+				Output:  []string{"\ndeclare const foo: { bar: undefined | (() => void) };\nfoo.bar?.();\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Optional property callable
+			{
+				Code: `
+declare const foo: { bar?: () => void };
+foo.bar && foo.bar();
+`,
+				Output:  []string{"\ndeclare const foo: { bar?: () => void };\nfoo.bar?.();\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+func TestGlobalThisTypeofPattern(t *testing.T) {
+	// Tests for globalThis typeof patterns
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// globalThis typeof pattern
+			{
+				Code:    `typeof globalThis !== 'undefined' && globalThis.Array && globalThis.Array();`,
+				Output:  []string{`globalThis.Array?.();`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// globalThis with property access chain
+			{
+				Code:    `typeof globalThis !== 'undefined' && globalThis.foo && globalThis.foo.bar;`,
+				Output:  []string{`globalThis.foo?.bar;`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+// TestMissingUpstreamCases tests patterns identified as missing from upstream typescript-eslint tests
+func TestMissingUpstreamCases(t *testing.T) {
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// High Priority: this.property chaining patterns
+			// this.bar && this.bar.baz → this.bar?.baz
+			{
+				Code: `
+declare const self: { bar?: { baz: string } };
+self.bar && self.bar.baz;
+`,
+				Output:  []string{"\ndeclare const self: { bar?: { baz: string } };\nself.bar?.baz;\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Negated OR with this.property: !this.bar || !this.bar.baz → !this.bar?.baz
+			{
+				Code: `
+declare const self: { bar?: { baz: string } };
+!self.bar || !self.bar.baz;
+`,
+				Output:  []string{"\ndeclare const self: { bar?: { baz: string } };\n!self.bar?.baz;\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+
+			// High Priority: Hybrid patterns with existing optional chain
+			// foo && foo?.() → foo?.()
+			{
+				Code: `
+declare const foo: (() => void) | null;
+foo && foo?.();
+`,
+				Output:  []string{"\ndeclare const foo: (() => void) | null;\nfoo?.();\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// foo.bar && foo.bar?.() → foo.bar?.()
+			{
+				Code: `
+declare const foo: { bar?: () => void };
+foo.bar && foo.bar?.();
+`,
+				Output:  []string{"\ndeclare const foo: { bar?: () => void };\nfoo.bar?.();\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// !foo[bar] || !foo[bar]?.[baz] → !foo[bar]?.[baz]
+			{
+				Code: `
+declare const foo: { [key: string]: { [key: string]: string } | undefined };
+declare const bar: string;
+declare const baz: string;
+!foo[bar] || !foo[bar]?.[baz];
+`,
+				Output:  []string{"\ndeclare const foo: { [key: string]: { [key: string]: string } | undefined };\ndeclare const bar: string;\ndeclare const baz: string;\n!foo[bar]?.[baz];\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+
+			// Medium Priority: Negated OR with inner optional chain
+			// !foo || !foo?.bar.baz → !foo?.bar.baz
+			{
+				Code: `
+declare const foo: { bar: { baz: string } } | null;
+!foo || !foo?.bar.baz;
+`,
+				Output:  []string{"\ndeclare const foo: { bar: { baz: string } } | null;\n!foo?.bar.baz;\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Call expression in negated OR: !foo() || !foo().bar → !foo()?.bar
+			{
+				Code: `
+declare const foo: () => { bar: string } | null;
+!foo() || !foo().bar;
+`,
+				Output:  []string{"\ndeclare const foo: () => { bar: string } | null;\n!foo()?.bar;\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+
+			// Medium Priority: Two-error with parentheses
+			// (!foo || !foo.bar || !foo.bar.baz) && (!baz || !baz.bar || !baz.bar.foo)
+			{
+				Code: `
+declare const foo: { bar?: { baz: string } };
+declare const baz: { bar?: { foo: string } };
+(!foo || !foo.bar || !foo.bar.baz) && (!baz || !baz.bar || !baz.bar.foo);
+`,
+				Output:  []string{"\ndeclare const foo: { bar?: { baz: string } };\ndeclare const baz: { bar?: { foo: string } };\n(!foo?.bar?.baz) && (!baz?.bar?.foo);\n"},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}, {MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+		})
+}
+
+// TestThisPropertyChaining tests patterns specific to 'this' keyword property chaining
+func TestThisPropertyChaining(t *testing.T) {
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
+		[]rule_tester.ValidTestCase{},
+		[]rule_tester.InvalidTestCase{
+			// this.bar && this.bar.baz → this.bar?.baz (within class method)
+			{
+				Code: `
+class Foo {
+  bar?: { baz: string };
+  method() {
+    this.bar && this.bar.baz;
+  }
+}
+`,
+				Output: []string{`
+class Foo {
+  bar?: { baz: string };
+  method() {
+    this.bar?.baz;
+  }
+}
+`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// !this.bar || !this.bar.baz → !this.bar?.baz (within class method)
+			{
+				Code: `
+class Foo {
+  bar?: { baz: string };
+  method() {
+    !this.bar || !this.bar.baz;
+  }
+}
+`,
+				Output: []string{`
+class Foo {
+  bar?: { baz: string };
+  method() {
+    !this.bar?.baz;
+  }
+}
+`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// Deeper chain: this.bar && this.bar.baz && this.bar.baz.qux
+			{
+				Code: `
+class Foo {
+  bar?: { baz?: { qux: string } };
+  method() {
+    this.bar && this.bar.baz && this.bar.baz.qux;
+  }
+}
+`,
+				Output: []string{`
+class Foo {
+  bar?: { baz?: { qux: string } };
+  method() {
+    this.bar?.baz?.qux;
+  }
+}
+`},
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+			},
+			// this with method call: this.bar && this.bar.baz()
+			{
+				Code: `
+class Foo {
+  bar?: { baz: () => void };
+  method() {
+    this.bar && this.bar.baz();
+  }
+}
+`,
+				Output: []string{`
+class Foo {
+  bar?: { baz: () => void };
+  method() {
+    this.bar?.baz();
+  }
+}
+`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
 			},

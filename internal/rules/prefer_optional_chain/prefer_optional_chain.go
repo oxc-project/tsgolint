@@ -423,12 +423,6 @@ var PreferOptionalChainRule = rule.Rule{
 				}
 			}
 
-			// Check for mismatched optional chaining
-			// If one expression uses ?. and the other doesn't in the overlapping part, they're not equivalent
-			// Example: (foo?.a)() vs foo.a() - different chaining behavior
-			leftHasOptional := strings.Contains(leftText, "?.")
-			rightHasOptional := strings.Contains(rightText, "?.")
-
 			// Normalize: remove ALL parentheses (not part of calls), type annotations, optional chain operators, and non-null assertions
 			// (foo as any)?.bar?.baz! should be compared as foo.bar.baz
 			// foo?.bar?.baz should be compared as foo.bar.baz
@@ -458,29 +452,15 @@ var PreferOptionalChainRule = rule.Rule{
 
 			if leftNormalized == rightNormalized {
 				// If normalized forms are equal but one has optional chaining and the other doesn't,
-				// they represent the same path but with different nullability handling
-				// Example: (foo?.a)() vs foo.a() - different chaining behavior (INVALID)
-				// However: foo vs foo?.() - valid optimization (remove redundant check)
+				// they represent the same path but with different nullability handling.
+				// For most cases where they ARE the same normalized expression, we consider them equal.
+				// This handles cases like:
+				//   foo?.bar?.baz !== null && typeof foo.bar.baz !== 'undefined'
+				// where both refer to the same property path.
 				//
-				// The difference: if the left side is JUST the base (no calls/properties),
-				// and the right side adds optional chaining, it's a valid optimization
-				// because we're replacing a truthy check with an optional chain
-				if leftHasOptional != rightHasOptional {
-					// Check if left is just a simple base expression (identifier, this, etc.)
-					// without any calls or property accesses
-					leftIsSimpleBase := !strings.Contains(leftNormalized, ".") &&
-						!strings.Contains(leftNormalized, "[") &&
-						!strings.Contains(leftNormalized, "(")
-
-					// If left is simple and right has optional chaining, it's OK
-					// Example: foo && foo?.() -> can optimize to foo?.()
-					// Example: foo && foo?.bar -> can optimize to foo?.bar
-					if leftIsSimpleBase && rightHasOptional {
-						// This is valid - continue with comparison
-					} else {
-						return NodeInvalid
-					}
-				}
+				// The only exception is when one side has optional CALL syntax that would change behavior:
+				// Example: (foo?.a)() vs foo.a() - the optional chaining affects whether the call happens
+				// But: foo?.bar?.baz vs foo.bar.baz - same property path, safe to treat as equal
 				return NodeEqual
 			}
 
@@ -968,6 +948,7 @@ var PreferOptionalChainRule = rule.Rule{
 						text:        text,
 						optional:    false,
 						requiresDot: false,
+						hasNonNull:  parentIsNonNull,
 					})
 				}
 			}
@@ -1827,29 +1808,34 @@ var PreferOptionalChainRule = rule.Rule{
 						}
 
 						if isComplementaryCheck {
+							// This is a complementary check (null + undefined on same expression)
+							// Together they are equivalent to `!= null`
+							// Include this operand in the chain
+							currentChain = append(currentChain, op)
+							if op.typ != OperandTypePlain {
+								lastCheckType = op.typ
+							}
+
 							// Check if there's a subsequent property access
-							// If not, this is an incomplete paired check - stop the chain
 							hasSubsequentPropertyAccess := false
 							if i+1 < len(operandNodes) {
 								nextOp := operands[i+1]
 								if nextOp.comparedExpr != nil {
 									nextCmp := compareNodes(op.comparedExpr, nextOp.comparedExpr)
 									if nextCmp == NodeSubset {
-										// There IS a subsequent property access - continue adding
+										// There IS a subsequent property access - continue building chain
 										hasSubsequentPropertyAccess = true
 									}
 								}
 							}
 
 							if !hasSubsequentPropertyAccess {
-								// No subsequent property access - this is an incomplete paired check
-								// The previous operand becomes a trailing comparison, chain is complete
-								// Don't include the current operand
+								// No subsequent property access - this pair is the end of the chain
+								// Mark the chain as complete (the complementary pair will be simplified to != null during fix)
 								chainComplete = true
-								stopProcessing = true
-								i++
-								continue
 							}
+							i++
+							continue
 						}
 
 						currentChain = append(currentChain, op)
@@ -2349,29 +2335,6 @@ var PreferOptionalChainRule = rule.Rule{
 								}
 							}
 
-							// Case 1: Check if there's a TRUTHINESS check on a PARENT expression
-							if !shouldStopChain {
-								for j := 0; j < len(currentChain)-1; j++ {
-									prevOp := currentChain[j]
-									if prevOp.comparedExpr == nil || lastChainOp.comparedExpr == nil {
-										continue
-									}
-
-									// Check if prevOp is on a PARENT expression
-									prevCmp := compareNodes(prevOp.comparedExpr, lastChainOp.comparedExpr)
-									if prevCmp != NodeSubset {
-										continue // Not a parent expression
-									}
-
-									// Check for truthiness check (plain operand with no comparison)
-									if prevOp.typ == OperandTypePlain {
-										// Truthiness check followed by strict check - inconsistent
-										shouldStopChain = true
-										break
-									}
-								}
-							}
-
 							// Case 3: Check if we just added a typeof check and the current operand is NOT a typeof check
 							// typeof checks act as chain boundaries - they can absorb previous checks,
 							// but subsequent non-typeof checks should start a new chain
@@ -2673,13 +2636,39 @@ var PreferOptionalChainRule = rule.Rule{
 				// - The ?. handles both null and undefined
 				// - Converting further would change semantics
 				// - Don't continue optimizing - the partial fix was intentional
+				//
+				// EXCEPTION: Don't skip if this is a "split strict equals" pattern where
+				// the last two operands form a complementary pair (null + undefined check on same expression)
+				// Example: foo?.bar?.baz !== null && typeof foo.bar.baz !== 'undefined'
+				// This should be optimized to: foo?.bar?.baz != null
 				if len(chain) >= 2 {
 					firstOp := chain[0]
 					isStrictCheck := firstOp.typ == OperandTypeNotStrictEqualNull ||
 						firstOp.typ == OperandTypeNotStrictEqualUndef
 					if isStrictCheck && firstOp.comparedExpr != nil && containsOptionalChain(firstOp.comparedExpr) {
-						debugLog("  Skipping: Strict check with existing optional chain")
-						continue
+						// Check if this is a split strict equals pattern
+						isSplitStrictEquals := false
+						if len(chain) == 2 {
+							lastOp := chain[1]
+							// Check if they're on the same expression (when normalized)
+							if lastOp.comparedExpr != nil {
+								cmpResult := compareNodes(firstOp.comparedExpr, lastOp.comparedExpr)
+								if cmpResult == NodeEqual {
+									// Check if they form a complementary pair
+									isFirstUndef := firstOp.typ == OperandTypeNotStrictEqualUndef || firstOp.typ == OperandTypeTypeofCheck
+									isFirstNull := firstOp.typ == OperandTypeNotStrictEqualNull
+									isLastUndef := lastOp.typ == OperandTypeNotStrictEqualUndef || lastOp.typ == OperandTypeTypeofCheck
+									isLastNull := lastOp.typ == OperandTypeNotStrictEqualNull
+									if (isFirstUndef && isLastNull) || (isFirstNull && isLastUndef) {
+										isSplitStrictEquals = true
+									}
+								}
+							}
+						}
+						if !isSplitStrictEquals {
+							debugLog("  Skipping: Strict check with existing optional chain")
+							continue
+						}
 					}
 				}
 
@@ -2720,6 +2709,10 @@ var PreferOptionalChainRule = rule.Rule{
 				// Pattern to skip: x['y'] !== undefined && x['y'] !== null
 				// This is a complete nullish check on a SINGLE property, not a chain
 				// A valid chain requires operands that EXTEND each other (e.g., foo && foo.bar)
+				//
+				// EXCEPTION: Don't skip if this is a "split strict equals" pattern
+				// Example: foo !== null && typeof foo !== 'undefined' -> should become foo != null
+				// Example: foo?.bar?.baz !== null && typeof foo.bar.baz !== 'undefined' -> foo?.bar?.baz != null
 				if len(chain) >= 2 {
 					allSameExpr := true
 					firstParts := flattenForFix(chain[0].comparedExpr)
@@ -2740,8 +2733,24 @@ var PreferOptionalChainRule = rule.Rule{
 						}
 					}
 					if allSameExpr {
-						debugLog("  Skipping: all operands check the same expression")
-						continue // All operands check the same expression, nothing to chain
+						// Check if this is a split strict equals pattern (complementary null + undefined checks)
+						// If so, we should NOT skip - we want to simplify to != null
+						isSplitStrictEquals := false
+						if len(chain) == 2 {
+							firstOp := chain[0]
+							lastOp := chain[1]
+							isFirstUndef := firstOp.typ == OperandTypeNotStrictEqualUndef || firstOp.typ == OperandTypeTypeofCheck
+							isFirstNull := firstOp.typ == OperandTypeNotStrictEqualNull
+							isLastUndef := lastOp.typ == OperandTypeNotStrictEqualUndef || lastOp.typ == OperandTypeTypeofCheck
+							isLastNull := lastOp.typ == OperandTypeNotStrictEqualNull
+							if (isFirstUndef && isLastNull) || (isFirstNull && isLastUndef) {
+								isSplitStrictEquals = true
+							}
+						}
+						if !isSplitStrictEquals {
+							debugLog("  Skipping: all operands check the same expression")
+							continue // All operands check the same expression, nothing to chain
+						}
 					}
 				}
 
@@ -3038,14 +3047,21 @@ var PreferOptionalChainRule = rule.Rule{
 						// Special case: typeof check on non-nullable expression with call expression
 						// Example: typeof globalThis !== 'undefined' && globalThis.Array()
 						// If globalThis is never undefined, this pattern shouldn't be converted
+						// UNLESS there's a middle guard operand that checks the property:
+						// Example: typeof globalThis !== 'undefined' && globalThis.Array && globalThis.Array()
+						// The middle guard (globalThis.Array) makes the conversion safe.
 						if op.typ == OperandTypeTypeofCheck && op.comparedExpr != nil && !includesNullish(op.comparedExpr) {
-							// Check if last operand is a call expression
-							lastOp := chain[len(chain)-1]
-							if lastOp.comparedExpr != nil {
-								unwrapped := unwrapParentheses(lastOp.comparedExpr)
-								if ast.IsCallExpression(unwrapped) {
-									shouldSkip = true
-									break
+							// Only skip if this is a 2-operand chain (typeof + call without middle guard)
+							// If there are more operands, the middle ones provide guards
+							if len(chain) == 2 {
+								// Check if last operand is a call expression
+								lastOp := chain[len(chain)-1]
+								if lastOp.comparedExpr != nil {
+									unwrapped := unwrapParentheses(lastOp.comparedExpr)
+									if ast.IsCallExpression(unwrapped) {
+										shouldSkip = true
+										break
+									}
 								}
 							}
 						}
@@ -3168,35 +3184,66 @@ var PreferOptionalChainRule = rule.Rule{
 				var lastPropertyAccess *ast.Node
 				var hasTrailingComparison bool
 				var hasTrailingTypeofCheck bool
-				for i := len(chain) - 1; i >= 0; i-- {
-					if chain[i].typ == OperandTypePlain {
-						// For plain operands, use node to preserve NonNull assertions
-						lastPropertyAccess = chain[i].node
-						hasTrailingComparison = false
-						hasTrailingTypeofCheck = false
-						break
-					} else if chain[i].typ == OperandTypeComparison ||
-						chain[i].typ == OperandTypeNotStrictEqualNull ||
-						chain[i].typ == OperandTypeNotStrictEqualUndef ||
-						chain[i].typ == OperandTypeNotEqualBoth {
-						// For comparison operands, use comparedExpr and mark as having trailing comparison
-						lastPropertyAccess = chain[i].comparedExpr
-						hasTrailingComparison = true
-						hasTrailingTypeofCheck = false
-						break
-					} else if chain[i].typ == OperandTypeTypeofCheck {
-						// For typeof checks, use comparedExpr and mark as having trailing typeof
-						lastPropertyAccess = chain[i].comparedExpr
-						hasTrailingComparison = true
-						hasTrailingTypeofCheck = true
-						break
-					} else if chain[i].comparedExpr != nil {
-						// For other operands with comparedExpr (like OperandTypeNot), use comparedExpr
-						// but don't mark as trailing comparison
-						lastPropertyAccess = chain[i].comparedExpr
-						hasTrailingComparison = false
-						hasTrailingTypeofCheck = false
-						break
+				var hasComplementaryNullCheck bool // true if last two operands form a complementary null+undefined check
+
+				// Check if the last two operands form a complementary pair (null + undefined checks on same expression)
+				// If so, they should be simplified to `!= null`
+				if len(chain) >= 2 {
+					lastOp := chain[len(chain)-1]
+					secondLastOp := chain[len(chain)-2]
+
+					// Check if they're on the same expression
+					if lastOp.comparedExpr != nil && secondLastOp.comparedExpr != nil {
+						cmpResult := compareNodes(lastOp.comparedExpr, secondLastOp.comparedExpr)
+						if cmpResult == NodeEqual {
+							// Same expression - check if they form a complementary pair
+							isLastUndef := lastOp.typ == OperandTypeNotStrictEqualUndef || lastOp.typ == OperandTypeTypeofCheck
+							isLastNull := lastOp.typ == OperandTypeNotStrictEqualNull
+							isSecondLastUndef := secondLastOp.typ == OperandTypeNotStrictEqualUndef || secondLastOp.typ == OperandTypeTypeofCheck
+							isSecondLastNull := secondLastOp.typ == OperandTypeNotStrictEqualNull
+
+							if (isLastUndef && isSecondLastNull) || (isLastNull && isSecondLastUndef) {
+								// Complementary pair! Simplify to `!= null`
+								hasComplementaryNullCheck = true
+								lastPropertyAccess = lastOp.comparedExpr
+								hasTrailingComparison = true
+								hasTrailingTypeofCheck = false
+							}
+						}
+					}
+				}
+
+				if !hasComplementaryNullCheck {
+					for i := len(chain) - 1; i >= 0; i-- {
+						if chain[i].typ == OperandTypePlain {
+							// For plain operands, use node to preserve NonNull assertions
+							lastPropertyAccess = chain[i].node
+							hasTrailingComparison = false
+							hasTrailingTypeofCheck = false
+							break
+						} else if chain[i].typ == OperandTypeComparison ||
+							chain[i].typ == OperandTypeNotStrictEqualNull ||
+							chain[i].typ == OperandTypeNotStrictEqualUndef ||
+							chain[i].typ == OperandTypeNotEqualBoth {
+							// For comparison operands, use comparedExpr and mark as having trailing comparison
+							lastPropertyAccess = chain[i].comparedExpr
+							hasTrailingComparison = true
+							hasTrailingTypeofCheck = false
+							break
+						} else if chain[i].typ == OperandTypeTypeofCheck {
+							// For typeof checks, use comparedExpr and mark as having trailing typeof
+							lastPropertyAccess = chain[i].comparedExpr
+							hasTrailingComparison = true
+							hasTrailingTypeofCheck = true
+							break
+						} else if chain[i].comparedExpr != nil {
+							// For other operands with comparedExpr (like OperandTypeNot), use comparedExpr
+							// but don't mark as trailing comparison
+							lastPropertyAccess = chain[i].comparedExpr
+							hasTrailingComparison = false
+							hasTrailingTypeofCheck = false
+							break
+						}
 					}
 				}
 
@@ -3257,8 +3304,33 @@ var PreferOptionalChainRule = rule.Rule{
 					checksToConsider = append(checksToConsider, op)
 				}
 
+				// First, count how many non-typeof checks we have
+				hasNonTypeofCheck := false
+				for _, operand := range checksToConsider {
+					if operand.typ != OperandTypeTypeofCheck && operand.comparedExpr != nil {
+						hasNonTypeofCheck = true
+						break
+					}
+				}
+
 				for _, operand := range checksToConsider {
 					if operand.comparedExpr != nil {
+						// Skip typeof checks when populating checkedLengths IF there are other checks
+						// typeof checks verify existence (not nullability) of the identifier
+						// They should NOT cause the immediate next property to be optional
+						// WHEN there's a middle guard that does the actual null check.
+						//
+						// Example: typeof globalThis !== 'undefined' && globalThis.foo && globalThis.foo.bar
+						// - typeof check on globalThis should NOT make .foo optional (there's a middle guard)
+						// - Check on globalThis.foo SHOULD make .bar optional
+						// Result: globalThis.foo?.bar (not globalThis?.foo?.bar)
+						//
+						// But: typeof foo !== 'undefined' && foo.bar
+						// - typeof check is the ONLY check, so it SHOULD make .bar optional
+						// Result: foo?.bar
+						if operand.typ == OperandTypeTypeofCheck && hasNonTypeofCheck {
+							continue
+						}
 						checkedParts := flattenForFix(operand.comparedExpr)
 						checkedLengths[len(checkedParts)] = true
 						// DEBUG
@@ -3352,26 +3424,47 @@ var PreferOptionalChainRule = rule.Rule{
 				// - First operand is a PROPER prefix of last, so replace indices 0,1,2 from first operand
 				// - Result: [foo, bar(?.opt), baz, bam] with first operand's optional flags preserved
 				if len(checksToConsider) > 0 && len(parts) > 1 {
-					// Find the operand with the longest PROPER prefix that matches the parts
-					// A proper prefix is one that is SHORTER than the full parts (i.e., doesn't include the extension)
-					var bestPrefixParts []ChainPart
-					bestPrefixLen := 0
-
+					// Find the maximum checked length (the longest check operand)
+					maxCheckedLen := 0
 					for _, op := range checksToConsider {
 						if op.comparedExpr != nil {
-							// For plain operands, use op.node to preserve NonNull assertions (foo! vs foo)
-							// For other operands (comparisons, etc.), use op.comparedExpr to get just the checked expression
+							opParts := flattenForFix(op.comparedExpr)
+							if len(opParts) > maxCheckedLen {
+								maxCheckedLen = len(opParts)
+							}
+						}
+					}
+
+					// First, STRIP non-null assertions from parts that are within the checked range
+					// This ensures we use the check operands' ! state, not the last operand's
+					// Example: foo!.bar != null && foo.bar!.baz != null
+					// - parts from last operand: [foo, bar!, baz]
+					// - maxCheckedLen = 2 (from foo!.bar)
+					// - We strip ! from parts[0] and parts[1] (indices < maxCheckedLen)
+					for i := 0; i < maxCheckedLen && i < len(parts); i++ {
+						parts[i].hasNonNull = false
+						if strings.HasSuffix(parts[i].text, "!") {
+							parts[i].text = parts[i].text[:len(parts[i].text)-1]
+						}
+					}
+
+					// Collect all check operand parts for later use
+					type opPartsInfo struct {
+						parts []ChainPart
+						len   int
+					}
+					var allOpParts []opPartsInfo
+					for _, op := range checksToConsider {
+						if op.comparedExpr != nil {
 							exprToFlatten := op.comparedExpr
 							if op.typ == OperandTypePlain {
 								exprToFlatten = op.node
 							}
 							opParts := flattenForFix(exprToFlatten)
-							// Check if opParts is a PROPER prefix of parts (strictly less than)
-							// This ensures we don't use the extension itself as the prefix
-							if len(opParts) < len(parts) && len(opParts) > bestPrefixLen {
+							// Check if opParts is a prefix of parts
+							if len(opParts) <= len(parts) {
 								isPrefix := true
 								for i := 0; i < len(opParts); i++ {
-									// Normalize by stripping ! and ?. for comparison
 									opText := strings.TrimSuffix(opParts[i].text, "!")
 									partText := strings.TrimSuffix(parts[i].text, "!")
 									if opText != partText {
@@ -3380,32 +3473,50 @@ var PreferOptionalChainRule = rule.Rule{
 									}
 								}
 								if isPrefix {
-									bestPrefixParts = opParts
-									bestPrefixLen = len(opParts)
-									if os.Getenv("DEBUG_BUILD_CHAIN") != "" {
-										fmt.Printf("DEBUG: found bestPrefixParts with len=%d\n", len(opParts))
-										for j, bp := range opParts {
-											fmt.Printf("  bestPrefixParts[%d]: text=%q, optional=%v\n", j, bp.text, bp.optional)
-										}
-									}
+									allOpParts = append(allOpParts, opPartsInfo{parts: opParts, len: len(opParts)})
 								}
 							}
 						}
 					}
 
-					// Replace parts in the common prefix with parts from the best matching operand
-					// This preserves both the ! non-null assertions AND the ?. optional chains
-					// from the checked expression (first operand)
-					if len(bestPrefixParts) > 0 {
-						if os.Getenv("DEBUG_BUILD_CHAIN") != "" {
-							fmt.Printf("DEBUG: replacing parts[0:%d] with bestPrefixParts\n", len(bestPrefixParts))
+					// For each part index, merge optional and non-null flags
+					// For optional chains (?.), use ANY operand that has it
+					// For non-null assertions (!), use the SHORTEST operand that covers this index
+					// This ensures we preserve ! from the earliest check, not from later extended checks
+					for i := 0; i < len(parts); i++ {
+						// Find the shortest operand that covers this index (for non-null assertions)
+						var shortestCoveringOp *opPartsInfo
+						for j := range allOpParts {
+							op := &allOpParts[j]
+							if i < op.len {
+								if shortestCoveringOp == nil || op.len < shortestCoveringOp.len {
+									shortestCoveringOp = op
+								}
+							}
 						}
-						for i := 0; i < len(bestPrefixParts) && i < len(parts); i++ {
-							// Use the operand's part (preserving its ! and ?.)
-							// The first operand's optional chains should be preserved
-							parts[i].text = bestPrefixParts[i].text
-							parts[i].hasNonNull = bestPrefixParts[i].hasNonNull
-							parts[i].optional = bestPrefixParts[i].optional
+
+						// Merge from all operands for optional flag
+						for _, op := range allOpParts {
+							if i < op.len && op.parts[i].optional {
+								parts[i].optional = true
+							}
+						}
+
+						// Use only the shortest covering operand for non-null assertion
+						if shortestCoveringOp != nil && i < shortestCoveringOp.len {
+							if shortestCoveringOp.parts[i].hasNonNull {
+								parts[i].hasNonNull = true
+								if !strings.HasSuffix(parts[i].text, "!") {
+									parts[i].text = parts[i].text + "!"
+								}
+							}
+						}
+					}
+
+					if os.Getenv("DEBUG_BUILD_CHAIN") != "" {
+						fmt.Printf("DEBUG: after merge, parts:\n")
+						for i, p := range parts {
+							fmt.Printf("  parts[%d]: text=%q, optional=%v, hasNonNull=%v\n", i, p.text, p.optional, p.hasNonNull)
 						}
 					}
 				}
@@ -3497,53 +3608,58 @@ var PreferOptionalChainRule = rule.Rule{
 
 				// Check if the last operand is a comparison - if so, append/prepend it
 				if hasTrailingComparison {
-					lastOperand := chain[len(chain)-1]
-					if ast.IsBinaryExpression(lastOperand.node) {
-						binExpr := lastOperand.node.AsBinaryExpression()
+					if hasComplementaryNullCheck {
+						// Complementary null+undefined check - simplify to `!= null`
+						newCode = newCode + " != null"
+					} else {
+						lastOperand := chain[len(chain)-1]
+						if ast.IsBinaryExpression(lastOperand.node) {
+							binExpr := lastOperand.node.AsBinaryExpression()
 
-						// Special handling for typeof checks: typeof foo.bar !== 'undefined'
-						// The binary expression is: (typeof foo.bar) !== 'undefined'
-						// We need to wrap the optional chain with: typeof ... !== 'undefined'
-						if hasTrailingTypeofCheck {
-							// For typeof checks, we need to:
-							// 1. Get the "typeof " prefix from the left side
-							// 2. Get the " !== 'undefined'" suffix from after the comparedExpr
-							leftRange := utils.TrimNodeTextRange(ctx.SourceFile, binExpr.Left)
-							comparedExprRange := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.comparedExpr)
+							// Special handling for typeof checks: typeof foo.bar !== 'undefined'
+							// The binary expression is: (typeof foo.bar) !== 'undefined'
+							// We need to wrap the optional chain with: typeof ... !== 'undefined'
+							if hasTrailingTypeofCheck {
+								// For typeof checks, we need to:
+								// 1. Get the "typeof " prefix from the left side
+								// 2. Get the " !== 'undefined'" suffix from after the comparedExpr
+								leftRange := utils.TrimNodeTextRange(ctx.SourceFile, binExpr.Left)
+								comparedExprRange := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.comparedExpr)
 
-							// typeof prefix: from start of left side to start of comparedExpr
-							typeofPrefix := ctx.SourceFile.Text()[leftRange.Pos():comparedExprRange.Pos()]
+								// typeof prefix: from start of left side to start of comparedExpr
+								typeofPrefix := ctx.SourceFile.Text()[leftRange.Pos():comparedExprRange.Pos()]
 
-							// comparison suffix: from end of comparedExpr to end of binary expression
-							binExprEnd := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.node).End()
-							comparisonSuffix := ctx.SourceFile.Text()[comparedExprRange.End():binExprEnd]
-
-							newCode = typeofPrefix + newCode + comparisonSuffix
-						} else {
-							// Check if this is a yoda condition (literal/constant on left, property on right)
-							// In yoda: '123' == foo.bar.baz
-							// Not yoda: foo.bar.baz == '123'
-							isYoda := false
-							comparedExprRange := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.comparedExpr)
-							leftRange := utils.TrimNodeTextRange(ctx.SourceFile, binExpr.Left)
-
-							// If comparedExpr is on the right side, it's yoda
-							if comparedExprRange.Pos() > leftRange.Pos() {
-								isYoda = true
-							}
-
-							if isYoda {
-								// Yoda: prepend the left side + operator
-								binExprStart := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.node).Pos()
-								comparedExprStart := comparedExprRange.Pos()
-								yodaPrefix := ctx.SourceFile.Text()[binExprStart:comparedExprStart]
-								newCode = yodaPrefix + newCode
-							} else {
-								// Normal: append the operator + right side
-								comparedExprEnd := comparedExprRange.End()
+								// comparison suffix: from end of comparedExpr to end of binary expression
 								binExprEnd := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.node).End()
-								comparisonSuffix := ctx.SourceFile.Text()[comparedExprEnd:binExprEnd]
-								newCode = newCode + comparisonSuffix
+								comparisonSuffix := ctx.SourceFile.Text()[comparedExprRange.End():binExprEnd]
+
+								newCode = typeofPrefix + newCode + comparisonSuffix
+							} else {
+								// Check if this is a yoda condition (literal/constant on left, property on right)
+								// In yoda: '123' == foo.bar.baz
+								// Not yoda: foo.bar.baz == '123'
+								isYoda := false
+								comparedExprRange := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.comparedExpr)
+								leftRange := utils.TrimNodeTextRange(ctx.SourceFile, binExpr.Left)
+
+								// If comparedExpr is on the right side, it's yoda
+								if comparedExprRange.Pos() > leftRange.Pos() {
+									isYoda = true
+								}
+
+								if isYoda {
+									// Yoda: prepend the left side + operator
+									binExprStart := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.node).Pos()
+									comparedExprStart := comparedExprRange.Pos()
+									yodaPrefix := ctx.SourceFile.Text()[binExprStart:comparedExprStart]
+									newCode = yodaPrefix + newCode
+								} else {
+									// Normal: append the operator + right side
+									comparedExprEnd := comparedExprRange.End()
+									binExprEnd := utils.TrimNodeTextRange(ctx.SourceFile, lastOperand.node).End()
+									comparisonSuffix := ctx.SourceFile.Text()[comparedExprEnd:binExprEnd]
+									newCode = newCode + comparisonSuffix
+								}
 							}
 						}
 					}
