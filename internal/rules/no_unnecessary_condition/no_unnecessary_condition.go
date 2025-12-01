@@ -948,6 +948,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					opKind == ast.KindAmpersandAmpersandEqualsToken ||
 					opKind == ast.KindBarBarEqualsToken {
 
+					isAssignment := opKind == ast.KindAmpersandAmpersandEqualsToken || opKind == ast.KindBarBarEqualsToken
 					isAndOperator := opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindAmpersandAmpersandEqualsToken
 					isOrOperator := opKind == ast.KindBarBarToken || opKind == ast.KindBarBarEqualsToken
 
@@ -980,8 +981,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// Check left side
 					checkCondition(binExpr.Left)
 
-					// Check right side only if it would be evaluated
-					if !skipRight {
+					// For assignment operators (&&=, ||=), don't check the right side as a condition
+					// The right side is a value being assigned, not a condition
+					// For regular operators (&&, ||), check the right side only if it would be evaluated
+					if !isAssignment && !skipRight {
 						// Control flow narrowing: if left and right are the same expression
 						// and this is an &&, then right is always truthy (since we already checked left)
 						if isAndOperator && isSameExpression(binExpr.Left, binExpr.Right) {
@@ -1126,6 +1129,30 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					typePredicate := ctx.TypeChecker.GetTypePredicateOfSignature(callSignature)
 					if typePredicate != nil {
 						// This is a type guard/assertion function call
+
+						// Skip checking if this is a standalone call with a type predicate and literal argument
+						// Example: assertString('falafel') or isString('falafel')
+						// These are valid because literal values might be used for runtime validation
+						// But still check non-literal arguments like variables: isString(a) where a: string
+						predicateType := checker.TypePredicate_t(typePredicate)
+						parent := node.Parent
+						if predicateType != nil && parent != nil && parent.Kind == ast.KindExpressionStatement {
+							// Check if the argument is a literal value
+							if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+								paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
+								if paramIndex >= 0 && paramIndex < len(callExpr.Arguments.Nodes) {
+									arg := callExpr.Arguments.Nodes[paramIndex]
+									if arg != nil {
+										argType := ctx.TypeChecker.GetTypeAtLocation(arg)
+										if argType != nil && isLiteralValue(argType) {
+											// Standalone call with literal argument - don't check
+											return
+										}
+									}
+								}
+							}
+						}
+
 						if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
 							paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
 
