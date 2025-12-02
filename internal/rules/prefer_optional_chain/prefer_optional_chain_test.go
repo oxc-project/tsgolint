@@ -98,6 +98,17 @@ b != null && a !== null && a !== undefined;
 					}},
 				}},
 			},
+			// Nested optional chain with parenthesized empty object
+			{
+				Code: `(foo1?.foo2 || ({})).foo3;`,
+				Errors: []rule_tester.InvalidTestCaseError{{
+					MessageId: "preferOptionalChain",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "optionalChainSuggest",
+						Output:    `foo1?.foo2?.foo3;`,
+					}},
+				}},
+			},
 			// Arrow function call
 			{
 				Code: `((() => foo())() || {}).bar;`,
@@ -670,6 +681,17 @@ b != null && a !== null && a !== undefined;
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
 						MessageId: "optionalChainSuggest",
 						Output:    `(a ? b : c)?.bar;`,
+					}},
+				}},
+			},
+			// undefined && foo || {} pattern
+			{
+				Code: `(undefined && foo || {}).bar;`,
+				Errors: []rule_tester.InvalidTestCaseError{{
+					MessageId: "preferOptionalChain",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "optionalChainSuggest",
+						Output:    `(undefined && foo)?.bar;`,
 					}},
 				}},
 			},
