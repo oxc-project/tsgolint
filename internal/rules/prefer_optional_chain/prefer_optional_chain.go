@@ -1,8 +1,6 @@
 package prefer_optional_chain
 
 import (
-	"fmt"
-	"os"
 	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -11,14 +9,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
-
-var debugMode = os.Getenv("DEBUG_PREFER_OPTIONAL_CHAIN") != ""
-
-func debugLog(format string, args ...any) {
-	if debugMode {
-		fmt.Printf(format+"\n", args...)
-	}
-}
 
 func buildPreferOptionalChainMessage() rule.RuleMessage {
 	return rule.RuleMessage{
@@ -70,14 +60,291 @@ const (
 	NodeInvalid                       // incomparable
 )
 
+// stripParens strips surrounding parentheses from text
+func stripParens(text string) string {
+	text = strings.TrimSpace(text)
+	// Keep stripping outer parentheses as long as they're balanced
+	for len(text) > 2 && text[0] == '(' && text[len(text)-1] == ')' {
+		// Check if the opening and closing parens are paired
+		depth := 0
+		paired := true
+		for i := 0; i < len(text); i++ {
+			if text[i] == '(' {
+				depth++
+			} else if text[i] == ')' {
+				depth--
+				if depth == 0 && i < len(text)-1 {
+					// Found closing paren before end - not fully paired
+					paired = false
+					break
+				}
+			}
+		}
+		if paired {
+			text = strings.TrimSpace(text[1 : len(text)-1])
+		} else {
+			break
+		}
+	}
+	return text
+}
+
+// removeAllParens removes ALL parentheses from text for normalization
+func removeAllParens(text string) string {
+	// Remove all parentheses that are not part of function calls
+	// This is a simple approach: remove ( and ) but keep the content
+	var result strings.Builder
+	inCall := false
+	depth := 0
+
+	for i := 0; i < len(text); i++ {
+		ch := text[i]
+		if ch == '(' {
+			// Check if this looks like a function call (preceded by identifier, ], ), or > for generic calls)
+			// Added > to handle foo<T>() pattern where ( follows the >
+			if i > 0 && (text[i-1] == ']' || text[i-1] == ')' || text[i-1] == '>' || (text[i-1] >= 'a' && text[i-1] <= 'z') || (text[i-1] >= 'A' && text[i-1] <= 'Z') || text[i-1] == '_' || text[i-1] == '$' || (text[i-1] >= '0' && text[i-1] <= '9')) {
+				// Likely a function call, keep the parentheses
+				inCall = true
+				result.WriteByte(ch)
+				depth++
+			} else {
+				// Grouping parentheses, skip it
+				depth++
+			}
+		} else if ch == ')' {
+			depth--
+			if inCall && depth == 0 {
+				inCall = false
+				result.WriteByte(ch)
+			} else if !inCall {
+				// Grouping parentheses, skip it
+			} else {
+				result.WriteByte(ch)
+			}
+		} else {
+			result.WriteByte(ch)
+		}
+	}
+	return result.String()
+}
+
+// removeTypeAnnotations removes TypeScript type annotations from text for comparison
+func removeTypeAnnotations(text string) string {
+	// Remove angle bracket type assertions: <Type>expr -> expr
+	// Pattern: <{...}>expr or <SomeType>expr
+	// We need to be careful to match balanced brackets
+	for {
+		ltIndex := strings.Index(text, "<")
+		if ltIndex == -1 {
+			break
+		}
+		// Find the matching >
+		depth := 1
+		gtIndex := -1
+		for i := ltIndex + 1; i < len(text); i++ {
+			if text[i] == '<' {
+				depth++
+			} else if text[i] == '>' {
+				depth--
+				if depth == 0 {
+					gtIndex = i
+					break
+				}
+			}
+		}
+		if gtIndex == -1 {
+			// No matching >, skip this <
+			break
+		}
+		// Remove the <Type> part, keeping the expression after it
+		text = text[:ltIndex] + text[gtIndex+1:]
+	}
+
+	// Remove "as Type" patterns
+	// This is a simple regex-like approach
+	text = strings.ReplaceAll(text, " as any", "")
+	text = strings.ReplaceAll(text, " as unknown", "")
+	// Remove generic "as SomeType" by finding " as " and skipping until we hit a property access
+	// For simplicity, we'll use a more aggressive approach
+	for {
+		asIndex := strings.Index(text, " as ")
+		if asIndex == -1 {
+			break
+		}
+		// Find the end of the type assertion (next . or [ or ! or ? or end of string)
+		endIndex := len(text)
+		for i := asIndex + 4; i < len(text); i++ {
+			if text[i] == '.' || text[i] == '[' || text[i] == '!' || text[i] == '?' {
+				endIndex = i
+				break
+			}
+		}
+		text = text[:asIndex] + text[endIndex:]
+	}
+
+	// Remove "!" non-null assertions at the end of identifiers (before . or [)
+	// foo! -> foo, but keep foo!.bar as foo.bar
+	text = strings.ReplaceAll(text, "!.", ".")
+	text = strings.ReplaceAll(text, "![", "[")
+
+	return text
+}
+
+// stripTrailingNonNull strips trailing non-null assertions from text
+// foo.bar! -> foo.bar
+// foo.bar!.baz! -> foo.bar.baz (strip after each segment)
+func stripTrailingNonNull(text string) string {
+	// Remove trailing ! at the very end
+	for len(text) > 0 && text[len(text)-1] == '!' {
+		text = text[:len(text)-1]
+	}
+	// Also remove ! before property accesses (foo!.bar -> foo.bar)
+	text = strings.ReplaceAll(text, "!.", ".")
+	text = strings.ReplaceAll(text, "![", "[")
+	return text
+}
+
+// unwrapParentheses unwraps parenthesized expressions
+func unwrapParentheses(n *ast.Node) *ast.Node {
+	for ast.IsParenthesizedExpression(n) {
+		n = n.AsParenthesizedExpression().Expression
+	}
+	return n
+}
+
+// unwrapForComparison unwraps both parentheses AND non-null assertions AND type assertions
+// Used for operand comparison where we want foo.bar! to match foo.bar
+// and (foo as Type) to match foo, and (<Type>foo) to match foo
+func unwrapForComparison(n *ast.Node) *ast.Node {
+	for {
+		if ast.IsParenthesizedExpression(n) {
+			n = n.AsParenthesizedExpression().Expression
+		} else if ast.IsNonNullExpression(n) {
+			n = n.AsNonNullExpression().Expression
+		} else if n.Kind == ast.KindAsExpression {
+			n = n.AsAsExpression().Expression
+		} else if n.Kind == ast.KindTypeAssertionExpression {
+			n = n.AsTypeAssertion().Expression
+		} else {
+			break
+		}
+	}
+	return n
+}
+
+// isInsideJSX checks if a node is inside a JSX context
+// In JSX, foo && foo.bar has different semantics than foo?.bar
+// (foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined)
+func isInsideJSX(node *ast.Node) bool {
+	current := node
+	for current != nil {
+		if ast.IsJsxExpression(current) ||
+			ast.IsJsxAttribute(current) ||
+			ast.IsJsxAttributes(current) ||
+			ast.IsJsxElement(current) ||
+			ast.IsJsxSelfClosingElement(current) ||
+			ast.IsJsxOpeningElement(current) ||
+			ast.IsJsxClosingElement(current) ||
+			ast.IsJsxFragment(current) {
+			return true
+		}
+		current = current.Parent
+	}
+	return false
+}
+
+// getBaseIdentifier extracts the base identifier from an expression chain
+// For foo.bar.baz, returns foo
+// For (foo as any).bar, returns foo
+// For foo!.bar, returns foo
+func getBaseIdentifier(node *ast.Node) *ast.Node {
+	current := node
+	for {
+		if ast.IsPropertyAccessExpression(current) {
+			current = current.AsPropertyAccessExpression().Expression
+		} else if ast.IsElementAccessExpression(current) {
+			current = current.AsElementAccessExpression().Expression
+		} else if ast.IsCallExpression(current) {
+			current = current.AsCallExpression().Expression
+		} else if ast.IsNonNullExpression(current) {
+			current = current.AsNonNullExpression().Expression
+		} else if ast.IsParenthesizedExpression(current) {
+			current = current.AsParenthesizedExpression().Expression
+		} else if current.Kind == ast.KindAsExpression {
+			// Type assertion - get the expression being asserted
+			current = current.AsAsExpression().Expression
+		} else {
+			// Base case - return the current node
+			return current
+		}
+	}
+}
+
+// hasSideEffects checks if an expression has side effects
+// This includes: ++, --, yield, assignment operators
+func hasSideEffects(node *ast.Node) bool {
+	if node == nil {
+		return false
+	}
+
+	// Check for prefix increment/decrement
+	if ast.IsPrefixUnaryExpression(node) {
+		op := node.AsPrefixUnaryExpression().Operator
+		if op == ast.KindPlusPlusToken || op == ast.KindMinusMinusToken {
+			return true
+		}
+	}
+
+	// Check for postfix increment/decrement
+	if node.Kind == ast.KindPostfixUnaryExpression {
+		return true // postfix ++ and -- always have side effects
+	}
+
+	// Check for yield expressions
+	if ast.IsYieldExpression(node) {
+		return true
+	}
+
+	// NOTE: We do NOT check await expressions here for side effects
+	// Await expressions can be safely included in property chains like (await foo).bar
+	// The check for problematic await patterns like "(await foo) && (await foo).bar"
+	// is handled separately in compareNodes
+
+	// Check for assignment operators
+	if ast.IsBinaryExpression(node) {
+		op := node.AsBinaryExpression().OperatorToken.Kind
+		// Assignment operators
+		if op == ast.KindEqualsToken ||
+			op == ast.KindPlusEqualsToken ||
+			op == ast.KindMinusEqualsToken ||
+			op == ast.KindAsteriskEqualsToken ||
+			op == ast.KindSlashEqualsToken {
+			return true
+		}
+	}
+
+	// Recursively check children
+	if ast.IsPropertyAccessExpression(node) {
+		return hasSideEffects(node.AsPropertyAccessExpression().Expression)
+	}
+	if ast.IsElementAccessExpression(node) {
+		elem := node.AsElementAccessExpression()
+		return hasSideEffects(elem.Expression) || hasSideEffects(elem.ArgumentExpression)
+	}
+	if ast.IsCallExpression(node) {
+		return hasSideEffects(node.AsCallExpression().Expression)
+	}
+	if ast.IsParenthesizedExpression(node) {
+		return hasSideEffects(node.AsParenthesizedExpression().Expression)
+	}
+
+	return false
+}
+
 var PreferOptionalChainRule = rule.Rule{
 	Name: "prefer-optional-chain",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[PreferOptionalChainOptions](options, "prefer-optional-chain")
-
-		// Debug: track rule instance
-		instanceID := fmt.Sprintf("%p", &opts)
-		debugLog("Rule instance created: %s, file: %s", instanceID, ctx.SourceFile.FileName())
 
 		// Track seen logical expressions to avoid duplicate processing
 		seenLogicals := make(map[*ast.Node]bool)
@@ -123,234 +390,7 @@ var PreferOptionalChainRule = rule.Rule{
 			return signatures
 		}
 
-		// Helper to check if a node is inside a JSX expression
-		// In JSX, foo && foo.bar has different semantics than foo?.bar
-		// (foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined)
-		isInsideJSX := func(node *ast.Node) bool {
-			current := node
-			for current != nil {
-				if ast.IsJsxExpression(current) ||
-					ast.IsJsxAttribute(current) ||
-					ast.IsJsxAttributes(current) ||
-					ast.IsJsxElement(current) ||
-					ast.IsJsxSelfClosingElement(current) ||
-					ast.IsJsxOpeningElement(current) ||
-					ast.IsJsxClosingElement(current) ||
-					ast.IsJsxFragment(current) {
-					return true
-				}
-				current = current.Parent
-			}
-			return false
-		}
-
-		// Compare two nodes to determine their relationship
-		// Helper to strip surrounding parentheses from text
-		stripParens := func(text string) string {
-			text = strings.TrimSpace(text)
-			// Keep stripping outer parentheses as long as they're balanced
-			for len(text) > 2 && text[0] == '(' && text[len(text)-1] == ')' {
-				// Check if the opening and closing parens are paired
-				depth := 0
-				paired := true
-				for i := 0; i < len(text); i++ {
-					if text[i] == '(' {
-						depth++
-					} else if text[i] == ')' {
-						depth--
-						if depth == 0 && i < len(text)-1 {
-							// Found closing paren before end - not fully paired
-							paired = false
-							break
-						}
-					}
-				}
-				if paired {
-					text = strings.TrimSpace(text[1 : len(text)-1])
-				} else {
-					break
-				}
-			}
-			return text
-		}
-
-		// Helper to remove ALL parentheses from text for normalization
-		removeAllParens := func(text string) string {
-			// Remove all parentheses that are not part of function calls
-			// This is a simple approach: remove ( and ) but keep the content
-			var result strings.Builder
-			inCall := false
-			depth := 0
-
-			for i := 0; i < len(text); i++ {
-				ch := text[i]
-				if ch == '(' {
-					// Check if this looks like a function call (preceded by identifier, ], ), or > for generic calls)
-					// Added > to handle foo<T>() pattern where ( follows the >
-					if i > 0 && (text[i-1] == ']' || text[i-1] == ')' || text[i-1] == '>' || (text[i-1] >= 'a' && text[i-1] <= 'z') || (text[i-1] >= 'A' && text[i-1] <= 'Z') || text[i-1] == '_' || text[i-1] == '$' || (text[i-1] >= '0' && text[i-1] <= '9')) {
-						// Likely a function call, keep the parentheses
-						inCall = true
-						result.WriteByte(ch)
-						depth++
-					} else {
-						// Grouping parentheses, skip it
-						depth++
-					}
-				} else if ch == ')' {
-					depth--
-					if inCall && depth == 0 {
-						inCall = false
-						result.WriteByte(ch)
-					} else if !inCall {
-						// Grouping parentheses, skip it
-					} else {
-						result.WriteByte(ch)
-					}
-				} else {
-					result.WriteByte(ch)
-				}
-			}
-			return result.String()
-		}
-
-		// Helper to remove TypeScript type annotations from text for comparison
-		removeTypeAnnotations := func(text string) string {
-			// Remove angle bracket type assertions: <Type>expr -> expr
-			// Pattern: <{...}>expr or <SomeType>expr
-			// We need to be careful to match balanced brackets
-			for {
-				ltIndex := strings.Index(text, "<")
-				if ltIndex == -1 {
-					break
-				}
-				// Find the matching >
-				depth := 1
-				gtIndex := -1
-				for i := ltIndex + 1; i < len(text); i++ {
-					if text[i] == '<' {
-						depth++
-					} else if text[i] == '>' {
-						depth--
-						if depth == 0 {
-							gtIndex = i
-							break
-						}
-					}
-				}
-				if gtIndex == -1 {
-					// No matching >, skip this <
-					break
-				}
-				// Remove the <Type> part, keeping the expression after it
-				text = text[:ltIndex] + text[gtIndex+1:]
-			}
-
-			// Remove "as Type" patterns
-			// This is a simple regex-like approach
-			text = strings.ReplaceAll(text, " as any", "")
-			text = strings.ReplaceAll(text, " as unknown", "")
-			// Remove generic "as SomeType" by finding " as " and skipping until we hit a property access
-			// For simplicity, we'll use a more aggressive approach
-			for {
-				asIndex := strings.Index(text, " as ")
-				if asIndex == -1 {
-					break
-				}
-				// Find the end of the type assertion (next . or [ or ! or ? or end of string)
-				endIndex := len(text)
-				for i := asIndex + 4; i < len(text); i++ {
-					if text[i] == '.' || text[i] == '[' || text[i] == '!' || text[i] == '?' {
-						endIndex = i
-						break
-					}
-				}
-				text = text[:asIndex] + text[endIndex:]
-			}
-
-			// Remove "!" non-null assertions at the end of identifiers (before . or [)
-			// foo! -> foo, but keep foo!.bar as foo.bar
-			text = strings.ReplaceAll(text, "!.", ".")
-			text = strings.ReplaceAll(text, "![", "[")
-
-			return text
-		}
-
-		// Check if an expression has side effects
-		// This includes: ++, --, yield, assignment operators
-		var hasSideEffects func(*ast.Node) bool
-		hasSideEffects = func(node *ast.Node) bool {
-			if node == nil {
-				return false
-			}
-
-			// Check for prefix increment/decrement
-			if ast.IsPrefixUnaryExpression(node) {
-				op := node.AsPrefixUnaryExpression().Operator
-				if op == ast.KindPlusPlusToken || op == ast.KindMinusMinusToken {
-					return true
-				}
-			}
-
-			// Check for postfix increment/decrement
-			if node.Kind == ast.KindPostfixUnaryExpression {
-				return true // postfix ++ and -- always have side effects
-			}
-
-			// Check for yield expressions
-			if ast.IsYieldExpression(node) {
-				return true
-			}
-
-			// NOTE: We do NOT check await expressions here for side effects
-			// Await expressions can be safely included in property chains like (await foo).bar
-			// The check for problematic await patterns like "(await foo) && (await foo).bar"
-			// is handled separately in compareNodes
-
-			// Check for assignment operators
-			if ast.IsBinaryExpression(node) {
-				op := node.AsBinaryExpression().OperatorToken.Kind
-				// Assignment operators
-				if op == ast.KindEqualsToken ||
-					op == ast.KindPlusEqualsToken ||
-					op == ast.KindMinusEqualsToken ||
-					op == ast.KindAsteriskEqualsToken ||
-					op == ast.KindSlashEqualsToken {
-					return true
-				}
-			}
-
-			// Recursively check children
-			if ast.IsPropertyAccessExpression(node) {
-				return hasSideEffects(node.AsPropertyAccessExpression().Expression)
-			}
-			if ast.IsElementAccessExpression(node) {
-				elem := node.AsElementAccessExpression()
-				return hasSideEffects(elem.Expression) || hasSideEffects(elem.ArgumentExpression)
-			}
-			if ast.IsCallExpression(node) {
-				return hasSideEffects(node.AsCallExpression().Expression)
-			}
-			if ast.IsParenthesizedExpression(node) {
-				return hasSideEffects(node.AsParenthesizedExpression().Expression)
-			}
-
-			return false
-		}
-
-		// Helper to strip trailing non-null assertions from text
-		// foo.bar! -> foo.bar
-		// foo.bar!.baz! -> foo.bar.baz (strip after each segment)
-		stripTrailingNonNull := func(text string) string {
-			// Remove trailing ! at the very end
-			for len(text) > 0 && text[len(text)-1] == '!' {
-				text = text[:len(text)-1]
-			}
-			// Also remove ! before property accesses (foo!.bar -> foo.bar)
-			text = strings.ReplaceAll(text, "!.", ".")
-			text = strings.ReplaceAll(text, "![", "[")
-			return text
-		}
-
+		// compareNodes compares two nodes to determine their relationship
 		compareNodes := func(left, right *ast.Node) NodeComparisonResult {
 			leftRange := utils.TrimNodeTextRange(ctx.SourceFile, left)
 			rightRange := utils.TrimNodeTextRange(ctx.SourceFile, right)
@@ -736,32 +776,6 @@ var PreferOptionalChainRule = rule.Rule{
 		}
 
 		// Get the base identifier from an expression
-		// For foo.bar.baz, returns foo
-		// For (foo as any).bar, returns foo
-		// For foo!.bar, returns foo
-		getBaseIdentifier := func(node *ast.Node) *ast.Node {
-			current := node
-			for {
-				if ast.IsPropertyAccessExpression(current) {
-					current = current.AsPropertyAccessExpression().Expression
-				} else if ast.IsElementAccessExpression(current) {
-					current = current.AsElementAccessExpression().Expression
-				} else if ast.IsCallExpression(current) {
-					current = current.AsCallExpression().Expression
-				} else if ast.IsNonNullExpression(current) {
-					current = current.AsNonNullExpression().Expression
-				} else if ast.IsParenthesizedExpression(current) {
-					current = current.AsParenthesizedExpression().Expression
-				} else if current.Kind == ast.KindAsExpression {
-					// Type assertion - get the expression being asserted
-					current = current.AsAsExpression().Expression
-				} else {
-					// Base case - return the current node
-					return current
-				}
-			}
-		}
-
 		// Check if we should skip this operand based on type-checking options
 		shouldSkipByType := func(node *ast.Node) bool {
 			// For plain operands, check the base identifier's type
@@ -769,11 +783,6 @@ var PreferOptionalChainRule = rule.Rule{
 			baseNode := getBaseIdentifier(node)
 			t := ctx.TypeChecker.GetTypeAtLocation(baseNode)
 			types := utils.UnionTypeParts(t)
-
-			// DEBUG: Temporarily log type checking
-			baseRange := utils.TrimNodeTextRange(ctx.SourceFile, baseNode)
-			baseText := ctx.SourceFile.Text()[baseRange.Pos():baseRange.End()]
-			_ = baseText // Keep for debugging
 
 			for _, part := range types {
 				// Skip nullish types - they're always allowed
@@ -1042,34 +1051,6 @@ var PreferOptionalChainRule = rule.Rule{
 				result.WriteString(partText)
 			}
 			return result.String()
-		}
-
-		// Helper to unwrap parenthesized expressions
-		unwrapParentheses := func(n *ast.Node) *ast.Node {
-			for ast.IsParenthesizedExpression(n) {
-				n = n.AsParenthesizedExpression().Expression
-			}
-			return n
-		}
-
-		// Helper to unwrap both parentheses AND non-null assertions AND type assertions
-		// Used for operand comparison where we want foo.bar! to match foo.bar
-		// and (foo as Type) to match foo, and (<Type>foo) to match foo
-		unwrapForComparison := func(n *ast.Node) *ast.Node {
-			for {
-				if ast.IsParenthesizedExpression(n) {
-					n = n.AsParenthesizedExpression().Expression
-				} else if ast.IsNonNullExpression(n) {
-					n = n.AsNonNullExpression().Expression
-				} else if n.Kind == ast.KindAsExpression {
-					n = n.AsAsExpression().Expression
-				} else if n.Kind == ast.KindTypeAssertionExpression {
-					n = n.AsTypeAssertion().Expression
-				} else {
-					break
-				}
-			}
-			return n
 		}
 
 		// Helper to check if an expression contains any optional chains
@@ -1556,23 +1537,6 @@ var PreferOptionalChainRule = rule.Rule{
 			for i < len(operands) && !stopProcessing {
 				op := operands[i]
 
-				// Debug: print operand info
-				opText := ""
-				if op.comparedExpr != nil {
-					opRange := utils.TrimNodeTextRange(ctx.SourceFile, op.comparedExpr)
-					if opRange.Pos() >= 0 && opRange.End() > opRange.Pos() && opRange.End() <= len(ctx.SourceFile.Text()) {
-						opText = ctx.SourceFile.Text()[opRange.Pos():opRange.End()]
-					}
-				}
-				lastExprText := ""
-				if lastExpr != nil {
-					lastRange := utils.TrimNodeTextRange(ctx.SourceFile, lastExpr)
-					if lastRange.Pos() >= 0 && lastRange.End() > lastRange.Pos() && lastRange.End() <= len(ctx.SourceFile.Text()) {
-						lastExprText = ctx.SourceFile.Text()[lastRange.Pos():lastRange.End()]
-					}
-				}
-				debugLog("i=%d, op.typ=%d, opText=%q, lastExprText=%q", i, op.typ, opText, lastExprText)
-
 				if op.typ == OperandTypeInvalid {
 					// Invalid operand, finalize current chain if valid
 					if len(currentChain) >= 2 {
@@ -1619,7 +1583,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 				// Check if this operand continues the chain
 				cmp := compareNodes(lastExpr, op.comparedExpr)
-				debugLog("  cmp=%d (0=Equal, 1=Subset, 2=Superset, 3=Invalid)", cmp)
 
 				// IMPORTANT: Check for "STRICT explicit check on call result" pattern FIRST
 				// This must happen before any special handling for cmp == NodeInvalid
@@ -1690,8 +1653,6 @@ var PreferOptionalChainRule = rule.Rule{
 								}
 							}
 
-							debugLog("  prevOp is STRICT check on call/element: isCallOrNew=%v, isElementAccess=%v, isAnyOrUnknown=%v, hasNull=%v, hasUndefined=%v, isIncomplete=%v, isMismatched=%v", isCallOrNew, isElementAccess, isAnyOrUnknown, hasNull, hasUndefined, isIncomplete, isMismatched)
-
 							// For call/new expressions: ALWAYS stop at incomplete/mismatched strict check
 							// (each call might return different value, semantics always change)
 							//
@@ -1711,7 +1672,6 @@ var PreferOptionalChainRule = rule.Rule{
 							if shouldStop {
 								// Previous operand is an INCOMPLETE/MISMATCHED strict check
 								// Stop extending - finalize current chain
-								debugLog("  -> Stopping chain extension (incomplete/mismatched strict check)")
 								if len(currentChain) >= 2 {
 									allChains = append(allChains, currentChain)
 								}
@@ -1721,7 +1681,6 @@ var PreferOptionalChainRule = rule.Rule{
 								break
 							}
 							// If check is COMPLETE (type only has what we check), continue extending
-							debugLog("  -> Continuing (complete strict check)")
 						}
 					}
 				}
@@ -1733,14 +1692,12 @@ var PreferOptionalChainRule = rule.Rule{
 				// Track if we used special handling to allow call chain extension
 				usedCallChainExtension := false
 				if cmp == NodeInvalid && opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-					debugLog("  Special handling: cmp==Invalid && unsafe option is true")
 					// Check if lastExpr is a call/new expression and op.comparedExpr extends it
 					lastUnwrapped := lastExpr
 					if lastUnwrapped != nil {
 						for ast.IsParenthesizedExpression(lastUnwrapped) {
 							lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
 						}
-						debugLog("  lastUnwrapped kind=%v, isCall=%v", lastUnwrapped.Kind, ast.IsCallExpression(lastUnwrapped))
 						if ast.IsCallExpression(lastUnwrapped) || ast.IsNewExpression(lastUnwrapped) {
 							// Try text-based comparison to see if op extends lastExpr
 							lastRange := utils.TrimNodeTextRange(ctx.SourceFile, lastExpr)
@@ -1750,7 +1707,6 @@ var PreferOptionalChainRule = rule.Rule{
 								opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
 								lastText := sourceText[lastRange.Pos():lastRange.End()]
 								opText := sourceText[opRange.Pos():opRange.End()]
-								debugLog("  text comparison: lastText=%q, opText=%q, hasPrefix=%v", lastText, opText, strings.HasPrefix(opText, lastText))
 								if strings.HasPrefix(opText, lastText) {
 									remainder := strings.TrimPrefix(opText, lastText)
 									if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
@@ -1758,7 +1714,6 @@ var PreferOptionalChainRule = rule.Rule{
 										cmp = NodeSubset
 										usedCallChainExtension = true
 										chainHasSafeCallExtension = true // Mark chain-level flag
-										debugLog("  -> Changed cmp to NodeSubset (via call chain extension)")
 									}
 								}
 							}
@@ -2056,133 +2011,6 @@ var PreferOptionalChainRule = rule.Rule{
 						}
 					}
 
-					// Check for inconsistent check types on property access
-					// ONLY when checking THE SAME expression (not a property of it)
-					// REMOVED: This was incorrectly triggering on different expressions
-					// Example that was broken: foo != null && foo.bar !== undefined && foo.bar.baz
-					// The check below was treating foo.bar !== undefined as inconsistent with foo != null
-					// But they're checking DIFFERENT expressions, so it's NOT inconsistent!
-					// Inconsistent would be: foo != null && foo !== undefined (both checking foo)
-					// We need to check that the expressions are the SAME, not just related
-					/*
-						if lastCheckType == OperandTypeNotEqualBoth &&
-							(op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeNotStrictEqualUndef) {
-							// Inconsistent check - include it but mark chain complete
-							currentChain = append(currentChain, op)
-							// Don't update lastExpr - this prevents subsequent operands from being compared
-							// against the inconsistent check's expression
-							chainComplete = true
-							stopProcessing = true // Stop looking for more chains
-
-							// Mark all remaining operand nodes as seen to prevent them from being
-							// processed as a separate chain by the visitor
-							// We need to walk the ENTIRE remaining subtree and mark all nodes
-							var markAllNodes func(*ast.Node)
-							markAllNodes = func(n *ast.Node) {
-								if n == nil {
-									return
-								}
-								seenLogicals[n] = true
-								unwrapped := unwrapParentheses(n)
-								seenLogicals[unwrapped] = true
-
-								if ast.IsBinaryExpression(unwrapped) {
-									binExpr := unwrapped.AsBinaryExpression()
-									markAllNodes(binExpr.Left)
-									markAllNodes(binExpr.Right)
-								} else if ast.IsPropertyAccessExpression(unwrapped) {
-									markAllNodes(unwrapped.AsPropertyAccessExpression().Expression)
-								} else if ast.IsElementAccessExpression(unwrapped) {
-									elemAccess := unwrapped.AsElementAccessExpression()
-									markAllNodes(elemAccess.Expression)
-									markAllNodes(elemAccess.ArgumentExpression)
-								} else if ast.IsCallExpression(unwrapped) {
-									call := unwrapped.AsCallExpression()
-									markAllNodes(call.Expression)
-								}
-							}
-
-							for j := i + 1; j < len(operandNodes); j++ {
-								markAllNodes(operandNodes[j])
-							}
-
-							// Also mark the inconsistent check's comparedExpr to prevent it from
-							// being used as the base of a new chain with remaining operands
-							if op.comparedExpr != nil {
-								seenLogicals[op.comparedExpr] = true
-							}
-
-							i++
-							continue
-						}
-					*/
-
-					// REMOVED: The following logic was too aggressive and broke chains
-					// It terminated chains on ANY property strict null check, even when they were part of a valid chain
-					// Example that was incorrectly broken: foo !== null && foo.bar !== null && foo.bar.baz !== null && foo.bar.baz.qux
-					// The logic below was terminating after foo.bar !== null, preventing the full chain from being detected
-					//
-					// TODO: Re-evaluate if this logic is needed for specific edge cases
-					// Original comment: "The last operand (foo.bar.baz !== undefined) should terminate the chain"
-					// But the code didn't check if it was the LAST operand - it terminated on ANY property check
-					/*
-						if op.typ == OperandTypeComparison && op.node != nil {
-							unwrappedNode := unwrapParentheses(op.node)
-							if ast.IsBinaryExpression(unwrappedNode) {
-								binExpr := unwrappedNode.AsBinaryExpression()
-								opKind := binExpr.OperatorToken.Kind
-								isPropertyStrictNullCheck := (opKind == ast.KindExclamationEqualsEqualsToken) &&
-									(binExpr.Right.Kind == ast.KindNullKeyword ||
-										(ast.IsIdentifier(binExpr.Right) && binExpr.Right.AsIdentifier().Text == "undefined") ||
-										ast.IsVoidExpression(binExpr.Right) ||
-										binExpr.Left.Kind == ast.KindNullKeyword ||
-										(ast.IsIdentifier(binExpr.Left) && binExpr.Left.AsIdentifier().Text == "undefined") ||
-										ast.IsVoidExpression(binExpr.Left))
-
-								if isPropertyStrictNullCheck {
-									currentChain = append(currentChain, op)
-									chainComplete = true
-									stopProcessing = true
-
-									markAllNodes := func(n ast.Node) {
-										if n == nil {
-											return
-										}
-										seenLogicals[n] = true
-										unwrapped := unwrapParentheses(n)
-										seenLogicals[unwrapped] = true
-
-										if ast.IsBinaryExpression(unwrapped) {
-											binExpr := unwrapped.AsBinaryExpression()
-											markAllNodes(binExpr.Left)
-											markAllNodes(binExpr.Right)
-										} else if ast.IsPropertyAccessExpression(unwrapped) {
-											markAllNodes(unwrapped.AsPropertyAccessExpression().Expression)
-										} else if ast.IsElementAccessExpression(unwrapped) {
-											elemAccess := unwrapped.AsElementAccessExpression()
-											markAllNodes(elemAccess.Expression)
-											markAllNodes(elemAccess.ArgumentExpression)
-										} else if ast.IsCallExpression(unwrapped) {
-											call := unwrapped.AsCallExpression()
-											markAllNodes(call.Expression)
-										}
-									}
-
-									for j := i + 1; j < len(operandNodes); j++ {
-										markAllNodes(operandNodes[j])
-									}
-
-									if op.comparedExpr != nil {
-										seenLogicals[op.comparedExpr] = true
-									}
-
-									i++
-									continue
-								}
-							}
-						}
-					*/
-
 					// Check if we should stop the chain due to:
 					// 1. INCONSISTENT nullish check (truthiness + strict mixing)
 					// 2. Strict check on a CALL expression result
@@ -2319,7 +2147,6 @@ var PreferOptionalChainRule = rule.Rule{
 								isAnyOrUnknown := typeIsAnyOrUnknown(lastChainOp.comparedExpr)
 								hasNull := typeIncludesNull(lastChainOp.comparedExpr)
 								hasUndefined := typeIncludesUndefined(lastChainOp.comparedExpr)
-								debugLog("  Case 4 check: lastChainOp.comparedExpr type isAnyOrUnknown=%v, hasNull=%v, hasUndefined=%v, strictCheckCount=%d", isAnyOrUnknown, hasNull, hasUndefined, strictCheckCount)
 								// Check is incomplete if type has both null/undefined but we only check one
 								// For any/unknown types, we can't determine exact nullishness, so don't stop
 								if !isAnyOrUnknown && hasNull && hasUndefined {
@@ -2331,7 +2158,6 @@ var PreferOptionalChainRule = rule.Rule{
 									//   -> foo?.bar !== undefined && foo.bar.baz
 									// The first part is converted, but the second !== undefined is preserved as trailing
 									shouldStopChain = true
-									debugLog("  Case 4: strict check is incomplete (type has both null and undefined)")
 								}
 							}
 
@@ -2401,7 +2227,6 @@ var PreferOptionalChainRule = rule.Rule{
 									// Previous operand has incomplete strict check
 									// Mark chain as complete but don't stop processing (allow the chain to be finalized)
 									chainComplete = true
-									debugLog("  Chain has incomplete strict check at operand %d, marking complete", j)
 									break
 								}
 							}
@@ -2446,7 +2271,6 @@ var PreferOptionalChainRule = rule.Rule{
 			// If stopProcessing is true, only finalize if the chain was marked as complete
 			// (meaning it was intentionally stopped, not just broken)
 			shouldFinalize := len(currentChain) >= 2
-			debugLog("currentChain len=%d, stopProcessing=%v, chainComplete=%v", len(currentChain), stopProcessing, chainComplete)
 			if stopProcessing && !chainComplete {
 				// Don't finalize incomplete chains when we stopped processing
 				shouldFinalize = false
@@ -2454,11 +2278,9 @@ var PreferOptionalChainRule = rule.Rule{
 			if shouldFinalize {
 				allChains = append(allChains, currentChain)
 			}
-			debugLog("allChains len=%d", len(allChains))
 
 			// Need at least one valid chain
 			if len(allChains) == 0 {
-				debugLog("No valid chains found")
 				return
 			}
 
@@ -2474,7 +2296,7 @@ var PreferOptionalChainRule = rule.Rule{
 				// When stopProcessing is true, we should only have 1 chain (the one that triggered stop)
 				// If we have more, something went wrong in the chain building logic
 				if len(allChains) > 1 {
-					// DEBUG: This shouldn't happen - log and only use first chain
+					// Only use first chain if we got multiple
 					chainsToReport = allChains[:1]
 				}
 			}
@@ -2578,9 +2400,7 @@ var PreferOptionalChainRule = rule.Rule{
 			}
 
 			// Process each chain
-			debugLog("Processing %d chains", len(chainsToReport))
 			for _, chain := range chainsToReport {
-				debugLog("  Processing chain with %d operands", len(chain))
 				// Check if any operand in this chain overlaps with ANY previously reported range
 				hasOverlap := false
 				for _, op := range chain {
@@ -2600,7 +2420,6 @@ var PreferOptionalChainRule = rule.Rule{
 					}
 				}
 				if hasOverlap {
-					debugLog("  Skipping: hasOverlap")
 					continue // Skip this chain as it overlaps with a previously reported one
 				}
 
@@ -2624,7 +2443,6 @@ var PreferOptionalChainRule = rule.Rule{
 						// Plain operand with optional chaining - this is risky
 						// The subsequent operands likely use different bases
 						// Skip this pattern for safety
-						debugLog("  Skipping: Plain operand with optional chaining")
 						continue
 					}
 				}
@@ -2666,7 +2484,6 @@ var PreferOptionalChainRule = rule.Rule{
 							}
 						}
 						if !isSplitStrictEquals {
-							debugLog("  Skipping: Strict check with existing optional chain")
 							continue
 						}
 					}
@@ -2681,7 +2498,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 				// Also skip single-operand chains (need at least 2 operands to form a chain)
 				if len(chain) < 2 {
-					debugLog("  Skipping: chain < 2")
 					continue
 				}
 
@@ -2701,7 +2517,6 @@ var PreferOptionalChainRule = rule.Rule{
 					}
 				}
 				if !hasPropertyAccess {
-					debugLog("  Skipping: no property access")
 					continue // No property access, nothing to chain
 				}
 
@@ -2748,7 +2563,6 @@ var PreferOptionalChainRule = rule.Rule{
 							}
 						}
 						if !isSplitStrictEquals {
-							debugLog("  Skipping: all operands check the same expression")
 							continue // All operands check the same expression, nothing to chain
 						}
 					}
@@ -2829,7 +2643,6 @@ var PreferOptionalChainRule = rule.Rule{
 									}
 									// If we have optional chaining in the extension part, it's already optimal
 									if hasOptionalInExtension {
-										debugLog("  Skipping: already optimal")
 										continue
 									}
 								}
@@ -2989,7 +2802,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 						if hasOnlyNullCheck || hasOnlyUndefinedCheck {
 							// Skip - incomplete nullish check
-							debugLog("  Skipping: incomplete nullish check (hasOnlyNull=%v, hasOnlyUndef=%v)", hasOnlyNullCheck, hasOnlyUndefinedCheck)
 							continue
 						}
 					}
@@ -3333,11 +3145,6 @@ var PreferOptionalChainRule = rule.Rule{
 						}
 						checkedParts := flattenForFix(operand.comparedExpr)
 						checkedLengths[len(checkedParts)] = true
-						// DEBUG
-						sourceText := ctx.SourceFile.Text()
-						exprRange := utils.TrimNodeTextRange(ctx.SourceFile, operand.comparedExpr)
-						exprText := sourceText[exprRange.Pos():exprRange.End()]
-						_ = exprText // Keep for debugging
 					}
 				}
 
@@ -3513,12 +3320,6 @@ var PreferOptionalChainRule = rule.Rule{
 						}
 					}
 
-					if os.Getenv("DEBUG_BUILD_CHAIN") != "" {
-						fmt.Printf("DEBUG: after merge, parts:\n")
-						for i, p := range parts {
-							fmt.Printf("  parts[%d]: text=%q, optional=%v, hasNonNull=%v\n", i, p.text, p.optional, p.hasNonNull)
-						}
-					}
 				}
 
 				// Don't normalize parts - we want to preserve existing optional flags
@@ -3532,25 +3333,12 @@ var PreferOptionalChainRule = rule.Rule{
 				if len(parts) > 0 && strings.HasPrefix(parts[len(parts)-1].text, "(") {
 					// Last part is a call expression
 					// Check if we have a check for the expression without the call
-					partsWithoutCall := len(parts) - 1
-
-					// DEBUG: Print what we're looking for
-					sourceText := ctx.SourceFile.Text()
-					lastAccessRange := utils.TrimNodeTextRange(ctx.SourceFile, lastPropertyAccess)
-					lastAccessText := sourceText[lastAccessRange.Pos():lastAccessRange.End()]
-					_ = lastAccessText   // e.g., "foo.bar()"
-					_ = partsWithoutCall // e.g., 2 for ["foo", "bar", "()"]
+					partsWithoutCall := len(flattenForFix(lastPropertyAccess.AsCallExpression().Expression))
 
 					for _, op := range chain[:len(chain)-1] { // Don't check the last operand (the call itself)
 						// Use comparedExpr to get the actual expression being checked (without ! or comparisons)
 						if op.comparedExpr != nil {
 							checkedParts := flattenForFix(op.comparedExpr)
-
-							// DEBUG: Print what we found
-							opRange := utils.TrimNodeTextRange(ctx.SourceFile, op.comparedExpr)
-							opText := sourceText[opRange.Pos():opRange.End()]
-							_ = opText            // e.g., "foo.bar"
-							_ = len(checkedParts) // e.g., 2
 
 							// If we checked all parts except the call, the call should be optional
 							if len(checkedParts) == partsWithoutCall {
@@ -3558,14 +3346,6 @@ var PreferOptionalChainRule = rule.Rule{
 								break
 							}
 						}
-					}
-				}
-
-				// DEBUG: print parts and checkedLengths before building
-				if os.Getenv("DEBUG_BUILD_CHAIN") != "" {
-					fmt.Printf("DEBUG: parts=%d, checkedLengths=%v, callShouldBeOptional=%v\n", len(parts), checkedLengths, callShouldBeOptional)
-					for i, p := range parts {
-						fmt.Printf("  parts[%d]: text=%q, optional=%v, requiresDot=%v\n", i, p.text, p.optional, p.requiresDot)
 					}
 				}
 
@@ -3812,7 +3592,6 @@ var PreferOptionalChainRule = rule.Rule{
 						rightUnwrapped := unwrapParentheses(parentBin.Right)
 						if leftUnwrapped == node || rightUnwrapped == node {
 							// This is a nested || expression, skip it
-							debugLog("OR processOrChain: skipping nested || expression, parent is ||")
 							return
 						}
 					}
@@ -3828,13 +3607,10 @@ var PreferOptionalChainRule = rule.Rule{
 			// Skip if already seen (use range-based check for reliability)
 			nodeRange := utils.TrimNodeTextRange(ctx.SourceFile, node)
 			nodeTextRange := textRange{start: nodeRange.Pos(), end: nodeRange.End()}
-			debugLog("OR processOrChain: checking range [%d,%d], already seen: %v, map size: %d", nodeTextRange.start, nodeTextRange.end, seenLogicalRanges[nodeTextRange], len(seenLogicalRanges))
 			if seenLogicalRanges[nodeTextRange] {
-				debugLog("OR processOrChain: skipping already seen range")
 				return
 			}
 			seenLogicalRanges[nodeTextRange] = true
-			debugLog("OR processOrChain: marked range [%d,%d], map size now: %d", nodeTextRange.start, nodeTextRange.end, len(seenLogicalRanges))
 
 			// Skip if inside JSX - semantic difference
 			if isInsideJSX(node) {
@@ -3866,7 +3642,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 			// Mark all collected binary expression ranges as seen
 			for _, r := range collectedBinaryRanges {
-				debugLog("OR processOrChain: marking nested range [%d,%d] as seen", r.start, r.end)
 				seenLogicalRanges[r] = true
 			}
 
@@ -3889,11 +3664,6 @@ var PreferOptionalChainRule = rule.Rule{
 				operands[i] = parseOperand(n, false)
 			}
 
-			debugLog("OR chain: %d operands", len(operands))
-			for i, op := range operands {
-				debugLog("  operand[%d]: typ=%d", i, op.typ)
-			}
-
 			// Look for pattern: !foo || !foo.bar or foo == null || foo.bar != 0
 			var chain []Operand
 			var lastExpr *ast.Node
@@ -3901,8 +3671,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 			for i := 0; i < len(operands); i++ {
 				op := operands[i]
-
-				debugLog("OR processing operand[%d]: typ=%d", i, op.typ)
 
 				// Accept OperandTypeNot, OperandTypeComparison, OperandTypePlain, typeof checks, and null check types
 				validOrOperand := op.typ == OperandTypeNot ||
@@ -3953,7 +3721,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 				// Check if this continues the chain
 				cmp := compareNodes(lastExpr, op.comparedExpr)
-				debugLog("  cmp=%d (lastExpr vs op.comparedExpr)", cmp)
 
 				// Special case for OR chains with unsafe option enabled:
 				// Allow extending call expressions even though they may have side effects
@@ -3988,7 +3755,6 @@ var PreferOptionalChainRule = rule.Rule{
 				}
 
 				if cmp == NodeSubset || cmp == NodeEqual {
-					debugLog("  continuing chain: cmp=%d, op.typ=%d", cmp, op.typ)
 					// Special case: Don't add a value comparison (OperandTypeComparison) when it's
 					// on the same expression as a previous negation/null check.
 					// Pattern: !foo || !foo.bar || foo.bar > 5
@@ -4039,11 +3805,8 @@ var PreferOptionalChainRule = rule.Rule{
 			}
 
 			if len(chain) < 2 {
-				debugLog("OR chain rejected: less than 2 operands (len=%d)", len(chain))
 				return
 			}
-
-			debugLog("OR chain: %d operands in final chain, hasTrailingComparison=%v", len(chain), hasTrailingComparison)
 
 			// Check if all operands in the chain have the same base identifier
 			// Example: a === undefined || b === null - different bases (a vs b), skip
@@ -4152,11 +3915,9 @@ var PreferOptionalChainRule = rule.Rule{
 								chain[i].typ == OperandTypeTypeofCheck
 							isComparison := chain[i].typ == OperandTypeComparison
 							isSafeComparison := isComparison && isOrChainComparisonSafe(chain[i])
-							debugLog("  chain[%d]: typ=%d, isNullCheck=%v, isComparison=%v, isSafeComparison=%v", i, chain[i].typ, isNullCheck, isComparison, isSafeComparison)
 
 							if chain[i].typ != OperandTypeNot && !isSafeComparison && !isNullCheck {
 								allNegatedOrSafeComparisonOrNullCheck = false
-								debugLog("  chain[%d] is not safe - breaking", i)
 								break
 							}
 						}
@@ -4198,7 +3959,6 @@ var PreferOptionalChainRule = rule.Rule{
 			if opts.RequireNullish {
 				firstOpIsNegation := chain[0].typ == OperandTypeNot
 				if firstOpIsNegation {
-					debugLog("OR chain rejected: requireNullish and first op is negation")
 					return
 				}
 			}
@@ -4211,7 +3971,6 @@ var PreferOptionalChainRule = rule.Rule{
 				if firstExpr != nil {
 					unwrapped := unwrapParentheses(firstExpr)
 					if unwrapped.Kind == ast.KindMetaProperty {
-						debugLog("OR chain rejected: import.meta pattern")
 						return
 					}
 				}
@@ -4239,7 +3998,6 @@ var PreferOptionalChainRule = rule.Rule{
 						// Allow patterns like: foo || foo.bar (truthy + plain property access)
 						for i := 1; i < len(chain); i++ {
 							if chain[i].typ == OperandTypeComparison {
-								debugLog("OR chain rejected: plain truthy check with trailing comparison")
 								return
 							}
 						}
@@ -4280,7 +4038,6 @@ var PreferOptionalChainRule = rule.Rule{
 					hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
 
 					if hasOnlyNullCheck || hasOnlyUndefinedCheck {
-						debugLog("OR chain rejected: incomplete nullish checks (hasNull=%v, hasUndef=%v, hasBoth=%v)", hasNullCheck, hasUndefinedCheck, hasBothCheck)
 						return // Skip chains with incomplete nullish checks
 					}
 				}
@@ -4329,11 +4086,9 @@ var PreferOptionalChainRule = rule.Rule{
 									// If type has both null and undefined, but we only check one, reject
 									if typeHasNull && typeHasUndefined {
 										if isStrictNullCheck && !isStrictUndefCheck {
-											debugLog("OR chain rejected: property strict null check but type has both null and undefined")
 											return
 										}
 										if isStrictUndefCheck && !isStrictNullCheck {
-											debugLog("OR chain rejected: property strict undefined check but type has both null and undefined")
 											return
 										}
 									}
@@ -4349,7 +4104,6 @@ var PreferOptionalChainRule = rule.Rule{
 			for _, op := range chain {
 				if op.typ == OperandTypePlain || op.typ == OperandTypeNot {
 					if wouldChangeReturnType(op.comparedExpr) && !opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-						debugLog("OR chain rejected: would change return type")
 						return
 					}
 				}
@@ -4444,7 +4198,6 @@ var PreferOptionalChainRule = rule.Rule{
 						lastOpRange := utils.TrimNodeTextRange(ctx.SourceFile, lastOp.node)
 						trailingPlainOperand = ctx.SourceFile.Text()[lastOpRange.Pos():lastOpRange.End()]
 						chainForOptional = chain[:len(chain)-1]
-						debugLog("OR chain: keeping trailing plain operand separate: %q", trailingPlainOperand)
 					}
 				}
 			}
@@ -4459,7 +4212,6 @@ var PreferOptionalChainRule = rule.Rule{
 					singleOpRange := utils.TrimNodeTextRange(ctx.SourceFile, singleOp.comparedExpr)
 					singleOpText := ctx.SourceFile.Text()[singleOpRange.Pos():singleOpRange.End()]
 					if strings.Contains(singleOpText, "?.") {
-						debugLog("OR chain skipped: single operand with trailing plain already has optional chaining: %q", singleOpText)
 						return
 					}
 				}
@@ -4513,12 +4265,9 @@ var PreferOptionalChainRule = rule.Rule{
 
 			optionalChainCode := buildOptionalChain(parts, checkedLengths, callShouldBeOptional, true) // true = strip ! assertions for OR chains
 
-			debugLog("OR chain buildOptionalChain: optionalChainCode=%q, parts=%d, checkedLengths=%v", optionalChainCode, len(parts), checkedLengths)
-
 			// If buildOptionalChain returned empty string, it means we'd create invalid syntax
 			// (e.g., ?.#privateIdentifier which TypeScript doesn't allow)
 			if optionalChainCode == "" {
-				debugLog("OR chain rejected: buildOptionalChain returned empty")
 				return
 			}
 
