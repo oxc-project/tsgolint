@@ -386,6 +386,15 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 			}
 
+			// Skip logical operators - they're handled by KindBinaryExpression listener
+			if skipNode.Kind == ast.KindBinaryExpression {
+				binExpr := skipNode.AsBinaryExpression()
+				opKind := binExpr.OperatorToken.Kind
+				if opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindBarBarToken {
+					return
+				}
+			}
+
 			// Check literal boolean keywords first
 			if isLiteralBoolean(node) {
 				if skipNode.Kind == ast.KindTrueKeyword {
@@ -1041,13 +1050,14 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						}
 					}
 
-					// Check left side
+					// Always check the left side as it's used as a condition
+					// For both regular operators (&&, ||) and assignment operators (&&=, ||=)
 					checkCondition(binExpr.Left)
 
-					// For assignment operators (&&=, ||=), don't check the right side as a condition
-					// The right side is a value being assigned, not a condition
-					// For regular operators (&&, ||), check the right side only if it would be evaluated
-					// AND if we're in a conditional context (e.g., if/while/for/ternary)
+					// Check right side only for regular operators (not assignment operators)
+					// in conditional context, and only if it would be evaluated (not short-circuited)
+					// For assignment operators (&&=, ||=), the right side is a value, not a condition
+					// For non-conditional context like `const x = b1 && b2`, only check left, not right
 					if !isAssignment && !skipRight && isInConditionalContext(node) {
 						// Control flow narrowing: if left and right are the same expression
 						// and this is an &&, then right is always truthy (since we already checked left)
