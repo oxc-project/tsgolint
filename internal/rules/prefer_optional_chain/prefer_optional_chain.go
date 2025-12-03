@@ -356,14 +356,39 @@ type ChainPart struct {
 	hasNonNull  bool // true if this part has a non-null assertion (!)
 }
 
+// TypeInfo caches computed type information for a node to avoid repeated type checker calls
+type TypeInfo struct {
+	parts            []*checker.Type
+	hasNull          bool
+	hasUndefined     bool
+	hasVoid          bool
+	hasAny           bool
+	hasUnknown       bool
+	hasBoolLiteral   bool
+	hasNumLiteral    bool
+	hasStrLiteral    bool
+	hasBigIntLiteral bool
+	// Additional flags for shouldSkipByType
+	hasBigIntLike  bool
+	hasBooleanLike bool
+	hasNumberLike  bool
+	hasStringLike  bool
+}
+
 // chainProcessor manages state and provides helper methods for processing optional chain candidates
 type chainProcessor struct {
 	ctx                rule.RuleContext
 	opts               PreferOptionalChainOptions
+	sourceText         string // Cached source text to avoid repeated calls
 	seenLogicals       map[*ast.Node]bool
 	processedAndRanges []textRange
 	seenLogicalRanges  map[textRange]bool
 	reportedRanges     map[textRange]bool
+	// Caches to avoid repeated computations
+	typeCache       map[*ast.Node]*TypeInfo
+	normalizedCache map[*ast.Node]string
+	flattenCache    map[*ast.Node][]ChainPart
+	callSigCache    map[*ast.Node]map[string]string
 }
 
 // newChainProcessor creates a new chainProcessor with initialized state
@@ -371,17 +396,88 @@ func newChainProcessor(ctx rule.RuleContext, opts PreferOptionalChainOptions) *c
 	return &chainProcessor{
 		ctx:                ctx,
 		opts:               opts,
-		seenLogicals:       make(map[*ast.Node]bool),
-		processedAndRanges: []textRange{},
-		seenLogicalRanges:  make(map[textRange]bool),
-		reportedRanges:     make(map[textRange]bool),
+		sourceText:         ctx.SourceFile.Text(), // Cache source text once
+		seenLogicals:       make(map[*ast.Node]bool, 16),
+		processedAndRanges: make([]textRange, 0, 8),
+		seenLogicalRanges:  make(map[textRange]bool, 16),
+		reportedRanges:     make(map[textRange]bool, 8),
+		typeCache:          make(map[*ast.Node]*TypeInfo, 32),
+		normalizedCache:    make(map[*ast.Node]string, 32),
+		flattenCache:       make(map[*ast.Node][]ChainPart, 16),
+		callSigCache:       make(map[*ast.Node]map[string]string, 8),
 	}
+}
+
+// getTypeInfo returns cached type information for a node, computing it if not already cached.
+// This avoids repeated calls to GetTypeAtLocation and UnionTypeParts for the same node.
+func (processor *chainProcessor) getTypeInfo(node *ast.Node) *TypeInfo {
+	if info, ok := processor.typeCache[node]; ok {
+		return info
+	}
+
+	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
+	parts := utils.UnionTypeParts(nodeType)
+
+	info := &TypeInfo{
+		parts: parts,
+	}
+
+	for _, part := range parts {
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull) {
+			info.hasNull = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsUndefined) {
+			info.hasUndefined = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsVoid) {
+			info.hasVoid = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsAny) {
+			info.hasAny = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsUnknown) {
+			info.hasUnknown = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLiteral) {
+			info.hasBoolLiteral = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsNumberLiteral) {
+			info.hasNumLiteral = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsStringLiteral) {
+			info.hasStrLiteral = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsBigIntLiteral) {
+			info.hasBigIntLiteral = true
+		}
+		// Additional flags for shouldSkipByType
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsBigIntLike) {
+			info.hasBigIntLike = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLike) {
+			info.hasBooleanLike = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsNumberLike) {
+			info.hasNumberLike = true
+		}
+		if utils.IsTypeFlagSet(part, checker.TypeFlagsStringLike) {
+			info.hasStringLike = true
+		}
+	}
+
+	processor.typeCache[node] = info
+	return info
 }
 
 // extractCallSignatures extracts call signatures from a node for comparison.
 // Returns a map of "base expression" -> "full call text" for all call expressions in the node.
 func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[string]string {
-	signatures := make(map[string]string)
+	// Check cache first
+	if cached, ok := processor.callSigCache[node]; ok {
+		return cached
+	}
+
+	signatures := make(map[string]string, 4)
 	var visit func(*ast.Node)
 	visit = func(n *ast.Node) {
 		if n == nil {
@@ -391,10 +487,10 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 			call := n.AsCallExpression()
 			// Get base expression text
 			exprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, call.Expression)
-			exprText := processor.ctx.SourceFile.Text()[exprRange.Pos():exprRange.End()]
+			exprText := processor.sourceText[exprRange.Pos():exprRange.End()]
 			// Get full call text (including args and type args)
 			fullRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-			fullText := processor.ctx.SourceFile.Text()[fullRange.Pos():fullRange.End()]
+			fullText := processor.sourceText[fullRange.Pos():fullRange.End()]
 			signatures[exprText] = fullText
 			visit(call.Expression)
 		} else if ast.IsPropertyAccessExpression(n) {
@@ -406,6 +502,9 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 		}
 	}
 	visit(node)
+
+	// Cache the result
+	processor.callSigCache[node] = signatures
 	return signatures
 }
 
@@ -415,11 +514,10 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	rightRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, right)
 
 	// Bounds check to prevent panic - if ranges are invalid, nodes are not equal
-	sourceText := processor.ctx.SourceFile.Text()
-	if leftRange.Pos() < 0 || leftRange.End() > len(sourceText) || leftRange.Pos() > leftRange.End() {
+	if leftRange.Pos() < 0 || leftRange.End() > len(processor.sourceText) || leftRange.Pos() > leftRange.End() {
 		return NodeInvalid
 	}
-	if rightRange.Pos() < 0 || rightRange.End() > len(sourceText) || rightRange.Pos() > rightRange.End() {
+	if rightRange.Pos() < 0 || rightRange.End() > len(processor.sourceText) || rightRange.Pos() > rightRange.End() {
 		return NodeInvalid
 	}
 
@@ -430,8 +528,8 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		return NodeInvalid
 	}
 
-	leftText := sourceText[leftRange.Pos():leftRange.End()]
-	rightText := sourceText[rightRange.Pos():rightRange.End()]
+	leftText := processor.sourceText[leftRange.Pos():leftRange.End()]
+	rightText := processor.sourceText[rightRange.Pos():rightRange.End()]
 
 	// Strip surrounding parentheses for comparison
 	leftText = stripParens(leftText)
@@ -553,104 +651,56 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 // includesNullish checks if a type includes nullish flags.
 // Also returns true for 'any' and 'unknown' types since they can be nullish at runtime.
 func (processor *chainProcessor) includesNullish(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
-	for _, part := range typeParts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull|checker.TypeFlagsUndefined) {
-			return true
-		}
-		// any and unknown can be nullish at runtime
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsAny|checker.TypeFlagsUnknown) {
-			return true
-		}
-	}
-	return false
+	info := processor.getTypeInfo(node)
+	return info.hasNull || info.hasUndefined || info.hasAny || info.hasUnknown
 }
 
 // includesExplicitNullish checks if a type includes explicit nullish types (null | undefined).
 // This does NOT return true for 'any' or 'unknown' types.
 // Used to determine if autofix is safe when allowPotentiallyUnsafe is false.
 func (processor *chainProcessor) includesExplicitNullish(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
-	for _, part := range typeParts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull|checker.TypeFlagsUndefined) {
-			return true
-		}
-	}
-	return false
+	info := processor.getTypeInfo(node)
+	return info.hasNull || info.hasUndefined
 }
 
 // typeIsAnyOrUnknown checks if a type is any or unknown (where we can't determine exact nullishness).
 func (processor *chainProcessor) typeIsAnyOrUnknown(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
-	// If all parts are any/unknown, return true
-	for _, part := range typeParts {
+	info := processor.getTypeInfo(node)
+	// If the type has any or unknown and nothing else that's non-nullish
+	if len(info.parts) == 0 {
+		return false
+	}
+	// Check if all parts are any/unknown
+	for _, part := range info.parts {
 		if !utils.IsTypeFlagSet(part, checker.TypeFlagsAny|checker.TypeFlagsUnknown) {
 			return false
 		}
 	}
-	return len(typeParts) > 0
+	return true
 }
 
 // typeIncludesNull checks if a type includes the null type specifically.
 func (processor *chainProcessor) typeIncludesNull(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
-	for _, part := range typeParts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull) {
-			return true
-		}
-		// any and unknown can be null at runtime
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsAny|checker.TypeFlagsUnknown) {
-			return true
-		}
-	}
-	return false
+	info := processor.getTypeInfo(node)
+	// any and unknown can be null at runtime
+	return info.hasNull || info.hasAny || info.hasUnknown
 }
 
 // typeIncludesUndefined checks if a type includes the undefined type specifically.
 func (processor *chainProcessor) typeIncludesUndefined(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
-	for _, part := range typeParts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsUndefined) {
-			return true
-		}
-		// any and unknown can be undefined at runtime
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsAny|checker.TypeFlagsUnknown) {
-			return true
-		}
-	}
-	return false
+	info := processor.getTypeInfo(node)
+	// any and unknown can be undefined at runtime
+	return info.hasUndefined || info.hasAny || info.hasUnknown
 }
 
 // wouldChangeReturnType checks if converting to optional chaining would change the return type.
-// This happens when the type includes falsy non-nullish values (false, 0, ”, 0n)
+// This happens when the type includes falsy non-nullish values (false, 0, ", 0n)
 // but does NOT include null/undefined.
 func (processor *chainProcessor) wouldChangeReturnType(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
+	info := processor.getTypeInfo(node)
 
-	hasNullish := false
-	hasFalsyNonNullish := false
-
-	for _, part := range typeParts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull|checker.TypeFlagsUndefined) {
-			hasNullish = true
-		}
-		// Check for falsy non-nullish values
-		// Note: We check for literal types like 'false', '0', '', '0n'
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLiteral) ||
-			utils.IsTypeFlagSet(part, checker.TypeFlagsNumberLiteral) ||
-			utils.IsTypeFlagSet(part, checker.TypeFlagsStringLiteral) ||
-			utils.IsTypeFlagSet(part, checker.TypeFlagsBigIntLiteral) {
-			// Check if it's a falsy literal by looking at the type text
-			// TODO: This is a heuristic; ideally we'd check the actual value
-			hasFalsyNonNullish = true
-		}
-	}
+	hasNullish := info.hasNull || info.hasUndefined
+	hasFalsyNonNullish := info.hasBoolLiteral || info.hasNumLiteral || info.hasStrLiteral || info.hasBigIntLiteral
 
 	// Return type changes if we have falsy non-nullish but no nullish
 	return hasFalsyNonNullish && !hasNullish
@@ -667,22 +717,8 @@ func (processor *chainProcessor) wouldChangeReturnType(node *ast.Node) bool {
 // are handled by the existing checkBoolean/checkNumber/checkString options.
 // void is special because it's ALWAYS falsy (never truthy like true/1/"x")
 func (processor *chainProcessor) hasVoidType(node *ast.Node) bool {
-	nodeType := processor.ctx.TypeChecker.GetTypeAtLocation(node)
-	typeParts := utils.UnionTypeParts(nodeType)
-
-	for _, part := range typeParts {
-		// Skip nullish types
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull|checker.TypeFlagsUndefined) {
-			continue
-		}
-
-		// Check for void type (always falsy, not nullish)
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsVoid) {
-			return true
-		}
-	}
-
-	return false
+	info := processor.getTypeInfo(node)
+	return info.hasVoid
 }
 
 // isOrChainComparisonSafe checks if a comparison operand in an OR chain is safe to convert to optional chaining.
@@ -799,34 +835,35 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 // For example, in (foo as any).bar, we want to check foo's type, not any.
 func (processor *chainProcessor) shouldSkipByType(node *ast.Node) bool {
 	baseNode := getBaseIdentifier(node)
-	t := processor.ctx.TypeChecker.GetTypeAtLocation(baseNode)
-	types := utils.UnionTypeParts(t)
+	info := processor.getTypeInfo(baseNode)
 
-	for _, part := range types {
-		// Skip nullish types - they're always allowed
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull|checker.TypeFlagsUndefined) {
-			continue
-		}
+	// Skip nullish types - they're always allowed
+	// We need to check each non-nullish type against the options
+	// If the type has any flag that should be skipped (based on options), return true
 
-		// Check each type flag
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsAny) && !processor.opts.CheckAny {
-			return true
-		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsBigIntLike) && !processor.opts.CheckBigInt {
-			return true
-		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLike) && !processor.opts.CheckBoolean {
-			return true
-		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNumberLike) && !processor.opts.CheckNumber {
-			return true
-		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsStringLike) && !processor.opts.CheckString {
-			return true
-		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsUnknown) && !processor.opts.CheckUnknown {
-			return true
-		}
+	// Check any type
+	if info.hasAny && !processor.opts.CheckAny {
+		return true
+	}
+	// Check bigint type
+	if info.hasBigIntLike && !processor.opts.CheckBigInt {
+		return true
+	}
+	// Check boolean type
+	if info.hasBooleanLike && !processor.opts.CheckBoolean {
+		return true
+	}
+	// Check number type
+	if info.hasNumberLike && !processor.opts.CheckNumber {
+		return true
+	}
+	// Check string type
+	if info.hasStringLike && !processor.opts.CheckString {
+		return true
+	}
+	// Check unknown type
+	if info.hasUnknown && !processor.opts.CheckUnknown {
+		return true
 	}
 
 	return false
@@ -834,6 +871,11 @@ func (processor *chainProcessor) shouldSkipByType(node *ast.Node) bool {
 
 // flattenForFix flattens a chain expression to its component parts for reconstruction
 func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
+	// Check cache first
+	if cached, ok := processor.flattenCache[node]; ok {
+		return cached
+	}
+
 	parts := []ChainPart{}
 
 	var visit func(n *ast.Node, parentIsNonNull bool)
@@ -846,7 +888,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 			if ast.IsAwaitExpression(inner) || ast.IsYieldExpression(inner) {
 				// Keep the parentheses - get the full text including parens
 				textRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-				text := processor.ctx.SourceFile.Text()[textRange.Pos():textRange.End()]
+				text := processor.sourceText[textRange.Pos():textRange.End()]
 
 				parts = append(parts, ChainPart{
 					text:        text,
@@ -868,7 +910,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 			propAccess := n.AsPropertyAccessExpression()
 			visit(propAccess.Expression, false)
 			nameRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, propAccess.Name())
-			nameText := processor.ctx.SourceFile.Text()[nameRange.Pos():nameRange.End()]
+			nameText := processor.sourceText[nameRange.Pos():nameRange.End()]
 
 			// If this property access is wrapped in a NonNullExpression (parentIsNonNull),
 			// append ! to the property name
@@ -892,7 +934,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 			elemAccess := n.AsElementAccessExpression()
 			visit(elemAccess.Expression, false)
 			argRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, elemAccess.ArgumentExpression)
-			argText := processor.ctx.SourceFile.Text()[argRange.Pos():argRange.End()]
+			argText := processor.sourceText[argRange.Pos():argRange.End()]
 
 			// If this element access is wrapped in a NonNullExpression (parentIsNonNull),
 			// we need to handle it, but element access already uses brackets
@@ -920,7 +962,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 				// Use the NodeList's Loc to get the full range including whitespace
 				typeArgsStart := callExpr.TypeArguments.Loc.Pos()
 				typeArgsEnd := callExpr.TypeArguments.Loc.End()
-				typeArgsText = "<" + processor.ctx.SourceFile.Text()[typeArgsStart:typeArgsEnd] + ">"
+				typeArgsText = "<" + processor.sourceText[typeArgsStart:typeArgsEnd] + ">"
 			}
 
 			// Get the arguments text - extract from opening ( to closing )
@@ -935,7 +977,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 				// The call expression's End() points to right after the closing )
 				// So End()-1 is the ), and we want everything from argsStart to End()-1
 				callEnd := n.End()
-				argsText = "(" + processor.ctx.SourceFile.Text()[argsStart:callEnd-1] + ")"
+				argsText = "(" + processor.sourceText[argsStart:callEnd-1] + ")"
 			}
 
 			parts = append(parts, ChainPart{
@@ -947,7 +989,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 		default:
 			// Base case - identifier or other expression
 			textRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-			text := processor.ctx.SourceFile.Text()[textRange.Pos():textRange.End()]
+			text := processor.sourceText[textRange.Pos():textRange.End()]
 
 			// If this base expression is wrapped in a NonNullExpression (parentIsNonNull),
 			// the ! is already part of the text range
@@ -973,6 +1015,9 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 	}
 
 	visit(node, false)
+
+	// Cache the result
+	processor.flattenCache[node] = parts
 	return parts
 }
 
@@ -1712,7 +1757,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					// Try text-based comparison to see if op extends lastExpr
 					lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
 					opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
-					sourceText := processor.ctx.SourceFile.Text()
+					sourceText := processor.sourceText
 					if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
 						opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
 						lastText := sourceText[lastRange.Pos():lastRange.End()]
@@ -1889,13 +1934,13 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 						if callExpr != nil && callExpr.Expression != nil {
 							calleeText := ""
 							calleeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, callExpr.Expression)
-							if calleeRange.Pos() >= 0 && calleeRange.End() <= len(processor.ctx.SourceFile.Text()) {
-								calleeText = processor.ctx.SourceFile.Text()[calleeRange.Pos():calleeRange.End()]
+							if calleeRange.Pos() >= 0 && calleeRange.End() <= len(processor.sourceText) {
+								calleeText = processor.sourceText[calleeRange.Pos():calleeRange.End()]
 							}
 							lastText := ""
 							lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
-							if lastRange.Pos() >= 0 && lastRange.End() <= len(processor.ctx.SourceFile.Text()) {
-								lastText = processor.ctx.SourceFile.Text()[lastRange.Pos():lastRange.End()]
+							if lastRange.Pos() >= 0 && lastRange.End() <= len(processor.sourceText) {
+								lastText = processor.sourceText[lastRange.Pos():lastRange.End()]
 							}
 							if calleeText == lastText {
 								// The call is calling the expression we just checked - safe to continue
@@ -2076,7 +2121,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 						if ast.IsCallExpression(unwrappedLast) {
 							// First check if the source already has optional chaining
 							lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastChainOp.comparedExpr)
-							sourceText := processor.ctx.SourceFile.Text()
+							sourceText := processor.sourceText
 							lastText := ""
 							if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) {
 								lastText = sourceText[lastRange.Pos():lastRange.End()]
@@ -2341,7 +2386,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				if len(chain) > 0 && chain[0].comparedExpr != nil {
 					base := getBaseIdentifier(chain[0].comparedExpr)
 					baseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, base)
-					sourceText := processor.ctx.SourceFile.Text()
+					sourceText := processor.sourceText
 					if baseRange.Pos() >= 0 && baseRange.End() <= len(sourceText) {
 						baseText := sourceText[baseRange.Pos():baseRange.End()]
 						baseIdentifiers[baseText] = true
@@ -3382,7 +3427,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					trimmedRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, opNode)
 					trimmedPos := trimmedRange.Pos()
 					if fullPos < trimmedPos {
-						trivia := processor.ctx.SourceFile.Text()[fullPos:trimmedPos]
+						trivia := processor.sourceText[fullPos:trimmedPos]
 						leadingTrivia.WriteString(trivia)
 					}
 				}
@@ -3417,11 +3462,11 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 						comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.comparedExpr)
 
 						// typeof prefix: from start of left side to start of comparedExpr
-						typeofPrefix := processor.ctx.SourceFile.Text()[leftRange.Pos():comparedExprRange.Pos()]
+						typeofPrefix := processor.sourceText[leftRange.Pos():comparedExprRange.Pos()]
 
 						// comparison suffix: from end of comparedExpr to end of binary expression
 						binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.node).End()
-						comparisonSuffix := processor.ctx.SourceFile.Text()[comparedExprRange.End():binExprEnd]
+						comparisonSuffix := processor.sourceText[comparedExprRange.End():binExprEnd]
 
 						newCode = typeofPrefix + newCode + comparisonSuffix
 					} else {
@@ -3441,13 +3486,13 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 							// Yoda: prepend the left side + operator
 							binExprStart := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.node).Pos()
 							comparedExprStart := comparedExprRange.Pos()
-							yodaPrefix := processor.ctx.SourceFile.Text()[binExprStart:comparedExprStart]
+							yodaPrefix := processor.sourceText[binExprStart:comparedExprStart]
 							newCode = yodaPrefix + newCode
 						} else {
 							// Normal: append the operator + right side
 							comparedExprEnd := comparedExprRange.End()
 							binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.node).End()
-							comparisonSuffix := processor.ctx.SourceFile.Text()[comparedExprEnd:binExprEnd]
+							comparisonSuffix := processor.sourceText[comparedExprEnd:binExprEnd]
 							newCode = newCode + comparisonSuffix
 						}
 					}
@@ -3746,7 +3791,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 					// Try text-based comparison to see if op extends lastExpr
 					lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
 					opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
-					sourceText := processor.ctx.SourceFile.Text()
+					sourceText := processor.sourceText
 					if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
 						opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
 						lastText := sourceText[lastRange.Pos():lastRange.End()]
@@ -3832,7 +3877,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			// Compare base identifiers
 			firstBaseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, firstBase)
 			baseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, base)
-			sourceText := processor.ctx.SourceFile.Text()
+			sourceText := processor.sourceText
 			if firstBaseRange.Pos() >= 0 && firstBaseRange.End() <= len(sourceText) &&
 				baseRange.Pos() >= 0 && baseRange.End() <= len(sourceText) {
 				firstBaseText := sourceText[firstBaseRange.Pos():firstBaseRange.End()]
@@ -4205,7 +4250,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			if len(lastParts) > len(secondLastParts) {
 				// Plain extends null check - keep plain operand separate
 				lastOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOp.node)
-				trailingPlainOperand = processor.ctx.SourceFile.Text()[lastOpRange.Pos():lastOpRange.End()]
+				trailingPlainOperand = processor.sourceText[lastOpRange.Pos():lastOpRange.End()]
 				chainForOptional = chain[:len(chain)-1]
 			}
 		}
@@ -4219,7 +4264,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		singleOp := chainForOptional[0]
 		if singleOp.comparedExpr != nil {
 			singleOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, singleOp.comparedExpr)
-			singleOpText := processor.ctx.SourceFile.Text()[singleOpRange.Pos():singleOpRange.End()]
+			singleOpText := processor.sourceText[singleOpRange.Pos():singleOpRange.End()]
 			if strings.Contains(singleOpText, "?.") {
 				return
 			}
@@ -4317,15 +4362,15 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 				// Yoda: normalize to non-Yoda style (optionalChain OP value)
 				// Extract operator text (trim trivia to avoid extra spaces)
 				opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.OperatorToken)
-				opText := processor.ctx.SourceFile.Text()[opRange.Pos():opRange.End()]
+				opText := processor.sourceText[opRange.Pos():opRange.End()]
 				// Extract left side (the value being compared)
-				valueText := strings.TrimSpace(processor.ctx.SourceFile.Text()[leftRange.Pos():leftRange.End()])
+				valueText := strings.TrimSpace(processor.sourceText[leftRange.Pos():leftRange.End()])
 				newCode = optionalChainCode + " " + opText + " " + valueText
 			} else {
 				// Normal: append the operator + right side
 				opStart := binExpr.OperatorToken.Pos()
 				rightEnd := binExpr.Right.End()
-				comparisonText := processor.ctx.SourceFile.Text()[opStart:rightEnd]
+				comparisonText := processor.sourceText[opStart:rightEnd]
 				newCode = optionalChainCode + comparisonText
 			}
 		} else {
@@ -4494,7 +4539,7 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 
 	leftNode := binExpr.Left
 	leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, leftNode)
-	leftText := processor.ctx.SourceFile.Text()[leftRange.Pos():leftRange.End()]
+	leftText := processor.sourceText[leftRange.Pos():leftRange.End()]
 
 	// Determine if we need to add parentheses around the left expression
 	// We need parentheses when the left side is a complex expression that would
@@ -4517,9 +4562,9 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 	propRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, propNode)
 	propertyText := ""
 	if isComputed {
-		propertyText = "[" + processor.ctx.SourceFile.Text()[propRange.Pos():propRange.End()] + "]"
+		propertyText = "[" + processor.sourceText[propRange.Pos():propRange.End()] + "]"
 	} else {
-		propertyText = processor.ctx.SourceFile.Text()[propRange.Pos():propRange.End()]
+		propertyText = processor.sourceText[propRange.Pos():propRange.End()]
 	}
 
 	newCode := leftText + "?." + propertyText
