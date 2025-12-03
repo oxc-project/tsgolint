@@ -4,6 +4,7 @@
 package tsoptions
 
 import "github.com/microsoft/typescript-go/internal/ast"
+import "github.com/microsoft/typescript-go/internal/collections"
 import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/diagnostics"
 import "github.com/microsoft/typescript-go/internal/tsoptions"
@@ -59,9 +60,9 @@ func GetNameMapFromList(optDecls []*tsoptions.CommandLineOption) *tsoptions.Name
 //go:linkname GetOptionsSyntaxByArrayElementValue github.com/microsoft/typescript-go/internal/tsoptions.GetOptionsSyntaxByArrayElementValue
 func GetOptionsSyntaxByArrayElementValue(objectLiteral *ast.ObjectLiteralExpression, propKey string, elementValue string) *ast.Node
 //go:linkname GetParsedCommandLineOfConfigFile github.com/microsoft/typescript-go/internal/tsoptions.GetParsedCommandLineOfConfigFile
-func GetParsedCommandLineOfConfigFile(configFileName string, options *core.CompilerOptions, sys tsoptions.ParseConfigHost, extendedConfigCache tsoptions.ExtendedConfigCache) (*tsoptions.ParsedCommandLine, []*ast.Diagnostic)
+func GetParsedCommandLineOfConfigFile(configFileName string, options *core.CompilerOptions, optionsRaw *collections.OrderedMap[string, any], sys tsoptions.ParseConfigHost, extendedConfigCache tsoptions.ExtendedConfigCache) (*tsoptions.ParsedCommandLine, []*ast.Diagnostic)
 //go:linkname GetParsedCommandLineOfConfigFilePath github.com/microsoft/typescript-go/internal/tsoptions.GetParsedCommandLineOfConfigFilePath
-func GetParsedCommandLineOfConfigFilePath(configFileName string, path tspath.Path, options *core.CompilerOptions, sys tsoptions.ParseConfigHost, extendedConfigCache tsoptions.ExtendedConfigCache) (*tsoptions.ParsedCommandLine, []*ast.Diagnostic)
+func GetParsedCommandLineOfConfigFilePath(configFileName string, path tspath.Path, options *core.CompilerOptions, optionsRaw *collections.OrderedMap[string, any], sys tsoptions.ParseConfigHost, extendedConfigCache tsoptions.ExtendedConfigCache) (*tsoptions.ParsedCommandLine, []*ast.Diagnostic)
 //go:linkname GetSupportedExtensionsWithJsonIfResolveJsonModule github.com/microsoft/typescript-go/internal/tsoptions.GetSupportedExtensionsWithJsonIfResolveJsonModule
 func GetSupportedExtensionsWithJsonIfResolveJsonModule(compilerOptions *core.CompilerOptions, supportedExtensions [][]string) [][]string
 //go:linkname GetTsConfigPropArrayElementValue github.com/microsoft/typescript-go/internal/tsoptions.GetTsConfigPropArrayElementValue

@@ -7,8 +7,5 @@
   "devDependencies": {
     "@types/node": "^24.10.0",
     "dprint": "^0.50.1"
-  },
-  "volta": {
-    "node": "22.19.0"
   }
 }

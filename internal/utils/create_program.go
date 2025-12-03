@@ -33,7 +33,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
 	}
 
-	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, &core.CompilerOptions{}, host, nil)
+	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, &core.CompilerOptions{}, nil, host, nil)
 
 	if len(diagnostics) > 0 {
 		internalDiags := make([]diagnostic.Internal, len(diagnostics))
