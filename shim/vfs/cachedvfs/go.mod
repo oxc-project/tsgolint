@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/vfs/cachedvfs
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251128180406-ea6a3dc055cf
+require github.com/microsoft/typescript-go v0.0.0-20251202201304-dc6ce076f4d0
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
