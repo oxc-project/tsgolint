@@ -1,4 +1,4 @@
-From 9aa648bb87eb8485be34b6dfc9f2ad12d5ce9ff2 Mon Sep 17 00:00:00 2001
+From ecff07d2153a3f9b6f61ccf349598e569f67d07b Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
 Subject: [PATCH] patch: expose more functions via the shim with type fixes
@@ -44,7 +44,7 @@ index 30fa7a72b..a670b2d8f 100644
  }
  
 diff --git a/internal/project/configfileregistrybuilder.go b/internal/project/configfileregistrybuilder.go
-index 051ab2318..c5a980c43 100644
+index f91d28ddd..eca4b63fd 100644
 --- a/internal/project/configfileregistrybuilder.go
 +++ b/internal/project/configfileregistrybuilder.go
 @@ -16,15 +16,15 @@ import (
