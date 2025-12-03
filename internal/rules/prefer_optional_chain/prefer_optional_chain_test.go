@@ -1,6 +1,7 @@
 package prefer_optional_chain
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
@@ -8,1209 +9,310 @@ import (
 )
 
 // =============================================================================
-// SECTION 1: || {} Tests (Empty Object Pattern)
-// Source: upstream prefer-optional-chain.test.ts lines 10-693
+// Empty Object Pattern Test Case Generators
+// For generating (foo || {}).bar and (foo ?? {}).bar patterns
 // =============================================================================
 
-func TestOrEmptyObjectPattern(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
-		// Valid cases - should NOT be converted
-		[]rule_tester.ValidTestCase{
-			{Code: `foo || {};`},                       // No property access
-			{Code: `foo || ({} as any);`},              // Type cast empty object
-			{Code: `(foo || {})?.bar;`},                // Already optional
-			{Code: `(foo || { bar: 1 }).bar;`},         // Non-empty object
-			{Code: `foo ||= bar || {};`},               // Assignment operator
-			{Code: `foo ||= bar?.baz || {};`},          // Assignment with optional chain
-			{Code: `(foo1 ? foo2 : foo3 || {}).foo4;`}, // Ternary in wrong position
-			{Code: `(foo = 2 || {}).bar;`},             // Assignment expression
-			{Code: `func(foo || {}).bar;`},             // Function call result
-			{Code: `(undefined && (foo || {})).bar;`},  // Complex condition
-			// https://github.com/typescript-eslint/typescript-eslint/issues/8380
-			{Code: `
+// replaceEmptyObjectOperator replaces ${OP} placeholder with the actual operator
+func replaceEmptyObjectOperator(s, op string) string {
+	return strings.ReplaceAll(s, "${OP}", op)
+}
+
+// GenerateEmptyObjectValidCases generates valid test cases for both || and ?? operators.
+// These are cases that should NOT be converted to optional chaining.
+func GenerateEmptyObjectValidCases() []rule_tester.ValidTestCase {
+	// Cases that apply to BOTH operators - using ${OP} placeholder
+	sharedCases := []string{
+		`foo ${OP} {};`,         // No property access
+		`(foo ${OP} {})?.bar;`,  // Already optional
+		`foo ||= bar ${OP} {};`, // Assignment operator
+	}
+
+	// Cases specific to || operator only
+	orOnlyCases := []string{
+		`(foo || ({} as any));`,            // Type cast empty object
+		`(foo || { bar: 1 }).bar;`,         // Non-empty object
+		`foo ||= bar?.baz || {};`,          // Assignment with optional chain
+		`(foo1 ? foo2 : foo3 || {}).foo4;`, // Ternary in wrong position
+		`(foo = 2 || {}).bar;`,             // Assignment expression
+		`func(foo || {}).bar;`,             // Function call result
+		`(undefined && (foo || {})).bar;`,  // Complex condition
+	}
+
+	// Issue #8380 cases (apply to || only based on upstream)
+	issueCase8380 := []string{
+		`
 const a = null;
 const b = 0;
 a === undefined || b === null || b === undefined;
-`},
-			{Code: `
+`,
+		`
 const a = 0;
 const b = 0;
 a === undefined || b === undefined || b === null;
-`},
-			{Code: `
+`,
+		`
 const a = 0;
 const b = 0;
 b === null || a === undefined || b === undefined;
-`},
-			{Code: `
+`,
+		`
 const b = 0;
 b === null || b === undefined;
-`},
-			{Code: `
+`,
+		`
 const a = 0;
 const b = 0;
 b != null && a !== null && a !== undefined;
-`},
+`,
+	}
+
+	var result []rule_tester.ValidTestCase
+
+	// Generate shared cases for both operators
+	for _, op := range []string{"||", "??"} {
+		for _, code := range sharedCases {
+			result = append(result, rule_tester.ValidTestCase{
+				Code: replaceEmptyObjectOperator(code, op),
+			})
+		}
+	}
+
+	// Add || only cases
+	for _, code := range orOnlyCases {
+		result = append(result, rule_tester.ValidTestCase{Code: code})
+	}
+
+	// Add issue #8380 cases
+	for _, code := range issueCase8380 {
+		result = append(result, rule_tester.ValidTestCase{Code: code})
+	}
+
+	return result
+}
+
+// emptyObjectInvalidTemplate represents a template for invalid test cases
+type emptyObjectInvalidTemplate struct {
+	Code   string // Code template with ${OP} placeholder
+	Output string // Output template with ${OP} placeholder
+}
+
+// emptyObjectMultiErrorTemplate represents a template for cases with multiple errors
+type emptyObjectMultiErrorTemplate struct {
+	Code    string
+	Outputs []string
+}
+
+// GenerateEmptyObjectInvalidCases generates invalid test cases for both || and ?? operators.
+// These are cases that SHOULD be converted to optional chaining.
+func GenerateEmptyObjectInvalidCases() []rule_tester.InvalidTestCase {
+	// Single-error cases that work identically for both operators
+	singleErrorTemplates := []emptyObjectInvalidTemplate{
+		// Basic patterns
+		{Code: `(foo ${OP} {}).bar;`, Output: `foo?.bar;`},
+		{Code: `(foo ${OP} ({})).bar;`, Output: `foo?.bar;`},
+		{Code: `(await foo ${OP} {}).bar;`, Output: `(await foo)?.bar;`},
+		{Code: `(foo1?.foo2 ${OP} {}).foo3;`, Output: `foo1?.foo2?.foo3;`},
+		{Code: `(foo1?.foo2 ${OP} ({})).foo3;`, Output: `foo1?.foo2?.foo3;`},
+		{Code: `((() => foo())() ${OP} {}).bar;`, Output: `(() => foo())()?.bar;`},
+		{Code: `const foo = (bar ${OP} {}).baz;`, Output: `const foo = bar?.baz;`},
+		{Code: `(foo.bar ${OP} {})[baz];`, Output: `foo.bar?.[baz];`},
+
+		// Multiple alternates
+		{Code: `(foo ${OP} undefined ${OP} {}).bar;`, Output: `(foo ${OP} undefined)?.bar;`},
+		{Code: `(foo() ${OP} bar ${OP} {}).baz;`, Output: `(foo() ${OP} bar)?.baz;`},
+
+		// Ternary expression
+		{Code: `((foo1 ? foo2 : foo3) ${OP} {}).foo4;`, Output: `(foo1 ? foo2 : foo3)?.foo4;`},
+
+		// Binary operators - comparison
+		{Code: `(a > b ${OP} {}).bar;`, Output: `(a > b)?.bar;`},
+		{Code: `(a instanceof Error ${OP} {}).bar;`, Output: `(a instanceof Error)?.bar;`},
+
+		// Shift operators
+		{Code: `((a << b) ${OP} {}).bar;`, Output: `(a << b)?.bar;`},
+
+		// Exponentiation
+		{Code: `((foo ** 2) ${OP} {}).bar;`, Output: `(foo ** 2)?.bar;`},
+		{Code: `(foo ** 2 ${OP} {}).bar;`, Output: `(foo ** 2)?.bar;`},
+
+		// Unary operators
+		{Code: `(foo++ ${OP} {}).bar;`, Output: `(foo++)?.bar;`},
+		{Code: `(+foo ${OP} {}).bar;`, Output: `(+foo)?.bar;`},
+
+		// this keyword
+		{Code: `(this ${OP} {}).foo;`, Output: `this?.foo;`},
+
+		// Type cast
+		{Code: `(((typeof x) as string) ${OP} {}).bar;`, Output: `((typeof x) as string)?.bar;`},
+
+		// Void operator
+		{Code: `(void foo() ${OP} {}).bar;`, Output: `(void foo())?.bar;`},
+
+		// New expression
+		{Code: `(new Foo() ${OP} {}).bar;`, Output: `new Foo()?.bar;`},
+		{Code: `(new Foo(arg) ${OP} {}).bar;`, Output: `new Foo(arg)?.bar;`},
+
+		// Sequence expression
+		{Code: `((foo, bar) ${OP} {}).baz;`, Output: `(foo, bar)?.baz;`},
+
+		// Class expression
+		{Code: `((class {}) ${OP} {}).name;`, Output: `(class {})?.name;`},
+
+		// Optional chaining on left
+		{Code: `(foo?.() ${OP} {}).bar;`, Output: `foo?.()?.bar;`},
+
+		// Delete operator
+		{Code: `(delete foo.bar ${OP} {}).baz;`, Output: `(delete foo.bar)?.baz;`},
+
+		// In operator
+		{Code: `(('foo' in bar) ${OP} {}).baz;`, Output: `('foo' in bar)?.baz;`},
+
+		// Multiple binary operators
+		{Code: `(a + b - c ${OP} {}).foo;`, Output: `(a + b - c)?.foo;`},
+
+		// Bitwise operators
+		{Code: `(a | b ${OP} {}).foo;`, Output: `(a | b)?.foo;`},
+		{Code: `(a & b ${OP} {}).foo;`, Output: `(a & b)?.foo;`},
+		{Code: `(a ^ b ${OP} {}).foo;`, Output: `(a ^ b)?.foo;`},
+
+		// Regex pattern
+		{Code: `(/test/ ${OP} {}).source;`, Output: `/test/?.source;`},
+
+		// Tagged template
+		{Code: "(tag`template` ${OP} {}).foo;", Output: "tag`template`?.foo;"},
+
+		// Deeply nested property chain
+		{Code: `((foo1.foo2.foo3.foo4) ${OP} {}).foo5;`, Output: `(foo1.foo2.foo3.foo4)?.foo5;`},
+
+		// Mixed operators
+		{Code: `(foo && bar + baz ${OP} {}).qux;`, Output: `(foo && bar + baz)?.qux;`},
+
+		// Array literal access
+		{Code: `([foo, bar] ${OP} {}).length;`, Output: `[foo, bar]?.length;`},
+
+		// Object literal with spread
+		{Code: `({...foo, bar: 1} ${OP} {}).baz;`, Output: `{...foo, bar: 1}?.baz;`},
+
+		// Function expression
+		{Code: `(function() { return foo; } ${OP} {}).bar;`, Output: `function() { return foo; }?.bar;`},
+
+		// Logical NOT with comparison
+		{Code: `(!(foo === bar) ${OP} {}).baz;`, Output: `(!(foo === bar))?.baz;`},
+
+		// Negation operator
+		{Code: `(!foo ${OP} {}).bar;`, Output: `(!foo)?.bar;`},
+
+		// Tilde (bitwise NOT)
+		{Code: `((~foo) ${OP} {}).bar;`, Output: `(~foo)?.bar;`},
+
+		// Decrement operators
+		{Code: `(foo-- ${OP} {}).bar;`, Output: `(foo--)?.bar;`},
+		{Code: `(--foo ${OP} {}).bar;`, Output: `(--foo)?.bar;`},
+
+		// Logical AND within empty object
+		{Code: `((foo && bar) ${OP} {}).baz;`, Output: `(foo && bar)?.baz;`},
+
+		// Nullish/OR coalescing on left side (cross-operator)
+		{Code: `((foo ?? bar) ${OP} {}).baz;`, Output: `(foo ?? bar)?.baz;`},
+		{Code: `((foo || bar) ${OP} {}).baz;`, Output: `(foo || bar)?.baz;`},
+
+		// Comparison operators
+		{Code: `((foo > 0) ${OP} {}).bar;`, Output: `(foo > 0)?.bar;`},
+		{Code: `((foo < 10) ${OP} {}).bar;`, Output: `(foo < 10)?.bar;`},
+		{Code: `((foo >= 0) ${OP} {}).bar;`, Output: `(foo >= 0)?.bar;`},
+		{Code: `((foo <= 10) ${OP} {}).bar;`, Output: `(foo <= 10)?.bar;`},
+
+		// Typeof operator
+		{Code: `((typeof foo) ${OP} {}).length;`, Output: `(typeof foo)?.length;`},
+
+		// If-block context tests
+		{Code: `if (foo) { (foo ${OP} {}).bar; }`, Output: `if (foo) { foo?.bar; }`},
+		{Code: `if ((foo ${OP} {}).bar) { foo.bar; }`, Output: `if (foo?.bar) { foo.bar; }`},
+
+		// Ternary expression (parenthesized)
+		{Code: `((a ? b : c) ${OP} {}).bar;`, Output: `(a ? b : c)?.bar;`},
+
+		// undefined && foo pattern
+		{Code: `(undefined && foo ${OP} {}).bar;`, Output: `(undefined && foo)?.bar;`},
+
+		// Parenthesized bitwise operators
+		{Code: `((a | b) ${OP} {}).foo;`, Output: `(a | b)?.foo;`},
+		{Code: `((a & b) ${OP} {}).foo;`, Output: `(a & b)?.foo;`},
+		{Code: `((a ^ b) ${OP} {}).foo;`, Output: `(a ^ b)?.foo;`},
+		{Code: `((a + b - c) ${OP} {}).foo;`, Output: `(a + b - c)?.foo;`},
+	}
+
+	// Multi-error cases
+	multiErrorTemplates := []emptyObjectMultiErrorTemplate{
+		// Nested empty object patterns (2 errors)
+		{
+			Code: `((foo1 ${OP} {}).foo2 ${OP} {}).foo3;`,
+			Outputs: []string{
+				`(foo1 ${OP} {}).foo2?.foo3;`,
+				`(foo1?.foo2 ${OP} {}).foo3;`,
+			},
 		},
-		// Invalid cases - should be converted
-		[]rule_tester.InvalidTestCase{
-			// Basic || {} pattern
-			{
-				Code: `(foo || {}).bar;`,
+		// Triple nested (3 errors)
+		{
+			Code: `(((foo ${OP} {}).bar ${OP} {}).baz ${OP} {}).qux;`,
+			Outputs: []string{
+				`((foo ${OP} {}).bar ${OP} {}).baz?.qux;`,
+				`((foo ${OP} {}).bar?.baz ${OP} {}).qux;`,
+				`((foo?.bar ${OP} {}).baz ${OP} {}).qux;`,
+			},
+		},
+	}
+
+	var result []rule_tester.InvalidTestCase
+
+	// Generate single-error cases for both operators
+	for _, op := range []string{"||", "??"} {
+		for _, tmpl := range singleErrorTemplates {
+			result = append(result, rule_tester.InvalidTestCase{
+				Code: replaceEmptyObjectOperator(tmpl.Code, op),
 				Errors: []rule_tester.InvalidTestCaseError{{
 					MessageId: "preferOptionalChain",
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
 						MessageId: "optionalChainSuggest",
-						Output:    `foo?.bar;`,
+						Output:    replaceEmptyObjectOperator(tmpl.Output, op),
 					}},
 				}},
-			},
-			// Parenthesized empty object
-			{
-				Code: `(foo || ({})).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
+			})
+		}
+
+		// Generate multi-error cases for both operators
+		for _, tmpl := range multiErrorTemplates {
+			var errors []rule_tester.InvalidTestCaseError
+			for _, output := range tmpl.Outputs {
+				errors = append(errors, rule_tester.InvalidTestCaseError{
 					MessageId: "preferOptionalChain",
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
 						MessageId: "optionalChainSuggest",
-						Output:    `foo?.bar;`,
+						Output:    replaceEmptyObjectOperator(output, op),
 					}},
-				}},
-			},
-			// Await with empty object
-			{
-				Code: `(await foo || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(await foo)?.bar;`,
-					}},
-				}},
-			},
-			// Nested optional chain
-			{
-				Code: `(foo1?.foo2 || {}).foo3;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo1?.foo2?.foo3;`,
-					}},
-				}},
-			},
-			// Nested optional chain with parenthesized empty object
-			{
-				Code: `(foo1?.foo2 || ({})).foo3;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo1?.foo2?.foo3;`,
-					}},
-				}},
-			},
-			// Arrow function call
-			{
-				Code: `((() => foo())() || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(() => foo())()?.bar;`,
-					}},
-				}},
-			},
-			// Const assignment
-			{
-				Code: `const foo = (bar || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `const foo = bar?.baz;`,
-					}},
-				}},
-			},
-			// Computed property
-			{
-				Code: `(foo.bar || {})[baz];`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo.bar?.[baz];`,
-					}},
-				}},
-			},
-			// Nested empty object patterns (multiple errors)
-			{
-				Code: `((foo1 || {}).foo2 || {}).foo3;`,
-				Errors: []rule_tester.InvalidTestCaseError{
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `(foo1 || {}).foo2?.foo3;`,
-						}},
-					},
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `(foo1?.foo2 || {}).foo3;`,
-						}},
-					},
-				},
-			},
-			// Multiple alternates
-			{
-				Code: `(foo || undefined || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo || undefined)?.bar;`,
-					}},
-				}},
-			},
-			// Chained calls
-			{
-				Code: `(foo() || bar || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo() || bar)?.baz;`,
-					}},
-				}},
-			},
-			// Ternary expression
-			{
-				Code: `((foo1 ? foo2 : foo3) || {}).foo4;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo1 ? foo2 : foo3)?.foo4;`,
-					}},
-				}},
-			},
-			// Binary operators
-			{
-				Code: `(a > b || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a > b)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a instanceof Error || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a instanceof Error)?.bar;`,
-					}},
-				}},
-			},
-			// Shift operators
-			{
-				Code: `((a << b) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a << b)?.bar;`,
-					}},
-				}},
-			},
-			// Exponentiation
-			{
-				Code: `((foo ** 2) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo ** 2)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo ** 2 || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo ** 2)?.bar;`,
-					}},
-				}},
-			},
-			// Unary operators
-			{
-				Code: `(foo++ || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo++)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(+foo || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(+foo)?.bar;`,
-					}},
-				}},
-			},
-			// this keyword
-			{
-				Code: `(this || {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `this?.foo;`,
-					}},
-				}},
-			},
-			// Type cast
-			{
-				Code: `(((typeof x) as string) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `((typeof x) as string)?.bar;`,
-					}},
-				}},
-			},
-			// Void operator
-			{
-				Code: `(void foo() || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(void foo())?.bar;`,
-					}},
-				}},
-			},
-			// New expression
-			{
-				Code: `(new Foo() || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `new Foo()?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(new Foo(arg) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `new Foo(arg)?.bar;`,
-					}},
-				}},
-			},
-			// Sequence expression
-			{
-				Code: `((foo, bar) || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo, bar)?.baz;`,
-					}},
-				}},
-			},
-			// Class expression
-			{
-				Code: `((class {}) || {}).name;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(class {})?.name;`,
-					}},
-				}},
-			},
-			// Optional chaining on left
-			{
-				Code: `(foo?.() || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo?.()?.bar;`,
-					}},
-				}},
-			},
-			// Delete operator
-			{
-				Code: `(delete foo.bar || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(delete foo.bar)?.baz;`,
-					}},
-				}},
-			},
-			// In operator
-			{
-				Code: `(('foo' in bar) || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `('foo' in bar)?.baz;`,
-					}},
-				}},
-			},
-			// Multiple binary operators
-			{
-				Code: `(a + b - c || {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a + b - c)?.foo;`,
-					}},
-				}},
-			},
-			// Bitwise operators
-			{
-				Code: `(a | b || {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a | b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a & b || {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a & b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a ^ b || {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a ^ b)?.foo;`,
-					}},
-				}},
-			},
-			// Regex pattern
-			{
-				Code: `(/test/ || {}).source;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `/test/?.source;`,
-					}},
-				}},
-			},
-			// Tagged template
-			{
-				Code: "(tag`template` || {}).foo;",
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    "tag`template`?.foo;",
-					}},
-				}},
-			},
-			// Deeply nested property chain
-			{
-				Code: `((foo1.foo2.foo3.foo4) || {}).foo5;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo1.foo2.foo3.foo4)?.foo5;`,
-					}},
-				}},
-			},
-			// Mixed operators
-			{
-				Code: `(foo && bar + baz || {}).qux;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo && bar + baz)?.qux;`,
-					}},
-				}},
-			},
-			// Array literal access
-			{
-				Code: `([foo, bar] || {}).length;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `[foo, bar]?.length;`,
-					}},
-				}},
-			},
-			// Object literal with spread
-			{
-				Code: `({...foo, bar: 1} || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `{...foo, bar: 1}?.baz;`,
-					}},
-				}},
-			},
-			// Function expression
-			{
-				Code: `(function() { return foo; } || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `function() { return foo; }?.bar;`,
-					}},
-				}},
-			},
-			// Multiple levels of nesting (3 errors)
-			{
-				Code: `(((foo || {}).bar || {}).baz || {}).qux;`,
-				Errors: []rule_tester.InvalidTestCaseError{
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `((foo || {}).bar || {}).baz?.qux;`,
-						}},
-					},
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `((foo || {}).bar?.baz || {}).qux;`,
-						}},
-					},
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `((foo?.bar || {}).baz || {}).qux;`,
-						}},
-					},
-				},
-			},
-			// Logical NOT with comparison
-			{
-				Code: `(!(foo === bar) || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(!(foo === bar))?.baz;`,
-					}},
-				}},
-			},
-			// Negation operator
-			{
-				Code: `(!foo || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(!foo)?.bar;`,
-					}},
-				}},
-			},
-			// Tilde (bitwise NOT)
-			{
-				Code: `((~foo) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(~foo)?.bar;`,
-					}},
-				}},
-			},
-			// Decrement operators
-			{
-				Code: `(foo-- || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo--)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(--foo || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(--foo)?.bar;`,
-					}},
-				}},
-			},
-			// Logical AND within empty object
-			{
-				Code: `((foo && bar) || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo && bar)?.baz;`,
-					}},
-				}},
-			},
-			// Nullish coalescing on left side
-			{
-				Code: `((foo ?? bar) || {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo ?? bar)?.baz;`,
-					}},
-				}},
-			},
-			// Comparison operators
-			{
-				Code: `((foo > 0) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo > 0)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo < 10) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo < 10)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo >= 0) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo >= 0)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo <= 10) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo <= 10)?.bar;`,
-					}},
-				}},
-			},
-			// Typeof operator
-			{
-				Code: `((typeof foo) || {}).length;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(typeof foo)?.length;`,
-					}},
-				}},
-			},
-			// If-block context tests
-			{
-				Code: `if (foo) { (foo || {}).bar; }`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `if (foo) { foo?.bar; }`,
-					}},
-				}},
-			},
-			{
-				Code: `if ((foo || {}).bar) { foo.bar; }`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `if (foo?.bar) { foo.bar; }`,
-					}},
-				}},
-			},
-			// Ternary expression
-			{
-				Code: `((a ? b : c) || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a ? b : c)?.bar;`,
-					}},
-				}},
-			},
-			// undefined && foo || {} pattern
-			{
-				Code: `(undefined && foo || {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(undefined && foo)?.bar;`,
-					}},
-				}},
-			},
-		})
+				})
+			}
+			result = append(result, rule_tester.InvalidTestCase{
+				Code:   replaceEmptyObjectOperator(tmpl.Code, op),
+				Errors: errors,
+			})
+		}
+	}
+
+	return result
 }
 
 // =============================================================================
-// SECTION 1b: ?? {} Tests (Nullish Coalescing Empty Object Pattern)
+// SECTION 1: Empty Object Pattern Tests (|| {} and ?? {})
+// Source: upstream prefer-optional-chain.test.ts lines 10-693
+// Consolidated from separate || and ?? tests to reduce duplication
 // =============================================================================
 
-func TestNullishCoalescingEmptyObjectPattern(t *testing.T) {
+func TestEmptyObjectPattern(t *testing.T) {
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule,
-		// Valid cases
-		[]rule_tester.ValidTestCase{
-			{Code: `foo ?? {};`},         // No property access
-			{Code: `(foo ?? {})?.bar;`},  // Already optional
-			{Code: `foo ||= bar ?? {};`}, // Assignment operator with ??
-		},
-		// Invalid cases
-		[]rule_tester.InvalidTestCase{
-			// Basic ?? {} pattern
-			{
-				Code: `(foo ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo ?? ({})).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(await foo ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(await foo)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo1?.foo2 ?? {}).foo3;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo1?.foo2?.foo3;`,
-					}},
-				}},
-			},
-			{
-				Code: `((() => foo())() ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(() => foo())()?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `const foo = (bar ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `const foo = bar?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo.bar ?? {})[baz];`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo.bar?.[baz];`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo1 ?? {}).foo2 ?? {}).foo3;`,
-				Errors: []rule_tester.InvalidTestCaseError{
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `(foo1 ?? {}).foo2?.foo3;`,
-						}},
-					},
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `(foo1?.foo2 ?? {}).foo3;`,
-						}},
-					},
-				},
-			},
-			{
-				Code: `(foo ?? undefined ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo ?? undefined)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo() ?? bar ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo() ?? bar)?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo1 ? foo2 : foo3) ?? {}).foo4;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo1 ? foo2 : foo3)?.foo4;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a > b ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a > b)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((a << b) ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a << b)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo ** 2) ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo ** 2)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo++ ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo++)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(+foo ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(+foo)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(void foo() ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(void foo())?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(new Foo() ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `new Foo()?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo, bar) ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo, bar)?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `((class {}) ?? {}).name;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(class {})?.name;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo?.() ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `foo?.()?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(delete foo.bar ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(delete foo.bar)?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `(('foo' in bar) ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `('foo' in bar)?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a + b - c ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a + b - c)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a | b ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a | b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `(a & b ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a & b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `(/test/ ?? {}).source;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `/test/?.source;`,
-					}},
-				}},
-			},
-			{
-				Code: "(tag`template` ?? {}).foo;",
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    "tag`template`?.foo;",
-					}},
-				}},
-			},
-			{
-				Code: `([foo, bar] ?? {}).length;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `[foo, bar]?.length;`,
-					}},
-				}},
-			},
-			{
-				Code: `({...foo, bar: 1} ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `{...foo, bar: 1}?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `(function() { return foo; } ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `function() { return foo; }?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(!(foo === bar) ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(!(foo === bar))?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `(!foo ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(!foo)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((a | b) ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a | b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `((a & b) ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a & b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `((a ^ b) ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a ^ b)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `((a + b - c) ?? {}).foo;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(a + b - c)?.foo;`,
-					}},
-				}},
-			},
-			{
-				Code: `((~foo) ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(~foo)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(foo-- ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo--)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `(((foo ?? {}).bar ?? {}).baz ?? {}).qux;`,
-				Errors: []rule_tester.InvalidTestCaseError{
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `((foo ?? {}).bar ?? {}).baz?.qux;`,
-						}},
-					},
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `((foo ?? {}).bar?.baz ?? {}).qux;`,
-						}},
-					},
-					{
-						MessageId: "preferOptionalChain",
-						Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-							MessageId: "optionalChainSuggest",
-							Output:    `((foo?.bar ?? {}).baz ?? {}).qux;`,
-						}},
-					},
-				},
-			},
-			{
-				Code: `((foo && bar) ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo && bar)?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo || bar) ?? {}).baz;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo || bar)?.baz;`,
-					}},
-				}},
-			},
-			{
-				Code: `((foo > 0) ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(foo > 0)?.bar;`,
-					}},
-				}},
-			},
-			{
-				Code: `((typeof foo) ?? {}).length;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(typeof foo)?.length;`,
-					}},
-				}},
-			},
-			// If-block context tests
-			{
-				Code: `if (foo) { (foo ?? {}).bar; }`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `if (foo) { foo?.bar; }`,
-					}},
-				}},
-			},
-			{
-				Code: `if ((foo ?? {}).bar) { foo.bar; }`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `if (foo?.bar) { foo.bar; }`,
-					}},
-				}},
-			},
-			// undefined && foo ?? {} pattern
-			{
-				Code: `(undefined && foo ?? {}).bar;`,
-				Errors: []rule_tester.InvalidTestCaseError{{
-					MessageId: "preferOptionalChain",
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
-						MessageId: "optionalChainSuggest",
-						Output:    `(undefined && foo)?.bar;`,
-					}},
-				}},
-			},
-		})
+		GenerateEmptyObjectValidCases(),
+		GenerateEmptyObjectInvalidCases())
 }
 
 // =============================================================================
