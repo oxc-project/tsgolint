@@ -43,6 +43,49 @@ const (
 	OperandTypeStrictEqualUndef                // foo === undefined (inverted check in && chains)
 )
 
+// isNullishCheckType returns true if the operand type represents any kind of null/undefined check.
+// This includes both strict (===, !==) and loose (==, !=) null checks, as well as typeof checks.
+func isNullishCheckType(typ OperandType) bool {
+	return typ == OperandTypeNotStrictEqualNull ||
+		typ == OperandTypeNotStrictEqualUndef ||
+		typ == OperandTypeNotEqualBoth ||
+		typ == OperandTypeStrictEqualNull ||
+		typ == OperandTypeEqualNull ||
+		typ == OperandTypeStrictEqualUndef ||
+		typ == OperandTypeTypeofCheck
+}
+
+// isStrictNullishCheck returns true if the operand type is a strict (!==) nullish check.
+// Used to detect incomplete nullish check patterns.
+func isStrictNullishCheck(typ OperandType) bool {
+	return typ == OperandTypeNotStrictEqualNull || typ == OperandTypeNotStrictEqualUndef
+}
+
+// isExplicitNullishCheck returns true if the operand type is any explicit nullish check
+// (not a plain truthiness check). Includes strict, loose, and typeof checks.
+func isExplicitNullishCheck(typ OperandType) bool {
+	return typ == OperandTypeNotStrictEqualNull ||
+		typ == OperandTypeNotStrictEqualUndef ||
+		typ == OperandTypeNotEqualBoth ||
+		typ == OperandTypeTypeofCheck
+}
+
+// isTrailingComparisonType returns true if the operand type could be a trailing comparison/check.
+// This includes strict null checks, loose null checks, and value comparisons.
+// Used when determining which operands to exclude from guard checks.
+func isTrailingComparisonType(typ OperandType) bool {
+	return typ == OperandTypeNotStrictEqualNull ||
+		typ == OperandTypeNotStrictEqualUndef ||
+		typ == OperandTypeNotEqualBoth ||
+		typ == OperandTypeComparison
+}
+
+// isComparisonOrNullCheck returns true if the operand type is a comparison or any null/undefined check.
+// Used to determine if an operand should be treated as a trailing comparison in the output.
+func isComparisonOrNullCheck(typ OperandType) bool {
+	return typ == OperandTypeComparison || isNullishCheckType(typ)
+}
+
 // Operand represents a parsed operand in a logical chain
 type Operand struct {
 	typ          OperandType
@@ -68,10 +111,11 @@ func stripParens(text string) string {
 		// Check if the opening and closing parens are paired
 		depth := 0
 		paired := true
-		for i := 0; i < len(text); i++ {
-			if text[i] == '(' {
+		for i := range len(text) {
+			switch text[i] {
+			case '(':
 				depth++
-			} else if text[i] == ')' {
+			case ')':
 				depth--
 				if depth == 0 && i < len(text)-1 {
 					// Found closing paren before end - not fully paired
@@ -97,9 +141,10 @@ func removeAllParens(text string) string {
 	inCall := false
 	depth := 0
 
-	for i := 0; i < len(text); i++ {
+	for i := range len(text) {
 		ch := text[i]
-		if ch == '(' {
+		switch ch {
+		case '(':
 			// Check if this looks like a function call (preceded by identifier, ], ), or > for generic calls)
 			// Added > to handle foo<T>() pattern where ( follows the >
 			if i > 0 && (text[i-1] == ']' || text[i-1] == ')' || text[i-1] == '>' || (text[i-1] >= 'a' && text[i-1] <= 'z') || (text[i-1] >= 'A' && text[i-1] <= 'Z') || text[i-1] == '_' || text[i-1] == '$' || (text[i-1] >= '0' && text[i-1] <= '9')) {
@@ -111,7 +156,7 @@ func removeAllParens(text string) string {
 				// Grouping parentheses, skip it
 				depth++
 			}
-		} else if ch == ')' {
+		case ')':
 			depth--
 			if inCall && depth == 0 {
 				inCall = false
@@ -121,7 +166,7 @@ func removeAllParens(text string) string {
 			} else {
 				result.WriteByte(ch)
 			}
-		} else {
+		default:
 			result.WriteByte(ch)
 		}
 	}
@@ -142,9 +187,10 @@ func removeTypeAnnotations(text string) string {
 		depth := 1
 		gtIndex := -1
 		for i := ltIndex + 1; i < len(text); i++ {
-			if text[i] == '<' {
+			switch text[i] {
+			case '<':
 				depth++
-			} else if text[i] == '>' {
+			case '>':
 				depth--
 				if depth == 0 {
 					gtIndex = i
@@ -1467,6 +1513,128 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, isAndChain bool) O
 	return Operand{typ: OperandTypeInvalid, node: node}
 }
 
+// collectOperands collects all operands from a binary expression tree with the given operator kind.
+// Returns the operand nodes (preserving parentheses for range calculation) and marks binary expressions as seen.
+func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind ast.Kind) []*ast.Node {
+	operandNodes := []*ast.Node{}
+	var collect func(*ast.Node)
+	collect = func(n *ast.Node) {
+		// Check the unwrapped node for the operator type
+		unwrapped := unwrapParentheses(n)
+
+		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == operatorKind {
+			binExpr := unwrapped.AsBinaryExpression()
+			collect(binExpr.Left)
+			collect(binExpr.Right)
+			processor.seenLogicals[unwrapped] = true
+		} else {
+			// Store the original node (with parentheses) for range calculation
+			operandNodes = append(operandNodes, n)
+		}
+	}
+	collect(node)
+	return operandNodes
+}
+
+// collectOperandsWithRanges collects all operands and also returns ranges of binary expressions.
+// This is used by OR chains which use range-based seen tracking instead of node-based.
+func (processor *chainProcessor) collectOperandsWithRanges(node *ast.Node, operatorKind ast.Kind) ([]*ast.Node, []textRange) {
+	operandNodes := []*ast.Node{}
+	binaryRanges := []textRange{}
+	var collect func(*ast.Node)
+	collect = func(n *ast.Node) {
+		// Check the unwrapped node for the operator type
+		unwrapped := unwrapParentheses(n)
+
+		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == operatorKind {
+			binExpr := unwrapped.AsBinaryExpression()
+			collect(binExpr.Left)
+			collect(binExpr.Right)
+			// Collect the range for marking as seen
+			binRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, unwrapped)
+			binaryRanges = append(binaryRanges, textRange{start: binRange.Pos(), end: binRange.End()})
+		} else {
+			// Store the original node (with parentheses) for range calculation
+			operandNodes = append(operandNodes, n)
+		}
+	}
+	collect(node)
+	return operandNodes, binaryRanges
+}
+
+// hasPropertyAccessInChain checks if at least one operand in the chain involves property/element/call access.
+// Returns false for patterns like: foo != null && foo !== undefined (just null checks, no access)
+func (processor *chainProcessor) hasPropertyAccessInChain(chain []Operand) bool {
+	for _, op := range chain {
+		if op.comparedExpr != nil {
+			unwrapped := unwrapParentheses(op.comparedExpr)
+			if ast.IsPropertyAccessExpression(unwrapped) ||
+				ast.IsElementAccessExpression(unwrapped) ||
+				ast.IsCallExpression(unwrapped) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// hasSameBaseIdentifier checks if all operands in the chain have the same base identifier.
+// Returns false if different bases are found (e.g., a === undefined || b === null)
+func (processor *chainProcessor) hasSameBaseIdentifier(chain []Operand) bool {
+	var firstBase *ast.Node
+	for _, op := range chain {
+		if op.comparedExpr == nil {
+			continue
+		}
+		base := getBaseIdentifier(op.comparedExpr)
+		if firstBase == nil {
+			firstBase = base
+		} else {
+			// Compare base identifiers
+			firstBaseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, firstBase)
+			baseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, base)
+			if firstBaseRange.Pos() >= 0 && firstBaseRange.End() <= len(processor.sourceText) &&
+				baseRange.Pos() >= 0 && baseRange.End() <= len(processor.sourceText) {
+				firstBaseText := processor.sourceText[firstBaseRange.Pos():firstBaseRange.End()]
+				baseText := processor.sourceText[baseRange.Pos():baseRange.End()]
+				if firstBaseText != baseText {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+// shouldSkipForRequireNullish checks if the chain should be skipped based on requireNullish option.
+// When requireNullish is true, only convert chains that have explicit nullish checks or nullable types.
+func (processor *chainProcessor) shouldSkipForRequireNullish(chain []Operand, isAndChain bool) bool {
+	if !processor.opts.RequireNullish {
+		return false
+	}
+
+	// For OR chains starting with negation, skip entirely
+	if !isAndChain && len(chain) > 0 && chain[0].typ == OperandTypeNot {
+		return true
+	}
+
+	// Check if any operand has an explicit nullish context
+	for i, op := range chain {
+		// Check for explicit nullish check operators
+		if op.typ != OperandTypePlain {
+			return false // Has nullish context, don't skip
+		}
+		// For plain && checks, allow if the type explicitly includes null/undefined
+		// (but only for intermediate operands, not the last one)
+		if isAndChain && i < len(chain)-1 && op.comparedExpr != nil {
+			if processor.includesExplicitNullish(op.comparedExpr) {
+				return false // Has nullish type, don't skip
+			}
+		}
+	}
+	return true // No nullish context found, skip
+}
+
 // processAndChain processes && chains: foo && foo.bar -> foo?.bar
 func (processor *chainProcessor) processAndChain(node *ast.Node) {
 	if !ast.IsBinaryExpression(node) {
@@ -1537,24 +1705,8 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 
 	allLogicalNodes := flattenAndMarkLogicals(node)
 
-	// Collect all && operands (keeping track of original nodes with parentheses)
-	operandNodes := []*ast.Node{}
-	var collect func(*ast.Node)
-	collect = func(n *ast.Node) {
-		// Check the unwrapped node for the operator type
-		unwrapped := unwrapParentheses(n)
-
-		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == ast.KindAmpersandAmpersandToken {
-			binExpr := unwrapped.AsBinaryExpression()
-			collect(binExpr.Left)
-			collect(binExpr.Right)
-			processor.seenLogicals[unwrapped] = true
-		} else {
-			// Store the original node (with parentheses) for range calculation
-			operandNodes = append(operandNodes, n)
-		}
-	}
-	collect(node)
+	// Collect all && operands using the shared helper
+	operandNodes := processor.collectOperands(node, ast.KindAmpersandAmpersandToken)
 
 	if len(operandNodes) < 2 {
 		return
@@ -1666,9 +1818,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		if len(currentChain) > 0 {
 			prevOp := currentChain[len(currentChain)-1]
 			// Only consider STRICT checks, not loose checks (!= null)
-			isStrictExplicitCheck := prevOp.typ == OperandTypeNotStrictEqualNull ||
-				prevOp.typ == OperandTypeNotStrictEqualUndef
-			if isStrictExplicitCheck && prevOp.comparedExpr != nil {
+			if isStrictNullishCheck(prevOp.typ) && prevOp.comparedExpr != nil {
 				prevUnwrapped := prevOp.comparedExpr
 				for ast.IsParenthesizedExpression(prevUnwrapped) {
 					prevUnwrapped = prevUnwrapped.AsParenthesizedExpression().Expression
@@ -1781,16 +1931,14 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// foo !== null && foo !== undefined
 			// OR might be a duplicate plain check: foo.bar.baz && foo.bar.baz
 			// OR a check followed by access: foo.bar !== null && foo.bar
-			if op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeNotStrictEqualUndef ||
-				op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeTypeofCheck {
+			if isExplicitNullishCheck(op.typ) {
 
 				// Check for inconsistent check types
 				// If we had a "both" check (!= null) and now have a specific check (!== undefined or !== null),
 				// This is redundant but not incorrect - include it and continue
 				// We DON'T mark the chain as complete because subsequent property accesses should be included
 				// Example: foo != null && foo !== undefined && foo.bar -> foo?.bar (all checks on foo)
-				if lastCheckType == OperandTypeNotEqualBoth &&
-					(op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeNotStrictEqualUndef) {
+				if lastCheckType == OperandTypeNotEqualBoth && isStrictNullishCheck(op.typ) {
 					// Include this redundant check
 					currentChain = append(currentChain, op)
 					// Update lastCheckType to the more specific check
@@ -1860,10 +2008,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				// If so, this is the pattern: foo.bar !== null && foo.bar
 				// We should include this in the chain as it's the actual access after the check
 				prevOp := currentChain[len(currentChain)-1]
-				if prevOp.typ == OperandTypeNotStrictEqualNull ||
-					prevOp.typ == OperandTypeNotStrictEqualUndef ||
-					prevOp.typ == OperandTypeNotEqualBoth ||
-					prevOp.typ == OperandTypeTypeofCheck {
+				if isExplicitNullishCheck(prevOp.typ) {
 					// Previous was a null check on the same expression, include this access
 					currentChain = append(currentChain, op)
 					// Don't update lastExpr since we're accessing the same thing
@@ -1880,10 +2025,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				// Example: typeof foo.bar.baz !== 'undefined' && foo.bar.baz <= 100
 				// The comparison is a trailing comparison that should be included
 				prevOp := currentChain[len(currentChain)-1]
-				if prevOp.typ == OperandTypeNotStrictEqualNull ||
-					prevOp.typ == OperandTypeNotStrictEqualUndef ||
-					prevOp.typ == OperandTypeNotEqualBoth ||
-					prevOp.typ == OperandTypeTypeofCheck {
+				if isExplicitNullishCheck(prevOp.typ) {
 					// Previous was a null/typeof check on the same expression
 					// Include this trailing comparison and mark chain as complete
 					currentChain = append(currentChain, op)
@@ -1901,19 +2043,11 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// But FINALIZE for call expression chains (to avoid multiple evaluations)
 			// Example to ALLOW: foo != null && foo.bar != null && foo.bar.baz (property chain)
 			// Example to FINALIZE: foo.bar !== undefined && foo.bar() !== undefined (call chain)
-			isExplicitCheck := op.typ == OperandTypeNotStrictEqualNull ||
-				op.typ == OperandTypeNotStrictEqualUndef ||
-				op.typ == OperandTypeNotEqualBoth ||
-				op.typ == OperandTypeTypeofCheck
-
-			if isExplicitCheck && len(currentChain) >= 2 {
+			if isExplicitNullishCheck(op.typ) && len(currentChain) >= 2 {
 				// Check if we already have at least one explicit check in the chain
 				hasExplicitCheck := false
 				for _, chainOp := range currentChain {
-					if chainOp.typ == OperandTypeNotStrictEqualNull ||
-						chainOp.typ == OperandTypeNotStrictEqualUndef ||
-						chainOp.typ == OperandTypeNotEqualBoth ||
-						chainOp.typ == OperandTypeTypeofCheck {
+					if isExplicitNullishCheck(chainOp.typ) {
 						hasExplicitCheck = true
 						break
 					}
@@ -2188,7 +2322,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					// Count strict checks in the chain
 					strictCheckCount := 0
 					for _, chainOp := range currentChain {
-						if chainOp.typ == OperandTypeNotStrictEqualNull || chainOp.typ == OperandTypeNotStrictEqualUndef {
+						if isStrictNullishCheck(chainOp.typ) {
 							strictCheckCount++
 						}
 					}
@@ -2198,7 +2332,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					// - Current operand is also a strict check (resulting in 2+ strict checks)
 					if !shouldStopChain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing &&
 						strictCheckCount >= 1 && lastChainOp.comparedExpr != nil &&
-						(op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeNotStrictEqualUndef) {
+						isStrictNullishCheck(op.typ) {
 						isAnyOrUnknown := processor.typeIsAnyOrUnknown(lastChainOp.comparedExpr)
 						hasNull := processor.typeIncludesNull(lastChainOp.comparedExpr)
 						hasUndefined := processor.typeIncludesUndefined(lastChainOp.comparedExpr)
@@ -2268,12 +2402,11 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// IMPORTANT: When allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing
 			// is enabled, we should NOT stop at incomplete strict checks - allow full conversion.
 			if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing &&
-				(op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeNotStrictEqualUndef) {
+				isStrictNullishCheck(op.typ) {
 				// Check if any PREVIOUS operand (not the one we just added) has an incomplete strict check
-				for j := 0; j < len(currentChain)-1; j++ {
+				for j := range len(currentChain) - 1 {
 					prevOp := currentChain[j]
-					if (prevOp.typ == OperandTypeNotStrictEqualNull || prevOp.typ == OperandTypeNotStrictEqualUndef) &&
-						prevOp.comparedExpr != nil {
+					if isStrictNullishCheck(prevOp.typ) && prevOp.comparedExpr != nil {
 						isAnyOrUnknown := processor.typeIsAnyOrUnknown(prevOp.comparedExpr)
 						hasNull := processor.typeIncludesNull(prevOp.comparedExpr)
 						hasUndefined := processor.typeIncludesUndefined(prevOp.comparedExpr)
@@ -2516,9 +2649,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// This should be optimized to: foo?.bar?.baz != null
 		if len(chain) >= 2 {
 			firstOp := chain[0]
-			isStrictCheck := firstOp.typ == OperandTypeNotStrictEqualNull ||
-				firstOp.typ == OperandTypeNotStrictEqualUndef
-			if isStrictCheck && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
+			if isStrictNullishCheck(firstOp.typ) && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
 				// Check if this is a split strict equals pattern
 				isSplitStrictEquals := false
 				if len(chain) == 2 {
@@ -2559,19 +2690,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// Ensure at least one operand involves property/element/call access
 		// Pattern to skip: foo != null && foo !== undefined (just null checks, no access)
 		// Pattern to allow: foo != null && foo.bar (has property access)
-		hasPropertyAccess := false
-		for _, op := range chain {
-			if op.comparedExpr != nil {
-				unwrapped := unwrapParentheses(op.comparedExpr)
-				if ast.IsPropertyAccessExpression(unwrapped) ||
-					ast.IsElementAccessExpression(unwrapped) ||
-					ast.IsCallExpression(unwrapped) {
-					hasPropertyAccess = true
-					break
-				}
-			}
-		}
-		if !hasPropertyAccess {
+		if !processor.hasPropertyAccessInChain(chain) {
 			continue // No property access, nothing to chain
 		}
 
@@ -2592,7 +2711,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					allSameExpr = false
 					break
 				}
-				for j := 0; j < len(firstParts); j++ {
+				for j := range firstParts {
 					if firstParts[j].text != opParts[j].text {
 						allSameExpr = false
 						break
@@ -2660,7 +2779,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				if len(secondParts) == len(firstParts)+1 {
 					// Check if all parts match except the last
 					allMatch := true
-					for i := 0; i < len(firstParts); i++ {
+					for i := range firstParts {
 						if firstParts[i].text != secondParts[i].text || firstParts[i].optional != secondParts[i].optional {
 							allMatch = false
 							break
@@ -2680,7 +2799,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					if len(secondParts) > len(firstParts) && len(firstParts) > 0 {
 						// Check if the bases match (first N parts are the same)
 						basesMatch := true
-						for i := 0; i < len(firstParts); i++ {
+						for i := range firstParts {
 							if firstParts[i].text != secondParts[i].text {
 								basesMatch = false
 								break
@@ -2710,26 +2829,8 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// When requireNullish is true, only convert chains that either:
 		// 1. Have explicit nullish check operators (!=null, !==undefined, etc.), OR
 		// 2. Have types that explicitly include null/undefined
-		if processor.opts.RequireNullish {
-			hasNullishContext := false
-			for i, op := range chain {
-				// Check for explicit nullish check operators
-				if op.typ != OperandTypePlain {
-					hasNullishContext = true
-					break
-				}
-				// For plain && checks, allow if the type explicitly includes null/undefined
-				// (but only for intermediate operands, not the last one)
-				if i < len(chain)-1 && op.comparedExpr != nil {
-					if processor.includesExplicitNullish(op.comparedExpr) {
-						hasNullishContext = true
-						break
-					}
-				}
-			}
-			if !hasNullishContext {
-				continue // Skip chains without nullish context when requireNullish is true
-			}
+		if processor.shouldSkipForRequireNullish(chain, true) {
+			continue // Skip chains without nullish context when requireNullish is true
 		}
 
 		// CRITICAL: Check for void type in plain && chains
@@ -2804,8 +2905,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				// Exclude the last operand from guard checks in most cases:
 				// - If it's a comparison type, it's a trailing comparison
 				// - If it's Plain but extends a previous operand, it's the accessed expression
-				if lastOp.typ == OperandTypeNotStrictEqualNull || lastOp.typ == OperandTypeNotStrictEqualUndef ||
-					lastOp.typ == OperandTypeNotEqualBoth || lastOp.typ == OperandTypeComparison {
+				if isTrailingComparisonType(lastOp.typ) {
 					// Trailing comparison - always exclude
 					guardOperands = chain[:len(chain)-1]
 				} else if lastOp.typ == OperandTypePlain && lastOp.comparedExpr != nil {
@@ -3152,7 +3252,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// We want to exclude the final access that we're converting, but include
 		// all the checks that happen before it
 		checksToConsider := []Operand{}
-		for i := 0; i < len(chain); i++ {
+		for i := range chain {
 			op := chain[i]
 			// Skip the last operand if it's the final access (not a check)
 			isLastOperand := i == len(chain)-1
@@ -3326,7 +3426,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					// Check if opParts is a prefix of parts
 					if len(opParts) <= len(parts) {
 						isPrefix := true
-						for i := 0; i < len(opParts); i++ {
+						for i := range opParts {
 							opText := strings.TrimSuffix(opParts[i].text, "!")
 							partText := strings.TrimSuffix(parts[i].text, "!")
 							if opText != partText {
@@ -3345,7 +3445,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// For optional chains (?.), use ANY operand that has it
 			// For non-null assertions (!), use the SHORTEST operand that covers this index
 			// This ensures we preserve ! from the earliest check, not from later extended checks
-			for i := 0; i < len(parts); i++ {
+			for i := range parts {
 				// Find the shortest operand that covers this index (for non-null assertions)
 				var shortestCoveringOp *opPartsInfo
 				for j := range allOpParts {
@@ -3562,7 +3662,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// if the conversion is safe or not
 		if useSuggestion && len(chain) > 2 {
 			allIntermediateNullable := true
-			for i := 0; i < len(chain)-1; i++ {
+			for i := range len(chain) - 1 {
 				op := chain[i]
 				if op.comparedExpr != nil && !processor.includesExplicitNullish(op.comparedExpr) {
 					allIntermediateNullable = false
@@ -3671,28 +3771,8 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		return
 	}
 
-	// Collect all || operands (keeping track of original nodes with parentheses)
-	// Also collect all binary expression ranges to mark them as seen
-	operandNodes := []*ast.Node{}
-	var collectedBinaryRanges []textRange
-	var collect func(*ast.Node)
-	collect = func(n *ast.Node) {
-		// Check the unwrapped node for the operator type
-		unwrapped := unwrapParentheses(n)
-
-		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == ast.KindBarBarToken {
-			binExpr := unwrapped.AsBinaryExpression()
-			collect(binExpr.Left)
-			collect(binExpr.Right)
-			// Mark nested binary expressions by range
-			binRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, unwrapped)
-			collectedBinaryRanges = append(collectedBinaryRanges, textRange{start: binRange.Pos(), end: binRange.End()})
-		} else {
-			// Store the original node (with parentheses) for range calculation
-			operandNodes = append(operandNodes, n)
-		}
-	}
-	collect(node)
+	// Collect all || operands and binary expression ranges using the shared helper
+	operandNodes, collectedBinaryRanges := processor.collectOperandsWithRanges(node, ast.KindBarBarToken)
 
 	// Mark all collected binary expression ranges as seen
 	for _, r := range collectedBinaryRanges {
@@ -3723,7 +3803,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	var lastExpr *ast.Node
 	var hasTrailingComparison bool
 
-	for i := 0; i < len(operands); i++ {
+	for i := range operands {
 		op := operands[i]
 
 		// Accept OperandTypeNot, OperandTypeComparison, OperandTypePlain, typeof checks, and null check types
@@ -3760,14 +3840,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			lastExpr = op.comparedExpr
 			// Set hasTrailingComparison for both value comparisons AND null checks
 			// Null checks like foo.bar == null should be preserved in the output
-			isComparison := op.typ == OperandTypeComparison
-			isNullCheck := op.typ == OperandTypeNotStrictEqualNull ||
-				op.typ == OperandTypeNotStrictEqualUndef ||
-				op.typ == OperandTypeNotEqualBoth ||
-				op.typ == OperandTypeStrictEqualNull ||
-				op.typ == OperandTypeEqualNull ||
-				op.typ == OperandTypeStrictEqualUndef
-			if isComparison || isNullCheck {
+			if isComparisonOrNullCheck(op.typ) {
 				hasTrailingComparison = true
 			}
 			continue
@@ -3835,14 +3908,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			chain = append(chain, op)
 			lastExpr = op.comparedExpr
 			// Set hasTrailingComparison for both value comparisons AND null checks
-			isComparison := op.typ == OperandTypeComparison
-			isNullCheck := op.typ == OperandTypeNotStrictEqualNull ||
-				op.typ == OperandTypeNotStrictEqualUndef ||
-				op.typ == OperandTypeNotEqualBoth ||
-				op.typ == OperandTypeStrictEqualNull ||
-				op.typ == OperandTypeEqualNull ||
-				op.typ == OperandTypeStrictEqualUndef
-			if isComparison || isNullCheck {
+			if isComparisonOrNullCheck(op.typ) {
 				hasTrailingComparison = true
 			}
 
@@ -3865,46 +3931,14 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	// Check if all operands in the chain have the same base identifier
 	// Example: a === undefined || b === null - different bases (a vs b), skip
 	// Example: foo === null || foo.bar - same base (foo), allow
-	var firstBase *ast.Node
-	for _, op := range chain {
-		if op.comparedExpr == nil {
-			continue
-		}
-		base := getBaseIdentifier(op.comparedExpr)
-		if firstBase == nil {
-			firstBase = base
-		} else {
-			// Compare base identifiers
-			firstBaseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, firstBase)
-			baseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, base)
-			sourceText := processor.sourceText
-			if firstBaseRange.Pos() >= 0 && firstBaseRange.End() <= len(sourceText) &&
-				baseRange.Pos() >= 0 && baseRange.End() <= len(sourceText) {
-				firstBaseText := sourceText[firstBaseRange.Pos():firstBaseRange.End()]
-				baseText := sourceText[baseRange.Pos():baseRange.End()]
-				if firstBaseText != baseText {
-					return // Different base identifiers in the same chain
-				}
-			}
-		}
+	if !processor.hasSameBaseIdentifier(chain) {
+		return // Different base identifiers in the same chain
 	}
 
 	// Ensure at least one operand involves property/element/call access
 	// Pattern to skip: foo === null || foo === undefined (just null checks, no access)
 	// Pattern to allow: foo === null || foo.bar (has property access)
-	hasPropertyAccess := false
-	for _, op := range chain {
-		if op.comparedExpr != nil {
-			unwrapped := unwrapParentheses(op.comparedExpr)
-			if ast.IsPropertyAccessExpression(unwrapped) ||
-				ast.IsElementAccessExpression(unwrapped) ||
-				ast.IsCallExpression(unwrapped) {
-				hasPropertyAccess = true
-				break
-			}
-		}
-	}
-	if !hasPropertyAccess {
+	if !processor.hasPropertyAccessInChain(chain) {
 		return // No property access, nothing to chain
 	}
 
@@ -3963,14 +3997,10 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 				// - !foo || foo.bar != null (loose not-equal with null/undefined - NOT safe)
 				allNegatedOrSafeComparisonOrNullCheck := true
 				for i := 1; i < len(chain); i++ {
-					isNullCheck := chain[i].typ == OperandTypeNotStrictEqualNull ||
-						chain[i].typ == OperandTypeNotStrictEqualUndef ||
-						chain[i].typ == OperandTypeNotEqualBoth ||
-						chain[i].typ == OperandTypeTypeofCheck
 					isComparison := chain[i].typ == OperandTypeComparison
 					isSafeComparison := isComparison && processor.isOrChainComparisonSafe(chain[i])
 
-					if chain[i].typ != OperandTypeNot && !isSafeComparison && !isNullCheck {
+					if chain[i].typ != OperandTypeNot && !isSafeComparison && !isNullishCheckType(chain[i].typ) {
 						allNegatedOrSafeComparisonOrNullCheck = false
 						break
 					}
@@ -4010,11 +4040,8 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 
 	// When requireNullish is true, skip chains that start with negation (!foo || !foo.bar)
 	// Only allow chains that start with explicit null checks (foo == null || foo.bar)
-	if processor.opts.RequireNullish {
-		firstOpIsNegation := chain[0].typ == OperandTypeNot
-		if firstOpIsNegation {
-			return
-		}
+	if processor.shouldSkipForRequireNullish(chain, false) {
+		return
 	}
 
 	// Skip OR chains starting with import.meta (import.meta || import.meta.url)
@@ -4168,7 +4195,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	// Converting would change semantics: !a.b || a.b() !== !a.b?.()
 	// HOWEVER, allow !a.b || !a.b() (both negated) - this CAN be converted to !a.b?.()
 	if len(chain) >= 2 {
-		for i := 0; i < len(chain)-1; i++ {
+		for i := range len(chain) - 1 {
 			if chain[i].typ == OperandTypeNot {
 				// Check if any subsequent operand is a call to the same base
 				// BUT only if that subsequent operand is NOT also negated
@@ -4330,14 +4357,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	hasTrailingComparisonForFix := false
 	if len(chainForOptional) > 0 {
 		lastOpForFix := chainForOptional[len(chainForOptional)-1]
-		isComparison := lastOpForFix.typ == OperandTypeComparison
-		isNullCheck := lastOpForFix.typ == OperandTypeNotStrictEqualNull ||
-			lastOpForFix.typ == OperandTypeNotStrictEqualUndef ||
-			lastOpForFix.typ == OperandTypeNotEqualBoth ||
-			lastOpForFix.typ == OperandTypeStrictEqualNull ||
-			lastOpForFix.typ == OperandTypeEqualNull ||
-			lastOpForFix.typ == OperandTypeStrictEqualUndef
-		hasTrailingComparisonForFix = isComparison || isNullCheck
+		hasTrailingComparisonForFix = isComparisonOrNullCheck(lastOpForFix.typ)
 	}
 
 	if hasTrailingComparisonForFix {
