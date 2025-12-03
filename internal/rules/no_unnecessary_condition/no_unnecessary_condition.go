@@ -312,6 +312,65 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return nodeType
 		}
 
+		// isInConditionalContext checks if a node is used in a boolean conditional context.
+		// Returns true if the node is used as a condition (if/while/for/ternary).
+		// Returns false if it's in a non-conditional context (variable assignment, function argument, etc.).
+		var isInConditionalContext func(*ast.Node) bool
+		isInConditionalContext = func(node *ast.Node) bool {
+			if node == nil || node.Parent == nil {
+				return false
+			}
+
+			parent := node.Parent
+
+			switch parent.Kind {
+			case ast.KindIfStatement:
+				// Check if node is the condition
+				ifStmt := parent.AsIfStatement()
+				return ifStmt.Expression == node
+
+			case ast.KindWhileStatement:
+				whileStmt := parent.AsWhileStatement()
+				return whileStmt.Expression == node
+
+			case ast.KindDoStatement:
+				doStmt := parent.AsDoStatement()
+				return doStmt.Expression == node
+
+			case ast.KindForStatement:
+				forStmt := parent.AsForStatement()
+				return forStmt.Condition == node
+
+			case ast.KindConditionalExpression:
+				condExpr := parent.AsConditionalExpression()
+				return condExpr.Condition == node
+
+			case ast.KindPrefixUnaryExpression:
+				// ! operator - recursively check parent
+				unaryExpr := parent.AsPrefixUnaryExpression()
+				if unaryExpr.Operator == ast.KindExclamationToken {
+					return isInConditionalContext(parent)
+				}
+				return false
+
+			case ast.KindBinaryExpression:
+				// Logical operators (&&, ||) - recursively check parent
+				binExpr := parent.AsBinaryExpression()
+				opKind := binExpr.OperatorToken.Kind
+				if opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindBarBarToken {
+					return isInConditionalContext(parent)
+				}
+				return false
+
+			case ast.KindParenthesizedExpression:
+				// Parentheses - recursively check parent
+				return isInConditionalContext(parent)
+
+			default:
+				return false
+			}
+		}
+
 		isLiteralBoolean := func(node *ast.Node) bool {
 			skipNode := ast.SkipParentheses(node)
 			return skipNode.Kind == ast.KindTrueKeyword || skipNode.Kind == ast.KindFalseKeyword
@@ -459,7 +518,14 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					return false
 				}
 
-				// Check for array type by symbol name
+				// Check for array type by number index type
+				// Arrays have a number index type (arr[number] returns the element type)
+				numberIndexType := ctx.TypeChecker.GetNumberIndexType(t)
+				if numberIndexType != nil {
+					return true
+				}
+
+				// Check for array type by symbol name (fallback)
 				if t.Symbol() != nil {
 					symbolName := t.Symbol().Name
 					if symbolName == "Array" || symbolName == "ReadonlyArray" {
@@ -478,13 +544,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					return false
 				}
 
-				// Check if this expression is an array element access
+				// Without noUncheckedIndexedAccess, any element access might return undefined
+				// so we conservatively allow optional chaining after any element access
 				if expr.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-					elemAccess := expr.AsElementAccessExpression()
-					baseType := getResolvedType(elemAccess.Expression)
-					if baseType != nil && isArrayOrTupleType(baseType) {
-						return true
-					}
+					return true
 				}
 
 				// Recursively check the base expression
@@ -984,7 +1047,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// For assignment operators (&&=, ||=), don't check the right side as a condition
 					// The right side is a value being assigned, not a condition
 					// For regular operators (&&, ||), check the right side only if it would be evaluated
-					if !isAssignment && !skipRight {
+					// AND if we're in a conditional context (e.g., if/while/for/ternary)
+					if !isAssignment && !skipRight && isInConditionalContext(node) {
 						// Control flow narrowing: if left and right are the same expression
 						// and this is an &&, then right is always truthy (since we already checked left)
 						if isAndOperator && isSameExpression(binExpr.Left, binExpr.Right) {
@@ -1198,8 +1262,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 			},
 			ast.KindSwitchStatement: func(node *ast.Node) {
-				switchStmt := node.AsSwitchStatement()
-				checkCondition(switchStmt.Expression)
+				// Don't check switch expressions as conditions
+				// Switch statements compare values, not boolean conditions
+				// e.g., switch (true) { case condition: } is valid
 			},
 			ast.KindCaseClause: func(node *ast.Node) {
 				if node.Expression() != nil {
