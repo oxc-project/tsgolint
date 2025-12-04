@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "prefer_optional_chain_options": {
+      "type": "object",
+      "properties": {
+        "allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": {
+          "type": "boolean",
+          "default": false
+        },
+        "checkAny": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkBigInt": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkBoolean": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkNumber": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkString": {
+          "type": "boolean",
+          "default": true
+        },
+        "checkUnknown": {
+          "type": "boolean",
+          "default": true
+        },
+        "requireNullish": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

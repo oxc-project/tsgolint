@@ -16,7 +16,7 @@ import (
 
 func CreateCompilerHost(cwd string, fs vfs.FS) compiler.CompilerHost {
 	defaultLibraryPath := bundled.LibPath()
-	return compiler.NewCompilerHost(cwd, fs, defaultLibraryPath, nil, nil)
+	return NewCompilerHost(cwd, fs, defaultLibraryPath, nil, nil)
 }
 
 func enhanceHelpDiagnosticMessage(msg string) string {
