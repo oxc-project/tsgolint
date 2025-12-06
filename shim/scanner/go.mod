@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/scanner
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251203212037-25d94f62fc22
+require github.com/microsoft/typescript-go v0.0.0-20251206074146-1d138eaa29bc
 
 require (
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
