@@ -139,6 +139,8 @@ func ResolvePath(path string, paths ...string) string
 func ResolveTripleslashReference(moduleName string, containingFile string) string
 //go:linkname SplitVolumePath github.com/microsoft/typescript-go/internal/tspath.SplitVolumePath
 func SplitVolumePath(path string) (volume string, rest string, ok bool)
+//go:linkname StartsWithDirectory github.com/microsoft/typescript-go/internal/tspath.StartsWithDirectory
+func StartsWithDirectory(fileName string, directoryName string, useCaseSensitiveFileNames bool) bool
 var SupportedJSExtensions = tspath.SupportedJSExtensions
 var SupportedJSExtensionsFlat = tspath.SupportedJSExtensionsFlat
 var SupportedTSExtensions = tspath.SupportedTSExtensions
