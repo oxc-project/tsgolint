@@ -2,7 +2,7 @@
 
 package no_unnecessary_boolean_literal_compare
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type NoUnnecessaryBooleanLiteralCompareOptions struct {
 	// AllowComparingNullableBooleansToFalse corresponds to the JSON schema field

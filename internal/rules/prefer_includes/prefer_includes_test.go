@@ -90,6 +90,29 @@ func TestPreferIncludesRule(t *testing.T) {
         return pattern.test(a);
       }
     `},
+		{Code: `
+      const numbers = /\d/;
+      function f(password: string): void {
+        if (numbers.test(password)) {
+          // Should not be flagged - \d is a regex metacharacter
+        }
+      }
+    `},
+		{Code: `
+      function f(password: string): void {
+        /\d/.test(password);
+      }
+    `},
+		{Code: `
+      function f(text: string): void {
+        /\w+/.test(text);
+      }
+    `},
+		{Code: `
+      function f(text: string): void {
+        /\s/.test(text);
+      }
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `

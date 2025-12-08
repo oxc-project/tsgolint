@@ -10,6 +10,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/microsoft/typescript-go/shim/tspath"
+	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -98,9 +99,16 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 
 				diagnostics = append(diagnostics, diagnostic)
 			},
+			func(d diagnostic.Internal) {
+				// Internal diagnostics are not used in rule tester
+			},
 			linter.Fixes{
 				Fix:            true,
 				FixSuggestions: true,
+			},
+			linter.TypeErrors{
+				ReportSyntactic: false,
+				ReportSemantic:  false,
 			},
 		)
 

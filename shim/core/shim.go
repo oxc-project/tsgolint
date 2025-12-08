@@ -5,7 +5,6 @@ package core
 
 import "context"
 import "github.com/microsoft/typescript-go/internal/core"
-import "golang.org/x/text/language"
 import "iter"
 import _ "unsafe"
 
@@ -26,8 +25,6 @@ func ComputeECMALineStarts(text string) core.ECMALineStarts
 func ComputeECMALineStartsSeq(text string) iter.Seq[core.TextPos]
 type ECMALineStarts = core.ECMALineStarts
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
-//go:linkname GetLocale github.com/microsoft/typescript-go/internal/core.GetLocale
-func GetLocale(ctx context.Context) language.Tag
 //go:linkname GetNewLineKind github.com/microsoft/typescript-go/internal/core.GetNewLineKind
 func GetNewLineKind(s string) core.NewLineKind
 //go:linkname GetRequestID github.com/microsoft/typescript-go/internal/core.GetRequestID
@@ -173,8 +170,6 @@ const WatchFileKindPriorityPollingInterval = core.WatchFileKindPriorityPollingIn
 const WatchFileKindUseFsEvents = core.WatchFileKindUseFsEvents
 const WatchFileKindUseFsEventsOnParentDirectory = core.WatchFileKindUseFsEventsOnParentDirectory
 type WatchOptions = core.WatchOptions
-//go:linkname WithLocale github.com/microsoft/typescript-go/internal/core.WithLocale
-func WithLocale(ctx context.Context, locale language.Tag) context.Context
 //go:linkname WithRequestID github.com/microsoft/typescript-go/internal/core.WithRequestID
 func WithRequestID(ctx context.Context, id string) context.Context
 type WorkGroup = core.WorkGroup

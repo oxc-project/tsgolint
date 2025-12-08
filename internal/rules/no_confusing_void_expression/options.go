@@ -2,7 +2,7 @@
 
 package no_confusing_void_expression
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type NoConfusingVoidExpressionOptions struct {
 	// IgnoreArrowShorthand corresponds to the JSON schema field

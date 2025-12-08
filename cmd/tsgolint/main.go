@@ -16,6 +16,7 @@ import (
 	"time"
 	"unicode"
 
+	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -481,9 +482,16 @@ func runMain() int {
 		func(d rule.RuleDiagnostic) {
 			diagnosticsChan <- d
 		},
+		func(d diagnostic.Internal) {
+			// Internal diagnostics are not used in this mode
+		},
 		linter.Fixes{
 			Fix:            true,
 			FixSuggestions: true,
+		},
+		linter.TypeErrors{
+			ReportSyntactic: false,
+			ReportSemantic:  false,
 		},
 	)
 
