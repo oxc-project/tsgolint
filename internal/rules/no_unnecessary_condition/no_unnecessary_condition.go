@@ -140,7 +140,10 @@ func buildTypeGuardAlreadyIsTypeMessage() rule.RuleMessage {
 // with other types at compile time, so we conservatively avoid reporting them.
 func isIndeterminateType(t *checker.Type) bool {
 	flags := checker.Type_flags(t)
-	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndexedAccess|checker.TypeFlagsIndex) != 0
+	// Note: We don't include TypeFlagsIndexedAccess because TypeScript resolves
+	// indexed access types like T[K] to concrete types (e.g., number, string)
+	// TypeFlagsIndex is for the index type operator (keyof T), which is indeterminate
+	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndex) != 0
 }
 
 // isAlwaysNullishType checks if a type is always null, undefined, or void.
@@ -377,12 +380,26 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		}
 
 		checkCondition := func(node *ast.Node) {
-			// Skip negation expressions - they're handled by KindPrefixUnaryExpression listener
+			// Skip single negation expressions - they're handled by KindPrefixUnaryExpression listener
+			// But don't skip double negation (!!a) - that should be checked here
 			skipNode := ast.SkipParentheses(node)
 			if skipNode.Kind == ast.KindPrefixUnaryExpression {
 				unaryExpr := skipNode.AsPrefixUnaryExpression()
 				if unaryExpr.Operator == ast.KindExclamationToken {
-					return
+					// Check if operand is also a negation (double negation)
+					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
+					if operandSkipped.Kind == ast.KindPrefixUnaryExpression {
+						innerUnary := operandSkipped.AsPrefixUnaryExpression()
+						if innerUnary.Operator == ast.KindExclamationToken {
+							// Double negation - don't skip, check it here
+							// Fall through to check the condition
+						} else {
+							return
+						}
+					} else {
+						// Single negation - skip
+						return
+					}
 				}
 			}
 
@@ -430,9 +447,18 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				elemAccess := skipNode.AsElementAccessExpression()
 				baseType := getResolvedType(elemAccess.Expression)
 				if baseType != nil {
-					// Check if it's a tuple type (e.g., [number, string])
+					// Check if it's a tuple type with literal index (safe) or variable index (unsafe)
 					if checker.IsTupleType(baseType) {
-						return
+						// If accessing with literal numeric index, it's safe - don't skip
+						if elemAccess.ArgumentExpression != nil {
+							arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
+							// Numeric literal or other literals are safe
+							if arg.Kind != ast.KindNumericLiteral && arg.Kind != ast.KindFirstLiteralToken {
+								// Variable or computed index - unsafe, skip check
+								return
+							}
+						}
+						// Literal index - safe, continue to check
 					}
 					// Check if it's an array type (e.g., number[], Array<string>)
 					if baseType.Symbol() != nil {
@@ -576,17 +602,73 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			expressionSkipped := ast.SkipParentheses(expression)
 
-			// Rule 1: Expression itself is unguarded element access
+			// Rule 1: Expression itself is unguarded element access (but not safe tuple access)
 			if expressionSkipped.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 				elemAccess := expressionSkipped.AsElementAccessExpression()
 				if elemAccess.QuestionDotToken == nil {
-					return
+					// Check if this is a safe tuple access with literal index
+					isSafeTupleAccess := false
+					if elemAccess.ArgumentExpression != nil {
+						arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
+						// Check if argument is a numeric literal
+						if arg.Kind == ast.KindNumericLiteral || arg.Kind == ast.KindFirstLiteralToken {
+							// Check if base type is a tuple
+							baseType := getResolvedType(elemAccess.Expression)
+							if baseType != nil && checker.IsTupleType(baseType) {
+								isSafeTupleAccess = true
+							}
+						}
+					}
+					if !isSafeTupleAccess {
+						return
+					}
 				}
 			}
 
-			// Rule 2: Expression uses optional chaining AND contains unguarded element access
-			if usesOptionalChaining(expression) && containsUnguardedElementAccess(expression) {
-				return
+			// Rule 2: Expression uses optional chaining AND contains unguarded element access (but not safe tuple access)
+			if usesOptionalChaining(expression) {
+				// Check if contains unguarded element access that's not a safe tuple access
+				var hasUnsafeElementAccess func(*ast.Node) bool
+				hasUnsafeElementAccess = func(expr *ast.Node) bool {
+					if expr == nil {
+						return false
+					}
+					expr = ast.SkipParentheses(expr)
+
+					if expr.Kind == ast.KindElementAccessExpression {
+						elemAccess := expr.AsElementAccessExpression()
+						if elemAccess.QuestionDotToken == nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+							// Check if this is safe tuple access
+							isSafeTupleAccess := false
+							if elemAccess.ArgumentExpression != nil {
+								arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
+								if arg.Kind == ast.KindNumericLiteral || arg.Kind == ast.KindFirstLiteralToken {
+									baseType := getResolvedType(elemAccess.Expression)
+									if baseType != nil && checker.IsTupleType(baseType) {
+										isSafeTupleAccess = true
+									}
+								}
+							}
+							if !isSafeTupleAccess {
+								return true
+							}
+						}
+						return hasUnsafeElementAccess(elemAccess.Expression)
+					}
+
+					if expr.Kind == ast.KindPropertyAccessExpression {
+						return hasUnsafeElementAccess(expr.AsPropertyAccessExpression().Expression)
+					}
+					if expr.Kind == ast.KindCallExpression {
+						return hasUnsafeElementAccess(expr.AsCallExpression().Expression)
+					}
+
+					return false
+				}
+
+				if hasUnsafeElementAccess(expression) {
+					return
+				}
 			}
 
 			// Helper function to check if a type is an array or tuple type
@@ -1317,11 +1399,35 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
 				unaryExpr := node.AsPrefixUnaryExpression()
 				if unaryExpr.Operator == ast.KindExclamationToken {
+					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
+
 					// Skip element access - they can return undefined at runtime
 					// even if TypeScript type doesn't reflect this (without noUncheckedIndexedAccess)
-					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
 					if operandSkipped.Kind == ast.KindElementAccessExpression {
 						return
+					}
+
+					// For double negation (!!a), skip if operand is simple identifier with literal boolean type
+					// This avoids duplicate errors when both inner and outer negations are checked
+					if operandSkipped.Kind == ast.KindIdentifier {
+						operandType := getResolvedType(unaryExpr.Operand)
+						if operandType != nil {
+							// Check if it's a literal boolean type (true or false, not just boolean)
+							flags := checker.Type_flags(operandType)
+							if flags&(checker.TypeFlagsBooleanLiteral) != 0 {
+								// Skip - this is likely part of !!a pattern, checked in conditional context
+								return
+							}
+						}
+					}
+
+					// Skip if operand is another negation (outer negation of !!a)
+					if operandSkipped.Kind == ast.KindPrefixUnaryExpression {
+						innerUnary := operandSkipped.AsPrefixUnaryExpression()
+						if innerUnary.Operator == ast.KindExclamationToken {
+							// Skip - let the conditional context check handle !!a
+							return
+						}
 					}
 
 					// For negation operator (!), check the operand type
