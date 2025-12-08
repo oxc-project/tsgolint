@@ -519,6 +519,76 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
+			// Check if we should skip the check due to unguarded element access
+			// Rules:
+			// 1. If expression itself is unguarded element access - skip (arr[0]?.foo)
+			// 2. If expression uses optional chaining AND contains unguarded element access - skip (arr[0]?.foo?.bar)
+			// 3. If expression doesn't use optional chaining - don't skip (arr[0].foo?.bar)
+
+			// Helper: Check if expression or its chain contains unguarded element access
+			var containsUnguardedElementAccess func(*ast.Node) bool
+			containsUnguardedElementAccess = func(expr *ast.Node) bool {
+				if expr == nil {
+					return false
+				}
+				expr = ast.SkipParentheses(expr)
+
+				// Check if this is an unguarded element access
+				if expr.Kind == ast.KindElementAccessExpression {
+					elemAccess := expr.AsElementAccessExpression()
+					if elemAccess.QuestionDotToken == nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+						return true
+					}
+					// Check deeper
+					return containsUnguardedElementAccess(elemAccess.Expression)
+				}
+
+				// Check deeper in property/call chains
+				if expr.Kind == ast.KindPropertyAccessExpression {
+					return containsUnguardedElementAccess(expr.AsPropertyAccessExpression().Expression)
+				}
+				if expr.Kind == ast.KindCallExpression {
+					return containsUnguardedElementAccess(expr.AsCallExpression().Expression)
+				}
+
+				return false
+			}
+
+			// Helper: Check if expression uses optional chaining
+			var usesOptionalChaining func(*ast.Node) bool
+			usesOptionalChaining = func(expr *ast.Node) bool {
+				if expr == nil {
+					return false
+				}
+				expr = ast.SkipParentheses(expr)
+
+				if expr.Kind == ast.KindPropertyAccessExpression && expr.AsPropertyAccessExpression().QuestionDotToken != nil {
+					return true
+				}
+				if expr.Kind == ast.KindElementAccessExpression && expr.AsElementAccessExpression().QuestionDotToken != nil {
+					return true
+				}
+				if expr.Kind == ast.KindCallExpression && expr.AsCallExpression().QuestionDotToken != nil {
+					return true
+				}
+				return false
+			}
+
+			expressionSkipped := ast.SkipParentheses(expression)
+
+			// Rule 1: Expression itself is unguarded element access
+			if expressionSkipped.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+				elemAccess := expressionSkipped.AsElementAccessExpression()
+				if elemAccess.QuestionDotToken == nil {
+					return
+				}
+			}
+
+			// Rule 2: Expression uses optional chaining AND contains unguarded element access
+			if usesOptionalChaining(expression) && containsUnguardedElementAccess(expression) {
+				return
+			}
+
 			// Helper function to check if a type is an array or tuple type
 			var isArrayOrTupleType func(*checker.Type) bool
 			isArrayOrTupleType = func(t *checker.Type) bool {
@@ -559,39 +629,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return false
 			}
 
-			// Helper function to check if an expression chain contains array element access
-			// without noUncheckedIndexedAccess, which "infects" the entire chain
-			var hasArrayAccessInChain func(*ast.Node) bool
-			hasArrayAccessInChain = func(expr *ast.Node) bool {
-				if expr == nil {
-					return false
-				}
 
-				// Without noUncheckedIndexedAccess, any element access might return undefined
-				// so we conservatively allow optional chaining after any element access
-				if expr.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-					return true
-				}
-
-				// Recursively check the base expression
-				switch expr.Kind {
-				case ast.KindPropertyAccessExpression:
-					return hasArrayAccessInChain(expr.AsPropertyAccessExpression().Expression)
-				case ast.KindElementAccessExpression:
-					return hasArrayAccessInChain(expr.AsElementAccessExpression().Expression)
-				case ast.KindCallExpression:
-					return hasArrayAccessInChain(expr.AsCallExpression().Expression)
-				}
-
-				return false
-			}
-
-			// Check if expression or any part of the chain contains array element access
-			// e.g., arr[42]?.value or arr[42]?.x?.y?.z
-			// The array access "infects" the entire chain because arr[42] might be undefined
-			if hasArrayAccessInChain(expression) {
-				return
-			}
 
 			// Check if the expression is itself an optional chain (chained access)
 			// For foo?.bar?.baz, when checking the second ?.:
@@ -894,50 +932,59 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check nullish coalescing operator (??)
 				if opKind == ast.KindQuestionQuestionToken {
-					// Check if the left side is an array element access without noUncheckedIndexedAccess
+					// Check if the left side contains an array element access without noUncheckedIndexedAccess
 					// In this case, the ?? is justified even if the type appears non-nullish
 					// EXCEPT when the element type itself is always nullish (e.g., null[])
-					leftSkip := ast.SkipParentheses(binExpr.Left)
-					if leftSkip.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-						elemAccess := leftSkip.AsElementAccessExpression()
-						baseType := getResolvedType(elemAccess.Expression)
-						if baseType != nil {
-							// Helper function to check if a type is an array or tuple type (reuse from checkOptionalChain)
-							var isArrayOrTupleTypeLocal func(*checker.Type) bool
-							isArrayOrTupleTypeLocal = func(t *checker.Type) bool {
-								if t == nil {
-									return false
-								}
-								if checker.IsTupleType(t) {
-									return true
-								}
-								if utils.IsUnionType(t) {
-									for _, part := range t.Types() {
-										if isArrayOrTupleTypeLocal(part) {
-											return true
-										}
-									}
-									return false
-								}
-								if t.Symbol() != nil {
-									symbolName := t.Symbol().Name
-									if symbolName == "Array" || symbolName == "ReadonlyArray" {
-										return true
-									}
-								}
-								return false
-							}
-							if isArrayOrTupleTypeLocal(baseType) {
-								// Check if the element type is always nullish (e.g., null[])
-								// In that case, we should still report the error
-								leftType := getResolvedType(binExpr.Left)
-								if leftType != nil && !isAlwaysNullishType(leftType) {
-									// Element type is not always nullish, so skip the check
-									return
-								}
-								// Element type is always nullish, continue to check
-							}
+
+					// Helper to check if an expression has optional chaining
+					var hasOptionalChain func(*ast.Node) bool
+					hasOptionalChain = func(n *ast.Node) bool {
+						if n == nil {
+							return false
 						}
+						n = ast.SkipParentheses(n)
+						// Check if this node has optional chaining
+						if n.Kind == ast.KindPropertyAccessExpression && n.AsPropertyAccessExpression().QuestionDotToken != nil {
+							return true
+						}
+						if n.Kind == ast.KindElementAccessExpression && n.AsElementAccessExpression().QuestionDotToken != nil {
+							return true
+						}
+						if n.Kind == ast.KindCallExpression && n.AsCallExpression().QuestionDotToken != nil {
+							return true
+						}
+						// Check in the expression chain
+						if n.Kind == ast.KindPropertyAccessExpression {
+							return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
+						}
+						if n.Kind == ast.KindElementAccessExpression {
+							return hasOptionalChain(n.AsElementAccessExpression().Expression)
+						}
+						if n.Kind == ast.KindCallExpression {
+							return hasOptionalChain(n.AsCallExpression().Expression)
+						}
+						return false
+					}
+
+					// Helper to check if an expression contains an element access
+					var containsElementAccess func(*ast.Node) bool
+					containsElementAccess = func(n *ast.Node) bool {
+						if n == nil {
+							return false
+						}
+						n = ast.SkipParentheses(n)
+						if n.Kind == ast.KindElementAccessExpression {
+							return true
+						}
+						// Check in property access chains
+						if n.Kind == ast.KindPropertyAccessExpression {
+							return containsElementAccess(n.AsPropertyAccessExpression().Expression)
+						}
+						// Check in call expressions
+						if n.Kind == ast.KindCallExpression {
+							return containsElementAccess(n.AsCallExpression().Expression)
+						}
+						return false
 					}
 
 					leftType := getResolvedType(binExpr.Left)
@@ -960,6 +1007,23 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 
+						// Skip nullish coalescing checks for element access when noUncheckedIndexedAccess is disabled
+						// UNLESS the type is clearly always or never nullish (checked above)
+						// 1. Left side IS directly an element access (arr[0] ?? 'default')
+						// 2. Left side has optional chaining AND contains element access (arr[0]?.foo ?? 'default')
+						// But NOT: Left side has no optional chain but contains element access (arr[0].foo ?? 'default')
+						if !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+							leftSkip := ast.SkipParentheses(binExpr.Left)
+							if leftSkip.Kind == ast.KindElementAccessExpression {
+								// Case 1: Direct element access - skip check
+								return
+							}
+							if hasOptionalChain(binExpr.Left) && containsElementAccess(binExpr.Left) {
+								// Case 2: Optional chain with element access - skip check
+								return
+							}
+						}
+
 						// Check if the value is never nullish
 						if !isNullishType(ctx.TypeChecker, leftType) {
 							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
@@ -970,6 +1034,57 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check nullish coalescing assignment operator (??=)
 				if opKind == ast.KindQuestionQuestionEqualsToken {
+					// Helper to check if an expression has optional chaining
+					var hasOptionalChain func(*ast.Node) bool
+					hasOptionalChain = func(n *ast.Node) bool {
+						if n == nil {
+							return false
+						}
+						n = ast.SkipParentheses(n)
+						// Check if this node has optional chaining
+						if n.Kind == ast.KindPropertyAccessExpression && n.AsPropertyAccessExpression().QuestionDotToken != nil {
+							return true
+						}
+						if n.Kind == ast.KindElementAccessExpression && n.AsElementAccessExpression().QuestionDotToken != nil {
+							return true
+						}
+						if n.Kind == ast.KindCallExpression && n.AsCallExpression().QuestionDotToken != nil {
+							return true
+						}
+						// Check in the expression chain
+						if n.Kind == ast.KindPropertyAccessExpression {
+							return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
+						}
+						if n.Kind == ast.KindElementAccessExpression {
+							return hasOptionalChain(n.AsElementAccessExpression().Expression)
+						}
+						if n.Kind == ast.KindCallExpression {
+							return hasOptionalChain(n.AsCallExpression().Expression)
+						}
+						return false
+					}
+
+					// Helper to check if an expression contains an element access
+					var containsElementAccess func(*ast.Node) bool
+					containsElementAccess = func(n *ast.Node) bool {
+						if n == nil {
+							return false
+						}
+						n = ast.SkipParentheses(n)
+						if n.Kind == ast.KindElementAccessExpression {
+							return true
+						}
+						// Check in property access chains
+						if n.Kind == ast.KindPropertyAccessExpression {
+							return containsElementAccess(n.AsPropertyAccessExpression().Expression)
+						}
+						// Check in call expressions
+						if n.Kind == ast.KindCallExpression {
+							return containsElementAccess(n.AsCallExpression().Expression)
+						}
+						return false
+					}
+
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
 						// Don't report on indeterminate types
@@ -977,29 +1092,45 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 
+						// Check for always nullish first (before skipping for element access)
+						if isAlwaysNullishType(leftType) {
+							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
+							return
+						}
+
+						leftSkip := ast.SkipParentheses(binExpr.Left)
+
+						// Skip nullish coalescing assignment checks for element access when noUncheckedIndexedAccess is disabled
+						// UNLESS the type is clearly always or never nullish (checked above/below)
+						// 1. Left side IS directly an element access (arr[0] ??= 'default')
+						// 2. Left side has optional chaining AND contains element access (arr[0]?.foo ??= 'default')
+						// But NOT: Left side has no optional chain but contains element access (arr[0].foo ??= 'default')
+						if !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+							if leftSkip.Kind == ast.KindElementAccessExpression {
+								// Case 1: Direct element access - skip check
+								return
+							}
+							if hasOptionalChain(binExpr.Left) && containsElementAccess(binExpr.Left) {
+								// Case 2: Optional chain with element access - skip check
+								return
+							}
+						}
+
 						// Skip optional property access - with exactOptionalPropertyTypes,
 						// the type doesn't include undefined but the property can still be absent
-						if binExpr.Left.Kind == ast.KindPropertyAccessExpression || binExpr.Left.Kind == ast.KindElementAccessExpression {
-							// Check if accessing an optional property or using indexed access with union keys
+						if binExpr.Left.Kind == ast.KindPropertyAccessExpression {
+							// Check if accessing an optional property
 							var propSymbol *ast.Symbol
-							switch binExpr.Left.Kind {
-							case ast.KindPropertyAccessExpression:
-								propAccess := binExpr.Left.AsPropertyAccessExpression()
-								nameNode := propAccess.Name()
-								if nameNode != nil {
-									propName := ast.GetTextOfPropertyName(nameNode)
-									if propName != "" {
-										baseType := getResolvedType(propAccess.Expression)
-										if baseType != nil {
-											propSymbol = checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
-										}
+							propAccess := binExpr.Left.AsPropertyAccessExpression()
+							nameNode := propAccess.Name()
+							if nameNode != nil {
+								propName := ast.GetTextOfPropertyName(nameNode)
+								if propName != "" {
+									baseType := getResolvedType(propAccess.Expression)
+									if baseType != nil {
+										propSymbol = checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
 									}
 								}
-							case ast.KindElementAccessExpression:
-								// For element access, we can't reliably determine if the property is optional
-								// because the key might be a union type or computed at runtime
-								// So we skip the check for element access
-								return
 							}
 							// If property is optional, skip check (property may be undefined even if type doesn't show it)
 							if propSymbol != nil && propSymbol.Flags&ast.SymbolFlagsOptional != 0 {
