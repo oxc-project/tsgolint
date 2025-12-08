@@ -380,26 +380,42 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		}
 
 		checkCondition := func(node *ast.Node) {
-			// Skip single negation expressions - they're handled by KindPrefixUnaryExpression listener
-			// But don't skip double negation (!!a) - that should be checked here
 			skipNode := ast.SkipParentheses(node)
+
+			// Handle negation operator (!)
 			if skipNode.Kind == ast.KindPrefixUnaryExpression {
 				unaryExpr := skipNode.AsPrefixUnaryExpression()
 				if unaryExpr.Operator == ast.KindExclamationToken {
-					// Check if operand is also a negation (double negation)
 					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
-					if operandSkipped.Kind == ast.KindPrefixUnaryExpression {
-						innerUnary := operandSkipped.AsPrefixUnaryExpression()
-						if innerUnary.Operator == ast.KindExclamationToken {
-							// Double negation - don't skip, check it here
-							// Fall through to check the condition
-						} else {
-							return
-						}
-					} else {
-						// Single negation - skip
+
+					// Skip element access - they can return undefined at runtime
+					if operandSkipped.Kind == ast.KindElementAccessExpression {
 						return
 					}
+
+					// Get operand type
+					operandType := getResolvedType(unaryExpr.Operand)
+					if operandType == nil {
+						return
+					}
+
+					// Special case: never type
+					flags := checker.Type_flags(operandType)
+					if flags&checker.TypeFlagsNever != 0 {
+						ctx.ReportNode(unaryExpr.Operand, buildNeverMessage())
+						return
+					}
+
+					// Check if operand is always truthy or falsy
+					isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, operandType)
+					if isTruthy {
+						// operand is always truthy, so !operand is always falsy
+						ctx.ReportNode(node, buildAlwaysFalsyMessage())
+					} else if isFalsy {
+						// operand is always falsy, so !operand is always truthy
+						ctx.ReportNode(node, buildAlwaysTruthyMessage())
+					}
+					return
 				}
 			}
 
@@ -1200,23 +1216,28 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 						// Skip optional property access - with exactOptionalPropertyTypes,
 						// the type doesn't include undefined but the property can still be absent
+						// Also skip private properties - they have complex semantics
 						if binExpr.Left.Kind == ast.KindPropertyAccessExpression {
-							// Check if accessing an optional property
-							var propSymbol *ast.Symbol
 							propAccess := binExpr.Left.AsPropertyAccessExpression()
 							nameNode := propAccess.Name()
 							if nameNode != nil {
+								// Skip private identifiers (e.g., #rand)
+								// Private fields can be optional, and type checking is complex
+								if nameNode.Kind == ast.KindPrivateIdentifier {
+									return
+								}
+
+								// Regular property - check if optional
 								propName := ast.GetTextOfPropertyName(nameNode)
 								if propName != "" {
 									baseType := getResolvedType(propAccess.Expression)
 									if baseType != nil {
-										propSymbol = checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
+										propSymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
+										if propSymbol != nil && propSymbol.Flags&ast.SymbolFlagsOptional != 0 {
+											return
+										}
 									}
 								}
-							}
-							// If property is optional, skip check (property may be undefined even if type doesn't show it)
-							if propSymbol != nil && propSymbol.Flags&ast.SymbolFlagsOptional != 0 {
-								return
 							}
 						}
 
@@ -1396,63 +1417,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					}
 				}
 			},
-			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
-				unaryExpr := node.AsPrefixUnaryExpression()
-				if unaryExpr.Operator == ast.KindExclamationToken {
-					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
-
-					// Skip element access - they can return undefined at runtime
-					// even if TypeScript type doesn't reflect this (without noUncheckedIndexedAccess)
-					if operandSkipped.Kind == ast.KindElementAccessExpression {
-						return
-					}
-
-					// For double negation (!!a), skip if operand is simple identifier with literal boolean type
-					// This avoids duplicate errors when both inner and outer negations are checked
-					if operandSkipped.Kind == ast.KindIdentifier {
-						operandType := getResolvedType(unaryExpr.Operand)
-						if operandType != nil {
-							// Check if it's a literal boolean type (true or false, not just boolean)
-							flags := checker.Type_flags(operandType)
-							if flags&(checker.TypeFlagsBooleanLiteral) != 0 {
-								// Skip - this is likely part of !!a pattern, checked in conditional context
-								return
-							}
-						}
-					}
-
-					// Skip if operand is another negation (outer negation of !!a)
-					if operandSkipped.Kind == ast.KindPrefixUnaryExpression {
-						innerUnary := operandSkipped.AsPrefixUnaryExpression()
-						if innerUnary.Operator == ast.KindExclamationToken {
-							// Skip - let the conditional context check handle !!a
-							return
-						}
-					}
-
-					// For negation operator (!), check the operand type
-					operandType := getResolvedType(unaryExpr.Operand)
-					if operandType == nil {
-						return
-					}
-
-					// Special case: never type
-					flags := checker.Type_flags(operandType)
-					if flags&checker.TypeFlagsNever != 0 {
-						ctx.ReportNode(unaryExpr.Operand, buildNeverMessage())
-						return
-					}
-
-					isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, operandType)
-					if isTruthy {
-						// operand is always truthy, so !operand is always falsy
-						ctx.ReportNode(node, buildAlwaysFalsyMessage())
-					} else if isFalsy {
-						// operand is always falsy, so !operand is always truthy
-						ctx.ReportNode(node, buildAlwaysTruthyMessage())
-					}
-				}
-			},
+			// Note: Negation operator (!) is handled in checkCondition, not as a separate listener
+			// This prevents duplicate errors for patterns like !!a
 			ast.KindPropertyAccessExpression: checkOptionalChain,
 			ast.KindElementAccessExpression:  checkOptionalChain,
 			ast.KindCallExpression: func(node *ast.Node) {
