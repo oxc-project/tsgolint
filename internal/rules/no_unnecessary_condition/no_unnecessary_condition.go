@@ -445,6 +445,20 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 			}
 
+			// Without strict null checks, null/undefined are valid values for all types
+			// This means we can't reliably check conditions because:
+			// - `string | null` becomes just `string` (null is already a valid string value)
+			// - Objects can be null even if not explicitly typed as nullable
+			// Skip checking in this case unless the user explicitly allows it
+			if !isStrictNullChecks {
+				// If the type includes Object flag, it might be nullable in unstrict mode
+				// Only check if it's definitely falsy (never, void, etc.)
+				flags := checker.Type_flags(nodeType)
+				if flags&(checker.TypeFlagsObject|checker.TypeFlagsNonPrimitive) != 0 {
+					return
+				}
+			}
+
 			isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, nodeType)
 			if isTruthy {
 				ctx.ReportNode(node, buildAlwaysTruthyMessage())
@@ -1172,7 +1186,34 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			ast.KindPrefixUnaryExpression: func(node *ast.Node) {
 				unaryExpr := node.AsPrefixUnaryExpression()
 				if unaryExpr.Operator == ast.KindExclamationToken {
-					checkCondition(unaryExpr.Operand)
+					// Skip element access - they can return undefined at runtime
+					// even if TypeScript type doesn't reflect this (without noUncheckedIndexedAccess)
+					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
+					if operandSkipped.Kind == ast.KindElementAccessExpression {
+						return
+					}
+
+					// For negation operator (!), check the operand type
+					operandType := getResolvedType(unaryExpr.Operand)
+					if operandType == nil {
+						return
+					}
+
+					// Special case: never type
+					flags := checker.Type_flags(operandType)
+					if flags&checker.TypeFlagsNever != 0 {
+						ctx.ReportNode(unaryExpr.Operand, buildNeverMessage())
+						return
+					}
+
+					isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, operandType)
+					if isTruthy {
+						// operand is always truthy, so !operand is always falsy
+						ctx.ReportNode(node, buildAlwaysFalsyMessage())
+					} else if isFalsy {
+						// operand is always falsy, so !operand is always truthy
+						ctx.ReportNode(node, buildAlwaysTruthyMessage())
+					}
 				}
 			},
 			ast.KindPropertyAccessExpression: checkOptionalChain,
