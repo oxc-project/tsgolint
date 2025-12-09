@@ -5,30 +5,36 @@ package prefer_optional_chain
 import "github.com/go-json-experiment/json"
 
 type PreferOptionalChainOptions struct {
-	// AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing corresponds
-	// to the JSON schema field
-	// "allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing".
+	// Allow autofixers that will change the return type of the expression. This
+	// option is considered unsafe as it may break the build.
 	AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing bool `json:"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing,omitempty"`
 
-	// CheckAny corresponds to the JSON schema field "checkAny".
+	// Check operands that are typed as `any` when inspecting 'loose boolean'
+	// operands.
 	CheckAny bool `json:"checkAny,omitempty"`
 
-	// CheckBigInt corresponds to the JSON schema field "checkBigInt".
+	// Check operands that are typed as `bigint` when inspecting 'loose boolean'
+	// operands.
 	CheckBigInt bool `json:"checkBigInt,omitempty"`
 
-	// CheckBoolean corresponds to the JSON schema field "checkBoolean".
+	// Check operands that are typed as `boolean` when inspecting 'loose boolean'
+	// operands.
 	CheckBoolean bool `json:"checkBoolean,omitempty"`
 
-	// CheckNumber corresponds to the JSON schema field "checkNumber".
+	// Check operands that are typed as `number` when inspecting 'loose boolean'
+	// operands.
 	CheckNumber bool `json:"checkNumber,omitempty"`
 
-	// CheckString corresponds to the JSON schema field "checkString".
+	// Check operands that are typed as `string` when inspecting 'loose boolean'
+	// operands.
 	CheckString bool `json:"checkString,omitempty"`
 
-	// CheckUnknown corresponds to the JSON schema field "checkUnknown".
+	// Check operands that are typed as `unknown` when inspecting 'loose boolean'
+	// operands.
 	CheckUnknown bool `json:"checkUnknown,omitempty"`
 
-	// RequireNullish corresponds to the JSON schema field "requireNullish".
+	// Skip operands that are not typed with `null` and/or `undefined` when inspecting
+	// 'loose boolean' operands.
 	RequireNullish bool `json:"requireNullish,omitempty"`
 }
 
