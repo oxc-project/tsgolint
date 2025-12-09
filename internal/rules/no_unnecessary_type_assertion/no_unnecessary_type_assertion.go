@@ -6,6 +6,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -209,9 +210,8 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 			if node.Kind == ast.KindAsExpression {
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
-					s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
-					asKeywordRange := s.TokenRange()
-					return []rule.RuleFix{rule.RuleFixRemoveRange(asKeywordRange), rule.RuleFixRemove(ctx.SourceFile, typeNode)}
+					// Remove everything from expression end to type end (including whitespace around 'as')
+					return []rule.RuleFix{rule.RuleFixRemoveRange(core.NewTextRange(expression.End(), typeNode.End()))}
 				})
 			} else {
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
