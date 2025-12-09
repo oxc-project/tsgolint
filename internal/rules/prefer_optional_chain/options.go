@@ -2,7 +2,7 @@
 
 package prefer_optional_chain
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type PreferOptionalChainOptions struct {
 	// AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing corresponds
