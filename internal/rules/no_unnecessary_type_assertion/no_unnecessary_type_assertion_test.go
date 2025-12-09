@@ -987,7 +987,7 @@ const foo = (  3 + 5  );
 const foo = (  3 + 5  ) /*as*/ as number;
       `,
 			Output: []string{`
-const foo = (  3 + 5  );
+const foo = (  3 + 5  ) /*as*/;
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -1008,7 +1008,7 @@ const foo = (  3 + 5
       `,
 			Output: []string{`
 const foo = (  3 + 5
-  );
+  ) /*as*/;
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -1040,7 +1040,7 @@ const foo = (3 + (5 as number) );
 const foo = 3 + 5/*as*/ as number;
       `,
 			Output: []string{`
-const foo = 3 + 5;
+const foo = 3 + 5/*as*/;
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -1056,7 +1056,7 @@ const foo = 3 + 5;
 const foo = 3 + 5/*a*/ /*b*/ as number;
       `,
 			Output: []string{`
-const foo = 3 + 5;
+const foo = 3 + 5/*a*/ /*b*/;
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{

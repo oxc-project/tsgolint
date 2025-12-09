@@ -210,8 +210,24 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 			if node.Kind == ast.KindAsExpression {
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
-					// Remove everything from expression end to type end (including whitespace around 'as')
-					return []rule.RuleFix{rule.RuleFixRemoveRange(core.NewTextRange(expression.End(), typeNode.End()))}
+					s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
+					asKeywordStart := s.TokenStart()
+
+					rangeToCheck := core.NewTextRange(expression.End(), asKeywordStart)
+					var removeStart int
+					if utils.HasCommentsInRange(ctx.SourceFile, rangeToCheck) {
+						var lastCommentEnd int
+						for comment := range utils.GetCommentsInRange(ctx.SourceFile, rangeToCheck) {
+							if comment.End() > lastCommentEnd {
+								lastCommentEnd = comment.End()
+							}
+						}
+						removeStart = lastCommentEnd
+					} else {
+						removeStart = expression.End()
+					}
+
+					return []rule.RuleFix{rule.RuleFixRemoveRange(core.NewTextRange(removeStart, typeNode.End()))}
 				})
 			} else {
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
