@@ -5,43 +5,47 @@ package prefer_nullish_coalescing
 import "github.com/go-json-experiment/json"
 
 type PreferNullishCoalescingOptions struct {
-	// AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing corresponds to the JSON
-	// schema field "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing".
+	// Unless this is set to `true`, the rule will error on every file whose
+	// `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or
+	// `strict`) set to `true`.
 	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing bool `json:"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing,omitempty"`
 
-	// IgnoreBooleanCoercion corresponds to the JSON schema field
-	// "ignoreBooleanCoercion".
+	// Whether to ignore arguments to the `Boolean` constructor
 	IgnoreBooleanCoercion bool `json:"ignoreBooleanCoercion,omitempty"`
 
-	// IgnoreConditionalTests corresponds to the JSON schema field
-	// "ignoreConditionalTests".
+	// Whether to ignore cases that are located within a conditional test.
 	IgnoreConditionalTests bool `json:"ignoreConditionalTests,omitempty"`
 
-	// IgnoreIfStatements corresponds to the JSON schema field "ignoreIfStatements".
+	// Whether to ignore any if statements that could be simplified by using the
+	// nullish coalescing operator.
 	IgnoreIfStatements bool `json:"ignoreIfStatements,omitempty"`
 
-	// IgnoreMixedLogicalExpressions corresponds to the JSON schema field
-	// "ignoreMixedLogicalExpressions".
+	// Whether to ignore any logical or expressions that are part of a mixed logical
+	// expression (with `&&`).
 	IgnoreMixedLogicalExpressions bool `json:"ignoreMixedLogicalExpressions,omitempty"`
 
-	// IgnorePrimitives corresponds to the JSON schema field "ignorePrimitives".
+	// Whether to ignore all (`true`) or some (an object with properties) primitive
+	// types.
 	IgnorePrimitives *PreferNullishCoalescingOptionsIgnorePrimitives `json:"ignorePrimitives,omitempty"`
 
-	// IgnoreTernaryTests corresponds to the JSON schema field "ignoreTernaryTests".
+	// Whether to ignore any ternary expressions that could be simplified by using the
+	// nullish coalescing operator.
 	IgnoreTernaryTests bool `json:"ignoreTernaryTests,omitempty"`
 }
 
+// Whether to ignore all (`true`) or some (an object with properties) primitive
+// types.
 type PreferNullishCoalescingOptionsIgnorePrimitives struct {
-	// Bigint corresponds to the JSON schema field "bigint".
+	// Ignore bigint primitive types.
 	Bigint bool `json:"bigint,omitempty"`
 
-	// Boolean corresponds to the JSON schema field "boolean".
+	// Ignore boolean primitive types.
 	Boolean bool `json:"boolean,omitempty"`
 
-	// Number corresponds to the JSON schema field "number".
+	// Ignore number primitive types.
 	Number bool `json:"number,omitempty"`
 
-	// String corresponds to the JSON schema field "string".
+	// Ignore string primitive types.
 	String bool `json:"string,omitempty"`
 }
 
