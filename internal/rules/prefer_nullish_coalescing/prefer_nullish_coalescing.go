@@ -3,6 +3,7 @@ package prefer_nullish_coalescing
 import (
 	"strings"
 
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -318,19 +319,35 @@ var PreferNullishCoalescingRule = rule.Rule{
 
 			// Build ignorable flags based on options
 			var ignorableFlags checker.TypeFlags
-			ignorePrimitives := opts.IgnorePrimitives
-			if ignorePrimitives != nil {
-				if ignorePrimitives.Bigint {
-					ignorableFlags |= checker.TypeFlagsBigIntLike
-				}
-				if ignorePrimitives.Boolean {
-					ignorableFlags |= checker.TypeFlagsBooleanLike
-				}
-				if ignorePrimitives.Number {
-					ignorableFlags |= checker.TypeFlagsNumberLike
-				}
-				if ignorePrimitives.String {
-					ignorableFlags |= checker.TypeFlagsStringLike
+
+			// Handle ignorePrimitives which can be either a boolean or an object
+			if opts.IgnorePrimitives != nil {
+				switch v := opts.IgnorePrimitives.(type) {
+				case bool:
+					if v {
+						// If true, ignore all primitive types
+						ignorableFlags = checker.TypeFlagsBigIntLike | checker.TypeFlagsBooleanLike | checker.TypeFlagsNumberLike | checker.TypeFlagsStringLike
+					}
+				case map[string]interface{}:
+					// It's an object, unmarshal it as IgnorePrimitivesOptions
+					jsonBytes, err := json.Marshal(v)
+					if err == nil {
+						var primitivesOpts IgnorePrimitivesOptions
+						if err := json.Unmarshal(jsonBytes, &primitivesOpts); err == nil {
+							if primitivesOpts.Bigint {
+								ignorableFlags |= checker.TypeFlagsBigIntLike
+							}
+							if primitivesOpts.Boolean {
+								ignorableFlags |= checker.TypeFlagsBooleanLike
+							}
+							if primitivesOpts.Number {
+								ignorableFlags |= checker.TypeFlagsNumberLike
+							}
+							if primitivesOpts.String {
+								ignorableFlags |= checker.TypeFlagsStringLike
+							}
+						}
+					}
 				}
 			}
 

@@ -4,6 +4,47 @@ package prefer_nullish_coalescing
 
 import "github.com/go-json-experiment/json"
 
+type IgnorePrimitivesOptions struct {
+	// Ignore bigint primitive types.
+	Bigint bool `json:"bigint,omitempty"`
+
+	// Ignore boolean primitive types.
+	Boolean bool `json:"boolean,omitempty"`
+
+	// Ignore number primitive types.
+	Number bool `json:"number,omitempty"`
+
+	// Ignore string primitive types.
+	String bool `json:"string,omitempty"`
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *IgnorePrimitivesOptions) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	type Plain IgnorePrimitivesOptions
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["bigint"]; !ok || v == nil {
+		plain.Bigint = false
+	}
+	if v, ok := raw["boolean"]; !ok || v == nil {
+		plain.Boolean = false
+	}
+	if v, ok := raw["number"]; !ok || v == nil {
+		plain.Number = false
+	}
+	if v, ok := raw["string"]; !ok || v == nil {
+		plain.String = false
+	}
+	*j = IgnorePrimitivesOptions(plain)
+	return nil
+}
+
 type PreferNullishCoalescingOptions struct {
 	// Unless this is set to `true`, the rule will error on every file whose
 	// `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or
@@ -26,54 +67,11 @@ type PreferNullishCoalescingOptions struct {
 
 	// Whether to ignore all (`true`) or some (an object with properties) primitive
 	// types.
-	IgnorePrimitives *PreferNullishCoalescingOptionsIgnorePrimitives `json:"ignorePrimitives,omitempty"`
+	IgnorePrimitives interface{} `json:"ignorePrimitives,omitempty"`
 
 	// Whether to ignore any ternary expressions that could be simplified by using the
 	// nullish coalescing operator.
 	IgnoreTernaryTests bool `json:"ignoreTernaryTests,omitempty"`
-}
-
-// Whether to ignore all (`true`) or some (an object with properties) primitive
-// types.
-type PreferNullishCoalescingOptionsIgnorePrimitives struct {
-	// Ignore bigint primitive types.
-	Bigint bool `json:"bigint,omitempty"`
-
-	// Ignore boolean primitive types.
-	Boolean bool `json:"boolean,omitempty"`
-
-	// Ignore number primitive types.
-	Number bool `json:"number,omitempty"`
-
-	// Ignore string primitive types.
-	String bool `json:"string,omitempty"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *PreferNullishCoalescingOptionsIgnorePrimitives) UnmarshalJSON(value []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(value, &raw); err != nil {
-		return err
-	}
-	type Plain PreferNullishCoalescingOptionsIgnorePrimitives
-	var plain Plain
-	if err := json.Unmarshal(value, &plain); err != nil {
-		return err
-	}
-	if v, ok := raw["bigint"]; !ok || v == nil {
-		plain.Bigint = false
-	}
-	if v, ok := raw["boolean"]; !ok || v == nil {
-		plain.Boolean = false
-	}
-	if v, ok := raw["number"]; !ok || v == nil {
-		plain.Number = false
-	}
-	if v, ok := raw["string"]; !ok || v == nil {
-		plain.String = false
-	}
-	*j = PreferNullishCoalescingOptionsIgnorePrimitives(plain)
-	return nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

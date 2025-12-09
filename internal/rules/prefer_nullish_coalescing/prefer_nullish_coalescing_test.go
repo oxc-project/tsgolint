@@ -158,7 +158,35 @@ func TestPreferNullishCoalescingRule(t *testing.T) {
 		{Code: `declare let x: number | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": {"number": true}}`)},
 		{Code: `declare let x: boolean | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": {"boolean": true}}`)},
 		{Code: `declare let x: bigint | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": {"bigint": true}}`)},
-		// ignorePrimitives: all set to true (equivalent to ignorePrimitives: true in typescript-eslint)
+		// ignorePrimitives: true (boolean form - ignores all primitives)
+		{Code: `declare let x: string | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: number | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: boolean | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: bigint | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		// Branded types with ignorePrimitives: true (boolean form)
+		{Code: `declare let x: (string & { __brand?: any }) | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (number & { __brand?: any }) | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (boolean & { __brand?: any }) | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (bigint & { __brand?: any }) | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		// Ternary with ignorePrimitives: true (boolean form)
+		{Code: `declare let x: string | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: string | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: number | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: number | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: boolean | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: boolean | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: bigint | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: bigint | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		// Branded ternary with ignorePrimitives: true (boolean form)
+		{Code: `declare let x: (string & { __brand?: any }) | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (string & { __brand?: any }) | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (number & { __brand?: any }) | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (number & { __brand?: any }) | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (boolean & { __brand?: any }) | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (boolean & { __brand?: any }) | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (bigint & { __brand?: any }) | undefined; x ? x : y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		{Code: `declare let x: (bigint & { __brand?: any }) | undefined; !x ? y : x;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": true}`)},
+		// ignorePrimitives: all set to true (object form - equivalent to ignorePrimitives: true)
 		{Code: `declare let x: string | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": {"string": true, "number": true, "boolean": true, "bigint": true}}`)},
 		{Code: `declare let x: number | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": {"string": true, "number": true, "boolean": true, "bigint": true}}`)},
 		{Code: `declare let x: boolean | undefined; x || y;`, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": {"string": true, "number": true, "boolean": true, "bigint": true}}`)},
@@ -476,6 +504,34 @@ func TestPreferNullishCoalescingRule(t *testing.T) {
 			Code:   `declare const x: object | undefined; x || {};`,
 			Output: []string{`declare const x: object | undefined; x ?? {};`},
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferNullishOverOr"}},
+		},
+
+		// ==========================================
+		// ignorePrimitives: false (should still report errors)
+		// ==========================================
+		{
+			Code:    `declare const x: string | undefined; x || 'a';`,
+			Output:  []string{`declare const x: string | undefined; x ?? 'a';`},
+			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": false}`),
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferNullishOverOr"}},
+		},
+		{
+			Code:    `declare const x: number | undefined; x || 1;`,
+			Output:  []string{`declare const x: number | undefined; x ?? 1;`},
+			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": false}`),
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferNullishOverOr"}},
+		},
+		{
+			Code:    `declare const x: boolean | undefined; x || true;`,
+			Output:  []string{`declare const x: boolean | undefined; x ?? true;`},
+			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": false}`),
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferNullishOverOr"}},
+		},
+		{
+			Code:    `declare const x: bigint | undefined; x || 1n;`,
+			Output:  []string{`declare const x: bigint | undefined; x ?? 1n;`},
+			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": false}`),
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferNullishOverOr"}},
 		},
 
 		// ==========================================

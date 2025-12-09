@@ -1,6 +1,31 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "definitions": {
+    "ignorePrimitivesOptions": {
+      "type": "object",
+      "properties": {
+        "bigint": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ignore bigint primitive types."
+        },
+        "boolean": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ignore boolean primitive types."
+        },
+        "number": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ignore number primitive types."
+        },
+        "string": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ignore string primitive types."
+        }
+      }
+    },
     "prefer_nullish_coalescing_options": {
       "type": "object",
       "properties": {
@@ -35,30 +60,15 @@
           "description": "Whether to ignore any ternary expressions that could be simplified by using the nullish coalescing operator."
         },
         "ignorePrimitives": {
-          "type": "object",
           "description": "Whether to ignore all (`true`) or some (an object with properties) primitive types.",
-          "properties": {
-            "bigint": {
-              "type": "boolean",
-              "default": false,
-              "description": "Ignore bigint primitive types."
+          "oneOf": [
+            {
+              "type": "boolean"
             },
-            "boolean": {
-              "type": "boolean",
-              "default": false,
-              "description": "Ignore boolean primitive types."
-            },
-            "number": {
-              "type": "boolean",
-              "default": false,
-              "description": "Ignore number primitive types."
-            },
-            "string": {
-              "type": "boolean",
-              "default": false,
-              "description": "Ignore string primitive types."
+            {
+              "$ref": "#/definitions/ignorePrimitivesOptions"
             }
-          }
+          ]
         }
       }
     }
