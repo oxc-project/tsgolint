@@ -56,7 +56,11 @@ func isLogicalOrOperator(node *ast.Node) bool {
 	if !ast.IsBinaryExpression(node) {
 		return false
 	}
-	op := node.AsBinaryExpression().OperatorToken.Kind
+	binExpr := node.AsBinaryExpression()
+	if binExpr.OperatorToken == nil {
+		return false
+	}
+	op := binExpr.OperatorToken.Kind
 	return op == ast.KindBarBarToken || op == ast.KindBarBarEqualsToken
 }
 
@@ -114,12 +118,22 @@ func isNodeEqual(a, b *ast.Node) bool {
 	case ast.KindElementAccessExpression:
 		aElem := a.AsElementAccessExpression()
 		bElem := b.AsElementAccessExpression()
+		if aElem.ArgumentExpression == nil || bElem.ArgumentExpression == nil {
+			if aElem.ArgumentExpression != bElem.ArgumentExpression {
+				return false
+			}
+		}
+		if aElem.Expression == nil || bElem.Expression == nil {
+			if aElem.Expression != bElem.Expression {
+				return false
+			}
+		}
 		return isNodeEqual(aElem.ArgumentExpression, bElem.ArgumentExpression) && isNodeEqual(aElem.Expression, bElem.Expression)
 	case ast.KindNullKeyword:
 		return true
 	case ast.KindStringLiteral, ast.KindNoSubstitutionTemplateLiteral:
 		return a.Text() == b.Text()
-	case ast.KindNumericLiteral:
+	case ast.KindNumericLiteral, ast.KindBigIntLiteral:
 		return a.Text() == b.Text()
 	case ast.KindThisKeyword:
 		return true
@@ -362,6 +376,62 @@ var PreferNullishCoalescingRule = rule.Rule{
 			}
 
 			return true
+		}
+
+		// shouldSkipDueToPartialNullishCheck determines whether a nullish check with only null or only undefined
+		// should be skipped based on the type of the expression. Returns true if the fix should be skipped.
+		// The allowNotEqualOperator parameter controls whether !== operator should be treated like == (for ternary vs if-statement handling).
+		shouldSkipDueToPartialNullishCheck := func(hasNullCheck, hasUndefinedCheck bool, operator NullishCheckOperator, targetNode *ast.Node, allowNotEqualOperator bool) bool {
+			// If we check for both null and undefined, it's always fixable
+			if hasNullCheck && hasUndefinedCheck {
+				return false
+			}
+
+			// If we check for neither null nor undefined, skip
+			if !hasNullCheck && !hasUndefinedCheck {
+				return true
+			}
+
+			// Only one check - need to verify the operator and type
+			// For == and != operators, loose equality handles both null and undefined
+			if operator == OperatorEqual {
+				return false
+			}
+			if allowNotEqualOperator && operator == OperatorNotEqual {
+				return false
+			}
+
+			t := ctx.TypeChecker.GetTypeAtLocation(targetNode)
+			flags := checker.Type_flags(t)
+
+			// Skip if the type is any or unknown
+			if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
+				return true
+			}
+
+			// Check for null/undefined in union parts
+			hasNullType := false
+			hasUndefinedType := false
+			for _, part := range utils.UnionTypeParts(t) {
+				partFlags := checker.Type_flags(part)
+				if partFlags&checker.TypeFlagsNull != 0 {
+					hasNullType = true
+				}
+				if partFlags&checker.TypeFlagsUndefined != 0 {
+					hasUndefinedType = true
+				}
+			}
+
+			// If checking for undefined but type includes null, skip (incomplete nullish check)
+			if hasUndefinedCheck && hasNullType {
+				return true
+			}
+			// If checking for null but type includes undefined, skip (incomplete nullish check)
+			if hasNullCheck && hasUndefinedType {
+				return true
+			}
+
+			return false
 		}
 
 		// isMixedLogicalExpression checks if node is part of a mixed logical expression (with &&)
@@ -625,38 +695,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 
 					// Check if fixable
 					if !hasTruthinessCheck {
-						// It is fixable if we check for both null and undefined
-						if hasNullCheck != hasUndefinedCheck {
-							// Only one check - need to verify the operator and type
-							if operator != OperatorEqual && operator != OperatorNotEqual {
-								t := ctx.TypeChecker.GetTypeAtLocation(nullishCoalescingLeftNode)
-								flags := checker.Type_flags(t)
-
-								if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
-									return
-								}
-
-								// Check for null/undefined in union parts
-								hasNullType := false
-								hasUndefinedType := false
-								for _, part := range utils.UnionTypeParts(t) {
-									partFlags := checker.Type_flags(part)
-									if partFlags&checker.TypeFlagsNull != 0 {
-										hasNullType = true
-									}
-									if partFlags&checker.TypeFlagsUndefined != 0 {
-										hasUndefinedType = true
-									}
-								}
-
-								if hasUndefinedCheck && hasNullType {
-									return
-								}
-								if hasNullCheck && hasUndefinedType {
-									return
-								}
-							}
-						} else if !hasNullCheck && !hasUndefinedCheck {
+						if shouldSkipDueToPartialNullishCheck(hasNullCheck, hasUndefinedCheck, operator, nullishCoalescingLeftNode, true) {
 							return
 						}
 					}
@@ -776,36 +815,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 
 					// Check if fixable
-					if hasNullCheck != hasUndefinedCheck {
-						if operator != OperatorEqual {
-							t := ctx.TypeChecker.GetTypeAtLocation(nullishCoalescingLeftNode)
-							flags := checker.Type_flags(t)
-
-							if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
-								return
-							}
-
-							// Check for null/undefined in union parts
-							hasNullType := false
-							hasUndefinedType := false
-							for _, part := range utils.UnionTypeParts(t) {
-								partFlags := checker.Type_flags(part)
-								if partFlags&checker.TypeFlagsNull != 0 {
-									hasNullType = true
-								}
-								if partFlags&checker.TypeFlagsUndefined != 0 {
-									hasUndefinedType = true
-								}
-							}
-
-							if hasUndefinedCheck && hasNullType {
-								return
-							}
-							if hasNullCheck && hasUndefinedType {
-								return
-							}
-						}
-					} else if !hasNullCheck && !hasUndefinedCheck {
+					if shouldSkipDueToPartialNullishCheck(hasNullCheck, hasUndefinedCheck, operator, nullishCoalescingLeftNode, false) {
 						return
 					}
 				}
