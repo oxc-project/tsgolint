@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "prefer_nullish_coalescing_options": {
+      "type": "object",
+      "properties": {
+        "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreBooleanCoercion": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreConditionalTests": {
+          "type": "boolean",
+          "default": true
+        },
+        "ignoreIfStatements": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreMixedLogicalExpressions": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignoreTernaryTests": {
+          "type": "boolean",
+          "default": false
+        },
+        "ignorePrimitives": {
+          "type": "object",
+          "properties": {
+            "bigint": {
+              "type": "boolean",
+              "default": false
+            },
+            "boolean": {
+              "type": "boolean",
+              "default": false
+            },
+            "number": {
+              "type": "boolean",
+              "default": false
+            },
+            "string": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        }
+      }
+    }
+  }
+}
