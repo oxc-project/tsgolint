@@ -1008,7 +1008,8 @@ const foo = (  3 + 5
       `,
 			Output: []string{`
 const foo = (  3 + 5
-  ) /*as*/;
+  ) /*as*/ //as
+  ;
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
