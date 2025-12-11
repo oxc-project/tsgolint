@@ -2,109 +2,8 @@
 
 package restrict_template_expressions
 
-import "encoding/json"
-import "fmt"
-
-// Describes specific types or values declared in local files.
-type FileSpecifier struct {
-	// From corresponds to the JSON schema field "from".
-	From string `json:"from"`
-
-	// The name(s) of the type or value to match
-	Name interface{} `json:"name"`
-
-	// Optional file path to specify where the types or values must be declared. If
-	// omitted, all files will be matched.
-	Path *string `json:"path,omitempty"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *FileSpecifier) UnmarshalJSON(value []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(value, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["from"]; raw != nil && !ok {
-		return fmt.Errorf("field from in FileSpecifier: required")
-	}
-	if _, ok := raw["name"]; raw != nil && !ok {
-		return fmt.Errorf("field name in FileSpecifier: required")
-	}
-	type Plain FileSpecifier
-	var plain Plain
-	if err := json.Unmarshal(value, &plain); err != nil {
-		return err
-	}
-	*j = FileSpecifier(plain)
-	return nil
-}
-
-// Describes specific types or values declared in TypeScript's built-in lib.*.d.ts
-// types.
-type LibSpecifier struct {
-	// From corresponds to the JSON schema field "from".
-	From string `json:"from"`
-
-	// The name(s) of the lib type or value to match
-	Name interface{} `json:"name"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *LibSpecifier) UnmarshalJSON(value []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(value, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["from"]; raw != nil && !ok {
-		return fmt.Errorf("field from in LibSpecifier: required")
-	}
-	if _, ok := raw["name"]; raw != nil && !ok {
-		return fmt.Errorf("field name in LibSpecifier: required")
-	}
-	type Plain LibSpecifier
-	var plain Plain
-	if err := json.Unmarshal(value, &plain); err != nil {
-		return err
-	}
-	*j = LibSpecifier(plain)
-	return nil
-}
-
-// Describes specific types or values imported from packages.
-type PackageSpecifier struct {
-	// From corresponds to the JSON schema field "from".
-	From string `json:"from"`
-
-	// The name(s) of the type or value to match
-	Name interface{} `json:"name"`
-
-	// The package name to match
-	Package string `json:"package"`
-}
-
-// UnmarshalJSON implements json.Unmarshaler.
-func (j *PackageSpecifier) UnmarshalJSON(value []byte) error {
-	var raw map[string]interface{}
-	if err := json.Unmarshal(value, &raw); err != nil {
-		return err
-	}
-	if _, ok := raw["from"]; raw != nil && !ok {
-		return fmt.Errorf("field from in PackageSpecifier: required")
-	}
-	if _, ok := raw["name"]; raw != nil && !ok {
-		return fmt.Errorf("field name in PackageSpecifier: required")
-	}
-	if _, ok := raw["package"]; raw != nil && !ok {
-		return fmt.Errorf("field package in PackageSpecifier: required")
-	}
-	type Plain PackageSpecifier
-	var plain Plain
-	if err := json.Unmarshal(value, &plain); err != nil {
-		return err
-	}
-	*j = PackageSpecifier(plain)
-	return nil
-}
+import "github.com/go-json-experiment/json"
+import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type RestrictTemplateExpressionsOptions struct {
 	// Allow corresponds to the JSON schema field "allow".
@@ -132,7 +31,7 @@ type RestrictTemplateExpressionsOptions struct {
 	AllowRegExp bool `json:"allowRegExp,omitempty"`
 }
 
-type RestrictTemplateExpressionsOptionsAllowElem interface{}
+type RestrictTemplateExpressionsOptionsAllowElem = utils.TypeOrValueSpecifier
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *RestrictTemplateExpressionsOptions) UnmarshalJSON(value []byte) error {
@@ -147,13 +46,9 @@ func (j *RestrictTemplateExpressionsOptions) UnmarshalJSON(value []byte) error {
 	}
 	if v, ok := raw["allow"]; !ok || v == nil {
 		plain.Allow = []RestrictTemplateExpressionsOptionsAllowElem{
-			map[string]interface{}{
-				"from": "lib",
-				"name": []interface{}{
-					"Error",
-					"URL",
-					"URLSearchParams",
-				},
+			utils.TypeOrValueSpecifier{
+				From: utils.TypeOrValueSpecifierFromLib,
+				Name: []string{"Error", "URL", "URLSearchParams"},
 			},
 		}
 	}
@@ -181,5 +76,3 @@ func (j *RestrictTemplateExpressionsOptions) UnmarshalJSON(value []byte) error {
 	*j = RestrictTemplateExpressionsOptions(plain)
 	return nil
 }
-
-type TypeOrValueSpecifier interface{}

@@ -31,8 +31,11 @@ type headlessRange struct {
 	End int `json:"end"`
 }
 
-func headlessRangeFromRange(r core.TextRange) headlessRange {
-	return headlessRange{
+func headlessRangeFromRange(r core.TextRange) *headlessRange {
+	if !r.IsValid() {
+		return nil
+	}
+	return &headlessRange{
 		Pos: r.Pos(),
 		End: r.End(),
 	}
@@ -71,7 +74,7 @@ const (
 
 type headlessDiagnostic struct {
 	Kind     headlessDiagnosticKind `json:"kind"`
-	Range    headlessRange          `json:"range"`
+	Range    *headlessRange         `json:"range,omitempty"`
 	Message  headlessRuleMessage    `json:"message"`
 	FilePath *string                `json:"file_path"`
 
@@ -289,7 +292,7 @@ func runHeadless(args []string) int {
 					for i, fix := range rd.Fixes() {
 						hd.Fixes[i] = headlessFix{
 							Text:  fix.Text,
-							Range: headlessRangeFromRange(fix.Range),
+							Range: *headlessRangeFromRange(fix.Range),
 						}
 					}
 				}
@@ -303,7 +306,7 @@ func runHeadless(args []string) int {
 						for j, fix := range suggestion.Fixes() {
 							hd.Suggestions[i].Fixes[j] = headlessFix{
 								Text:  fix.Text,
-								Range: headlessRangeFromRange(fix.Range),
+								Range: *headlessRangeFromRange(fix.Range),
 							}
 						}
 					}
@@ -314,7 +317,7 @@ func runHeadless(args []string) int {
 
 				hd = headlessDiagnostic{
 					Kind:  headlessDiagnosticKindTsconfig,
-					Range: headlessRange{},
+					Range: headlessRangeFromRange(internalDiagnostic.Range),
 					Rule:  nil, // Internal diagnostics don't have a rule
 					Message: headlessRuleMessage{
 						Id:          internalDiagnostic.Id,
@@ -372,6 +375,10 @@ func runHeadless(args []string) int {
 		linter.Fixes{
 			Fix:            fix,
 			FixSuggestions: fixSuggestions,
+		},
+		linter.TypeErrors{
+			ReportSyntactic: payload.ReportSyntactic,
+			ReportSemantic:  payload.ReportSemantic,
 		},
 	)
 

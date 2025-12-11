@@ -2,7 +2,7 @@
 
 package no_misused_promises
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type ChecksVoidReturnOptions struct {
 	// Arguments corresponds to the JSON schema field "arguments".

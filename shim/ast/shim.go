@@ -6,6 +6,7 @@ package ast
 import "github.com/microsoft/typescript-go/internal/ast"
 import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/diagnostics"
+import "github.com/microsoft/typescript-go/internal/locale"
 import "github.com/microsoft/typescript-go/internal/tspath"
 import _ "unsafe"
 
@@ -96,6 +97,8 @@ type ClassExpression = ast.ClassExpression
 type ClassLikeBase = ast.ClassLikeBase
 type ClassLikeDeclaration = ast.ClassLikeDeclaration
 type ClassStaticBlockDeclaration = ast.ClassStaticBlockDeclaration
+//go:linkname ClimbPastPropertyAccess github.com/microsoft/typescript-go/internal/ast.ClimbPastPropertyAccess
+func ClimbPastPropertyAccess(node *ast.Node) *ast.Node
 type CommentDirective = ast.CommentDirective
 type CommentDirectiveKind = ast.CommentDirectiveKind
 const CommentDirectiveKindExpectError = ast.CommentDirectiveKindExpectError
@@ -124,6 +127,20 @@ type DeclarationName = ast.DeclarationName
 type Decorator = ast.Decorator
 type DeleteExpression = ast.DeleteExpression
 type Diagnostic = ast.Diagnostic
+//go:linkname Diagnostic_File github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).File
+func Diagnostic_File(recv *ast.Diagnostic) *ast.SourceFile
+//go:linkname Diagnostic_Loc github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Loc
+func Diagnostic_Loc(recv *ast.Diagnostic) core.TextRange
+//go:linkname Diagnostic_Code github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Code
+func Diagnostic_Code(recv *ast.Diagnostic) int32
+//go:linkname Diagnostic_Category github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Category
+func Diagnostic_Category(recv *ast.Diagnostic) diagnostics.Category
+//go:linkname Diagnostic_MessageKey github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).MessageKey
+func Diagnostic_MessageKey(recv *ast.Diagnostic) diagnostics.Key
+//go:linkname Diagnostic_MessageArgs github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).MessageArgs
+func Diagnostic_MessageArgs(recv *ast.Diagnostic) []string
+//go:linkname Diagnostic_Localize github.com/microsoft/typescript-go/internal/ast.(*Diagnostic).Localize
+func Diagnostic_Localize(recv *ast.Diagnostic, locale locale.Locale) string
 type DiagnosticsCollection = ast.DiagnosticsCollection
 type DoStatement = ast.DoStatement
 type ElementAccessExpression = ast.ElementAccessExpression
@@ -210,6 +227,8 @@ type FunctionLikeWithBodyBase = ast.FunctionLikeWithBodyBase
 type FunctionOrConstructorTypeNodeBase = ast.FunctionOrConstructorTypeNodeBase
 type FunctionTypeNode = ast.FunctionTypeNode
 type GetAccessorDeclaration = ast.GetAccessorDeclaration
+//go:linkname GetAssignedName github.com/microsoft/typescript-go/internal/ast.GetAssignedName
+func GetAssignedName(node *ast.Node) *ast.Node
 //go:linkname GetAssignmentDeclarationKind github.com/microsoft/typescript-go/internal/ast.GetAssignmentDeclarationKind
 func GetAssignmentDeclarationKind(bin *ast.BinaryExpression) ast.JSDeclarationKind
 //go:linkname GetAssignmentTarget github.com/microsoft/typescript-go/internal/ast.GetAssignmentTarget
@@ -230,6 +249,10 @@ func GetContainingClass(node *ast.Node) *ast.Node
 func GetContainingFunction(node *ast.Node) *ast.Node
 //go:linkname GetDeclarationContainer github.com/microsoft/typescript-go/internal/ast.GetDeclarationContainer
 func GetDeclarationContainer(node *ast.Node) *ast.Node
+//go:linkname GetDeclarationFromName github.com/microsoft/typescript-go/internal/ast.GetDeclarationFromName
+func GetDeclarationFromName(name *ast.Node) *ast.Declaration
+//go:linkname GetDeclarationName github.com/microsoft/typescript-go/internal/ast.GetDeclarationName
+func GetDeclarationName(declaration *ast.Node) string
 //go:linkname GetDeclarationOfKind github.com/microsoft/typescript-go/internal/ast.GetDeclarationOfKind
 func GetDeclarationOfKind(symbol *ast.Symbol, kind ast.Kind) *ast.Node
 //go:linkname GetElementOrPropertyAccessName github.com/microsoft/typescript-go/internal/ast.GetElementOrPropertyAccessName
@@ -430,6 +453,8 @@ func IsAnyExportAssignment(node *ast.Node) bool
 func IsAnyImportOrReExport(node *ast.Node) bool
 //go:linkname IsAnyImportSyntax github.com/microsoft/typescript-go/internal/ast.IsAnyImportSyntax
 func IsAnyImportSyntax(node *ast.Node) bool
+//go:linkname IsArgumentExpressionOfElementAccess github.com/microsoft/typescript-go/internal/ast.IsArgumentExpressionOfElementAccess
+func IsArgumentExpressionOfElementAccess(node *ast.Node) bool
 //go:linkname IsArrayBindingPattern github.com/microsoft/typescript-go/internal/ast.IsArrayBindingPattern
 func IsArrayBindingPattern(node *ast.Node) bool
 //go:linkname IsArrayLiteralExpression github.com/microsoft/typescript-go/internal/ast.IsArrayLiteralExpression
@@ -478,12 +503,16 @@ func IsBooleanLiteral(node *ast.Node) bool
 func IsBreakOrContinueStatement(node *ast.Node) bool
 //go:linkname IsCallExpression github.com/microsoft/typescript-go/internal/ast.IsCallExpression
 func IsCallExpression(node *ast.Node) bool
+//go:linkname IsCallExpressionTarget github.com/microsoft/typescript-go/internal/ast.IsCallExpressionTarget
+func IsCallExpressionTarget(node *ast.Node, includeElementAccess bool, skipPastOuterExpressions bool) bool
 //go:linkname IsCallLikeExpression github.com/microsoft/typescript-go/internal/ast.IsCallLikeExpression
 func IsCallLikeExpression(node *ast.Node) bool
 //go:linkname IsCallLikeOrFunctionLikeExpression github.com/microsoft/typescript-go/internal/ast.IsCallLikeOrFunctionLikeExpression
 func IsCallLikeOrFunctionLikeExpression(node *ast.Node) bool
 //go:linkname IsCallOrNewExpression github.com/microsoft/typescript-go/internal/ast.IsCallOrNewExpression
 func IsCallOrNewExpression(node *ast.Node) bool
+//go:linkname IsCallOrNewExpressionTarget github.com/microsoft/typescript-go/internal/ast.IsCallOrNewExpressionTarget
+func IsCallOrNewExpressionTarget(node *ast.Node, includeElementAccess bool, skipPastOuterExpressions bool) bool
 //go:linkname IsCallSignatureDeclaration github.com/microsoft/typescript-go/internal/ast.IsCallSignatureDeclaration
 func IsCallSignatureDeclaration(node *ast.Node) bool
 //go:linkname IsCaseClause github.com/microsoft/typescript-go/internal/ast.IsCaseClause
@@ -550,6 +579,8 @@ func IsDeclarationNode(node *ast.Node) bool
 func IsDeclarationStatement(node *ast.Node) bool
 //go:linkname IsDecorator github.com/microsoft/typescript-go/internal/ast.IsDecorator
 func IsDecorator(node *ast.Node) bool
+//go:linkname IsDecoratorTarget github.com/microsoft/typescript-go/internal/ast.IsDecoratorTarget
+func IsDecoratorTarget(node *ast.Node, includeElementAccess bool, skipPastOuterExpressions bool) bool
 //go:linkname IsDefaultClause github.com/microsoft/typescript-go/internal/ast.IsDefaultClause
 func IsDefaultClause(node *ast.Node) bool
 //go:linkname IsDefaultImport github.com/microsoft/typescript-go/internal/ast.IsDefaultImport
@@ -806,6 +837,8 @@ func IsJsxOpeningElement(node *ast.Node) bool
 func IsJsxOpeningFragment(node *ast.Node) bool
 //go:linkname IsJsxOpeningLikeElement github.com/microsoft/typescript-go/internal/ast.IsJsxOpeningLikeElement
 func IsJsxOpeningLikeElement(node *ast.Node) bool
+//go:linkname IsJsxOpeningLikeElementTagName github.com/microsoft/typescript-go/internal/ast.IsJsxOpeningLikeElementTagName
+func IsJsxOpeningLikeElementTagName(node *ast.Node, includeElementAccess bool, skipPastOuterExpressions bool) bool
 //go:linkname IsJsxSelfClosingElement github.com/microsoft/typescript-go/internal/ast.IsJsxSelfClosingElement
 func IsJsxSelfClosingElement(node *ast.Node) bool
 //go:linkname IsJsxSpreadAttribute github.com/microsoft/typescript-go/internal/ast.IsJsxSpreadAttribute
@@ -904,6 +937,8 @@ func IsNamespaceExportDeclaration(node *ast.Node) bool
 func IsNamespaceImport(node *ast.Node) bool
 //go:linkname IsNewExpression github.com/microsoft/typescript-go/internal/ast.IsNewExpression
 func IsNewExpression(node *ast.Node) bool
+//go:linkname IsNewExpressionTarget github.com/microsoft/typescript-go/internal/ast.IsNewExpressionTarget
+func IsNewExpressionTarget(node *ast.Node, includeElementAccess bool, skipPastOuterExpressions bool) bool
 //go:linkname IsNodeDescendantOf github.com/microsoft/typescript-go/internal/ast.IsNodeDescendantOf
 func IsNodeDescendantOf(node *ast.Node, ancestor *ast.Node) bool
 //go:linkname IsNonContextualKeyword github.com/microsoft/typescript-go/internal/ast.IsNonContextualKeyword
@@ -1064,6 +1099,8 @@ func IsSyntheticExpression(node *ast.Node) bool
 func IsSyntheticReferenceExpression(node *ast.Node) bool
 //go:linkname IsTaggedTemplateExpression github.com/microsoft/typescript-go/internal/ast.IsTaggedTemplateExpression
 func IsTaggedTemplateExpression(node *ast.Node) bool
+//go:linkname IsTaggedTemplateTag github.com/microsoft/typescript-go/internal/ast.IsTaggedTemplateTag
+func IsTaggedTemplateTag(node *ast.Node, includeElementAccess bool, skipPastOuterExpressions bool) bool
 //go:linkname IsTemplateExpression github.com/microsoft/typescript-go/internal/ast.IsTemplateExpression
 func IsTemplateExpression(node *ast.Node) bool
 //go:linkname IsTemplateHead github.com/microsoft/typescript-go/internal/ast.IsTemplateHead
@@ -1289,7 +1326,6 @@ const KindBlock = ast.KindBlock
 const KindBooleanKeyword = ast.KindBooleanKeyword
 const KindBreakKeyword = ast.KindBreakKeyword
 const KindBreakStatement = ast.KindBreakStatement
-const KindBundle = ast.KindBundle
 const KindCallExpression = ast.KindCallExpression
 const KindCallSignature = ast.KindCallSignature
 const KindCaretEqualsToken = ast.KindCaretEqualsToken
@@ -1737,8 +1773,8 @@ func NewCompilerDiagnostic(message *diagnostics.Message, args ...any) *ast.Diagn
 func NewDiagnostic(file *ast.SourceFile, loc core.TextRange, message *diagnostics.Message, args ...any) *ast.Diagnostic
 //go:linkname NewDiagnosticChain github.com/microsoft/typescript-go/internal/ast.NewDiagnosticChain
 func NewDiagnosticChain(chain *ast.Diagnostic, message *diagnostics.Message, args ...any) *ast.Diagnostic
-//go:linkname NewDiagnosticWith github.com/microsoft/typescript-go/internal/ast.NewDiagnosticWith
-func NewDiagnosticWith(file *ast.SourceFile, loc core.TextRange, code int32, category diagnostics.Category, message string, messageChain []*ast.Diagnostic, relatedInformation []*ast.Diagnostic, reportsUnnecessary bool, reportsDeprecated bool, skippedOnNoEmit bool) *ast.Diagnostic
+//go:linkname NewDiagnosticFromSerialized github.com/microsoft/typescript-go/internal/ast.NewDiagnosticFromSerialized
+func NewDiagnosticFromSerialized(file *ast.SourceFile, loc core.TextRange, code int32, category diagnostics.Category, messageKey diagnostics.Key, messageArgs []string, messageChain []*ast.Diagnostic, relatedInformation []*ast.Diagnostic, reportsUnnecessary bool, reportsDeprecated bool, skippedOnNoEmit bool) *ast.Diagnostic
 type NewExpression = ast.NewExpression
 //go:linkname NewFlowReduceLabelData github.com/microsoft/typescript-go/internal/ast.NewFlowReduceLabelData
 func NewFlowReduceLabelData(target *ast.FlowLabel, antecedents *ast.FlowList) *ast.Node

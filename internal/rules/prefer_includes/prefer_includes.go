@@ -38,13 +38,21 @@ var PreferIncludesRule = rule.Rule{
 
 		// Check if a pattern string contains only simple literal characters
 		// The TypeScript version uses a proper ECMAScript regex parser (@eslint-community/regexpp),
-		// but we just check for unescaped metacharacters.
+		// but we just check for unescaped metacharacters and escaped special sequences.
 		isSimpleLiteralPattern := func(pattern string) bool {
 			prevRune := rune(0)
 			for _, ch := range pattern {
 				if prevRune != '\\' {
+					// Unescaped regex metacharacters
 					switch ch {
 					case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
+						return false
+					}
+				} else {
+					// Escaped sequences that are regex metacharacters (not simple literals)
+					// \d, \D, \w, \W, \s, \S, \b, \B, \0, \n, \r, \t, \v, \f, \cX, \xHH, \uHHHH, \u{HHHH}
+					switch ch {
+					case 'd', 'D', 'w', 'W', 's', 'S', 'b', 'B', 'c', 'x', 'u':
 						return false
 					}
 				}

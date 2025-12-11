@@ -2,7 +2,7 @@
 
 package no_unnecessary_type_assertion
 
-import "encoding/json"
+import "github.com/go-json-experiment/json"
 
 type NoUnnecessaryTypeAssertionOptions struct {
 	// TypesToIgnore corresponds to the JSON schema field "typesToIgnore".
