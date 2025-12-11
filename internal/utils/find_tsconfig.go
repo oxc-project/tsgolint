@@ -24,7 +24,7 @@ func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
 		fs:               fs,
 		currentDirectory: currentDirectory,
 		configFileRegistryBuilder: project.NewConfigFileRegistryBuilder(
-			project.TsGoLintNewSnapshotFSBuilder(fs, currentDirectory), &project.ConfigFileRegistry{}, &project.ExtendedConfigCache{}, &project.SessionOptions{
+			project.TsGoLintNewSnapshotFSBuilder(fs, currentDirectory), &project.ConfigFileRegistry{}, project.NewExtendedConfigCache(), &project.SessionOptions{
 				CurrentDirectory: currentDirectory,
 			}, nil),
 	}
