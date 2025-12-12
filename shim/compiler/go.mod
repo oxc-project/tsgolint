@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/compiler
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251211214326-cac2644e7959
+require github.com/microsoft/typescript-go v0.0.0-20251212174213-032909d88e88
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect

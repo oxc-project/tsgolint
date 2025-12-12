@@ -17,6 +17,7 @@ const AccessKindReadWrite = ast.AccessKindReadWrite
 const AccessKindWrite = ast.AccessKindWrite
 type AccessorDeclaration = ast.AccessorDeclaration
 type AccessorDeclarationBase = ast.AccessorDeclarationBase
+type AllAccessorDeclarations = ast.AllAccessorDeclarations
 type AnyValidImportOrReExport = ast.AnyValidImportOrReExport
 type ArgumentList = ast.ArgumentList
 type ArrayLiteralExpression = ast.ArrayLiteralExpression
@@ -89,13 +90,19 @@ const CheckFlagsSyntheticProperty = ast.CheckFlagsSyntheticProperty
 const CheckFlagsUnresolved = ast.CheckFlagsUnresolved
 const CheckFlagsWritePartial = ast.CheckFlagsWritePartial
 type CheckJsDirective = ast.CheckJsDirective
+//go:linkname ChildIsDecorated github.com/microsoft/typescript-go/internal/ast.ChildIsDecorated
+func ChildIsDecorated(useLegacyDecorators bool, node *ast.Node, parent *ast.Node) bool
 type ClassDeclaration = ast.ClassDeclaration
 type ClassElement = ast.ClassElement
 type ClassElementBase = ast.ClassElementBase
 type ClassElementList = ast.ClassElementList
+//go:linkname ClassElementOrClassElementParameterIsDecorated github.com/microsoft/typescript-go/internal/ast.ClassElementOrClassElementParameterIsDecorated
+func ClassElementOrClassElementParameterIsDecorated(useLegacyDecorators bool, node *ast.Node, parent *ast.Node) bool
 type ClassExpression = ast.ClassExpression
 type ClassLikeBase = ast.ClassLikeBase
 type ClassLikeDeclaration = ast.ClassLikeDeclaration
+//go:linkname ClassOrConstructorParameterIsDecorated github.com/microsoft/typescript-go/internal/ast.ClassOrConstructorParameterIsDecorated
+func ClassOrConstructorParameterIsDecorated(useLegacyDecorators bool, node *ast.Node) bool
 type ClassStaticBlockDeclaration = ast.ClassStaticBlockDeclaration
 //go:linkname ClimbPastPropertyAccess github.com/microsoft/typescript-go/internal/ast.ClimbPastPropertyAccess
 func ClimbPastPropertyAccess(node *ast.Node) *ast.Node
@@ -227,6 +234,10 @@ type FunctionLikeWithBodyBase = ast.FunctionLikeWithBodyBase
 type FunctionOrConstructorTypeNodeBase = ast.FunctionOrConstructorTypeNodeBase
 type FunctionTypeNode = ast.FunctionTypeNode
 type GetAccessorDeclaration = ast.GetAccessorDeclaration
+//go:linkname GetAllAccessorDeclarations github.com/microsoft/typescript-go/internal/ast.GetAllAccessorDeclarations
+func GetAllAccessorDeclarations(parentDeclarations []*ast.Node, accessor *ast.AccessorDeclaration) ast.AllAccessorDeclarations
+//go:linkname GetAllAccessorDeclarationsForDeclaration github.com/microsoft/typescript-go/internal/ast.GetAllAccessorDeclarationsForDeclaration
+func GetAllAccessorDeclarationsForDeclaration(accessor *ast.AccessorDeclaration, declarationsOfSymbol []*ast.Node) ast.AllAccessorDeclarations
 //go:linkname GetAssignedName github.com/microsoft/typescript-go/internal/ast.GetAssignedName
 func GetAssignedName(node *ast.Node) *ast.Node
 //go:linkname GetAssignmentDeclarationKind github.com/microsoft/typescript-go/internal/ast.GetAssignmentDeclarationKind
@@ -339,6 +350,8 @@ func GetPragmaFromSourceFile(file *ast.SourceFile, name string) *ast.Pragma
 func GetPropertyNameForPropertyNameNode(name *ast.Node) string
 //go:linkname GetRestIndicatorOfBindingOrAssignmentElement github.com/microsoft/typescript-go/internal/ast.GetRestIndicatorOfBindingOrAssignmentElement
 func GetRestIndicatorOfBindingOrAssignmentElement(bindingElement *ast.Node) *ast.Node
+//go:linkname GetRestParameterElementType github.com/microsoft/typescript-go/internal/ast.GetRestParameterElementType
+func GetRestParameterElementType(node *ast.ParameterDeclarationNode) *ast.Node
 //go:linkname GetRightMostAssignedExpression github.com/microsoft/typescript-go/internal/ast.GetRightMostAssignedExpression
 func GetRightMostAssignedExpression(node *ast.Node) *ast.Node
 //go:linkname GetRootDeclaration github.com/microsoft/typescript-go/internal/ast.GetRootDeclaration
@@ -369,8 +382,12 @@ func GetThisParameter(signature *ast.Node) *ast.Node
 func GetTypeAnnotationNode(node *ast.Node) *ast.TypeNode
 //go:linkname GetTypeNodePrecedence github.com/microsoft/typescript-go/internal/ast.GetTypeNodePrecedence
 func GetTypeNodePrecedence(n *ast.TypeNode) ast.TypePrecedence
+//go:linkname HasAbstractModifier github.com/microsoft/typescript-go/internal/ast.HasAbstractModifier
+func HasAbstractModifier(node *ast.Node) bool
 //go:linkname HasAccessorModifier github.com/microsoft/typescript-go/internal/ast.HasAccessorModifier
 func HasAccessorModifier(node *ast.Node) bool
+//go:linkname HasAmbientModifier github.com/microsoft/typescript-go/internal/ast.HasAmbientModifier
+func HasAmbientModifier(node *ast.Node) bool
 //go:linkname HasContextSensitiveParameters github.com/microsoft/typescript-go/internal/ast.HasContextSensitiveParameters
 func HasContextSensitiveParameters(node *ast.Node) bool
 //go:linkname HasDecorators github.com/microsoft/typescript-go/internal/ast.HasDecorators
@@ -473,6 +490,8 @@ func IsAssignmentOperator(token ast.Kind) bool
 func IsAssignmentPattern(node *ast.Node) bool
 //go:linkname IsAssignmentTarget github.com/microsoft/typescript-go/internal/ast.IsAssignmentTarget
 func IsAssignmentTarget(node *ast.Node) bool
+//go:linkname IsAsyncFunction github.com/microsoft/typescript-go/internal/ast.IsAsyncFunction
+func IsAsyncFunction(node *ast.Node) bool
 //go:linkname IsAutoAccessorPropertyDeclaration github.com/microsoft/typescript-go/internal/ast.IsAutoAccessorPropertyDeclaration
 func IsAutoAccessorPropertyDeclaration(node *ast.Node) bool
 //go:linkname IsAwaitExpression github.com/microsoft/typescript-go/internal/ast.IsAwaitExpression
@@ -1791,6 +1810,8 @@ type Node = ast.Node
 //go:linkname Node_Type github.com/microsoft/typescript-go/internal/ast.(*Node).Type
 func Node_Type(recv *ast.Node) *ast.Node
 type NodeBase = ast.NodeBase
+//go:linkname NodeCanBeDecorated github.com/microsoft/typescript-go/internal/ast.NodeCanBeDecorated
+func NodeCanBeDecorated(useLegacyDecorators bool, node *ast.Node, parent *ast.Node, grandparent *ast.Node) bool
 type NodeDefault = ast.NodeDefault
 type NodeFactory = ast.NodeFactory
 type NodeFactoryCoercible = ast.NodeFactoryCoercible
@@ -1847,6 +1868,8 @@ func NodeIsSynthesized(node *ast.Node) bool
 //go:linkname NodeKindIs github.com/microsoft/typescript-go/internal/ast.NodeKindIs
 func NodeKindIs(node *ast.Node, kinds ...ast.Kind) bool
 type NodeList = ast.NodeList
+//go:linkname NodeOrChildIsDecorated github.com/microsoft/typescript-go/internal/ast.NodeOrChildIsDecorated
+func NodeOrChildIsDecorated(useLegacyDecorators bool, node *ast.Node, parent *ast.Node, grandparent *ast.Node) bool
 type NodeVisitor = ast.NodeVisitor
 type NodeVisitorHooks = ast.NodeVisitorHooks
 type NonNullExpression = ast.NonNullExpression
@@ -2013,6 +2036,7 @@ const SubtreeContainsMissingCatchClauseVariable = ast.SubtreeContainsMissingCatc
 const SubtreeContainsNullishCoalescing = ast.SubtreeContainsNullishCoalescing
 const SubtreeContainsObjectRestOrSpread = ast.SubtreeContainsObjectRestOrSpread
 const SubtreeContainsOptionalChaining = ast.SubtreeContainsOptionalChaining
+const SubtreeContainsPrivateIdentifierInExpression = ast.SubtreeContainsPrivateIdentifierInExpression
 const SubtreeContainsRestOrSpread = ast.SubtreeContainsRestOrSpread
 const SubtreeContainsTypeScript = ast.SubtreeContainsTypeScript
 const SubtreeContainsUsing = ast.SubtreeContainsUsing
