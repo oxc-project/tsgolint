@@ -180,6 +180,15 @@ func IsStrWhiteSpace(r rune) bool {
 	return unicode.Is(unicode.Zs, r)
 }
 
+func IsStringWhiteSpace(s string) bool {
+	for _, r := range s {
+		if !IsStrWhiteSpace(r) {
+			return false
+		}
+	}
+	return true
+}
+
 // UnmarshalOptions unmarshals rule options with proper JSON default handling.
 // It accepts options as either the target type T or as any, and ensures that
 // JSON unmarshalling occurs to apply default values defined in UnmarshalJSON.

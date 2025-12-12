@@ -3,6 +3,7 @@
 
 package project
 
+import "github.com/microsoft/typescript-go/internal/ast"
 import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "github.com/microsoft/typescript-go/internal/project"
@@ -10,6 +11,7 @@ import "github.com/microsoft/typescript-go/internal/project/logging"
 import "github.com/microsoft/typescript-go/internal/tsoptions"
 import "github.com/microsoft/typescript-go/internal/tspath"
 import "github.com/microsoft/typescript-go/internal/vfs"
+import "github.com/zeebo/xxh3"
 import _ "unsafe"
 
 type APISnapshotRequest = project.APISnapshotRequest
@@ -28,6 +30,8 @@ func ConfigFileRegistryBuilder_GetAncestorConfigFileName(recv *project.ConfigFil
 type CreateProgramResult = project.CreateProgramResult
 type DiskFile = project.DiskFile
 type ExtendedConfigCache = project.ExtendedConfigCache
+type ExtendedConfigCacheEntry = project.ExtendedConfigCacheEntry
+type ExtendedConfigParseArgs = project.ExtendedConfigParseArgs
 type FileChange = project.FileChange
 type FileChangeKind = project.FileChangeKind
 const FileChangeKindChange = project.FileChangeKindChange
@@ -48,8 +52,14 @@ const KindInferred = project.KindInferred
 func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
 //go:linkname NewConfiguredProject github.com/microsoft/typescript-go/internal/project.NewConfiguredProject
 func NewConfiguredProject(configFileName string, configFilePath tspath.Path, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
+//go:linkname NewExtendedConfigCache github.com/microsoft/typescript-go/internal/project.NewExtendedConfigCache
+func NewExtendedConfigCache() *project.ExtendedConfigCache
 //go:linkname NewInferredProject github.com/microsoft/typescript-go/internal/project.NewInferredProject
 func NewInferredProject(currentDirectory string, compilerOptions *core.CompilerOptions, rootFileNames []string, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
+//go:linkname NewParseCache github.com/microsoft/typescript-go/internal/project.NewParseCache
+func NewParseCache(options project.RefCountCacheOptions) *project.ParseCache
+//go:linkname NewParseCacheKey github.com/microsoft/typescript-go/internal/project.NewParseCacheKey
+func NewParseCacheKey(options ast.SourceFileParseOptions, hash xxh3.Uint128, scriptKind core.ScriptKind) project.ParseCacheKey
 //go:linkname NewProject github.com/microsoft/typescript-go/internal/project.NewProject
 func NewProject(configFileName string, kind project.Kind, currentDirectory string, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
 //go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
@@ -60,7 +70,7 @@ func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.Sess
 func NewSnapshotFSBuilder(fs vfs.FS, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
 type Overlay = project.Overlay
 type ParseCache = project.ParseCache
-type ParseCacheOptions = project.ParseCacheOptions
+type ParseCacheKey = project.ParseCacheKey
 type PatternsAndIgnored = project.PatternsAndIgnored
 type PendingReload = project.PendingReload
 const PendingReloadFileNames = project.PendingReloadFileNames
@@ -78,6 +88,8 @@ type ProjectLoadKind = project.ProjectLoadKind
 const ProjectLoadKindCreate = project.ProjectLoadKindCreate
 const ProjectLoadKindFind = project.ProjectLoadKindFind
 type ProjectTreeRequest = project.ProjectTreeRequest
+type RefCountCache[K comparable, V, AcquireArgs any] = project.RefCountCache[K,V,AcquireArgs]
+type RefCountCacheOptions = project.RefCountCacheOptions
 type ResourceRequest = project.ResourceRequest
 type Session = project.Session
 type SessionInit = project.SessionInit
