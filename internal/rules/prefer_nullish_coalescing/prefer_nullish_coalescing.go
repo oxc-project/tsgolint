@@ -143,6 +143,47 @@ func isNodeEqual(a, b *ast.Node) bool {
 	return false
 }
 
+// getPropertyNameFromAccess extracts the property name from either PropertyAccessExpression or ElementAccessExpression
+// Returns empty string if the name cannot be determined statically
+func getPropertyNameFromAccess(node *ast.Node) string {
+	if ast.IsPropertyAccessExpression(node) {
+		prop := node.AsPropertyAccessExpression()
+		name := prop.Name()
+		if name != nil {
+			return name.Text()
+		}
+		return ""
+	}
+	if ast.IsElementAccessExpression(node) {
+		elem := node.AsElementAccessExpression()
+		arg := elem.ArgumentExpression
+		if arg == nil {
+			return ""
+		}
+		// Handle string literal like x['a']
+		if arg.Kind == ast.KindStringLiteral {
+			return arg.Text()
+		}
+		// Handle no substitution template literal like x[`a`]
+		if arg.Kind == ast.KindNoSubstitutionTemplateLiteral {
+			return arg.Text()
+		}
+		return ""
+	}
+	return ""
+}
+
+// getObjectExpressionFromAccess extracts the object expression from either PropertyAccessExpression or ElementAccessExpression
+func getObjectExpressionFromAccess(node *ast.Node) *ast.Node {
+	if ast.IsPropertyAccessExpression(node) {
+		return node.AsPropertyAccessExpression().Expression
+	}
+	if ast.IsElementAccessExpression(node) {
+		return node.AsElementAccessExpression().Expression
+	}
+	return nil
+}
+
 // areNodesSimilarMemberAccess checks if two nodes have the same member access sequence
 func areNodesSimilarMemberAccess(a, b *ast.Node) bool {
 	// Unwrap parenthesized expressions
@@ -159,6 +200,42 @@ func areNodesSimilarMemberAccess(a, b *ast.Node) bool {
 	}
 	if b.Kind == ast.KindNonNullExpression {
 		b = b.AsNonNullExpression().Expression
+	}
+
+	// Check if both are property accesses (either dot or bracket notation)
+	aIsPropAccess := ast.IsPropertyAccessExpression(a) || ast.IsElementAccessExpression(a)
+	bIsPropAccess := ast.IsPropertyAccessExpression(b) || ast.IsElementAccessExpression(b)
+
+	if aIsPropAccess && bIsPropAccess {
+		// Get the property names
+		aName := getPropertyNameFromAccess(a)
+		bName := getPropertyNameFromAccess(b)
+
+		// If either name couldn't be determined statically, fall back to strict comparison
+		if aName == "" || bName == "" {
+			// Both must be the same kind for non-static comparison
+			if a.Kind != b.Kind {
+				return false
+			}
+			if ast.IsElementAccessExpression(a) && ast.IsElementAccessExpression(b) {
+				aElem := a.AsElementAccessExpression()
+				bElem := b.AsElementAccessExpression()
+				if !areNodesSimilarMemberAccess(aElem.Expression, bElem.Expression) {
+					return false
+				}
+				return isNodeEqual(aElem.ArgumentExpression, bElem.ArgumentExpression)
+			}
+		}
+
+		// Compare the property names
+		if aName != bName {
+			return false
+		}
+
+		// Compare the object expressions
+		aObj := getObjectExpressionFromAccess(a)
+		bObj := getObjectExpressionFromAccess(b)
+		return areNodesSimilarMemberAccess(aObj, bObj)
 	}
 
 	if ast.IsPropertyAccessExpression(a) && ast.IsPropertyAccessExpression(b) {
@@ -240,6 +317,11 @@ func isBooleanConstructorContext(ctx rule.RuleContext, node *ast.Node) bool {
 	parent := node.Parent
 	if parent == nil {
 		return false
+	}
+
+	// Handle parenthesized expressions - traverse up through them
+	if parent.Kind == ast.KindParenthesizedExpression {
+		return isBooleanConstructorContext(ctx, parent)
 	}
 
 	if ast.IsLogicalExpression(parent) {

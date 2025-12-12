@@ -287,21 +287,21 @@ let c: string | boolean | undefined;
 
 const test = Boolean(a ? 'success' : b || c);
       `, Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true}},
-		{Skip: true, Code: `
+		{Code: `
 let a: string | boolean | undefined;
 let b: string | boolean | undefined;
 let c: string | boolean | undefined;
 
 const test = Boolean(((a = b), b || c));
       `, Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true}},
-		{Skip: true, Code: `
+		{Code: `
 let a: string | boolean | undefined;
 let b: string | boolean | undefined;
 let c: string | boolean | undefined;
 
 const test = Boolean((a ? a : b) || c);
       `, Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true}},
-		{Skip: true, Code: `
+		{Code: `
 let a: string | boolean | undefined;
 let b: string | boolean | undefined;
 let c: string | boolean | undefined;
@@ -589,12 +589,17 @@ x ?? y;
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: \\`\\` | undefined;\nx || y;\n      ",
+			Code: `
+declare let x: ` + "`" + "`" + ` | undefined;
+x || y;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`\\`},
+			Output: []string{`
+declare let x: ` + "`" + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
@@ -665,12 +670,17 @@ x ?? y;
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: \\`\\` | undefined;\nx ? x : y;\n      ",
+			Code: `
+declare let x: ` + "`" + "`" + ` | undefined;
+x ? x : y;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`\\`},
+			Output: []string{`
+declare let x: ` + "`" + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
@@ -741,12 +751,17 @@ x ?? y;
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: \\`hello\\${'string'}\\` | undefined;\nx || y;\n      ",
+			Code: `
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+x || y;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`hello\\${'string'}\\`},
+			Output: []string{`
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
@@ -833,24 +848,34 @@ x ?? y;
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: \\`hello\\${'string'}\\` | undefined;\nx ? x : y;\n      ",
+			Code: `
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+x ? x : y;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`hello\\${'string'}\\`},
+			Output: []string{`
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: \\`hello\\${'string'}\\` | undefined;\n!x ? y : x;\n      ",
+			Code: `
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+!x ? y : x;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`hello\\${'string'}\\`},
+			Output: []string{`
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
@@ -969,12 +994,17 @@ x ?? y;
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: 'a' | \\`b\\` | undefined;\nx || y;\n      ",
+			Code: `
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+x || y;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`b\\`},
+			Output: []string{`
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
@@ -1093,24 +1123,34 @@ x ?? y;
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: 'a' | \\`b\\` | undefined;\nx ? x : y;\n      ",
+			Code: `
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+x ? x : y;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`b\\`},
+			Output: []string{`
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
 				},
 			},
 		},
-		// TODO: Skip template literal types - rule doesn't support them yet
+		// Template literal types are handled as string-like types
 		{
-			Skip:    true,
-			Code:    "\ndeclare let x: 'a' | \\`b\\` | undefined;\n!x ? y : x;\n      ",
+			Code: `
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+!x ? y : x;
+      `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output:  []string{`b\\`},
+			Output: []string{`
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+x ?? y;
+      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
@@ -2114,9 +2154,8 @@ x?.['a'] ?? 'foo';
 				},
 			},
 		},
-		// TODO: Skip - rule doesn't handle mixed property access syntax (bracket vs dot notation)
+		// Rule handles mixed property access syntax (bracket vs dot notation)
 		{
-			Skip: true,
 			Code: `
 declare let x: { a: string } | null;
 
@@ -2133,9 +2172,8 @@ x?.['a'] ?? 'foo';
 				},
 			},
 		},
-		// TODO: Skip - rule doesn't handle mixed property access syntax (bracket vs dot notation)
+		// Rule handles mixed property access syntax (bracket vs dot notation)
 		{
-			Skip: true,
 			Code: `
 declare let x: { a: string } | null;
 
