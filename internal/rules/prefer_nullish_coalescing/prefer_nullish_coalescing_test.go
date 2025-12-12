@@ -2523,9 +2523,7 @@ function lazyInitialize() {
 				},
 			},
 		},
-		// TODO: Skip - rule produces different whitespace/indentation in the fix
 		{
-			Skip: true,
 			Code: `
 declare let foo: string | null;
 declare function makeFoo(): string;
@@ -2543,7 +2541,7 @@ declare function makeFoo(): string;
 
 function lazyInitialize() {
   // comment
-foo ??= makeFoo();
+  foo ??= makeFoo();
 }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
