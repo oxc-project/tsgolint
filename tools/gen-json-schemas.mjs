@@ -234,10 +234,11 @@ func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
                 const goFieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
 
                 // Find the interface{} field and replace with utils.BoolOr[T]
-                const interfacePattern = new RegExp(`(${goFieldName}\\s+)interface\\{\\}(\\s+\`json:"${fieldName}[^"]*"\`)`, 'g');
+                const interfacePattern = new RegExp(`(${goFieldName}\\s+)interface\\{\\}(\\s+\`json:"${fieldName}[^"]*"\`)`);
+                const newContent = content.replace(interfacePattern, `$1utils.BoolOr[${optionsType}]$2`);
 
-                if (interfacePattern.test(content)) {
-                    content = content.replace(interfacePattern, `$1utils.BoolOr[${optionsType}]$2`);
+                if (newContent !== content) {
+                    content = newContent;
 
                     // Also fix the default value assignment in UnmarshalJSON if it assigns a raw boolean
                     // e.g., plain.ChecksVoidReturn = true -> plain.ChecksVoidReturn = utils.BoolOrTrue[ChecksVoidReturnOptions]()

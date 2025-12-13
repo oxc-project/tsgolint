@@ -88,10 +88,7 @@ func isMemberAccessLike(node *ast.Node) bool {
 	case ast.KindIdentifier, ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
 		return true
 	}
-	if ast.IsOptionalChain(node) {
-		return true
-	}
-	return false
+	return ast.IsOptionalChain(node)
 }
 
 // isNodeEqual checks if two nodes are semantically equal
