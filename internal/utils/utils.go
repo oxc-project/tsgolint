@@ -206,3 +206,96 @@ func UnmarshalOptions[T any](options any, ruleName string) T {
 
 	return result
 }
+
+// BoolOr represents a JSON value that can be either a boolean or an object of type T.
+// This is useful for rule options that accept either `true`/`false` or a detailed config object.
+//
+// Usage:
+//
+//	type MyOptions struct {
+//	    SomeOption BoolOr[SomeOptionsDetails] `json:"someOption"`
+//	}
+//
+//	// Check the value:
+//	if opts.SomeOption.IsTrue() {
+//	    // boolean true was provided
+//	} else if opts.SomeOption.IsFalse() {
+//	    // boolean false was provided (or not provided at all)
+//	} else if details := opts.SomeOption.Object(); details != nil {
+//	    // object was provided, use details
+//	}
+type BoolOr[T any] struct {
+	isSet     bool
+	boolVal   bool
+	objectVal *T
+}
+
+// IsTrue returns true if the value was set to boolean true.
+func (b BoolOr[T]) IsTrue() bool {
+	return b.isSet && b.boolVal && b.objectVal == nil
+}
+
+// IsFalse returns true if the value was set to boolean false or not set at all.
+func (b BoolOr[T]) IsFalse() bool {
+	return !b.isSet || (!b.boolVal && b.objectVal == nil)
+}
+
+// IsSet returns true if any value was explicitly provided.
+func (b BoolOr[T]) IsSet() bool {
+	return b.isSet
+}
+
+// Object returns the object value if one was provided, nil otherwise.
+func (b BoolOr[T]) Object() *T {
+	return b.objectVal
+}
+
+// Bool returns the boolean value. Returns true if explicitly set to true OR if an object was provided.
+// Returns false if set to false or not set.
+func (b BoolOr[T]) Bool() bool {
+	return b.boolVal || b.objectVal != nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (b *BoolOr[T]) UnmarshalJSON(data []byte) error {
+	// Handle null
+	if string(data) == "null" {
+		*b = BoolOr[T]{}
+		return nil
+	}
+
+	// Try boolean first
+	var boolVal bool
+	if err := json.Unmarshal(data, &boolVal); err == nil {
+		*b = BoolOr[T]{isSet: true, boolVal: boolVal}
+		return nil
+	}
+
+	// Try object
+	var objectVal T
+	if err := json.Unmarshal(data, &objectVal); err == nil {
+		*b = BoolOr[T]{isSet: true, boolVal: true, objectVal: &objectVal}
+		return nil
+	}
+
+	// If neither works, default to unset
+	*b = BoolOr[T]{}
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler.
+func (b BoolOr[T]) MarshalJSON() ([]byte, error) {
+	if !b.isSet {
+		return []byte("null"), nil
+	}
+	if b.objectVal != nil {
+		return json.Marshal(b.objectVal)
+	}
+	return json.Marshal(b.boolVal)
+}
+
+// BoolOrValue creates a BoolOr[T] with a boolean value.
+// This is useful for setting default values in generated UnmarshalJSON methods.
+func BoolOrValue[T any](val bool) BoolOr[T] {
+	return BoolOr[T]{isSet: true, boolVal: val}
+}
