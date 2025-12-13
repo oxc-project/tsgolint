@@ -5,6 +5,7 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
+	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestPreferNullishCoalescingRule(t *testing.T) {
@@ -412,7 +413,7 @@ if (c || (!a ? b : a)) {
 declare const a: any;
 declare const b: any;
 a ? a : b;
-      `, Options: PreferNullishCoalescingOptions{IgnorePrimitives: true}},
+      `, Options: PreferNullishCoalescingOptions{IgnorePrimitives: utils.BoolOrValue[IgnorePrimitivesOptions](true)}},
 		{Code: `
 declare const a: any;
 declare const b: any;

@@ -3,7 +3,6 @@ package prefer_nullish_coalescing
 import (
 	"strings"
 
-	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -238,27 +237,6 @@ func areNodesSimilarMemberAccess(a, b *ast.Node) bool {
 		return areNodesSimilarMemberAccess(aObj, bObj)
 	}
 
-	if ast.IsPropertyAccessExpression(a) && ast.IsPropertyAccessExpression(b) {
-		aProp := a.AsPropertyAccessExpression()
-		bProp := b.AsPropertyAccessExpression()
-		if !areNodesSimilarMemberAccess(aProp.Expression, bProp.Expression) {
-			return false
-		}
-		aName := aProp.Name()
-		bName := bProp.Name()
-		if aName == nil || bName == nil {
-			return aName == bName
-		}
-		return isNodeEqual(aName.AsNode(), bName.AsNode())
-	}
-	if ast.IsElementAccessExpression(a) && ast.IsElementAccessExpression(b) {
-		aElem := a.AsElementAccessExpression()
-		bElem := b.AsElementAccessExpression()
-		if !areNodesSimilarMemberAccess(aElem.Expression, bElem.Expression) {
-			return false
-		}
-		return isNodeEqual(aElem.ArgumentExpression, bElem.ArgumentExpression)
-	}
 	return isNodeEqual(a, b)
 }
 
@@ -376,6 +354,27 @@ var PreferNullishCoalescingRule = rule.Rule{
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
+		// Pre-compute ignorable flags once at rule initialization based on options
+		var ignorableFlags checker.TypeFlags
+		if opts.IgnorePrimitives.IsTrue() {
+			// If true, ignore all primitive types
+			ignorableFlags = checker.TypeFlagsBigIntLike | checker.TypeFlagsBooleanLike | checker.TypeFlagsNumberLike | checker.TypeFlagsStringLike
+		} else if primitivesOpts := opts.IgnorePrimitives.Object(); primitivesOpts != nil {
+			// It's an object with specific primitive options
+			if primitivesOpts.Bigint {
+				ignorableFlags |= checker.TypeFlagsBigIntLike
+			}
+			if primitivesOpts.Boolean {
+				ignorableFlags |= checker.TypeFlagsBooleanLike
+			}
+			if primitivesOpts.Number {
+				ignorableFlags |= checker.TypeFlagsNumberLike
+			}
+			if primitivesOpts.String {
+				ignorableFlags |= checker.TypeFlagsStringLike
+			}
+		}
+
 		// isNullableType checks if a type includes null or undefined
 		// Also returns true for any/unknown since they can include null/undefined
 		isNullableType := func(t *checker.Type) bool {
@@ -397,40 +396,6 @@ var PreferNullishCoalescingRule = rule.Rule{
 		isTypeEligibleForPreferNullish := func(t *checker.Type) bool {
 			if !isNullableType(t) {
 				return false
-			}
-
-			// Build ignorable flags based on options
-			var ignorableFlags checker.TypeFlags
-
-			// Handle ignorePrimitives which can be either a boolean or an object
-			if opts.IgnorePrimitives != nil {
-				switch v := opts.IgnorePrimitives.(type) {
-				case bool:
-					if v {
-						// If true, ignore all primitive types
-						ignorableFlags = checker.TypeFlagsBigIntLike | checker.TypeFlagsBooleanLike | checker.TypeFlagsNumberLike | checker.TypeFlagsStringLike
-					}
-				case map[string]interface{}:
-					// It's an object, unmarshal it as IgnorePrimitivesOptions
-					jsonBytes, err := json.Marshal(v)
-					if err == nil {
-						var primitivesOpts IgnorePrimitivesOptions
-						if err := json.Unmarshal(jsonBytes, &primitivesOpts); err == nil {
-							if primitivesOpts.Bigint {
-								ignorableFlags |= checker.TypeFlagsBigIntLike
-							}
-							if primitivesOpts.Boolean {
-								ignorableFlags |= checker.TypeFlagsBooleanLike
-							}
-							if primitivesOpts.Number {
-								ignorableFlags |= checker.TypeFlagsNumberLike
-							}
-							if primitivesOpts.String {
-								ignorableFlags |= checker.TypeFlagsStringLike
-							}
-						}
-					}
-				}
 			}
 
 			if ignorableFlags == 0 {

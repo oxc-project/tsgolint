@@ -3,6 +3,7 @@
 package prefer_nullish_coalescing
 
 import "github.com/go-json-experiment/json"
+import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type IgnorePrimitivesOptions struct {
 	// Ignore bigint primitive types.
@@ -67,7 +68,7 @@ type PreferNullishCoalescingOptions struct {
 
 	// Whether to ignore all (`true`) or some (an object with properties) primitive
 	// types.
-	IgnorePrimitives interface{} `json:"ignorePrimitives,omitempty"`
+	IgnorePrimitives utils.BoolOr[IgnorePrimitivesOptions] `json:"ignorePrimitives,omitempty"`
 
 	// Whether to ignore any ternary expressions that could be simplified by using the
 	// nullish coalescing operator.
