@@ -10,7 +10,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-// Message builders
 func buildNoStrictNullCheckMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noStrictNullCheck",
@@ -51,7 +50,6 @@ const (
 	OperatorNotStrictEq NullishCheckOperator = "!=="
 )
 
-// isLogicalOrOperator is a helper to check for || or ||= operators
 func isLogicalOrOperator(node *ast.Node) bool {
 	if !ast.IsBinaryExpression(node) {
 		return false
@@ -64,22 +62,18 @@ func isLogicalOrOperator(node *ast.Node) bool {
 	return op == ast.KindBarBarToken || op == ast.KindBarBarEqualsToken
 }
 
-// isNullLiteral checks if node is null literal
 func isNullLiteral(node *ast.Node) bool {
 	return node.Kind == ast.KindNullKeyword
 }
 
-// isUndefinedIdentifier checks if node is undefined identifier
 func isUndefinedIdentifier(node *ast.Node) bool {
 	return ast.IsIdentifier(node) && node.Text() == "undefined"
 }
 
-// isNullLiteralOrUndefinedIdentifier checks if node is null or undefined
 func isNullLiteralOrUndefinedIdentifier(node *ast.Node) bool {
 	return isNullLiteral(node) || isUndefinedIdentifier(node)
 }
 
-// isMemberAccessLike checks if node is member access like
 func isMemberAccessLike(node *ast.Node) bool {
 	// Skip parentheses to handle deeply nested patterns like ((((foo.a))))
 	node = ast.SkipParentheses(node)
@@ -91,7 +85,6 @@ func isMemberAccessLike(node *ast.Node) bool {
 	return ast.IsOptionalChain(node)
 }
 
-// isNodeEqual checks if two nodes are semantically equal
 func isNodeEqual(a, b *ast.Node) bool {
 	if a == nil || b == nil {
 		return a == b
@@ -237,7 +230,6 @@ func areNodesSimilarMemberAccess(a, b *ast.Node) bool {
 	return isNodeEqual(a, b)
 }
 
-// isConditionalTest checks if the node is part of a conditional test
 func isConditionalTest(node *ast.Node) bool {
 	parent := node.Parent
 	if parent == nil {
@@ -287,7 +279,6 @@ func isConditionalTest(node *ast.Node) bool {
 	return false
 }
 
-// isBooleanConstructorContext checks if node is argument to Boolean constructor
 func isBooleanConstructorContext(ctx rule.RuleContext, node *ast.Node) bool {
 	parent := node.Parent
 	if parent == nil {
@@ -680,24 +671,20 @@ var PreferNullishCoalescingRule = rule.Rule{
 		}
 
 		return rule.RuleListeners{
-			// Handle || operator (LogicalExpression)
 			ast.KindBinaryExpression: func(node *ast.Node) {
 				binExpr := node.AsBinaryExpression()
 
-				// Handle ||
 				if binExpr.OperatorToken.Kind == ast.KindBarBarToken {
 					checkAndFixWithPreferNullishOverOr(node, "or", "")
 					return
 				}
 
-				// Handle ||=
 				if binExpr.OperatorToken.Kind == ast.KindBarBarEqualsToken {
 					checkAndFixWithPreferNullishOverOr(node, "assignment", "=")
 					return
 				}
 			},
 
-			// Handle ternary expressions (ConditionalExpression)
 			ast.KindConditionalExpression: func(node *ast.Node) {
 				if opts.IgnoreTernaryTests {
 					return
@@ -766,7 +753,6 @@ var PreferNullishCoalescingRule = rule.Rule{
 					return
 				}
 
-				// Report the issue
 				ctx.ReportNodeWithFixes(node, buildPreferNullishOverTernaryMessage(), func() []rule.RuleFix {
 					leftText := ctx.SourceFile.Text()[nullishCoalescingLeftNode.Pos():nullishCoalescingLeftNode.End()]
 					rightText := ctx.SourceFile.Text()[nullishBranch.Pos():nullishBranch.End()]
@@ -786,7 +772,6 @@ var PreferNullishCoalescingRule = rule.Rule{
 				})
 			},
 
-			// Handle if statements
 			ast.KindIfStatement: func(node *ast.Node) {
 				if opts.IgnoreIfStatements {
 					return
@@ -881,7 +866,6 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 				}
 
-				// Report the issue
 				ctx.ReportNodeWithFixes(node, buildPreferNullishOverAssignmentMessage(), func() []rule.RuleFix {
 					// Strip all outer parentheses from the left node to get the inner expression
 					leftNodeUnwrapped := ast.SkipParentheses(nullishCoalescingLeftNode)
