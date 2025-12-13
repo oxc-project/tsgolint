@@ -19,6 +19,8 @@ type FileInfo = vfs.FileInfo
 type FileMatcherPatterns = vfs.FileMatcherPatterns
 //go:linkname GetRegexFromPattern github.com/microsoft/typescript-go/internal/vfs.GetRegexFromPattern
 func GetRegexFromPattern(pattern string, useCaseSensitiveFileNames bool) *regexp2.Regexp
+//go:linkname GetSubPatternFromSpec github.com/microsoft/typescript-go/internal/vfs.GetSubPatternFromSpec
+func GetSubPatternFromSpec(spec string, basePath string, usage vfs.Usage, matcher vfs.WildcardMatcher) string
 //go:linkname IsImplicitGlob github.com/microsoft/typescript-go/internal/vfs.IsImplicitGlob
 func IsImplicitGlob(lastPathComponent string) bool
 //go:linkname ReadDirectory github.com/microsoft/typescript-go/internal/vfs.ReadDirectory
@@ -26,5 +28,8 @@ func ReadDirectory(host vfs.FS, currentDir string, path string, extensions []str
 var SkipAll = vfs.SkipAll
 var SkipDir = vfs.SkipDir
 type Usage = vfs.Usage
+const UsageDirectories = vfs.UsageDirectories
+const UsageExclude = vfs.UsageExclude
+const UsageFiles = vfs.UsageFiles
 type WalkDirFunc = vfs.WalkDirFunc
 type WildcardMatcher = vfs.WildcardMatcher

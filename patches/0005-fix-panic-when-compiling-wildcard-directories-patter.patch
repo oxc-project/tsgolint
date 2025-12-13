@@ -1,4 +1,4 @@
-From b5865ddd9d989db16937a4f0ab2f251a5f65e849 Mon Sep 17 00:00:00 2001
+From 9b4682286bc628233150d333944d553a2bab0cb1 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 24 Oct 2025 11:24:09 +0100
 Subject: [PATCH] fix panic when compiling wildcard directories pattern
@@ -81,7 +81,7 @@ index 000000000..65976295a
 +	}
 +}
 diff --git a/internal/vfs/utilities.go b/internal/vfs/utilities.go
-index 5283284f0..9c7382cb0 100644
+index 57e6cc235..905d6aa67 100644
 --- a/internal/vfs/utilities.go
 +++ b/internal/vfs/utilities.go
 @@ -83,11 +83,11 @@ func IsImplicitGlob(lastPathComponent string) bool {
