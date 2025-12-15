@@ -212,10 +212,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
-      "description": "'// Examples of incorrect code for no-base-to-string rule
-
-// These will evaluate to '[object Object]'
-({})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "description": "'({})' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
     },
     "range": {
@@ -228,8 +225,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
-      "description": "'
-({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
     },
     "range": {
@@ -242,8 +238,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
-      "description": "'
-({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
     },
     "range": {

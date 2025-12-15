@@ -6,6 +6,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -76,7 +77,7 @@ var NoBaseToStringRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNode(node, buildBaseToStringMessage(ctx.SourceFile.Text()[node.Pos():node.End()], certainty))
+			ctx.ReportNode(node, buildBaseToStringMessage(scanner.GetSourceTextOfNodeFromSourceFile(ctx.SourceFile, node, false /* includeTrivia */), certainty))
 		}
 
 		checkExpressionForArrayJoin := func(
@@ -89,7 +90,7 @@ var NoBaseToStringRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNode(node, buildBaseArrayJoinMessage(ctx.SourceFile.Text()[node.Pos():node.End()], certainty))
+			ctx.ReportNode(node, buildBaseArrayJoinMessage(scanner.GetSourceTextOfNodeFromSourceFile(ctx.SourceFile, node, false /* includeTrivia */), certainty))
 		}
 
 		collectUnionTypeCertainty := func(
