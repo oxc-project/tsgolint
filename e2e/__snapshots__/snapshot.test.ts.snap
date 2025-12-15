@@ -212,10 +212,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
-      "description": "'// Examples of incorrect code for no-base-to-string rule
-
-// These will evaluate to '[object Object]'
-({})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "description": "'({})' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
     },
     "range": {
@@ -228,8 +225,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
-      "description": "'
-({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
     },
     "range": {
@@ -242,8 +238,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-base-to-string/index.ts",
     "kind": 0,
     "message": {
-      "description": "'
-({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
       "id": "baseToString",
     },
     "range": {
@@ -1196,15 +1191,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
-          "end": 123,
-          "pos": 121,
-        },
-        "text": "",
-      },
-      {
-        "range": {
           "end": 130,
-          "pos": 124,
+          "pos": 120,
         },
         "text": "",
       },
@@ -1225,15 +1213,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
-          "end": 251,
-          "pos": 249,
-        },
-        "text": "",
-      },
-      {
-        "range": {
           "end": 258,
-          "pos": 252,
+          "pos": 248,
         },
         "text": "",
       },
@@ -1254,15 +1235,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
-          "end": 356,
-          "pos": 354,
-        },
-        "text": "",
-      },
-      {
-        "range": {
           "end": 359,
-          "pos": 357,
+          "pos": 353,
         },
         "text": "",
       },
@@ -1309,15 +1283,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
-          "end": 231,
-          "pos": 229,
-        },
-        "text": "",
-      },
-      {
-        "range": {
           "end": 235,
-          "pos": 232,
+          "pos": 228,
         },
         "text": "",
       },
@@ -2205,15 +2172,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
-          "end": 176,
-          "pos": 174,
-        },
-        "text": "",
-      },
-      {
-        "range": {
           "end": 183,
-          "pos": 177,
+          "pos": 173,
         },
         "text": "",
       },

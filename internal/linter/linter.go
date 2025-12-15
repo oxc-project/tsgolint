@@ -199,7 +199,7 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 		}
 	}
 
-	program.ForEachCheckerParallel(ctx, func(idx int, ch *checker.Checker) {
+	program.ForEachCheckerParallel(func(idx int, ch *checker.Checker) {
 		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
 	})
 

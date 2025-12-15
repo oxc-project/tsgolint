@@ -50,6 +50,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/non_nullable_type_assertion_style"
 	"github.com/typescript-eslint/tsgolint/internal/rules/only_throw_error"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_includes"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_nullish_coalescing"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_optional_chain"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_promise_reject_errors"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_reduce_type_parameter"
@@ -154,6 +155,7 @@ var allRules = []rule.Rule{
 	only_throw_error.OnlyThrowErrorRule,
 	prefer_includes.PreferIncludesRule,
 	prefer_optional_chain.PreferOptionalChainRule,
+	prefer_nullish_coalescing.PreferNullishCoalescingRule,
 	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
 	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,
 	prefer_return_this_type.PreferReturnThisTypeRule,

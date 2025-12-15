@@ -6,6 +6,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -210,8 +211,62 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			if node.Kind == ast.KindAsExpression {
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
 					s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
+
+					// Get the text range of the `as` keyword token.
+					// Example: `const x = y as T;`
+					//                      ^^
 					asKeywordRange := s.TokenRange()
-					return []rule.RuleFix{rule.RuleFixRemoveRange(asKeywordRange), rule.RuleFixRemove(ctx.SourceFile, typeNode)}
+
+					// Get the text range of the type node (includes any trailing trivia).
+					// Example: `const x = y as T;`
+					//                         ^
+					typeNodeRange := typeNode.Loc
+
+					// Extend the `as` keyword range backwards to include any leading whitespace.
+					// Input:
+					// `x /* comment 1 */ as /* comment 2 */ SomeType`
+					//                   ^^ `asKeywordRange`
+					// Output:
+					// `x /* comment 1 */ as /* comment 2 */ SomeType`
+					//                   ^^^ `asKeywordRange`
+					// Input:
+					// `x  as /* comment 2 */ SomeType`
+					//     ^^ `asKeywordRange`
+					// Output:
+					// `x  as /* comment 2 */ SomeType`
+					//   ^^^^ `asKeywordRange`
+					//
+					for {
+						previousCharPos := asKeywordRange.Pos() - 1
+						// Don't extend past the end of the expression being asserted
+						if previousCharPos < expression.End() {
+							break
+						}
+						previousChar := ctx.SourceFile.Text()[previousCharPos]
+						// Stop when we hit a non-whitespace character (expression or comment)
+						if !utils.IsStrWhiteSpace(rune(previousChar)) {
+							break
+						}
+						asKeywordRange = asKeywordRange.WithPos(previousCharPos)
+					}
+
+					typeNodePos := utils.TrimNodeTextRange(ctx.SourceFile, typeNode).Pos()
+
+					// If the text between the `as` token and `SomeType` is only whitespace,
+					// the two fixes can be merged into one. This produces cleaner output.
+					// `x as /* comment 1 */ as /* comment 2 */ SomeType`
+					//                         ^^^^^^^^^^^^^^^^^
+					betweenText := ctx.SourceFile.Text()[asKeywordRange.End():typeNodePos]
+					if !utils.IsStringWhiteSpace(betweenText) {
+						return []rule.RuleFix{
+							rule.RuleFixRemoveRange(asKeywordRange),
+							rule.RuleFixRemove(ctx.SourceFile, typeNode),
+						}
+					}
+
+					return []rule.RuleFix{
+						rule.RuleFixRemoveRange(core.NewTextRange(asKeywordRange.Pos(), typeNodeRange.End())),
+					}
 				})
 			} else {
 				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {

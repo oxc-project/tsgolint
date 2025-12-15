@@ -43,6 +43,53 @@ function findSchemaDirs(dir) {
 
 const schemaDirs = findSchemaDirs(rulesDir);
 
+/**
+ * Find fields in the schema that use oneOf with boolean + $ref to an object.
+ * These need to be converted to utils.BoolOr[T] in the generated Go code.
+ * @param {any} schema - The JSON schema
+ * @returns {Array<{fieldName: string, optionsType: string, defaultValue: boolean | undefined}>}
+ */
+function findBoolOrFields(schema) {
+  const results = [];
+  const definitions = schema.definitions || {};
+
+  // Helper to convert definition name to Go type name (e.g., ignorePrimitivesOptions -> IgnorePrimitivesOptions)
+  function toGoTypeName(defName) {
+    // Split by underscore and capitalize each part
+    return defName
+      .split('_')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
+  }
+
+  // Check each definition for properties with oneOf boolean + $ref pattern
+  for (const [defName, def] of Object.entries(definitions)) {
+    if (def.type !== 'object' || !def.properties) continue;
+
+    for (const [propName, prop] of Object.entries(def.properties)) {
+      if (!prop.oneOf) continue;
+
+      // Check if oneOf contains boolean and a $ref
+      const hasBool = prop.oneOf.some((o) => o.type === 'boolean');
+      const refItem = prop.oneOf.find((o) => o.$ref);
+
+      if (hasBool && refItem) {
+        // Extract the referenced type name from $ref (e.g., "#/definitions/ignorePrimitivesOptions" -> "ignorePrimitivesOptions")
+        const refMatch = refItem.$ref.match(/#\/definitions\/(\w+)/);
+        if (refMatch) {
+          const referencedDefName = refMatch[1];
+          const goTypeName = toGoTypeName(referencedDefName);
+          // Get the default value if it's a boolean
+          const defaultValue = typeof prop.default === 'boolean' ? prop.default : undefined;
+          results.push({ fieldName: propName, optionsType: goTypeName, defaultValue });
+        }
+      }
+    }
+  }
+
+  return results;
+}
+
 for (const schemaDir of schemaDirs) {
   const schemaPath = path.join(schemaDir, 'schema.json');
   const outputPath = path.join(schemaDir, 'options.go');
@@ -68,10 +115,7 @@ for (const schemaDir of schemaDirs) {
     // Only if the file actually uses json (has UnmarshalJSON methods)
     if (content.includes('import "encoding/json"')) {
       if (content.includes('json.Unmarshal') || content.includes('json.Marshal')) {
-        content = content.replace(
-          /^import "encoding\/json"/m,
-          'import "github.com/go-json-experiment/json"',
-        );
+        content = content.replace(/^import "encoding\/json"/m, 'import "github.com/go-json-experiment/json"');
         modified = true;
       } else {
         // Remove unused json import
@@ -160,9 +204,7 @@ for (const schemaDir of schemaDirs) {
       );
 
       modified = true;
-      console.log(
-        `  Post-processed ${ruleName} to remove omitempty from Allow field`,
-      );
+      console.log(`  Post-processed ${ruleName} to remove omitempty from Allow field`);
     }
 
     if (ruleName === 'return_await') {
@@ -182,6 +224,65 @@ func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
       content = content.replace(originalUnmarshal, newUnmarshal);
       modified = true;
       console.log(`  Post-processed ${ruleName} to add null handling for default value`);
+    }
+
+    // Handle oneOf patterns with boolean + object (e.g., ignorePrimitives)
+    // These generate `interface{}` which requires manual type switching. Replace with utils.BoolOr[T].
+    // Skip rules that already have manual handling for these patterns.
+    const skipBoolOrRules = ['no_misused_promises'];
+    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const boolOrFields = skipBoolOrRules.includes(ruleName) ? [] : findBoolOrFields(schema);
+
+    if (boolOrFields.length > 0) {
+      for (const { fieldName, optionsType, defaultValue } of boolOrFields) {
+        // Convert field name to PascalCase for Go (e.g., ignorePrimitives -> IgnorePrimitives)
+        const goFieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+
+        // Find the interface{} field and replace with utils.BoolOr[T]
+        const interfacePattern = new RegExp(`(${goFieldName}\\s+)interface\\{\\}(\\s+\`json:"${fieldName}[^"]*"\`)`);
+        const newContent = content.replace(interfacePattern, `$1utils.BoolOr[${optionsType}]$2`);
+
+        if (newContent !== content) {
+          content = newContent;
+
+          // Also fix the default value assignment in UnmarshalJSON if it assigns a raw boolean
+          // e.g., plain.ChecksVoidReturn = true -> plain.ChecksVoidReturn = utils.BoolOrTrue[ChecksVoidReturnOptions]()
+          if (defaultValue !== undefined) {
+            const defaultPattern = new RegExp(`plain\\.${goFieldName} = (true|false)`, 'g');
+            const boolDefault = defaultValue ? 'true' : 'false';
+            content = content.replace(
+              defaultPattern,
+              `plain.${goFieldName} = utils.BoolOrValue[${optionsType}](${boolDefault})`,
+            );
+          }
+
+          // Add utils import if not present
+          if (!content.includes('"github.com/typescript-eslint/tsgolint/internal/utils"')) {
+            if (content.includes('import "github.com/go-json-experiment/json"')) {
+              content = content.replace(
+                /^import "github\.com\/go-json-experiment\/json"/m,
+                'import "github.com/go-json-experiment/json"\nimport "github.com/typescript-eslint/tsgolint/internal/utils"',
+              );
+            } else if (content.includes('import (')) {
+              content = content.replace(
+                /^import \(/m,
+                'import (\n\t"github.com/typescript-eslint/tsgolint/internal/utils"',
+              );
+            } else {
+              // Add new import block after package declaration
+              content = content.replace(
+                /^(package \w+)\n/m,
+                '$1\n\nimport "github.com/typescript-eslint/tsgolint/internal/utils"\n',
+              );
+            }
+          }
+
+          modified = true;
+          console.log(
+            `  Post-processed ${ruleName}: replaced ${goFieldName} interface{} with utils.BoolOr[${optionsType}]`,
+          );
+        }
+      }
     }
 
     if (modified) {

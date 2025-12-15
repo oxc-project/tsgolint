@@ -1,36 +1,14 @@
-From e8e7984af1c57a1fb993bbbbe09c2dae9fac8642 Mon Sep 17 00:00:00 2001
+From 45b0fd0a52c514a1d989ebe0cd225dbdf2327d7b Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
 Subject: [PATCH] Adapt project service for single run mode
 
 ---
- internal/project/checkerpool.go | 10 ++++++++++
- internal/project/project.go     |  3 ++-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+ internal/project/project.go | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/internal/project/checkerpool.go b/internal/project/checkerpool.go
-index 0e1ba1cd0..dbed1f689 100644
---- a/internal/project/checkerpool.go
-+++ b/internal/project/checkerpool.go
-@@ -106,6 +106,16 @@ func (p *CheckerPool) ForEachCheckerParallel(ctx context.Context, cb func(idx in
- 	if requestID == "" {
- 		panic("cannot call ForEachCheckerParallel on a project.checkerPool without a request ID")
- 	}
-+	if requestID == "__single_run__" {
-+		for i, existing := range p.checkers {
-+			if existing == nil {
-+				checker, _ := checker.NewChecker(p.program)
-+				p.checkers[i] = checker
-+			}
-+			cb(i, p.checkers[i])
-+		}
-+		return
-+	}
- 
- 	// A request can only access one checker
- 	if c, release := p.getRequestCheckerLocked(requestID); c != nil {
 diff --git a/internal/project/project.go b/internal/project/project.go
-index bb6aabfa6..e4705277f 100644
+index b2b933233..8b068b5de 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
 @@ -2,6 +2,7 @@ package project
@@ -41,7 +19,7 @@ index bb6aabfa6..e4705277f 100644
  	"strings"
  	"sync"
  
-@@ -345,7 +346,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
+@@ -348,7 +349,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
  				TypingsLocation:             typingsLocation,
  				JSDocParsingMode:            ast.JSDocParsingModeParseAll,
  				CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {
