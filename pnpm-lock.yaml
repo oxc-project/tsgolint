@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@types/node':
-        specifier: ^24.10.0
-        version: 24.10.3
+        specifier: ^25.0.0
+        version: 25.0.2
       dprint:
         specifier: ^0.50.1
         version: 0.50.2
@@ -62,8 +62,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@types/node@24.10.3':
-    resolution: {integrity: sha512-gqkrWUsS8hcm0r44yn7/xZeV1ERva/nLgrLxFRUGb7aoNMIJfZJ3AC261zDQuOAKC7MiXai1WCpYc48jAHoShQ==}
+  '@types/node@25.0.2':
+    resolution: {integrity: sha512-gWEkeiyYE4vqjON/+Obqcoeffmk0NF15WSBwSs7zwVA2bAbTaE0SJ7P0WNGoJn8uE7fiaV5a7dKYIJriEqOrmA==}
 
   dprint@0.50.2:
     resolution: {integrity: sha512-+0Fzg+17jsMMUouK00/Fara5YtGOuE76EAJINHB8VpkXHd0n00rMXtw/03qorOgz23eo8Y0UpYvNZBJJo3aNtw==}
@@ -101,7 +101,7 @@ snapshots:
   '@dprint/win32-x64@0.50.2':
     optional: true
 
-  '@types/node@24.10.3':
+  '@types/node@25.0.2':
     dependencies:
       undici-types: 7.16.0
 

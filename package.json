@@ -5,7 +5,7 @@
     "fmt": "dprint fmt"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0",
+    "@types/node": "^25.0.0",
     "dprint": "^0.50.1"
   }
 }

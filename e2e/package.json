@@ -7,7 +7,7 @@
     "test": "vitest"
   },
   "devDependencies": {
-    "@types/node": "^24.3.1",
+    "@types/node": "^25.0.0",
     "fast-glob": "^3.3.3",
     "typescript": "^5.9.2",
     "vitest": "^4.0.1"
