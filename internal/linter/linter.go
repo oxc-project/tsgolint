@@ -68,6 +68,10 @@ func RunLinter(
 			return err
 		}
 
+		if logLevel == utils.LogLevelDebug {
+			log.Printf("Program created with %d source files", len(program.GetSourceFiles()))
+		}
+
 		if len(diagnostics) > 0 {
 			for _, d := range diagnostics {
 				onInternalDiagnostic(d)
