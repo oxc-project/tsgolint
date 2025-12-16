@@ -22,25 +22,30 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `foo ?? {};`},
 		{Code: `(foo ?? {})?.bar;`},
 		{Code: `foo ||= bar ?? {};`},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/8380
 		{Code: `
         const a = null;
         const b = 0;
         a === undefined || b === null || b === undefined;
       `},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/8380
 		{Code: `
         const a = 0;
         const b = 0;
         a === undefined || b === undefined || b === null;
       `},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/8380
 		{Code: `
         const a = 0;
         const b = 0;
         b === null || a === undefined || b === undefined;
       `},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/8380
 		{Code: `
         const b = 0;
         b === null || b === undefined;
       `},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/8380
 		{Code: `
         const a = 0;
         const b = 0;
@@ -635,6 +640,7 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `!import.meta && !import.meta.foo;`},
 		{Code: `new.target || new.target.length;`},
 		{Code: `!new.target || true;`},
+		// Do not handle direct optional chaining on private properties because this TS limitation (https://github.com/microsoft/TypeScript/issues/42734)
 		{Code: `foo && foo.#bar;`},
 		{Code: `!foo || !foo.#bar;`},
 		{Code: `({}) && {}.toString();`},
@@ -643,6 +649,7 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `(function () {}) && function () {}.name;`},
 		{Code: `(class Foo {}) && class Foo {}.constructor;`},
 		{Code: `new Map().get('a') && new Map().get('a').what;`},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/7654
 		{Code: `data && data.value !== null;`},
 		{Code: `<div /> && (<div />).wtf;`},
 		{Code: `<></> && (<></>).wtf;`},
@@ -2390,6 +2397,7 @@ func TestPreferOptionalChainRule(t *testing.T) {
 				},
 			},
 		},
+		// case with inconsistent checks should "break" the chain
 		{
 			Code:   `foo && foo.bar != null && foo.bar.baz !== undefined && foo.bar.baz.buzz;`,
 			Output: []string{`foo?.bar?.baz !== undefined && foo.bar.baz.buzz;`},
@@ -2774,6 +2782,7 @@ func TestPreferOptionalChainRule(t *testing.T) {
 				},
 			},
 		},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/6332
 		{
 			Code:   `unrelated != null && foo != null && foo.bar != null;`,
 			Output: []string{`unrelated != null && foo?.bar != null;`},
@@ -2792,6 +2801,7 @@ func TestPreferOptionalChainRule(t *testing.T) {
 				},
 			},
 		},
+		// https://github.com/typescript-eslint/typescript-eslint/issues/1461
 		{
 			Code:   `foo1 != null && foo1.bar != null && foo2 != null && foo2.bar != null;`,
 			Output: []string{`foo1?.bar != null && foo2?.bar != null;`},
