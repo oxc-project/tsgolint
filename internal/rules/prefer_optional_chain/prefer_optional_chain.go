@@ -86,6 +86,39 @@ func isComparisonOrNullCheck(typ OperandType) bool {
 	return typ == OperandTypeComparison || isNullishCheckType(typ)
 }
 
+// isNullishComparison checks if an OperandTypeComparison operand is actually comparing to null/undefined.
+// This is used in OR chains where property null checks like `a.b == null` are parsed as OperandTypeComparison
+// but should still be treated as nullish checks for chain building purposes.
+func isNullishComparison(op Operand) bool {
+	if op.typ != OperandTypeComparison || op.node == nil {
+		return false
+	}
+	unwrapped := unwrapParentheses(op.node)
+	if !ast.IsBinaryExpression(unwrapped) {
+		return false
+	}
+	binExpr := unwrapped.AsBinaryExpression()
+	binOp := binExpr.OperatorToken.Kind
+
+	// Only == and === null/undefined checks are nullish comparisons in OR chains
+	// != and !== are the opposite (checking if NOT null)
+	if binOp != ast.KindEqualsEqualsToken && binOp != ast.KindEqualsEqualsEqualsToken {
+		return false
+	}
+
+	left := unwrapParentheses(binExpr.Left)
+	right := unwrapParentheses(binExpr.Right)
+
+	isLeftNullish := left.Kind == ast.KindNullKeyword ||
+		(ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
+		ast.IsVoidExpression(left)
+	isRightNullish := right.Kind == ast.KindNullKeyword ||
+		(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
+		ast.IsVoidExpression(right)
+
+	return isLeftNullish || isRightNullish
+}
+
 // Operand represents a parsed operand in a logical chain
 type Operand struct {
 	typ          OperandType
@@ -878,6 +911,14 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 func (processor *chainProcessor) shouldSkipByType(node *ast.Node) bool {
 	baseNode := getBaseIdentifier(node)
 	info := processor.getTypeInfo(baseNode)
+
+	// If requireNullish is true and the type explicitly includes null/undefined,
+	// do NOT skip - the chain is specifically checking for nullish values.
+	// The check* options are for "loose boolean" cases where we're checking
+	// falsy non-nullish values (like empty string, 0, false).
+	if processor.opts.RequireNullish && (info.hasNull || info.hasUndefined) {
+		return false
+	}
 
 	// Skip nullish types - they're always allowed
 	// We need to check each non-nullish type against the options
@@ -1886,35 +1927,86 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			}
 		}
 
-		// Special case for AND chains with unsafe option enabled:
-		// Allow extending call expressions even though they may have side effects
-		// Example: foo.bar() && foo.bar().baz with unsafe option
+		// Special case for AND chains:
+		// Allow extending call expressions even though they may have side effects when:
+		// 1. The unsafe option is enabled, OR
+		// 2. Both the previous and current operand are plain truthiness checks
+		//
+		// For case 2: foo && foo<string>() && foo<string>().bar
+		// - All operands are plain truthiness checks
+		// - The user's intent is clear: chain through the call result
+		// - This is a common pattern that typescript-eslint converts
+		//
 		// This is different from: getFoo() && getFoo().bar (different calls, always unsafe)
 		// Track if we used special handling to allow call chain extension
 		usedCallChainExtension := false
-		if cmp == NodeInvalid && processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-			// Check if lastExpr is a call/new expression and op.comparedExpr extends it
-			lastUnwrapped := lastExpr
-			if lastUnwrapped != nil {
-				for ast.IsParenthesizedExpression(lastUnwrapped) {
-					lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
-				}
-				if ast.IsCallExpression(lastUnwrapped) || ast.IsNewExpression(lastUnwrapped) {
-					// Try text-based comparison to see if op extends lastExpr
-					lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
-					opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
-					sourceText := processor.sourceText
-					if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
-						opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
-						lastText := sourceText[lastRange.Pos():lastRange.End()]
-						opText := sourceText[opRange.Pos():opRange.End()]
-						if strings.HasPrefix(opText, lastText) {
-							remainder := strings.TrimPrefix(opText, lastText)
-							if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
-								// op extends lastExpr, treat as NodeSubset
-								cmp = NodeSubset
-								usedCallChainExtension = true
-								chainHasSafeCallExtension = true // Mark chain-level flag
+		if cmp == NodeInvalid {
+			// Check if we should allow extending through call expression
+			// Either via unsafe option OR via plain truthiness chain pattern
+			prevOp := currentChain[len(currentChain)-1]
+			isPlainTruthinessChain := prevOp.typ == OperandTypePlain && op.typ == OperandTypePlain
+
+			if processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing || isPlainTruthinessChain {
+				// Check if lastExpr is a call/new expression and op.comparedExpr extends it
+				lastUnwrapped := lastExpr
+				if lastUnwrapped != nil {
+					for ast.IsParenthesizedExpression(lastUnwrapped) {
+						lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
+					}
+					if ast.IsCallExpression(lastUnwrapped) || ast.IsNewExpression(lastUnwrapped) {
+						// IMPORTANT: Only allow text-based extension if the FIRST operand
+						// in the chain is NOT rooted in a new/call expression.
+						//
+						// Valid: foo && foo() && foo().bar
+						//   - First operand `foo` is an identifier
+						//   - All refer to the same base object
+						//
+						// Invalid: new Map().get('a') && new Map().get('a').what
+						//   - First operand `new Map().get('a')` is rooted in `new Map()`
+						//   - Each `new Map()` creates a fresh instance, they're not the same
+						//
+						// Check if the first operand's base is a new/call expression
+						firstOpExpr := currentChain[0].comparedExpr
+						baseExpr := firstOpExpr
+						for baseExpr != nil {
+							unwrapped := baseExpr
+							for ast.IsParenthesizedExpression(unwrapped) {
+								unwrapped = unwrapped.AsParenthesizedExpression().Expression
+							}
+							if ast.IsPropertyAccessExpression(unwrapped) {
+								baseExpr = unwrapped.AsPropertyAccessExpression().Expression
+							} else if ast.IsElementAccessExpression(unwrapped) {
+								baseExpr = unwrapped.AsElementAccessExpression().Expression
+							} else if ast.IsCallExpression(unwrapped) {
+								baseExpr = unwrapped.AsCallExpression().Expression
+							} else {
+								// Found the base - check if it's a new expression
+								break
+							}
+						}
+
+						// If the base of the first operand is a new expression, don't allow extension
+						// (each `new X()` creates a fresh instance)
+						firstOpRootedInNew := baseExpr != nil && ast.IsNewExpression(baseExpr)
+
+						if !firstOpRootedInNew {
+							// Try text-based comparison to see if op extends lastExpr
+							lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
+							opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
+							sourceText := processor.sourceText
+							if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
+								opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
+								lastText := sourceText[lastRange.Pos():lastRange.End()]
+								opText := sourceText[opRange.Pos():opRange.End()]
+								if strings.HasPrefix(opText, lastText) {
+									remainder := strings.TrimPrefix(opText, lastText)
+									if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
+										// op extends lastExpr, treat as NodeSubset
+										cmp = NodeSubset
+										usedCallChainExtension = true
+										chainHasSafeCallExtension = true // Mark chain-level flag
+									}
+								}
 							}
 						}
 					}
@@ -2365,6 +2457,67 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 							shouldStopChain = true
 						}
 					}
+
+					// Case 5: Strict check followed by plain access that extends it
+					// When the last operand in the chain is a strict nullish check (!== null, !== undefined, typeof)
+					// and the current operand is a plain access that EXTENDS the checked expression,
+					// we should stop the chain. This is the "inconsistent checks" case.
+					//
+					// The issue is: optional chaining (?.) checks for BOTH null and undefined,
+					// but a strict check only checks for ONE. If we convert the plain access to
+					// optional chaining, we'd be adding a check that wasn't in the original code.
+					//
+					// Example: foo && foo.bar != null && foo.bar.baz !== undefined && foo.bar.baz.buzz
+					// - foo.bar.baz !== undefined only checks for undefined, not null
+					// - foo.bar.baz.buzz is a plain access extending the strict-checked expression
+					// - Converting to foo?.bar?.baz?.buzz would add a null check on foo.bar.baz.buzz
+					// -> foo?.bar?.baz !== undefined && foo.bar.baz.buzz (preserve the plain access)
+					//
+					// EXCEPTION: If the strict check is part of a complementary pair (both null and undefined
+					// are checked on the same expression), then we CAN continue the chain because the combined
+					// checks are equivalent to optional chaining.
+					//
+					// IMPORTANT: This only applies when:
+					// - NOT using unsafe option
+					// - Current operand is a plain access (not another nullish check)
+					// - Current operand EXTENDS the strict-checked expression (not just any access)
+					// - The strict check is NOT part of a complementary pair
+					if !shouldStopChain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing &&
+						op.typ == OperandTypePlain && isStrictNullishCheck(lastChainOp.typ) {
+						// Check if current operand extends the last chain operand's expression
+						if lastChainOp.comparedExpr != nil && op.comparedExpr != nil {
+							cmpResult := processor.compareNodes(lastChainOp.comparedExpr, op.comparedExpr)
+							if cmpResult == NodeSubset {
+								// Before stopping, check if the strict check is part of a complementary pair
+								// Look for another check on the same expression that completes the null+undefined check
+								hasComplementaryCheck := false
+								isLastNull := lastChainOp.typ == OperandTypeNotStrictEqualNull
+								isLastUndef := lastChainOp.typ == OperandTypeNotStrictEqualUndef || lastChainOp.typ == OperandTypeTypeofCheck
+
+								for j := 0; j < len(currentChain)-1; j++ {
+									prevOp := currentChain[j]
+									if prevOp.comparedExpr != nil {
+										prevCmp := processor.compareNodes(prevOp.comparedExpr, lastChainOp.comparedExpr)
+										if prevCmp == NodeEqual {
+											// Same expression - check if it's a complementary check
+											isPrevNull := prevOp.typ == OperandTypeNotStrictEqualNull
+											isPrevUndef := prevOp.typ == OperandTypeNotStrictEqualUndef || prevOp.typ == OperandTypeTypeofCheck
+											if (isLastNull && isPrevUndef) || (isLastUndef && isPrevNull) {
+												hasComplementaryCheck = true
+												break
+											}
+										}
+									}
+								}
+
+								if !hasComplementaryCheck {
+									// Current operand extends the strict-checked expression
+									// Stop the chain - the strict check becomes trailing, plain access is preserved
+									shouldStopChain = true
+								}
+							}
+						}
+					}
 				}
 
 				// If we should stop the chain and current is a property access, do so
@@ -2485,50 +2638,9 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		}
 	}
 
-	// Check if we have multiple chains with different base identifiers
-	// Without the unsafe option, we should skip ALL chains if they have different bases
-	// This is to avoid partial conversions that might be confusing
-	// Example: a.b && a.b.c && c.d && c.d.e (different bases: a and c)
-	// With unsafe option: report both chains separately
-	// Without unsafe option: skip all chains
-	if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing && len(chainsToReport) > 1 {
-		// Check if all chains are plain AND chains (no explicit null checks)
-		// If any chain has explicit null checks, allow conversion
-		allPlain := true
-		for _, chain := range chainsToReport {
-			for _, op := range chain {
-				if op.typ != OperandTypePlain {
-					allPlain = false
-					break
-				}
-			}
-			if !allPlain {
-				break
-			}
-		}
-
-		if allPlain {
-			// All chains are plain AND chains
-			// Check if they have different base identifiers
-			baseIdentifiers := make(map[string]bool)
-			for _, chain := range chainsToReport {
-				if len(chain) > 0 && chain[0].comparedExpr != nil {
-					base := getBaseIdentifier(chain[0].comparedExpr)
-					baseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, base)
-					sourceText := processor.sourceText
-					if baseRange.Pos() >= 0 && baseRange.End() <= len(sourceText) {
-						baseText := sourceText[baseRange.Pos():baseRange.End()]
-						baseIdentifiers[baseText] = true
-					}
-				}
-			}
-
-			// If we have multiple different bases, skip all chains
-			if len(baseIdentifiers) > 1 {
-				return // Skip all chains when multiple bases without unsafe option
-			}
-		}
-	}
+	// Note: Previously we skipped all chains when multiple bases were present
+	// without the unsafe option. However, typescript-eslint reports each chain
+	// separately, so we now process all chains regardless of base differences.
 
 	// Filter out chains that overlap with longer chains
 	// For example: foo !== null && foo.bar !== null && foo.bar.baz !== null && foo.bar.baz.qux
@@ -2919,6 +3031,15 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			}
 
 			hasTypeofCheck := false
+			// Also check if the TRAILING operand (excluded from guardOperands) is a "both" check
+			// If so, the chain is still safe because the result is a boolean nullish check
+			hasTrailingBothCheck := false
+			if len(chain) >= 2 && len(guardOperands) < len(chain) {
+				lastOp := chain[len(chain)-1]
+				if lastOp.typ == OperandTypeNotEqualBoth {
+					hasTrailingBothCheck = true
+				}
+			}
 			for _, op := range guardOperands {
 				if op.typ == OperandTypePlain {
 					hasPlainTruthinessCheck = true
@@ -2942,7 +3063,27 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// The conversion to foo?.bar !== undefined is safe
 			// Also, typeof checks should NOT be flagged as incomplete because optional chaining is strictly safer
 			// (typeof x !== 'undefined' only checks undefined, but x?.foo checks both null and undefined)
-			if !hasPlainTruthinessCheck && !hasBothCheck && !hasTypeofCheck {
+			// Also, if the trailing operand is a "both" check (!= null), the chain is safe
+			// ALSO: If the trailing operand already has optional chaining, allow the conversion
+			// This handles patterns like: foo.bar !== undefined && foo.bar?.() !== undefined
+			// where the user has already opted into optional chaining semantics
+			hasTrailingOptionalChaining := false
+			if len(chain) >= 2 && len(guardOperands) < len(chain) {
+				lastOp := chain[len(chain)-1]
+				if lastOp.comparedExpr != nil && processor.containsOptionalChain(lastOp.comparedExpr) {
+					hasTrailingOptionalChaining = true
+				}
+			}
+			// ALSO: If the first operand's expression type doesn't include nullish, skip this check
+			// The incomplete nullish check is only dangerous when the type COULD be null but we only check undefined
+			// If the type can never be null, then checking only for undefined is fine
+			firstOpNotNullish := false
+			if len(guardOperands) > 0 && guardOperands[0].comparedExpr != nil {
+				if !processor.includesNullish(guardOperands[0].comparedExpr) {
+					firstOpNotNullish = true
+				}
+			}
+			if !hasPlainTruthinessCheck && !hasBothCheck && !hasTypeofCheck && !hasTrailingBothCheck && !hasTrailingOptionalChaining && !firstOpNotNullish {
 				// If we have a strict null check or strict undefined check (but not both), skip
 				// This is unsafe regardless of other checks in the chain
 				// UNLESS we also have a "both" check (!=) or a typeof check
@@ -2960,22 +3101,24 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 
 		// Check type-checking options for "loose boolean" operands
 		// These options only apply to plain operands (not explicit nullish checks)
+		// and only to the FIRST operand (the guard) - subsequent operands are just accesses
 		shouldSkip := false
 		for i, op := range chain {
 			if op.typ == OperandTypePlain {
-				// Check if we should skip based on type
-				if processor.shouldSkipByType(op.comparedExpr) {
-					shouldSkip = true
-					break
-				}
-				// Check if conversion would change return type for the FIRST operand only
-				// This happens when the type has falsy non-nullish values (like '', 0, false)
-				// but does NOT have null/undefined. In this case, && checks for these falsy values
-				// but ?. would not, so conversion would change behavior.
-				// Example: foo: { bar: string } | '' - && guards against '', ?. doesn't
-				// We only check the first operand because that's what && is checking for truthiness.
-				// Subsequent operands don't affect whether we can convert - they're accessed after the guard.
+				// Check if we should skip based on type - only for the first operand (the guard)
+				// Subsequent operands are just accesses, not truthiness guards
 				if i == 0 {
+					if processor.shouldSkipByType(op.comparedExpr) {
+						shouldSkip = true
+						break
+					}
+					// Check if conversion would change return type for the FIRST operand only
+					// This happens when the type has falsy non-nullish values (like '', 0, false)
+					// but does NOT have null/undefined. In this case, && checks for these falsy values
+					// but ?. would not, so conversion would change behavior.
+					// Example: foo: { bar: string } | '' - && guards against '', ?. doesn't
+					// We only check the first operand because that's what && is checking for truthiness.
+					// Subsequent operands don't affect whether we can convert - they're accessed after the guard.
 					if processor.wouldChangeReturnType(op.comparedExpr) {
 						// If allowUnsafe is true, we can still convert (user opted in)
 						// If allowUnsafe is false, skip entirely (not even suggestion)
@@ -3147,10 +3290,14 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		var lastPropertyAccess *ast.Node
 		var hasTrailingComparison bool
 		var hasTrailingTypeofCheck bool
-		var hasComplementaryNullCheck bool // true if last two operands form a complementary null+undefined check
+		var hasComplementaryNullCheck bool      // true if last two operands form a complementary null+undefined check
+		var complementaryTrailingNode *ast.Node // the last operand's node to append as trailing text
 
 		// Check if the last two operands form a complementary pair (null + undefined checks on same expression)
-		// If so, they should be simplified to `!= null`
+		// When this is true, we DON'T simplify to `!= null`. Instead:
+		// - Use the SECOND-TO-LAST operand as the chain endpoint
+		// - Append the LAST operand as trailing text (preserving it)
+		// - Make it a SUGGESTION because the code can't be fully simplified
 		if len(chain) >= 2 {
 			lastOp := chain[len(chain)-1]
 			secondLastOp := chain[len(chain)-2]
@@ -3166,11 +3313,13 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					isSecondLastNull := secondLastOp.typ == OperandTypeNotStrictEqualNull
 
 					if (isLastUndef && isSecondLastNull) || (isLastNull && isSecondLastUndef) {
-						// Complementary pair! Simplify to `!= null`
+						// Complementary pair! Don't simplify - use second-to-last as chain end, keep last as trailing
 						hasComplementaryNullCheck = true
-						lastPropertyAccess = lastOp.comparedExpr
+						lastPropertyAccess = secondLastOp.comparedExpr
+						complementaryTrailingNode = lastOp.node
+						// Set flags based on the second-to-last operand (the one we're including in the chain)
 						hasTrailingComparison = true
-						hasTrailingTypeofCheck = false
+						hasTrailingTypeofCheck = secondLastOp.typ == OperandTypeTypeofCheck
 					}
 				}
 			}
@@ -3436,11 +3585,17 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			}
 
 			// For each part index, merge optional and non-null flags
-			// For optional chains (?.), use ANY operand that has it
+			// For optional chains (?.), use the SHORTEST operand that covers this index
+			// This ensures we preserve the optional state from the earliest check (the one that validates the path)
+			// Example: foo.bar.baz != null && foo?.bar?.baz.bam != null
+			// - First operand (foo.bar.baz) is shorter and has NO optional chaining
+			// - So we should NOT make bar/baz optional, even though second operand has them optional
+			// - Result: foo.bar.baz?.bam (only the extension is optional)
+			//
 			// For non-null assertions (!), use the SHORTEST operand that covers this index
 			// This ensures we preserve ! from the earliest check, not from later extended checks
 			for i := range parts {
-				// Find the shortest operand that covers this index (for non-null assertions)
+				// Find the shortest operand that covers this index
 				var shortestCoveringOp *opPartsInfo
 				for j := range allOpParts {
 					op := &allOpParts[j]
@@ -3451,11 +3606,10 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					}
 				}
 
-				// Merge from all operands for optional flag
-				for _, op := range allOpParts {
-					if i < op.len && op.parts[i].optional {
-						parts[i].optional = true
-					}
+				// Use the shortest covering operand for optional flag
+				// This ensures we respect the first check's optional state
+				if shortestCoveringOp != nil && i < shortestCoveringOp.len {
+					parts[i].optional = shortestCoveringOp.parts[i].optional
 				}
 
 				// Use only the shortest covering operand for non-null assertion
@@ -3537,60 +3691,75 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 
 		// Check if the last operand is a comparison - if so, append/prepend it
 		if hasTrailingComparison {
+			// For complementary null+undefined checks, use the SECOND-TO-LAST operand
+			// as the comparison and append the LAST operand as trailing text
+			var operandForComparison Operand
 			if hasComplementaryNullCheck {
-				// Complementary null+undefined check - simplify to `!= null`
-				newCode = newCode + " != null"
+				operandForComparison = chain[len(chain)-2]
 			} else {
-				lastOperand := chain[len(chain)-1]
-				if ast.IsBinaryExpression(lastOperand.node) {
-					binExpr := lastOperand.node.AsBinaryExpression()
+				operandForComparison = chain[len(chain)-1]
+			}
 
-					// Special handling for typeof checks: typeof foo.bar !== 'undefined'
-					// The binary expression is: (typeof foo.bar) !== 'undefined'
-					// We need to wrap the optional chain with: typeof ... !== 'undefined'
-					if hasTrailingTypeofCheck {
-						// For typeof checks, we need to:
-						// 1. Get the "typeof " prefix from the left side
-						// 2. Get the " !== 'undefined'" suffix from after the comparedExpr
-						leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
-						comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.comparedExpr)
+			if ast.IsBinaryExpression(operandForComparison.node) {
+				binExpr := operandForComparison.node.AsBinaryExpression()
 
-						// typeof prefix: from start of left side to start of comparedExpr
-						typeofPrefix := processor.sourceText[leftRange.Pos():comparedExprRange.Pos()]
+				// Special handling for typeof checks: typeof foo.bar !== 'undefined'
+				// The binary expression is: (typeof foo.bar) !== 'undefined'
+				// We need to wrap the optional chain with: typeof ... !== 'undefined'
+				if hasTrailingTypeofCheck {
+					// For typeof checks, we need to:
+					// 1. Get the "typeof " prefix from the left side
+					// 2. Get the " !== 'undefined'" suffix from after the comparedExpr
+					leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
+					comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.comparedExpr)
 
-						// comparison suffix: from end of comparedExpr to end of binary expression
-						binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.node).End()
-						comparisonSuffix := processor.sourceText[comparedExprRange.End():binExprEnd]
+					// typeof prefix: from start of left side to start of comparedExpr
+					typeofPrefix := processor.sourceText[leftRange.Pos():comparedExprRange.Pos()]
 
-						newCode = typeofPrefix + newCode + comparisonSuffix
+					// comparison suffix: from end of comparedExpr to end of binary expression
+					binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).End()
+					comparisonSuffix := processor.sourceText[comparedExprRange.End():binExprEnd]
+
+					newCode = typeofPrefix + newCode + comparisonSuffix
+				} else {
+					// Check if this is a yoda condition (literal/constant on left, property on right)
+					// In yoda: '123' == foo.bar.baz
+					// Not yoda: foo.bar.baz == '123'
+					isYoda := false
+					comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.comparedExpr)
+					leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
+
+					// If comparedExpr is on the right side, it's yoda
+					if comparedExprRange.Pos() > leftRange.Pos() {
+						isYoda = true
+					}
+
+					if isYoda {
+						// Yoda: prepend the left side + operator
+						binExprStart := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).Pos()
+						comparedExprStart := comparedExprRange.Pos()
+						yodaPrefix := processor.sourceText[binExprStart:comparedExprStart]
+						newCode = yodaPrefix + newCode
 					} else {
-						// Check if this is a yoda condition (literal/constant on left, property on right)
-						// In yoda: '123' == foo.bar.baz
-						// Not yoda: foo.bar.baz == '123'
-						isYoda := false
-						comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.comparedExpr)
-						leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
-
-						// If comparedExpr is on the right side, it's yoda
-						if comparedExprRange.Pos() > leftRange.Pos() {
-							isYoda = true
-						}
-
-						if isYoda {
-							// Yoda: prepend the left side + operator
-							binExprStart := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.node).Pos()
-							comparedExprStart := comparedExprRange.Pos()
-							yodaPrefix := processor.sourceText[binExprStart:comparedExprStart]
-							newCode = yodaPrefix + newCode
-						} else {
-							// Normal: append the operator + right side
-							comparedExprEnd := comparedExprRange.End()
-							binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOperand.node).End()
-							comparisonSuffix := processor.sourceText[comparedExprEnd:binExprEnd]
-							newCode = newCode + comparisonSuffix
-						}
+						// Normal: append the operator + right side
+						comparedExprEnd := comparedExprRange.End()
+						binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).End()
+						comparisonSuffix := processor.sourceText[comparedExprEnd:binExprEnd]
+						newCode = newCode + comparisonSuffix
 					}
 				}
+			}
+
+			// For complementary null+undefined checks, append the last operand as trailing text
+			if hasComplementaryNullCheck && complementaryTrailingNode != nil {
+				// Get the text of the last operand including the && before it
+				// We need to find the && between the second-to-last and last operands
+				secondLastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-2].node)
+				lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, complementaryTrailingNode)
+				// The text between includes " && " or similar
+				betweenText := processor.sourceText[secondLastRange.End():lastRange.Pos()]
+				lastText := processor.sourceText[lastRange.Pos():lastRange.End()]
+				newCode = newCode + betweenText + lastText
 			}
 		}
 
@@ -3600,17 +3769,53 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// Otherwise, use the operand ranges
 		var replaceStart, replaceEnd int
 
-		// typeof checks should be removed when converting to optional chain
-		// typeof foo !== 'undefined' && foo.bar -> foo?.bar
-		// The optional chain handles the undefined check implicitly
-		if len(chain) == len(operandNodes) {
+		// Determine the effective chain start for replacement
+		// When the first operand is a typeof check on an UNDECLARED variable AND there are
+		// other non-typeof checks, we must PRESERVE the typeof check because it guards
+		// against ReferenceError for potentially-undeclared globals.
+		//
+		// Example: typeof globalThis !== 'undefined' && globalThis.Array && globalThis.Array()
+		// - globalThis might not exist in older environments (no declaration)
+		// - The typeof check prevents ReferenceError if globalThis doesn't exist
+		// - We can only transform: globalThis.Array && globalThis.Array() -> globalThis.Array?.()
+		// - Result: typeof globalThis !== 'undefined' && globalThis.Array?.()
+		//
+		// But: function foo(globalThis?: ...) { typeof globalThis !== 'undefined' && globalThis.Array() }
+		// - globalThis is a DECLARED parameter, so it always exists (might be undefined, but won't throw)
+		// - Can be fully transformed to: globalThis?.Array()
+		effectiveChainStart := 0
+		if len(chain) >= 2 && chain[0].typ == OperandTypeTypeofCheck {
+			// Check if there are non-typeof checks after the first operand
+			hasNonTypeofAfterFirst := false
+			for i := 1; i < len(chain); i++ {
+				if chain[i].typ != OperandTypeTypeofCheck {
+					hasNonTypeofAfterFirst = true
+					break
+				}
+			}
+			if hasNonTypeofAfterFirst && chain[0].comparedExpr != nil {
+				// Check if the typeof target is a declared variable
+				// If it has no symbol or no declarations, it's potentially undeclared
+				typeofTarget := chain[0].comparedExpr
+				symbol := processor.ctx.TypeChecker.GetSymbolAtLocation(typeofTarget)
+				isUndeclared := symbol == nil || len(symbol.Declarations) == 0
+
+				if isUndeclared {
+					// Preserve the typeof check - start replacement from second operand
+					effectiveChainStart = 1
+				}
+			}
+		}
+
+		if effectiveChainStart == 0 && len(chain) == len(operandNodes) {
 			// We're replacing all operands - use the top-level node range
 			nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
 			replaceStart = nodeRange.Pos()
 			replaceEnd = nodeRange.End()
 		} else {
 			// We're replacing a subset - use operand ranges
-			firstNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[0].node)
+			// Start from effectiveChainStart to preserve leading typeof checks
+			firstNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[effectiveChainStart].node)
 			lastNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-1].node)
 			replaceStart = firstNodeRange.Pos()
 			replaceEnd = lastNodeRange.End()
@@ -3621,69 +3826,105 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		}
 
 		// Determine if we should autofix or suggest
-		// When the unsafe option is enabled, always autofix
-		// When it's not enabled, use suggestion UNLESS:
-		//   1. The FINAL expression's type includes nullish (which makes it safe), OR
-		//   2. We have a trailing comparison (which ensures return type is consistent)
+		// Following typescript-eslint's logic:
+		// 1. If allowPotentiallyUnsafe option is enabled, always autofix
+		// 2. If there's a trailing comparison or the last operand has a nullish comparison type, autofix
+		// 3. Otherwise, check if ANY operand includes undefined (including any/unknown) - if so, autofix
+		// 4. Default to suggestion
 		useSuggestion := !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing
 
-		// Check if the FINAL operand (the one being accessed) includes nullish
-		// If the final expression is already nullable, converting to optional chain is safe
-		// Example: foo && foo.bar where foo.bar: string | null
-		// Original: string | null | false (from foo being falsy)
-		// With ?.: string | null | undefined - close enough, safe
-		// Counter-example: foo && foo.bar where foo.bar: string
-		// Original: string | false/null (from foo being falsy)
-		// With ?.: string | undefined - changes return type, unsafe
-		// NOTE: We use includesExplicitNullish here (not includesNullish) because
-		// for 'any'/'unknown' types we should use suggestion since we can't know
-		// if the conversion is safe or not
 		if useSuggestion && len(chain) > 0 {
 			lastOp := chain[len(chain)-1]
-			if processor.includesExplicitNullish(lastOp.comparedExpr) {
+
+			// Check if the last operand has a comparison type that makes autofix safe
+			// These comparison types ensure the return type remains consistent (boolean)
+			switch lastOp.typ {
+			case OperandTypeEqualNull, // == null (covers both null and undefined)
+				OperandTypeNotEqualBoth,        // != null (covers both)
+				OperandTypeStrictEqualUndef,    // === undefined
+				OperandTypeNotStrictEqualUndef: // !== undefined
+				useSuggestion = false
+			case OperandTypeTypeofCheck:
+				// typeof checks are safe to autofix
 				useSuggestion = false
 			}
-		}
 
-		// For chains where ALL intermediate operands (except last) have EXPLICIT nullable types,
-		// AND there are at least 2 intermediate operands (multiple nullable checks),
-		// the conversion is safe because we're just adding optional chaining to already-nullable accesses.
-		// Example: foo && foo.bar && foo.bar.toString() where foo: T | null | undefined and foo.bar: string | null | undefined
-		// Even though toString() returns string (not nullable), the intermediate accesses are safe to chain.
-		// Note: Single nullable check (foo && foo.bar) should remain suggestion only.
-		// NOTE: We use includesExplicitNullish here (not includesNullish) because
-		// for 'any'/'unknown' types we should use suggestion since we can't know
-		// if the conversion is safe or not
-		if useSuggestion && len(chain) > 2 {
-			allIntermediateNullable := true
-			for i := range len(chain) - 1 {
-				op := chain[i]
-				if op.comparedExpr != nil && !processor.includesExplicitNullish(op.comparedExpr) {
-					allIntermediateNullable = false
-					break
+			// For AND chains with trailing comparisons (non-nullish), always provide a fix
+			// The comparison ensures the return type remains consistent
+			// Example: foo && foo.bar === 0 -> foo?.bar === 0 (both return boolean)
+			if useSuggestion && hasTrailingComparison {
+				useSuggestion = false
+			}
+
+			// If still using suggestion, check if ANY operand includes undefined
+			// (including any/unknown types). If so, the autofix is safe because
+			// optional chaining will union undefined into a type that already has it.
+			// NOTE: We specifically check for UNDEFINED, not null. If the type only
+			// has null (not undefined), converting would change return type from null
+			// to undefined, which is an unsafe change.
+			if useSuggestion {
+				for _, op := range chain {
+					if op.comparedExpr != nil {
+						info := processor.getTypeInfo(op.comparedExpr)
+						// Safe to autofix if type includes undefined, any, or unknown
+						// (because ?. returns undefined, so adding undefined is safe)
+						if info.hasUndefined || info.hasAny || info.hasUnknown {
+							useSuggestion = false
+							break
+						}
+					}
 				}
 			}
-			if allIntermediateNullable {
-				useSuggestion = false
+
+			// EXCEPTION: When the first operand is an explicit nullish comparison
+			// (like foo != null or foo !== undefined) AND the last operand is a
+			// plain access (not a comparison), the return type changes from
+			// "false | T" to "undefined | T". If the operand's type doesn't include
+			// any/unknown (which would mask this difference), use suggestion.
+			if !useSuggestion && len(chain) > 0 {
+				firstOp := chain[0]
+				lastOp := chain[len(chain)-1]
+				// Check if first operand is an explicit nullish comparison
+				isExplicitNullishCheck := firstOp.typ == OperandTypeNotEqualBoth ||
+					firstOp.typ == OperandTypeNotStrictEqualNull ||
+					firstOp.typ == OperandTypeNotStrictEqualUndef
+				// Check if last operand is a plain access (not a comparison)
+				isPlainAccess := lastOp.typ == OperandTypePlain
+
+				if isExplicitNullishCheck && isPlainAccess {
+					// Check if the first operand's type includes any/unknown
+					// If not, the return type change is observable, so use suggestion
+					if firstOp.comparedExpr != nil {
+						info := processor.getTypeInfo(firstOp.comparedExpr)
+						if !info.hasAny && !info.hasUnknown {
+							useSuggestion = true
+						}
+					}
+				}
 			}
-		}
 
-		// For AND chains with trailing comparisons, always provide a fix
-		// The comparison ensures the return type remains consistent
-		// Example: foo && foo.bar === 0 -> foo?.bar === 0 (both return boolean)
-		if useSuggestion && hasTrailingComparison {
-			useSuggestion = false
-		}
-
-		// For chains guarded by typeof checks, always provide a fix
-		// typeof x !== 'undefined' only checks for undefined, but x?.foo checks both null AND undefined
-		// So converting is STRICTLY SAFER - it handles more cases
-		// Example: typeof globalThis !== 'undefined' && globalThis.Array() -> globalThis?.Array()
-		if useSuggestion && len(chain) > 0 {
-			for _, op := range chain {
-				if op.typ == OperandTypeTypeofCheck {
-					useSuggestion = false
-					break
+			// For complementary null+undefined checks, use suggestion when:
+			// 1. The trailing operand uses typeof, OR
+			// 2. The included operand (second-to-last) is a null check (!== null)
+			//
+			// Reason: If we convert foo?.bar !== null, and foo is undefined,
+			// the result is (undefined !== null) = true, which might not be expected.
+			// But foo?.bar !== undefined returns false when foo is undefined, which is expected.
+			//
+			// Example: null !== foo.bar.baz && undefined !== foo.bar.baz -> SUGGESTION
+			//          (because the chain uses !== null which returns true for undefined)
+			// Example: undefined !== foo.bar.baz && null !== foo.bar.baz -> FIX
+			//          (because the chain uses !== undefined which returns false for undefined)
+			if hasComplementaryNullCheck && len(chain) >= 2 {
+				lastOp := chain[len(chain)-1]
+				secondLastOp := chain[len(chain)-2]
+				// Check if trailing uses typeof
+				if lastOp.typ == OperandTypeTypeofCheck {
+					useSuggestion = true
+				}
+				// Check if the included check (second-to-last) is a null check
+				if secondLastOp.typ == OperandTypeNotStrictEqualNull {
+					useSuggestion = true
 				}
 			}
 		}
@@ -3801,23 +4042,20 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		op := operands[i]
 
 		// Accept OperandTypeNot, OperandTypeComparison, OperandTypePlain, typeof checks, and null check types
+		// In OR chains, both !== and === null checks are valid:
+		// - !== null: foo !== null || foo.bar (checks if NOT null, short-circuits if null)
+		// - === null: !a || a.b === null || !a.b.c (checks if IS null, returns true if null)
+		// Both patterns can be converted to optional chaining because they're checking for nullish values
 		validOrOperand := op.typ == OperandTypeNot ||
 			op.typ == OperandTypeComparison ||
 			op.typ == OperandTypePlain ||
 			op.typ == OperandTypeTypeofCheck ||
 			op.typ == OperandTypeNotStrictEqualNull ||
 			op.typ == OperandTypeNotStrictEqualUndef ||
-			op.typ == OperandTypeNotEqualBoth
-
-		// With unsafe option, also allow === null checks in OR chains
-		// Example: foo === null || foo.bar === null -> foo?.bar === null
-		// This changes semantics (when foo is null, original returns true, transformed returns false)
-		// but is allowed with the unsafe option
-		if !validOrOperand && processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-			validOrOperand = op.typ == OperandTypeStrictEqualNull ||
-				op.typ == OperandTypeEqualNull ||
-				op.typ == OperandTypeStrictEqualUndef
-		}
+			op.typ == OperandTypeNotEqualBoth ||
+			op.typ == OperandTypeStrictEqualNull ||
+			op.typ == OperandTypeStrictEqualUndef ||
+			op.typ == OperandTypeEqualNull
 
 		if !validOrOperand {
 			// Not a valid operand type for OR chain
@@ -3830,6 +4068,58 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		}
 
 		if len(chain) == 0 {
+			// CRITICAL: In OR chains, do NOT start a chain with `foo != null` or `foo !== null`
+			// on a BASE identifier. These patterns are semantically OPPOSITE of optional chaining.
+			//
+			// Example: foo != null || foo.bar
+			// - If foo is NOT null (true), short-circuit to true - we never evaluate foo.bar
+			// - If foo IS null (false), we try foo.bar which THROWS because foo is null!
+			//
+			// This is the OPPOSITE of what optional chaining does:
+			// - foo?.bar: If foo is null/undefined, return undefined; otherwise access foo.bar
+			//
+			// Valid OR chain starting patterns:
+			// - foo == null || foo.bar (if foo IS null, short-circuit; otherwise access foo.bar)
+			// - foo === null || foo.bar (same)
+			// - !foo || foo.bar (if foo is falsy, short-circuit; otherwise access foo.bar)
+			//
+			// Invalid OR chain starting patterns (should not be flagged):
+			// - foo != null || foo.bar (wrong semantics - throws if foo is null!)
+			// - foo !== null || foo.bar !== X (same issue)
+			if op.typ == OperandTypeComparison && op.node != nil {
+				unwrapped := unwrapParentheses(op.node)
+				if ast.IsBinaryExpression(unwrapped) {
+					binExpr := unwrapped.AsBinaryExpression()
+					binOp := binExpr.OperatorToken.Kind
+					// Check for != or !== operators
+					if binOp == ast.KindExclamationEqualsToken || binOp == ast.KindExclamationEqualsEqualsToken {
+						left := unwrapParentheses(binExpr.Left)
+						right := unwrapParentheses(binExpr.Right)
+						// Check if comparing to null/undefined
+						isLeftNullish := left.Kind == ast.KindNullKeyword ||
+							(ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
+							ast.IsVoidExpression(left)
+						isRightNullish := right.Kind == ast.KindNullKeyword ||
+							(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
+							ast.IsVoidExpression(right)
+						if isLeftNullish || isRightNullish {
+							// Determine which side is the checked expression
+							var checkedExpr *ast.Node
+							if isRightNullish {
+								checkedExpr = left
+							} else {
+								checkedExpr = right
+							}
+							// If the checked expression is a base identifier, don't start chain
+							isBaseIdentifier := ast.IsIdentifier(checkedExpr) || checkedExpr.Kind == ast.KindThisKeyword
+							if isBaseIdentifier {
+								// Skip this operand - cannot start a valid OR chain
+								continue
+							}
+						}
+					}
+				}
+			}
 			chain = append(chain, op)
 			lastExpr = op.comparedExpr
 			// Set hasTrailingComparison for both value comparisons AND null checks
@@ -3843,31 +4133,41 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		// Check if this continues the chain
 		cmp := processor.compareNodes(lastExpr, op.comparedExpr)
 
-		// Special case for OR chains with unsafe option enabled:
-		// Allow extending call expressions even though they may have side effects
-		// Example: foo.bar() || foo.bar().baz with unsafe option
-		// This is different from: getFoo() && getFoo().bar (different calls, always unsafe)
-		if cmp == NodeInvalid && processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-			// Check if lastExpr is a call/new expression and op.comparedExpr extends it
-			lastUnwrapped := lastExpr
-			if lastUnwrapped != nil {
-				for ast.IsParenthesizedExpression(lastUnwrapped) {
-					lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
-				}
-				if ast.IsCallExpression(lastUnwrapped) || ast.IsNewExpression(lastUnwrapped) {
-					// Try text-based comparison to see if op extends lastExpr
-					lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
-					opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
-					sourceText := processor.sourceText
-					if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
-						opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
-						lastText := sourceText[lastRange.Pos():lastRange.End()]
-						opText := sourceText[opRange.Pos():opRange.End()]
-						if strings.HasPrefix(opText, lastText) {
-							remainder := strings.TrimPrefix(opText, lastText)
-							if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
-								// op extends lastExpr, treat as NodeSubset
-								cmp = NodeSubset
+		// Special case for OR chains:
+		// Allow extending call expressions even though they may have side effects when:
+		// 1. The unsafe option is enabled, OR
+		// 2. Both the previous and current operand are negations (OperandTypeNot)
+		//
+		// For case 2: !foo() || !foo().bar
+		// - Both operands are negations checking for falsy values
+		// - The user's intent is clear: chain through the call result
+		// - This is a common pattern that typescript-eslint converts
+		if cmp == NodeInvalid && len(chain) > 0 {
+			prevOp := chain[len(chain)-1]
+			isNegationChain := prevOp.typ == OperandTypeNot && op.typ == OperandTypeNot
+
+			if processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing || isNegationChain {
+				// Check if lastExpr is a call/new expression and op.comparedExpr extends it
+				lastUnwrapped := lastExpr
+				if lastUnwrapped != nil {
+					for ast.IsParenthesizedExpression(lastUnwrapped) {
+						lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
+					}
+					if ast.IsCallExpression(lastUnwrapped) || ast.IsNewExpression(lastUnwrapped) {
+						// Try text-based comparison to see if op extends lastExpr
+						lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
+						opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
+						sourceText := processor.sourceText
+						if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
+							opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
+							lastText := sourceText[lastRange.Pos():lastRange.End()]
+							opText := sourceText[opRange.Pos():opRange.End()]
+							if strings.HasPrefix(opText, lastText) {
+								remainder := strings.TrimPrefix(opText, lastText)
+								if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
+									// op extends lastExpr, treat as NodeSubset
+									cmp = NodeSubset
+								}
 							}
 						}
 					}
@@ -3882,7 +4182,12 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			//   -> !foo?.bar || foo.bar > 5 (NOT foo?.bar > 5)
 			// The comparison to a non-nullish value (> 5) is a different semantic check
 			// and should NOT be part of the optional chain.
-			if cmp == NodeEqual && op.typ == OperandTypeComparison && len(chain) > 0 {
+			//
+			// EXCEPTION: If the comparison is actually a null/undefined check (e.g., a.b == null),
+			// then it SHOULD extend the chain because it's checking for nullish values.
+			// Pattern: !a || a.b == null || !a.b.c
+			//   -> !a?.b?.c (the a.b == null is a nullish check that extends the chain)
+			if cmp == NodeEqual && op.typ == OperandTypeComparison && len(chain) > 0 && !isNullishComparison(op) {
 				lastOp := chain[len(chain)-1]
 				// If the previous operand was a negation or null check, don't add this comparison
 				if lastOp.typ == OperandTypeNot ||
@@ -3984,17 +4289,33 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 				// - !foo || foo.bar != 0 (negation + SAFE comparison with literal)
 				// - !foo || foo.bar === undefined (negation + null check) - SAFE
 				// - !foo || foo.bar == null (negation + null check) - SAFE
+				// - !a || a.b === null || !a.b.c (nullish comparison as INTERMEDIATE check - SAFE)
+				// - !a || a.b == null || a.b.c (nullish comparisons + plain at end - SAFE)
 				// Block patterns like:
-				// - !foo || foo.bar (negation + plain property access)
+				// - !foo || foo.bar (negation + plain property access without intermediate checks)
 				// - !foo || foo.bar === 'foo' (strict equality with non-undefined - NOT safe)
 				// - !foo || foo.bar !== 'foo' (strict not-equal - NOT safe)
 				// - !foo || foo.bar != null (loose not-equal with null/undefined - NOT safe)
+				// - !foo || foo.bar === null (2-operand chain ending in === null - NOT safe, changes semantics for falsy non-nullish)
 				allNegatedOrSafeComparisonOrNullCheck := true
+				hasIntermediateNullishComp := false // Track if we have intermediate nullish checks
 				for i := 1; i < len(chain); i++ {
 					isComparison := chain[i].typ == OperandTypeComparison
 					isSafeComparison := isComparison && processor.isOrChainComparisonSafe(chain[i])
+					// Allow nullish comparisons (== null, === null, === undefined) ONLY as intermediate checks
+					// i.e., when this is NOT the last operand in the chain
+					// For 2-operand chains like !foo || foo.bar === null, the conversion changes semantics
+					// for falsy non-nullish values (0, "", false), so we don't allow it
+					isIntermediateNullishComp := isComparison && isNullishComparison(chain[i]) && i < len(chain)-1
+					if isIntermediateNullishComp {
+						hasIntermediateNullishComp = true
+					}
 
-					if chain[i].typ != OperandTypeNot && !isSafeComparison && !isNullishCheckType(chain[i].typ) {
+					// Allow OperandTypePlain at the END of the chain if there were intermediate nullish checks
+					// Pattern: !a || a.b == null || a.b.c.d.e.f.g.h (guarded by nullish checks)
+					isAllowedPlainAtEnd := chain[i].typ == OperandTypePlain && i == len(chain)-1 && hasIntermediateNullishComp
+
+					if chain[i].typ != OperandTypeNot && !isSafeComparison && !isIntermediateNullishComp && !isNullishCheckType(chain[i].typ) && !isAllowedPlainAtEnd {
 						allNegatedOrSafeComparisonOrNullCheck = false
 						break
 					}
@@ -4102,13 +4423,68 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 				// typeof checks are equivalent to undefined checks
 				// (typeof x === 'undefined' in OR chains means undefined check)
 				hasUndefinedCheck = true
+			} else if op.typ == OperandTypeNot {
+				// !foo checks all falsy values including null and undefined
+				hasBothCheck = true
+			} else if op.typ == OperandTypeComparison && op.node != nil {
+				// Check if this is a nullish comparison (== null, === null, === undefined)
+				unwrapped := op.node
+				for ast.IsParenthesizedExpression(unwrapped) {
+					unwrapped = unwrapped.AsParenthesizedExpression().Expression
+				}
+				if ast.IsBinaryExpression(unwrapped) {
+					binExpr := unwrapped.AsBinaryExpression()
+					binOp := binExpr.OperatorToken.Kind
+					left := binExpr.Left
+					right := binExpr.Right
+					for ast.IsParenthesizedExpression(left) {
+						left = left.AsParenthesizedExpression().Expression
+					}
+					for ast.IsParenthesizedExpression(right) {
+						right = right.AsParenthesizedExpression().Expression
+					}
+
+					isNull := left.Kind == ast.KindNullKeyword || right.Kind == ast.KindNullKeyword
+					isUndefined := (ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
+						(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
+						ast.IsVoidExpression(left) || ast.IsVoidExpression(right)
+
+					if binOp == ast.KindEqualsEqualsToken && (isNull || isUndefined) {
+						// == null covers both null and undefined
+						hasBothCheck = true
+					} else if binOp == ast.KindEqualsEqualsEqualsToken {
+						if isNull {
+							hasNullCheck = true
+						}
+						if isUndefined {
+							hasUndefinedCheck = true
+						}
+					}
+				}
 			}
 		}
 
 		// If we have a strict null check or strict undefined check (but not both), skip
 		// This is unsafe regardless of other checks in the chain
 		// Note: typeof checks count as undefined checks
-		if !hasBothCheck {
+		// EXCEPTION: If the first operand's expression type doesn't include nullish, skip this check
+		// The incomplete nullish check is only dangerous when the type COULD be null but we only check undefined
+		// If the type can never be null, then checking only for undefined is fine
+		// ALSO: If the trailing operand already has optional chaining, allow the conversion
+		firstOpNotNullish := false
+		hasTrailingOptionalChaining := false
+		if len(chain) > 0 && chain[0].comparedExpr != nil {
+			if !processor.includesNullish(chain[0].comparedExpr) {
+				firstOpNotNullish = true
+			}
+		}
+		if len(chain) >= 2 {
+			lastOp := chain[len(chain)-1]
+			if lastOp.comparedExpr != nil && processor.containsOptionalChain(lastOp.comparedExpr) {
+				hasTrailingOptionalChaining = true
+			}
+		}
+		if !hasBothCheck && !firstOpNotNullish && !hasTrailingOptionalChaining {
 			hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
 			hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
 
@@ -4122,7 +4498,19 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		// but the check only covers one, the conversion would be unsafe.
 		// Example: foo.bar === undefined || foo.bar.baz where foo.bar has type T | null | undefined
 		//          This is unsafe because if foo.bar is null, the original throws but foo.bar?.baz doesn't
-		for _, op := range chain {
+		// IMPORTANT: Only check guard operands (not the last one), because the last operand's check
+		// is preserved in the output.
+		// ALSO: Skip operands that already have optional chaining - they're intermediate operands
+		// whose checks will be preserved in the output.
+		for i, op := range chain {
+			// Skip the last operand - its check is preserved in the output
+			if i == len(chain)-1 {
+				continue
+			}
+			// Skip operands that already have optional chaining - they're preserved
+			if op.comparedExpr != nil && processor.containsOptionalChain(op.comparedExpr) {
+				continue
+			}
 			if op.typ == OperandTypeComparison && op.node != nil && op.comparedExpr != nil {
 				unwrapped := op.node
 				for ast.IsParenthesizedExpression(unwrapped) {
@@ -4221,7 +4609,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		}
 		// OperandTypeComparison can also be a null/undefined check in OR chains
 		// e.g., a.b == null is classified as OperandTypeComparison for property accesses
-		if op.typ == OperandTypeComparison && ast.IsBinaryExpression(op.node) {
+		if op.typ == OperandTypeComparison && op.node != nil && ast.IsBinaryExpression(op.node) {
 			binExpr := op.node.AsBinaryExpression()
 			// Check if right side is null or undefined
 			rightIsNull := binExpr.Right.Kind == ast.KindNullKeyword
@@ -4236,14 +4624,20 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		return false
 	}
 
-	// Special case: OR chain with trailing plain operand after MULTIPLE null checks
-	// Pattern: !a || a.b == null || ... || a.b.c.d.e.f.g == null || a.b.c.d.e.f.g.h
-	// Expected: a?.b?.c?.d?.e?.f?.g == null || a.b.c.d.e.f.g.h
-	// The plain operand should NOT be converted to optional chain; it should remain separate
+	// Special case: OR chain with trailing PLAIN operand after null checks
+	// When the last operand is OperandTypePlain (not negated), it should be kept SEPARATE
+	// because the conversion is only partial - we convert the guarded part, not the final access.
 	//
-	// BUT for simple 2-operand chains like: foo == null || foo.bar
-	// Expected: foo?.bar (NOT keeping them separate)
-	// So we only separate trailing plain when there are 3+ operands
+	// Pattern: !a || a.b == null || ... || a.b.c.d.e.f.g == null || a.b.c.d.e.f.g.h
+	// Expected: a?.b?.c?.d?.e?.f?.g == null || a.b.c.d.e.f.g.h (keep plain separate)
+	//
+	// BUT when the last operand is negated (!a.b.c.d.e.f.g.h), fully convert:
+	// Pattern: !a || a.b == null || ... || !a.b.c.d.e.f.g.h
+	// Expected: !a?.b?.c?.d?.e?.f?.g?.h (full conversion)
+	//
+	// For simple 2-operand chains like: foo == null || foo.bar
+	// Expected: foo?.bar (fully converted)
+	//
 	// NOTE: When unsafe option is enabled, we allow full conversion even with trailing plain
 	trailingPlainOperand := ""
 	chainForOptional := chain
@@ -4274,6 +4668,20 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			singleOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, singleOp.comparedExpr)
 			singleOpText := processor.sourceText[singleOpRange.Pos():singleOpRange.End()]
 			if strings.Contains(singleOpText, "?.") {
+				return
+			}
+		}
+	}
+
+	// Also check for 2-operand chains where the first operand already has optional chaining
+	// This prevents the second fix pass on: a?.b?.c == null || a.b.c.d
+	// which would try to convert to a.b.c?.d
+	if len(chain) == 2 && trailingPlainOperand == "" {
+		firstOp := chain[0]
+		if firstOp.node != nil {
+			firstOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, firstOp.node)
+			firstOpText := processor.sourceText[firstOpRange.Pos():firstOpRange.End()]
+			if strings.Contains(firstOpText, "?.") {
 				return
 			}
 		}
@@ -4378,14 +4786,19 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			newCode = optionalChainCode
 		}
 	} else {
-		// Check if first operand is negated (!foo || !foo.bar)
-		// If ALL operands are negated, add negation: !foo || !foo.bar -> !foo?.bar
-		// Otherwise no negation: foo || foo.bar -> foo?.bar
-		//                        foo == null || foo.bar -> foo?.bar
-		//                        typeof foo === 'undefined' || foo.bar -> foo?.bar
+		// Determine if we should add negation based on the chain pattern:
+		// 1. If ALL operands are negated: !foo || !foo.bar -> !foo?.bar
+		// 2. If first AND last operands are negated: !a || ... || !a.b.c -> !a?.b?.c
+		// 3. Otherwise no negation: foo || foo.bar -> foo?.bar
+		//                           foo == null || foo.bar -> foo?.bar
+		//                           !a || a.b == null || a.b.c -> a?.b?.c (plain last)
 		firstOpIsNegated := chainForOptional[0].typ == OperandTypeNot
+		lastOpIsNegated := chainForOptional[len(chainForOptional)-1].typ == OperandTypeNot
 
-		if firstOpIsNegated {
+		// Add negation if both first and last operands are negated
+		// This handles: !foo || !foo.bar -> !foo?.bar
+		// And: !a || a.b == null || !a.b.c -> !a?.b?.c
+		if firstOpIsNegated && lastOpIsNegated {
 			newCode = "!" + optionalChainCode
 		} else {
 			newCode = optionalChainCode
@@ -4394,7 +4807,17 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 
 	// Append trailing plain operand if we kept one separate
 	if trailingPlainOperand != "" {
-		newCode = newCode + " ||\n            " + trailingPlainOperand
+		// Extract the original separator between the last two operands
+		// to preserve formatting (spaces vs newlines)
+		lastChainOp := chain[len(chain)-2] // Second to last (last in chainForOptional before trailing)
+		trailingOp := chain[len(chain)-1]  // The trailing plain operand
+		lastChainEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastChainOp.node).End()
+		trailingStart := utils.TrimNodeTextRange(processor.ctx.SourceFile, trailingOp.node).Pos()
+		// Extract text between them (includes ||)
+		separator := processor.sourceText[lastChainEnd:trailingStart]
+		// Clean up the separator: should be " || " or " ||\n..."
+		// Just use the original separator as-is
+		newCode = newCode + separator + trailingPlainOperand
 	}
 
 	// Use trimmed ranges to preserve leading/trailing whitespace
@@ -4417,16 +4840,28 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		rule.RuleFixReplaceRange(core.NewTextRange(replaceStart, replaceEnd), newCode),
 	}
 
+	// Determine if we should autofix or suggest
+	// Following typescript-eslint's logic for OR chains:
+	// 1. If allowPotentiallyUnsafe option is enabled, always autofix
+	// 2. If the last operand is !foo (NotBoolean) or has a nullish comparison type, autofix
+	// 3. If there's a trailing comparison, autofix
+	// 4. Otherwise, check if ANY operand includes undefined (including any/unknown) - if so, autofix
+	// 5. Default to suggestion
 	useSuggestion := !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing
 
-	// Check if the FINAL operand (the one being accessed) includes nullish
-	// If the final expression is already nullable, converting to optional chain is safe
-	// NOTE: We use includesExplicitNullish here (not includesNullish) because
-	// for 'any'/'unknown' types we should use suggestion since we can't know
-	// if the conversion is safe or not
 	if useSuggestion && len(chain) > 0 {
 		lastOp := chain[len(chain)-1]
-		if processor.includesExplicitNullish(lastOp.comparedExpr) {
+
+		// Check if the last operand has a comparison type that makes autofix safe
+		switch lastOp.typ {
+		case OperandTypeNot: // !foo - for OR chains, this is safe
+			useSuggestion = false
+		case OperandTypeEqualNull, // == null (covers both null and undefined)
+			OperandTypeNotEqualBoth,        // != null (covers both)
+			OperandTypeStrictEqualUndef,    // === undefined
+			OperandTypeNotStrictEqualUndef: // !== undefined
+			useSuggestion = false
+		case OperandTypeTypeofCheck:
 			useSuggestion = false
 		}
 	}
@@ -4436,6 +4871,17 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	// Example: !foo || foo.bar === undefined -> foo?.bar === undefined (both return boolean)
 	if useSuggestion && hasTrailingComparison {
 		useSuggestion = false
+	}
+
+	// If still using suggestion, check if ANY operand includes undefined
+	// (including any/unknown types). If so, the autofix is safe.
+	if useSuggestion && len(chain) > 0 {
+		for _, op := range chain {
+			if op.comparedExpr != nil && processor.includesNullish(op.comparedExpr) {
+				useSuggestion = false
+				break
+			}
+		}
 	}
 
 	if useSuggestion {
@@ -4472,12 +4918,6 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 		return
 	}
 
-	// When requireNullish is true, skip empty object patterns entirely
-	// These patterns are conceptually different from explicit nullish checks in && chains
-	if processor.opts.RequireNullish {
-		return
-	}
-
 	// Check if right side is empty object literal
 	// It can be either {} or ({})
 	rightNode := binExpr.Right
@@ -4497,6 +4937,15 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 	}
 	if len(objLit.Properties.Nodes) != 0 {
 		return
+	}
+
+	// When requireNullish is true, only process if the left expression's type includes null/undefined
+	// This ensures we only flag patterns where the nullish check is semantically meaningful
+	if processor.opts.RequireNullish {
+		leftExpr := binExpr.Left
+		if !processor.includesExplicitNullish(leftExpr) {
+			return
+		}
 	}
 
 	// Check if parent (or grandparent through parenthesized expression) is property access expression
