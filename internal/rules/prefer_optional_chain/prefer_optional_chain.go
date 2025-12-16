@@ -465,19 +465,19 @@ func (processor *chainProcessor) getTypeInfo(node *ast.Node) *TypeInfo {
 	}
 
 	for _, part := range parts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNull) {
+		if utils.IsTypeNullType(part) {
 			info.hasNull = true
 		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsUndefined) {
+		if utils.IsTypeUndefinedType(part) {
 			info.hasUndefined = true
 		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsVoid) {
+		if utils.IsTypeVoidType(part) {
 			info.hasVoid = true
 		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsAny) {
+		if utils.IsTypeAnyType(part) {
 			info.hasAny = true
 		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsUnknown) {
+		if utils.IsTypeUnknownType(part) {
 			info.hasUnknown = true
 		}
 		if utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLiteral) {
@@ -4142,24 +4142,11 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 							ast.IsVoidExpression(binExpr.Right) || ast.IsVoidExpression(binExpr.Left)
 
 						if isStrictNullCheck || isStrictUndefCheck {
-							// Get the type of the compared expression (property access)
-							propType := processor.ctx.TypeChecker.GetTypeAtLocation(op.comparedExpr)
-							typeParts := utils.UnionTypeParts(propType)
-
-							// Check if type includes BOTH null and undefined
-							typeHasNull := false
-							typeHasUndefined := false
-							for _, part := range typeParts {
-								if utils.IsTypeFlagSet(part, checker.TypeFlagsNull) {
-									typeHasNull = true
-								}
-								if utils.IsTypeFlagSet(part, checker.TypeFlagsUndefined) {
-									typeHasUndefined = true
-								}
-							}
+							// Get cached type info for the compared expression
+							typeInfo := processor.getTypeInfo(op.comparedExpr)
 
 							// If type has both null and undefined, but we only check one, reject
-							if typeHasNull && typeHasUndefined {
+							if typeInfo.hasNull && typeInfo.hasUndefined {
 								if isStrictNullCheck && !isStrictUndefCheck {
 									return
 								}
@@ -4622,19 +4609,13 @@ var PreferOptionalChainRule = rule.Rule{
 				binExpr := node.AsBinaryExpression()
 				operator := binExpr.OperatorToken.Kind
 
-				// Handle && chains
-				if operator == ast.KindAmpersandAmpersandToken {
+				switch operator {
+				case ast.KindAmpersandAmpersandToken:
 					processor.processAndChain(node)
-				}
-
-				// Handle || chains
-				if operator == ast.KindBarBarToken {
+				case ast.KindBarBarToken:
 					processor.processOrChain(node)
 					processor.handleEmptyObjectPattern(node)
-				}
-
-				// Handle ?? chains for empty object pattern
-				if operator == ast.KindQuestionQuestionToken {
+				case ast.KindQuestionQuestionToken:
 					processor.handleEmptyObjectPattern(node)
 				}
 			},

@@ -53,6 +53,15 @@ func IsObjectType(t *checker.Type) bool {
 func IsTypeParameter(t *checker.Type) bool {
 	return IsTypeFlagSet(t, checker.TypeFlagsTypeParameter)
 }
+func IsTypeNullType(t *checker.Type) bool {
+	return IsTypeFlagSet(t, checker.TypeFlagsNull)
+}
+func IsTypeUndefinedType(t *checker.Type) bool {
+	return IsTypeFlagSet(t, checker.TypeFlagsUndefined)
+}
+func IsTypeVoidType(t *checker.Type) bool {
+	return IsTypeFlagSet(t, checker.TypeFlagsVoid)
+}
 func IsBooleanLiteralType(t *checker.Type) bool {
 	return IsTypeFlagSet(t, checker.TypeFlagsBoolean)
 }
