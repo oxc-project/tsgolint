@@ -379,8 +379,6 @@ type FullDocumentDiagnosticReportOrUnchangedDocumentDiagnosticReport = lsproto.F
 type GeneralClientCapabilities = lsproto.GeneralClientCapabilities
 //go:linkname GetClientCapabilities github.com/microsoft/typescript-go/internal/lsp/lsproto.GetClientCapabilities
 func GetClientCapabilities(ctx context.Context) *lsproto.ResolvedClientCapabilities
-type HasLocation = lsproto.HasLocation
-type HasLocations = lsproto.HasLocations
 type HasTextDocumentPosition = lsproto.HasTextDocumentPosition
 type HasTextDocumentURI = lsproto.HasTextDocumentURI
 type Hover = lsproto.Hover
