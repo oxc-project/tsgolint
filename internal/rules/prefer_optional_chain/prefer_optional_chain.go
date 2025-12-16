@@ -3401,7 +3401,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// - We strip ! from parts[0] and parts[1] (indices < maxCheckedLen)
 			for i := 0; i < maxCheckedLen && i < len(parts); i++ {
 				parts[i].hasNonNull = false
-				strings.TrimSuffix(parts[i].text, "!")
+				parts[i].text = strings.TrimSuffix(parts[i].text, "!")
 			}
 
 			// Collect all check operand parts for later use
