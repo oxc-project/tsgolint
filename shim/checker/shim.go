@@ -891,6 +891,8 @@ type SignatureToSignatureDeclarationOptions = checker.SignatureToSignatureDeclar
 type SimpleTypeMapper = checker.SimpleTypeMapper
 //go:linkname SkipAlias github.com/microsoft/typescript-go/internal/checker.SkipAlias
 func SkipAlias(symbol *ast.Symbol, checker *checker.Checker) *ast.Symbol
+//go:linkname SkipTypeChecking github.com/microsoft/typescript-go/internal/checker.SkipTypeChecking
+func SkipTypeChecking(sourceFile *ast.SourceFile, options *core.CompilerOptions, host checker.Program, ignoreNoCheck bool) bool
 type SourceFileLinks = checker.SourceFileLinks
 type SpreadLinks = checker.SpreadLinks
 type StringLiteralType = checker.StringLiteralType
