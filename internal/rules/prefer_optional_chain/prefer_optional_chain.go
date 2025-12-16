@@ -107,10 +107,10 @@ const (
 func stripParens(text string) string {
 	text = strings.TrimSpace(text)
 	// Keep stripping outer parentheses as long as they're balanced
+outer:
 	for len(text) > 2 && text[0] == '(' && text[len(text)-1] == ')' {
 		// Check if the opening and closing parens are paired
 		depth := 0
-		paired := true
 		for i := range len(text) {
 			switch text[i] {
 			case '(':
@@ -119,16 +119,11 @@ func stripParens(text string) string {
 				depth--
 				if depth == 0 && i < len(text)-1 {
 					// Found closing paren before end - not fully paired
-					paired = false
-					break
+					break outer
 				}
 			}
 		}
-		if paired {
-			text = strings.TrimSpace(text[1 : len(text)-1])
-		} else {
-			break
-		}
+		text = strings.TrimSpace(text[1 : len(text)-1])
 	}
 	return text
 }
@@ -186,6 +181,7 @@ func removeTypeAnnotations(text string) string {
 		// Find the matching >
 		depth := 1
 		gtIndex := -1
+	findClosingBracket:
 		for i := ltIndex + 1; i < len(text); i++ {
 			switch text[i] {
 			case '<':
@@ -194,7 +190,7 @@ func removeTypeAnnotations(text string) string {
 				depth--
 				if depth == 0 {
 					gtIndex = i
-					break
+					break findClosingBracket
 				}
 			}
 		}
@@ -3405,9 +3401,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// - We strip ! from parts[0] and parts[1] (indices < maxCheckedLen)
 			for i := 0; i < maxCheckedLen && i < len(parts); i++ {
 				parts[i].hasNonNull = false
-				if strings.HasSuffix(parts[i].text, "!") {
-					parts[i].text = parts[i].text[:len(parts[i].text)-1]
-				}
+				strings.TrimSuffix(parts[i].text, "!")
 			}
 
 			// Collect all check operand parts for later use
