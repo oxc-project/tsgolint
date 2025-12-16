@@ -198,13 +198,13 @@ func Identity(s string) string {
 
 // BaseCaseOptions configures how base cases are generated
 type BaseCaseOptions struct {
-	Operator           string         // "&&" or "||"
-	MutateCode         MutateFn       // Transform the input code
-	MutateDeclaration  MutateFn       // Transform the declaration
-	MutateOutput       MutateFn       // Transform the output (defaults to MutateCode)
-	SkipIDs            map[int]bool   // IDs to skip
-	UseSuggestionFixer bool           // Use suggestion instead of direct fix
-	Options            map[string]any // Rule options
+	Operator           string       // "&&" or "||"
+	MutateCode         MutateFn     // Transform the input code
+	MutateDeclaration  MutateFn     // Transform the declaration
+	MutateOutput       MutateFn     // Transform the output (defaults to MutateCode)
+	SkipIDs            map[int]bool // IDs to skip
+	UseSuggestionFixer bool         // Use suggestion instead of direct fix
+	Options            any          // Rule options (PreferOptionalChainOptions or nil)
 }
 
 // GenerateBaseCases creates test cases from the base cases with the given options
@@ -219,9 +219,7 @@ func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 		opts.MutateOutput = opts.MutateCode
 	}
 	if opts.Options == nil {
-		opts.Options = map[string]any{
-			"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-		}
+		opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`)
 	}
 
 	var result []rule_tester.InvalidTestCase
@@ -271,7 +269,7 @@ func GenerateValidBaseCases(opts BaseCaseOptions) []rule_tester.ValidTestCase {
 		opts.MutateDeclaration = Identity
 	}
 	if opts.Options == nil {
-		opts.Options = map[string]any{}
+		opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{}`)
 	}
 
 	var result []rule_tester.ValidTestCase

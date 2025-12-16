@@ -865,99 +865,99 @@ func TestHandCraftedCases(t *testing.T) {
 			{
 				Code:    `foo && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			{
 				Code:    `foo && foo.bar && foo.bar.baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			{
 				Code:    `foo && foo.bar && foo.bar.baz && foo.bar.baz.buzz;`,
 				Output:  []string{`foo?.bar?.baz?.buzz;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Computed property access
 			{
 				Code:    `foo && foo['bar'] && foo['bar'].baz;`,
 				Output:  []string{`foo?.['bar']?.baz;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Method calls
 			{
 				Code:    `foo && foo.bar && foo.bar.baz && foo.bar.baz();`,
 				Output:  []string{`foo?.bar?.baz?.();`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Nullish comparisons
 			{
 				Code:    `foo != null && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			{
 				Code:    `foo !== null && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			{
 				Code:    `foo !== undefined && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Combined null and undefined checks
 			{
 				Code:    `foo !== null && foo !== undefined && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Yoda conditions
 			{
 				Code:    `null !== foo && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			{
 				Code:    `undefined !== foo && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Typeof check
 			{
 				Code:    `typeof foo !== 'undefined' && foo.bar;`,
 				Output:  []string{`foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Multi-level with nullish check
 			{
 				Code:    `foo != null && foo.bar && foo.bar.baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Negated OR chain
 			{
 				Code:    `!foo || !foo.bar;`,
 				Output:  []string{`!foo?.bar;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			{
 				Code:    `!foo || !foo.bar || !foo.bar.baz;`,
 				Output:  []string{`!foo?.bar?.baz;`},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Multiple chains in one expression (two errors)
@@ -968,7 +968,7 @@ func TestHandCraftedCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Mixed loose/strict checks - full conversion is safe since optional chain
 			// handles both null and undefined at every level
@@ -976,94 +976,94 @@ func TestHandCraftedCases(t *testing.T) {
 				Code:    `foo && foo.bar != null && foo.bar.baz !== undefined && foo.bar.baz.buzz;`,
 				Output:  []string{`foo?.bar?.baz?.buzz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// String literal element access
 			{
 				Code:    `foo && foo['some long string'] && foo['some long string'].baz;`,
 				Output:  []string{`foo?.['some long string']?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    "foo && foo[`some long string`] && foo[`some long string`].baz;",
 				Output:  []string{"foo?.[`some long string`]?.baz;"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    "foo && foo[`some ${long} string`] && foo[`some ${long} string`].baz;",
 				Output:  []string{"foo?.[`some ${long} string`]?.baz;"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Complex computed properties
 			{
 				Code:    `foo && foo[bar as string] && foo[bar as string].baz;`,
 				Output:  []string{`foo?.[bar as string]?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `foo && foo[1 + 2] && foo[1 + 2].baz;`,
 				Output:  []string{`foo?.[1 + 2]?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `foo && foo[typeof bar] && foo[typeof bar].baz;`,
 				Output:  []string{`foo?.[typeof bar]?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Call expressions
 			{
 				Code:    `foo() && foo()(bar);`,
 				Output:  []string{`foo()?.(bar);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Type parameters
 			{
 				Code:    `foo && foo<string>() && foo<string>().bar;`,
 				Output:  []string{`foo?.<string>()?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Await expressions
 			{
 				Code:    `(await foo).bar && (await foo).bar.baz;`,
 				Output:  []string{`(await foo).bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// import.meta
 			{
 				Code:    `import.meta && import.meta.baz;`,
 				Output:  []string{`import.meta?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// new.target
 			{
 				Code:    "class Foo { constructor() { new.target && new.target.length; } }",
 				Output:  []string{"class Foo { constructor() { new.target?.length; } }"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Complex chain with method call
 			{
 				Code:    `foo !== null && foo.bar !== undefined && foo.bar.baz();`,
 				Output:  []string{`foo?.bar?.baz();`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Nested property with computed access
 			{
 				Code:    `foo != null && foo.bar && foo.bar['baz'];`,
 				Output:  []string{`foo?.bar?.['baz'];`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1098,7 +1098,7 @@ func TestThisKeywordAccess(t *testing.T) {
 				Code:    `class Foo { method() { this != null && this.bar; } }`,
 				Output:  []string{`class Foo { method() { this?.bar; } }`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1126,28 +1126,28 @@ func TestNonNullAssertion(t *testing.T) {
 				Code:    `foo && foo.bar && foo.bar.baz!;`,
 				Output:  []string{`foo?.bar?.baz!;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Non-null on base, but chain pattern still applies
 			{
 				Code:    `foo && foo!.bar;`,
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Non-null chain pattern
 			{
 				Code:    `foo!.bar && foo!.bar.baz;`,
 				Output:  []string{`foo!.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Non-null on intermediate access with continuation
 			{
 				Code:    `foo && foo.bar!.baz;`,
 				Output:  []string{`foo?.bar!?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1181,7 +1181,7 @@ func TestMixedOptionalChainTokens(t *testing.T) {
 				Code:    `foo && foo.bar && foo.bar?.baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1203,42 +1203,42 @@ func TestLongMixedBinaryChains(t *testing.T) {
 				Code:    `foo && foo.a && foo.a.b && foo.a.b.c && foo.a.b.c.d;`,
 				Output:  []string{`foo?.a?.b?.c?.d;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// 6-part chain
 			{
 				Code:    `foo && foo.a && foo.a.b && foo.a.b.c && foo.a.b.c.d && foo.a.b.c.d.e;`,
 				Output:  []string{`foo?.a?.b?.c?.d?.e;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// 7-part chain with nullish checks
 			{
 				Code:    `foo != null && foo.a != null && foo.a.b && foo.a.b.c && foo.a.b.c.d && foo.a.b.c.d.e && foo.a.b.c.d.e.f;`,
 				Output:  []string{`foo?.a?.b?.c?.d?.e?.f;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Mixed property and element access long chain
 			{
 				Code:    `foo && foo['a'] && foo['a'].b && foo['a'].b['c'] && foo['a'].b['c'].d;`,
 				Output:  []string{`foo?.['a']?.b?.['c']?.d;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Long negated OR chain
 			{
 				Code:    `!foo || !foo.a || !foo.a.b || !foo.a.b.c || !foo.a.b.c.d;`,
 				Output:  []string{`!foo?.a?.b?.c?.d;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Chain with method calls in between
 			{
 				Code:    `foo && foo.bar && foo.bar() && foo.bar().baz && foo.bar().baz.qux;`,
 				Output:  []string{`foo?.bar?.()?.baz?.qux;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1268,21 +1268,21 @@ func TestPrivatePropertyAccess(t *testing.T) {
 				Code:    `class Foo { #bar: { baz: any }; method() { this.#bar && this.#bar.baz; } }`,
 				Output:  []string{`class Foo { #bar: { baz: any }; method() { this.#bar?.baz; } }`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Private with nullish check
 			{
 				Code:    `class Foo { #bar: any; method() { this.#bar != null && this.#bar.baz; } }`,
 				Output:  []string{`class Foo { #bar: any; method() { this.#bar?.baz; } }`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Chain where private property is intermediate
 			{
 				Code:    `class Foo { #bar: { baz?: { qux: any } }; method() { this.#bar.baz && this.#bar.baz.qux; } }`,
 				Output:  []string{`class Foo { #bar: { baz?: { qux: any } }; method() { this.#bar.baz?.qux; } }`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1305,47 +1305,47 @@ func TestParenthesisGrouping(t *testing.T) {
 				Code:    `(foo && foo.bar);`,
 				Output:  []string{`(foo?.bar);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Nested parentheses with inner chain
 			{
 				Code:    `a && (a.b && a.b.c);`,
 				Output:  []string{`a?.b?.c;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Multiple levels of grouping
 			{
 				Code:    `(a && (a.b && (a.b.c)));`,
 				Output:  []string{`(a?.b?.c);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Parentheses around operand but same chain
 			{
 				Code:    `foo && (foo.bar) && (foo.bar.baz);`,
 				Output:  []string{`foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Parentheses around individual parts
 			{
 				Code:    `a && (a).b;`,
 				Output:  []string{`a?.b;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `(a) && (a).b;`,
 				Output:  []string{`a?.b;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `((a)) && ((a)).b;`,
 				Output:  []string{`a?.b;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Two chains in different parentheses groups
 			{
@@ -1355,7 +1355,7 @@ func TestParenthesisGrouping(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1378,7 +1378,7 @@ func TestTwoErrorCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Three chains in one expression
 			{
@@ -1389,7 +1389,7 @@ func TestTwoErrorCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Two chains with nullish checks
 			{
@@ -1399,7 +1399,7 @@ func TestTwoErrorCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Long chains side by side
 			{
@@ -1409,7 +1409,7 @@ func TestTwoErrorCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Ternary with two chains
 			{
@@ -1419,7 +1419,7 @@ func TestTwoErrorCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// https://github.com/typescript-eslint/typescript-eslint/issues/6332
 			// Chain preceded by unrelated nullish check - only the foo chain should convert
@@ -1450,7 +1450,7 @@ func TestTwoErrorCases(t *testing.T) {
 					{MessageId: "preferOptionalChain"},
 					{MessageId: "preferOptionalChain"},
 				},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1643,45 +1643,33 @@ func TestOptionsCheckTypes(t *testing.T) {
 		[]rule_tester.ValidTestCase{
 			// checkString option disables string checks
 			{
-				Code: `declare const foo: string; foo && foo.length;`,
-				Options: map[string]interface{}{
-					"checkString": false,
-				},
+				Code:    `declare const foo: string; foo && foo.length;`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"checkString": false}`),
 			},
 			// checkNumber option disables number checks
 			{
-				Code: `declare const foo: number; foo && foo.toFixed();`,
-				Options: map[string]interface{}{
-					"checkNumber": false,
-				},
+				Code:    `declare const foo: number; foo && foo.toFixed();`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"checkNumber": false}`),
 			},
 			// checkBoolean option disables boolean checks
 			{
-				Code: `declare const foo: boolean; foo && foo.valueOf();`,
-				Options: map[string]interface{}{
-					"checkBoolean": false,
-				},
+				Code:    `declare const foo: boolean; foo && foo.valueOf();`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"checkBoolean": false}`),
 			},
 			// checkBigInt option disables bigint checks
 			{
-				Code: `declare const foo: bigint; foo && foo.toString();`,
-				Options: map[string]interface{}{
-					"checkBigInt": false,
-				},
+				Code:    `declare const foo: bigint; foo && foo.toString();`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"checkBigInt": false}`),
 			},
 			// checkAny option disables any checks
 			{
-				Code: `declare const foo: any; foo && foo.bar;`,
-				Options: map[string]interface{}{
-					"checkAny": false,
-				},
+				Code:    `declare const foo: any; foo && foo.bar;`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"checkAny": false}`),
 			},
 			// checkUnknown option disables unknown checks
 			{
-				Code: `declare const foo: unknown; foo && (foo as any).bar;`,
-				Options: map[string]interface{}{
-					"checkUnknown": false,
-				},
+				Code:    `declare const foo: unknown; foo && (foo as any).bar;`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"checkUnknown": false}`),
 			},
 		},
 		[]rule_tester.InvalidTestCase{})
@@ -1695,90 +1683,65 @@ func TestOptionsRequireNullish(t *testing.T) {
 			// Note: When the type explicitly includes null/undefined, the chain IS converted
 			// because the implementation considers explicit nullish types as valid context
 			{
-				Code: `declare const foo: { bar: number }; foo && foo.bar;`,
-				Options: map[string]interface{}{
-					"requireNullish": true,
-				},
+				Code:    `declare const foo: { bar: number }; foo && foo.bar;`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"requireNullish": true}`),
 			},
 			// Negated truthiness checks on non-nullable types also shouldn't convert
 			{
-				Code: `declare const foo: { bar: number }; !foo || foo.bar;`,
-				Options: map[string]interface{}{
-					"requireNullish": true,
-				},
+				Code:    `declare const foo: { bar: number }; !foo || foo.bar;`,
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"requireNullish": true}`),
 			},
 		},
 		[]rule_tester.InvalidTestCase{
 			// With requireNullish, explicit nullish checks should still convert
 			{
-				Code:   `foo != null && foo.bar;`,
-				Output: []string{`foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `foo != null && foo.bar;`,
+				Output:  []string{`foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// !== null with requireNullish
 			{
-				Code:   `declare const foo: { bar: number } | null; foo !== null && foo.bar;`,
-				Output: []string{`declare const foo: { bar: number } | null; foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: { bar: number } | null; foo !== null && foo.bar;`,
+				Output:  []string{`declare const foo: { bar: number } | null; foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// !== undefined with requireNullish
 			{
-				Code:   `declare const foo: { bar: number } | undefined; foo !== undefined && foo.bar;`,
-				Output: []string{`declare const foo: { bar: number } | undefined; foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: { bar: number } | undefined; foo !== undefined && foo.bar;`,
+				Output:  []string{`declare const foo: { bar: number } | undefined; foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// == null || with requireNullish
 			{
-				Code:   `foo == null || foo.bar;`,
-				Output: []string{`foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `foo == null || foo.bar;`,
+				Output:  []string{`foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Multi-part nullish chain with requireNullish
 			{
-				Code:   `foo != null && foo.bar != null && foo.bar.baz;`,
-				Output: []string{`foo?.bar?.baz;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `foo != null && foo.bar != null && foo.bar.baz;`,
+				Output:  []string{`foo?.bar?.baz;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// When the type explicitly includes null/undefined, truthiness checks convert
 			// (current implementation behavior - type info is considered nullish context)
 			{
-				Code:   `declare const foo: { bar: number } | null | undefined; foo && foo.bar;`,
-				Output: []string{`declare const foo: { bar: number } | null | undefined; foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: { bar: number } | null | undefined; foo && foo.bar;`,
+				Output:  []string{`declare const foo: { bar: number } | null | undefined; foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// Longer truthiness chain with nullable intermediate type
 			{
-				Code:   `declare const foo: { bar: { baz: number } | null }; foo && foo.bar && foo.bar.baz;`,
-				Output: []string{`declare const foo: { bar: { baz: number } | null }; foo?.bar?.baz;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"requireNullish": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: { bar: { baz: number } | null }; foo && foo.bar && foo.bar.baz;`,
+				Output:  []string{`declare const foo: { bar: { baz: number } | null }; foo?.bar?.baz;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "requireNullish": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 		})
 }
@@ -1801,12 +1764,10 @@ func TestOptionsAllowPotentiallyUnsafeFixes(t *testing.T) {
 			},
 			// With allowPotentiallyUnsafeFixes, should auto-fix
 			{
-				Code:   `foo && foo.bar;`,
-				Output: []string{`foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `foo && foo.bar;`,
+				Output:  []string{`foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// More complex chain without option - should suggest
 			{
@@ -1821,12 +1782,10 @@ func TestOptionsAllowPotentiallyUnsafeFixes(t *testing.T) {
 			},
 			// More complex chain with option - should auto-fix
 			{
-				Code:   `foo && foo.bar && foo.bar.baz;`,
-				Output: []string{`foo?.bar?.baz;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `foo && foo.bar && foo.bar.baz;`,
+				Output:  []string{`foo?.bar?.baz;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 		})
 }
@@ -1838,63 +1797,45 @@ func TestOptionsCheckTypesInvalid(t *testing.T) {
 		[]rule_tester.InvalidTestCase{
 			// checkString enabled (default) - should flag string chains
 			{
-				Code:   `declare const foo: string; foo && foo.length;`,
-				Output: []string{`declare const foo: string; foo?.length;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"checkString": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: string; foo && foo.length;`,
+				Output:  []string{`declare const foo: string; foo?.length;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "checkString": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// checkNumber enabled (default)
 			{
-				Code:   `declare const foo: number; foo && foo.toFixed();`,
-				Output: []string{`declare const foo: number; foo?.toFixed();`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"checkNumber": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: number; foo && foo.toFixed();`,
+				Output:  []string{`declare const foo: number; foo?.toFixed();`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "checkNumber": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// checkBoolean enabled (default)
 			{
-				Code:   `declare const foo: boolean; foo && foo.valueOf();`,
-				Output: []string{`declare const foo: boolean; foo?.valueOf();`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"checkBoolean": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: boolean; foo && foo.valueOf();`,
+				Output:  []string{`declare const foo: boolean; foo?.valueOf();`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "checkBoolean": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// checkBigInt enabled (default)
 			{
-				Code:   `declare const foo: bigint; foo && foo.toString();`,
-				Output: []string{`declare const foo: bigint; foo?.toString();`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"checkBigInt": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: bigint; foo && foo.toString();`,
+				Output:  []string{`declare const foo: bigint; foo?.toString();`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "checkBigInt": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// checkAny enabled (default)
 			{
-				Code:   `declare const foo: any; foo && foo.bar;`,
-				Output: []string{`declare const foo: any; foo?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"checkAny": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: any; foo && foo.bar;`,
+				Output:  []string{`declare const foo: any; foo?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "checkAny": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 			// checkUnknown enabled (default)
 			{
-				Code:   `declare const foo: unknown; foo && (foo as any).bar;`,
-				Output: []string{`declare const foo: unknown; (foo as any)?.bar;`},
-				Options: map[string]interface{}{
-					"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true,
-					"checkUnknown": true,
-				},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				Code:    `declare const foo: unknown; foo && (foo as any).bar;`,
+				Output:  []string{`declare const foo: unknown; (foo as any)?.bar;`},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true, "checkUnknown": true}`),
+				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 			},
 		})
 }
@@ -1920,46 +1861,46 @@ func TestBaseCaseVariations(t *testing.T) {
 				Code:    `foo && foo.bar && bing;`,
 				Output:  []string{`foo?.bar && bing;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `foo && foo.bar && bing.bong;`,
 				Output:  []string{`foo?.bar && bing.bong;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `foo != null && foo.bar && bing;`,
 				Output:  []string{`foo?.bar && bing;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			{
 				Code:    `foo != null && foo.bar && bing.bong;`,
 				Output:  []string{`foo?.bar && bing.bong;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Assignment expressions are also flagged - rule converts the chain
 			{
 				Code:    `foo && (bar = foo.baz);`,
 				Output:  []string{`foo?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Chain where bing is on same object - full conversion
 			{
 				Code:    `foo && foo.bar && foo.bar.bing;`,
 				Output:  []string{`foo?.bar?.bing;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Trailing access on same chain
 			{
 				Code:    `foo != null && foo.bar && foo.bar.bing;`,
 				Output:  []string{`foo?.bar?.bing;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -1974,7 +1915,7 @@ func TestWhitespaceVariations(t *testing.T) {
 				Code:    `foo  &&  foo.bar;`,
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Newlines
 			{
@@ -1982,14 +1923,14 @@ func TestWhitespaceVariations(t *testing.T) {
 					&& foo.bar;`,
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Tabs
 			{
 				Code:    "foo\t&&\tfoo.bar;",
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Multiple newlines in chain
 			{
@@ -1998,14 +1939,14 @@ func TestWhitespaceVariations(t *testing.T) {
 					&& foo.bar.baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// No spaces
 			{
 				Code:    `foo&&foo.bar;`,
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Spacing sanity check: extra spaces within property access (`.      `)
 			// Note: the rule normalizes whitespace in the fix output
@@ -2013,7 +1954,7 @@ func TestWhitespaceVariations(t *testing.T) {
 				Code:    `foo && foo.      bar;`,
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Spacing sanity check: newline within property access (`.\n`)
 			// Note: the rule normalizes whitespace in the fix output
@@ -2022,7 +1963,7 @@ func TestWhitespaceVariations(t *testing.T) {
 bar;`,
 				Output:  []string{`foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Spacing sanity check: deep chain with extra spaces
 			// Note: the rule normalizes whitespace in the fix output
@@ -2030,7 +1971,7 @@ bar;`,
 				Code:    `foo && foo.      bar && foo.      bar.      baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// should preserve comments in a call expression
 			{
@@ -2041,7 +1982,7 @@ bar;`,
             // comment2
             b, );`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2081,14 +2022,14 @@ func TestWeirdNonConstantCases(t *testing.T) {
 				Code:    "(tag``) && (tag``).length;",
 				Output:  []string{"tag``?.length;"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Regex literal - rule flags it
 			{
 				Code:    `(/foo/) && (/foo/).source;`,
 				Output:  []string{`/foo/?.source;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2105,14 +2046,14 @@ func TestSuperAndMetaProperties(t *testing.T) {
 				Code:    `class Sub extends Base { method() { super.foo && super.foo.bar; } }`,
 				Output:  []string{`class Sub extends Base { method() { super.foo?.bar; } }`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// import.meta chain should convert
 			{
 				Code:    `import.meta && import.meta.url;`,
 				Output:  []string{`import.meta?.url;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2129,28 +2070,28 @@ func TestTypeAssertionPatterns(t *testing.T) {
 				Code:    `(foo as const) && (foo as const).bar;`,
 				Output:  []string{`(foo as const)?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Different type assertions - still flagged, converts to second assertion's type
 			{
 				Code:    `(foo as string) && (foo as number).bar;`,
 				Output:  []string{`(foo as number)?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Same type assertion should convert
 			{
 				Code:    `(foo as Bar) && (foo as Bar).baz;`,
 				Output:  []string{`(foo as Bar)?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Angle bracket assertion
 			{
 				Code:    `(<Bar>foo) && (<Bar>foo).baz;`,
 				Output:  []string{`(<Bar>foo)?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2169,7 +2110,7 @@ func TestSatisfiesExpression(t *testing.T) {
 				Code:    `(foo satisfies Bar) && (foo satisfies Bar).baz;`,
 				Output:  []string{`foo satisfies Bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2190,7 +2131,7 @@ func TestJSXPatterns(t *testing.T) {
 				Code:    `foo && foo.bar(baz => <This Requires Spaces />);`,
 				Output:  []string{`foo?.bar(baz => <This Requires Spaces />);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Tsx:     true,
 			},
 			// JSX with arrow function containing element with children
@@ -2198,7 +2139,7 @@ func TestJSXPatterns(t *testing.T) {
 				Code:    `foo && foo.bar(baz => <div>{baz}</div>);`,
 				Output:  []string{`foo?.bar(baz => <div>{baz}</div>);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Tsx:     true,
 			},
 			// JSX with fragment
@@ -2206,7 +2147,7 @@ func TestJSXPatterns(t *testing.T) {
 				Code:    `foo && foo.bar(baz => <><span>{baz}</span></>);`,
 				Output:  []string{`foo?.bar(baz => <><span>{baz}</span></>);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 				Tsx:     true,
 			},
 			// Arrow function with typeof - ensure whitespace preserved
@@ -2214,7 +2155,7 @@ func TestJSXPatterns(t *testing.T) {
 				Code:    `foo && foo.bar(baz => typeof baz);`,
 				Output:  []string{`foo?.bar(baz => typeof baz);`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2233,28 +2174,28 @@ func TestMultiLevelYodaChains(t *testing.T) {
 				Code:    `foo != null && null != foo.bar && '123' == foo.bar.baz;`,
 				Output:  []string{`'123' == foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// All Yoda style with different operators
 			{
 				Code:    `null != foo && null != foo.bar && null != foo.bar.baz;`,
 				Output:  []string{`null != foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Mixed Yoda and normal style
 			{
 				Code:    `foo != null && null !== foo.bar && foo.bar.baz !== null;`,
 				Output:  []string{`foo?.bar?.baz !== null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Yoda with undefined
 			{
 				Code:    `undefined !== foo && undefined !== foo.bar && foo.bar.baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2269,21 +2210,21 @@ func TestRandomlyPlacedOptionalChainTokens(t *testing.T) {
 				Code:    `foo?.bar?.baz != null && foo.bar.baz.bam != null;`,
 				Output:  []string{`foo?.bar?.baz?.bam != null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Optional tokens at the start of chain
 			{
 				Code:    `foo?.bar != null && foo.bar.baz != null && foo.bar.baz.bam;`,
 				Output:  []string{`foo?.bar?.baz?.bam;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Interleaved optional tokens
 			{
 				Code:    `foo?.bar?.baz != null && foo.bar.baz?.bam != null && foo.bar.baz.bam.qux;`,
 				Output:  []string{`foo?.bar?.baz?.bam?.qux;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2298,21 +2239,21 @@ func TestRandomlyPlacedNonNullAssertions(t *testing.T) {
 				Code:    `foo!.bar!.baz != null && foo.bar.baz.bam != null;`,
 				Output:  []string{`foo!.bar!.baz?.bam != null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Non-null assertions at various positions
 			{
 				Code:    `foo!.bar != null && foo.bar!.baz != null;`,
 				Output:  []string{`foo!.bar?.baz != null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Mixed non-null and optional chain
 			{
 				Code:    `foo!.bar?.baz != null && foo.bar.baz.bam;`,
 				Output:  []string{`foo!.bar?.baz?.bam;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2336,7 +2277,7 @@ a.b.c.d.e.f.g.h.i !== undefined &&
 a.b.c.d.e.f.g.h.i.j;`,
 				Output:  []string{`a?.b?.c?.d?.e?.f?.g?.h?.i?.j;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Mixed binary and typeof checks
 			{
@@ -2347,7 +2288,7 @@ foo.bar != null &&
 foo.bar.baz;`,
 				Output:  []string{`foo?.bar?.baz;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2362,21 +2303,21 @@ func TestSplitStrictEqualsAsLastOperand(t *testing.T) {
 				Code:    `foo?.bar?.baz !== null && typeof foo.bar.baz !== 'undefined';`,
 				Output:  []string{`foo?.bar?.baz != null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Split strict equals without preceding optional chain
 			{
 				Code:    `foo !== null && typeof foo !== 'undefined' && foo.bar !== null && typeof foo.bar !== 'undefined';`,
 				Output:  []string{`foo?.bar != null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Reversed split strict equals
 			{
 				Code:    `typeof foo !== 'undefined' && foo !== null && typeof foo.bar !== 'undefined' && foo.bar !== null;`,
 				Output:  []string{`foo?.bar != null;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2394,7 +2335,7 @@ foo.bar && foo.bar();
 `,
 				Output:  []string{"\ndeclare const foo: { bar: undefined | (() => void) };\nfoo.bar?.();\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Optional property callable
 			{
@@ -2404,7 +2345,7 @@ foo.bar && foo.bar();
 `,
 				Output:  []string{"\ndeclare const foo: { bar?: () => void };\nfoo.bar?.();\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2419,14 +2360,14 @@ func TestGlobalThisTypeofPattern(t *testing.T) {
 				Code:    `typeof globalThis !== 'undefined' && globalThis.Array && globalThis.Array();`,
 				Output:  []string{`globalThis.Array?.();`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// globalThis with property access chain
 			{
 				Code:    `typeof globalThis !== 'undefined' && globalThis.foo && globalThis.foo.bar;`,
 				Output:  []string{`globalThis.foo?.bar;`},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2445,7 +2386,7 @@ self.bar && self.bar.baz;
 `,
 				Output:  []string{"\ndeclare const self: { bar?: { baz: string } };\nself.bar?.baz;\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Negated OR with this.property: !this.bar || !this.bar.baz → !this.bar?.baz
 			{
@@ -2455,7 +2396,7 @@ declare const self: { bar?: { baz: string } };
 `,
 				Output:  []string{"\ndeclare const self: { bar?: { baz: string } };\n!self.bar?.baz;\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 
 			// High Priority: Hybrid patterns with existing optional chain
@@ -2467,7 +2408,7 @@ foo && foo?.();
 `,
 				Output:  []string{"\ndeclare const foo: (() => void) | null;\nfoo?.();\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// foo.bar && foo.bar?.() → foo.bar?.()
 			{
@@ -2477,7 +2418,7 @@ foo.bar && foo.bar?.();
 `,
 				Output:  []string{"\ndeclare const foo: { bar?: () => void };\nfoo.bar?.();\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// !foo[bar] || !foo[bar]?.[baz] → !foo[bar]?.[baz]
 			{
@@ -2489,7 +2430,7 @@ declare const baz: string;
 `,
 				Output:  []string{"\ndeclare const foo: { [key: string]: { [key: string]: string } | undefined };\ndeclare const bar: string;\ndeclare const baz: string;\n!foo[bar]?.[baz];\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 
 			// Medium Priority: Negated OR with inner optional chain
@@ -2501,7 +2442,7 @@ declare const foo: { bar: { baz: string } } | null;
 `,
 				Output:  []string{"\ndeclare const foo: { bar: { baz: string } } | null;\n!foo?.bar.baz;\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Call expression in negated OR: !foo() || !foo().bar → !foo()?.bar
 			{
@@ -2511,7 +2452,7 @@ declare const foo: () => { bar: string } | null;
 `,
 				Output:  []string{"\ndeclare const foo: () => { bar: string } | null;\n!foo()?.bar;\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 
 			// Medium Priority: Two-error with parentheses
@@ -2524,7 +2465,7 @@ declare const baz: { bar?: { foo: string } };
 `,
 				Output:  []string{"\ndeclare const foo: { bar?: { baz: string } };\ndeclare const baz: { bar?: { foo: string } };\n(!foo?.bar?.baz) && (!baz?.bar?.foo);\n"},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}, {MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
@@ -2553,7 +2494,7 @@ class Foo {
 }
 `},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// !this.bar || !this.bar.baz → !this.bar?.baz (within class method)
 			{
@@ -2574,7 +2515,7 @@ class Foo {
 }
 `},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// Deeper chain: this.bar && this.bar.baz && this.bar.baz.qux
 			{
@@ -2595,7 +2536,7 @@ class Foo {
 }
 `},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 			// this with method call: this.bar && this.bar.baz()
 			{
@@ -2616,7 +2557,7 @@ class Foo {
 }
 `},
 				Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
-				Options: map[string]interface{}{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true},
+				Options: rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`),
 			},
 		})
 }
