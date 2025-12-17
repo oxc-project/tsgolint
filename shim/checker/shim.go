@@ -39,6 +39,7 @@ const AssignmentKindDefinite = checker.AssignmentKindDefinite
 const AssignmentKindNone = checker.AssignmentKindNone
 type AssignmentReducedKey = checker.AssignmentReducedKey
 type AssignmentTarget = checker.AssignmentTarget
+type CacheHashKey = checker.CacheHashKey
 type CachedSignatureKey = checker.CachedSignatureKey
 type CachedTypeKey = checker.CachedTypeKey
 type CachedTypeKind = checker.CachedTypeKind
@@ -173,13 +174,13 @@ type extra_Checker struct {
   numberLiteralTypes map[jsnum.Number]*checker.Type
   bigintLiteralTypes map[jsnum.PseudoBigInt]*checker.Type
   enumLiteralTypes map[checker.EnumLiteralKey]*checker.Type
-  indexedAccessTypes map[string]*checker.Type
-  templateLiteralTypes map[string]*checker.Type
+  indexedAccessTypes map[checker.CacheHashKey]*checker.Type
+  templateLiteralTypes map[checker.CacheHashKey]*checker.Type
   stringMappingTypes map[checker.StringMappingKey]*checker.Type
   uniqueESSymbolTypes map[*ast.Symbol]*checker.Type
   thisExpandoKinds map[*ast.Symbol]int32
   thisExpandoLocations map[*ast.Symbol]*ast.Node
-  subtypeReductionCache map[string][]*checker.Type
+  subtypeReductionCache map[checker.CacheHashKey][]*checker.Type
   cachedTypes map[checker.CachedTypeKey]*checker.Type
   cachedSignatures map[checker.CachedSignatureKey]*checker.Signature
   undefinedProperties map[string]*ast.Symbol
@@ -197,14 +198,14 @@ type extra_Checker struct {
   requireSymbol *ast.Symbol
   unknownSymbol *ast.Symbol
   unresolvedSymbols map[string]*ast.Symbol
-  errorTypes map[string]*checker.Type
+  errorTypes map[checker.CacheHashKey]*checker.Type
   globalThisSymbol *ast.Symbol
   resolveName func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
   resolveNameForSymbolSuggestion func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
-  tupleTypes map[string]*checker.Type
-  unionTypes map[string]*checker.Type
+  tupleTypes map[checker.CacheHashKey]*checker.Type
+  unionTypes map[checker.CacheHashKey]*checker.Type
   unionOfUnionTypes map[checker.UnionOfUnionKey]*checker.Type
-  intersectionTypes map[string]*checker.Type
+  intersectionTypes map[checker.CacheHashKey]*checker.Type
   diagnostics ast.DiagnosticsCollection
   suggestionDiagnostics ast.DiagnosticsCollection
   symbolPool core.Pool[ast.Symbol]
@@ -431,7 +432,7 @@ type extra_Checker struct {
   ctx context.Context
   packagesMap map[string]bool
   activeMappers []*checker.TypeMapper
-  activeTypeMappersCaches []map[string]*checker.Type
+  activeTypeMappersCaches []map[checker.CacheHashKey]*checker.Type
   ambientModulesOnce sync.Once
   ambientModules []*ast.Symbol
   withinUnreachableCode bool
@@ -663,7 +664,6 @@ type JsxReferenceKind = checker.JsxReferenceKind
 const JsxReferenceKindComponent = checker.JsxReferenceKindComponent
 const JsxReferenceKindFunction = checker.JsxReferenceKindFunction
 const JsxReferenceKindMixed = checker.JsxReferenceKindMixed
-type KeyBuilder = checker.KeyBuilder
 var LanguageFeatureMinimumTarget = checker.LanguageFeatureMinimumTarget
 type LanguageFeatureMinimumTargetMap = checker.LanguageFeatureMinimumTargetMap
 type LateBoundLinks = checker.LateBoundLinks
@@ -872,12 +872,12 @@ const SignatureFlagsIsSignatureCandidateForOverloadFailure = checker.SignatureFl
 const SignatureFlagsIsUntypedSignatureInJSFile = checker.SignatureFlagsIsUntypedSignatureInJSFile
 const SignatureFlagsNone = checker.SignatureFlagsNone
 const SignatureFlagsPropagatingFlags = checker.SignatureFlagsPropagatingFlags
-const SignatureKeyBase = checker.SignatureKeyBase
-const SignatureKeyCanonical = checker.SignatureKeyCanonical
-const SignatureKeyErased = checker.SignatureKeyErased
-const SignatureKeyImplementation = checker.SignatureKeyImplementation
-const SignatureKeyInner = checker.SignatureKeyInner
-const SignatureKeyOuter = checker.SignatureKeyOuter
+var SignatureKeyBase = checker.SignatureKeyBase
+var SignatureKeyCanonical = checker.SignatureKeyCanonical
+var SignatureKeyErased = checker.SignatureKeyErased
+var SignatureKeyImplementation = checker.SignatureKeyImplementation
+var SignatureKeyInner = checker.SignatureKeyInner
+var SignatureKeyOuter = checker.SignatureKeyOuter
 type SignatureKind = checker.SignatureKind
 const SignatureKindCall = checker.SignatureKindCall
 const SignatureKindConstruct = checker.SignatureKindConstruct

@@ -1,4 +1,4 @@
-From 2d60589a0a54d0600979665d3869799d8f373be3 Mon Sep 17 00:00:00 2001
+From 0a48cff41e12e79086476a9dc3759c9bbe4cc043 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Wed, 22 Oct 2025 09:32:18 +0100
 Subject: [PATCH] feat: improve panic message for extracting TS extension
@@ -8,10 +8,10 @@ Subject: [PATCH] feat: improve panic message for extracting TS extension
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/internal/checker/checker.go b/internal/checker/checker.go
-index 4f3683f37..c7f4a7730 100644
+index b15adea09..06b7577f4 100644
 --- a/internal/checker/checker.go
 +++ b/internal/checker/checker.go
-@@ -14742,7 +14742,7 @@ func (c *Checker) resolveExternalModule(location *ast.Node, moduleReference stri
+@@ -14749,7 +14749,7 @@ func (c *Checker) resolveExternalModule(location *ast.Node, moduleReference stri
  				if ast.FindAncestor(location, ast.IsEmittableImport) != nil {
  					tsExtension := tspath.TryExtractTSExtension(moduleReference)
  					if tsExtension == "" {
@@ -20,7 +20,7 @@ index 4f3683f37..c7f4a7730 100644
  					}
  					c.error(
  						errorNode,
-@@ -14754,7 +14754,7 @@ func (c *Checker) resolveExternalModule(location *ast.Node, moduleReference stri
+@@ -14761,7 +14761,7 @@ func (c *Checker) resolveExternalModule(location *ast.Node, moduleReference stri
  				if ast.FindAncestor(location, ast.IsEmittableImport) != nil {
  					tsExtension := tspath.TryExtractTSExtension(moduleReference)
  					if tsExtension == "" {
