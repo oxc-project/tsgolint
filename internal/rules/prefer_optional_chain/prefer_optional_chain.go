@@ -350,6 +350,91 @@ func hasOptionalChaining(node *ast.Node) bool {
 	return false
 }
 
+// isChainExtension checks if 'longer' extends 'shorter' in a chain expression.
+// Returns true if 'shorter' is a prefix of 'longer' (e.g., foo.bar is a prefix of foo.bar.baz).
+// This is an AST-based check that replaces text-based prefix matching.
+//
+// Examples:
+//   - isChainExtension(foo, foo.bar) -> true (property access extends)
+//   - isChainExtension(foo.bar, foo.bar[0]) -> true (element access extends)
+//   - isChainExtension(foo.bar, foo.bar()) -> true (call extends)
+//   - isChainExtension(foo.bar, foo.baz) -> false (different property)
+//   - isChainExtension(foo, bar.foo) -> false (different base)
+func (processor *chainProcessor) isChainExtension(shorter, longer *ast.Node) bool {
+	if shorter == nil || longer == nil {
+		return false
+	}
+
+	// Get normalized text for both - if shorter is a prefix of longer's normalized text,
+	// we need to verify using AST that it's actually a chain extension
+	shorterNorm := processor.getNormalizedNodeText(shorter)
+	longerNorm := processor.getNormalizedNodeText(longer)
+
+	// Quick check: if normalized texts are equal, it's not an extension
+	if shorterNorm == longerNorm {
+		return false
+	}
+
+	// Quick check: if shorter's text isn't a prefix of longer's text, can't be extension
+	if !strings.HasPrefix(longerNorm, shorterNorm) {
+		return false
+	}
+
+	// Now verify via AST that 'shorter' appears as a base in the chain of 'longer'
+	// Walk up the chain of 'longer' and check if any base matches 'shorter'
+	current := longer
+	for {
+		current = unwrapChainNode(current)
+		if current == nil {
+			return false
+		}
+
+		var base *ast.Node
+		switch {
+		case ast.IsPropertyAccessExpression(current):
+			base = current.AsPropertyAccessExpression().Expression
+		case ast.IsElementAccessExpression(current):
+			base = current.AsElementAccessExpression().Expression
+		case ast.IsCallExpression(current):
+			base = current.AsCallExpression().Expression
+		case ast.IsNonNullExpression(current):
+			base = current.AsNonNullExpression().Expression
+		case ast.IsTaggedTemplateExpression(current):
+			base = current.AsTaggedTemplateExpression().Tag
+		default:
+			// Reached a terminal node (identifier, literal, etc.)
+			return false
+		}
+
+		// Check if the base matches 'shorter'
+		if processor.getNormalizedNodeText(base) == shorterNorm {
+			return true
+		}
+
+		// Continue walking up the chain
+		current = base
+	}
+}
+
+// unwrapChainNode unwraps parentheses, type assertions, and non-null expressions
+// to get to the underlying chain expression
+func unwrapChainNode(node *ast.Node) *ast.Node {
+	current := node
+	for current != nil {
+		switch {
+		case ast.IsParenthesizedExpression(current):
+			current = current.AsParenthesizedExpression().Expression
+		case current.Kind == ast.KindAsExpression:
+			current = current.AsAsExpression().Expression
+		case current.Kind == ast.KindTypeAssertionExpression:
+			current = current.AsTypeAssertion().Expression
+		default:
+			return current
+		}
+	}
+	return current
+}
+
 // isInsideJSX checks if a node is inside a JSX context
 // In JSX, foo && foo.bar has different semantics than foo?.bar
 // (foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined)
@@ -757,27 +842,14 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	}
 
 	// Check if left is a subset of right (foo vs foo.bar or foo vs foo<T>())
-	// Use normalized text for comparison
-	if strings.HasPrefix(rightNormalized, leftNormalized) {
-		remainder := strings.TrimPrefix(rightNormalized, leftNormalized)
-		// Allow ., [, (, <, and ! (for non-null assertions) as valid continuations
-		if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(' || remainder[0] == '<' || remainder[0] == '!') {
-			// Allow optional chaining in left when extending to right
-			// Example: foo?.bar (left) vs foo.bar.baz (right) is valid
-			// We normalize both before comparison, so the optional chaining is already stripped
-			// The key insight: if left has ?. and is a subset of right, we're building a longer chain
-			// The optional chaining in left will be replaced by the final chain anyway
-			return NodeSubset
-		}
+	// Use AST-based chain extension check
+	if processor.isChainExtension(left, right) {
+		return NodeSubset
 	}
 
 	// Check if right is a subset of left
-	if strings.HasPrefix(leftNormalized, rightNormalized) {
-		remainder := strings.TrimPrefix(leftNormalized, rightNormalized)
-		// Allow ., [, (, <, and ! (for non-null assertions) as valid continuations
-		if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(' || remainder[0] == '<' || remainder[0] == '!') {
-			return NodeSuperset
-		}
+	if processor.isChainExtension(right, left) {
+		return NodeSuperset
 	}
 
 	return NodeInvalid
@@ -2050,22 +2122,11 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 						firstOpRootedInNew := baseExpr != nil && ast.IsNewExpression(baseExpr)
 
 						if !firstOpRootedInNew {
-							// Try text-based comparison to see if op extends lastExpr
-							lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
-							opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
-							sourceText := processor.sourceText
-							if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
-								opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
-								lastText := sourceText[lastRange.Pos():lastRange.End()]
-								opText := sourceText[opRange.Pos():opRange.End()]
-								if strings.HasPrefix(opText, lastText) {
-									remainder := strings.TrimPrefix(opText, lastText)
-									if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
-										// op extends lastExpr, treat as NodeSubset
-										cmp = NodeSubset
-										usedCallChainExtension = true
-									}
-								}
+							// Use AST-based chain extension check to see if op extends lastExpr
+							if processor.isChainExtension(lastExpr, op.comparedExpr) {
+								// op extends lastExpr, treat as NodeSubset
+								cmp = NodeSubset
+								usedCallChainExtension = true
 							}
 						}
 					}
@@ -4207,21 +4268,10 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 						lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
 					}
 					if ast.IsCallExpression(lastUnwrapped) || ast.IsNewExpression(lastUnwrapped) {
-						// Try text-based comparison to see if op extends lastExpr
-						lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
-						opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.comparedExpr)
-						sourceText := processor.sourceText
-						if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) &&
-							opRange.Pos() >= 0 && opRange.End() <= len(sourceText) {
-							lastText := sourceText[lastRange.Pos():lastRange.End()]
-							opText := sourceText[opRange.Pos():opRange.End()]
-							if strings.HasPrefix(opText, lastText) {
-								remainder := strings.TrimPrefix(opText, lastText)
-								if len(remainder) > 0 && (remainder[0] == '.' || remainder[0] == '[' || remainder[0] == '(') {
-									// op extends lastExpr, treat as NodeSubset
-									cmp = NodeSubset
-								}
-							}
+						// Use AST-based chain extension check to see if op extends lastExpr
+						if processor.isChainExtension(lastExpr, op.comparedExpr) {
+							// op extends lastExpr, treat as NodeSubset
+							cmp = NodeSubset
 						}
 					}
 				}
