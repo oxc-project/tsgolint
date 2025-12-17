@@ -1,6 +1,7 @@
 package prefer_optional_chain
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
@@ -8,7 +9,7 @@ import (
 )
 
 func TestPreferOptionalChainRule(t *testing.T) {
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, []rule_tester.ValidTestCase{
+	validCases := []rule_tester.ValidTestCase{
 		{Code: `foo || {};`},
 		{Code: `foo || ({} as any);`},
 		{Code: `(foo || {})?.bar;`},
@@ -767,7 +768,9 @@ func TestPreferOptionalChainRule(t *testing.T) {
         declare const x: void | (() => void);
         x && x();
       `},
-	}, []rule_tester.InvalidTestCase{
+	}
+
+	invalidCases := []rule_tester.InvalidTestCase{
 		{
 			Code: `(foo || {}).bar;`,
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -3644,5 +3647,226 @@ const baz = foo?.bar;
 				},
 			},
 		},
+	}
+
+	// ========== BASE CASES ==========
+	// These match the upstream typescript-eslint 'describe("base cases", ...)' tests
+
+	// --- AND operator ---
+
+	// AND boolean - basic
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{Operator: "&&"})...)
+
+	// AND boolean - with trailing && bing
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:   "&&",
+		MutateCode: AddTrailingAnd,
+	})...)
+
+	// AND boolean - with trailing && bing.bong
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:   "&&",
+		MutateCode: AddTrailingAndBingBong,
+	})...)
+
+	// !== null - VALID with full | null | undefined type
+	validCases = append(validCases, GenerateValidBaseCases(BaseCaseOptions{
+		Operator:   "&&",
+		MutateCode: ReplaceOperatorWithStrictNotEqualNull,
+	})...)
+
+	// !== null - INVALID with | null only type (suggestion fixer)
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:           "&&",
+		MutateCode:         ReplaceOperatorWithStrictNotEqualNull,
+		MutateDeclaration:  RemoveUndefinedFromType,
+		MutateOutput:       Identity,
+		UseSuggestionFixer: true,
+	})...)
+
+	// != null - INVALID (suggestion fixer)
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:           "&&",
+		MutateCode:         ReplaceOperatorWithNotEqualNull,
+		MutateOutput:       Identity,
+		UseSuggestionFixer: true,
+	})...)
+
+	// !== undefined - VALID with full type (skip IDs 20, 26)
+	validCases = append(validCases, GenerateValidBaseCases(BaseCaseOptions{
+		Operator:   "&&",
+		MutateCode: ReplaceOperatorWithStrictNotEqualUndefined,
+		SkipIDs:    map[int]bool{20: true, 26: true},
+	})...)
+
+	// !== undefined - INVALID with | undefined only type (suggestion fixer)
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:           "&&",
+		MutateCode:         ReplaceOperatorWithStrictNotEqualUndefined,
+		MutateDeclaration:  RemoveNullFromType,
+		MutateOutput:       Identity,
+		UseSuggestionFixer: true,
+	})...)
+
+	// !== undefined - 2 hardcoded special cases
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const foo: {
+  bar: () =>
+    | { baz: { buzz: (() => number) | null | undefined } | null | undefined }
+    | null
+    | undefined;
+};
+foo.bar !== undefined &&
+  foo.bar() !== undefined &&
+  foo.bar().baz !== undefined &&
+  foo.bar().baz.buzz !== undefined &&
+  foo.bar().baz.buzz();
+`,
+		Output: []string{`
+declare const foo: {
+  bar: () =>
+    | { baz: { buzz: (() => number) | null | undefined } | null | undefined }
+    | null
+    | undefined;
+};
+foo.bar?.() !== undefined &&
+  foo.bar().baz !== undefined &&
+  foo.bar().baz.buzz !== undefined &&
+  foo.bar().baz.buzz();
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	}, rule_tester.InvalidTestCase{
+		Code: `
+declare const foo: { bar: () => { baz: number } | null | undefined };
+foo.bar !== undefined && foo.bar?.() !== undefined && foo.bar?.().baz;
+`,
+		Output: []string{`
+declare const foo: { bar: () => { baz: number } | null | undefined };
+foo.bar?.() !== undefined && foo.bar?.().baz;
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 	})
+
+	// != undefined - INVALID (suggestion fixer)
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:           "&&",
+		MutateCode:         ReplaceOperatorWithNotEqualUndefined,
+		MutateOutput:       Identity,
+		UseSuggestionFixer: true,
+	})...)
+
+	// --- OR operator ---
+
+	// OR boolean - negated (!foo || !foo.bar pattern)
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator: "||",
+		MutateCode: func(s string) string {
+			return "!" + strings.ReplaceAll(s, "||", "|| !")
+		},
+		MutateOutput: func(s string) string {
+			return "!" + s
+		},
+	})...)
+
+	// === null - VALID with full type
+	validCases = append(validCases, GenerateValidBaseCases(BaseCaseOptions{
+		Operator:   "||",
+		MutateCode: ReplaceOperatorWithStrictEqualNull,
+	})...)
+
+	// === null - INVALID with | null only type + trailing check (suggestion fixer)
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:           "||",
+		MutateCode:         AddTrailingStrictEqualNull(ReplaceOperatorWithStrictEqualNull),
+		MutateDeclaration:  RemoveUndefinedFromType,
+		MutateOutput:       AddTrailingStrictEqualNull(Identity),
+		UseSuggestionFixer: true,
+	})...)
+
+	// == null - INVALID with trailing check
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:     "||",
+		MutateCode:   AddTrailingEqualNull(ReplaceOperatorWithEqualNull),
+		MutateOutput: AddTrailingEqualNull(Identity),
+	})...)
+
+	// === undefined - VALID with full type (skip IDs 20, 26)
+	validCases = append(validCases, GenerateValidBaseCases(BaseCaseOptions{
+		Operator:   "||",
+		MutateCode: ReplaceOperatorWithStrictEqualUndefined,
+		SkipIDs:    map[int]bool{20: true, 26: true},
+	})...)
+
+	// === undefined - INVALID with | undefined only type + trailing check
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:          "||",
+		MutateCode:        AddTrailingStrictEqualUndefined(ReplaceOperatorWithStrictEqualUndefined),
+		MutateDeclaration: RemoveNullFromType,
+		MutateOutput:      AddTrailingStrictEqualUndefined(Identity),
+	})...)
+
+	// === undefined - 2 hardcoded special cases
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const foo: {
+  bar: () =>
+    | { baz: { buzz: (() => number) | null | undefined } | null | undefined }
+    | null
+    | undefined;
+};
+foo.bar === undefined ||
+  foo.bar() === undefined ||
+  foo.bar().baz === undefined ||
+  foo.bar().baz.buzz === undefined ||
+  foo.bar().baz.buzz();
+`,
+		Output: []string{`
+declare const foo: {
+  bar: () =>
+    | { baz: { buzz: (() => number) | null | undefined } | null | undefined }
+    | null
+    | undefined;
+};
+foo.bar?.() === undefined ||
+  foo.bar().baz === undefined ||
+  foo.bar().baz.buzz === undefined ||
+  foo.bar().baz.buzz();
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	}, rule_tester.InvalidTestCase{
+		Code: `
+declare const foo: { bar: () => { baz: number } | null | undefined };
+foo.bar === undefined || foo.bar?.() === undefined || foo.bar?.().baz;
+`,
+		Output: []string{`
+declare const foo: { bar: () => { baz: number } | null | undefined };
+foo.bar?.() === undefined || foo.bar?.().baz;
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
+	// == undefined - INVALID with trailing check
+	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
+		Operator:     "||",
+		MutateCode:   AddTrailingEqualUndefined(ReplaceOperatorWithEqualUndefined),
+		MutateOutput: AddTrailingEqualUndefined(Identity),
+	})...)
+
+	// --- Spacing sanity checks ---
+	// These test that extra spacing in the code is handled correctly
+	invalidCases = append(invalidCases, DedupeInvalidTestCases(
+		GenerateBaseCases(BaseCaseOptions{
+			Operator:     "&&",
+			MutateCode:   AddSpacingAfterDots,
+			MutateOutput: AddSpacingInsideBrackets,
+		}),
+		GenerateBaseCases(BaseCaseOptions{
+			Operator:     "&&",
+			MutateCode:   AddNewlineAfterDots,
+			MutateOutput: AddNewlineInsideBrackets,
+		}),
+	)...)
+
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }

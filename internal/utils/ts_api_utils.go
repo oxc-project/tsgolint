@@ -62,6 +62,15 @@ func IsTypeUndefinedType(t *checker.Type) bool {
 func IsTypeVoidType(t *checker.Type) bool {
 	return IsTypeFlagSet(t, checker.TypeFlagsVoid)
 }
+
+func GetNonNullableType(typeChecker *checker.Checker, t *checker.Type) *checker.Type {
+	return checker.Checker_GetNonNullableType(typeChecker, t)
+}
+
+func IsNullableType(typeChecker *checker.Checker, t *checker.Type) bool {
+	return checker.Checker_IsNullableType(typeChecker, t)
+}
+
 func IsBooleanLiteralType(t *checker.Type) bool {
 	return IsTypeFlagSet(t, checker.TypeFlagsBoolean)
 }

@@ -119,6 +119,52 @@ func isNullishComparison(op Operand) bool {
 	return isLeftNullish || isRightNullish
 }
 
+// isStrictNullComparison checks if an OperandTypeComparison operand is comparing to null (not undefined).
+// This is used to distinguish between null checks and undefined checks in OR chains.
+func isStrictNullComparison(op Operand) bool {
+	if op.typ != OperandTypeComparison || op.node == nil {
+		return false
+	}
+	unwrapped := unwrapParentheses(op.node)
+	if !ast.IsBinaryExpression(unwrapped) {
+		return false
+	}
+	binExpr := unwrapped.AsBinaryExpression()
+	binOp := binExpr.OperatorToken.Kind
+
+	// Only === null checks (not undefined)
+	if binOp != ast.KindEqualsEqualsEqualsToken && binOp != ast.KindEqualsEqualsToken {
+		return false
+	}
+
+	left := unwrapParentheses(binExpr.Left)
+	right := unwrapParentheses(binExpr.Right)
+
+	// Check only for null keyword, NOT undefined
+	isLeftNull := left.Kind == ast.KindNullKeyword
+	isRightNull := right.Kind == ast.KindNullKeyword
+
+	return isLeftNull || isRightNull
+}
+
+// isOrChainNullishCheck returns true if the operand is any kind of nullish check that can be
+// used in an OR chain. This includes:
+// - OperandTypeStrictEqualNull (foo === null)
+// - OperandTypeStrictEqualUndef (foo === undefined)
+// - OperandTypeEqualNull (foo == null)
+// - OperandTypeComparison when comparing to null/undefined
+// Used to allow extending OR chains through call expressions for nullish comparison patterns.
+func isOrChainNullishCheck(op Operand) bool {
+	switch op.typ {
+	case OperandTypeStrictEqualNull, OperandTypeStrictEqualUndef, OperandTypeEqualNull:
+		return true
+	case OperandTypeComparison:
+		return isNullishComparison(op)
+	default:
+		return false
+	}
+}
+
 // Operand represents a parsed operand in a logical chain
 type Operand struct {
 	typ          OperandType
@@ -497,6 +543,8 @@ func (processor *chainProcessor) getTypeInfo(node *ast.Node) *TypeInfo {
 		parts: parts,
 	}
 
+	// Use UnionTypeParts to detect nullability from the type's constituent parts.
+	// This is more reliable than string parsing and handles all type kinds correctly.
 	for _, part := range parts {
 		if utils.IsTypeNullType(part) {
 			info.hasNull = true
@@ -614,8 +662,12 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	// If so, we cannot safely chain because calling the function/constructor multiple times may have side effects
 	// Example: getFoo() && getFoo().bar -> Cannot convert (getFoo() might have side effects)
 	// Example: new Date() && new Date().getTime() -> Cannot convert (different instances)
-	// EXCEPTION: If the expression already contains optional chaining (?.), it's safe to extend
+	// EXCEPTION 1: If the expression already contains optional chaining (?.), it's safe to extend
 	// Example: foo?.() || foo?.().bar -> CAN convert to foo?.()?.bar (single evaluation)
+	// EXCEPTION 2: If the call is a method call on an object (e.g., foo.bar()), allow it because:
+	//   - We've already verified the base (foo.bar) in a previous operand
+	//   - The original code already calls the method multiple times
+	//   - Converting to optional chain actually REDUCES call count
 	// Also check for literal expressions (arrays, objects, functions, classes) which create new instances
 	// Example: [] && [].length -> Cannot convert (different arrays)
 	// Example: (class Foo {}) && class Foo {}.name -> Cannot convert (different classes)
@@ -627,7 +679,58 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	// Allow call expressions if they contain optional chaining (already safe)
 	hasOptionalChaining := strings.Contains(leftText, "?.")
 	if !hasOptionalChaining {
-		if ast.IsCallExpression(leftUnwrapped) || ast.IsNewExpression(leftUnwrapped) ||
+		// For CallExpressions and NewExpressions, only block if the callee is a standalone identifier
+		// (like getFoo() or new Date()). Allow method calls like foo.bar() because:
+		// 1. The base object was already verified in a previous chain operand
+		// 2. The original code already calls the method in both operands
+		// 3. Converting to optional chain reduces the number of calls
+		//
+		// EXCEPTION: If the root of the expression is a NewExpression, block it because
+		// each `new X()` creates a different instance.
+		// Example: new Map().get('a') && new Map().get('a').what -> SHOULD NOT CONVERT
+
+		// Find the root of the expression (traverse through property/element/call chains)
+		rootExpr := leftUnwrapped
+		for {
+			unwrapped := rootExpr
+			for ast.IsParenthesizedExpression(unwrapped) {
+				unwrapped = unwrapped.AsParenthesizedExpression().Expression
+			}
+			if ast.IsPropertyAccessExpression(unwrapped) {
+				rootExpr = unwrapped.AsPropertyAccessExpression().Expression
+			} else if ast.IsElementAccessExpression(unwrapped) {
+				rootExpr = unwrapped.AsElementAccessExpression().Expression
+			} else if ast.IsCallExpression(unwrapped) {
+				rootExpr = unwrapped.AsCallExpression().Expression
+			} else {
+				break
+			}
+		}
+
+		// Check if the root is a NewExpression (problematic - creates different instances)
+		isRootedInNew := false
+		if rootExpr != nil {
+			unwrappedRoot := rootExpr
+			for ast.IsParenthesizedExpression(unwrappedRoot) {
+				unwrappedRoot = unwrappedRoot.AsParenthesizedExpression().Expression
+			}
+			isRootedInNew = ast.IsNewExpression(unwrappedRoot)
+		}
+
+		isStandaloneCall := false
+		if ast.IsCallExpression(leftUnwrapped) {
+			callee := leftUnwrapped.AsCallExpression().Expression
+			for ast.IsParenthesizedExpression(callee) {
+				callee = callee.AsParenthesizedExpression().Expression
+			}
+			// Standalone call if callee is just an identifier (not a property/element access)
+			isStandaloneCall = ast.IsIdentifier(callee)
+		} else if ast.IsNewExpression(leftUnwrapped) {
+			// new expressions are always problematic (create different instances)
+			isStandaloneCall = true
+		}
+
+		if isStandaloneCall || isRootedInNew ||
 			ast.IsArrayLiteralExpression(leftUnwrapped) ||
 			ast.IsObjectLiteralExpression(leftUnwrapped) ||
 			ast.IsFunctionExpression(leftUnwrapped) ||
@@ -1423,6 +1526,9 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, isAndChain bool) O
 				} else if !isPropertyOrElement {
 					// Base identifier null/undefined checks
 					// Example: foo === null || foo.bar
+					// Note: We use OperandTypeNotStrictEqual* types here because in OR chains,
+					// foo === null has the same semantics as foo !== null in AND chains
+					// (both filter out null values before accessing properties)
 					switch op {
 					case ast.KindEqualsEqualsEqualsToken:
 						if isNull {
@@ -1740,7 +1846,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		return result
 	}
 
-	allLogicalNodes := flattenAndMarkLogicals(node)
+	_ = flattenAndMarkLogicals(node)
 
 	// Collect all && operands using the shared helper
 	operandNodes := processor.collectOperands(node, ast.KindAmpersandAmpersandToken)
@@ -1772,10 +1878,9 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 	var allChains [][]Operand
 	var currentChain []Operand
 	var lastExpr *ast.Node
-	var lastCheckType OperandType      // Track the type of the last nullish check
-	var chainComplete bool             // Mark when chain should not accept more operands
-	var stopProcessing bool            // Stop processing after inconsistent check
-	var chainHasSafeCallExtension bool // Track if chain has been safely extended through a call
+	var lastCheckType OperandType // Track the type of the last nullish check
+	var chainComplete bool        // Mark when chain should not accept more operands
+	var stopProcessing bool       // Stop processing after inconsistent check
 	i := 0
 
 	for i < len(operands) && !stopProcessing {
@@ -1790,7 +1895,6 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			lastExpr = nil
 			lastCheckType = OperandTypeInvalid
 			chainComplete = false
-			chainHasSafeCallExtension = false
 			i++
 			continue
 		}
@@ -1803,7 +1907,6 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				lastCheckType = op.typ
 			}
 			chainComplete = false
-			chainHasSafeCallExtension = false
 			i++
 			continue
 		}
@@ -1820,7 +1923,6 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				lastCheckType = op.typ
 			}
 			chainComplete = false
-			chainHasSafeCallExtension = false
 			i++
 			continue
 		}
@@ -1940,6 +2042,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// This is different from: getFoo() && getFoo().bar (different calls, always unsafe)
 		// Track if we used special handling to allow call chain extension
 		usedCallChainExtension := false
+		_ = usedCallChainExtension // May be set but not used after simplification
 		if cmp == NodeInvalid {
 			// Check if we should allow extending through call expression
 			// Either via unsafe option OR via plain truthiness chain pattern
@@ -2004,7 +2107,6 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 										// op extends lastExpr, treat as NodeSubset
 										cmp = NodeSubset
 										usedCallChainExtension = true
-										chainHasSafeCallExtension = true // Mark chain-level flag
 									}
 								}
 							}
@@ -2125,139 +2227,12 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		} else if cmp == NodeSubset {
 			// Property access of previous expression
 
-			// Check if current operand is an explicit null/undefined check
-			// and we already have at least one check in the chain
-			// If so, CONTINUE adding to the chain for simple property/element access chains
-			// But FINALIZE for call expression chains (to avoid multiple evaluations)
-			// Example to ALLOW: foo != null && foo.bar != null && foo.bar.baz (property chain)
-			// Example to FINALIZE: foo.bar !== undefined && foo.bar() !== undefined (call chain)
-			if isExplicitNullishCheck(op.typ) && len(currentChain) >= 2 {
-				// Check if we already have at least one explicit check in the chain
-				hasExplicitCheck := false
-				for _, chainOp := range currentChain {
-					if isExplicitNullishCheck(chainOp.typ) {
-						hasExplicitCheck = true
-						break
-					}
-				}
-
-				// Check if this is a call expression chain (has side effects)
-				// If so, use conservative approach (finalize chain)
-				// Otherwise, continue adding to the chain
-				hasCallInChain := false
-				isCallingCheckedExpr := false // True if current operand is calling the expression we just checked
-				if op.comparedExpr != nil {
-					unwrappedOp := unwrapParentheses(op.comparedExpr)
-					if ast.IsCallExpression(unwrappedOp) {
-						hasCallInChain = true
-						// Check if this call is calling the lastExpr (the expression we just checked)
-						// Example: foo.bar != null && foo.bar() - foo.bar() is calling foo.bar
-						callExpr := unwrappedOp.AsCallExpression()
-						if callExpr != nil && callExpr.Expression != nil {
-							calleeText := ""
-							calleeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, callExpr.Expression)
-							if calleeRange.Pos() >= 0 && calleeRange.End() <= len(processor.sourceText) {
-								calleeText = processor.sourceText[calleeRange.Pos():calleeRange.End()]
-							}
-							lastText := ""
-							lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastExpr)
-							if lastRange.Pos() >= 0 && lastRange.End() <= len(processor.sourceText) {
-								lastText = processor.sourceText[lastRange.Pos():lastRange.End()]
-							}
-							if calleeText == lastText {
-								// The call is calling the expression we just checked - safe to continue
-								isCallingCheckedExpr = true
-							}
-						}
-					}
-				}
-				// Also check if previous operands had calls
-				if !hasCallInChain {
-					for _, chainOp := range currentChain {
-						if chainOp.comparedExpr != nil {
-							unwrappedChainOp := unwrapParentheses(chainOp.comparedExpr)
-							if ast.IsCallExpression(unwrappedChainOp) {
-								hasCallInChain = true
-								break
-							}
-						}
-					}
-				}
-
-				if hasExplicitCheck && hasCallInChain && !usedCallChainExtension && !chainHasSafeCallExtension && !isCallingCheckedExpr {
-					// Finalize current chain and don't include this check
-					// This is the conservative approach for call chains
-					// BUT: if we used call chain extension (usedCallChainExtension=true) or
-					// the chain has already been safely extended through a call (chainHasSafeCallExtension=true),
-					// or we're calling the expression we just checked (isCallingCheckedExpr=true),
-					// we're safely extending through a call that was already null-checked,
-					// so we should continue building the chain instead of stopping.
-					if len(currentChain) >= 2 {
-						allChains = append(allChains, currentChain)
-					}
-					// Reset currentChain to prevent double-adding at loop end
-					currentChain = nil
-					chainComplete = true
-					stopProcessing = true
-
-					// Update processed range to include the ENTIRE node (top-level expression)
-					// This prevents ANY sub-chains from being detected separately
-					// We need to cover the full range of the top-level && expression
-					topLevelRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-					// Find the existing range entry and update it to cover the entire expression
-					for idx := range processor.processedAndRanges {
-						if processor.processedAndRanges[idx].start == nodeStart {
-							processor.processedAndRanges[idx].end = topLevelRange.End()
-							break
-						}
-					}
-
-					// Mark ALL logical nodes in this expression tree to prevent any sub-chains
-					// from being detected separately
-					for _, logicalNode := range allLogicalNodes {
-						if logicalNode != nil {
-							processor.seenLogicals[logicalNode] = true
-							unwrappedLogical := unwrapParentheses(logicalNode)
-							processor.seenLogicals[unwrappedLogical] = true
-						}
-					}
-
-					// Mark all remaining operand nodes as seen to prevent them from being
-					// processed as a separate chain by the visitor
-					var markAllNodes func(*ast.Node)
-					markAllNodes = func(n *ast.Node) {
-						if n == nil {
-							return
-						}
-						processor.seenLogicals[n] = true
-						unwrapped := unwrapParentheses(n)
-						processor.seenLogicals[unwrapped] = true
-
-						if ast.IsBinaryExpression(unwrapped) {
-							binExpr := unwrapped.AsBinaryExpression()
-							markAllNodes(binExpr.Left)
-							markAllNodes(binExpr.Right)
-						} else if ast.IsPropertyAccessExpression(unwrapped) {
-							markAllNodes(unwrapped.AsPropertyAccessExpression().Expression)
-						} else if ast.IsElementAccessExpression(unwrapped) {
-							elemAccess := unwrapped.AsElementAccessExpression()
-							markAllNodes(elemAccess.Expression)
-							markAllNodes(elemAccess.ArgumentExpression)
-						} else if ast.IsCallExpression(unwrapped) {
-							call := unwrapped.AsCallExpression()
-							markAllNodes(call.Expression)
-						}
-					}
-
-					for j := i + 1; j < len(operandNodes); j++ {
-						markAllNodes(operandNodes[j])
-					}
-
-					i++
-					continue
-				}
-				// For property/element chains, continue adding to the chain
-			}
+			// Note: Previously we had conservative logic here that would stop the chain
+			// when there were calls. But this was too restrictive - typescript-eslint
+			// converts chains with calls as long as each step is checked.
+			// Since we're in `cmp == NodeSubset` (the current operand extends lastExpr),
+			// and we've already verified the previous operands, it's safe to continue.
+			// The semantic differences (if any) are handled by useSuggestion logic later.
 
 			// Special check: if previous operand is NegatedAndOperand or inverted null check, handle carefully
 			// !a checks ALL falsy values (0, "", false, null, undefined)
@@ -2494,7 +2469,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 								isLastNull := lastChainOp.typ == OperandTypeNotStrictEqualNull
 								isLastUndef := lastChainOp.typ == OperandTypeNotStrictEqualUndef || lastChainOp.typ == OperandTypeTypeofCheck
 
-								for j := 0; j < len(currentChain)-1; j++ {
+								for j := range len(currentChain) - 1 {
 									prevOp := currentChain[j]
 									if prevOp.comparedExpr != nil {
 										prevCmp := processor.compareNodes(prevOp.comparedExpr, lastChainOp.comparedExpr)
@@ -2511,9 +2486,54 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 								}
 
 								if !hasComplementaryCheck {
-									// Current operand extends the strict-checked expression
-									// Stop the chain - the strict check becomes trailing, plain access is preserved
-									shouldStopChain = true
+									// Before stopping, check if the strict check is COMPLETE for the type.
+									// A strict check is complete when:
+									// - `!== null` and type has null but NOT undefined
+									// - `!== undefined` and type has undefined but NOT null
+									// In these cases, the check is semantically equivalent to optional chaining
+									// for that type, so we should continue the chain (with suggestion fixer).
+									strictCheckComplete := false
+
+									// IMPORTANT: Due to type narrowing, we need to find the FIRST occurrence
+									// of this expression in the chain to get the un-narrowed type.
+									// Otherwise, duplicate checks like foo.bar.baz !== null && foo.bar.baz !== null
+									// would have the second occurrence already narrowed to non-null.
+									exprToCheck := lastChainOp.comparedExpr
+									for j := range len(currentChain) - 1 {
+										prevOp := currentChain[j]
+										if prevOp.comparedExpr != nil {
+											prevCmp := processor.compareNodes(prevOp.comparedExpr, lastChainOp.comparedExpr)
+											if prevCmp == NodeEqual {
+												// Found an earlier occurrence - use its node for type checking
+												exprToCheck = prevOp.comparedExpr
+												break
+											}
+										}
+									}
+
+									if exprToCheck != nil {
+										isAnyOrUnknown := processor.typeIsAnyOrUnknown(exprToCheck)
+										hasNull := processor.typeIncludesNull(exprToCheck)
+										hasUndefined := processor.typeIncludesUndefined(exprToCheck)
+
+										// For any/unknown types, we can't determine, so treat as incomplete
+										if !isAnyOrUnknown {
+											// !== null is complete if type has null but NOT undefined
+											if isLastNull && hasNull && !hasUndefined {
+												strictCheckComplete = true
+											}
+											// !== undefined is complete if type has undefined but NOT null
+											if isLastUndef && hasUndefined && !hasNull {
+												strictCheckComplete = true
+											}
+										}
+									}
+
+									if !strictCheckComplete {
+										// Current operand extends the strict-checked expression
+										// Stop the chain - the strict check becomes trailing, plain access is preserved
+										shouldStopChain = true
+									}
 								}
 							}
 						}
@@ -2860,11 +2880,60 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// However, inverted checks (!foo && ..., foo == null && ...) are blocked earlier
 		// in the chain building logic because those have different semantics.
 
-		// Skip chains where the subsequent operands already have optimal optional chaining
-		// Example: x && x.y?.z -> already optimal, don't report
-		// This happens when:
-		// - First operand is a simple check (x)
-		// - Second operand extends the first and already uses optional chaining (x.y?.z)
+		// Skip chains where ALL operands use STRICT nullish checks AND subsequent operands
+		// already have optimal optional chaining.
+		//
+		// Key insight:
+		// - Strict checks (!== null, !== undefined) only guard against ONE nullish value
+		// - Optional chaining (?.) guards against BOTH null and undefined
+		// - So foo !== undefined && foo?.bar is intentional: strict check + optional for the other
+		// - But foo != undefined && foo?.bar is redundant: loose check already covers both
+		//
+		// Only skip if ALL checks in the chain are STRICT (not loose) AND subsequent operands
+		// have optional chaining. For loose checks, the optional chaining is redundant and
+		// should be optimized away.
+		if len(chain) >= 2 {
+			// Check if ALL operands after the first have optional chaining
+			allSubsequentHaveOptionalChaining := true
+			for i := 1; i < len(chain); i++ {
+				if chain[i].comparedExpr != nil && !processor.containsOptionalChain(chain[i].comparedExpr) {
+					allSubsequentHaveOptionalChaining = false
+					break
+				}
+			}
+
+			// Check if ALL nullish checks in the chain are STRICT (not loose)
+			allStrictChecks := true
+			for _, op := range chain {
+				// Loose checks that cover both null and undefined
+				if op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull {
+					allStrictChecks = false
+					break
+				}
+				// Plain/Not operands also check for all falsy values, not just one nullish
+				if op.typ == OperandTypePlain || op.typ == OperandTypeNot {
+					allStrictChecks = false
+					break
+				}
+			}
+
+			// Only skip if BOTH conditions are met:
+			// 1. All subsequent operands have optional chaining
+			// 2. All checks are strict (so the pattern is intentional)
+			// EXCEPTION: If the first type is not nullable (no null or undefined),
+			// then we should still flag for conversion - the strict check is meaningless.
+			if allSubsequentHaveOptionalChaining && allStrictChecks {
+				firstOp := chain[0]
+				firstTypeInfo := processor.getTypeInfo(firstOp.comparedExpr)
+				typeHasNeitherNullNorUndefined := !firstTypeInfo.hasNull && !firstTypeInfo.hasUndefined
+				if !typeHasNeitherNullNorUndefined {
+					continue // Chain uses strict checks with optimal optional chaining, skip it
+				}
+				// If first type is not nullable, continue processing - the check is meaningless
+			}
+		}
+
+		// Additional check for 2-operand chains where second has optional in extension
 		if len(chain) == 2 {
 			firstOp := chain[0]
 			secondOp := chain[1]
@@ -3083,7 +3152,34 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					firstOpNotNullish = true
 				}
 			}
-			if !hasPlainTruthinessCheck && !hasBothCheck && !hasTypeofCheck && !hasTrailingBothCheck && !hasTrailingOptionalChaining && !firstOpNotNullish {
+
+			// Check if the strict check is COMPLETE for the type
+			// A strict check is complete when:
+			// - `!== null` and type has null but NOT undefined
+			// - `!== undefined` and type has undefined but NOT null
+			// In these cases, the check is semantically complete and we should report with suggestion
+			strictCheckIsComplete := false
+			if len(guardOperands) > 0 && guardOperands[0].comparedExpr != nil {
+				info := processor.getTypeInfo(guardOperands[0].comparedExpr)
+				// Don't consider complete if type is any or unknown (can't determine)
+				if !info.hasAny && !info.hasUnknown {
+					hasNull := info.hasNull
+					hasUndefined := info.hasUndefined
+					hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
+					hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
+
+					// !== null is complete if type has null but NOT undefined
+					if hasOnlyNullCheck && hasNull && !hasUndefined {
+						strictCheckIsComplete = true
+					}
+					// !== undefined is complete if type has undefined but NOT null
+					if hasOnlyUndefinedCheck && hasUndefined && !hasNull {
+						strictCheckIsComplete = true
+					}
+				}
+			}
+
+			if !hasPlainTruthinessCheck && !hasBothCheck && !hasTypeofCheck && !hasTrailingBothCheck && !hasTrailingOptionalChaining && !firstOpNotNullish && !strictCheckIsComplete {
 				// If we have a strict null check or strict undefined check (but not both), skip
 				// This is unsafe regardless of other checks in the chain
 				// UNLESS we also have a "both" check (!=) or a typeof check
@@ -4145,8 +4241,12 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		if cmp == NodeInvalid && len(chain) > 0 {
 			prevOp := chain[len(chain)-1]
 			isNegationChain := prevOp.typ == OperandTypeNot && op.typ == OperandTypeNot
+			// Also allow extending through call expressions for nullish comparison chains
+			// Pattern: foo.bar() === null || foo.bar().baz === null
+			// Both operands are checking for null/undefined, so extending through the call is safe
+			isNullishComparisonChain := isOrChainNullishCheck(prevOp) && isOrChainNullishCheck(op)
 
-			if processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing || isNegationChain {
+			if processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing || isNegationChain || isNullishComparisonChain {
 				// Check if lastExpr is a call/new expression and op.comparedExpr extends it
 				lastUnwrapped := lastExpr
 				if lastUnwrapped != nil {
@@ -4256,6 +4356,134 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		return // No explicit checks, just plain operands - can't convert
 	}
 
+	// Skip OR chains where ALL operands use STRICT nullish checks AND subsequent operands
+	// already have optimal optional chaining.
+	// Same logic as for AND chains - strict checks are intentional when combined with ?.
+	if len(chain) >= 2 {
+		// Check if ALL operands after the first have optional chaining
+		allSubsequentHaveOptionalChaining := true
+		for i := 1; i < len(chain); i++ {
+			if chain[i].comparedExpr != nil && !processor.containsOptionalChain(chain[i].comparedExpr) {
+				allSubsequentHaveOptionalChaining = false
+				break
+			}
+		}
+
+		// Early check: If all subsequent operands already have optimal optional chaining,
+		// and the first operand is an explicit NULL check (not undefined) on a non-nullable type, skip.
+		// Example: foo.bar === null || foo.bar?.() === null || foo.bar?.().baz
+		// where foo.bar is a function type (not nullable) - the code is already optimal.
+		//
+		// BUT: Don't skip for === undefined checks! These should be flagged for conversion.
+		// This matches typescript-eslint behavior where === null on non-nullable with ?. is valid,
+		// but === undefined on non-nullable with ?. should be converted to optional chaining only.
+		//
+		// Also don't skip if the first operand is a negation (!foo) or plain truthiness check,
+		// as those can still be converted to optional chaining regardless of nullability.
+		if allSubsequentHaveOptionalChaining {
+			firstOp := chain[0]
+			// Only check type when first operand is an explicit NULL equality check (not undefined)
+			// For OR chains, property null comparisons are classified as OperandTypeComparison,
+			// so we need to check the actual comparison too
+			isExplicitNullCheck := firstOp.typ == OperandTypeStrictEqualNull ||
+				firstOp.typ == OperandTypeEqualNull ||
+				isStrictNullComparison(firstOp)
+			if isExplicitNullCheck {
+				// Check if ANY type in the chain is nullable
+				// We should only skip if ALL types in the chain are non-nullable
+				// Example: foo.bar === null || foo.bar?.() === null
+				// foo.bar is a function (not nullable), but foo.bar() is nullable
+				// We should still report because there are nullable types that can be consolidated
+				anyTypeHasNullOrUndefined := false
+				for _, op := range chain {
+					if op.comparedExpr != nil {
+						typeInfo := processor.getTypeInfo(op.comparedExpr)
+						if typeInfo.hasNull || typeInfo.hasUndefined {
+							anyTypeHasNullOrUndefined = true
+							break
+						}
+					}
+				}
+				if !anyTypeHasNullOrUndefined {
+					return // No type in the chain is nullable and subsequent operands already use ?., skip
+				}
+			}
+		}
+
+		// Check if ALL nullish checks in the chain are STRICT (not loose)
+		allStrictChecks := true
+		for _, op := range chain {
+			// Loose checks that cover both null and undefined
+			if op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull {
+				allStrictChecks = false
+				break
+			}
+			// Plain/Not operands also check for all falsy values, not just one nullish
+			if op.typ == OperandTypePlain || op.typ == OperandTypeNot {
+				allStrictChecks = false
+				break
+			}
+			// For OperandTypeComparison, check if it's a loose nullish comparison
+			if op.typ == OperandTypeComparison && op.node != nil {
+				if ast.IsBinaryExpression(op.node) {
+					binExpr := op.node.AsBinaryExpression()
+					binOp := binExpr.OperatorToken.Kind
+					// == null/undefined is loose (covers both)
+					if binOp == ast.KindEqualsEqualsToken {
+						left := unwrapParentheses(binExpr.Left)
+						right := unwrapParentheses(binExpr.Right)
+						isNullish := left.Kind == ast.KindNullKeyword || right.Kind == ast.KindNullKeyword ||
+							(ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
+							(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined")
+						if isNullish {
+							allStrictChecks = false
+							break
+						}
+					}
+				}
+			}
+		}
+
+		// Only skip if BOTH conditions are met:
+		// 1. All subsequent operands have optional chaining
+		// 2. All checks are strict (so the pattern is intentional)
+		// EXCEPTION: If the type only includes null OR only includes undefined (but not both),
+		// then strict checks are appropriate for the type and we should still report.
+		// Example: type is `| null` only - using === null is just being type-correct, not
+		// intentionally distinguishing between null and undefined.
+		if allSubsequentHaveOptionalChaining && allStrictChecks {
+			// Check types across ALL operands in the chain, not just the first
+			// Example: foo.bar === null || foo.bar?.() === null
+			// foo.bar is a function (not nullable), but foo.bar() is nullable
+			anyHasNull := false
+			anyHasUndefined := false
+			for _, op := range chain {
+				if op.comparedExpr != nil {
+					typeInfo := processor.getTypeInfo(op.comparedExpr)
+					if typeInfo.hasNull {
+						anyHasNull = true
+					}
+					if typeInfo.hasUndefined {
+						anyHasUndefined = true
+					}
+				}
+			}
+
+			// Skip if NO type in the chain has null or undefined
+			// In this case, all checks are meaningless (dead code)
+			if !anyHasNull && !anyHasUndefined {
+				return // No types are nullable, skip it
+			}
+			// Skip if types include BOTH null AND undefined across the chain
+			// In that case, strict checks are intentionally distinguishing between them
+			if anyHasNull && anyHasUndefined {
+				return // Chain uses strict checks with optimal optional chaining, skip it
+			}
+			// If types only include null OR only undefined (but not both), continue processing
+			// as the strict check is just type-appropriate, not distinguishing
+		}
+	}
+
 	// Note: OR chains with trailing comparisons do NOT require the unsafe option
 	// The semantics are preserved because:
 	// - Original: !foo || foo.bar != 0 returns true if foo is falsy, otherwise (foo.bar != 0)
@@ -4344,10 +4572,36 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	// Skip this check when the unsafe option is enabled (allow potentially unsafe transformations)
 	if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		if len(chain) >= 2 && (chain[0].typ == OperandTypeNotEqualBoth || chain[0].typ == OperandTypeNotStrictEqualNull || chain[0].typ == OperandTypeNotStrictEqualUndef) {
+			// Get type info for the first operand to determine what values it can be
+			firstTypeInfo := processor.getTypeInfo(chain[0].comparedExpr)
+
 			// Check if trailing comparisons are safe
 			for i := 1; i < len(chain); i++ {
 				if chain[i].typ == OperandTypeComparison && !processor.isOrChainComparisonSafe(chain[i]) {
-					return // Unsafe comparison (e.g., with undeclared variable), skip this chain
+					isLastOperand := i == len(chain)-1
+
+					if isLastOperand && isNullishComparison(chain[i]) {
+						// Trailing nullish comparison - only unsafe if the first operand's type
+						// includes BOTH null AND undefined (meaning == null catches values that
+						// === null doesn't, changing semantics when converted)
+						//
+						// Examples:
+						// - foo == null || foo.bar === null (foo: any) -> UNSAFE
+						//   When foo is undefined, original returns true, converted returns false
+						// - foo === null || foo.bar === null (foo: T | null) -> SAFE
+						//   foo can never be undefined, so semantics are preserved
+						if firstTypeInfo.hasNull && firstTypeInfo.hasUndefined {
+							return // Type includes both null and undefined, trailing === null is unsafe
+						}
+						if firstTypeInfo.hasAny || firstTypeInfo.hasUnknown {
+							return // any/unknown could be anything, be conservative
+						}
+						// Type only includes one of null/undefined (or neither), so trailing comparison is safe
+					} else if !isNullishComparison(chain[i]) {
+						// Non-nullish comparison that's not safe - skip chain
+						return
+					}
+					// Intermediate nullish comparison is safe (it's a guard)
 				}
 			}
 		}
@@ -4411,13 +4665,13 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		hasNullCheck := false
 		hasUndefinedCheck := false
 		hasBothCheck := false
-
+		// Debug mode for invalid-225
 		for _, op := range chain {
-			if op.typ == OperandTypeNotStrictEqualNull {
+			if op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull {
 				hasNullCheck = true
-			} else if op.typ == OperandTypeNotStrictEqualUndef {
+			} else if op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef {
 				hasUndefinedCheck = true
-			} else if op.typ == OperandTypeNotEqualBoth {
+			} else if op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull {
 				hasBothCheck = true
 			} else if op.typ == OperandTypeTypeofCheck {
 				// typeof checks are equivalent to undefined checks
@@ -4484,7 +4738,57 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 				hasTrailingOptionalChaining = true
 			}
 		}
-		if !hasBothCheck && !firstOpNotNullish && !hasTrailingOptionalChaining {
+
+		// Check if the strict check is COMPLETE for the types in the chain.
+		// A strict check is complete when:
+		// - `=== null` (for OR) and ALL nullable types have null but NOT undefined
+		// - `=== undefined` (for OR) and ALL nullable types have undefined but NOT null
+		// In these cases, the check is semantically complete and we should report.
+		//
+		// We check all operands because the first operand might not be nullable (e.g., function type),
+		// but subsequent operands (return values) might be.
+		strictCheckIsComplete := true // Assume complete, set false if any operand has both
+		hasAnyNullableOperand := false
+		for _, op := range chain {
+			if op.comparedExpr == nil {
+				continue
+			}
+			info := processor.getTypeInfo(op.comparedExpr)
+			// Skip non-nullable operands (like function types) - they don't affect completeness
+			if !info.hasNull && !info.hasUndefined && !info.hasAny && !info.hasUnknown {
+				continue
+			}
+			hasAnyNullableOperand = true
+			// If any nullable operand has any/unknown, we can't determine completeness
+			if info.hasAny || info.hasUnknown {
+				strictCheckIsComplete = false
+				break
+			}
+			// If any nullable operand has BOTH null AND undefined, the check is incomplete
+			if info.hasNull && info.hasUndefined {
+				strictCheckIsComplete = false
+				break
+			}
+			// Check if the check type matches the type's nullability
+			hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
+			hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
+			// === null is incomplete if type only has undefined (not null)
+			if hasOnlyNullCheck && !info.hasNull && info.hasUndefined {
+				strictCheckIsComplete = false
+				break
+			}
+			// === undefined is incomplete if type only has null (not undefined)
+			if hasOnlyUndefinedCheck && info.hasNull && !info.hasUndefined {
+				strictCheckIsComplete = false
+				break
+			}
+		}
+		// If no nullable operands found, can't be complete
+		if !hasAnyNullableOperand {
+			strictCheckIsComplete = false
+		}
+
+		if !hasBothCheck && !firstOpNotNullish && !hasTrailingOptionalChaining && !strictCheckIsComplete {
 			hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
 			hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
 
@@ -4502,6 +4806,10 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		// is preserved in the output.
 		// ALSO: Skip operands that already have optional chaining - they're intermediate operands
 		// whose checks will be preserved in the output.
+		//
+		// MODIFICATION: Instead of rejecting the entire chain, truncate it so that the operand
+		// with the incomplete check becomes the last operand (whose check will be preserved).
+		truncateAt := -1 // -1 means no truncation needed
 		for i, op := range chain {
 			// Skip the last operand - its check is preserved in the output
 			if i == len(chain)-1 {
@@ -4511,41 +4819,108 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 			if op.comparedExpr != nil && processor.containsOptionalChain(op.comparedExpr) {
 				continue
 			}
-			if op.typ == OperandTypeComparison && op.node != nil && op.comparedExpr != nil {
-				unwrapped := op.node
-				for ast.IsParenthesizedExpression(unwrapped) {
-					unwrapped = unwrapped.AsParenthesizedExpression().Expression
-				}
-				if ast.IsBinaryExpression(unwrapped) {
-					binExpr := unwrapped.AsBinaryExpression()
-					operator := binExpr.OperatorToken.Kind
 
-					// Only check strict equality operators (=== null or === undefined)
-					if operator == ast.KindEqualsEqualsEqualsToken {
-						// Check if comparing to null or undefined
-						isStrictNullCheck := binExpr.Right.Kind == ast.KindNullKeyword ||
-							binExpr.Left.Kind == ast.KindNullKeyword
-						isStrictUndefCheck := (ast.IsIdentifier(binExpr.Right) && binExpr.Right.AsIdentifier().Text == "undefined") ||
-							(ast.IsIdentifier(binExpr.Left) && binExpr.Left.AsIdentifier().Text == "undefined") ||
-							ast.IsVoidExpression(binExpr.Right) || ast.IsVoidExpression(binExpr.Left)
+			// Check for incomplete nullish checks on guard operands.
+			// This covers:
+			// 1. OperandTypeNotStrictEqualNull in OR chains (foo === null parsed as equivalent to !== null in AND)
+			// 2. OperandTypeNotStrictEqualUndef in OR chains (foo === undefined parsed as equivalent to !== undefined in AND)
+			// 3. OperandTypeComparison with === null or === undefined
+			//
+			// If the type has BOTH null AND undefined but the check only covers one,
+			// truncate the chain so this operand becomes the last (preserving its check).
+			if op.comparedExpr != nil {
+				typeInfo := processor.getTypeInfo(op.comparedExpr)
+				if typeInfo.hasNull && typeInfo.hasUndefined {
+					// Type has both null and undefined
+					// In OR chains, OperandTypeNotStrictEqualNull represents "foo === null"
+					// (semantically equivalent to !== null in AND chains)
+					switch op.typ {
+					case OperandTypeNotStrictEqualNull:
+						// foo === null in OR chain on type that also includes undefined - incomplete check
+						// Truncate chain so this operand becomes the last (preserving its check)
+						if truncateAt == -1 || i+1 < truncateAt {
+							truncateAt = i + 1
+						}
+					case OperandTypeNotStrictEqualUndef:
+						// foo === undefined in OR chain on type that also includes null - incomplete check
+						if truncateAt == -1 || i+1 < truncateAt {
+							truncateAt = i + 1
+						}
+					case OperandTypeStrictEqualNull:
+						// foo === null (for inverted AND chain checks) on type with both - incomplete
+						if truncateAt == -1 || i+1 < truncateAt {
+							truncateAt = i + 1
+						}
+					case OperandTypeStrictEqualUndef:
+						// foo === undefined (for inverted AND chain checks) on type with both - incomplete
+						if truncateAt == -1 || i+1 < truncateAt {
+							truncateAt = i + 1
+						}
+					case OperandTypeComparison:
+						if op.node != nil {
+							unwrapped := op.node
+							for ast.IsParenthesizedExpression(unwrapped) {
+								unwrapped = unwrapped.AsParenthesizedExpression().Expression
+							}
+							if ast.IsBinaryExpression(unwrapped) {
+								binExpr := unwrapped.AsBinaryExpression()
+								operator := binExpr.OperatorToken.Kind
 
-						if isStrictNullCheck || isStrictUndefCheck {
-							// Get cached type info for the compared expression
-							typeInfo := processor.getTypeInfo(op.comparedExpr)
+								// Only check strict equality operators (=== null or === undefined)
+								if operator == ast.KindEqualsEqualsEqualsToken {
+									// Check if comparing to null or undefined
+									isStrictNullCheck := binExpr.Right.Kind == ast.KindNullKeyword ||
+										binExpr.Left.Kind == ast.KindNullKeyword
+									isStrictUndefCheck := (ast.IsIdentifier(binExpr.Right) && binExpr.Right.AsIdentifier().Text == "undefined") ||
+										(ast.IsIdentifier(binExpr.Left) && binExpr.Left.AsIdentifier().Text == "undefined") ||
+										ast.IsVoidExpression(binExpr.Right) || ast.IsVoidExpression(binExpr.Left)
 
-							// If type has both null and undefined, but we only check one, reject
-							if typeInfo.hasNull && typeInfo.hasUndefined {
-								if isStrictNullCheck && !isStrictUndefCheck {
-									return
-								}
-								if isStrictUndefCheck && !isStrictNullCheck {
-									return
+									// If type has both null and undefined, but we only check one, truncate
+									if isStrictNullCheck && !isStrictUndefCheck {
+										if truncateAt == -1 || i+1 < truncateAt {
+											truncateAt = i + 1
+										}
+									}
+									if isStrictUndefCheck && !isStrictNullCheck {
+										if truncateAt == -1 || i+1 < truncateAt {
+											truncateAt = i + 1
+										}
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+		}
+
+		// Apply truncation if needed
+		if truncateAt > 0 && truncateAt < len(chain) {
+			chain = chain[:truncateAt]
+		}
+
+		// After truncation, verify we still have a valid chain
+		if len(chain) < 2 {
+			return
+		}
+
+		// CRITICAL: For === null OR chains, converting to ?. changes semantics.
+		//
+		// Optional chaining (?.) returns UNDEFINED when the value is nullish:
+		//   x?.y returns undefined if x is null OR undefined
+		//
+		// This means:
+		//   - x === null || x.y === null  →  returns true if x is null
+		//   - x?.y === null               →  returns false if x is null (undefined === null is false)
+		//
+		// For === undefined, the semantics ARE preserved:
+		//   - x === undefined || x.y === undefined  →  returns true if x is undefined
+		//   - x?.y === undefined                    →  returns true if x is undefined (undefined === undefined is true)
+		//
+		// So we skip === null chains unless the type only includes null (no undefined),
+		// in which case the strict check is semantically complete for that type.
+		if hasNullCheck && !hasUndefinedCheck && !hasBothCheck && !strictCheckIsComplete {
+			return
 		}
 	}
 
@@ -4866,20 +5241,116 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		}
 	}
 
-	// For OR chains with trailing comparisons, always provide a fix
+	// For OR chains with trailing comparisons, check if direct fix is safe
 	// The comparison ensures the return type remains consistent
 	// Example: !foo || foo.bar === undefined -> foo?.bar === undefined (both return boolean)
+	// HOWEVER: For strict null/undefined checks on types that only have one of them,
+	// we should use suggestion because converting intermediate checks to optional chaining
+	// changes semantics (optional chaining checks for BOTH null and undefined).
 	if useSuggestion && hasTrailingComparison {
-		useSuggestion = false
+		// Check if this is a strict check that's "complete" for the type
+		// If so, still use suggestion because the intermediate conversions change semantics
+		strictCheckRequiresSuggestion := false
+		if len(chain) > 0 && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+			// Check what kind of checks we have
+			hasNullCheck := false
+			hasUndefinedCheck := false
+			hasBothCheck := false
+			for _, op := range chain {
+				if op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull {
+					hasNullCheck = true
+				} else if op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef {
+					hasUndefinedCheck = true
+				} else if op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull || op.typ == OperandTypeNot {
+					hasBothCheck = true
+				} else if op.typ == OperandTypeComparison && isNullishComparison(op) {
+					// Check what kind of nullish comparison
+					if op.node != nil && ast.IsBinaryExpression(op.node) {
+						binExpr := op.node.AsBinaryExpression()
+						left := unwrapParentheses(binExpr.Left)
+						right := unwrapParentheses(binExpr.Right)
+						isNull := left.Kind == ast.KindNullKeyword || right.Kind == ast.KindNullKeyword
+						isUndefined := (ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
+							(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
+							ast.IsVoidExpression(left) || ast.IsVoidExpression(right)
+						binOp := binExpr.OperatorToken.Kind
+						if binOp == ast.KindEqualsEqualsToken {
+							hasBothCheck = true
+						} else if binOp == ast.KindEqualsEqualsEqualsToken {
+							if isNull {
+								hasNullCheck = true
+							}
+							if isUndefined {
+								hasUndefinedCheck = true
+							}
+						}
+					}
+				}
+			}
+			hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck && !hasBothCheck
+			hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck && !hasBothCheck
+
+			// Check ALL nullable operands to determine if the check is complete for all types
+			// A check is complete when all nullable types in the chain match the check type
+			if hasOnlyNullCheck || hasOnlyUndefinedCheck {
+				allTypesMatchCheck := true
+				hasAnyNullableType := false
+				for _, op := range chain {
+					if op.comparedExpr == nil {
+						continue
+					}
+					info := processor.getTypeInfo(op.comparedExpr)
+					// Skip non-nullable operands
+					if !info.hasNull && !info.hasUndefined && !info.hasAny && !info.hasUnknown {
+						continue
+					}
+					hasAnyNullableType = true
+					// If any type has any/unknown, we can't determine
+					if info.hasAny || info.hasUnknown {
+						allTypesMatchCheck = false
+						break
+					}
+					// If any type has BOTH, check is incomplete
+					if info.hasNull && info.hasUndefined {
+						allTypesMatchCheck = false
+						break
+					}
+					// For null-only checks, type should have null but not undefined
+					if hasOnlyNullCheck && (!info.hasNull || info.hasUndefined) {
+						allTypesMatchCheck = false
+						break
+					}
+					// For undefined-only checks, type should have undefined but not null
+					if hasOnlyUndefinedCheck && (info.hasNull || !info.hasUndefined) {
+						allTypesMatchCheck = false
+						break
+					}
+				}
+				if hasAnyNullableType && allTypesMatchCheck {
+					strictCheckRequiresSuggestion = true
+				}
+			}
+		}
+		if !strictCheckRequiresSuggestion {
+			useSuggestion = false
+		}
 	}
 
-	// If still using suggestion, check if ANY operand includes undefined
-	// (including any/unknown types). If so, the autofix is safe.
+	// If still using suggestion, check if ANY operand includes BOTH null and undefined
+	// (or any/unknown types). If so, the autofix is safe because optional chaining
+	// checks for both null and undefined, matching the expected behavior.
+	// BUT: If the type only has null OR only undefined (not both), keep using suggestion
+	// because the conversion would change semantics.
 	if useSuggestion && len(chain) > 0 {
 		for _, op := range chain {
-			if op.comparedExpr != nil && processor.includesNullish(op.comparedExpr) {
-				useSuggestion = false
-				break
+			if op.comparedExpr != nil {
+				info := processor.getTypeInfo(op.comparedExpr)
+				// Safe if type is any/unknown (can't determine, assume safe)
+				// or if type includes BOTH null AND undefined
+				if info.hasAny || info.hasUnknown || (info.hasNull && info.hasUndefined) {
+					useSuggestion = false
+					break
+				}
 			}
 		}
 	}

@@ -2,6 +2,7 @@ package prefer_optional_chain
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
@@ -219,7 +220,12 @@ func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 		opts.MutateOutput = opts.MutateCode
 	}
 	if opts.Options == nil {
-		opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`)
+		if opts.UseSuggestionFixer {
+			// When using suggestion fixer, don't set the unsafe option so the rule uses suggestions
+			opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{}`)
+		} else {
+			opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`)
+		}
 	}
 
 	var result []rule_tester.InvalidTestCase
@@ -244,14 +250,21 @@ func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 		tc := rule_tester.InvalidTestCase{
 			Code:    fullCode,
 			Options: opts.Options,
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 		}
 
 		if opts.UseSuggestionFixer {
+			// No direct fix, but provide suggestion
 			tc.Output = nil
-			// Note: Suggestions not yet implemented in rule_tester
+			tc.Errors = []rule_tester.InvalidTestCaseError{{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "optionalChainSuggest",
+					Output:    fullOutput,
+				}},
+			}}
 		} else {
 			tc.Output = []string{fullOutput}
+			tc.Errors = []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}}
 		}
 
 		result = append(result, tc)
@@ -422,6 +435,49 @@ func NegateChainOperands(s string, operator string) string {
 	result := strings.Join(parts, " "+operator+" ")
 	if hasSemicolon {
 		result += ";"
+	}
+	return result
+}
+
+// AddSpacingAfterDots adds extra spaces after dots in property access
+func AddSpacingAfterDots(s string) string {
+	return strings.ReplaceAll(s, ".", ".      ")
+}
+
+// AddNewlineAfterDots adds newlines after dots in property access
+func AddNewlineAfterDots(s string) string {
+	return strings.ReplaceAll(s, ".", ".\n")
+}
+
+// bracketContentRegex matches content inside square brackets [...]
+var bracketContentRegex = regexp.MustCompile(`\[[^\]]+\]`)
+
+// AddSpacingInsideBrackets preserves spacing only inside computed property brackets [...]
+// Matches upstream: c.replaceAll(/(\[.+])/g, m => m.replaceAll('.', '.      '))
+func AddSpacingInsideBrackets(s string) string {
+	return bracketContentRegex.ReplaceAllStringFunc(s, func(match string) string {
+		return strings.ReplaceAll(match, ".", ".      ")
+	})
+}
+
+// AddNewlineInsideBrackets preserves newlines only inside computed property brackets [...]
+func AddNewlineInsideBrackets(s string) string {
+	return bracketContentRegex.ReplaceAllStringFunc(s, func(match string) string {
+		return strings.ReplaceAll(match, ".", ".\n")
+	})
+}
+
+// DedupeInvalidTestCases removes duplicate test cases based on Code field
+func DedupeInvalidTestCases(cases ...[]rule_tester.InvalidTestCase) []rule_tester.InvalidTestCase {
+	seen := make(map[string]bool)
+	var result []rule_tester.InvalidTestCase
+	for _, batch := range cases {
+		for _, tc := range batch {
+			if !seen[tc.Code] {
+				seen[tc.Code] = true
+				result = append(result, tc)
+			}
+		}
 	}
 	return result
 }
