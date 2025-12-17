@@ -472,6 +472,16 @@ type ChainPart struct {
 	requiresDot bool
 	isPrivate   bool // true if this part is a private identifier (#foo)
 	hasNonNull  bool // true if this part has a non-null assertion (!)
+	isCall      bool // true if this part is a call expression (foo() or foo<T>())
+}
+
+// baseText returns the text without the non-null assertion suffix (!)
+// This is useful for comparing parts where ! should be ignored
+func (p ChainPart) baseText() string {
+	if p.hasNonNull && len(p.text) > 0 && p.text[len(p.text)-1] == '!' {
+		return p.text[:len(p.text)-1]
+	}
+	return p.text
 }
 
 // TypeInfo caches computed type information for a node to avoid repeated type checker calls
@@ -1117,6 +1127,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 				text:        typeArgsText + argsText,
 				optional:    callExpr.QuestionDotToken != nil,
 				requiresDot: false,
+				isCall:      true,
 			})
 
 		default:
@@ -1184,9 +1195,8 @@ func (processor *chainProcessor) buildOptionalChain(parts []ChainPart, checkedLe
 				optionalParts[i] = true
 			} else {
 				// Priority 3: Check for call expressions
-				isCall := strings.HasPrefix(part.text, "(") || strings.HasPrefix(part.text, "<(")
 				isLastPart := i == len(parts)-1
-				if isCall && isLastPart && callShouldBeOptional {
+				if part.isCall && isLastPart && callShouldBeOptional {
 					optionalParts[i] = true
 				}
 			}
@@ -1211,7 +1221,7 @@ func (processor *chainProcessor) buildOptionalChain(parts []ChainPart, checkedLe
 		//       (strip ! from baz at index 2, max checked is 3, 2 < 3 so strip)
 		// For AND chains (stripNonNullAssertions=false), preserve all ! assertions
 		// e.g., foo! && foo!.bar! && foo!.bar!.baz -> foo!?.bar!?.baz
-		if stripNonNullAssertions && i < len(parts)-1 && optionalParts[i+1] && part.hasNonNull && strings.HasSuffix(partText, "!") {
+		if stripNonNullAssertions && i < len(parts)-1 && optionalParts[i+1] && part.hasNonNull {
 			// Only strip if this part is within the checked region
 			if i < maxCheckedLength {
 				partText = partText[:len(partText)-1]
@@ -3533,8 +3543,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 						// Don't fill up to include a call - calls are handled separately by callShouldBeOptional
 						if fillUpTo > 0 && len(lastPlainParts) > 0 {
 							lastPart := lastPlainParts[len(lastPlainParts)-1]
-							isCall := strings.HasPrefix(lastPart.text, "(") || strings.HasPrefix(lastPart.text, "<(")
-							if isCall {
+							if lastPart.isCall {
 								fillUpTo--
 							}
 						}
@@ -3587,8 +3596,10 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 			// - maxCheckedLen = 2 (from foo!.bar)
 			// - We strip ! from parts[0] and parts[1] (indices < maxCheckedLen)
 			for i := 0; i < maxCheckedLen && i < len(parts); i++ {
-				parts[i].hasNonNull = false
-				parts[i].text = strings.TrimSuffix(parts[i].text, "!")
+				if parts[i].hasNonNull {
+					parts[i].text = parts[i].baseText()
+					parts[i].hasNonNull = false
+				}
 			}
 
 			// Collect all check operand parts for later use
@@ -3608,9 +3619,8 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 					if len(opParts) <= len(parts) {
 						isPrefix := true
 						for i := range opParts {
-							opText := strings.TrimSuffix(opParts[i].text, "!")
-							partText := strings.TrimSuffix(parts[i].text, "!")
-							if opText != partText {
+							// Compare base text without ! suffix
+							if opParts[i].baseText() != parts[i].baseText() {
 								isPrefix = false
 								break
 							}
@@ -3653,10 +3663,11 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 				// Use only the shortest covering operand for non-null assertion
 				if shortestCoveringOp != nil && i < shortestCoveringOp.len {
 					if shortestCoveringOp.parts[i].hasNonNull {
-						parts[i].hasNonNull = true
-						if !strings.HasSuffix(parts[i].text, "!") {
+						// Only add "!" to text if it doesn't already have one
+						if !parts[i].hasNonNull {
 							parts[i].text = parts[i].text + "!"
 						}
+						parts[i].hasNonNull = true
 					}
 				}
 			}
@@ -3671,7 +3682,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 		// e.g., foo && foo.bar && foo.bar.baz && foo.bar.baz()
 		// We check foo.bar.baz before calling it, so the call should be optional
 		callShouldBeOptional := false
-		if len(parts) > 0 && strings.HasPrefix(parts[len(parts)-1].text, "(") {
+		if len(parts) > 0 && parts[len(parts)-1].isCall {
 			// Last part is a call expression
 			// Check if we have a check for the expression without the call
 			partsWithoutCall := len(processor.flattenForFix(lastPropertyAccess.AsCallExpression().Expression))
@@ -5035,7 +5046,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	// e.g., !foo || !foo.bar || !foo.bar.baz || !foo.bar.baz()
 	// We check foo.bar.baz before calling it, so the call should be optional
 	callShouldBeOptional := false
-	if len(parts) > 0 && strings.HasPrefix(parts[len(parts)-1].text, "(") {
+	if len(parts) > 0 && parts[len(parts)-1].isCall {
 		// Last part is a call expression
 		// Check if we have a check for the expression without the call
 		partsWithoutCall := len(parts) - 1
