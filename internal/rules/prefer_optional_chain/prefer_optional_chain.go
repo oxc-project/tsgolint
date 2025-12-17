@@ -182,149 +182,6 @@ const (
 	NodeInvalid                       // incomparable
 )
 
-// stripParens strips surrounding parentheses from text
-func stripParens(text string) string {
-	text = strings.TrimSpace(text)
-	// Keep stripping outer parentheses as long as they're balanced
-outer:
-	for len(text) > 2 && text[0] == '(' && text[len(text)-1] == ')' {
-		// Check if the opening and closing parens are paired
-		depth := 0
-		for i := range len(text) {
-			switch text[i] {
-			case '(':
-				depth++
-			case ')':
-				depth--
-				if depth == 0 && i < len(text)-1 {
-					// Found closing paren before end - not fully paired
-					break outer
-				}
-			}
-		}
-		text = strings.TrimSpace(text[1 : len(text)-1])
-	}
-	return text
-}
-
-// removeAllParens removes ALL parentheses from text for normalization
-func removeAllParens(text string) string {
-	// Remove all parentheses that are not part of function calls
-	// This is a simple approach: remove ( and ) but keep the content
-	var result strings.Builder
-	inCall := false
-	depth := 0
-
-	for i := range len(text) {
-		ch := text[i]
-		switch ch {
-		case '(':
-			// Check if this looks like a function call (preceded by identifier, ], ), or > for generic calls)
-			// Added > to handle foo<T>() pattern where ( follows the >
-			if i > 0 && (text[i-1] == ']' || text[i-1] == ')' || text[i-1] == '>' || (text[i-1] >= 'a' && text[i-1] <= 'z') || (text[i-1] >= 'A' && text[i-1] <= 'Z') || text[i-1] == '_' || text[i-1] == '$' || (text[i-1] >= '0' && text[i-1] <= '9')) {
-				// Likely a function call, keep the parentheses
-				inCall = true
-				result.WriteByte(ch)
-				depth++
-			} else {
-				// Grouping parentheses, skip it
-				depth++
-			}
-		case ')':
-			depth--
-			if inCall && depth == 0 {
-				inCall = false
-				result.WriteByte(ch)
-			} else if !inCall {
-				// Grouping parentheses, skip it
-			} else {
-				result.WriteByte(ch)
-			}
-		default:
-			result.WriteByte(ch)
-		}
-	}
-	return result.String()
-}
-
-// removeTypeAnnotations removes TypeScript type annotations from text for comparison
-func removeTypeAnnotations(text string) string {
-	// Remove angle bracket type assertions: <Type>expr -> expr
-	// Pattern: <{...}>expr or <SomeType>expr
-	// We need to be careful to match balanced brackets
-	for {
-		ltIndex := strings.Index(text, "<")
-		if ltIndex == -1 {
-			break
-		}
-		// Find the matching >
-		depth := 1
-		gtIndex := -1
-	findClosingBracket:
-		for i := ltIndex + 1; i < len(text); i++ {
-			switch text[i] {
-			case '<':
-				depth++
-			case '>':
-				depth--
-				if depth == 0 {
-					gtIndex = i
-					break findClosingBracket
-				}
-			}
-		}
-		if gtIndex == -1 {
-			// No matching >, skip this <
-			break
-		}
-		// Remove the <Type> part, keeping the expression after it
-		text = text[:ltIndex] + text[gtIndex+1:]
-	}
-
-	// Remove "as Type" patterns
-	// This is a simple regex-like approach
-	text = strings.ReplaceAll(text, " as any", "")
-	text = strings.ReplaceAll(text, " as unknown", "")
-	// Remove generic "as SomeType" by finding " as " and skipping until we hit a property access
-	// For simplicity, we'll use a more aggressive approach
-	for {
-		asIndex := strings.Index(text, " as ")
-		if asIndex == -1 {
-			break
-		}
-		// Find the end of the type assertion (next . or [ or ! or ? or end of string)
-		endIndex := len(text)
-		for i := asIndex + 4; i < len(text); i++ {
-			if text[i] == '.' || text[i] == '[' || text[i] == '!' || text[i] == '?' {
-				endIndex = i
-				break
-			}
-		}
-		text = text[:asIndex] + text[endIndex:]
-	}
-
-	// Remove "!" non-null assertions at the end of identifiers (before . or [)
-	// foo! -> foo, but keep foo!.bar as foo.bar
-	text = strings.ReplaceAll(text, "!.", ".")
-	text = strings.ReplaceAll(text, "![", "[")
-
-	return text
-}
-
-// stripTrailingNonNull strips trailing non-null assertions from text
-// foo.bar! -> foo.bar
-// foo.bar!.baz! -> foo.bar.baz (strip after each segment)
-func stripTrailingNonNull(text string) string {
-	// Remove trailing ! at the very end
-	for len(text) > 0 && text[len(text)-1] == '!' {
-		text = text[:len(text)-1]
-	}
-	// Also remove ! before property accesses (foo!.bar -> foo.bar)
-	text = strings.ReplaceAll(text, "!.", ".")
-	text = strings.ReplaceAll(text, "![", "[")
-	return text
-}
-
 // unwrapParentheses unwraps parenthesized expressions
 func unwrapParentheses(n *ast.Node) *ast.Node {
 	for ast.IsParenthesizedExpression(n) {
@@ -351,6 +208,146 @@ func unwrapForComparison(n *ast.Node) *ast.Node {
 		}
 	}
 	return n
+}
+
+// getNormalizedNodeText builds a normalized text representation of an AST node for comparison.
+// This replaces text-based removeAllParens and related functions with proper AST traversal.
+// Normalization:
+// - Unwraps parenthesized expressions (grouping parens are removed)
+// - Normalizes optional chaining (?. → .)
+// - Strips non-null assertions (!)
+// - Strips type assertions (as Type, <Type>)
+// - Preserves call/element access structure
+func (processor *chainProcessor) getNormalizedNodeText(node *ast.Node) string {
+	if node == nil {
+		return ""
+	}
+
+	// Check cache first
+	if cached, ok := processor.normalizedCache[node]; ok {
+		return cached
+	}
+
+	var result strings.Builder
+	processor.buildNormalizedText(node, &result)
+	normalized := result.String()
+
+	// Cache the result
+	processor.normalizedCache[node] = normalized
+	return normalized
+}
+
+// buildNormalizedText recursively builds normalized text from an AST node
+func (processor *chainProcessor) buildNormalizedText(n *ast.Node, result *strings.Builder) {
+	if n == nil {
+		return
+	}
+
+	switch {
+	case ast.IsParenthesizedExpression(n):
+		// Unwrap parentheses - just process the inner expression
+		processor.buildNormalizedText(n.AsParenthesizedExpression().Expression, result)
+
+	case ast.IsNonNullExpression(n):
+		// Strip non-null assertions - just process the inner expression
+		processor.buildNormalizedText(n.AsNonNullExpression().Expression, result)
+
+	case n.Kind == ast.KindAsExpression:
+		// Strip type assertions - just process the expression being asserted
+		processor.buildNormalizedText(n.AsAsExpression().Expression, result)
+
+	case n.Kind == ast.KindTypeAssertionExpression:
+		// Strip angle bracket type assertions - just process the inner expression
+		processor.buildNormalizedText(n.AsTypeAssertion().Expression, result)
+
+	case ast.IsPropertyAccessExpression(n):
+		propAccess := n.AsPropertyAccessExpression()
+		// Build the base expression
+		processor.buildNormalizedText(propAccess.Expression, result)
+		// Always use regular dot (normalize ?. to .)
+		result.WriteByte('.')
+		// Add the property name
+		nameRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, propAccess.Name())
+		result.WriteString(processor.sourceText[nameRange.Pos():nameRange.End()])
+
+	case ast.IsElementAccessExpression(n):
+		elemAccess := n.AsElementAccessExpression()
+		// Build the base expression
+		processor.buildNormalizedText(elemAccess.Expression, result)
+		// Always use regular bracket (normalize ?.[ to [)
+		result.WriteByte('[')
+		// Add the argument expression (use raw text to preserve computed expressions)
+		argRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, elemAccess.ArgumentExpression)
+		result.WriteString(processor.sourceText[argRange.Pos():argRange.End()])
+		result.WriteByte(']')
+
+	case ast.IsCallExpression(n):
+		callExpr := n.AsCallExpression()
+		// Build the callee expression
+		processor.buildNormalizedText(callExpr.Expression, result)
+		// Add type arguments if present
+		if callExpr.TypeArguments != nil && len(callExpr.TypeArguments.Nodes) > 0 {
+			result.WriteByte('<')
+			typeArgsStart := callExpr.TypeArguments.Loc.Pos()
+			typeArgsEnd := callExpr.TypeArguments.Loc.End()
+			result.WriteString(processor.sourceText[typeArgsStart:typeArgsEnd])
+			result.WriteByte('>')
+		}
+		// Always use regular paren (normalize ?.( to ()
+		result.WriteByte('(')
+		// Add arguments
+		if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+			argsStart := callExpr.Arguments.Loc.Pos()
+			callEnd := n.End()
+			result.WriteString(processor.sourceText[argsStart : callEnd-1])
+		}
+		result.WriteByte(')')
+
+	default:
+		// Base case - identifiers, literals, or other expressions
+		// Get the raw text
+		textRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
+		result.WriteString(processor.sourceText[textRange.Pos():textRange.End()])
+	}
+}
+
+// hasOptionalChaining checks if an expression contains optional chaining (?.)
+// This is an AST-based check that replaces text-based strings.Contains(text, "?.")
+func hasOptionalChaining(node *ast.Node) bool {
+	if node == nil {
+		return false
+	}
+
+	switch {
+	case ast.IsParenthesizedExpression(node):
+		return hasOptionalChaining(node.AsParenthesizedExpression().Expression)
+
+	case ast.IsNonNullExpression(node):
+		return hasOptionalChaining(node.AsNonNullExpression().Expression)
+
+	case ast.IsPropertyAccessExpression(node):
+		propAccess := node.AsPropertyAccessExpression()
+		if propAccess.QuestionDotToken != nil {
+			return true
+		}
+		return hasOptionalChaining(propAccess.Expression)
+
+	case ast.IsElementAccessExpression(node):
+		elemAccess := node.AsElementAccessExpression()
+		if elemAccess.QuestionDotToken != nil {
+			return true
+		}
+		return hasOptionalChaining(elemAccess.Expression)
+
+	case ast.IsCallExpression(node):
+		callExpr := node.AsCallExpression()
+		if callExpr.QuestionDotToken != nil {
+			return true
+		}
+		return hasOptionalChaining(callExpr.Expression)
+	}
+
+	return false
 }
 
 // isInsideJSX checks if a node is inside a JSX context
@@ -633,17 +630,6 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 
 // compareNodes compares two nodes to determine their relationship.
 func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeComparisonResult {
-	leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, left)
-	rightRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, right)
-
-	// Bounds check to prevent panic - if ranges are invalid, nodes are not equal
-	if leftRange.Pos() < 0 || leftRange.End() > len(processor.sourceText) || leftRange.Pos() > leftRange.End() {
-		return NodeInvalid
-	}
-	if rightRange.Pos() < 0 || rightRange.End() > len(processor.sourceText) || rightRange.Pos() > rightRange.End() {
-		return NodeInvalid
-	}
-
 	// Check for side effects in either expression
 	// Example: foo[x++] && foo[x++].bar -> Cannot convert (x++ has side effects)
 	// Example: foo[yield x] && foo[yield x].bar -> Cannot convert (yield has side effects)
@@ -651,12 +637,8 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		return NodeInvalid
 	}
 
-	leftText := processor.sourceText[leftRange.Pos():leftRange.End()]
-	rightText := processor.sourceText[rightRange.Pos():rightRange.End()]
-
-	// Strip surrounding parentheses for comparison
-	leftText = stripParens(leftText)
-	rightText = stripParens(rightText)
+	// Unwrap parentheses for AST-based checks
+	leftUnwrapped := unwrapParentheses(left)
 
 	// Check if the left operand is a CallExpression or NewExpression at the base level
 	// If so, we cannot safely chain because calling the function/constructor multiple times may have side effects
@@ -671,14 +653,9 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	// Also check for literal expressions (arrays, objects, functions, classes) which create new instances
 	// Example: [] && [].length -> Cannot convert (different arrays)
 	// Example: (class Foo {}) && class Foo {}.name -> Cannot convert (different classes)
-	// Unwrap parentheses manually since unwrapParentheses is defined later
-	leftUnwrapped := left
-	for ast.IsParenthesizedExpression(leftUnwrapped) {
-		leftUnwrapped = leftUnwrapped.AsParenthesizedExpression().Expression
-	}
+
 	// Allow call expressions if they contain optional chaining (already safe)
-	hasOptionalChaining := strings.Contains(leftText, "?.")
-	if !hasOptionalChaining {
+	if !hasOptionalChaining(left) {
 		// For CallExpressions and NewExpressions, only block if the callee is a standalone identifier
 		// (like getFoo() or new Date()). Allow method calls like foo.bar() because:
 		// 1. The base object was already verified in a previous chain operand
@@ -692,10 +669,7 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		// Find the root of the expression (traverse through property/element/call chains)
 		rootExpr := leftUnwrapped
 		for {
-			unwrapped := rootExpr
-			for ast.IsParenthesizedExpression(unwrapped) {
-				unwrapped = unwrapped.AsParenthesizedExpression().Expression
-			}
+			unwrapped := unwrapParentheses(rootExpr)
 			if ast.IsPropertyAccessExpression(unwrapped) {
 				rootExpr = unwrapped.AsPropertyAccessExpression().Expression
 			} else if ast.IsElementAccessExpression(unwrapped) {
@@ -710,19 +684,13 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		// Check if the root is a NewExpression (problematic - creates different instances)
 		isRootedInNew := false
 		if rootExpr != nil {
-			unwrappedRoot := rootExpr
-			for ast.IsParenthesizedExpression(unwrappedRoot) {
-				unwrappedRoot = unwrappedRoot.AsParenthesizedExpression().Expression
-			}
+			unwrappedRoot := unwrapParentheses(rootExpr)
 			isRootedInNew = ast.IsNewExpression(unwrappedRoot)
 		}
 
 		isStandaloneCall := false
 		if ast.IsCallExpression(leftUnwrapped) {
-			callee := leftUnwrapped.AsCallExpression().Expression
-			for ast.IsParenthesizedExpression(callee) {
-				callee = callee.AsParenthesizedExpression().Expression
-			}
+			callee := unwrapParentheses(leftUnwrapped.AsCallExpression().Expression)
 			// Standalone call if callee is just an identifier (not a property/element access)
 			isStandaloneCall = ast.IsIdentifier(callee)
 		} else if ast.IsNewExpression(leftUnwrapped) {
@@ -758,32 +726,11 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		}
 	}
 
-	// Normalize: remove ALL parentheses (not part of calls), type annotations, optional chain operators, and non-null assertions
-	// (foo as any)?.bar?.baz! should be compared as foo.bar.baz
-	// foo?.bar?.baz should be compared as foo.bar.baz
-	// foo?.() should be compared as foo()
-	// foo?.[bar] should be compared as foo[bar]
-	// foo.bar! should be compared as foo.bar
-	leftNormalized := removeAllParens(leftText)
-	rightNormalized := removeAllParens(rightText)
-	leftNormalized = removeTypeAnnotations(leftNormalized)
-	rightNormalized = removeTypeAnnotations(rightNormalized)
-	// Remove optional chaining operators while preserving valid syntax:
-	// - ?.( -> ( (optional call)
-	// - ?.[ -> [ (optional element access)
-	// - ?. -> . (optional property access)
-	leftNormalized = strings.ReplaceAll(leftNormalized, "?.(", "(")
-	leftNormalized = strings.ReplaceAll(leftNormalized, "?.[", "[")
-	leftNormalized = strings.ReplaceAll(leftNormalized, "?.", ".")
-	rightNormalized = strings.ReplaceAll(rightNormalized, "?.(", "(")
-	rightNormalized = strings.ReplaceAll(rightNormalized, "?.[", "[")
-	rightNormalized = strings.ReplaceAll(rightNormalized, "?.", ".")
-	// Remove trailing non-null assertions for comparison
-	// foo.bar! should equal foo.bar
-	// But be careful not to remove ! from other contexts
-	// We strip trailing ! that's not inside brackets or parens
-	leftNormalized = stripTrailingNonNull(leftNormalized)
-	rightNormalized = stripTrailingNonNull(rightNormalized)
+	// Use AST-based normalization instead of text manipulation
+	// This handles: parentheses unwrapping, optional chaining normalization,
+	// type assertion stripping, and non-null assertion stripping
+	leftNormalized := processor.getNormalizedNodeText(left)
+	rightNormalized := processor.getNormalizedNodeText(right)
 
 	if leftNormalized == rightNormalized {
 		// If normalized forms are equal but one has optional chaining and the other doesn't,
@@ -2317,13 +2264,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 						// Check if it's a call expression (including optional call)
 						if ast.IsCallExpression(unwrappedLast) {
 							// First check if the source already has optional chaining
-							lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastChainOp.comparedExpr)
-							sourceText := processor.sourceText
-							lastText := ""
-							if lastRange.Pos() >= 0 && lastRange.End() <= len(sourceText) {
-								lastText = sourceText[lastRange.Pos():lastRange.End()]
-							}
-							hasOptionalChaining := strings.Contains(lastText, "?.")
+							hasOptionalChaining := hasOptionalChaining(lastChainOp.comparedExpr)
 
 							// Also check if the call's base expression was checked earlier in our chain
 							// If so, the base will be converted to optional chain
@@ -2333,6 +2274,7 @@ func (processor *chainProcessor) processAndChain(node *ast.Node) {
 								if callExpr != nil && callExpr.Expression != nil {
 									// Get the callee (e.g., foo.bar in foo.bar())
 									calleeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, callExpr.Expression)
+									sourceText := processor.sourceText
 									calleeText := ""
 									if calleeRange.Pos() >= 0 && calleeRange.End() <= len(sourceText) {
 										calleeText = sourceText[calleeRange.Pos():calleeRange.End()]
@@ -5040,9 +4982,7 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 		// Check if the single remaining operand already has optional chaining
 		singleOp := chainForOptional[0]
 		if singleOp.comparedExpr != nil {
-			singleOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, singleOp.comparedExpr)
-			singleOpText := processor.sourceText[singleOpRange.Pos():singleOpRange.End()]
-			if strings.Contains(singleOpText, "?.") {
+			if hasOptionalChaining(singleOp.comparedExpr) {
 				return
 			}
 		}
@@ -5053,12 +4993,13 @@ func (processor *chainProcessor) processOrChain(node *ast.Node) {
 	// which would try to convert to a.b.c?.d
 	if len(chain) == 2 && trailingPlainOperand == "" {
 		firstOp := chain[0]
-		if firstOp.node != nil {
-			firstOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, firstOp.node)
-			firstOpText := processor.sourceText[firstOpRange.Pos():firstOpRange.End()]
-			if strings.Contains(firstOpText, "?.") {
-				return
-			}
+		// Check both node and comparedExpr since for comparison operands,
+		// comparedExpr contains the actual expression being checked
+		if firstOp.comparedExpr != nil && hasOptionalChaining(firstOp.comparedExpr) {
+			return
+		}
+		if firstOp.node != nil && hasOptionalChaining(firstOp.node) {
+			return
 		}
 	}
 
