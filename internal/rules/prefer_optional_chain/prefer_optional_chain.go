@@ -24,6 +24,31 @@ func buildOptionalChainSuggestMessage() rule.RuleMessage {
 	}
 }
 
+// isNullLiteral checks if a node is the null keyword.
+func isNullLiteral(node *ast.Node) bool {
+	return node != nil && node.Kind == ast.KindNullKeyword
+}
+
+// isUndefinedIdentifier checks if a node is the identifier "undefined".
+func isUndefinedIdentifier(node *ast.Node) bool {
+	return node != nil && ast.IsIdentifier(node) && node.AsIdentifier().Text == "undefined"
+}
+
+// isVoidUndefined checks if a node is a void expression (e.g., void 0).
+func isVoidUndefined(node *ast.Node) bool {
+	return node != nil && ast.IsVoidExpression(node)
+}
+
+// isUndefinedLiteral checks if a node represents undefined (identifier or void expression).
+func isUndefinedLiteral(node *ast.Node) bool {
+	return isUndefinedIdentifier(node) || isVoidUndefined(node)
+}
+
+// isNullishLiteral checks if a node is null, undefined, or void expression.
+func isNullishLiteral(node *ast.Node) bool {
+	return isNullLiteral(node) || isUndefinedLiteral(node)
+}
+
 type OperandType int
 
 const (
@@ -71,7 +96,7 @@ func isNullishComparison(op Operand) bool {
 	if op.typ != OperandTypeComparison || op.node == nil {
 		return false
 	}
-	unwrapped := unwrapParentheses(op.node)
+	unwrapped := ast.SkipParentheses(op.node)
 	if !ast.IsBinaryExpression(unwrapped) {
 		return false
 	}
@@ -82,24 +107,17 @@ func isNullishComparison(op Operand) bool {
 		return false
 	}
 
-	left := unwrapParentheses(binExpr.Left)
-	right := unwrapParentheses(binExpr.Right)
+	left := ast.SkipParentheses(binExpr.Left)
+	right := ast.SkipParentheses(binExpr.Right)
 
-	isLeftNullish := left.Kind == ast.KindNullKeyword ||
-		(ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
-		ast.IsVoidExpression(left)
-	isRightNullish := right.Kind == ast.KindNullKeyword ||
-		(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
-		ast.IsVoidExpression(right)
-
-	return isLeftNullish || isRightNullish
+	return isNullishLiteral(left) || isNullishLiteral(right)
 }
 
 func isStrictNullComparison(op Operand) bool {
 	if op.typ != OperandTypeComparison || op.node == nil {
 		return false
 	}
-	unwrapped := unwrapParentheses(op.node)
+	unwrapped := ast.SkipParentheses(op.node)
 	if !ast.IsBinaryExpression(unwrapped) {
 		return false
 	}
@@ -110,13 +128,10 @@ func isStrictNullComparison(op Operand) bool {
 		return false
 	}
 
-	left := unwrapParentheses(binExpr.Left)
-	right := unwrapParentheses(binExpr.Right)
+	left := ast.SkipParentheses(binExpr.Left)
+	right := ast.SkipParentheses(binExpr.Right)
 
-	isLeftNull := left.Kind == ast.KindNullKeyword
-	isRightNull := right.Kind == ast.KindNullKeyword
-
-	return isLeftNull || isRightNull
+	return isNullLiteral(left) || isNullLiteral(right)
 }
 
 func isOrChainNullishCheck(op Operand) bool {
@@ -141,13 +156,8 @@ func isNullishCheckOperand(op Operand) bool {
 	}
 	if op.typ == OperandTypeComparison && op.node != nil && ast.IsBinaryExpression(op.node) {
 		binExpr := op.node.AsBinaryExpression()
-		rightIsNull := binExpr.Right.Kind == ast.KindNullKeyword
-		rightIsUndefined := ast.IsIdentifier(binExpr.Right) &&
-			binExpr.Right.AsIdentifier().Text == "undefined"
-		leftIsNull := binExpr.Left.Kind == ast.KindNullKeyword
-		leftIsUndefined := ast.IsIdentifier(binExpr.Left) &&
-			binExpr.Left.AsIdentifier().Text == "undefined"
-		return rightIsNull || rightIsUndefined || leftIsNull || leftIsUndefined
+		return isNullLiteral(binExpr.Right) || isUndefinedIdentifier(binExpr.Right) ||
+			isNullLiteral(binExpr.Left) || isUndefinedIdentifier(binExpr.Left)
 	}
 	return false
 }
@@ -175,102 +185,223 @@ func isOrLikeOperator(op ast.Kind) bool {
 	return op == ast.KindBarBarToken || op == ast.KindQuestionQuestionToken
 }
 
-func unwrapParentheses(n *ast.Node) *ast.Node {
-	for ast.IsParenthesizedExpression(n) {
-		n = n.AsParenthesizedExpression().Expression
-	}
-	return n
-}
-
 func unwrapForComparison(n *ast.Node) *ast.Node {
 	for {
-		if ast.IsParenthesizedExpression(n) {
+		switch {
+		case ast.IsParenthesizedExpression(n):
 			n = n.AsParenthesizedExpression().Expression
-		} else if ast.IsNonNullExpression(n) {
+		case ast.IsNonNullExpression(n):
 			n = n.AsNonNullExpression().Expression
-		} else if n.Kind == ast.KindAsExpression {
+		case n.Kind == ast.KindAsExpression:
 			n = n.AsAsExpression().Expression
-		} else if n.Kind == ast.KindTypeAssertionExpression {
+		case n.Kind == ast.KindTypeAssertionExpression:
 			n = n.AsTypeAssertion().Expression
-		} else {
-			break
+		default:
+			return n
 		}
 	}
-	return n
 }
 
-func (processor *chainProcessor) getNormalizedNodeText(node *ast.Node) string {
-	if node == nil {
-		return ""
+// areNodesStructurallyEqual checks if two nodes represent the same expression
+// (ignoring parentheses, non-null assertions, type assertions).
+func areNodesStructurallyEqual(a, b *ast.Node) bool {
+	a = unwrapForComparison(a)
+	b = unwrapForComparison(b)
+
+	if a == nil || b == nil {
+		return a == b
 	}
 
-	if cached, ok := processor.normalizedCache[node]; ok {
-		return cached
+	if a.Kind != b.Kind {
+		return false
 	}
 
-	var result strings.Builder
-	processor.buildNormalizedText(node, &result)
-	normalized := result.String()
+	switch a.Kind {
+	case ast.KindIdentifier:
+		return a.Text() == b.Text()
 
-	processor.normalizedCache[node] = normalized
-	return normalized
+	case ast.KindThisKeyword, ast.KindNullKeyword, ast.KindSuperKeyword:
+		return true
+
+	case ast.KindPropertyAccessExpression:
+		aProp := a.AsPropertyAccessExpression()
+		bProp := b.AsPropertyAccessExpression()
+		aName, bName := aProp.Name(), bProp.Name()
+		if aName == nil || bName == nil {
+			return aName == bName
+		}
+		return aName.Text() == bName.Text() &&
+			areNodesStructurallyEqual(aProp.Expression, bProp.Expression)
+
+	case ast.KindElementAccessExpression:
+		aElem := a.AsElementAccessExpression()
+		bElem := b.AsElementAccessExpression()
+		return areNodesStructurallyEqual(aElem.ArgumentExpression, bElem.ArgumentExpression) &&
+			areNodesStructurallyEqual(aElem.Expression, bElem.Expression)
+
+	case ast.KindCallExpression:
+		aCall := a.AsCallExpression()
+		bCall := b.AsCallExpression()
+		if !areNodesStructurallyEqual(aCall.Expression, bCall.Expression) {
+			return false
+		}
+		aArgs := aCall.Arguments
+		bArgs := bCall.Arguments
+		if aArgs == nil && bArgs == nil {
+			return true
+		}
+		if aArgs == nil || bArgs == nil || len(aArgs.Nodes) != len(bArgs.Nodes) {
+			return false
+		}
+		for i := range aArgs.Nodes {
+			if !areNodesStructurallyEqual(aArgs.Nodes[i], bArgs.Nodes[i]) {
+				return false
+			}
+		}
+		// Also compare type arguments
+		aTypeArgs := aCall.TypeArguments
+		bTypeArgs := bCall.TypeArguments
+		if aTypeArgs == nil && bTypeArgs == nil {
+			return true
+		}
+		if aTypeArgs == nil || bTypeArgs == nil || len(aTypeArgs.Nodes) != len(bTypeArgs.Nodes) {
+			return false
+		}
+		for i := range aTypeArgs.Nodes {
+			if !areNodesStructurallyEqual(aTypeArgs.Nodes[i], bTypeArgs.Nodes[i]) {
+				return false
+			}
+		}
+		return true
+
+	case ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral,
+		ast.KindNoSubstitutionTemplateLiteral:
+		return a.Text() == b.Text()
+
+	case ast.KindTrueKeyword, ast.KindFalseKeyword:
+		return true
+
+	// Type keywords (for type arguments comparison)
+	case ast.KindStringKeyword, ast.KindNumberKeyword, ast.KindBooleanKeyword,
+		ast.KindAnyKeyword, ast.KindUnknownKeyword, ast.KindNeverKeyword,
+		ast.KindVoidKeyword, ast.KindUndefinedKeyword, ast.KindObjectKeyword,
+		ast.KindSymbolKeyword, ast.KindBigIntKeyword:
+		return true
+
+	case ast.KindTypeReference:
+		aRef := a.AsTypeReferenceNode()
+		bRef := b.AsTypeReferenceNode()
+		return areNodesStructurallyEqual(aRef.TypeName, bRef.TypeName)
+
+	case ast.KindQualifiedName:
+		aQual := a.AsQualifiedName()
+		bQual := b.AsQualifiedName()
+		return areNodesStructurallyEqual(aQual.Left, bQual.Left) &&
+			areNodesStructurallyEqual(aQual.Right, bQual.Right)
+
+	case ast.KindMetaProperty:
+		// Handles import.meta and new.target
+		aMeta := a.AsMetaProperty()
+		bMeta := b.AsMetaProperty()
+		aName, bName := aMeta.Name(), bMeta.Name()
+		if aName == nil || bName == nil {
+			return aName == bName
+		}
+		return aMeta.KeywordToken == bMeta.KeywordToken && aName.Text() == bName.Text()
+
+	case ast.KindBinaryExpression:
+		aBin := a.AsBinaryExpression()
+		bBin := b.AsBinaryExpression()
+		if aBin.OperatorToken.Kind != bBin.OperatorToken.Kind {
+			return false
+		}
+		return areNodesStructurallyEqual(aBin.Left, bBin.Left) &&
+			areNodesStructurallyEqual(aBin.Right, bBin.Right)
+
+	case ast.KindPrefixUnaryExpression:
+		aPrefix := a.AsPrefixUnaryExpression()
+		bPrefix := b.AsPrefixUnaryExpression()
+		if aPrefix.Operator != bPrefix.Operator {
+			return false
+		}
+		return areNodesStructurallyEqual(aPrefix.Operand, bPrefix.Operand)
+
+	case ast.KindTypeOfExpression:
+		aTypeof := a.AsTypeOfExpression()
+		bTypeof := b.AsTypeOfExpression()
+		return areNodesStructurallyEqual(aTypeof.Expression, bTypeof.Expression)
+
+	case ast.KindTemplateExpression:
+		aTmpl := a.AsTemplateExpression()
+		bTmpl := b.AsTemplateExpression()
+		// Compare head
+		if aTmpl.Head == nil || bTmpl.Head == nil {
+			if aTmpl.Head != bTmpl.Head {
+				return false
+			}
+		} else if aTmpl.Head.Text() != bTmpl.Head.Text() {
+			return false
+		}
+		// Compare template spans
+		aSpans := aTmpl.TemplateSpans
+		bSpans := bTmpl.TemplateSpans
+		if aSpans == nil && bSpans == nil {
+			return true
+		}
+		if aSpans == nil || bSpans == nil || len(aSpans.Nodes) != len(bSpans.Nodes) {
+			return false
+		}
+		for i := range aSpans.Nodes {
+			aSpan := aSpans.Nodes[i].AsTemplateSpan()
+			bSpan := bSpans.Nodes[i].AsTemplateSpan()
+			if !areNodesStructurallyEqual(aSpan.Expression, bSpan.Expression) {
+				return false
+			}
+			if aSpan.Literal == nil || bSpan.Literal == nil {
+				if aSpan.Literal != bSpan.Literal {
+					return false
+				}
+			} else if aSpan.Literal.Text() != bSpan.Literal.Text() {
+				return false
+			}
+		}
+		return true
+
+	case ast.KindAwaitExpression:
+		aAwait := a.AsAwaitExpression()
+		bAwait := b.AsAwaitExpression()
+		return areNodesStructurallyEqual(aAwait.Expression, bAwait.Expression)
+	}
+
+	return false
 }
 
-func (processor *chainProcessor) buildNormalizedText(n *ast.Node, result *strings.Builder) {
-	if n == nil {
-		return
+// isNodePrefixOf checks if 'shorter' is a prefix of the chain in 'longer'.
+// e.g., foo.bar is a prefix of foo.bar.baz
+func isNodePrefixOf(shorter, longer *ast.Node) bool {
+	shorter = unwrapForComparison(shorter)
+	longer = unwrapForComparison(longer)
+
+	if areNodesStructurallyEqual(shorter, longer) {
+		return true
 	}
 
+	// Get the base of 'longer' and recursively check
+	var base *ast.Node
 	switch {
-	case ast.IsParenthesizedExpression(n):
-		processor.buildNormalizedText(n.AsParenthesizedExpression().Expression, result)
-
-	case ast.IsNonNullExpression(n):
-		processor.buildNormalizedText(n.AsNonNullExpression().Expression, result)
-
-	case n.Kind == ast.KindAsExpression:
-		processor.buildNormalizedText(n.AsAsExpression().Expression, result)
-
-	case n.Kind == ast.KindTypeAssertionExpression:
-		processor.buildNormalizedText(n.AsTypeAssertion().Expression, result)
-
-	case ast.IsPropertyAccessExpression(n):
-		propAccess := n.AsPropertyAccessExpression()
-		processor.buildNormalizedText(propAccess.Expression, result)
-		result.WriteByte('.')
-		nameRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, propAccess.Name())
-		result.WriteString(processor.sourceText[nameRange.Pos():nameRange.End()])
-
-	case ast.IsElementAccessExpression(n):
-		elemAccess := n.AsElementAccessExpression()
-		processor.buildNormalizedText(elemAccess.Expression, result)
-		result.WriteByte('[')
-		argRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, elemAccess.ArgumentExpression)
-		result.WriteString(processor.sourceText[argRange.Pos():argRange.End()])
-		result.WriteByte(']')
-
-	case ast.IsCallExpression(n):
-		callExpr := n.AsCallExpression()
-		processor.buildNormalizedText(callExpr.Expression, result)
-		if callExpr.TypeArguments != nil && len(callExpr.TypeArguments.Nodes) > 0 {
-			result.WriteByte('<')
-			typeArgsStart := callExpr.TypeArguments.Loc.Pos()
-			typeArgsEnd := callExpr.TypeArguments.Loc.End()
-			result.WriteString(processor.sourceText[typeArgsStart:typeArgsEnd])
-			result.WriteByte('>')
-		}
-		result.WriteByte('(')
-		if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-			argsStart := callExpr.Arguments.Loc.Pos()
-			callEnd := n.End()
-			result.WriteString(processor.sourceText[argsStart : callEnd-1])
-		}
-		result.WriteByte(')')
-
+	case ast.IsPropertyAccessExpression(longer):
+		base = longer.AsPropertyAccessExpression().Expression
+	case ast.IsElementAccessExpression(longer):
+		base = longer.AsElementAccessExpression().Expression
+	case ast.IsCallExpression(longer):
+		base = longer.AsCallExpression().Expression
+	case ast.IsNonNullExpression(longer):
+		base = longer.AsNonNullExpression().Expression
 	default:
-		textRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-		result.WriteString(processor.sourceText[textRange.Pos():textRange.End()])
+		return false
 	}
+
+	return isNodePrefixOf(shorter, base)
 }
 
 func hasOptionalChaining(node *ast.Node) bool {
@@ -310,70 +441,6 @@ func hasOptionalChaining(node *ast.Node) bool {
 	return false
 }
 
-func (processor *chainProcessor) isChainExtension(shorter, longer *ast.Node) bool {
-	if shorter == nil || longer == nil {
-		return false
-	}
-
-	shorterNorm := processor.getNormalizedNodeText(shorter)
-	longerNorm := processor.getNormalizedNodeText(longer)
-
-	if shorterNorm == longerNorm {
-		return false
-	}
-
-	if !strings.HasPrefix(longerNorm, shorterNorm) {
-		return false
-	}
-
-	current := longer
-	for {
-		current = unwrapChainNode(current)
-		if current == nil {
-			return false
-		}
-
-		var base *ast.Node
-		switch {
-		case ast.IsPropertyAccessExpression(current):
-			base = current.AsPropertyAccessExpression().Expression
-		case ast.IsElementAccessExpression(current):
-			base = current.AsElementAccessExpression().Expression
-		case ast.IsCallExpression(current):
-			base = current.AsCallExpression().Expression
-		case ast.IsNonNullExpression(current):
-			base = current.AsNonNullExpression().Expression
-		case ast.IsTaggedTemplateExpression(current):
-			base = current.AsTaggedTemplateExpression().Tag
-		default:
-			return false
-		}
-
-		if processor.getNormalizedNodeText(base) == shorterNorm {
-			return true
-		}
-
-		current = base
-	}
-}
-
-func unwrapChainNode(node *ast.Node) *ast.Node {
-	current := node
-	for current != nil {
-		switch {
-		case ast.IsParenthesizedExpression(current):
-			current = current.AsParenthesizedExpression().Expression
-		case current.Kind == ast.KindAsExpression:
-			current = current.AsAsExpression().Expression
-		case current.Kind == ast.KindTypeAssertionExpression:
-			current = current.AsTypeAssertion().Expression
-		default:
-			return current
-		}
-	}
-	return current
-}
-
 // In JSX, foo && foo.bar has different semantics than foo?.bar:
 // foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined.
 func isInsideJSX(node *ast.Node) bool {
@@ -397,19 +464,20 @@ func isInsideJSX(node *ast.Node) bool {
 func getBaseIdentifier(node *ast.Node) *ast.Node {
 	current := node
 	for {
-		if ast.IsPropertyAccessExpression(current) {
+		switch {
+		case ast.IsPropertyAccessExpression(current):
 			current = current.AsPropertyAccessExpression().Expression
-		} else if ast.IsElementAccessExpression(current) {
+		case ast.IsElementAccessExpression(current):
 			current = current.AsElementAccessExpression().Expression
-		} else if ast.IsCallExpression(current) {
+		case ast.IsCallExpression(current):
 			current = current.AsCallExpression().Expression
-		} else if ast.IsNonNullExpression(current) {
+		case ast.IsNonNullExpression(current):
 			current = current.AsNonNullExpression().Expression
-		} else if ast.IsParenthesizedExpression(current) {
+		case ast.IsParenthesizedExpression(current):
 			current = current.AsParenthesizedExpression().Expression
-		} else if current.Kind == ast.KindAsExpression {
+		case current.Kind == ast.KindAsExpression:
 			current = current.AsAsExpression().Expression
-		} else {
+		default:
 			return current
 		}
 	}
@@ -515,7 +583,6 @@ type chainProcessor struct {
 	seenLogicalRanges  map[textRange]bool
 	reportedRanges     map[textRange]bool
 	typeCache          map[*ast.Node]*TypeInfo
-	normalizedCache    map[*ast.Node]string
 	flattenCache       map[*ast.Node][]ChainPart
 	callSigCache       map[*ast.Node]map[string]string
 }
@@ -530,7 +597,6 @@ func newChainProcessor(ctx rule.RuleContext, opts PreferOptionalChainOptions) *c
 		seenLogicalRanges:  make(map[textRange]bool, 16),
 		reportedRanges:     make(map[textRange]bool, 8),
 		typeCache:          make(map[*ast.Node]*TypeInfo, 32),
-		normalizedCache:    make(map[*ast.Node]string, 32),
 		flattenCache:       make(map[*ast.Node][]ChainPart, 16),
 		callSigCache:       make(map[*ast.Node]map[string]string, 8),
 	}
@@ -605,7 +671,8 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 		if n == nil {
 			return
 		}
-		if ast.IsCallExpression(n) {
+		switch {
+		case ast.IsCallExpression(n):
 			call := n.AsCallExpression()
 			exprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, call.Expression)
 			exprText := processor.sourceText[exprRange.Pos():exprRange.End()]
@@ -613,11 +680,11 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 			fullText := processor.sourceText[fullRange.Pos():fullRange.End()]
 			signatures[exprText] = fullText
 			visit(call.Expression)
-		} else if ast.IsPropertyAccessExpression(n) {
+		case ast.IsPropertyAccessExpression(n):
 			visit(n.AsPropertyAccessExpression().Expression)
-		} else if ast.IsElementAccessExpression(n) {
+		case ast.IsElementAccessExpression(n):
 			visit(n.AsElementAccessExpression().Expression)
-		} else if ast.IsNonNullExpression(n) {
+		case ast.IsNonNullExpression(n):
 			visit(n.AsNonNullExpression().Expression)
 		}
 	}
@@ -689,8 +756,8 @@ func (processor *chainProcessor) isOrChainNestedInLargerChain(node *ast.Node) bo
 		if ast.IsBinaryExpression(parent) {
 			parentBin := parent.AsBinaryExpression()
 			if parentBin.OperatorToken.Kind == ast.KindBarBarToken {
-				leftUnwrapped := unwrapParentheses(parentBin.Left)
-				rightUnwrapped := unwrapParentheses(parentBin.Right)
+				leftUnwrapped := ast.SkipParentheses(parentBin.Left)
+				rightUnwrapped := ast.SkipParentheses(parentBin.Right)
 				if leftUnwrapped == node || rightUnwrapped == node {
 					return true
 				}
@@ -702,7 +769,7 @@ func (processor *chainProcessor) isOrChainNestedInLargerChain(node *ast.Node) bo
 }
 
 func (processor *chainProcessor) flattenAndMarkLogicals(node *ast.Node, operatorKind ast.Kind) []*ast.Node {
-	unwrapped := unwrapParentheses(node)
+	unwrapped := ast.SkipParentheses(node)
 	if !ast.IsBinaryExpression(unwrapped) {
 		return nil
 	}
@@ -782,7 +849,7 @@ func (processor *chainProcessor) isInvalidOrChainStartingOperand(op Operand) boo
 		return false
 	}
 
-	unwrapped := unwrapParentheses(op.node)
+	unwrapped := ast.SkipParentheses(op.node)
 	if !ast.IsBinaryExpression(unwrapped) {
 		return false
 	}
@@ -794,15 +861,11 @@ func (processor *chainProcessor) isInvalidOrChainStartingOperand(op Operand) boo
 		return false
 	}
 
-	left := unwrapParentheses(binExpr.Left)
-	right := unwrapParentheses(binExpr.Right)
+	left := ast.SkipParentheses(binExpr.Left)
+	right := ast.SkipParentheses(binExpr.Right)
 
-	isLeftNullish := left.Kind == ast.KindNullKeyword ||
-		(ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
-		ast.IsVoidExpression(left)
-	isRightNullish := right.Kind == ast.KindNullKeyword ||
-		(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
-		ast.IsVoidExpression(right)
+	isLeftNullish := isNullishLiteral(left)
+	isRightNullish := isNullishLiteral(right)
 
 	if !isLeftNullish && !isRightNullish {
 		return false
@@ -874,7 +937,7 @@ func (processor *chainProcessor) tryExtendThroughCallExpression(lastExpr *ast.No
 		}
 	}
 
-	if processor.isChainExtension(lastExpr, currentOp.comparedExpr) {
+	if isNodePrefixOf(lastExpr, currentOp.comparedExpr) {
 		return NodeSubset
 	}
 
@@ -886,7 +949,7 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		return NodeInvalid
 	}
 
-	leftUnwrapped := unwrapParentheses(left)
+	leftUnwrapped := ast.SkipParentheses(left)
 
 	// Block standalone calls (getFoo()) and new expressions (new Date()) since they may have
 	// side effects or create different instances. Allow method calls (foo.bar()) and expressions
@@ -895,7 +958,7 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	if !hasOptionalChaining(left) {
 		rootExpr := leftUnwrapped
 		for {
-			unwrapped := unwrapParentheses(rootExpr)
+			unwrapped := ast.SkipParentheses(rootExpr)
 			if ast.IsPropertyAccessExpression(unwrapped) {
 				rootExpr = unwrapped.AsPropertyAccessExpression().Expression
 			} else if ast.IsElementAccessExpression(unwrapped) {
@@ -909,13 +972,13 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 
 		isRootedInNew := false
 		if rootExpr != nil {
-			unwrappedRoot := unwrapParentheses(rootExpr)
+			unwrappedRoot := ast.SkipParentheses(rootExpr)
 			isRootedInNew = ast.IsNewExpression(unwrappedRoot)
 		}
 
 		isStandaloneCall := false
 		if ast.IsCallExpression(leftUnwrapped) {
-			callee := unwrapParentheses(leftUnwrapped.AsCallExpression().Expression)
+			callee := ast.SkipParentheses(leftUnwrapped.AsCallExpression().Expression)
 			isStandaloneCall = ast.IsIdentifier(callee)
 		} else if ast.IsNewExpression(leftUnwrapped) {
 			isStandaloneCall = true
@@ -945,18 +1008,16 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		}
 	}
 
-	leftNormalized := processor.getNormalizedNodeText(left)
-	rightNormalized := processor.getNormalizedNodeText(right)
-
-	if leftNormalized == rightNormalized {
+	// Use AST-based comparison
+	if areNodesStructurallyEqual(left, right) {
 		return NodeEqual
 	}
 
-	if processor.isChainExtension(left, right) {
+	if isNodePrefixOf(left, right) {
 		return NodeSubset
 	}
 
-	if processor.isChainExtension(right, left) {
+	if isNodePrefixOf(right, left) {
 		return NodeSuperset
 	}
 
@@ -1050,8 +1111,8 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 		return true
 	}
 
-	isNull := value.Kind == ast.KindNullKeyword
-	isUndefined := (ast.IsIdentifier(value) && value.AsIdentifier().Text == "undefined") || ast.IsVoidExpression(value)
+	isNull := isNullLiteral(value)
+	isUndefined := isUndefinedLiteral(value)
 	isLiteral := value.Kind == ast.KindNumericLiteral ||
 		value.Kind == ast.KindStringLiteral ||
 		value.Kind == ast.KindTrueKeyword ||
@@ -1150,7 +1211,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 
 			hasNonNull := parentIsNonNull
 			if hasNonNull {
-				nameText = nameText + "!"
+				nameText += "!"
 			}
 
 			isPrivate := propAccess.Name().Kind == ast.KindPrivateIdentifier
@@ -1212,7 +1273,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 			text := processor.sourceText[textRange.Pos():textRange.End()]
 
 			if parentIsNonNull && ast.IsIdentifier(n) {
-				text = text + "!"
+				text += "!"
 			}
 
 			if n.Kind == ast.KindAsExpression || n.Kind == ast.KindTypeAssertionExpression {
@@ -1245,11 +1306,12 @@ func (processor *chainProcessor) buildOptionalChain(parts []ChainPart, checkedLe
 	optionalParts := make([]bool, len(parts))
 	for i, part := range parts {
 		if i > 0 {
-			if checkedLengths[i] {
+			switch {
+			case checkedLengths[i]:
 				optionalParts[i] = true
-			} else if part.optional {
+			case part.optional:
 				optionalParts[i] = true
-			} else {
+			default:
 				isLastPart := i == len(parts)-1
 				if part.isCall && isLastPart && callShouldBeOptional {
 					optionalParts[i] = true
@@ -1287,7 +1349,7 @@ func (processor *chainProcessor) buildOptionalChain(parts []ChainPart, checkedLe
 }
 
 func (processor *chainProcessor) containsOptionalChain(n *ast.Node) bool {
-	unwrapped := unwrapParentheses(n)
+	unwrapped := ast.SkipParentheses(n)
 
 	if ast.IsPropertyAccessExpression(unwrapped) {
 		if unwrapped.AsPropertyAccessExpression().QuestionDotToken != nil {
@@ -1360,34 +1422,16 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 
 		var expr, value *ast.Node
 
-		if binExpr.Right.Kind == ast.KindNullKeyword {
+		if isNullishLiteral(binExpr.Right) || ast.IsStringLiteral(binExpr.Right) {
 			expr = binExpr.Left
 			value = binExpr.Right
-		} else if ast.IsIdentifier(binExpr.Right) && binExpr.Right.AsIdentifier().Text == "undefined" {
-			expr = binExpr.Left
-			value = binExpr.Right
-		} else if ast.IsVoidExpression(binExpr.Right) {
-			expr = binExpr.Left
-			value = binExpr.Right
-		} else if ast.IsStringLiteral(binExpr.Right) {
-			expr = binExpr.Left
-			value = binExpr.Right
-		} else if binExpr.Left.Kind == ast.KindNullKeyword {
-			expr = binExpr.Right
-			value = binExpr.Left
-		} else if ast.IsIdentifier(binExpr.Left) && binExpr.Left.AsIdentifier().Text == "undefined" {
-			expr = binExpr.Right
-			value = binExpr.Left
-		} else if ast.IsVoidExpression(binExpr.Left) {
-			expr = binExpr.Right
-			value = binExpr.Left
-		} else if ast.IsStringLiteral(binExpr.Left) {
+		} else if isNullishLiteral(binExpr.Left) || ast.IsStringLiteral(binExpr.Left) {
 			expr = binExpr.Right
 			value = binExpr.Left
 		}
 
 		if expr != nil && value != nil {
-			expr = unwrapParentheses(expr)
+			expr = ast.SkipParentheses(expr)
 
 			if ast.IsTypeOfExpression(expr) {
 				typeofExpr := expr.AsTypeOfExpression()
@@ -1401,8 +1445,8 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 				}
 			}
 
-			isNull := value.Kind == ast.KindNullKeyword
-			isUndefined := (ast.IsIdentifier(value) && value.AsIdentifier().Text == "undefined") || ast.IsVoidExpression(value)
+			isNull := isNullLiteral(value)
+			isUndefined := isUndefinedLiteral(value)
 
 			if isAndChain {
 				switch op {
@@ -1474,16 +1518,16 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 	if isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
 
-		comparedExpr := unwrapParentheses(binExpr.Left)
+		comparedExpr := ast.SkipParentheses(binExpr.Left)
 		hasPropertyAccess := ast.IsPropertyAccessExpression(comparedExpr) ||
 			ast.IsElementAccessExpression(comparedExpr) ||
 			ast.IsCallExpression(comparedExpr)
 
 		if ast.IsPropertyAccessExpression(binExpr.Right) || ast.IsElementAccessExpression(binExpr.Right) {
-			comparedExpr = unwrapParentheses(binExpr.Right)
+			comparedExpr = ast.SkipParentheses(binExpr.Right)
 			hasPropertyAccess = true
 		} else if ast.IsCallExpression(binExpr.Right) {
-			comparedExpr = unwrapParentheses(binExpr.Right)
+			comparedExpr = ast.SkipParentheses(binExpr.Right)
 			hasPropertyAccess = true
 		}
 
@@ -1496,11 +1540,11 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 
 	if !isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
-		comparedExpr := unwrapParentheses(binExpr.Left)
+		comparedExpr := ast.SkipParentheses(binExpr.Left)
 		if ast.IsPropertyAccessExpression(binExpr.Right) || ast.IsElementAccessExpression(binExpr.Right) {
-			comparedExpr = unwrapParentheses(binExpr.Right)
+			comparedExpr = ast.SkipParentheses(binExpr.Right)
 		} else if ast.IsCallExpression(binExpr.Right) {
-			comparedExpr = unwrapParentheses(binExpr.Right)
+			comparedExpr = ast.SkipParentheses(binExpr.Right)
 		}
 		return Operand{typ: OperandTypeComparison, node: node, comparedExpr: comparedExpr}
 	}
@@ -1538,7 +1582,7 @@ func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind as
 	operandNodes := []*ast.Node{}
 	var collect func(*ast.Node)
 	collect = func(n *ast.Node) {
-		unwrapped := unwrapParentheses(n)
+		unwrapped := ast.SkipParentheses(n)
 
 		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == operatorKind {
 			binExpr := unwrapped.AsBinaryExpression()
@@ -1558,7 +1602,7 @@ func (processor *chainProcessor) collectOperandsWithRanges(node *ast.Node, opera
 	binaryRanges := []textRange{}
 	var collect func(*ast.Node)
 	collect = func(n *ast.Node) {
-		unwrapped := unwrapParentheses(n)
+		unwrapped := ast.SkipParentheses(n)
 
 		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == operatorKind {
 			binExpr := unwrapped.AsBinaryExpression()
@@ -1577,7 +1621,7 @@ func (processor *chainProcessor) collectOperandsWithRanges(node *ast.Node, opera
 func (processor *chainProcessor) hasPropertyAccessInChain(chain []Operand) bool {
 	for _, op := range chain {
 		if op.comparedExpr != nil {
-			unwrapped := unwrapParentheses(op.comparedExpr)
+			unwrapped := ast.SkipParentheses(op.comparedExpr)
 			if ast.IsPropertyAccessExpression(unwrapped) ||
 				ast.IsElementAccessExpression(unwrapped) ||
 				ast.IsCallExpression(unwrapped) {
@@ -2247,7 +2291,7 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 			if len(chain) == 2 {
 				lastOp := chain[len(chain)-1]
 				if lastOp.comparedExpr != nil {
-					unwrapped := unwrapParentheses(lastOp.comparedExpr)
+					unwrapped := ast.SkipParentheses(lastOp.comparedExpr)
 					if ast.IsCallExpression(unwrapped) {
 						return nil
 					}
@@ -2301,15 +2345,16 @@ func (processor *chainProcessor) hasIncompleteNullishCheck(chain []Operand) bool
 	}
 
 	for _, op := range guardOperands {
-		if op.typ == OperandTypePlain {
+		switch op.typ {
+		case OperandTypePlain:
 			hasPlainTruthinessCheck = true
-		} else if op.typ == OperandTypeNotStrictEqualNull {
+		case OperandTypeNotStrictEqualNull:
 			hasNullCheck = true
-		} else if op.typ == OperandTypeNotStrictEqualUndef {
+		case OperandTypeNotStrictEqualUndef:
 			hasUndefinedCheck = true
-		} else if op.typ == OperandTypeNotEqualBoth {
+		case OperandTypeNotEqualBoth:
 			hasBothCheck = true
-		} else if op.typ == OperandTypeTypeofCheck {
+		case OperandTypeTypeofCheck:
 			hasTypeofCheck = true
 			hasUndefinedCheck = true
 		}
@@ -2376,7 +2421,7 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 	}
 
 	if isTrailingComparison && lastOp.node != nil {
-		unwrappedNode := unwrapParentheses(lastOp.node)
+		unwrappedNode := ast.SkipParentheses(lastOp.node)
 		if ast.IsBinaryExpression(unwrappedNode) {
 			binExpr := unwrappedNode.AsBinaryExpression()
 			op := binExpr.OperatorToken.Kind
@@ -2389,8 +2434,8 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 			}
 
 			if value != nil {
-				isNull := value.Kind == ast.KindNullKeyword
-				isUndefined := (ast.IsIdentifier(value) && value.AsIdentifier().Text == "undefined") || ast.IsVoidExpression(value)
+				isNull := isNullLiteral(value)
+				isUndefined := isUndefinedLiteral(value)
 				isNullish := isNull || isUndefined
 				isLiteral := value.Kind == ast.KindNumericLiteral ||
 					value.Kind == ast.KindStringLiteral ||
@@ -2440,17 +2485,18 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 	hasBothCheck := false
 
 	for _, op := range chain {
-		if op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull {
+		switch {
+		case op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull:
 			hasNullCheck = true
-		} else if op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef {
+		case op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef:
 			hasUndefinedCheck = true
-		} else if op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull {
+		case op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull:
 			hasBothCheck = true
-		} else if op.typ == OperandTypeTypeofCheck {
+		case op.typ == OperandTypeTypeofCheck:
 			hasUndefinedCheck = true
-		} else if op.typ == OperandTypeNot {
+		case op.typ == OperandTypeNot:
 			hasBothCheck = true
-		} else if op.typ == OperandTypeComparison && op.node != nil {
+		case op.typ == OperandTypeComparison && op.node != nil:
 			unwrapped := op.node
 			for ast.IsParenthesizedExpression(unwrapped) {
 				unwrapped = unwrapped.AsParenthesizedExpression().Expression
@@ -2467,10 +2513,8 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 					right = right.AsParenthesizedExpression().Expression
 				}
 
-				isNull := left.Kind == ast.KindNullKeyword || right.Kind == ast.KindNullKeyword
-				isUndefined := (ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
-					(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
-					ast.IsVoidExpression(left) || ast.IsVoidExpression(right)
+				isNull := isNullLiteral(left) || isNullLiteral(right)
+				isUndefined := isUndefinedLiteral(left) || isUndefinedLiteral(right)
 
 				if binOp == ast.KindEqualsEqualsToken && (isNull || isUndefined) {
 					hasBothCheck = true
@@ -2571,11 +2615,8 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 							operator := binExpr.OperatorToken.Kind
 
 							if operator == ast.KindEqualsEqualsEqualsToken {
-								isStrictNullCheck := binExpr.Right.Kind == ast.KindNullKeyword ||
-									binExpr.Left.Kind == ast.KindNullKeyword
-								isStrictUndefCheck := (ast.IsIdentifier(binExpr.Right) && binExpr.Right.AsIdentifier().Text == "undefined") ||
-									(ast.IsIdentifier(binExpr.Left) && binExpr.Left.AsIdentifier().Text == "undefined") ||
-									ast.IsVoidExpression(binExpr.Right) || ast.IsVoidExpression(binExpr.Left)
+								isStrictNullCheck := isNullLiteral(binExpr.Right) || isNullLiteral(binExpr.Left)
+								isStrictUndefCheck := isUndefinedLiteral(binExpr.Right) || isUndefinedLiteral(binExpr.Left)
 
 								if (isStrictNullCheck && !isStrictUndefCheck) || (isStrictUndefCheck && !isStrictNullCheck) {
 									if truncateAt == -1 || i+1 < truncateAt {
@@ -2676,11 +2717,10 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 					binExpr := op.node.AsBinaryExpression()
 					binOp := binExpr.OperatorToken.Kind
 					if binOp == ast.KindEqualsEqualsToken {
-						left := unwrapParentheses(binExpr.Left)
-						right := unwrapParentheses(binExpr.Right)
-						isNullish := left.Kind == ast.KindNullKeyword || right.Kind == ast.KindNullKeyword ||
-							(ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
-							(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined")
+						left := ast.SkipParentheses(binExpr.Left)
+						right := ast.SkipParentheses(binExpr.Right)
+						isNullish := isNullLiteral(left) || isNullLiteral(right) ||
+							isUndefinedIdentifier(left) || isUndefinedIdentifier(right)
 						if isNullish {
 							allStrictChecks = false
 							break
@@ -2716,7 +2756,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	if len(chain) >= 2 && chain[0].typ == OperandTypeNot && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		firstExpr := chain[0].comparedExpr
 		if firstExpr != nil {
-			unwrappedFirst := unwrapParentheses(firstExpr)
+			unwrappedFirst := ast.SkipParentheses(firstExpr)
 			isFirstSimpleNegation := !ast.IsPropertyAccessExpression(unwrappedFirst) &&
 				!ast.IsElementAccessExpression(unwrappedFirst) &&
 				!ast.IsCallExpression(unwrappedFirst)
@@ -2780,7 +2820,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	if len(chain) >= 2 && chain[0].typ == OperandTypePlain {
 		firstExpr := chain[0].comparedExpr
 		if firstExpr != nil {
-			unwrapped := unwrapParentheses(firstExpr)
+			unwrapped := ast.SkipParentheses(firstExpr)
 			if unwrapped.Kind == ast.KindMetaProperty {
 				return nil
 			}
@@ -2790,7 +2830,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	if len(chain) >= 2 && chain[0].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		firstExpr := chain[0].comparedExpr
 		if firstExpr != nil {
-			unwrappedFirst := unwrapParentheses(firstExpr)
+			unwrappedFirst := ast.SkipParentheses(firstExpr)
 			isFirstSimplePlain := !ast.IsPropertyAccessExpression(unwrappedFirst) &&
 				!ast.IsElementAccessExpression(unwrappedFirst) &&
 				!ast.IsCallExpression(unwrappedFirst)
@@ -2827,8 +2867,8 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 						continue
 					}
 					callExpr := chain[j].comparedExpr
-					if callExpr != nil && ast.IsCallExpression(unwrapParentheses(callExpr)) {
-						call := unwrapParentheses(callExpr).AsCallExpression()
+					if callExpr != nil && ast.IsCallExpression(ast.SkipParentheses(callExpr)) {
+						call := ast.SkipParentheses(callExpr).AsCallExpression()
 						callBase := call.Expression
 						cmp := processor.compareNodes(negatedExpr, callBase)
 						if cmp == NodeEqual {
@@ -3059,30 +3099,32 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	}
 
 	if !hasComplementaryNullCheck && !hasLooseStrictWithTrailingPlain {
+	chainLoop:
 		for i := len(chain) - 1; i >= 0; i-- {
-			if chain[i].typ == OperandTypePlain {
+			switch {
+			case chain[i].typ == OperandTypePlain:
 				lastPropertyAccess = chain[i].node
 				hasTrailingComparison = false
 				hasTrailingTypeofCheck = false
-				break
-			} else if chain[i].typ == OperandTypeComparison ||
+				break chainLoop
+			case chain[i].typ == OperandTypeComparison ||
 				chain[i].typ == OperandTypeNotStrictEqualNull ||
 				chain[i].typ == OperandTypeNotStrictEqualUndef ||
-				chain[i].typ == OperandTypeNotEqualBoth {
+				chain[i].typ == OperandTypeNotEqualBoth:
 				lastPropertyAccess = chain[i].comparedExpr
 				hasTrailingComparison = true
 				hasTrailingTypeofCheck = false
-				break
-			} else if chain[i].typ == OperandTypeTypeofCheck {
+				break chainLoop
+			case chain[i].typ == OperandTypeTypeofCheck:
 				lastPropertyAccess = chain[i].comparedExpr
 				hasTrailingComparison = true
 				hasTrailingTypeofCheck = true
-				break
-			} else if chain[i].comparedExpr != nil {
+				break chainLoop
+			case chain[i].comparedExpr != nil:
 				lastPropertyAccess = chain[i].comparedExpr
 				hasTrailingComparison = false
 				hasTrailingTypeofCheck = false
-				break
+				break chainLoop
 			}
 		}
 	}
@@ -3241,7 +3283,7 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 			if shortestCoveringOp != nil && i < shortestCoveringOp.len {
 				if shortestCoveringOp.parts[i].hasNonNull {
 					if !parts[i].hasNonNull {
-						parts[i].text = parts[i].text + "!"
+						parts[i].text += "!"
 					}
 					parts[i].hasNonNull = true
 				}
@@ -3333,7 +3375,7 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 					comparedExprEnd := comparedExprRange.End()
 					binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).End()
 					comparisonSuffix := processor.sourceText[comparedExprEnd:binExprEnd]
-					newCode = newCode + comparisonSuffix
+					newCode += comparisonSuffix
 				}
 			}
 		}
@@ -3640,25 +3682,24 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 			hasUndefinedCheck := false
 			hasBothCheck := false
 			for _, op := range chain {
-				if op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull {
+				switch {
+				case op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull:
 					hasNullCheck = true
-				} else if op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef {
+				case op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef:
 					hasUndefinedCheck = true
-				} else if op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull || op.typ == OperandTypeNot {
+				case op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull || op.typ == OperandTypeNot:
 					hasBothCheck = true
-				} else if op.typ == OperandTypeComparison && isNullishComparison(op) {
+				case op.typ == OperandTypeComparison && isNullishComparison(op):
 					if op.node != nil && ast.IsBinaryExpression(op.node) {
 						binExpr := op.node.AsBinaryExpression()
-						left := unwrapParentheses(binExpr.Left)
-						right := unwrapParentheses(binExpr.Right)
-						isNull := left.Kind == ast.KindNullKeyword || right.Kind == ast.KindNullKeyword
-						isUndefined := (ast.IsIdentifier(left) && left.AsIdentifier().Text == "undefined") ||
-							(ast.IsIdentifier(right) && right.AsIdentifier().Text == "undefined") ||
-							ast.IsVoidExpression(left) || ast.IsVoidExpression(right)
-						binOp := binExpr.OperatorToken.Kind
-						if binOp == ast.KindEqualsEqualsToken {
+						left := ast.SkipParentheses(binExpr.Left)
+						right := ast.SkipParentheses(binExpr.Right)
+						isNull := isNullLiteral(left) || isNullLiteral(right)
+						isUndefined := isUndefinedLiteral(left) || isUndefinedLiteral(right)
+						switch binExpr.OperatorToken.Kind {
+						case ast.KindEqualsEqualsToken:
 							hasBothCheck = true
-						} else if binOp == ast.KindEqualsEqualsEqualsToken {
+						case ast.KindEqualsEqualsEqualsToken:
 							if isNull {
 								hasNullCheck = true
 							}
