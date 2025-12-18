@@ -1,4 +1,4 @@
-From e6869f0b58af339fe54c0c3d699e12f92724428e Mon Sep 17 00:00:00 2001
+From 66bd50e97640a8191c2ceaf34966d497a33a600a Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
 Subject: [PATCH] patch: expose more functions via the shim with type fixes
@@ -295,7 +295,7 @@ index 048ec36a3..0bb82d586 100644
  		entry.DeleteIf(func(value *configFileEntry) bool {
  			return len(value.retainingProjects) == 0 && len(value.retainingOpenFiles) == 0 && len(value.retainingConfigs) == 0
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index 3a5e36905..7968731f3 100644
+index 84eab0ea0..36cbfad3e 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
 @@ -68,13 +68,13 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
@@ -616,10 +616,10 @@ index fb06c9f6c..42b73a1be 100644
  	project.Delete()
  }
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index 50889c7cb..b69a8f410 100644
+index dcb945a9e..d0fe32d05 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
-@@ -253,7 +253,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -256,7 +256,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  	}
  
  	start := time.Now()
@@ -628,7 +628,7 @@ index 50889c7cb..b69a8f410 100644
  	if change.fileChanges.HasExcessiveWatchEvents() {
  		invalidateStart := time.Now()
  		if !fs.watchChangesOverlapCache(change.fileChanges) {
-@@ -331,7 +331,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -334,7 +334,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  		if changedFiles {
  			cleanFilesStart := time.Now()
  			removedFiles := 0
@@ -638,7 +638,7 @@ index 50889c7cb..b69a8f410 100644
  					if project.host != nil && project.host.seenFiles.Has(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index dc02cb89c..77570d7c3 100644
+index bff9168ba..d8e63fe49 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -19,7 +19,7 @@ type FileSource interface {
@@ -734,7 +734,7 @@ index dc02cb89c..77570d7c3 100644
 -					entry.Change(func(file *diskFile) {
 +					entry.Change(func(file *DiskFile) {
  						file.content = content
- 						file.hash = xxh3.Hash128([]byte(content))
+ 						file.hash = xxh3.HashString128(content)
  						file.needsReload = false
 @@ -134,7 +134,7 @@ func (s *snapshotFSBuilder) GetFileByPath(fileName string, path tspath.Path) Fil
  	return entry.Value()

@@ -2,10 +2,11 @@ module github.com/microsoft/typescript-go/shim/bundled
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20251215180454-51d6a11318b7
+require github.com/microsoft/typescript-go v0.0.0-20251217202042-c15e7649ca15
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect
 	golang.org/x/sync v0.19.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
 )
