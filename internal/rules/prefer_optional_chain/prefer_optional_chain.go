@@ -67,9 +67,6 @@ func isComparisonOrNullCheck(typ OperandType) bool {
 	return typ == OperandTypeComparison || isNullishCheckType(typ)
 }
 
-// isNullishComparison checks if an OperandTypeComparison is comparing to null/undefined.
-// In OR chains, `a.b == null` is parsed as OperandTypeComparison for property accesses
-// but should still be treated as a nullish check for chain building.
 func isNullishComparison(op Operand) bool {
 	if op.typ != OperandTypeComparison || op.node == nil {
 		return false
@@ -81,7 +78,6 @@ func isNullishComparison(op Operand) bool {
 	binExpr := unwrapped.AsBinaryExpression()
 	binOp := binExpr.OperatorToken.Kind
 
-	// Only == and === null/undefined checks are nullish comparisons in OR chains
 	if binOp != ast.KindEqualsEqualsToken && binOp != ast.KindEqualsEqualsEqualsToken {
 		return false
 	}
@@ -123,8 +119,6 @@ func isStrictNullComparison(op Operand) bool {
 	return isLeftNull || isRightNull
 }
 
-// isOrChainNullishCheck returns true if the operand is a nullish check usable in an OR chain.
-// Used to allow extending OR chains through call expressions for nullish comparison patterns.
 func isOrChainNullishCheck(op Operand) bool {
 	switch op.typ {
 	case OperandTypeStrictEqualNull, OperandTypeStrictEqualUndef, OperandTypeEqualNull:
@@ -188,8 +182,6 @@ func unwrapParentheses(n *ast.Node) *ast.Node {
 	return n
 }
 
-// unwrapForComparison unwraps parentheses, non-null assertions, and type assertions.
-// Used for operand comparison where we want foo.bar! to match foo.bar.
 func unwrapForComparison(n *ast.Node) *ast.Node {
 	for {
 		if ast.IsParenthesizedExpression(n) {
@@ -207,8 +199,6 @@ func unwrapForComparison(n *ast.Node) *ast.Node {
 	return n
 }
 
-// getNormalizedNodeText builds a normalized text representation of an AST node.
-// Normalization: unwraps parentheses, normalizes ?. to ., strips ! and type assertions.
 func (processor *chainProcessor) getNormalizedNodeText(node *ast.Node) string {
 	if node == nil {
 		return ""
@@ -320,8 +310,6 @@ func hasOptionalChaining(node *ast.Node) bool {
 	return false
 }
 
-// isChainExtension checks if 'longer' extends 'shorter' in a chain expression.
-// E.g., isChainExtension(foo, foo.bar) -> true, isChainExtension(foo.bar, foo.baz) -> false.
 func (processor *chainProcessor) isChainExtension(shorter, longer *ast.Node) bool {
 	if shorter == nil || longer == nil {
 		return false
@@ -386,7 +374,6 @@ func unwrapChainNode(node *ast.Node) *ast.Node {
 	return current
 }
 
-// isInsideJSX checks if a node is inside a JSX context.
 // In JSX, foo && foo.bar has different semantics than foo?.bar:
 // foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined.
 func isInsideJSX(node *ast.Node) bool {
@@ -650,9 +637,6 @@ func (processor *chainProcessor) validateChainRoot(node *ast.Node, operatorKind 
 		return nil, false
 	}
 
-	// Skip if inside JSX - semantic difference
-	// In JSX, foo && foo.bar returns false/null/undefined (rendered as-is)
-	// while foo?.bar always returns undefined
 	if isInsideJSX(node) {
 		return nil, false
 	}
@@ -1013,7 +997,6 @@ func (processor *chainProcessor) typeIncludesUndefined(node *ast.Node) bool {
 	return info.hasUndefined || info.hasAny || info.hasUnknown
 }
 
-// Returns true when type has falsy non-nullish values (false, 0, "", 0n) but no null/undefined.
 func (processor *chainProcessor) wouldChangeReturnType(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
 	hasNullish := info.hasNull || info.hasUndefined
@@ -1100,7 +1083,6 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 	return true
 }
 
-// Checks base identifier's type (e.g., in (foo as any).bar, checks foo's type).
 func (processor *chainProcessor) shouldSkipByType(node *ast.Node) bool {
 	baseNode := getBaseIdentifier(node)
 	info := processor.getTypeInfo(baseNode)
@@ -1252,8 +1234,6 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 	return parts
 }
 
-// Returns empty string if the chain would result in invalid syntax (e.g., ?.#private).
-// stripNonNullAssertions: true for OR chains (strip !), false for AND chains (preserve !).
 func (processor *chainProcessor) buildOptionalChain(parts []ChainPart, checkedLengths map[int]bool, callShouldBeOptional bool, stripNonNullAssertions bool) string {
 	maxCheckedLength := 0
 	for length := range checkedLengths {
@@ -1412,11 +1392,9 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 			if ast.IsTypeOfExpression(expr) {
 				typeofExpr := expr.AsTypeOfExpression()
 				if ast.IsStringLiteral(value) && value.AsStringLiteral().Text == "undefined" {
-					// AND chain: typeof foo !== 'undefined' && foo.bar
 					if (op == ast.KindExclamationEqualsEqualsToken || op == ast.KindExclamationEqualsToken) && isAndChain {
 						return Operand{typ: OperandTypeTypeofCheck, node: node, comparedExpr: typeofExpr.Expression}
 					}
-					// OR chain: typeof foo === 'undefined' || foo.bar
 					if (op == ast.KindEqualsEqualsEqualsToken || op == ast.KindEqualsEqualsToken) && !isAndChain {
 						return Operand{typ: OperandTypeTypeofCheck, node: node, comparedExpr: typeofExpr.Expression}
 					}
@@ -1456,8 +1434,6 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 					}
 				}
 			} else {
-				// OR chain: base identifier null checks become optional chain starts,
-				// property null checks become comparison operands at chain end
 				isPropertyOrElement := ast.IsPropertyAccessExpression(expr) || ast.IsElementAccessExpression(expr) || ast.IsCallExpression(expr)
 
 				if isPropertyOrElement && (isNull || isUndefined) {
@@ -1721,13 +1697,11 @@ func (processor *chainProcessor) hasChainOverlapWithReported(chain []Operand) bo
 	return false
 }
 
-// When requireNullish is true, only convert chains with explicit nullish checks or nullable types.
 func (processor *chainProcessor) shouldSkipForRequireNullish(chain []Operand, operatorKind ast.Kind) bool {
 	if !processor.opts.RequireNullish {
 		return false
 	}
 
-	// For OR chains starting with negation, skip entirely
 	if !isAndOperator(operatorKind) && len(chain) > 0 && chain[0].typ == OperandTypeNot {
 		return true
 	}
@@ -1736,7 +1710,6 @@ func (processor *chainProcessor) shouldSkipForRequireNullish(chain []Operand, op
 		if op.typ != OperandTypePlain {
 			return false
 		}
-		// For plain && checks, allow if the type explicitly includes null/undefined
 		if isAndOperator(operatorKind) && i < len(chain)-1 && op.comparedExpr != nil {
 			if processor.includesExplicitNullish(op.comparedExpr) {
 				return false
@@ -2429,19 +2402,19 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 
 				unsafe := false
 				switch op {
-				case ast.KindEqualsEqualsToken: // ==
+				case ast.KindEqualsEqualsToken:
 					if isNullish || isUndeclaredVar {
 						unsafe = true
 					}
-				case ast.KindEqualsEqualsEqualsToken: // ===
+				case ast.KindEqualsEqualsEqualsToken:
 					if isUndefined || isUndeclaredVar {
 						unsafe = true
 					}
-				case ast.KindExclamationEqualsToken: // !=
+				case ast.KindExclamationEqualsToken:
 					if !isNullish {
 						unsafe = true
 					}
-				case ast.KindExclamationEqualsEqualsToken: // !==
+				case ast.KindExclamationEqualsEqualsToken:
 					if !isUndefined {
 						unsafe = true
 					}
@@ -2997,7 +2970,6 @@ func (processor *chainProcessor) generateFixAndReport(node *ast.Node, chain []Op
 	}
 }
 
-// generateAndChainFixAndReport handles AND chains: foo && foo.bar -> foo?.bar
 func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, chain []Operand, operandNodes []*ast.Node) {
 	var lastPropertyAccess *ast.Node
 	var hasTrailingComparison bool
@@ -3116,7 +3088,7 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	}
 
 	if lastPropertyAccess == nil {
-		return // Skip this chain
+		return
 	}
 
 	parts := processor.flattenForFix(lastPropertyAccess)
@@ -3206,7 +3178,6 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 		}
 	}
 
-	// Replace parts from earlier operands for the checked prefix to preserve existing ?. and !.
 	if len(checksToConsider) > 0 && len(parts) > 1 {
 		maxCheckedLen := 0
 		for _, op := range checksToConsider {
@@ -3218,7 +3189,6 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 			}
 		}
 
-		// Strip non-null assertions from parts within the checked range
 		for i := 0; i < maxCheckedLen && i < len(parts); i++ {
 			if parts[i].hasNonNull {
 				parts[i].text = parts[i].baseText()
@@ -3491,7 +3461,6 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	processor.markChainOperandsAsReported(chain)
 }
 
-// generateOrChainFixAndReport handles OR chains: !foo || !foo.bar -> !foo?.bar
 func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, chain []Operand, operandNodes []*ast.Node) {
 	hasTrailingComparison := false
 	if len(chain) > 0 {
