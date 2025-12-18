@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
@@ -203,8 +204,11 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 		}
 	}
 
+	var flatQueueMu sync.Mutex
 	program.ForEachCheckerParallel(func(idx int, ch *checker.Checker) {
+		flatQueueMu.Lock()
 		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
+		flatQueueMu.Unlock()
 	})
 
 	workloadQueue := make(chan checkerWorkload, len(flatQueue))
