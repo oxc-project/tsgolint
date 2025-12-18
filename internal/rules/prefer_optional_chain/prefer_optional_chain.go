@@ -1,13 +1,12 @@
 package prefer_optional_chain
 
 import (
-	"strings"
-
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
+	"strings"
 )
 
 func buildPreferOptionalChainMessage() rule.RuleMessage {
@@ -24,27 +23,22 @@ func buildOptionalChainSuggestMessage() rule.RuleMessage {
 	}
 }
 
-// isNullLiteral checks if a node is the null keyword.
 func isNullLiteral(node *ast.Node) bool {
 	return node != nil && node.Kind == ast.KindNullKeyword
 }
 
-// isUndefinedIdentifier checks if a node is the identifier "undefined".
 func isUndefinedIdentifier(node *ast.Node) bool {
 	return node != nil && ast.IsIdentifier(node) && node.AsIdentifier().Text == "undefined"
 }
 
-// isVoidUndefined checks if a node is a void expression (e.g., void 0).
 func isVoidUndefined(node *ast.Node) bool {
 	return node != nil && ast.IsVoidExpression(node)
 }
 
-// isUndefinedLiteral checks if a node represents undefined (identifier or void expression).
 func isUndefinedLiteral(node *ast.Node) bool {
 	return isUndefinedIdentifier(node) || isVoidUndefined(node)
 }
 
-// isNullishLiteral checks if a node is null, undefined, or void expression.
 func isNullishLiteral(node *ast.Node) bool {
 	return isNullLiteral(node) || isUndefinedLiteral(node)
 }
@@ -67,32 +61,34 @@ const (
 	OperandTypeStrictEqualUndef
 )
 
-func isNullishCheckType(typ OperandType) bool {
-	return typ == OperandTypeNotStrictEqualNull ||
-		typ == OperandTypeNotStrictEqualUndef ||
-		typ == OperandTypeNotEqualBoth ||
-		typ == OperandTypeStrictEqualNull ||
-		typ == OperandTypeEqualNull ||
-		typ == OperandTypeStrictEqualUndef ||
-		typ == OperandTypeTypeofCheck
+func (t OperandType) IsNullishCheck() bool {
+	switch t {
+	case OperandTypeNotStrictEqualNull, OperandTypeNotStrictEqualUndef,
+		OperandTypeNotEqualBoth, OperandTypeStrictEqualNull,
+		OperandTypeEqualNull, OperandTypeStrictEqualUndef, OperandTypeTypeofCheck:
+		return true
+	}
+	return false
 }
 
-func isStrictNullishCheck(typ OperandType) bool {
-	return typ == OperandTypeNotStrictEqualNull || typ == OperandTypeNotStrictEqualUndef
+func (t OperandType) IsStrictNullishCheck() bool {
+	return t == OperandTypeNotStrictEqualNull || t == OperandTypeNotStrictEqualUndef
 }
 
-func isTrailingComparisonType(typ OperandType) bool {
-	return typ == OperandTypeNotStrictEqualNull ||
-		typ == OperandTypeNotStrictEqualUndef ||
-		typ == OperandTypeNotEqualBoth ||
-		typ == OperandTypeComparison
+func (t OperandType) IsTrailingComparison() bool {
+	switch t {
+	case OperandTypeNotStrictEqualNull, OperandTypeNotStrictEqualUndef,
+		OperandTypeNotEqualBoth, OperandTypeComparison:
+		return true
+	}
+	return false
 }
 
-func isComparisonOrNullCheck(typ OperandType) bool {
-	return typ == OperandTypeComparison || isNullishCheckType(typ)
+func (t OperandType) IsComparisonOrNullCheck() bool {
+	return t == OperandTypeComparison || t.IsNullishCheck()
 }
 
-func isNullishComparison(op Operand) bool {
+func isComparisonAgainst(op Operand, predicate func(*ast.Node) bool) bool {
 	if op.typ != OperandTypeComparison || op.node == nil {
 		return false
 	}
@@ -110,28 +106,15 @@ func isNullishComparison(op Operand) bool {
 	left := ast.SkipParentheses(binExpr.Left)
 	right := ast.SkipParentheses(binExpr.Right)
 
-	return isNullishLiteral(left) || isNullishLiteral(right)
+	return predicate(left) || predicate(right)
+}
+
+func isNullishComparison(op Operand) bool {
+	return isComparisonAgainst(op, isNullishLiteral)
 }
 
 func isStrictNullComparison(op Operand) bool {
-	if op.typ != OperandTypeComparison || op.node == nil {
-		return false
-	}
-	unwrapped := ast.SkipParentheses(op.node)
-	if !ast.IsBinaryExpression(unwrapped) {
-		return false
-	}
-	binExpr := unwrapped.AsBinaryExpression()
-	binOp := binExpr.OperatorToken.Kind
-
-	if binOp != ast.KindEqualsEqualsEqualsToken && binOp != ast.KindEqualsEqualsToken {
-		return false
-	}
-
-	left := ast.SkipParentheses(binExpr.Left)
-	right := ast.SkipParentheses(binExpr.Right)
-
-	return isNullLiteral(left) || isNullLiteral(right)
+	return isComparisonAgainst(op, isNullLiteral)
 }
 
 func isOrChainNullishCheck(op Operand) bool {
@@ -160,6 +143,79 @@ func isNullishCheckOperand(op Operand) bool {
 			isNullLiteral(binExpr.Left) || isUndefinedIdentifier(binExpr.Left)
 	}
 	return false
+}
+
+// NullishCheckAnalysis tracks what kinds of null/undefined checks are present in a chain.
+// Optional chaining checks for BOTH null AND undefined, so incomplete checks are unsafe.
+type NullishCheckAnalysis struct {
+	HasNullCheck      bool
+	HasUndefinedCheck bool
+	HasBothCheck      bool
+}
+
+func (a NullishCheckAnalysis) HasOnlyNullCheck() bool {
+	return a.HasNullCheck && !a.HasUndefinedCheck && !a.HasBothCheck
+}
+
+func (a NullishCheckAnalysis) HasOnlyUndefinedCheck() bool {
+	return !a.HasNullCheck && a.HasUndefinedCheck && !a.HasBothCheck
+}
+
+func (a NullishCheckAnalysis) HasIncompleteCheck() bool {
+	return a.HasOnlyNullCheck() || a.HasOnlyUndefinedCheck()
+}
+
+// orChainMode: true for OR chains (=== null), false for AND chains (!== null)
+func analyzeNullishChecks(chain []Operand, orChainMode bool) NullishCheckAnalysis {
+	analysis := NullishCheckAnalysis{}
+
+	for _, op := range chain {
+		switch op.typ {
+		case OperandTypeNotStrictEqualNull, OperandTypeStrictEqualNull:
+			analysis.HasNullCheck = true
+		case OperandTypeNotStrictEqualUndef, OperandTypeStrictEqualUndef:
+			analysis.HasUndefinedCheck = true
+		case OperandTypeNotEqualBoth, OperandTypeEqualNull:
+			analysis.HasBothCheck = true
+		case OperandTypeTypeofCheck:
+			analysis.HasUndefinedCheck = true
+		case OperandTypeNot:
+			if orChainMode {
+				analysis.HasBothCheck = true
+			}
+		case OperandTypePlain:
+			// Plain truthiness checks only count as both in AND chain mode
+			if !orChainMode {
+				analysis.HasBothCheck = true
+			}
+		case OperandTypeComparison:
+			if op.node != nil {
+				unwrapped := ast.SkipParentheses(op.node)
+				if ast.IsBinaryExpression(unwrapped) {
+					binExpr := unwrapped.AsBinaryExpression()
+					binOp := binExpr.OperatorToken.Kind
+					left := ast.SkipParentheses(binExpr.Left)
+					right := ast.SkipParentheses(binExpr.Right)
+
+					isNull := isNullLiteral(left) || isNullLiteral(right)
+					isUndefined := isUndefinedLiteral(left) || isUndefinedLiteral(right)
+
+					if binOp == ast.KindEqualsEqualsToken && (isNull || isUndefined) {
+						analysis.HasBothCheck = true
+					} else if binOp == ast.KindEqualsEqualsEqualsToken {
+						if isNull {
+							analysis.HasNullCheck = true
+						}
+						if isUndefined {
+							analysis.HasUndefinedCheck = true
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return analysis
 }
 
 type Operand struct {
@@ -202,8 +258,7 @@ func unwrapForComparison(n *ast.Node) *ast.Node {
 	}
 }
 
-// areNodesStructurallyEqual checks if two nodes represent the same expression
-// (ignoring parentheses, non-null assertions, type assertions).
+// Ignores parentheses, non-null assertions, type assertions.
 func areNodesStructurallyEqual(a, b *ast.Node) bool {
 	a = unwrapForComparison(a)
 	b = unwrapForComparison(b)
@@ -332,19 +387,19 @@ func areNodesStructurallyEqual(a, b *ast.Node) bool {
 		return areNodesStructurallyEqual(aTypeof.Expression, bTypeof.Expression)
 
 	case ast.KindTemplateExpression:
-		aTmpl := a.AsTemplateExpression()
-		bTmpl := b.AsTemplateExpression()
+		aTemplate := a.AsTemplateExpression()
+		bTemplate := b.AsTemplateExpression()
 		// Compare head
-		if aTmpl.Head == nil || bTmpl.Head == nil {
-			if aTmpl.Head != bTmpl.Head {
+		if aTemplate.Head == nil || bTemplate.Head == nil {
+			if aTemplate.Head != bTemplate.Head {
 				return false
 			}
-		} else if aTmpl.Head.Text() != bTmpl.Head.Text() {
+		} else if aTemplate.Head.Text() != bTemplate.Head.Text() {
 			return false
 		}
 		// Compare template spans
-		aSpans := aTmpl.TemplateSpans
-		bSpans := bTmpl.TemplateSpans
+		aSpans := aTemplate.TemplateSpans
+		bSpans := bTemplate.TemplateSpans
 		if aSpans == nil && bSpans == nil {
 			return true
 		}
@@ -376,7 +431,6 @@ func areNodesStructurallyEqual(a, b *ast.Node) bool {
 	return false
 }
 
-// isNodePrefixOf checks if 'shorter' is a prefix of the chain in 'longer'.
 // e.g., foo.bar is a prefix of foo.bar.baz
 func isNodePrefixOf(shorter, longer *ast.Node) bool {
 	shorter = unwrapForComparison(shorter)
@@ -386,7 +440,6 @@ func isNodePrefixOf(shorter, longer *ast.Node) bool {
 		return true
 	}
 
-	// Get the base of 'longer' and recursively check
 	var base *ast.Node
 	switch {
 	case ast.IsPropertyAccessExpression(longer):
@@ -572,6 +625,27 @@ type TypeInfo struct {
 	hasBooleanLike   bool
 	hasNumberLike    bool
 	hasStringLike    bool
+}
+
+func (t *TypeInfo) IsNullish() bool {
+	return t.hasNull || t.hasUndefined || t.hasAny || t.hasUnknown
+}
+
+// HasExplicitNullish excludes any/unknown (which are implicitly nullish).
+func (t *TypeInfo) HasExplicitNullish() bool {
+	return t.hasNull || t.hasUndefined
+}
+
+func (t *TypeInfo) IsAnyOrUnknown() bool {
+	return t.hasAny || t.hasUnknown
+}
+
+func (t *TypeInfo) HasBothNullAndUndefined() bool {
+	return t.hasNull && t.hasUndefined
+}
+
+func (t *TypeInfo) HasNoNullableTypes() bool {
+	return !t.hasNull && !t.hasUndefined && !t.hasAny && !t.hasUnknown
 }
 
 type chainProcessor struct {
@@ -904,10 +978,7 @@ func (processor *chainProcessor) tryExtendThroughCallExpression(lastExpr *ast.No
 		return NodeInvalid
 	}
 
-	lastUnwrapped := lastExpr
-	for ast.IsParenthesizedExpression(lastUnwrapped) {
-		lastUnwrapped = lastUnwrapped.AsParenthesizedExpression().Expression
-	}
+	lastUnwrapped := ast.SkipParentheses(lastExpr)
 
 	if !ast.IsCallExpression(lastUnwrapped) && !ast.IsNewExpression(lastUnwrapped) {
 		return NodeInvalid
@@ -916,23 +987,22 @@ func (processor *chainProcessor) tryExtendThroughCallExpression(lastExpr *ast.No
 	// Each `new X()` creates a fresh instance, so can't chain through it
 	if isAndOperator(operatorKind) && firstOpExpr != nil {
 		baseExpr := firstOpExpr
+	outer:
 		for baseExpr != nil {
-			unwrapped := baseExpr
-			for ast.IsParenthesizedExpression(unwrapped) {
-				unwrapped = unwrapped.AsParenthesizedExpression().Expression
-			}
-			if ast.IsPropertyAccessExpression(unwrapped) {
+			unwrapped := ast.SkipParentheses(baseExpr)
+			switch {
+			case ast.IsPropertyAccessExpression(unwrapped):
 				baseExpr = unwrapped.AsPropertyAccessExpression().Expression
-			} else if ast.IsElementAccessExpression(unwrapped) {
+			case ast.IsElementAccessExpression(unwrapped):
 				baseExpr = unwrapped.AsElementAccessExpression().Expression
-			} else if ast.IsCallExpression(unwrapped) {
+			case ast.IsCallExpression(unwrapped):
 				baseExpr = unwrapped.AsCallExpression().Expression
-			} else {
-				break
+			default:
+				break outer
 			}
 		}
 
-		if baseExpr != nil && ast.IsNewExpression(baseExpr) {
+		if baseExpr != nil && ast.IsNewExpression(ast.SkipParentheses(baseExpr)) {
 			return NodeInvalid
 		}
 	}
@@ -957,16 +1027,18 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	// which create new instances each time.
 	if !hasOptionalChaining(left) {
 		rootExpr := leftUnwrapped
+	outer2:
 		for {
 			unwrapped := ast.SkipParentheses(rootExpr)
-			if ast.IsPropertyAccessExpression(unwrapped) {
+			switch {
+			case ast.IsPropertyAccessExpression(unwrapped):
 				rootExpr = unwrapped.AsPropertyAccessExpression().Expression
-			} else if ast.IsElementAccessExpression(unwrapped) {
+			case ast.IsElementAccessExpression(unwrapped):
 				rootExpr = unwrapped.AsElementAccessExpression().Expression
-			} else if ast.IsCallExpression(unwrapped) {
+			case ast.IsCallExpression(unwrapped):
 				rootExpr = unwrapped.AsCallExpression().Expression
-			} else {
-				break
+			default:
+				break outer2
 			}
 		}
 
@@ -1008,7 +1080,6 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 		}
 	}
 
-	// Use AST-based comparison
 	if areNodesStructurallyEqual(left, right) {
 		return NodeEqual
 	}
@@ -1026,13 +1097,12 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 
 func (processor *chainProcessor) includesNullish(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
-	return info.hasNull || info.hasUndefined || info.hasAny || info.hasUnknown
+	return info.IsNullish()
 }
 
-// Does NOT return true for 'any' or 'unknown' types.
 func (processor *chainProcessor) includesExplicitNullish(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
-	return info.hasNull || info.hasUndefined
+	return info.HasExplicitNullish()
 }
 
 func (processor *chainProcessor) typeIsAnyOrUnknown(node *ast.Node) bool {
@@ -1060,30 +1130,23 @@ func (processor *chainProcessor) typeIncludesUndefined(node *ast.Node) bool {
 
 func (processor *chainProcessor) wouldChangeReturnType(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
-	hasNullish := info.hasNull || info.hasUndefined
 	hasFalsyNonNullish := info.hasBoolLiteral || info.hasNumLiteral || info.hasStrLiteral || info.hasBigIntLiteral
-	return hasFalsyNonNullish && !hasNullish
+	return hasFalsyNonNullish && !info.HasExplicitNullish()
 }
 
-// void is always falsy but not nullish, causing issues with && to ?. conversion.
-// Example: x && x() where x is void | (() => void) - converting to x?.() would TypeError.
+// void is falsy but not nullish - x?.() on void would TypeError.
 func (processor *chainProcessor) hasVoidType(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
 	return info.hasVoid
 }
 
-// For OR chains (!foo || foo.bar OP VALUE), checks if the comparison is safe to convert.
-// Safe: !== X (literals/null), === undefined, == null/undefined, != X (literals only)
-// Unsafe: === X (non-undefined), != null/undefined (undefined != null is false in JS!)
+// Unsafe: === X (non-undefined), != null/undefined (since undefined != null is false!)
 func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 	if op.typ != OperandTypeComparison || op.node == nil {
 		return true
 	}
 
-	unwrapped := op.node
-	for ast.IsParenthesizedExpression(unwrapped) {
-		unwrapped = unwrapped.AsParenthesizedExpression().Expression
-	}
+	unwrapped := ast.SkipParentheses(op.node)
 
 	if !ast.IsBinaryExpression(unwrapped) {
 		return true
@@ -1092,22 +1155,20 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 	binExpr := unwrapped.AsBinaryExpression()
 	operator := binExpr.OperatorToken.Kind
 
-	left := binExpr.Left
-	right := binExpr.Right
+	left := ast.SkipParentheses(binExpr.Left)
+	right := ast.SkipParentheses(binExpr.Right)
 
-	for ast.IsParenthesizedExpression(left) {
-		left = left.AsParenthesizedExpression().Expression
-	}
-	for ast.IsParenthesizedExpression(right) {
-		right = right.AsParenthesizedExpression().Expression
+	isAccessExpr := func(n *ast.Node) bool {
+		return ast.IsPropertyAccessExpression(n) || ast.IsElementAccessExpression(n) || ast.IsCallExpression(n)
 	}
 
 	var value *ast.Node
-	if ast.IsPropertyAccessExpression(left) || ast.IsElementAccessExpression(left) || ast.IsCallExpression(left) {
+	switch {
+	case isAccessExpr(left):
 		value = right
-	} else if ast.IsPropertyAccessExpression(right) || ast.IsElementAccessExpression(right) || ast.IsCallExpression(right) {
+	case isAccessExpr(right):
 		value = left
-	} else {
+	default:
 		return true
 	}
 
@@ -1148,7 +1209,7 @@ func (processor *chainProcessor) shouldSkipByType(node *ast.Node) bool {
 	baseNode := getBaseIdentifier(node)
 	info := processor.getTypeInfo(baseNode)
 
-	if processor.opts.RequireNullish && (info.hasNull || info.hasUndefined) {
+	if processor.opts.RequireNullish && info.HasExplicitNullish() {
 		return false
 	}
 
@@ -1389,23 +1450,25 @@ func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.K
 	}
 
 	baseExpr := unwrapped
+outer3:
 	for {
-		if ast.IsPropertyAccessExpression(baseExpr) {
+		switch {
+		case ast.IsPropertyAccessExpression(baseExpr):
 			baseExpr = baseExpr.AsPropertyAccessExpression().Expression
-		} else if ast.IsElementAccessExpression(baseExpr) {
+		case ast.IsElementAccessExpression(baseExpr):
 			baseExpr = baseExpr.AsElementAccessExpression().Expression
-		} else if ast.IsCallExpression(baseExpr) {
+		case ast.IsCallExpression(baseExpr):
 			baseExpr = baseExpr.AsCallExpression().Expression
-		} else if ast.IsNonNullExpression(baseExpr) {
+		case ast.IsNonNullExpression(baseExpr):
 			baseExpr = baseExpr.AsNonNullExpression().Expression
-		} else if ast.IsParenthesizedExpression(baseExpr) {
+		case ast.IsParenthesizedExpression(baseExpr):
 			baseExpr = baseExpr.AsParenthesizedExpression().Expression
-		} else if baseExpr.Kind == ast.KindAsExpression {
+		case baseExpr.Kind == ast.KindAsExpression:
 			baseExpr = baseExpr.AsAsExpression().Expression
-		} else if baseExpr.Kind == ast.KindTypeAssertionExpression {
+		case baseExpr.Kind == ast.KindTypeAssertionExpression:
 			baseExpr = baseExpr.AsTypeAssertion().Expression
-		} else {
-			break
+		default:
+			break outer3
 		}
 	}
 
@@ -1641,17 +1704,8 @@ func (processor *chainProcessor) hasSameBaseIdentifier(chain []Operand) bool {
 		base := getBaseIdentifier(op.comparedExpr)
 		if firstBase == nil {
 			firstBase = base
-		} else {
-			firstBaseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, firstBase)
-			baseRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, base)
-			if firstBaseRange.Pos() >= 0 && firstBaseRange.End() <= len(processor.sourceText) &&
-				baseRange.Pos() >= 0 && baseRange.End() <= len(processor.sourceText) {
-				firstBaseText := processor.sourceText[firstBaseRange.Pos():firstBaseRange.End()]
-				baseText := processor.sourceText[baseRange.Pos():baseRange.End()]
-				if firstBaseText != baseText {
-					return false
-				}
-			}
+		} else if !areNodesStructurallyEqual(firstBase, base) {
+			return false
 		}
 	}
 	return true
@@ -1927,7 +1981,7 @@ func (processor *chainProcessor) buildAndChains(operands []Operand) [][]Operand 
 			}
 		}
 
-		if isNullishCheckType(op.typ) && lastCheckType != OperandTypeInvalid {
+		if op.typ.IsNullishCheck() && lastCheckType != OperandTypeInvalid {
 			if !processor.areNullishChecksConsistent(lastCheckType, op.typ) {
 				if len(currentChain) >= 2 {
 					allChains = append(allChains, currentChain)
@@ -1940,7 +1994,7 @@ func (processor *chainProcessor) buildAndChains(operands []Operand) [][]Operand 
 		if cmp == NodeSubset || cmp == NodeEqual {
 			currentChain = append(currentChain, op)
 			lastExpr = op.comparedExpr
-			if op.typ != OperandTypePlain && isNullishCheckType(op.typ) {
+			if op.typ != OperandTypePlain && op.typ.IsNullishCheck() {
 				lastCheckType = op.typ
 			}
 			i++
@@ -2051,14 +2105,11 @@ func (processor *chainProcessor) buildOrChains(operands []Operand) [][]Operand {
 }
 
 func (processor *chainProcessor) shouldStopAtStrictNullishCheck(prevOp Operand) bool {
-	if !isStrictNullishCheck(prevOp.typ) || prevOp.comparedExpr == nil {
+	if !prevOp.typ.IsStrictNullishCheck() || prevOp.comparedExpr == nil {
 		return false
 	}
 
-	prevUnwrapped := prevOp.comparedExpr
-	for ast.IsParenthesizedExpression(prevUnwrapped) {
-		prevUnwrapped = prevUnwrapped.AsParenthesizedExpression().Expression
-	}
+	prevUnwrapped := ast.SkipParentheses(prevOp.comparedExpr)
 
 	isCallOrNew := ast.IsCallExpression(prevUnwrapped) || ast.IsNewExpression(prevUnwrapped)
 	isElementAccess := ast.IsElementAccessExpression(prevUnwrapped)
@@ -2174,7 +2225,7 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 
 	if len(chain) >= 2 {
 		firstOp := chain[0]
-		if isStrictNullishCheck(firstOp.typ) && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
+		if firstOp.typ.IsStrictNullishCheck() && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
 			if !processor.isSplitStrictEqualsPattern(chain) {
 				return nil
 			}
@@ -2313,15 +2364,10 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 // Optional chaining checks for BOTH null AND undefined, so if the chain only checks
 // for one but not both, it's unsafe to convert.
 func (processor *chainProcessor) hasIncompleteNullishCheck(chain []Operand) bool {
-	hasNullCheck := false
-	hasUndefinedCheck := false
-	hasBothCheck := false
-	hasPlainTruthinessCheck := false
-
 	guardOperands := chain
 	if len(chain) >= 2 {
 		lastOp := chain[len(chain)-1]
-		if isTrailingComparisonType(lastOp.typ) {
+		if lastOp.typ.IsTrailingComparison() {
 			guardOperands = chain[:len(chain)-1]
 		} else if lastOp.typ == OperandTypePlain && lastOp.comparedExpr != nil {
 			prevOp := chain[len(chain)-2]
@@ -2335,28 +2381,21 @@ func (processor *chainProcessor) hasIncompleteNullishCheck(chain []Operand) bool
 		}
 	}
 
+	analysis := analyzeNullishChecks(guardOperands, false)
+
 	hasTypeofCheck := false
+	for _, op := range guardOperands {
+		if op.typ == OperandTypeTypeofCheck {
+			hasTypeofCheck = true
+			break
+		}
+	}
+
 	hasTrailingBothCheck := false
 	if len(chain) >= 2 && len(guardOperands) < len(chain) {
 		lastOp := chain[len(chain)-1]
 		if lastOp.typ == OperandTypeNotEqualBoth {
 			hasTrailingBothCheck = true
-		}
-	}
-
-	for _, op := range guardOperands {
-		switch op.typ {
-		case OperandTypePlain:
-			hasPlainTruthinessCheck = true
-		case OperandTypeNotStrictEqualNull:
-			hasNullCheck = true
-		case OperandTypeNotStrictEqualUndef:
-			hasUndefinedCheck = true
-		case OperandTypeNotEqualBoth:
-			hasBothCheck = true
-		case OperandTypeTypeofCheck:
-			hasTypeofCheck = true
-			hasUndefinedCheck = true
 		}
 	}
 
@@ -2378,25 +2417,23 @@ func (processor *chainProcessor) hasIncompleteNullishCheck(chain []Operand) bool
 	strictCheckIsComplete := false
 	if len(guardOperands) > 0 && guardOperands[0].comparedExpr != nil {
 		info := processor.getTypeInfo(guardOperands[0].comparedExpr)
-		if !info.hasAny && !info.hasUnknown {
-			hasNull := info.hasNull
-			hasUndefined := info.hasUndefined
-			hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
-			hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
+		if !info.IsAnyOrUnknown() {
+			hasOnlyNullCheck := analysis.HasNullCheck && !analysis.HasUndefinedCheck
+			hasOnlyUndefinedCheck := !analysis.HasNullCheck && analysis.HasUndefinedCheck
 
-			if hasOnlyNullCheck && hasNull && !hasUndefined {
+			if hasOnlyNullCheck && info.hasNull && !info.hasUndefined {
 				strictCheckIsComplete = true
 			}
-			if hasOnlyUndefinedCheck && hasUndefined && !hasNull {
+			if hasOnlyUndefinedCheck && info.hasUndefined && !info.hasNull {
 				strictCheckIsComplete = true
 			}
 		}
 	}
 
-	if !hasPlainTruthinessCheck && !hasBothCheck && !hasTypeofCheck && !hasTrailingBothCheck && !hasTrailingOptionalChaining && !firstOpNotNullish && !strictCheckIsComplete {
-		hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
-		hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
-		if hasOnlyNullCheck || hasOnlyUndefinedCheck {
+	hasPlainTruthinessCheck := analysis.HasBothCheck
+
+	if !hasPlainTruthinessCheck && !hasTypeofCheck && !hasTrailingBothCheck && !hasTrailingOptionalChaining && !firstOpNotNullish && !strictCheckIsComplete {
+		if analysis.HasIncompleteCheck() {
 			return true
 		}
 	}
@@ -2480,55 +2517,7 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 		return chain
 	}
 
-	hasNullCheck := false
-	hasUndefinedCheck := false
-	hasBothCheck := false
-
-	for _, op := range chain {
-		switch {
-		case op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull:
-			hasNullCheck = true
-		case op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef:
-			hasUndefinedCheck = true
-		case op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull:
-			hasBothCheck = true
-		case op.typ == OperandTypeTypeofCheck:
-			hasUndefinedCheck = true
-		case op.typ == OperandTypeNot:
-			hasBothCheck = true
-		case op.typ == OperandTypeComparison && op.node != nil:
-			unwrapped := op.node
-			for ast.IsParenthesizedExpression(unwrapped) {
-				unwrapped = unwrapped.AsParenthesizedExpression().Expression
-			}
-			if ast.IsBinaryExpression(unwrapped) {
-				binExpr := unwrapped.AsBinaryExpression()
-				binOp := binExpr.OperatorToken.Kind
-				left := binExpr.Left
-				right := binExpr.Right
-				for ast.IsParenthesizedExpression(left) {
-					left = left.AsParenthesizedExpression().Expression
-				}
-				for ast.IsParenthesizedExpression(right) {
-					right = right.AsParenthesizedExpression().Expression
-				}
-
-				isNull := isNullLiteral(left) || isNullLiteral(right)
-				isUndefined := isUndefinedLiteral(left) || isUndefinedLiteral(right)
-
-				if binOp == ast.KindEqualsEqualsToken && (isNull || isUndefined) {
-					hasBothCheck = true
-				} else if binOp == ast.KindEqualsEqualsEqualsToken {
-					if isNull {
-						hasNullCheck = true
-					}
-					if isUndefined {
-						hasUndefinedCheck = true
-					}
-				}
-			}
-		}
-	}
+	analysis := analyzeNullishChecks(chain, true)
 
 	firstOpNotNullish := false
 	hasTrailingOptionalChaining := false
@@ -2551,25 +2540,23 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 			continue
 		}
 		info := processor.getTypeInfo(op.comparedExpr)
-		if !info.hasNull && !info.hasUndefined && !info.hasAny && !info.hasUnknown {
+		if info.HasNoNullableTypes() {
 			continue
 		}
 		hasAnyNullableOperand = true
-		if info.hasAny || info.hasUnknown {
+		if info.IsAnyOrUnknown() {
 			strictCheckIsComplete = false
 			break
 		}
-		if info.hasNull && info.hasUndefined {
+		if info.HasBothNullAndUndefined() {
 			strictCheckIsComplete = false
 			break
 		}
-		hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
-		hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
-		if hasOnlyNullCheck && !info.hasNull && info.hasUndefined {
+		if analysis.HasOnlyNullCheck() && !info.hasNull && info.hasUndefined {
 			strictCheckIsComplete = false
 			break
 		}
-		if hasOnlyUndefinedCheck && info.hasNull && !info.hasUndefined {
+		if analysis.HasOnlyUndefinedCheck() && info.hasNull && !info.hasUndefined {
 			strictCheckIsComplete = false
 			break
 		}
@@ -2578,10 +2565,8 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 		strictCheckIsComplete = false
 	}
 
-	if !hasBothCheck && !firstOpNotNullish && !hasTrailingOptionalChaining && !strictCheckIsComplete {
-		hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck
-		hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck
-		if hasOnlyNullCheck || hasOnlyUndefinedCheck {
+	if !analysis.HasBothCheck && !firstOpNotNullish && !hasTrailingOptionalChaining && !strictCheckIsComplete {
+		if analysis.HasIncompleteCheck() {
 			return nil
 		}
 	}
@@ -2606,10 +2591,7 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 					}
 				case OperandTypeComparison:
 					if op.node != nil {
-						unwrapped := op.node
-						for ast.IsParenthesizedExpression(unwrapped) {
-							unwrapped = unwrapped.AsParenthesizedExpression().Expression
-						}
+						unwrapped := ast.SkipParentheses(op.node)
 						if ast.IsBinaryExpression(unwrapped) {
 							binExpr := unwrapped.AsBinaryExpression()
 							operator := binExpr.OperatorToken.Kind
@@ -2639,7 +2621,7 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 		return nil
 	}
 
-	if hasNullCheck && !hasUndefinedCheck && !hasBothCheck && !strictCheckIsComplete {
+	if analysis.HasNullCheck && !analysis.HasUndefinedCheck && !analysis.HasBothCheck && !strictCheckIsComplete {
 		return nil
 	}
 
@@ -2773,7 +2755,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 					}
 					isAllowedPlainAtEnd := chain[i].typ == OperandTypePlain && i == len(chain)-1 && hasIntermediateNullishComp
 
-					if chain[i].typ != OperandTypeNot && !isSafeComparison && !isIntermediateNullishComp && !isNullishCheckType(chain[i].typ) && !isAllowedPlainAtEnd {
+					if chain[i].typ != OperandTypeNot && !isSafeComparison && !isIntermediateNullishComp && !chain[i].typ.IsNullishCheck() && !isAllowedPlainAtEnd {
 						allNegatedOrSafeComparisonOrNullCheck = false
 						break
 					}
@@ -2946,7 +2928,7 @@ func (processor *chainProcessor) shouldSkipOptimalStrictChecks(chain []Operand) 
 			allStrictChecks = false
 			break
 		}
-		if isStrictNullishCheck(op.typ) {
+		if op.typ.IsStrictNullishCheck() {
 			hasNullishCheck = true
 		}
 	}
@@ -2959,15 +2941,11 @@ func (processor *chainProcessor) shouldSkipOptimalStrictChecks(chain []Operand) 
 		return false
 	}
 
-	// Only skip if type has BOTH null AND undefined (strict check intentionally covers one)
+	// Strict checks (=== null or === undefined) intentionally cover one - skip only when type has BOTH
 	firstOp := chain[0]
 	firstTypeInfo := processor.getTypeInfo(firstOp.comparedExpr)
 
-	if firstTypeInfo.hasNull && firstTypeInfo.hasUndefined {
-		return true
-	}
-
-	return false
+	return firstTypeInfo.HasBothNullAndUndefined()
 }
 
 func (processor *chainProcessor) shouldSkipOrChainOptimalChecks(chain []Operand) bool {
@@ -3460,7 +3438,7 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 			for _, op := range chain {
 				if op.comparedExpr != nil {
 					info := processor.getTypeInfo(op.comparedExpr)
-					if info.hasUndefined || info.hasAny || info.hasUnknown {
+					if info.hasUndefined || info.IsAnyOrUnknown() {
 						useSuggestion = false
 						break
 					}
@@ -3479,7 +3457,7 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 			if isExplicitNullishCheck && isPlainAccess {
 				if firstOp.comparedExpr != nil {
 					info := processor.getTypeInfo(firstOp.comparedExpr)
-					if !info.hasAny && !info.hasUnknown {
+					if !info.IsAnyOrUnknown() {
 						useSuggestion = true
 					}
 				}
@@ -3507,7 +3485,7 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	hasTrailingComparison := false
 	if len(chain) > 0 {
 		lastOp := chain[len(chain)-1]
-		hasTrailingComparison = isComparisonOrNullCheck(lastOp.typ)
+		hasTrailingComparison = lastOp.typ.IsComparisonOrNullCheck()
 	}
 
 	trailingPlainOperand := ""
@@ -3590,7 +3568,7 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	hasTrailingComparisonForFix := false
 	if len(chainForOptional) > 0 {
 		lastOpForFix := chainForOptional[len(chainForOptional)-1]
-		hasTrailingComparisonForFix = isComparisonOrNullCheck(lastOpForFix.typ)
+		hasTrailingComparisonForFix = lastOpForFix.typ.IsComparisonOrNullCheck()
 	}
 
 	if hasTrailingComparisonForFix {
@@ -3678,42 +3656,9 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	if useSuggestion && hasTrailingComparison {
 		strictCheckRequiresSuggestion := false
 		if len(chain) > 0 && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-			hasNullCheck := false
-			hasUndefinedCheck := false
-			hasBothCheck := false
-			for _, op := range chain {
-				switch {
-				case op.typ == OperandTypeNotStrictEqualNull || op.typ == OperandTypeStrictEqualNull:
-					hasNullCheck = true
-				case op.typ == OperandTypeNotStrictEqualUndef || op.typ == OperandTypeStrictEqualUndef:
-					hasUndefinedCheck = true
-				case op.typ == OperandTypeNotEqualBoth || op.typ == OperandTypeEqualNull || op.typ == OperandTypeNot:
-					hasBothCheck = true
-				case op.typ == OperandTypeComparison && isNullishComparison(op):
-					if op.node != nil && ast.IsBinaryExpression(op.node) {
-						binExpr := op.node.AsBinaryExpression()
-						left := ast.SkipParentheses(binExpr.Left)
-						right := ast.SkipParentheses(binExpr.Right)
-						isNull := isNullLiteral(left) || isNullLiteral(right)
-						isUndefined := isUndefinedLiteral(left) || isUndefinedLiteral(right)
-						switch binExpr.OperatorToken.Kind {
-						case ast.KindEqualsEqualsToken:
-							hasBothCheck = true
-						case ast.KindEqualsEqualsEqualsToken:
-							if isNull {
-								hasNullCheck = true
-							}
-							if isUndefined {
-								hasUndefinedCheck = true
-							}
-						}
-					}
-				}
-			}
-			hasOnlyNullCheck := hasNullCheck && !hasUndefinedCheck && !hasBothCheck
-			hasOnlyUndefinedCheck := !hasNullCheck && hasUndefinedCheck && !hasBothCheck
+			analysis := analyzeNullishChecks(chain, true)
 
-			if hasOnlyNullCheck || hasOnlyUndefinedCheck {
+			if analysis.HasIncompleteCheck() {
 				allTypesMatchCheck := true
 				hasAnyNullableType := false
 				for _, op := range chain {
@@ -3721,23 +3666,23 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 						continue
 					}
 					info := processor.getTypeInfo(op.comparedExpr)
-					if !info.hasNull && !info.hasUndefined && !info.hasAny && !info.hasUnknown {
+					if info.HasNoNullableTypes() {
 						continue
 					}
 					hasAnyNullableType = true
-					if info.hasAny || info.hasUnknown {
+					if info.IsAnyOrUnknown() {
 						allTypesMatchCheck = false
 						break
 					}
-					if info.hasNull && info.hasUndefined {
+					if info.HasBothNullAndUndefined() {
 						allTypesMatchCheck = false
 						break
 					}
-					if hasOnlyNullCheck && (!info.hasNull || info.hasUndefined) {
+					if analysis.HasOnlyNullCheck() && (!info.hasNull || info.hasUndefined) {
 						allTypesMatchCheck = false
 						break
 					}
-					if hasOnlyUndefinedCheck && (info.hasNull || !info.hasUndefined) {
+					if analysis.HasOnlyUndefinedCheck() && (info.hasNull || !info.hasUndefined) {
 						allTypesMatchCheck = false
 						break
 					}
@@ -3752,12 +3697,11 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 		}
 	}
 
-	// Safe if type includes BOTH null AND undefined (or any/unknown)
 	if useSuggestion && len(chain) > 0 {
 		for _, op := range chain {
 			if op.comparedExpr != nil {
 				info := processor.getTypeInfo(op.comparedExpr)
-				if info.hasAny || info.hasUnknown || (info.hasNull && info.hasUndefined) {
+				if info.IsAnyOrUnknown() || info.HasBothNullAndUndefined() {
 					useSuggestion = false
 					break
 				}
