@@ -311,7 +311,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			if isTypeParameter {
 				return constraintType
 			}
-
 			return nodeType
 		}
 
@@ -443,6 +442,27 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
+			// Handle indexed access types for element access expressions
+			// e.g., obj[key] where obj: Record<string, T> and key: keyof Obj
+			// In this case, nodeType might be an indexed access type (Obj[Key])
+			// We need to resolve it to the actual element type
+			if skipNode.Kind == ast.KindElementAccessExpression {
+				flags := checker.Type_flags(nodeType)
+				if flags&checker.TypeFlagsIndexedAccess != 0 {
+					// This is an indexed access type (e.g., Obj[Key])
+					// Try to get the actual element type by checking the base type's index signature
+					elemAccess := skipNode.AsElementAccessExpression()
+					baseType := getResolvedType(elemAccess.Expression)
+					if baseType != nil {
+						// Try string index type first
+						stringIndexType := ctx.TypeChecker.GetStringIndexType(baseType)
+						if stringIndexType != nil {
+							// Use the string index type as the element type
+							nodeType = stringIndexType
+						}
+					}
+				}
+			}
 			// Skip array/tuple element access without noUncheckedIndexedAccess
 			//
 			// TypeScript's type system has a soundness hole with array element access:
@@ -792,8 +812,15 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							if prop != nil {
 								exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
 							} else {
-								// Property doesn't exist, might be index signature
-								exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+								// Property doesn't exist, check index signature
+								// For mapped types like {[name in Lowercase<string>]: T}, we need to check string index type
+								stringIndexType := ctx.TypeChecker.GetStringIndexType(nonNullishBase)
+								if stringIndexType != nil {
+									exprType = stringIndexType
+								} else {
+									// Fall back to GetTypeAtLocation
+									exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+								}
 							}
 						} else {
 							exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
@@ -1650,6 +1677,15 @@ func checkTypeCondition(typeChecker *checker.Checker, t *checker.Type) (isTruthy
 		return false, true
 	}
 
+	// Handle indexed access types (e.g., Obj[Key] where Obj: Record<string, 1|2|3>)
+	// Try to resolve them by checking if the base type has an index signature
+	if flags&checker.TypeFlagsIndexedAccess != 0 {
+		// Indexed access types need special handling
+		// For now, treat them as indeterminate (could be truthy or falsy)
+		// unless we can determine the index signature type
+		// TODO: Try to resolve the indexed access to get the actual element type
+		return false, false
+	}
 	// Handle unions - check all parts
 	if utils.IsUnionType(t) {
 		allTruthy := true
