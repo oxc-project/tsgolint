@@ -4,6 +4,11 @@
     "no_unnecessary_type_assertion_options": {
       "type": "object",
       "properties": {
+        "checkLiteralConstAssertions": {
+          "type": "boolean",
+          "description": "Whether to check literal const assertions.",
+          "default": false
+        },
         "typesToIgnore": {
           "type": "array",
           "items": {

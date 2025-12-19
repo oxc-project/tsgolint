@@ -5,6 +5,9 @@ package no_unnecessary_type_assertion
 import "github.com/go-json-experiment/json"
 
 type NoUnnecessaryTypeAssertionOptions struct {
+	// Whether to check literal const assertions.
+	CheckLiteralConstAssertions bool `json:"checkLiteralConstAssertions,omitempty"`
+
 	// TypesToIgnore corresponds to the JSON schema field "typesToIgnore".
 	TypesToIgnore []string `json:"typesToIgnore,omitempty"`
 }
@@ -19,6 +22,9 @@ func (j *NoUnnecessaryTypeAssertionOptions) UnmarshalJSON(value []byte) error {
 	var plain Plain
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
+	}
+	if v, ok := raw["checkLiteralConstAssertions"]; !ok || v == nil {
+		plain.CheckLiteralConstAssertions = false
 	}
 	if v, ok := raw["typesToIgnore"]; !ok || v == nil {
 		plain.TypesToIgnore = []string{}
