@@ -61,6 +61,39 @@ class B implements F.S.T.A {}
 		{Code: `
 interface B extends F.S.T.A {}
     `},
+		// Valid test cases with allowOptionalChaining: true
+		{
+			Code: `
+function foo(x?: { a: number }) {
+  x?.a;
+}
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+		},
+		{
+			Code: `
+function foo(x?: { a: number }, y: string) {
+  x?.[y];
+}
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+		},
+		{
+			Code: `
+function foo(x: { a: number }, y: 'a') {
+  x?.[y];
+}
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+		},
+		{
+			Code: `
+function foo(x: { a: number }, y: NotKnown) {
+  x?.[y];
+}
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -320,6 +353,98 @@ function log(arg: unknown) {}
 					Line:      5,
 					Column:    18,
 					EndColumn: 22,
+				},
+			},
+		},
+		// Invalid test cases with allowOptionalChaining: true
+		// value?.middle.inner - optional on any, but .inner is not optional (reports on .inner)
+		{
+			Code: `
+let value: any;
+
+value?.middle.inner;
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeMemberExpression",
+					Line:      4,
+					Column:    15,
+					EndColumn: 20,
+				},
+			},
+		},
+		// value?.outer.middle.inner - optional on any, reports on .middle (first non-optional after any)
+		{
+			Code: `
+let value: any;
+
+value?.outer.middle.inner;
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeMemberExpression",
+					Line:      4,
+					Column:    14,
+					EndColumn: 20,
+				},
+			},
+		},
+		// value.outer?.middle.inner - not optional at the any level, reports on .outer and .inner
+		{
+			Code: `
+let value: any;
+
+value.outer?.middle.inner;
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeMemberExpression",
+					Line:      4,
+					Column:    21,
+					EndColumn: 26,
+				},
+				{
+					MessageId: "unsafeMemberExpression",
+					Line:      4,
+					Column:    7,
+					EndColumn: 12,
+				},
+			},
+		},
+		// value.outer.middle?.inner - not optional at the any level, reports on .outer
+		{
+			Code: `
+let value: any;
+
+value.outer.middle?.inner;
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeMemberExpression",
+					Line:      4,
+					Column:    7,
+					EndColumn: 12,
+				},
+			},
+		},
+		// x[y] without optional chaining should still report even with allowOptionalChaining: true
+		{
+			Code: `
+function foo(x: { a: number }, y: NotKnown) {
+  x[y];
+}
+      `,
+			Options: NoUnsafeMemberAccessOptions{AllowOptionalChaining: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeComputedMemberAccess",
+					Line:      3,
+					Column:    5,
+					EndColumn: 6,
 				},
 			},
 		},

@@ -9,6 +9,16 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+func isOptionalChain(node *ast.Node) bool {
+	if ast.IsPropertyAccessExpression(node) {
+		return node.AsPropertyAccessExpression().QuestionDotToken != nil
+	}
+	if ast.IsElementAccessExpression(node) {
+		return node.AsElementAccessExpression().QuestionDotToken != nil
+	}
+	return false
+}
+
 func buildUnsafeComputedMemberAccessMessage(property, t string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeComputedMemberAccess",
@@ -32,8 +42,9 @@ func buildUnsafeThisMemberExpressionMessage(property string) rule.RuleMessage {
 type state uint8
 
 const (
-	stateUnsafe state = iota
-	stateSafe   state = iota
+	stateUnsafe  state = iota
+	stateSafe    state = iota
+	stateChained state = iota
 )
 
 func createDataType(t *checker.Type) string {
@@ -46,6 +57,9 @@ func createDataType(t *checker.Type) string {
 var NoUnsafeMemberAccessRule = rule.Rule{
 	Name: "no-unsafe-member-access",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+		opts := utils.UnmarshalOptions[NoUnsafeMemberAccessOptions](options, "no-unsafe-member-access")
+		allowOptionalChaining := opts.AllowOptionalChaining
+
 		compilerOptions := ctx.Program.Options()
 		isNoImplicitThis := utils.IsStrictCompilerOptionEnabled(
 			compilerOptions,
@@ -54,8 +68,21 @@ var NoUnsafeMemberAccessRule = rule.Rule{
 
 		stateCache := map[*ast.Node]state{}
 
+		// Case notes:
+		// value?.outer.middle.inner
+		// The ChainExpression is a child of the root expression, and a parent of all the MemberExpressions.
+		// But the left-most expression is what we want to report on: the inner-most expressions.
+		// In fact, this is true even if the chain is on the inside!
+		// value.outer.middle?.inner;
+		// It was already true that every `object` (MemberExpression) has optional: boolean
+
 		var checkMemberExpression func(node *ast.Node) state
 		checkMemberExpression = func(node *ast.Node) state {
+			if allowOptionalChaining && isOptionalChain(node) {
+				stateCache[node] = stateChained
+				return stateChained
+			}
+
 			cachedState, ok := stateCache[node]
 			if ok {
 				return cachedState
@@ -128,6 +155,11 @@ var NoUnsafeMemberAccessRule = rule.Rule{
 			},
 			ast.KindElementAccessExpression: func(node *ast.Node) {
 				checkMemberExpression(node)
+
+				// Skip computed property check if allowOptionalChaining and this is an optional chain
+				if allowOptionalChaining && isOptionalChain(node) {
+					return
+				}
 
 				arg := node.AsElementAccessExpression().ArgumentExpression
 				// x[1]
