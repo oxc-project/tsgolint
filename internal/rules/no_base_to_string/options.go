@@ -5,6 +5,9 @@ package no_base_to_string
 import "github.com/go-json-experiment/json"
 
 type NoBaseToStringOptions struct {
+	// Whether to also check values of type `unknown`.
+	CheckUnknown bool `json:"checkUnknown,omitempty"`
+
 	// IgnoredTypeNames corresponds to the JSON schema field "ignoredTypeNames".
 	IgnoredTypeNames []string `json:"ignoredTypeNames,omitempty"`
 }
@@ -19,6 +22,9 @@ func (j *NoBaseToStringOptions) UnmarshalJSON(value []byte) error {
 	var plain Plain
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
+	}
+	if v, ok := raw["checkUnknown"]; !ok || v == nil {
+		plain.CheckUnknown = false
 	}
 	if v, ok := raw["ignoredTypeNames"]; !ok || v == nil {
 		plain.IgnoredTypeNames = []string{

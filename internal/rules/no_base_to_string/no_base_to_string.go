@@ -194,6 +194,9 @@ var NoBaseToStringRule = rule.Rule{
 					return collectToStringCertainty(constraint, visited)
 				}
 				// unconstrained generic means `unknown`
+				if opts.CheckUnknown {
+					return usefulnessSometimes
+				}
 				return usefulnessAlways
 			}
 
@@ -231,7 +234,11 @@ var NoBaseToStringRule = rule.Rule{
 				toString = checker.Checker_getPropertyOfType(ctx.TypeChecker, t, "toLocaleString")
 			}
 			if toString == nil {
-				// e.g. any/unknown
+				// unknown
+				if opts.CheckUnknown && utils.IsTypeFlagSet(t, checker.TypeFlagsUnknown) {
+					return usefulnessSometimes
+				}
+				// e.g. any
 				return usefulnessAlways
 			}
 

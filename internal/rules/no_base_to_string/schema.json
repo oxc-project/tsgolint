@@ -4,6 +4,11 @@
     "no_base_to_string_options": {
       "type": "object",
       "properties": {
+        "checkUnknown": {
+          "type": "boolean",
+          "description": "Whether to also check values of type `unknown`.",
+          "default": false
+        },
         "ignoredTypeNames": {
           "type": "array",
           "items": {
