@@ -12,13 +12,11 @@ import (
 // Source: https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/tests/rules/prefer-optional-chain/base-cases.ts
 type BaseCase struct {
 	ID          int
-	Chain       string // The input chain expression (with ${operator} placeholder)
-	Declaration string // Type declarations
-	OutputChain string // Expected output
+	Chain       string
+	Declaration string
+	OutputChain string
 }
 
-// RawBaseCases returns all 26 base cases from upstream
-// These are the core test cases that get transformed with different operators and mutations
 func RawBaseCases() []BaseCase {
 	return []BaseCase{
 		// chained members
@@ -142,6 +140,7 @@ func RawBaseCases() []BaseCase {
 			Declaration: "declare const foo: {bar: {baz: {buzz: (() => number) | null | undefined}} | null | undefined} | null | undefined;",
 			OutputChain: "foo?.bar?.baz.buzz?.();",
 		},
+		// case with a call expr inside the chain for some inefficient reason
 		{
 			ID:          20,
 			Chain:       "foo.bar ${operator} foo.bar() ${operator} foo.bar().baz ${operator} foo.bar().baz.buzz ${operator} foo.bar().baz.buzz();",
@@ -189,26 +188,21 @@ func RawBaseCases() []BaseCase {
 	}
 }
 
-// MutateFn is a function that transforms a string
 type MutateFn func(string) string
-
-// Identity returns the input unchanged
 func Identity(s string) string {
 	return s
 }
 
-// BaseCaseOptions configures how base cases are generated
 type BaseCaseOptions struct {
-	Operator           string       // "&&" or "||"
-	MutateCode         MutateFn     // Transform the input code
-	MutateDeclaration  MutateFn     // Transform the declaration
-	MutateOutput       MutateFn     // Transform the output (defaults to MutateCode)
-	SkipIDs            map[int]bool // IDs to skip
-	UseSuggestionFixer bool         // Use suggestion instead of direct fix
-	Options            any          // Rule options (PreferOptionalChainOptions or nil)
+	Operator           string // "&&" or "||"
+	MutateCode         MutateFn
+	MutateDeclaration  MutateFn
+	MutateOutput       MutateFn
+	SkipIDs            map[int]bool
+	UseSuggestionFixer bool
+	Options            *PreferOptionalChainOptions
 }
 
-// GenerateBaseCases creates test cases from the base cases with the given options
 func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 	if opts.MutateCode == nil {
 		opts.MutateCode = Identity
@@ -221,10 +215,11 @@ func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 	}
 	if opts.Options == nil {
 		if opts.UseSuggestionFixer {
-			// When using suggestion fixer, don't set the unsafe option so the rule uses suggestions
-			opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{}`)
+			defaultOpts := rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{}`)
+			opts.Options = &defaultOpts
 		} else {
-			opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`)
+			defaultOpts := rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": true}`)
+			opts.Options = &defaultOpts
 		}
 	}
 
@@ -234,16 +229,12 @@ func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 			continue
 		}
 
-		// Replace operator placeholder
 		chain := strings.ReplaceAll(bc.Chain, "${operator}", opts.Operator)
 		outputChain := bc.OutputChain
-
-		// Apply mutations
 		declaration := opts.MutateDeclaration(bc.Declaration)
 		code := opts.MutateCode(chain)
 		output := opts.MutateOutput(outputChain)
 
-		// Build full code with comment and declaration
 		fullCode := fmt.Sprintf("// %d\n%s\n%s", bc.ID, declaration, code)
 		fullOutput := fmt.Sprintf("// %d\n%s\n%s", bc.ID, declaration, output)
 
@@ -273,7 +264,6 @@ func GenerateBaseCases(opts BaseCaseOptions) []rule_tester.InvalidTestCase {
 	return result
 }
 
-// GenerateValidBaseCases creates valid test cases (no fix expected) from base cases
 func GenerateValidBaseCases(opts BaseCaseOptions) []rule_tester.ValidTestCase {
 	if opts.MutateCode == nil {
 		opts.MutateCode = Identity
@@ -282,7 +272,8 @@ func GenerateValidBaseCases(opts BaseCaseOptions) []rule_tester.ValidTestCase {
 		opts.MutateDeclaration = Identity
 	}
 	if opts.Options == nil {
-		opts.Options = rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{}`)
+		defaultOpts := rule_tester.OptionsFromJSON[PreferOptionalChainOptions](`{}`)
+		opts.Options = &defaultOpts
 	}
 
 	var result []rule_tester.ValidTestCase
@@ -291,16 +282,10 @@ func GenerateValidBaseCases(opts BaseCaseOptions) []rule_tester.ValidTestCase {
 			continue
 		}
 
-		// Replace operator placeholder
 		chain := strings.ReplaceAll(bc.Chain, "${operator}", opts.Operator)
-
-		// Apply mutations
 		declaration := opts.MutateDeclaration(bc.Declaration)
 		code := opts.MutateCode(chain)
-
-		// Build full code with comment and declaration
 		fullCode := fmt.Sprintf("// %d\n%s\n%s", bc.ID, declaration, code)
-
 		result = append(result, rule_tester.ValidTestCase{
 			Code:    fullCode,
 			Options: opts.Options,
@@ -311,96 +296,62 @@ func GenerateValidBaseCases(opts BaseCaseOptions) []rule_tester.ValidTestCase {
 }
 
 // Common mutation functions matching upstream
-
-// ReplaceOperatorWithNotEqualNull replaces && with != null &&
 func ReplaceOperatorWithNotEqualNull(s string) string {
 	return strings.ReplaceAll(s, "&&", "!= null &&")
 }
-
-// ReplaceOperatorWithNotEqualUndefined replaces && with != undefined &&
 func ReplaceOperatorWithNotEqualUndefined(s string) string {
 	return strings.ReplaceAll(s, "&&", "!= undefined &&")
 }
-
-// ReplaceOperatorWithStrictNotEqualNull replaces && with !== null &&
 func ReplaceOperatorWithStrictNotEqualNull(s string) string {
 	return strings.ReplaceAll(s, "&&", "!== null &&")
 }
-
-// ReplaceOperatorWithStrictNotEqualUndefined replaces && with !== undefined &&
 func ReplaceOperatorWithStrictNotEqualUndefined(s string) string {
 	return strings.ReplaceAll(s, "&&", "!== undefined &&")
 }
-
-// RemoveNullFromType removes | null from type declarations
 func RemoveNullFromType(s string) string {
 	return strings.ReplaceAll(s, "| null", "")
 }
-
-// RemoveUndefinedFromType removes | undefined from type declarations
 func RemoveUndefinedFromType(s string) string {
 	return strings.ReplaceAll(s, "| undefined", "")
 }
-
-// AddTrailingAnd appends && bing to the chain
 func AddTrailingAnd(s string) string {
 	return strings.Replace(s, ";", " && bing;", 1)
 }
-
-// AddTrailingAndBingBong appends && bing.bong to the chain
 func AddTrailingAndBingBong(s string) string {
 	return strings.Replace(s, ";", " && bing.bong;", 1)
 }
 
-// OR operator mutations
-
-// ReplaceOperatorWithEqualNull replaces || with == null ||
 func ReplaceOperatorWithEqualNull(s string) string {
 	return strings.ReplaceAll(s, "||", "== null ||")
 }
-
-// ReplaceOperatorWithEqualUndefined replaces || with == undefined ||
 func ReplaceOperatorWithEqualUndefined(s string) string {
 	return strings.ReplaceAll(s, "||", "== undefined ||")
 }
-
-// ReplaceOperatorWithStrictEqualNull replaces || with === null ||
 func ReplaceOperatorWithStrictEqualNull(s string) string {
 	return strings.ReplaceAll(s, "||", "=== null ||")
 }
-
-// ReplaceOperatorWithStrictEqualUndefined replaces || with === undefined ||
 func ReplaceOperatorWithStrictEqualUndefined(s string) string {
 	return strings.ReplaceAll(s, "||", "=== undefined ||")
 }
 
-// AddTrailingSemicolonCheck returns a function that wraps another function and adds
-// a trailing equality check to the semicolon
-// e.g., "foo;" becomes "foo === null;" for OR chains
 func AddTrailingStrictEqualNull(fn MutateFn) MutateFn {
 	return func(s string) string {
 		s = fn(s)
 		return strings.Replace(s, ";", " === null;", 1)
 	}
 }
-
-// AddTrailingStrictEqualUndefined returns a function that adds trailing "=== undefined" check
 func AddTrailingStrictEqualUndefined(fn MutateFn) MutateFn {
 	return func(s string) string {
 		s = fn(s)
 		return strings.Replace(s, ";", " === undefined;", 1)
 	}
 }
-
-// AddTrailingEqualNull returns a function that adds trailing "== null" check
 func AddTrailingEqualNull(fn MutateFn) MutateFn {
 	return func(s string) string {
 		s = fn(s)
 		return strings.Replace(s, ";", " == null;", 1)
 	}
 }
-
-// AddTrailingEqualUndefined returns a function that adds trailing "== undefined" check
 func AddTrailingEqualUndefined(fn MutateFn) MutateFn {
 	return func(s string) string {
 		s = fn(s)
@@ -408,66 +359,24 @@ func AddTrailingEqualUndefined(fn MutateFn) MutateFn {
 	}
 }
 
-// NegateExpression adds ! prefix to negate the expression for OR chains
-func NegateExpression(s string) string {
-	// This is simplified - upstream has more complex logic
-	return "!" + s
-}
-
-// NegateChainOperands negates each operand in a chain separated by the given operator
-// For example: "foo || foo.bar" becomes "!foo || !foo.bar"
-func NegateChainOperands(s string, operator string) string {
-	// Remove trailing semicolon for processing
-	hasSemicolon := strings.HasSuffix(s, ";")
-	if hasSemicolon {
-		s = s[:len(s)-1]
-	}
-
-	// Split by operator
-	parts := strings.Split(s, " "+operator+" ")
-	for i, part := range parts {
-		part = strings.TrimSpace(part)
-		if part != "" && !strings.HasPrefix(part, "!") {
-			parts[i] = "!" + part
-		}
-	}
-
-	result := strings.Join(parts, " "+operator+" ")
-	if hasSemicolon {
-		result += ";"
-	}
-	return result
-}
-
-// AddSpacingAfterDots adds extra spaces after dots in property access
 func AddSpacingAfterDots(s string) string {
 	return strings.ReplaceAll(s, ".", ".      ")
 }
-
-// AddNewlineAfterDots adds newlines after dots in property access
 func AddNewlineAfterDots(s string) string {
 	return strings.ReplaceAll(s, ".", ".\n")
 }
 
-// bracketContentRegex matches content inside square brackets [...]
 var bracketContentRegex = regexp.MustCompile(`\[[^\]]+\]`)
-
-// AddSpacingInsideBrackets preserves spacing only inside computed property brackets [...]
-// Matches upstream: c.replaceAll(/(\[.+])/g, m => m.replaceAll('.', '.      '))
 func AddSpacingInsideBrackets(s string) string {
 	return bracketContentRegex.ReplaceAllStringFunc(s, func(match string) string {
 		return strings.ReplaceAll(match, ".", ".      ")
 	})
 }
-
-// AddNewlineInsideBrackets preserves newlines only inside computed property brackets [...]
 func AddNewlineInsideBrackets(s string) string {
 	return bracketContentRegex.ReplaceAllStringFunc(s, func(match string) string {
 		return strings.ReplaceAll(match, ".", ".\n")
 	})
 }
-
-// DedupeInvalidTestCases removes duplicate test cases based on Code field
 func DedupeInvalidTestCases(cases ...[]rule_tester.InvalidTestCase) []rule_tester.InvalidTestCase {
 	seen := make(map[string]bool)
 	var result []rule_tester.InvalidTestCase
