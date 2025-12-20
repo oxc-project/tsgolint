@@ -403,37 +403,23 @@ foo(baz!);
 declare const foo: any;
 foo!;
 		`},
+		{Code: "const a = `a` as const;"},
+		{Code: "const a = 'a' as const;"},
+		{Code: "<const>'a';"},
+		{Code: `
+class T {
+  readonly a = 'a' as const;
+}
+		`},
+		{Code: `
+enum T {
+  Value1,
+  Value2,
+}
+declare const a: T.Value1;
+const b = a as const;
+		`},
 	}, []rule_tester.InvalidTestCase{
-		{
-			Code:   "const a = `a` as const;",
-			Output: []string{"const a = `a`;"},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "unnecessaryAssertion",
-					Line:      1,
-				},
-			},
-		},
-		{
-			Code:   "const a = 'a' as const;",
-			Output: []string{"const a = 'a';"},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "unnecessaryAssertion",
-					Line:      1,
-				},
-			},
-		},
-		{
-			Code:   "const a = <const>'a';",
-			Output: []string{"const a = 'a';"},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "unnecessaryAssertion",
-					Line:      1,
-				},
-			},
-		},
 		{
 			Code:   "const foo = <3>3;",
 			Output: []string{"const foo = 3;"},
@@ -1260,25 +1246,6 @@ var x = 1;
 		{
 			Code: `
 class T {
-  readonly a = 'a' as const;
-}
-      `,
-			Output: []string{`
-class T {
-  readonly a = 'a';
-}
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "unnecessaryAssertion",
-					Line:      3,
-				},
-			},
-		},
-		{
-			Code: `
-class T {
   readonly a = 3 as 3;
 }
       `,
@@ -1381,32 +1348,6 @@ const b = a;
 		},
 		{
 			Code: `
-enum T {
-  Value1,
-  Value2,
-}
-
-declare const a: T.Value1;
-const b = a as const;
-      `,
-			Output: []string{`
-enum T {
-  Value1,
-  Value2,
-}
-
-declare const a: T.Value1;
-const b = a;
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "unnecessaryAssertion",
-				},
-			},
-		},
-		{
-			Code: `
 const foo: unknown = {};
 const bar: unknown = foo!;
       `,
@@ -1475,6 +1416,153 @@ class Foo extends Promise {}
 declare const bar: Promise<Foo>;
 bar;
 			`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		// Tests with checkLiteralConstAssertions: true
+		{
+			Code:    "const a = true as const;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = true;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = <const>true;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = true;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = 1 as const;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = 1;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = <const>1;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = 1;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = 1n as const;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = 1n;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = <const>1n;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = 1n;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = `a` as const;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = `a`;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = 'a' as const;",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = 'a';"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code:    "const a = <const>'a';",
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output:  []string{"const a = 'a';"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      1,
+				},
+			},
+		},
+		{
+			Code: `
+class T {
+  readonly a = 'a' as const;
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output: []string{`
+class T {
+  readonly a = 'a';
+}
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+				},
+			},
+		},
+		{
+			Code: `
+enum T {
+  Value1,
+  Value2,
+}
+
+declare const a: T.Value1;
+const b = a as const;
+      `,
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"checkLiteralConstAssertions": true}`),
+			Output: []string{`
+enum T {
+  Value1,
+  Value2,
+}
+
+declare const a: T.Value1;
+const b = a;
+      `,
+			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",

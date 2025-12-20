@@ -182,6 +182,10 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return castHasUndefined && uncastPartsCount == castPartsCount
 		}
 
+		isTypeLiteral := func(t *checker.Type) bool {
+			return utils.IsTypeFlagSet(t, checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral)
+		}
+
 		checkTypeAssertion := func(node *ast.Node) {
 			typeNode := node.Type()
 			if slices.Contains(opts.TypesToIgnore, strings.TrimSpace(ctx.SourceFile.Text()[typeNode.Pos():typeNode.End()])) {
@@ -189,20 +193,25 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			castType := ctx.TypeChecker.GetTypeAtLocation(node)
+			castTypeIsLiteral := isTypeLiteral(castType)
+			typeAnnotationIsConstAssertion := isConstAssertion(typeNode)
 
-			if !utils.IsTypeFlagSet(castType, checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral) {
-				if isConstAssertion(typeNode) {
-					return
-				}
-			} else {
-				if !isImplicitlyNarrowedLiteralDeclaration(node) {
-					return
-				}
+			if !opts.CheckLiteralConstAssertions && castTypeIsLiteral && typeAnnotationIsConstAssertion {
+				return
 			}
 
 			expression := node.Expression()
 			uncastType := ctx.TypeChecker.GetTypeAtLocation(expression)
-			if !isTypeUnchanged(uncastType, castType) {
+			typeIsUnchanged := isTypeUnchanged(uncastType, castType)
+
+			var wouldSameTypeBeInferred bool
+			if castTypeIsLiteral {
+				wouldSameTypeBeInferred = isImplicitlyNarrowedLiteralDeclaration(node)
+			} else {
+				wouldSameTypeBeInferred = !typeAnnotationIsConstAssertion
+			}
+
+			if !typeIsUnchanged || !wouldSameTypeBeInferred {
 				return
 			}
 

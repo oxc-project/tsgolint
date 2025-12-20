@@ -487,15 +487,6 @@ declare const bb: ExtendedGuildChannel;
 bb.toString();
     `},
 			{Code: `
-function foo<T>(x: T) {
-  String(x);
-}
-    `},
-			{Code: `
-declare const u: unknown;
-String(u);
-    `},
-			{Code: `
 type Value = string | Value[];
 declare const v: Value;
 
@@ -523,7 +514,109 @@ String(v);
 declare const v: ('foo' | 'bar')[][];
 String(v);
     `},
+			// unknown type - valid by default (checkUnknown: false)
+			{Code: "declare const x: unknown;\n`${x})`;\n"},
+			{Code: "declare const x: unknown;\nx.toString();\n"},
+			{Code: "declare const x: unknown;\nx.toLocaleString();\n"},
+			{Code: "declare const x: unknown;\n'' + x;\n"},
+			{Code: "declare const x: unknown;\nString(x);\n"},
+			{Code: "declare const x: unknown;\n'' += x;\n"},
+			// unconstrained generic - valid by default (checkUnknown: false)
+			{Code: "function foo<T>(x: T) {\n  String(x);\n}\n"},
+			// any type - always valid
+			{Code: "declare const x: any;\n`${x})`;\n"},
+			{Code: "declare const x: any;\nx.toString();\n"},
+			{Code: "declare const x: any;\nx.toLocaleString();\n"},
+			{Code: "declare const x: any;\n'' + x;\n"},
+			{Code: "declare const x: any;\nString(x);\n"},
+			{Code: "declare const x: any;\n'' += x;\n"},
 		}), []rule_tester.InvalidTestCase{
+		// Tests with checkUnknown: true
+		{
+			Code: `
+declare const x: unknown;
+` + "`" + `${x})` + "`" + `;
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: unknown;
+x.toString();
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: unknown;
+x.toLocaleString();
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: unknown;
+'' + x;
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: unknown;
+String(x);
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: unknown;
+'' += x;
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+function foo<T>(x: T) {
+  String(x);
+}
+      `,
+			Options: NoBaseToStringOptions{CheckUnknown: true},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
 		{
 			Code: "`${{}})`;",
 			Errors: []rule_tester.InvalidTestCaseError{
