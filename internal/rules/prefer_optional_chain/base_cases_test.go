@@ -189,6 +189,7 @@ func RawBaseCases() []BaseCase {
 }
 
 type MutateFn func(string) string
+
 func Identity(s string) string {
 	return s
 }
@@ -367,6 +368,7 @@ func AddNewlineAfterDots(s string) string {
 }
 
 var bracketContentRegex = regexp.MustCompile(`\[[^\]]+\]`)
+
 func AddSpacingInsideBrackets(s string) string {
 	return bracketContentRegex.ReplaceAllStringFunc(s, func(match string) string {
 		return strings.ReplaceAll(match, ".", ".      ")

@@ -213,3 +213,53 @@ func IsStrictCompilerOptionEnabled(
 	// 		isStrictCompilerOptionEnabled(options, "strictNullChecks"))
 	// );
 }
+
+// AST Node Helpers
+
+func IsNullLiteral(node *ast.Node) bool {
+	return node != nil && node.Kind == ast.KindNullKeyword
+}
+
+func IsUndefinedIdentifier(node *ast.Node) bool {
+	return node != nil && ast.IsIdentifier(node) && node.AsIdentifier().Text == "undefined"
+}
+
+func IsVoidExpression(node *ast.Node) bool {
+	return node != nil && ast.IsVoidExpression(node)
+}
+
+func IsUndefinedLiteral(node *ast.Node) bool {
+	return IsUndefinedIdentifier(node) || IsVoidExpression(node)
+}
+
+func IsNullishLiteral(node *ast.Node) bool {
+	return IsNullLiteral(node) || IsUndefinedLiteral(node)
+}
+
+func IsNullLiteralOrUndefinedIdentifier(node *ast.Node) bool {
+	return IsNullLiteral(node) || IsUndefinedIdentifier(node)
+}
+
+func IsLiteralValue(node *ast.Node) bool {
+	if node == nil {
+		return false
+	}
+	switch node.Kind {
+	case ast.KindNumericLiteral,
+		ast.KindStringLiteral,
+		ast.KindTrueKeyword,
+		ast.KindFalseKeyword,
+		ast.KindObjectLiteralExpression,
+		ast.KindArrayLiteralExpression:
+		return true
+	}
+	return false
+}
+
+func IsPropertyOrElementAccess(node *ast.Node) bool {
+	return ast.IsPropertyAccessExpression(node) || ast.IsElementAccessExpression(node)
+}
+
+func IsAccessExpression(node *ast.Node) bool {
+	return ast.IsPropertyAccessExpression(node) || ast.IsElementAccessExpression(node) || ast.IsCallExpression(node)
+}

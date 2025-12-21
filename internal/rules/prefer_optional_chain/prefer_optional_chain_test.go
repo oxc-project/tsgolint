@@ -3777,7 +3777,7 @@ foo.bar?.() !== undefined && foo.bar?.().baz;
 	// but if the type is just `| null` - then it covers the cases and is
 	// a valid conversion
 	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
-		Operator:           "||",
+		Operator: "||",
 		// We need to ensure the final operand is also a "valid" `||` check
 		MutateCode:         AddTrailingStrictEqualNull(ReplaceOperatorWithStrictEqualNull),
 		MutateDeclaration:  RemoveUndefinedFromType,
@@ -3787,7 +3787,7 @@ foo.bar?.() !== undefined && foo.bar?.().baz;
 
 	// == null
 	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
-		Operator:     "||",
+		Operator: "||",
 		// We need to ensure the final operand is also a "valid" `||` check
 		MutateCode:   AddTrailingEqualNull(ReplaceOperatorWithEqualNull),
 		MutateOutput: AddTrailingEqualNull(Identity),
@@ -3850,7 +3850,7 @@ foo.bar?.() === undefined || foo.bar?.().baz;
 
 	// == undefined
 	invalidCases = append(invalidCases, GenerateBaseCases(BaseCaseOptions{
-		Operator:     "||",
+		Operator: "||",
 		// We need to ensure the final operand is also a "valid" `||` check
 		MutateCode:   AddTrailingEqualUndefined(ReplaceOperatorWithEqualUndefined),
 		MutateOutput: AddTrailingEqualUndefined(Identity),

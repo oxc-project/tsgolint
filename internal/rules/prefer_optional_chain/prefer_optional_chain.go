@@ -23,26 +23,6 @@ func buildOptionalChainSuggestMessage() rule.RuleMessage {
 	}
 }
 
-func isNullLiteral(node *ast.Node) bool {
-	return node != nil && node.Kind == ast.KindNullKeyword
-}
-
-func isUndefinedIdentifier(node *ast.Node) bool {
-	return node != nil && ast.IsIdentifier(node) && node.AsIdentifier().Text == "undefined"
-}
-
-func isVoidUndefined(node *ast.Node) bool {
-	return node != nil && ast.IsVoidExpression(node)
-}
-
-func isUndefinedLiteral(node *ast.Node) bool {
-	return isUndefinedIdentifier(node) || isVoidUndefined(node)
-}
-
-func isNullishLiteral(node *ast.Node) bool {
-	return isNullLiteral(node) || isUndefinedLiteral(node)
-}
-
 type OperandType int
 
 const (
@@ -115,11 +95,11 @@ func isComparisonAgainst(op Operand, predicate func(*ast.Node) bool) bool {
 }
 
 func isNullishComparison(op Operand) bool {
-	return isComparisonAgainst(op, isNullishLiteral)
+	return isComparisonAgainst(op, utils.IsNullishLiteral)
 }
 
 func isStrictNullComparison(op Operand) bool {
-	return isComparisonAgainst(op, isNullLiteral)
+	return isComparisonAgainst(op, utils.IsNullLiteral)
 }
 
 func isOrChainNullishCheck(op Operand) bool {
@@ -134,18 +114,20 @@ func isOrChainNullishCheck(op Operand) bool {
 }
 
 func isNullishCheckOperand(op Operand) bool {
-	if op.typ == OperandTypeNotStrictEqualNull ||
-		op.typ == OperandTypeNotStrictEqualUndef ||
-		op.typ == OperandTypeNotEqualBoth ||
-		op.typ == OperandTypeStrictEqualNull ||
-		op.typ == OperandTypeStrictEqualUndef ||
-		op.typ == OperandTypeEqualNull {
+	// Use IsNullishCheck for most types, but exclude OperandTypeTypeofCheck
+	// which is technically a nullish check but not for this function's purpose
+	switch op.typ {
+	case OperandTypeNotStrictEqualNull, OperandTypeNotStrictEqualUndef,
+		OperandTypeNotEqualBoth, OperandTypeStrictEqualNull,
+		OperandTypeStrictEqualUndef, OperandTypeEqualNull:
 		return true
-	}
-	if op.typ == OperandTypeComparison && op.node != nil {
+	case OperandTypeComparison:
+		if op.node == nil {
+			return false
+		}
 		if bin := unwrapBinary(op.node); bin != nil {
-			return isNullLiteral(bin.right) || isUndefinedIdentifier(bin.right) ||
-				isNullLiteral(bin.left) || isUndefinedIdentifier(bin.left)
+			return utils.IsNullLiteral(bin.right) || utils.IsUndefinedIdentifier(bin.right) ||
+				utils.IsNullLiteral(bin.left) || utils.IsUndefinedIdentifier(bin.left)
 		}
 	}
 	return false
@@ -196,8 +178,8 @@ func analyzeNullishChecks(chain []Operand, orChainMode bool) NullishCheckAnalysi
 			}
 		case OperandTypeComparison:
 			if bin := unwrapBinary(op.node); bin != nil {
-				isNull := isNullLiteral(bin.left) || isNullLiteral(bin.right)
-				isUndefined := isUndefinedLiteral(bin.left) || isUndefinedLiteral(bin.right)
+				isNull := utils.IsNullLiteral(bin.left) || utils.IsNullLiteral(bin.right)
+				isUndefined := utils.IsUndefinedLiteral(bin.left) || utils.IsUndefinedLiteral(bin.right)
 
 				if bin.operator == ast.KindEqualsEqualsToken && (isNull || isUndefined) {
 					analysis.HasBothCheck = true
@@ -677,13 +659,11 @@ type chainProcessor struct {
 	ctx                rule.RuleContext
 	opts               PreferOptionalChainOptions
 	sourceText         string
-	seenLogicals       map[*ast.Node]bool
-	processedAndRanges []textRange
-	seenLogicalRanges  map[textRange]bool
-	reportedRanges     map[textRange]bool
+	seenRanges         map[textRange]bool
 	typeCache          map[*ast.Node]*TypeInfo
 	flattenCache       map[*ast.Node][]ChainPart
 	callSigCache       map[*ast.Node]map[string]string
+	optionalChainCache map[*ast.Node]bool
 }
 
 func newChainProcessor(ctx rule.RuleContext, opts PreferOptionalChainOptions) *chainProcessor {
@@ -691,13 +671,11 @@ func newChainProcessor(ctx rule.RuleContext, opts PreferOptionalChainOptions) *c
 		ctx:                ctx,
 		opts:               opts,
 		sourceText:         ctx.SourceFile.Text(),
-		seenLogicals:       make(map[*ast.Node]bool, 16),
-		processedAndRanges: make([]textRange, 0, 8),
-		seenLogicalRanges:  make(map[textRange]bool, 16),
-		reportedRanges:     make(map[textRange]bool, 8),
+		seenRanges:         make(map[textRange]bool, 16),
 		typeCache:          make(map[*ast.Node]*TypeInfo, 32),
 		flattenCache:       make(map[*ast.Node][]ChainPart, 16),
 		callSigCache:       make(map[*ast.Node]map[string]string, 8),
+		optionalChainCache: make(map[*ast.Node]bool, 16),
 	}
 }
 
@@ -794,10 +772,6 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 }
 
 func (processor *chainProcessor) validateChainRoot(node *ast.Node, operatorKind ast.Kind) (*ast.BinaryExpression, bool) {
-	if !ast.IsBinaryExpression(node) {
-		return nil, false
-	}
-
 	binExpr := node.AsBinaryExpression()
 	if binExpr.OperatorToken.Kind != operatorKind {
 		return nil, false
@@ -810,99 +784,10 @@ func (processor *chainProcessor) validateChainRoot(node *ast.Node, operatorKind 
 	return binExpr, true
 }
 
-func (processor *chainProcessor) isAndChainAlreadySeen(node *ast.Node) bool {
-	if processor.seenLogicals[node] {
-		return true
-	}
-
-	nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-	nodeStart, nodeEnd := nodeRange.Pos(), nodeRange.End()
-
-	for _, processedRange := range processor.processedAndRanges {
-		if nodeStart < processedRange.end && processedRange.start < nodeEnd {
-			processor.seenLogicals[node] = true
-			return true
-		}
-	}
-	return false
-}
-
-func (processor *chainProcessor) isOrChainAlreadySeen(node *ast.Node) bool {
+func (processor *chainProcessor) isChainAlreadySeen(node *ast.Node) bool {
 	nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
 	nodeTextRange := textRange{start: nodeRange.Pos(), end: nodeRange.End()}
-	return processor.seenLogicalRanges[nodeTextRange]
-}
-
-func (processor *chainProcessor) markAndChainAsSeen(node *ast.Node) {
-	nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-	nodeStart, nodeEnd := nodeRange.Pos(), nodeRange.End()
-	processor.processedAndRanges = append(processor.processedAndRanges, textRange{start: nodeStart, end: nodeEnd})
-}
-
-func (processor *chainProcessor) markOrChainAsSeen(node *ast.Node) {
-	nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-	nodeTextRange := textRange{start: nodeRange.Pos(), end: nodeRange.End()}
-	processor.seenLogicalRanges[nodeTextRange] = true
-}
-
-func (processor *chainProcessor) isOrChainNestedInLargerChain(node *ast.Node) bool {
-	parent := node.Parent
-	for parent != nil {
-		if ast.IsParenthesizedExpression(parent) {
-			parent = parent.Parent
-			continue
-		}
-		if ast.IsBinaryExpression(parent) {
-			parentBin := parent.AsBinaryExpression()
-			if parentBin.OperatorToken.Kind == ast.KindBarBarToken {
-				leftUnwrapped := ast.SkipParentheses(parentBin.Left)
-				rightUnwrapped := ast.SkipParentheses(parentBin.Right)
-				if leftUnwrapped == node || rightUnwrapped == node {
-					return true
-				}
-			}
-		}
-		break
-	}
-	return false
-}
-
-func (processor *chainProcessor) flattenAndMarkLogicals(node *ast.Node, operatorKind ast.Kind) []*ast.Node {
-	unwrapped := ast.SkipParentheses(node)
-	if !ast.IsBinaryExpression(unwrapped) {
-		return nil
-	}
-	binExpr := unwrapped.AsBinaryExpression()
-	if binExpr.OperatorToken.Kind != operatorKind {
-		return nil
-	}
-
-	processor.seenLogicals[node] = true
-	processor.seenLogicals[unwrapped] = true
-
-	result := []*ast.Node{node, unwrapped}
-	result = append(result, processor.flattenAndMarkLogicals(binExpr.Left, operatorKind)...)
-	result = append(result, processor.flattenAndMarkLogicals(binExpr.Right, operatorKind)...)
-	return result
-}
-
-func (processor *chainProcessor) hasAnyOperandBeenReported(operandNodes []*ast.Node) bool {
-	for _, n := range operandNodes {
-		opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-		opTextRange := textRange{start: opRange.Pos(), end: opRange.End()}
-		if processor.reportedRanges[opTextRange] {
-			return true
-		}
-	}
-	return false
-}
-
-func (processor *chainProcessor) markChainOperandsAsReported(chain []Operand) {
-	for _, op := range chain {
-		opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.node)
-		opTextRange := textRange{start: opRange.Pos(), end: opRange.End()}
-		processor.reportedRanges[opTextRange] = true
-	}
+	return processor.seenRanges[nodeTextRange]
 }
 
 func (processor *chainProcessor) reportChainWithFixes(node *ast.Node, fixes []rule.RuleFix, useSuggestion bool) {
@@ -957,8 +842,8 @@ func (processor *chainProcessor) isInvalidOrChainStartingOperand(op Operand) boo
 		return false
 	}
 
-	isLeftNullish := isNullishLiteral(bin.left)
-	isRightNullish := isNullishLiteral(bin.right)
+	isLeftNullish := utils.IsNullishLiteral(bin.left)
+	isRightNullish := utils.IsNullishLiteral(bin.right)
 
 	if !isLeftNullish && !isRightNullish {
 		return false
@@ -1137,16 +1022,6 @@ func (processor *chainProcessor) typeIsAnyOrUnknown(node *ast.Node) bool {
 	return true
 }
 
-func (processor *chainProcessor) typeIncludesNull(node *ast.Node) bool {
-	info := processor.getTypeInfo(node)
-	return info.hasNull || info.hasAny || info.hasUnknown
-}
-
-func (processor *chainProcessor) typeIncludesUndefined(node *ast.Node) bool {
-	info := processor.getTypeInfo(node)
-	return info.hasUndefined || info.hasAny || info.hasUnknown
-}
-
 func (processor *chainProcessor) wouldChangeReturnType(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
 	hasFalsyNonNullish := info.hasBoolLiteral || info.hasNumLiteral || info.hasStrLiteral || info.hasBigIntLiteral
@@ -1170,9 +1045,7 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 		return true
 	}
 
-	isAccessExpr := func(n *ast.Node) bool {
-		return ast.IsPropertyAccessExpression(n) || ast.IsElementAccessExpression(n) || ast.IsCallExpression(n)
-	}
+	isAccessExpr := utils.IsAccessExpression
 
 	var value *ast.Node
 	switch {
@@ -1184,8 +1057,8 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 		return true
 	}
 
-	isNull := isNullLiteral(value)
-	isUndefined := isUndefinedLiteral(value)
+	isNull := utils.IsNullLiteral(value)
+	isUndefined := utils.IsUndefinedLiteral(value)
 	isLiteral := value.Kind == ast.KindNumericLiteral ||
 		value.Kind == ast.KindStringLiteral ||
 		value.Kind == ast.KindTrueKeyword ||
@@ -1422,6 +1295,21 @@ func (processor *chainProcessor) buildOptionalChain(parts []ChainPart, checkedLe
 }
 
 func (processor *chainProcessor) containsOptionalChain(n *ast.Node) bool {
+	if n == nil {
+		return false
+	}
+
+	// Check cache first
+	if cached, ok := processor.optionalChainCache[n]; ok {
+		return cached
+	}
+
+	result := processor.containsOptionalChainUncached(n)
+	processor.optionalChainCache[n] = result
+	return result
+}
+
+func (processor *chainProcessor) containsOptionalChainUncached(n *ast.Node) bool {
 	unwrapped := ast.SkipParentheses(n)
 
 	if ast.IsPropertyAccessExpression(unwrapped) {
@@ -1449,6 +1337,18 @@ func (processor *chainProcessor) containsOptionalChain(n *ast.Node) bool {
 	}
 
 	return false
+}
+
+// allSubsequentHaveOptionalChaining checks whether all operands in the chain
+// (starting from index 1) already have optional chaining.
+// This is used to determine if we should skip transformation in certain cases.
+func (processor *chainProcessor) allSubsequentHaveOptionalChaining(chain []Operand) bool {
+	for i := 1; i < len(chain); i++ {
+		if chain[i].comparedExpr != nil && !processor.containsOptionalChain(chain[i].comparedExpr) {
+			return false
+		}
+	}
+	return true
 }
 
 func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.Kind) Operand {
@@ -1497,10 +1397,10 @@ outer3:
 
 		var expr, value *ast.Node
 
-		if isNullishLiteral(binExpr.Right) || ast.IsStringLiteral(binExpr.Right) {
+		if utils.IsNullishLiteral(binExpr.Right) || ast.IsStringLiteral(binExpr.Right) {
 			expr = binExpr.Left
 			value = binExpr.Right
-		} else if isNullishLiteral(binExpr.Left) || ast.IsStringLiteral(binExpr.Left) {
+		} else if utils.IsNullishLiteral(binExpr.Left) || ast.IsStringLiteral(binExpr.Left) {
 			expr = binExpr.Right
 			value = binExpr.Left
 		}
@@ -1520,8 +1420,8 @@ outer3:
 				}
 			}
 
-			isNull := isNullLiteral(value)
-			isUndefined := isUndefinedLiteral(value)
+			isNull := utils.IsNullLiteral(value)
+			isUndefined := utils.IsUndefinedLiteral(value)
 
 			if isAndChain {
 				switch op {
@@ -1553,7 +1453,7 @@ outer3:
 					}
 				}
 			} else {
-				isPropertyOrElement := ast.IsPropertyAccessExpression(expr) || ast.IsElementAccessExpression(expr) || ast.IsCallExpression(expr)
+				isPropertyOrElement := utils.IsAccessExpression(expr)
 
 				if isPropertyOrElement && (isNull || isUndefined) {
 					return Operand{typ: OperandTypeComparison, node: node, comparedExpr: expr}
@@ -1594,14 +1494,9 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 
 		comparedExpr := ast.SkipParentheses(binExpr.Left)
-		hasPropertyAccess := ast.IsPropertyAccessExpression(comparedExpr) ||
-			ast.IsElementAccessExpression(comparedExpr) ||
-			ast.IsCallExpression(comparedExpr)
+		hasPropertyAccess := utils.IsAccessExpression(comparedExpr)
 
-		if ast.IsPropertyAccessExpression(binExpr.Right) || ast.IsElementAccessExpression(binExpr.Right) {
-			comparedExpr = ast.SkipParentheses(binExpr.Right)
-			hasPropertyAccess = true
-		} else if ast.IsCallExpression(binExpr.Right) {
+		if utils.IsAccessExpression(binExpr.Right) {
 			comparedExpr = ast.SkipParentheses(binExpr.Right)
 			hasPropertyAccess = true
 		}
@@ -1616,9 +1511,7 @@ outer3:
 	if !isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
 		comparedExpr := ast.SkipParentheses(binExpr.Left)
-		if ast.IsPropertyAccessExpression(binExpr.Right) || ast.IsElementAccessExpression(binExpr.Right) {
-			comparedExpr = ast.SkipParentheses(binExpr.Right)
-		} else if ast.IsCallExpression(binExpr.Right) {
+		if utils.IsAccessExpression(binExpr.Right) {
 			comparedExpr = ast.SkipParentheses(binExpr.Right)
 		}
 		return Operand{typ: OperandTypeComparison, node: node, comparedExpr: comparedExpr}
@@ -1663,7 +1556,9 @@ func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind as
 			binExpr := unwrapped.AsBinaryExpression()
 			collect(binExpr.Left)
 			collect(binExpr.Right)
-			processor.seenLogicals[unwrapped] = true
+			// Mark this binary expression as seen to prevent re-processing
+			binRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, unwrapped)
+			processor.seenRanges[textRange{start: binRange.Pos(), end: binRange.End()}] = true
 		} else {
 			operandNodes = append(operandNodes, n)
 		}
@@ -1672,34 +1567,11 @@ func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind as
 	return operandNodes
 }
 
-func (processor *chainProcessor) collectOperandsWithRanges(node *ast.Node, operatorKind ast.Kind) ([]*ast.Node, []textRange) {
-	operandNodes := []*ast.Node{}
-	binaryRanges := []textRange{}
-	var collect func(*ast.Node)
-	collect = func(n *ast.Node) {
-		unwrapped := ast.SkipParentheses(n)
-
-		if ast.IsBinaryExpression(unwrapped) && unwrapped.AsBinaryExpression().OperatorToken.Kind == operatorKind {
-			binExpr := unwrapped.AsBinaryExpression()
-			collect(binExpr.Left)
-			collect(binExpr.Right)
-			binRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, unwrapped)
-			binaryRanges = append(binaryRanges, textRange{start: binRange.Pos(), end: binRange.End()})
-		} else {
-			operandNodes = append(operandNodes, n)
-		}
-	}
-	collect(node)
-	return operandNodes, binaryRanges
-}
-
 func (processor *chainProcessor) hasPropertyAccessInChain(chain []Operand) bool {
 	for _, op := range chain {
 		if op.comparedExpr != nil {
 			unwrapped := ast.SkipParentheses(op.comparedExpr)
-			if ast.IsPropertyAccessExpression(unwrapped) ||
-				ast.IsElementAccessExpression(unwrapped) ||
-				ast.IsCallExpression(unwrapped) {
+			if utils.IsAccessExpression(unwrapped) {
 				return true
 			}
 		}
@@ -1743,70 +1615,6 @@ func (processor *chainProcessor) validateChain(chain []Operand, operatorKind ast
 	return true
 }
 
-func (processor *chainProcessor) filterOverlappingChains(chains [][]Operand) [][]Operand {
-	if len(chains) <= 1 {
-		return chains
-	}
-
-	type chainWithRange struct {
-		chain    []Operand
-		startPos int
-		endPos   int
-		length   int
-	}
-
-	chainRanges := make([]chainWithRange, len(chains))
-	for i, chain := range chains {
-		if len(chain) == 0 {
-			continue
-		}
-		firstOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[0].node)
-		lastOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-1].node)
-		chainRanges[i] = chainWithRange{
-			chain:    chain,
-			startPos: firstOpRange.Pos(),
-			endPos:   lastOpRange.End(),
-			length:   len(chain),
-		}
-	}
-
-	filteredChains := [][]Operand{}
-	for i, cr1 := range chainRanges {
-		if len(cr1.chain) == 0 {
-			continue
-		}
-		isOverlappedByLonger := false
-		for j, cr2 := range chainRanges {
-			if i == j || len(cr2.chain) == 0 {
-				continue
-			}
-			overlaps := cr1.startPos < cr2.endPos && cr2.startPos < cr1.endPos
-			if overlaps && cr2.length > cr1.length {
-				isOverlappedByLonger = true
-				break
-			}
-		}
-		if !isOverlappedByLonger {
-			filteredChains = append(filteredChains, cr1.chain)
-		}
-	}
-	return filteredChains
-}
-
-func (processor *chainProcessor) hasChainOverlapWithReported(chain []Operand) bool {
-	for _, op := range chain {
-		opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, op.node)
-		opStart, opEnd := opRange.Pos(), opRange.End()
-
-		for reportedRange := range processor.reportedRanges {
-			if opStart < reportedRange.end && reportedRange.start < opEnd {
-				return true
-			}
-		}
-	}
-	return false
-}
-
 func (processor *chainProcessor) shouldSkipForRequireNullish(chain []Operand, operatorKind ast.Kind) bool {
 	if !processor.opts.RequireNullish {
 		return false
@@ -1843,38 +1651,13 @@ func (processor *chainProcessor) processChain(node *ast.Node, operatorKind ast.K
 		return
 	}
 
-	if isAndOperator(operatorKind) {
-		if processor.isAndChainAlreadySeen(node) {
-			return
-		}
-		processor.markAndChainAsSeen(node)
-		_ = processor.flattenAndMarkLogicals(node, operatorKind)
-	} else {
-		if processor.isOrChainNestedInLargerChain(node) {
-			return
-		}
-		if processor.isOrChainAlreadySeen(node) {
-			return
-		}
-		processor.markOrChainAsSeen(node)
-	}
-
-	var operandNodes []*ast.Node
-	if isAndOperator(operatorKind) {
-		operandNodes = processor.collectOperands(node, operatorKind)
-	} else {
-		var collectedBinaryRanges []textRange
-		operandNodes, collectedBinaryRanges = processor.collectOperandsWithRanges(node, operatorKind)
-		for _, r := range collectedBinaryRanges {
-			processor.seenLogicalRanges[r] = true
-		}
-	}
-
-	if len(operandNodes) < 2 {
+	if processor.isChainAlreadySeen(node) {
 		return
 	}
 
-	if processor.hasAnyOperandBeenReported(operandNodes) {
+	operandNodes := processor.collectOperands(node, operatorKind)
+
+	if len(operandNodes) < 2 {
 		return
 	}
 
@@ -1884,13 +1667,8 @@ func (processor *chainProcessor) processChain(node *ast.Node, operatorKind ast.K
 	}
 
 	chains := processor.buildChains(operands, operatorKind)
-	chains = processor.filterOverlappingChains(chains)
 
 	for _, chain := range chains {
-		if processor.hasChainOverlapWithReported(chain) {
-			continue
-		}
-
 		validatedChain := processor.validateChainForReporting(chain, operatorKind)
 		if validatedChain == nil {
 			continue
@@ -1913,10 +1691,9 @@ func (processor *chainProcessor) buildAndChains(operands []Operand) [][]Operand 
 	var lastExpr *ast.Node
 	var lastCheckType OperandType
 	var chainComplete bool
-	var stopProcessing bool
 
 	i := 0
-	for i < len(operands) && !stopProcessing {
+	for i < len(operands) {
 		op := operands[i]
 
 		if op.typ == OperandTypeInvalid ||
@@ -2131,8 +1908,9 @@ func (processor *chainProcessor) shouldStopAtStrictNullishCheck(prevOp Operand) 
 	}
 
 	isAnyOrUnknown := processor.typeIsAnyOrUnknown(prevOp.comparedExpr)
-	hasNull := processor.typeIncludesNull(prevOp.comparedExpr)
-	hasUndefined := processor.typeIncludesUndefined(prevOp.comparedExpr)
+	typeInfo := processor.getTypeInfo(prevOp.comparedExpr)
+	hasNull := typeInfo.hasNull || typeInfo.hasAny || typeInfo.hasUnknown
+	hasUndefined := typeInfo.hasUndefined || typeInfo.hasAny || typeInfo.hasUnknown
 
 	isIncomplete := !isAnyOrUnknown && hasNull && hasUndefined
 
@@ -2226,35 +2004,23 @@ func (processor *chainProcessor) validateChainForReporting(chain []Operand, oper
 }
 
 func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) []Operand {
-	if len(chain) >= 2 {
-		firstOp := chain[0]
-		if firstOp.typ == OperandTypePlain && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
+	// Note: chain length >= 2, hasSameBaseIdentifier, and hasPropertyAccessInChain are already
+	// validated by validateChain() which is called before this function.
+
+	firstOp := chain[0]
+	if firstOp.typ == OperandTypePlain && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
+		return nil
+	}
+
+	if firstOp.typ.IsStrictNullishCheck() && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
+		if !processor.isSplitStrictEqualsPattern(chain) {
 			return nil
 		}
 	}
 
-	if len(chain) >= 2 {
-		firstOp := chain[0]
-		if firstOp.typ.IsStrictNullishCheck() && firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
-			if !processor.isSplitStrictEqualsPattern(chain) {
-				return nil
-			}
-		}
-	}
-
-	if len(chain) < 2 {
-		return nil
-	}
-
-	if !processor.hasPropertyAccessInChain(chain) {
-		return nil
-	}
-
-	if len(chain) >= 2 {
-		if processor.allOperandsCheckSameExpression(chain) {
-			if !processor.isSplitStrictEqualsPattern(chain) {
-				return nil
-			}
+	if processor.allOperandsCheckSameExpression(chain) {
+		if !processor.isSplitStrictEqualsPattern(chain) {
+			return nil
 		}
 	}
 
@@ -2327,9 +2093,6 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 				return nil
 			}
 		}
-	}
-
-	if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		if processor.hasIncompleteNullishCheck(chain) {
 			return nil
 		}
@@ -2474,15 +2237,15 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 			op := binExpr.OperatorToken.Kind
 
 			var value *ast.Node
-			if ast.IsPropertyAccessExpression(binExpr.Left) || ast.IsElementAccessExpression(binExpr.Left) || ast.IsCallExpression(binExpr.Left) {
+			if utils.IsAccessExpression(binExpr.Left) {
 				value = binExpr.Right
-			} else if ast.IsPropertyAccessExpression(binExpr.Right) || ast.IsElementAccessExpression(binExpr.Right) || ast.IsCallExpression(binExpr.Right) {
+			} else if utils.IsAccessExpression(binExpr.Right) {
 				value = binExpr.Left
 			}
 
 			if value != nil {
-				isNull := isNullLiteral(value)
-				isUndefined := isUndefinedLiteral(value)
+				isNull := utils.IsNullLiteral(value)
+				isUndefined := utils.IsUndefinedLiteral(value)
 				isNullish := isNull || isUndefined
 				isLiteral := value.Kind == ast.KindNumericLiteral ||
 					value.Kind == ast.KindStringLiteral ||
@@ -2607,8 +2370,8 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 							operator := binExpr.OperatorToken.Kind
 
 							if operator == ast.KindEqualsEqualsEqualsToken {
-								isStrictNullCheck := isNullLiteral(binExpr.Right) || isNullLiteral(binExpr.Left)
-								isStrictUndefCheck := isUndefinedLiteral(binExpr.Right) || isUndefinedLiteral(binExpr.Left)
+								isStrictNullCheck := utils.IsNullLiteral(binExpr.Right) || utils.IsNullLiteral(binExpr.Left)
+								isStrictUndefCheck := utils.IsUndefinedLiteral(binExpr.Right) || utils.IsUndefinedLiteral(binExpr.Left)
 
 								if (isStrictNullCheck && !isStrictUndefCheck) || (isStrictUndefCheck && !isStrictNullCheck) {
 									if truncateAt == -1 || i+1 < truncateAt {
@@ -2639,17 +2402,8 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 }
 
 func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []Operand {
-	if len(chain) < 2 {
-		return nil
-	}
-
-	if !processor.hasSameBaseIdentifier(chain) {
-		return nil
-	}
-
-	if !processor.hasPropertyAccessInChain(chain) {
-		return nil
-	}
+	// Note: chain length >= 2, hasSameBaseIdentifier, and hasPropertyAccessInChain are already
+	// validated by validateChain() which is called before this function.
 
 	hasExplicitCheck := false
 	for _, op := range chain {
@@ -2666,92 +2420,81 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 		return nil
 	}
 
-	if len(chain) >= 2 {
-		allSubsequentHaveOptionalChaining := true
-		for i := 1; i < len(chain); i++ {
-			if chain[i].comparedExpr != nil && !processor.containsOptionalChain(chain[i].comparedExpr) {
-				allSubsequentHaveOptionalChaining = false
-				break
-			}
-		}
-
-		if allSubsequentHaveOptionalChaining {
-			firstOp := chain[0]
-			isExplicitNullCheck := firstOp.typ == OperandTypeStrictEqualNull ||
-				firstOp.typ == OperandTypeEqualNull ||
-				isStrictNullComparison(firstOp)
-			if isExplicitNullCheck {
-				anyTypeHasNullOrUndefined := false
-				for _, op := range chain {
-					if op.comparedExpr != nil {
-						typeInfo := processor.getTypeInfo(op.comparedExpr)
-						if typeInfo.hasNull || typeInfo.hasUndefined {
-							anyTypeHasNullOrUndefined = true
-							break
-						}
-					}
-				}
-				if !anyTypeHasNullOrUndefined {
-					return nil
-				}
-			}
-		}
-
-		allStrictChecks := true
-		for _, op := range chain {
-			if op.typ.IsLooseNullishCheck() ||
-				op.typ == OperandTypePlain || op.typ == OperandTypeNot {
-				allStrictChecks = false
-				break
-			}
-			if op.typ == OperandTypeComparison && op.node != nil {
-				if ast.IsBinaryExpression(op.node) {
-					binExpr := op.node.AsBinaryExpression()
-					binOp := binExpr.OperatorToken.Kind
-					if binOp == ast.KindEqualsEqualsToken {
-						left := ast.SkipParentheses(binExpr.Left)
-						right := ast.SkipParentheses(binExpr.Right)
-						isNullish := isNullLiteral(left) || isNullLiteral(right) ||
-							isUndefinedIdentifier(left) || isUndefinedIdentifier(right)
-						if isNullish {
-							allStrictChecks = false
-							break
-						}
-					}
-				}
-			}
-		}
-
-		if allSubsequentHaveOptionalChaining && allStrictChecks {
-			anyHasNull := false
-			anyHasUndefined := false
+	allSubsequentHaveOptionalChaining := processor.allSubsequentHaveOptionalChaining(chain)
+	if allSubsequentHaveOptionalChaining {
+		firstOp := chain[0]
+		isExplicitNullCheck := firstOp.typ == OperandTypeStrictEqualNull ||
+			firstOp.typ == OperandTypeEqualNull ||
+			isStrictNullComparison(firstOp)
+		if isExplicitNullCheck {
+			anyTypeHasNullOrUndefined := false
 			for _, op := range chain {
 				if op.comparedExpr != nil {
 					typeInfo := processor.getTypeInfo(op.comparedExpr)
-					if typeInfo.hasNull {
-						anyHasNull = true
-					}
-					if typeInfo.hasUndefined {
-						anyHasUndefined = true
+					if typeInfo.hasNull || typeInfo.hasUndefined {
+						anyTypeHasNullOrUndefined = true
+						break
 					}
 				}
 			}
-			if !anyHasNull && !anyHasUndefined {
-				return nil
-			}
-			if anyHasNull && anyHasUndefined {
+			if !anyTypeHasNullOrUndefined {
 				return nil
 			}
 		}
 	}
 
-	if len(chain) >= 2 && chain[0].typ == OperandTypeNot && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+	allStrictChecks := true
+	for _, op := range chain {
+		if op.typ.IsLooseNullishCheck() ||
+			op.typ == OperandTypePlain || op.typ == OperandTypeNot {
+			allStrictChecks = false
+			break
+		}
+		if op.typ == OperandTypeComparison && op.node != nil {
+			if ast.IsBinaryExpression(op.node) {
+				binExpr := op.node.AsBinaryExpression()
+				binOp := binExpr.OperatorToken.Kind
+				if binOp == ast.KindEqualsEqualsToken {
+					left := ast.SkipParentheses(binExpr.Left)
+					right := ast.SkipParentheses(binExpr.Right)
+					isNullish := utils.IsNullLiteral(left) || utils.IsNullLiteral(right) ||
+						utils.IsUndefinedIdentifier(left) || utils.IsUndefinedIdentifier(right)
+					if isNullish {
+						allStrictChecks = false
+						break
+					}
+				}
+			}
+		}
+	}
+
+	if allSubsequentHaveOptionalChaining && allStrictChecks {
+		anyHasNull := false
+		anyHasUndefined := false
+		for _, op := range chain {
+			if op.comparedExpr != nil {
+				typeInfo := processor.getTypeInfo(op.comparedExpr)
+				if typeInfo.hasNull {
+					anyHasNull = true
+				}
+				if typeInfo.hasUndefined {
+					anyHasUndefined = true
+				}
+			}
+		}
+		if !anyHasNull && !anyHasUndefined {
+			return nil
+		}
+		if anyHasNull && anyHasUndefined {
+			return nil
+		}
+	}
+
+	if chain[0].typ == OperandTypeNot && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		firstExpr := chain[0].comparedExpr
 		if firstExpr != nil {
 			unwrappedFirst := ast.SkipParentheses(firstExpr)
-			isFirstSimpleNegation := !ast.IsPropertyAccessExpression(unwrappedFirst) &&
-				!ast.IsElementAccessExpression(unwrappedFirst) &&
-				!ast.IsCallExpression(unwrappedFirst)
+			isFirstSimpleNegation := !utils.IsAccessExpression(unwrappedFirst)
 
 			if isFirstSimpleNegation {
 				allNegatedOrSafeComparisonOrNullCheck := true
@@ -2784,7 +2527,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	}
 
 	if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-		if len(chain) >= 2 && (chain[0].typ == OperandTypeNotEqualBoth || chain[0].typ == OperandTypeNotStrictEqualNull || chain[0].typ == OperandTypeNotStrictEqualUndef) {
+		if chain[0].typ == OperandTypeNotEqualBoth || chain[0].typ == OperandTypeNotStrictEqualNull || chain[0].typ == OperandTypeNotStrictEqualUndef {
 			firstTypeInfo := processor.getTypeInfo(chain[0].comparedExpr)
 
 			for i := 1; i < len(chain); i++ {
@@ -2809,7 +2552,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 		return nil
 	}
 
-	if len(chain) >= 2 && chain[0].typ == OperandTypePlain {
+	if chain[0].typ == OperandTypePlain {
 		firstExpr := chain[0].comparedExpr
 		if firstExpr != nil {
 			unwrapped := ast.SkipParentheses(firstExpr)
@@ -2819,13 +2562,11 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 		}
 	}
 
-	if len(chain) >= 2 && chain[0].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+	if chain[0].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		firstExpr := chain[0].comparedExpr
 		if firstExpr != nil {
 			unwrappedFirst := ast.SkipParentheses(firstExpr)
-			isFirstSimplePlain := !ast.IsPropertyAccessExpression(unwrappedFirst) &&
-				!ast.IsElementAccessExpression(unwrappedFirst) &&
-				!ast.IsCallExpression(unwrappedFirst)
+			isFirstSimplePlain := !utils.IsAccessExpression(unwrappedFirst)
 
 			if isFirstSimplePlain {
 				for i := 1; i < len(chain); i++ {
@@ -2838,7 +2579,7 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	}
 
 	chain = processor.validateOrChainNullishChecks(chain)
-	if chain == nil || len(chain) < 2 {
+	if len(chain) < 2 {
 		return nil
 	}
 
@@ -2850,22 +2591,20 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 		}
 	}
 
-	if len(chain) >= 2 {
-		for i := range len(chain) - 1 {
-			if chain[i].typ == OperandTypeNot {
-				negatedExpr := chain[i].comparedExpr
-				for j := i + 1; j < len(chain); j++ {
-					if chain[j].typ == OperandTypeNot {
-						continue
-					}
-					callExpr := chain[j].comparedExpr
-					if callExpr != nil && ast.IsCallExpression(ast.SkipParentheses(callExpr)) {
-						call := ast.SkipParentheses(callExpr).AsCallExpression()
-						callBase := call.Expression
-						cmp := processor.compareNodes(negatedExpr, callBase)
-						if cmp == NodeEqual {
-							return nil
-						}
+	for i := range len(chain) - 1 {
+		if chain[i].typ == OperandTypeNot {
+			negatedExpr := chain[i].comparedExpr
+			for j := i + 1; j < len(chain); j++ {
+				if chain[j].typ == OperandTypeNot {
+					continue
+				}
+				callExpr := chain[j].comparedExpr
+				if callExpr != nil && ast.IsCallExpression(ast.SkipParentheses(callExpr)) {
+					call := ast.SkipParentheses(callExpr).AsCallExpression()
+					callBase := call.Expression
+					cmp := processor.compareNodes(negatedExpr, callBase)
+					if cmp == NodeEqual {
+						return nil
 					}
 				}
 			}
@@ -2912,15 +2651,7 @@ func (processor *chainProcessor) shouldSkipOptimalStrictChecks(chain []Operand) 
 		return false
 	}
 
-	allSubsequentHaveOptionalChaining := true
-	for i := 1; i < len(chain); i++ {
-		if chain[i].comparedExpr != nil && !processor.containsOptionalChain(chain[i].comparedExpr) {
-			allSubsequentHaveOptionalChaining = false
-			break
-		}
-	}
-
-	if !allSubsequentHaveOptionalChaining {
+	if !processor.allSubsequentHaveOptionalChaining(chain) {
 		return false
 	}
 
@@ -2963,15 +2694,7 @@ func (processor *chainProcessor) shouldSkipOrChainOptimalChecks(chain []Operand)
 		return false
 	}
 
-	allSubsequentHaveOptionalChaining := true
-	for i := 1; i < len(chain); i++ {
-		if chain[i].comparedExpr != nil && !processor.containsOptionalChain(chain[i].comparedExpr) {
-			allSubsequentHaveOptionalChaining = false
-			break
-		}
-	}
-
-	if !allSubsequentHaveOptionalChaining {
+	if !processor.allSubsequentHaveOptionalChaining(chain) {
 		return false
 	}
 
@@ -3487,8 +3210,6 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	}
 
 	processor.reportChainWithFixes(node, fixes, useSuggestion)
-
-	processor.markChainOperandsAsReported(chain)
 }
 
 func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, chain []Operand, operandNodes []*ast.Node) {
@@ -3720,15 +3441,9 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	}
 
 	processor.reportChainWithFixes(node, fixes, useSuggestion)
-
-	processor.markChainOperandsAsReported(chain)
 }
 
 func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
-	if !ast.IsBinaryExpression(node) {
-		return
-	}
-
 	binExpr := node.AsBinaryExpression()
 	operator := binExpr.OperatorToken.Kind
 
@@ -3763,11 +3478,11 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 	}
 
 	var accessExpr *ast.Node
-	if ast.IsPropertyAccessExpression(node.Parent) || ast.IsElementAccessExpression(node.Parent) {
+	if utils.IsPropertyOrElementAccess(node.Parent) {
 		accessExpr = node.Parent
 	} else if ast.IsParenthesizedExpression(node.Parent) {
 		grandParent := node.Parent.Parent
-		if grandParent != nil && (ast.IsPropertyAccessExpression(grandParent) || ast.IsElementAccessExpression(grandParent)) {
+		if grandParent != nil && utils.IsPropertyOrElementAccess(grandParent) {
 			accessExpr = grandParent
 		}
 	}
@@ -3795,8 +3510,6 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 	if isOptional {
 		return
 	}
-
-	processor.seenLogicals[node] = true
 
 	leftNode := binExpr.Left
 	leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, leftNode)
@@ -3855,10 +3568,6 @@ var PreferOptionalChainRule = rule.Rule{
 
 		return rule.RuleListeners{
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				if !ast.IsBinaryExpression(node) {
-					return
-				}
-
 				binExpr := node.AsBinaryExpression()
 				operator := binExpr.OperatorToken.Kind
 
