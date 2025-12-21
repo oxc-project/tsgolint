@@ -217,10 +217,6 @@ func isAndOperator(op ast.Kind) bool {
 	return op == ast.KindAmpersandAmpersandToken
 }
 
-func isOrLikeOperator(op ast.Kind) bool {
-	return op == ast.KindBarBarToken || op == ast.KindQuestionQuestionToken
-}
-
 // binaryParts holds the components of a binary expression after unwrapping parentheses.
 type binaryParts struct {
 	expr     *ast.BinaryExpression
@@ -229,8 +225,6 @@ type binaryParts struct {
 	right    *ast.Node // parentheses-skipped
 }
 
-// unwrapBinary extracts a binary expression's components, skipping parentheses.
-// Returns nil if the node is not a binary expression.
 func unwrapBinary(node *ast.Node) *binaryParts {
 	if node == nil {
 		return nil
@@ -462,43 +456,6 @@ func isNodePrefixOf(shorter, longer *ast.Node) bool {
 	}
 
 	return isNodePrefixOf(shorter, base)
-}
-
-func hasOptionalChaining(node *ast.Node) bool {
-	if node == nil {
-		return false
-	}
-
-	switch {
-	case ast.IsParenthesizedExpression(node):
-		return hasOptionalChaining(node.AsParenthesizedExpression().Expression)
-
-	case ast.IsNonNullExpression(node):
-		return hasOptionalChaining(node.AsNonNullExpression().Expression)
-
-	case ast.IsPropertyAccessExpression(node):
-		propAccess := node.AsPropertyAccessExpression()
-		if propAccess.QuestionDotToken != nil {
-			return true
-		}
-		return hasOptionalChaining(propAccess.Expression)
-
-	case ast.IsElementAccessExpression(node):
-		elemAccess := node.AsElementAccessExpression()
-		if elemAccess.QuestionDotToken != nil {
-			return true
-		}
-		return hasOptionalChaining(elemAccess.Expression)
-
-	case ast.IsCallExpression(node):
-		callExpr := node.AsCallExpression()
-		if callExpr.QuestionDotToken != nil {
-			return true
-		}
-		return hasOptionalChaining(callExpr.Expression)
-	}
-
-	return false
 }
 
 // In JSX, foo && foo.bar has different semantics than foo?.bar:
@@ -929,7 +886,7 @@ func (processor *chainProcessor) compareNodes(left, right *ast.Node) NodeCompari
 	// side effects or create different instances. Allow method calls (foo.bar()) and expressions
 	// with existing optional chaining. Also block literals ([], {}, functions, classes, JSX)
 	// which create new instances each time.
-	if !hasOptionalChaining(left) {
+	if !processor.containsOptionalChain(left) {
 		rootExpr := leftUnwrapped
 	outer2:
 		for {
@@ -1539,11 +1496,7 @@ outer3:
 		return Operand{typ: OperandTypePlain, node: node, comparedExpr: unwrapped}
 	}
 
-	if !isAndChain {
-		return Operand{typ: OperandTypePlain, node: node, comparedExpr: unwrapped}
-	}
-
-	return Operand{typ: OperandTypeInvalid, node: node}
+	return Operand{typ: OperandTypePlain, node: node, comparedExpr: unwrapped}
 }
 
 func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind ast.Kind) []*ast.Node {
@@ -1638,7 +1591,7 @@ func (processor *chainProcessor) shouldSkipForRequireNullish(chain []Operand, op
 }
 
 func (processor *chainProcessor) processChain(node *ast.Node, operatorKind ast.Kind) {
-	if isOrLikeOperator(operatorKind) {
+	if operatorKind == ast.KindBarBarToken || operatorKind == ast.KindQuestionQuestionToken {
 		processor.handleEmptyObjectPattern(node)
 	}
 
@@ -2075,10 +2028,6 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 				}
 			}
 		}
-	}
-
-	if processor.shouldSkipForRequireNullish(chain, ast.KindAmpersandAmpersandToken) {
-		return nil
 	}
 
 	if len(chain) > 0 && chain[0].typ == OperandTypePlain {
@@ -2546,10 +2495,6 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 				}
 			}
 		}
-	}
-
-	if processor.shouldSkipForRequireNullish(chain, ast.KindBarBarToken) {
-		return nil
 	}
 
 	if chain[0].typ == OperandTypePlain {
@@ -3238,7 +3183,7 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	if len(chainForOptional) == 1 && trailingPlainOperand != "" {
 		singleOp := chainForOptional[0]
 		if singleOp.comparedExpr != nil {
-			if hasOptionalChaining(singleOp.comparedExpr) {
+			if processor.containsOptionalChain(singleOp.comparedExpr) {
 				return
 			}
 		}
@@ -3246,10 +3191,10 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 
 	if len(chain) == 2 && trailingPlainOperand == "" {
 		firstOp := chain[0]
-		if firstOp.comparedExpr != nil && hasOptionalChaining(firstOp.comparedExpr) {
+		if firstOp.comparedExpr != nil && processor.containsOptionalChain(firstOp.comparedExpr) {
 			return
 		}
-		if firstOp.node != nil && hasOptionalChaining(firstOp.node) {
+		if firstOp.node != nil && processor.containsOptionalChain(firstOp.node) {
 			return
 		}
 	}
