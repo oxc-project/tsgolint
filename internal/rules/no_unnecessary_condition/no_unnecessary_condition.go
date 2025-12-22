@@ -948,6 +948,72 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// For other expression types, use the full type
 					exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 				}
+			} else if expression.Kind == ast.KindPropertyAccessExpression || expression.Kind == ast.KindElementAccessExpression {
+				// Handle property/element access on call expression result
+				// e.g., foo?.().bar?.baz or foo?.bar?.().baz
+				var innerExpr *ast.Node
+				if expression.Kind == ast.KindPropertyAccessExpression {
+					innerExpr = expression.AsPropertyAccessExpression().Expression
+				} else {
+					innerExpr = expression.AsElementAccessExpression().Expression
+				}
+
+				// Check if the inner expression is a call expression
+				if innerExpr != nil && innerExpr.Kind == ast.KindCallExpression {
+					// Get the call expression's return type, then access the property
+					callExpr := innerExpr.AsCallExpression()
+					funcType := getResolvedType(callExpr.Expression)
+					if funcType != nil {
+						nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
+						if nonNullishFunc != nil {
+							signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
+							if len(signatures) > 0 {
+								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
+								if returnType != nil {
+									// Now get the property type from the return type
+									nonNullishReturn := removeNullishFromType(ctx.TypeChecker, returnType)
+									if nonNullishReturn != nil {
+										if expression.Kind == ast.KindPropertyAccessExpression {
+											propAccess := expression.AsPropertyAccessExpression()
+											nameNode := propAccess.Name()
+											if nameNode != nil {
+												propName := ast.GetTextOfPropertyName(nameNode)
+												if propName != "" {
+													prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishReturn, propName)
+													if prop != nil {
+														exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
+													} else {
+														exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+													}
+												} else {
+													exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+												}
+											} else {
+												exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+											}
+										} else {
+											// ElementAccessExpression
+											exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+										}
+									} else {
+										// Return type is always nullish
+										return
+									}
+								} else {
+									return
+								}
+							} else {
+								return
+							}
+						} else {
+							return
+						}
+					} else {
+						exprType = getResolvedType(expression)
+					}
+				} else {
+					exprType = getResolvedType(expression)
+				}
 			} else {
 				// For simple access like foo?.bar, check foo's type
 				// Also handle call expressions that aren't chained (e.g., foo?.bar()?.baz)
@@ -1584,14 +1650,30 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 									// Handle different predicate kinds
 									switch predicateKind {
-									case checker.TypePredicateKindAssertsIdentifier, checker.TypePredicateKindAssertsThis:
-										// For "asserts x" (no type specified), check if argument is always truthy/falsy
+									case checker.TypePredicateKindAssertsThis:
+									// For "asserts this", we don't check arguments
+									// because it asserts the this context, not a parameter
+									// Example: assertThis(this: unknown, arg2: unknown): asserts this
+									// The arg2 parameter is not being asserted
+									return
+								case checker.TypePredicateKindAssertsIdentifier:
+									// For "asserts x is Type", check if argument already satisfies the type
+									// For "asserts x" (no type specified), check if argument is always truthy/falsy
+									predicateType := checker.TypePredicate_t(typePredicate)
+									if predicateType != nil {
+										// "asserts x is Type" - check if argType is already assignable to predicateType
+										if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, argType, predicateType) {
+											ctx.ReportNode(node, buildTypeGuardAlreadyIsTypeMessage())
+										}
+									} else {
+										// "asserts x" - check if argument is always truthy/falsy
 										isTruthy, isFalsy := checkTypeCondition(ctx.TypeChecker, argType)
 										if isTruthy {
 											ctx.ReportNode(arg, buildAlwaysTruthyMessage())
 										} else if isFalsy {
 											ctx.ReportNode(arg, buildAlwaysFalsyMessage())
 										}
+									}
 									case checker.TypePredicateKindIdentifier, checker.TypePredicateKindThis:
 										// For "x is Type" type guards, check if argument already satisfies the type
 										predicateType := checker.TypePredicate_t(typePredicate)
