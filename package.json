@@ -1,6 +1,6 @@
 {
   "name": "tsgolint",
-  "packageManager": "pnpm@10.25.0",
+  "packageManager": "pnpm@10.26.1",
   "scripts": {
     "fmt": "dprint fmt"
   },
