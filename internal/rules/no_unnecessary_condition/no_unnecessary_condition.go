@@ -535,6 +535,92 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
+	// Helper: Get the return type of a call expression's function
+	getCallReturnType := func(callExpr *ast.Node) *checker.Type {
+		if callExpr == nil || callExpr.Kind != ast.KindCallExpression {
+			return nil
+		}
+
+		call := callExpr.AsCallExpression()
+		funcType := getResolvedType(call.Expression)
+		if funcType == nil {
+			return nil
+		}
+
+		nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
+		if nonNullishFunc == nil {
+			return nil
+		}
+
+		signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
+		if len(signatures) == 0 {
+			return nil
+		}
+
+		return ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
+	}
+
+	// Helper: Get property type from a base type given a property access expression
+	getPropertyTypeFromBase := func(baseType *checker.Type, propAccess *ast.Node) *checker.Type {
+		if baseType == nil || propAccess == nil {
+			return nil
+		}
+		if propAccess.Kind != ast.KindPropertyAccessExpression {
+			return nil
+		}
+
+		nonNullishBase := removeNullishFromType(ctx.TypeChecker, baseType)
+		if nonNullishBase == nil {
+			return nil
+		}
+
+		pa := propAccess.AsPropertyAccessExpression()
+		nameNode := pa.Name()
+		if nameNode == nil {
+			return ctx.TypeChecker.GetTypeAtLocation(propAccess)
+		}
+
+		propName := ast.GetTextOfPropertyName(nameNode)
+		if propName == "" {
+			return ctx.TypeChecker.GetTypeAtLocation(propAccess)
+		}
+
+		prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishBase, propName)
+		if prop != nil {
+			return ctx.TypeChecker.GetTypeOfSymbol(prop)
+		}
+
+		// Property doesn't exist, check index signature
+		stringIndexType := ctx.TypeChecker.GetStringIndexType(nonNullishBase)
+		if stringIndexType != nil {
+			return stringIndexType
+		}
+
+		return ctx.TypeChecker.GetTypeAtLocation(propAccess)
+	}
+
+	// Helper: Get type from property/element access on call expression result
+	// e.g., foo?.().bar or foo().baz
+	getTypeFromCallProperty := func(callExpr *ast.Node, accessExpr *ast.Node) *checker.Type {
+		returnType := getCallReturnType(callExpr)
+		if returnType == nil {
+			return nil
+		}
+
+		nonNullishReturn := removeNullishFromType(ctx.TypeChecker, returnType)
+		if nonNullishReturn == nil {
+			return nil
+		}
+
+		if accessExpr.Kind == ast.KindPropertyAccessExpression {
+			return getPropertyTypeFromBase(nonNullishReturn, accessExpr)
+		}
+
+		// ElementAccessExpression
+		return ctx.TypeChecker.GetTypeAtLocation(accessExpr)
+	}
+
+
 		// checkOptionalChain validates optional chaining (?.) to detect unnecessary usage.
 		//
 		// Optional chaining is unnecessary when the expression being accessed is never nullish.
@@ -636,6 +722,23 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return false
 			}
 
+		// Helper: Check if element access is a safe tuple access with literal index
+		isSafeTupleAccess := func(elemAccess *ast.ElementAccessExpression) bool {
+			if elemAccess == nil || elemAccess.ArgumentExpression == nil {
+				return false
+			}
+			arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
+			// Check if argument is a numeric literal
+			if arg.Kind == ast.KindNumericLiteral || arg.Kind == ast.KindFirstLiteralToken {
+				// Check if base type is a tuple
+				baseType := getResolvedType(elemAccess.Expression)
+				if baseType != nil && checker.IsTupleType(baseType) {
+					return true
+				}
+			}
+			return false
+		}
+
 			expressionSkipped := ast.SkipParentheses(expression)
 
 			// Rule 1: Expression itself is unguarded element access (but not safe tuple access)
@@ -643,19 +746,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				elemAccess := expressionSkipped.AsElementAccessExpression()
 				if elemAccess.QuestionDotToken == nil {
 					// Check if this is a safe tuple access with literal index
-					isSafeTupleAccess := false
-					if elemAccess.ArgumentExpression != nil {
-						arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
-						// Check if argument is a numeric literal
-						if arg.Kind == ast.KindNumericLiteral || arg.Kind == ast.KindFirstLiteralToken {
-							// Check if base type is a tuple
-							baseType := getResolvedType(elemAccess.Expression)
-							if baseType != nil && checker.IsTupleType(baseType) {
-								isSafeTupleAccess = true
-							}
-						}
-					}
-					if !isSafeTupleAccess {
+				if !isSafeTupleAccess(elemAccess) {
 						return
 					}
 				}
@@ -675,17 +766,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						elemAccess := expr.AsElementAccessExpression()
 						if elemAccess.QuestionDotToken == nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 							// Check if this is safe tuple access
-							isSafeTupleAccess := false
-							if elemAccess.ArgumentExpression != nil {
-								arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
-								if arg.Kind == ast.KindNumericLiteral || arg.Kind == ast.KindFirstLiteralToken {
-									baseType := getResolvedType(elemAccess.Expression)
-									if baseType != nil && checker.IsTupleType(baseType) {
-										isSafeTupleAccess = true
-									}
-								}
-							}
-							if !isSafeTupleAccess {
+							if !isSafeTupleAccess(elemAccess) {
 								return true
 							}
 						}
@@ -802,32 +883,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				// Get the type of bar from foo's (non-nullish) type
 				// For PropertyAccessExpression, we can get the property name
 				if expression.Kind == ast.KindPropertyAccessExpression {
-					propAccess := expression.AsPropertyAccessExpression()
-					nameNode := propAccess.Name()
-					if nameNode != nil {
-						propName := ast.GetTextOfPropertyName(nameNode)
-						if propName != "" {
-							// Get the property type from the non-nullish base
-							prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishBase, propName)
-							if prop != nil {
-								exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
-							} else {
-								// Property doesn't exist, check index signature
-								// For mapped types like {[name in Lowercase<string>]: T}, we need to check string index type
-								stringIndexType := ctx.TypeChecker.GetStringIndexType(nonNullishBase)
-								if stringIndexType != nil {
-									exprType = stringIndexType
-								} else {
-									// Fall back to GetTypeAtLocation
-									exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-								}
-							}
-						} else {
-							exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-						}
-					} else {
-						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-					}
+					exprType = getPropertyTypeFromBase(nonNullishBase, expression)
 				} else if expression.Kind == ast.KindElementAccessExpression {
 					// For element access, check if we're accessing with a literal key
 					// e.g., foo?.[key] where key is 'bar' | 'foo'
@@ -910,39 +966,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 					}
 				} else if expression.Kind == ast.KindCallExpression {
-					// For call expressions in a chain, we need special handling
-					// e.g., foo?.bar()?.baz where expression is foo?.bar()
-					// or foo?.()?.baz where expression is foo?.()
-					callExpr := expression.AsCallExpression()
-
-					// For both optional and regular calls, get the function's return type
-					// The full expression type includes | undefined from the optional chain/call
-					funcType := getResolvedType(callExpr.Expression)
-					if funcType != nil {
-						// Remove nullish types to get the actual function type
-						nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
-						if nonNullishFunc != nil {
-							// Get call signatures from the function type
-							signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
-							if len(signatures) > 0 {
-								// Get the return type of the first signature
-								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
-								if returnType != nil {
-									exprType = returnType
-								} else {
-									// Can't determine return type, allow the optional chain
-									return
-								}
-							} else {
-								// No call signatures, allow the optional chain
-								return
-							}
-						} else {
-							// Function is always nullish, allow the optional chain
-							return
-						}
-					} else {
-						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+					// For call expressions in a chain, get the function's return type
+					exprType = getCallReturnType(expression)
+					if exprType == nil {
+						return
 					}
 				} else {
 					// For other expression types, use the full type
@@ -960,56 +987,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check if the inner expression is a call expression
 				if innerExpr != nil && innerExpr.Kind == ast.KindCallExpression {
-					// Get the call expression's return type, then access the property
-					callExpr := innerExpr.AsCallExpression()
-					funcType := getResolvedType(callExpr.Expression)
-					if funcType != nil {
-						nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
-						if nonNullishFunc != nil {
-							signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
-							if len(signatures) > 0 {
-								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
-								if returnType != nil {
-									// Now get the property type from the return type
-									nonNullishReturn := removeNullishFromType(ctx.TypeChecker, returnType)
-									if nonNullishReturn != nil {
-										if expression.Kind == ast.KindPropertyAccessExpression {
-											propAccess := expression.AsPropertyAccessExpression()
-											nameNode := propAccess.Name()
-											if nameNode != nil {
-												propName := ast.GetTextOfPropertyName(nameNode)
-												if propName != "" {
-													prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishReturn, propName)
-													if prop != nil {
-														exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
-													} else {
-														exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-													}
-												} else {
-													exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-												}
-											} else {
-												exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-											}
-										} else {
-											// ElementAccessExpression
-											exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-										}
-									} else {
-										// Return type is always nullish
-										return
-									}
-								} else {
-									return
-								}
-							} else {
-								return
-							}
-						} else {
-							return
-						}
-					} else {
-						exprType = getResolvedType(expression)
+					exprType = getTypeFromCallProperty(innerExpr, expression)
+					if exprType == nil {
+						return
 					}
 				} else {
 					exprType = getResolvedType(expression)
@@ -1018,37 +998,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				// For simple access like foo?.bar, check foo's type
 				// Also handle call expressions that aren't chained (e.g., foo?.bar()?.baz)
 				if expression.Kind == ast.KindCallExpression {
-					callExpr := expression.AsCallExpression()
 					// For both optional calls (foo?.()) and regular calls (foo()),
 					// get the function's return type, not the full expression type which includes undefined
-					// e.g., for foo?.bar(), get the type of foo?.bar (which is () => number | undefined)
-					// Then extract the return type (number)
-					funcType := getResolvedType(callExpr.Expression)
-					if funcType != nil {
-						// Remove nullish types to get the actual function type
-						nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
-						if nonNullishFunc != nil {
-							// Get call signatures from the function type
-							signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
-							if len(signatures) > 0 {
-								// Get the return type of the first signature
-								returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
-								if returnType != nil {
-									exprType = returnType
-								} else {
-									// Can't determine return type, allow the optional chain
-									return
-								}
-							} else {
-								// No call signatures, allow the optional chain
-								return
-							}
-						} else {
-							// Function is always nullish, allow the optional chain
-							return
-						}
-					} else {
-						exprType = getResolvedType(expression)
+					exprType = getCallReturnType(expression)
+					if exprType == nil {
+						return
 					}
 				} else if expression.Kind == ast.KindPropertyAccessExpression || expression.Kind == ast.KindElementAccessExpression {
 					// Handle property/element access on call expression result
@@ -1062,56 +1016,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 					// Check if the inner expression is a call expression
 					if innerExpr != nil && innerExpr.Kind == ast.KindCallExpression {
-						// Get the call expression's return type, then access the property
-						callExpr := innerExpr.AsCallExpression()
-						funcType := getResolvedType(callExpr.Expression)
-						if funcType != nil {
-							nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
-							if nonNullishFunc != nil {
-								signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
-								if len(signatures) > 0 {
-									returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
-									if returnType != nil {
-										// Now get the property type from the return type
-										nonNullishReturn := removeNullishFromType(ctx.TypeChecker, returnType)
-										if nonNullishReturn != nil {
-											if expression.Kind == ast.KindPropertyAccessExpression {
-												propAccess := expression.AsPropertyAccessExpression()
-												nameNode := propAccess.Name()
-												if nameNode != nil {
-													propName := ast.GetTextOfPropertyName(nameNode)
-													if propName != "" {
-														prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishReturn, propName)
-														if prop != nil {
-															exprType = ctx.TypeChecker.GetTypeOfSymbol(prop)
-														} else {
-															exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-														}
-													} else {
-														exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-													}
-												} else {
-													exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-												}
-											} else {
-												// ElementAccessExpression
-												exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
-											}
-										} else {
-											// Return type is always nullish
-											return
-										}
-									} else {
-										return
-									}
-								} else {
-									return
-								}
-							} else {
-								return
-							}
-						} else {
-							exprType = getResolvedType(expression)
+						exprType = getTypeFromCallProperty(innerExpr, expression)
+						if exprType == nil {
+							return
 						}
 					} else {
 						exprType = getResolvedType(expression)
