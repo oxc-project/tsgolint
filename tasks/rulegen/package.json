@@ -1,0 +1,16 @@
+{
+  "name": "@tsgolint/rulegen",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "rulegen": "node --import @oxc-node/core/register src/index.ts",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@oxc-node/core": "^0.0.32",
+    "@types/node": "^24.5.2",
+    "oxc-parser": "^0.89.0",
+    "typescript": "^5.9.2"
+  }
+}
