@@ -53,6 +53,24 @@ func IsObjectType(t *checker.Type) bool {
 func IsTypeParameter(t *checker.Type) bool {
 	return IsTypeFlagSet(t, checker.TypeFlagsTypeParameter)
 }
+func IsTypeNullType(t *checker.Type) bool {
+	return IsTypeFlagSet(t, checker.TypeFlagsNull)
+}
+func IsTypeUndefinedType(t *checker.Type) bool {
+	return IsTypeFlagSet(t, checker.TypeFlagsUndefined)
+}
+func IsTypeVoidType(t *checker.Type) bool {
+	return IsTypeFlagSet(t, checker.TypeFlagsVoid)
+}
+
+func GetNonNullableType(typeChecker *checker.Checker, t *checker.Type) *checker.Type {
+	return checker.Checker_GetNonNullableType(typeChecker, t)
+}
+
+func IsNullableType(typeChecker *checker.Checker, t *checker.Type) bool {
+	return checker.Checker_IsNullableType(typeChecker, t)
+}
+
 func IsBooleanLiteralType(t *checker.Type) bool {
 	return IsTypeFlagSet(t, checker.TypeFlagsBoolean)
 }
@@ -194,4 +212,54 @@ func IsStrictCompilerOptionEnabled(
 	// 	(option !== "strictPropertyInitialization" ||
 	// 		isStrictCompilerOptionEnabled(options, "strictNullChecks"))
 	// );
+}
+
+// AST Node Helpers
+
+func IsNullLiteral(node *ast.Node) bool {
+	return node != nil && node.Kind == ast.KindNullKeyword
+}
+
+func IsUndefinedIdentifier(node *ast.Node) bool {
+	return node != nil && ast.IsIdentifier(node) && node.AsIdentifier().Text == "undefined"
+}
+
+func IsVoidExpression(node *ast.Node) bool {
+	return node != nil && ast.IsVoidExpression(node)
+}
+
+func IsUndefinedLiteral(node *ast.Node) bool {
+	return IsUndefinedIdentifier(node) || IsVoidExpression(node)
+}
+
+func IsNullishLiteral(node *ast.Node) bool {
+	return IsNullLiteral(node) || IsUndefinedLiteral(node)
+}
+
+func IsNullLiteralOrUndefinedIdentifier(node *ast.Node) bool {
+	return IsNullLiteral(node) || IsUndefinedIdentifier(node)
+}
+
+func IsLiteralValue(node *ast.Node) bool {
+	if node == nil {
+		return false
+	}
+	switch node.Kind {
+	case ast.KindNumericLiteral,
+		ast.KindStringLiteral,
+		ast.KindTrueKeyword,
+		ast.KindFalseKeyword,
+		ast.KindObjectLiteralExpression,
+		ast.KindArrayLiteralExpression:
+		return true
+	}
+	return false
+}
+
+func IsPropertyOrElementAccess(node *ast.Node) bool {
+	return ast.IsPropertyAccessExpression(node) || ast.IsElementAccessExpression(node)
+}
+
+func IsAccessExpression(node *ast.Node) bool {
+	return ast.IsPropertyAccessExpression(node) || ast.IsElementAccessExpression(node) || ast.IsCallExpression(node)
 }
