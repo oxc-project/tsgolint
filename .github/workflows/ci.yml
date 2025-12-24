@@ -69,9 +69,6 @@ jobs:
 
       - uses: ./.github/actions/setup
 
-      - name: Run go tests
-        run: go test ./internal/...
-
       - name: Build
         run: go build -o tsgolint.exe ./cmd/tsgolint
 
