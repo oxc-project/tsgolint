@@ -378,6 +378,29 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return skipNode.Kind == ast.KindTrueKeyword || skipNode.Kind == ast.KindFalseKeyword
 		}
 
+	// Type check predicates for declarative, readable code
+
+	isNeverType := func(flags checker.TypeFlags) bool {
+		return flags&checker.TypeFlagsNever != 0
+	}
+
+	isIndexedAccessFlags := func(flags checker.TypeFlags) bool {
+		return flags&checker.TypeFlagsIndexedAccess != 0
+	}
+
+	isPropertyAccess := func(node *ast.Node) bool {
+		return node != nil && node.Kind == ast.KindPropertyAccessExpression
+	}
+
+	isElementAccess := func(node *ast.Node) bool {
+		return node != nil && node.Kind == ast.KindElementAccessExpression
+	}
+
+	isCallExpr := func(node *ast.Node) bool {
+		return node != nil && node.Kind == ast.KindCallExpression
+	}
+
+
 		checkCondition := func(node *ast.Node) {
 			skipNode := ast.SkipParentheses(node)
 
@@ -388,7 +411,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
 
 					// Skip element access - they can return undefined at runtime
-					if operandSkipped.Kind == ast.KindElementAccessExpression {
+					if isElementAccess(operandSkipped) {
 						return
 					}
 
@@ -400,7 +423,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 					// Special case: never type
 					flags := checker.Type_flags(operandType)
-					if flags&checker.TypeFlagsNever != 0 {
+					if isNeverType(flags) {
 						ctx.ReportNode(unaryExpr.Operand, buildNeverMessage())
 						return
 					}
@@ -446,9 +469,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			// e.g., obj[key] where obj: Record<string, T> and key: keyof Obj
 			// In this case, nodeType might be an indexed access type (Obj[Key])
 			// We need to resolve it to the actual element type
-			if skipNode.Kind == ast.KindElementAccessExpression {
+			if isElementAccess(skipNode) {
 				flags := checker.Type_flags(nodeType)
-				if flags&checker.TypeFlagsIndexedAccess != 0 {
+				if isIndexedAccessFlags(flags) {
 					// This is an indexed access type (e.g., Obj[Key])
 					// Try to get the actual element type by checking the base type's index signature
 					elemAccess := skipNode.AsElementAccessExpression()
@@ -479,7 +502,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			// We only skip this check for actual array/tuple types. Object types with index
 			// signatures (like Record<string, T>) are still checked because they don't have
 			// this soundness issue.
-			if skipNode.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+			if isElementAccess(skipNode) && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 				elemAccess := skipNode.AsElementAccessExpression()
 				baseType := getResolvedType(elemAccess.Expression)
 				if baseType != nil {
@@ -527,7 +550,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			} else if isFalsy {
 				// Check if it's specifically the never type
 				flags := checker.Type_flags(nodeType)
-				if flags&checker.TypeFlagsNever != 0 {
+				if isNeverType(flags) {
 					ctx.ReportNode(node, buildNeverMessage())
 				} else {
 					ctx.ReportNode(node, buildAlwaysFalsyMessage())
@@ -612,7 +635,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return nil
 		}
 
-		if accessExpr.Kind == ast.KindPropertyAccessExpression {
+		if isPropertyAccess(accessExpr) {
 			return getPropertyTypeFromBase(nonNullishReturn, accessExpr)
 		}
 
@@ -682,7 +705,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				expr = ast.SkipParentheses(expr)
 
 				// Check if this is an unguarded element access
-				if expr.Kind == ast.KindElementAccessExpression {
+				if isElementAccess(expr) {
 					elemAccess := expr.AsElementAccessExpression()
 					if elemAccess.QuestionDotToken == nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 						return true
@@ -692,10 +715,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 
 				// Check deeper in property/call chains
-				if expr.Kind == ast.KindPropertyAccessExpression {
+				if isPropertyAccess(expr) {
 					return containsUnguardedElementAccess(expr.AsPropertyAccessExpression().Expression)
 				}
-				if expr.Kind == ast.KindCallExpression {
+				if isCallExpr(expr) {
 					return containsUnguardedElementAccess(expr.AsCallExpression().Expression)
 				}
 
@@ -710,13 +733,13 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 				expr = ast.SkipParentheses(expr)
 
-				if expr.Kind == ast.KindPropertyAccessExpression && expr.AsPropertyAccessExpression().QuestionDotToken != nil {
+				if isPropertyAccess(expr) && expr.AsPropertyAccessExpression().QuestionDotToken != nil {
 					return true
 				}
-				if expr.Kind == ast.KindElementAccessExpression && expr.AsElementAccessExpression().QuestionDotToken != nil {
+				if isElementAccess(expr) && expr.AsElementAccessExpression().QuestionDotToken != nil {
 					return true
 				}
-				if expr.Kind == ast.KindCallExpression && expr.AsCallExpression().QuestionDotToken != nil {
+				if isCallExpr(expr) && expr.AsCallExpression().QuestionDotToken != nil {
 					return true
 				}
 				return false
@@ -742,7 +765,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			expressionSkipped := ast.SkipParentheses(expression)
 
 			// Rule 1: Expression itself is unguarded element access (but not safe tuple access)
-			if expressionSkipped.Kind == ast.KindElementAccessExpression && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+			if isElementAccess(expressionSkipped) && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 				elemAccess := expressionSkipped.AsElementAccessExpression()
 				if elemAccess.QuestionDotToken == nil {
 					// Check if this is a safe tuple access with literal index
@@ -762,7 +785,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					}
 					expr = ast.SkipParentheses(expr)
 
-					if expr.Kind == ast.KindElementAccessExpression {
+					if isElementAccess(expr) {
 						elemAccess := expr.AsElementAccessExpression()
 						if elemAccess.QuestionDotToken == nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 							// Check if this is safe tuple access
@@ -773,10 +796,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						return hasUnsafeElementAccess(elemAccess.Expression)
 					}
 
-					if expr.Kind == ast.KindPropertyAccessExpression {
+					if isPropertyAccess(expr) {
 						return hasUnsafeElementAccess(expr.AsPropertyAccessExpression().Expression)
 					}
-					if expr.Kind == ast.KindCallExpression {
+					if isCallExpr(expr) {
 						return hasUnsafeElementAccess(expr.AsCallExpression().Expression)
 					}
 
@@ -882,9 +905,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Get the type of bar from foo's (non-nullish) type
 				// For PropertyAccessExpression, we can get the property name
-				if expression.Kind == ast.KindPropertyAccessExpression {
+				if isPropertyAccess(expression) {
 					exprType = getPropertyTypeFromBase(nonNullishBase, expression)
-				} else if expression.Kind == ast.KindElementAccessExpression {
+				} else if isElementAccess(expression) {
 					// For element access, check if we're accessing with a literal key
 					// e.g., foo?.[key] where key is 'bar' | 'foo'
 					elemAccess := expression.AsElementAccessExpression()
@@ -965,7 +988,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					} else {
 						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 					}
-				} else if expression.Kind == ast.KindCallExpression {
+				} else if isCallExpr(expression) {
 					// For call expressions in a chain, get the function's return type
 					exprType = getCallReturnType(expression)
 					if exprType == nil {
@@ -975,18 +998,18 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// For other expression types, use the full type
 					exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
 				}
-			} else if expression.Kind == ast.KindPropertyAccessExpression || expression.Kind == ast.KindElementAccessExpression {
+			} else if isPropertyAccess(expression) || isElementAccess(expression) {
 				// Handle property/element access on call expression result
 				// e.g., foo?.().bar?.baz or foo?.bar?.().baz
 				var innerExpr *ast.Node
-				if expression.Kind == ast.KindPropertyAccessExpression {
+				if isPropertyAccess(expression) {
 					innerExpr = expression.AsPropertyAccessExpression().Expression
 				} else {
 					innerExpr = expression.AsElementAccessExpression().Expression
 				}
 
 				// Check if the inner expression is a call expression
-				if innerExpr != nil && innerExpr.Kind == ast.KindCallExpression {
+				if innerExpr != nil && isCallExpr(innerExpr) {
 					exprType = getTypeFromCallProperty(innerExpr, expression)
 					if exprType == nil {
 						return
@@ -997,25 +1020,25 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			} else {
 				// For simple access like foo?.bar, check foo's type
 				// Also handle call expressions that aren't chained (e.g., foo?.bar()?.baz)
-				if expression.Kind == ast.KindCallExpression {
+				if isCallExpr(expression) {
 					// For both optional calls (foo?.()) and regular calls (foo()),
 					// get the function's return type, not the full expression type which includes undefined
 					exprType = getCallReturnType(expression)
 					if exprType == nil {
 						return
 					}
-				} else if expression.Kind == ast.KindPropertyAccessExpression || expression.Kind == ast.KindElementAccessExpression {
+				} else if isPropertyAccess(expression) || isElementAccess(expression) {
 					// Handle property/element access on call expression result
 					// e.g., foo?.().bar?.baz or foo?.bar?.().baz
 					var innerExpr *ast.Node
-					if expression.Kind == ast.KindPropertyAccessExpression {
+					if isPropertyAccess(expression) {
 						innerExpr = expression.AsPropertyAccessExpression().Expression
 					} else {
 						innerExpr = expression.AsElementAccessExpression().Expression
 					}
 
 					// Check if the inner expression is a call expression
-					if innerExpr != nil && innerExpr.Kind == ast.KindCallExpression {
+					if innerExpr != nil && isCallExpr(innerExpr) {
 						exprType = getTypeFromCallProperty(innerExpr, expression)
 						if exprType == nil {
 							return
@@ -1108,23 +1131,23 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						}
 						n = ast.SkipParentheses(n)
 						// Check if this node has optional chaining
-						if n.Kind == ast.KindPropertyAccessExpression && n.AsPropertyAccessExpression().QuestionDotToken != nil {
+						if isPropertyAccess(n) && n.AsPropertyAccessExpression().QuestionDotToken != nil {
 							return true
 						}
-						if n.Kind == ast.KindElementAccessExpression && n.AsElementAccessExpression().QuestionDotToken != nil {
+						if isElementAccess(n) && n.AsElementAccessExpression().QuestionDotToken != nil {
 							return true
 						}
-						if n.Kind == ast.KindCallExpression && n.AsCallExpression().QuestionDotToken != nil {
+						if isCallExpr(n) && n.AsCallExpression().QuestionDotToken != nil {
 							return true
 						}
 						// Check in the expression chain
-						if n.Kind == ast.KindPropertyAccessExpression {
+						if isPropertyAccess(n) {
 							return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
 						}
-						if n.Kind == ast.KindElementAccessExpression {
+						if isElementAccess(n) {
 							return hasOptionalChain(n.AsElementAccessExpression().Expression)
 						}
-						if n.Kind == ast.KindCallExpression {
+						if isCallExpr(n) {
 							return hasOptionalChain(n.AsCallExpression().Expression)
 						}
 						return false
@@ -1137,15 +1160,15 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return false
 						}
 						n = ast.SkipParentheses(n)
-						if n.Kind == ast.KindElementAccessExpression {
+						if isElementAccess(n) {
 							return true
 						}
 						// Check in property access chains
-						if n.Kind == ast.KindPropertyAccessExpression {
+						if isPropertyAccess(n) {
 							return containsElementAccess(n.AsPropertyAccessExpression().Expression)
 						}
 						// Check in call expressions
-						if n.Kind == ast.KindCallExpression {
+						if isCallExpr(n) {
 							return containsElementAccess(n.AsCallExpression().Expression)
 						}
 						return false
@@ -1160,7 +1183,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 						// Check for never type first (never is a special case)
 						flags := checker.Type_flags(leftType)
-						if flags&checker.TypeFlagsNever != 0 {
+						if isNeverType(flags) {
 							ctx.ReportNode(binExpr.Left, buildNeverMessage())
 							return
 						}
@@ -1178,7 +1201,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						// But NOT: Left side has no optional chain but contains element access (arr[0].foo ?? 'default')
 						if !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
 							leftSkip := ast.SkipParentheses(binExpr.Left)
-							if leftSkip.Kind == ast.KindElementAccessExpression {
+							if isElementAccess(leftSkip) {
 								// Case 1: Direct element access - skip check
 								return
 							}
@@ -1206,23 +1229,23 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						}
 						n = ast.SkipParentheses(n)
 						// Check if this node has optional chaining
-						if n.Kind == ast.KindPropertyAccessExpression && n.AsPropertyAccessExpression().QuestionDotToken != nil {
+						if isPropertyAccess(n) && n.AsPropertyAccessExpression().QuestionDotToken != nil {
 							return true
 						}
-						if n.Kind == ast.KindElementAccessExpression && n.AsElementAccessExpression().QuestionDotToken != nil {
+						if isElementAccess(n) && n.AsElementAccessExpression().QuestionDotToken != nil {
 							return true
 						}
-						if n.Kind == ast.KindCallExpression && n.AsCallExpression().QuestionDotToken != nil {
+						if isCallExpr(n) && n.AsCallExpression().QuestionDotToken != nil {
 							return true
 						}
 						// Check in the expression chain
-						if n.Kind == ast.KindPropertyAccessExpression {
+						if isPropertyAccess(n) {
 							return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
 						}
-						if n.Kind == ast.KindElementAccessExpression {
+						if isElementAccess(n) {
 							return hasOptionalChain(n.AsElementAccessExpression().Expression)
 						}
-						if n.Kind == ast.KindCallExpression {
+						if isCallExpr(n) {
 							return hasOptionalChain(n.AsCallExpression().Expression)
 						}
 						return false
@@ -1235,15 +1258,15 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return false
 						}
 						n = ast.SkipParentheses(n)
-						if n.Kind == ast.KindElementAccessExpression {
+						if isElementAccess(n) {
 							return true
 						}
 						// Check in property access chains
-						if n.Kind == ast.KindPropertyAccessExpression {
+						if isPropertyAccess(n) {
 							return containsElementAccess(n.AsPropertyAccessExpression().Expression)
 						}
 						// Check in call expressions
-						if n.Kind == ast.KindCallExpression {
+						if isCallExpr(n) {
 							return containsElementAccess(n.AsCallExpression().Expression)
 						}
 						return false
@@ -1270,7 +1293,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						// 2. Left side has optional chaining AND contains element access (arr[0]?.foo ??= 'default')
 						// But NOT: Left side has no optional chain but contains element access (arr[0].foo ??= 'default')
 						if !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-							if leftSkip.Kind == ast.KindElementAccessExpression {
+							if isElementAccess(leftSkip) {
 								// Case 1: Direct element access - skip check
 								return
 							}
@@ -1283,7 +1306,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						// Skip optional property access - with exactOptionalPropertyTypes,
 						// the type doesn't include undefined but the property can still be absent
 						// Also skip private properties - they have complex semantics
-						if binExpr.Left.Kind == ast.KindPropertyAccessExpression {
+						if isPropertyAccess(binExpr.Left) {
 							propAccess := binExpr.Left.AsPropertyAccessExpression()
 							nameNode := propAccess.Name()
 							if nameNode != nil {
@@ -1309,7 +1332,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 						// Check if the value is always nullish
 						flags := checker.Type_flags(leftType)
-						if flags&checker.TypeFlagsNever != 0 {
+						if isNeverType(flags) {
 							// Special case for never type
 							ctx.ReportNode(binExpr.Left, buildNeverMessage())
 							return
