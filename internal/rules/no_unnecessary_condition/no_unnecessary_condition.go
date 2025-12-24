@@ -559,6 +559,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		}
 
 	// Helper: Get the return type of a call expression's function
+	// Returns the function's return type, or the full expression type for union of functions
 	getCallReturnType := func(callExpr *ast.Node) *checker.Type {
 		if callExpr == nil || callExpr.Kind != ast.KindCallExpression {
 			return nil
@@ -572,6 +573,31 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 		nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
 		if nonNullishFunc == nil {
+			return nil
+		}
+
+		// If it's a union type of functions, check each part's return type
+		// e.g., (() => undefined) | (() => number) should check if any returns nullish
+		if utils.IsUnionType(nonNullishFunc) {
+			// For union of functions, check if any function returns a nullish type
+			// If so, the optional chaining result can be nullish
+			parts := nonNullishFunc.Types()
+			for _, part := range parts {
+				sigs := ctx.TypeChecker.GetCallSignatures(part)
+				if len(sigs) > 0 {
+					retType := ctx.TypeChecker.GetReturnTypeOfSignature(sigs[0])
+					if retType != nil && isNullishType(ctx.TypeChecker, retType) {
+						// At least one function returns nullish, so use full expression type
+						// which includes all possible return types
+						return ctx.TypeChecker.GetTypeAtLocation(callExpr)
+					}
+				}
+			}
+			// No function returns nullish, get first signature's return type
+			signatures := ctx.TypeChecker.GetCallSignatures(nonNullishFunc)
+			if len(signatures) > 0 {
+				return ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
+			}
 			return nil
 		}
 
@@ -614,9 +640,12 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		}
 
 		// Property doesn't exist, check index signature
+		// If index signature exists, we should use GetTypeAtLocation
+		// because index signature access might return undefined (if the key doesn't exist)
 		stringIndexType := ctx.TypeChecker.GetStringIndexType(nonNullishBase)
 		if stringIndexType != nil {
-			return stringIndexType
+			// Let GetTypeAtLocation handle this to include undefined possibility
+			return nil
 		}
 
 		return ctx.TypeChecker.GetTypeAtLocation(propAccess)
@@ -627,7 +656,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 	getTypeFromCallProperty := func(callExpr *ast.Node, accessExpr *ast.Node) *checker.Type {
 		returnType := getCallReturnType(callExpr)
 		if returnType == nil {
-			return nil
+			// For union types, use GetTypeAtLocation
+			returnType = ctx.TypeChecker.GetTypeAtLocation(callExpr)
+			if returnType == nil {
+				return nil
+			}
 		}
 
 		nonNullishReturn := removeNullishFromType(ctx.TypeChecker, returnType)
@@ -907,6 +940,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				// For PropertyAccessExpression, we can get the property name
 				if isPropertyAccess(expression) {
 					exprType = getPropertyTypeFromBase(nonNullishBase, expression)
+					// If nil (index signature case), use GetTypeAtLocation which includes undefined
+					if exprType == nil {
+						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+					}
 				} else if isElementAccess(expression) {
 					// For element access, check if we're accessing with a literal key
 					// e.g., foo?.[key] where key is 'bar' | 'foo'
@@ -992,7 +1029,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// For call expressions in a chain, get the function's return type
 					exprType = getCallReturnType(expression)
 					if exprType == nil {
-						return
+						// For union types, use GetTypeAtLocation
+						exprType = getResolvedType(expression)
+						if exprType == nil {
+							return
+						}
 					}
 				} else {
 					// For other expression types, use the full type
@@ -1025,7 +1066,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// get the function's return type, not the full expression type which includes undefined
 					exprType = getCallReturnType(expression)
 					if exprType == nil {
-						return
+						// For union types or errors, use GetTypeAtLocation
+						exprType = getResolvedType(expression)
+						if exprType == nil {
+							return
+						}
 					}
 				} else if isPropertyAccess(expression) || isElementAccess(expression) {
 					// Handle property/element access on call expression result
@@ -1053,6 +1098,30 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			if exprType == nil {
 				return
+			}
+
+			// Special case: if expression is a call to a union of functions
+			// and any function returns nullish, allow the optional chain
+			if isCallExpr(expression) {
+				callExpr := expression.AsCallExpression()
+				funcType := getResolvedType(callExpr.Expression)
+				if funcType != nil {
+					nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
+					if nonNullishFunc != nil && utils.IsUnionType(nonNullishFunc) {
+						// Check if any function in the union returns nullish
+						parts := nonNullishFunc.Types()
+						for _, part := range parts {
+							sigs := ctx.TypeChecker.GetCallSignatures(part)
+							if len(sigs) > 0 {
+								retType := ctx.TypeChecker.GetReturnTypeOfSignature(sigs[0])
+								if retType != nil && isNullishType(ctx.TypeChecker, retType) {
+									// At least one function returns nullish, allow the optional chain
+									return
+								}
+							}
+						}
+					}
+				}
 			}
 
 			// Allow optional chain on indeterminate types since we can't determine if they're nullish
