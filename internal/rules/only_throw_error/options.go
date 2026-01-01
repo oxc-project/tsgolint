@@ -9,6 +9,9 @@ type OnlyThrowErrorOptions struct {
 	// An array of type or value specifiers which are allowed to be thrown
 	Allow []OnlyThrowErrorOptionsAllowElem `json:"allow,omitempty"`
 
+	// Whether to allow rethrowing caught values that are not Error objects
+	AllowRethrowing bool `json:"allowRethrowing,omitempty"`
+
 	// Whether to allow throwing values typed as any
 	AllowThrowingAny bool `json:"allowThrowingAny,omitempty"`
 
@@ -31,6 +34,9 @@ func (j *OnlyThrowErrorOptions) UnmarshalJSON(value []byte) error {
 	}
 	if v, ok := raw["allow"]; !ok || v == nil {
 		plain.Allow = []OnlyThrowErrorOptionsAllowElem{}
+	}
+	if v, ok := raw["allowRethrowing"]; !ok || v == nil {
+		plain.AllowRethrowing = true
 	}
 	if v, ok := raw["allowThrowingAny"]; !ok || v == nil {
 		plain.AllowThrowingAny = true
