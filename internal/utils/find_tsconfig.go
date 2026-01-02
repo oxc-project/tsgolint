@@ -75,7 +75,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 		visited = &collections.SyncSet[searchNode]{}
 	}
 
-	search := BreadthFirstSearchParallelEx(
+	search := BreadthFirstSearch(
 		searchNode{configFileName: configFileName},
 		func(node searchNode) []searchNode {
 			if config, ok := configs.Load(r.toPath(node.configFileName)); ok && len(config.ProjectReferences()) > 0 {
@@ -193,6 +193,26 @@ func (r *TsConfigResolver) findConfigWithReferences(
 	}
 
 	return configSearchResult{configFileName: ""}
+}
+
+func (r *TsConfigResolver) FindTsConfigParallel(files []string) {
+	// configFileName := r.configFileRegistryBuilder.ComputeConfigFileName(file, skipSearchInDirectoryOfFile, nil)
+	//
+	// if configFileName == "" {
+	// 	return "", false
+	// }
+	//
+	// normalizedPath := tspath.ToPath(filePath, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
+	//
+	// // Search through the config and its references
+	// // This corresponds to findOrCreateDefaultConfiguredProjectWorker
+	// result := r.findConfigWithReferences(filePath, normalizedPath, configFileName, nil, nil)
+	//
+	// if result.configFileName != "" {
+	// 	return result.configFileName, true
+	// }
+	//
+	// return "", false
 }
 
 // Reference: `toPath`: typescript-go/internal/project/projectcollectionbuilder.go:687-689

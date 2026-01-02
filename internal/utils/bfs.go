@@ -206,3 +206,87 @@ func updateMin(a *atomic.Int64, candidate int64) {
 		}
 	}
 }
+
+func BreadthFirstSearch[N comparable](
+	start N,
+	neighbors func(N) []N,
+	visit func(node N) (isResult bool, stop bool),
+	options BreadthFirstSearchOptions[N],
+) BreadthFirstSearchResult[N] {
+	visited := options.Visited
+	if visited == nil {
+		visited = &collections.SyncSet[N]{}
+	}
+
+	type result struct {
+		stop bool
+		job  *breadthFirstSearchJob[N]
+		next *collections.OrderedMap[N, *breadthFirstSearchJob[N]]
+	}
+
+	var fallback *breadthFirstSearchJob[N]
+	// processLevel processes each node at the current level in parallel.
+	// It produces either a list of jobs to be processed in the next level,
+	// or a result if the visit function returns true for any node.
+	processLevel := func(_ int, jobs *collections.OrderedMap[N, *breadthFirstSearchJob[N]]) result {
+		if options.PreprocessLevel != nil {
+			options.PreprocessLevel(&BreadthFirstSearchLevel[N]{jobs: jobs})
+		}
+		nextJobs := collections.NewOrderedMapWithSizeHint[N, *breadthFirstSearchJob[N]](jobs.Size())
+		for i := 0; i < jobs.Size(); i++ {
+			_, j, _ := jobs.EntryAt(i)
+			// If we have already visited this node, skip it.
+			if !visited.AddIfAbsent(j.node) {
+				continue
+			}
+
+			isResult, stopVisit := visit(j.node)
+			if isResult {
+				if stopVisit {
+					return result{
+						stop: true,
+						job:  j,
+						next: nil,
+					}
+				}
+				if fallback == nil {
+					fallback = j
+				}
+			}
+
+			for _, child := range neighbors(j.node) {
+				if !nextJobs.Has(child) {
+					nextJobs.Set(child, &breadthFirstSearchJob[N]{node: child, parent: j})
+				}
+
+			}
+		}
+
+		return result{next: nextJobs}
+	}
+
+	createPath := func(job *breadthFirstSearchJob[N]) []N {
+		var path []N
+		for job != nil {
+			path = append(path, job.node)
+			job = job.parent
+		}
+		return path
+	}
+
+	levelIndex := 0
+	level := collections.NewOrderedMapFromList([]collections.MapEntry[N, *breadthFirstSearchJob[N]]{
+		{Key: start, Value: &breadthFirstSearchJob[N]{node: start}},
+	})
+	for level.Size() > 0 {
+		result := processLevel(levelIndex, level)
+		if result.stop {
+			return BreadthFirstSearchResult[N]{Stopped: true, Path: createPath(result.job)}
+		} else if result.job != nil && fallback == nil {
+			fallback = result.job
+		}
+		level = result.next
+		levelIndex++
+	}
+	return BreadthFirstSearchResult[N]{Stopped: false, Path: createPath(fallback)}
+}
