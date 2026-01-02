@@ -1,3 +1,17 @@
+// Package jsx_no_leaked_render implements a rule that prevents falsy values from
+// leaking into JSX expressions when using the && operator.
+//
+// This rule flags number, bigint, and any types because:
+//   - number: 0 and NaN render as visible "0" and "NaN" in JSX
+//   - bigint: 0n renders as visible "0" in JSX
+//   - any: could be any of the above
+//
+// Strings are NOT flagged because React 18+ treats empty strings as null
+// (no text node created). See: https://github.com/facebook/react/pull/22807
+//
+// Safe alternatives: !!value, Boolean(value), value ? <X/> : null, value > 0
+//
+// Inspired by github.com/gkiely/eslint-plugin-jsx-no-leaked-values
 package jsx_no_leaked_render
 
 import (
@@ -10,7 +24,7 @@ import (
 func buildLeakedRenderMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noLeakedConditionalRendering",
-		Description: "Potential leaked value that might cause unintentionally rendered values or rendering crashes.",
+		Description: "Potential leaked value in JSX. Using `&&` with a number or bigint may render unwanted values (0, NaN). Use `!!`, `Boolean()`, or a ternary to be explicit.",
 	}
 }
 
@@ -21,10 +35,8 @@ func checkLeakyType(t *checker.Type) bool {
 		return true
 	}
 
-	flags := checker.Type_flags(t)
-
 	// Check for number types
-	if flags&checker.TypeFlagsNumberLike != 0 {
+	if utils.IsTypeFlagSet(t, checker.TypeFlagsNumberLike) {
 		// If it's a number literal, check if it's 0 (falsy)
 		if t.IsNumberLiteral() {
 			literal := t.AsLiteralType()
@@ -40,11 +52,12 @@ func checkLeakyType(t *checker.Type) bool {
 	}
 
 	// Check for bigint types (0n is also falsy and renders "0")
-	if flags&checker.TypeFlagsBigIntLike != 0 {
+	if utils.IsTypeFlagSet(t, checker.TypeFlagsBigIntLike) {
 		// If it's a bigint literal, check if it's 0n (falsy)
 		if t.IsBigIntLiteral() {
 			literal := t.AsLiteralType()
-			if literal != nil && literal.String() != "0" {
+			// BigInt literal String() returns value with "n" suffix (e.g., "0n", "123n")
+			if literal != nil && literal.String() != "0n" {
 				// Non-zero bigint literal is safe (truthy)
 				return false
 			}
@@ -56,7 +69,7 @@ func checkLeakyType(t *checker.Type) bool {
 	}
 
 	// Other types (string, boolean, object, null, undefined) are safe
-	// - string: empty string doesn't render visibly
+	// - string: React 18+ treats "" as null (https://github.com/facebook/react/pull/22807)
 	// - boolean: false doesn't render
 	// - object: always truthy
 	// - null/undefined: don't render
