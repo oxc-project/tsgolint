@@ -217,54 +217,6 @@ func BreadthFirstSearch[N comparable](
 	if visited == nil {
 		visited = &collections.SyncSet[N]{}
 	}
-
-	type result struct {
-		stop bool
-		job  *breadthFirstSearchJob[N]
-		next *collections.OrderedMap[N, *breadthFirstSearchJob[N]]
-	}
-
-	var fallback *breadthFirstSearchJob[N]
-	// processLevel processes each node at the current level in parallel.
-	// It produces either a list of jobs to be processed in the next level,
-	// or a result if the visit function returns true for any node.
-	processLevel := func(_ int, jobs *collections.OrderedMap[N, *breadthFirstSearchJob[N]]) result {
-		if options.PreprocessLevel != nil {
-			options.PreprocessLevel(&BreadthFirstSearchLevel[N]{jobs: jobs})
-		}
-		nextJobs := collections.NewOrderedMapWithSizeHint[N, *breadthFirstSearchJob[N]](jobs.Size())
-		for i := 0; i < jobs.Size(); i++ {
-			_, j, _ := jobs.EntryAt(i)
-			// If we have already visited this node, skip it.
-			if !visited.AddIfAbsent(j.node) {
-				continue
-			}
-
-			isResult, stopVisit := visit(j.node)
-			if isResult {
-				if stopVisit {
-					return result{
-						stop: true,
-						job:  j,
-						next: nil,
-					}
-				}
-				if fallback == nil {
-					fallback = j
-				}
-			}
-
-			for _, child := range neighbors(j.node) {
-				if !nextJobs.Has(child) {
-					nextJobs.Set(child, &breadthFirstSearchJob[N]{node: child, parent: j})
-				}
-
-			}
-		}
-
-		return result{next: nextJobs}
-	}
-
 	createPath := func(job *breadthFirstSearchJob[N]) []N {
 		var path []N
 		for job != nil {
@@ -274,19 +226,47 @@ func BreadthFirstSearch[N comparable](
 		return path
 	}
 
-	levelIndex := 0
+	// processLevel processes each node at the current level in parallel.
+	// It produces either a list of jobs to be processed in the next level,
+	// or a result if the visit function returns true for any node.
+	var fallback *breadthFirstSearchJob[N]
 	level := collections.NewOrderedMapFromList([]collections.MapEntry[N, *breadthFirstSearchJob[N]]{
 		{Key: start, Value: &breadthFirstSearchJob[N]{node: start}},
 	})
-	for level.Size() > 0 {
-		result := processLevel(levelIndex, level)
-		if result.stop {
-			return BreadthFirstSearchResult[N]{Stopped: true, Path: createPath(result.job)}
-		} else if result.job != nil && fallback == nil {
-			fallback = result.job
+
+	for levelIndex := 0; level.Size() > 0; levelIndex++ {
+		if options.PreprocessLevel != nil {
+			options.PreprocessLevel(&BreadthFirstSearchLevel[N]{jobs: level})
 		}
-		level = result.next
-		levelIndex++
+
+		nextLevel := collections.NewOrderedMapWithSizeHint[N, *breadthFirstSearchJob[N]](level.Size())
+
+		for i := 0; i < level.Size(); i++ {
+			_, job, _ := level.EntryAt(i)
+
+			if !visited.AddIfAbsent(job.node) {
+				continue
+			}
+
+			isResult, stopVisit := visit(job.node)
+			if isResult {
+				if stopVisit {
+					return BreadthFirstSearchResult[N]{Stopped: true, Path: createPath(job)}
+				}
+				if fallback == nil {
+					fallback = job
+				}
+			}
+
+			for _, child := range neighbors(job.node) {
+				if !nextLevel.Has(child) {
+					nextLevel.Set(child, &breadthFirstSearchJob[N]{node: child, parent: job})
+				}
+			}
+		}
+
+		level = nextLevel
 	}
+
 	return BreadthFirstSearchResult[N]{Stopped: false, Path: createPath(fallback)}
 }

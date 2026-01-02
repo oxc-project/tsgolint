@@ -207,36 +207,26 @@ func runHeadless(args []string) int {
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
 	fileConfigs := make(map[string][]headlessRule, totalFileCount)
-
-	idx := 0
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
-			if logLevel == utils.LogLevelDebug {
-				log.Printf("[%d/%d] Processing file: %s", idx+1, totalFileCount, filePath)
-			}
+			fileConfigs[filePath] = config.Rules
+		}
+	}
 
-			normalizedFilePath := tspath.NormalizeSlashes(filePath)
+	normalizedList := make([]string, 0, totalFileCount)
+	for _, config := range payload.Configs {
+		for _, filePath := range config.FilePaths {
+			normalized := tspath.NormalizeSlashes(filePath)
+			normalizedList = append(normalizedList, normalized)
+		}
+	}
 
-			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
-			if logLevel == utils.LogLevelDebug {
-				log.Printf("tsconfig: %v, found: %v", tsconfig, found)
-			}
-
-			if logLevel == utils.LogLevelDebug {
-				tsconfigStr := "<none>"
-				if found {
-					tsconfigStr = tsconfig
-				}
-				log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
-			}
-
-			if !found {
-				workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
-			} else {
-				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
-			}
-			fileConfigs[normalizedFilePath] = config.Rules
-			idx++
+	result := tsConfigResolver.FindTsConfigParallel(normalizedList)
+	for file, tsconfig := range result {
+		if tsconfig == "" {
+			workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
+		} else {
+			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], file)
 		}
 	}
 

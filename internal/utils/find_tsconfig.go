@@ -2,8 +2,10 @@ package utils
 
 import (
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/project"
@@ -195,24 +197,67 @@ func (r *TsConfigResolver) findConfigWithReferences(
 	return configSearchResult{configFileName: ""}
 }
 
-func (r *TsConfigResolver) FindTsConfigParallel(files []string) {
-	// configFileName := r.configFileRegistryBuilder.ComputeConfigFileName(file, skipSearchInDirectoryOfFile, nil)
-	//
-	// if configFileName == "" {
-	// 	return "", false
-	// }
-	//
-	// normalizedPath := tspath.ToPath(filePath, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
-	//
-	// // Search through the config and its references
-	// // This corresponds to findOrCreateDefaultConfiguredProjectWorker
-	// result := r.findConfigWithReferences(filePath, normalizedPath, configFileName, nil, nil)
-	//
-	// if result.configFileName != "" {
-	// 	return result.configFileName, true
-	// }
-	//
-	// return "", false
+type ResolutionResult struct {
+	file   string
+	config string
+}
+
+func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]string {
+	in := make(chan string, len(fileNames))
+	out := make(chan ResolutionResult, len(fileNames))
+
+	numWorker := runtime.GOMAXPROCS(0)
+
+	var wg sync.WaitGroup
+	for range numWorker {
+		wg.Go(func() {
+			for file := range in {
+				config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
+				if config == "" {
+					out <- ResolutionResult{
+						file:   file,
+						config: config,
+					}
+					continue
+				}
+
+				fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
+
+				// Search through the config and its references
+				result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
+
+				if result.configFileName != "" {
+					out <- ResolutionResult{
+						config: result.configFileName,
+						file:   file,
+					}
+					continue
+				}
+
+				out <- ResolutionResult{
+					config: result.configFileName,
+					file:   file,
+				}
+			}
+		})
+	}
+
+	for i := range fileNames {
+		in <- fileNames[i]
+	}
+	close(in)
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	res := make(map[string]string, len(fileNames))
+	for result := range out {
+		res[result.file] = result.config
+	}
+
+	return res
 }
 
 // Reference: `toPath`: typescript-go/internal/project/projectcollectionbuilder.go:687-689
