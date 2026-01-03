@@ -1222,3 +1222,5 @@ const WideningKindNormal = checker.WideningKindNormal
 func GetFunctionFlags(node *ast.Node) checker.FunctionFlags
 //go:linkname IsNonDeferredTypeReference github.com/microsoft/typescript-go/internal/checker.isNonDeferredTypeReference
 func IsNonDeferredTypeReference(t *checker.Type) bool
+//go:linkname GetMappedTypeModifiers github.com/microsoft/typescript-go/internal/checker.getMappedTypeModifiers
+func GetMappedTypeModifiers(t *checker.Type) checker.MappedTypeModifiers
