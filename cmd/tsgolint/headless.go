@@ -213,15 +213,15 @@ func runHeadless(args []string) int {
 		}
 	}
 
-	normalizedList := make([]string, 0, totalFileCount)
+	normalizedFiles := make([]string, 0, totalFileCount)
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
 			normalized := tspath.NormalizeSlashes(filePath)
-			normalizedList = append(normalizedList, normalized)
+			normalizedFiles = append(normalizedFiles, normalized)
 		}
 	}
 
-	result := tsConfigResolver.FindTsConfigParallel(normalizedList)
+	result := tsConfigResolver.FindTsConfigParallel(normalizedFiles)
 	for file, tsconfig := range result {
 		if tsconfig == "" {
 			workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
