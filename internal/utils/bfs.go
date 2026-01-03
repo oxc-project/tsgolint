@@ -241,7 +241,7 @@ func BreadthFirstSearch[N comparable](
 
 		nextLevel := collections.NewOrderedMapWithSizeHint[N, *breadthFirstSearchJob[N]](level.Size())
 
-		for i := 0; i < level.Size(); i++ {
+		for i := range level.Size() {
 			_, job, _ := level.EntryAt(i)
 
 			if !visited.AddIfAbsent(job.node) {
