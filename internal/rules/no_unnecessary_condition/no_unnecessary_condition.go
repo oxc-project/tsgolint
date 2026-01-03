@@ -634,20 +634,69 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return ctx.TypeChecker.GetTypeAtLocation(propAccess)
 		}
 
+		// Try to get the property directly first
 		prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishBase, propName)
 		if prop != nil {
 			return ctx.TypeChecker.GetTypeOfSymbol(prop)
 		}
 
-		// Property doesn't exist, check index signature
-		// If index signature exists, we should use GetTypeAtLocation
-		// because index signature access might return undefined (if the key doesn't exist)
-		stringIndexType := ctx.TypeChecker.GetStringIndexType(nonNullishBase)
-		if stringIndexType != nil {
-			// Let GetTypeAtLocation handle this to include undefined possibility
-			return nil
+		// For mapped types, try the apparent type which may have the property
+		apparentType := checker.Checker_getApparentType(ctx.TypeChecker, nonNullishBase)
+		if apparentType != nil && apparentType != nonNullishBase {
+			prop = checker.Checker_getPropertyOfType(ctx.TypeChecker, apparentType, propName)
+			if prop != nil {
+				return ctx.TypeChecker.GetTypeOfSymbol(prop)
+			}
 		}
 
+		// Property doesn't exist as a declared property, check index signatures
+		// For index signatures and mapped types, behavior depends on noUncheckedIndexedAccess:
+		// - WITH noUncheckedIndexedAccess: index access returns T | undefined, be conservative
+		// - WITHOUT noUncheckedIndexedAccess: index access returns T, use the actual type
+		stringIndexType := ctx.TypeChecker.GetStringIndexType(nonNullishBase)
+		if stringIndexType == nil && apparentType != nil {
+			// Try the apparent type's index signature
+			stringIndexType = ctx.TypeChecker.GetStringIndexType(apparentType)
+		}
+
+		// For mapped types with template literal keys (e.g., Lowercase<string>),
+		// GetStringIndexType may return nil. Check if the type is a mapped type
+		// and look at all its properties to find one that matches.
+		if stringIndexType == nil {
+			objectFlags := checker.Type_objectFlags(nonNullishBase)
+			if objectFlags&checker.ObjectFlagsMapped != 0 {
+				// This is a mapped type - get all its properties
+				properties := checker.Checker_getPropertiesOfType(ctx.TypeChecker, nonNullishBase)
+				for _, p := range properties {
+					if p.Name == propName {
+						// Found the property - check if it's optional
+						if p.Flags&ast.SymbolFlagsOptional == 0 {
+							// Non-optional property - use its type
+							return ctx.TypeChecker.GetTypeOfSymbol(p)
+						}
+						// Optional property - let caller handle it
+						return nil
+					}
+				}
+				// For mapped types where we couldn't find the property,
+				// return nil to signal we couldn't determine the property type.
+				// The caller can then handle this case specially for mapped types.
+				return nil
+			}
+		}
+
+		if stringIndexType != nil {
+			// With noUncheckedIndexedAccess, TypeScript adds undefined to index accesses
+			// So we should let GetTypeAtLocation handle it to be conservative
+			if ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+				return nil
+			}
+			// Without noUncheckedIndexedAccess, return the actual index type
+			// This allows us to flag unnecessary optional chains on non-optional mapped types
+			return stringIndexType
+		}
+
+		// For non-mapped types, fall back to GetTypeAtLocation
 		return ctx.TypeChecker.GetTypeAtLocation(propAccess)
 	}
 
@@ -940,9 +989,25 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				// For PropertyAccessExpression, we can get the property name
 				if isPropertyAccess(expression) {
 					exprType = getPropertyTypeFromBase(nonNullishBase, expression)
-					// If nil (index signature case), use GetTypeAtLocation which includes undefined
+					// If nil (couldn't resolve property directly), use GetTypeAtLocation
 					if exprType == nil {
 						exprType = ctx.TypeChecker.GetTypeAtLocation(expression)
+						// For chained access with optional chains, GetTypeAtLocation includes
+						// short-circuit undefined. For non-optional mapped types, we should
+						// remove this undefined. Check if the base type is a mapped type
+						// and if so, remove nullish from the result.
+						if exprType != nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
+							objectFlags := checker.Type_objectFlags(nonNullishBase)
+							if objectFlags&checker.ObjectFlagsMapped != 0 {
+								// Check if the mapped type has the optional modifier (?)
+								// If it does, the property genuinely can be undefined
+								modifiers := checker.GetMappedTypeModifiers(nonNullishBase)
+								if modifiers&checker.MappedTypeModifiersIncludeOptional == 0 {
+									// Non-optional mapped type - remove the short-circuit undefined
+									exprType = removeNullishFromType(ctx.TypeChecker, exprType)
+								}
+							}
+						}
 					}
 				} else if isElementAccess(expression) {
 					// For element access, check if we're accessing with a literal key
@@ -1102,22 +1167,28 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			// Special case: if expression is a call to a union of functions
 			// and any function returns nullish, allow the optional chain
+			// e.g., type Foo = (() => undefined) | (() => number) | null
+			//       foo?.()?.bar - second ?. is necessary because result could be undefined
 			if isCallExpr(expression) {
 				callExpr := expression.AsCallExpression()
 				funcType := getResolvedType(callExpr.Expression)
 				if funcType != nil {
-					nonNullishFunc := removeNullishFromType(ctx.TypeChecker, funcType)
-					if nonNullishFunc != nil && utils.IsUnionType(nonNullishFunc) {
-						// Check if any function in the union returns nullish
-						parts := nonNullishFunc.Types()
-						for _, part := range parts {
-							sigs := ctx.TypeChecker.GetCallSignatures(part)
-							if len(sigs) > 0 {
-								retType := ctx.TypeChecker.GetReturnTypeOfSignature(sigs[0])
-								if retType != nil && isNullishType(ctx.TypeChecker, retType) {
-									// At least one function returns nullish, allow the optional chain
-									return
-								}
+					// Check the ORIGINAL type's parts, not after removeNullishFromType
+					// because removeNullishFromType only returns the first non-nullish part
+					parts := utils.UnionTypeParts(funcType)
+					for _, part := range parts {
+						// Skip nullish parts (null, undefined, void)
+						partFlags := checker.Type_flags(part)
+						if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
+							continue
+						}
+						// Check if this function part returns nullish
+						sigs := ctx.TypeChecker.GetCallSignatures(part)
+						if len(sigs) > 0 {
+							retType := ctx.TypeChecker.GetReturnTypeOfSignature(sigs[0])
+							if retType != nil && isNullishType(ctx.TypeChecker, retType) {
+								// At least one function returns nullish, allow the optional chain
+								return
 							}
 						}
 					}
