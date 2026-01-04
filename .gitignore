@@ -2,3 +2,7 @@
 internal/collections/
 e2e/node_modules/
 node_modules/
+
+*.pprof
+*.out
+
