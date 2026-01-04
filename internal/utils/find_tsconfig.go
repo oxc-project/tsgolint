@@ -202,6 +202,37 @@ type ResolutionResult struct {
 	config string
 }
 
+func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
+	for file := range in {
+		config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
+		if config == "" {
+			out <- ResolutionResult{
+				file:   file,
+				config: config,
+			}
+			continue
+		}
+
+		fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
+
+		// Search through the config and its references
+		result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
+
+		if result.configFileName != "" {
+			out <- ResolutionResult{
+				config: result.configFileName,
+				file:   file,
+			}
+			continue
+		}
+
+		out <- ResolutionResult{
+			config: result.configFileName,
+			file:   file,
+		}
+	}
+}
+
 func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]string {
 	in := make(chan string, len(fileNames))
 	out := make(chan ResolutionResult, len(fileNames))
@@ -211,34 +242,7 @@ func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]s
 	var wg sync.WaitGroup
 	for range numWorker {
 		wg.Go(func() {
-			for file := range in {
-				config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
-				if config == "" {
-					out <- ResolutionResult{
-						file:   file,
-						config: config,
-					}
-					continue
-				}
-
-				fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
-
-				// Search through the config and its references
-				result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
-
-				if result.configFileName != "" {
-					out <- ResolutionResult{
-						config: result.configFileName,
-						file:   file,
-					}
-					continue
-				}
-
-				out <- ResolutionResult{
-					config: result.configFileName,
-					file:   file,
-				}
-			}
+			r.work(in, out)
 		})
 	}
 
