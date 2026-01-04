@@ -155,6 +155,42 @@ throw new Map();
 		},
 		{
 			Code: `
+try {
+} catch (e) {
+  throw e;
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+		},
+		{
+			Code: `
+try {
+} catch (eOuter) {
+  try {
+    if (Math.random() > 0.5) {
+      throw eOuter;
+    }
+  } catch (eInner) {
+    if (Math.random() > 0.5) {
+      throw eOuter;
+    } else {
+      throw eInner;
+    }
+  }
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+		},
+		{
+			Code: `
+Promise.reject('foo').catch(e => {
+  throw e;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+		},
+		{
+			Code: `
         import { createError } from 'errors';
         throw createError();
       `,
@@ -591,6 +627,102 @@ function *foo(): Generator<number, void, string> {
 }
       `,
 			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowThrowingAny": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+let x = 1;
+Promise.reject('foo').catch(e => {
+  throw x;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+Promise.reject('foo').catch((...e) => {
+  throw e;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: any[];
+Promise.reject('foo').catch(...x, e => {
+  throw e;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+declare const x: any[];
+Promise.reject('foo').then(...x, e => {
+  throw e;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+declare const onFulfilled: any;
+declare const x: any[];
+Promise.reject('foo').then(onFulfilled, ...x, e => {
+  throw e;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+Promise.reject('foo').then((...e) => {
+  throw e;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+Promise.reject('foo').then(e => {
+  throw globalThis;
+});
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",
