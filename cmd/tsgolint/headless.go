@@ -231,6 +231,14 @@ func runHeadless(args []string) int {
 	}
 
 	if logLevel == utils.LogLevelDebug {
+		for file, tsconfig := range result {
+			tsconfigStr := "<none>"
+			if tsconfig != "" {
+				tsconfigStr = tsconfig
+			}
+			log.Printf("Got tsconfig for file %s: %s", file, tsconfigStr)
+		}
+
 		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
 		for program, files := range workload.Programs {
 			log.Printf("  Program %s: %d files", program, len(files))
