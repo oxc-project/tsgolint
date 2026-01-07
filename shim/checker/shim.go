@@ -855,9 +855,6 @@ func Signature_parameters(v *checker.Signature) []*ast.Symbol {
 func Signature_declaration(v *checker.Signature) *ast.Node {
   return ((*extra_Signature)(unsafe.Pointer(v))).declaration
 }
-func Signature_resolvedTypePredicate(v *checker.Signature) *checker.TypePredicate {
-  return ((*extra_Signature)(unsafe.Pointer(v))).resolvedTypePredicate
-}
 type SignatureCheckMode = checker.SignatureCheckMode
 const SignatureCheckModeBivariantCallback = checker.SignatureCheckModeBivariantCallback
 const SignatureCheckModeCallback = checker.SignatureCheckModeCallback
@@ -893,8 +890,6 @@ type SignatureToSignatureDeclarationOptions = checker.SignatureToSignatureDeclar
 type SimpleTypeMapper = checker.SimpleTypeMapper
 //go:linkname SkipAlias github.com/microsoft/typescript-go/internal/checker.SkipAlias
 func SkipAlias(symbol *ast.Symbol, checker *checker.Checker) *ast.Symbol
-//go:linkname SkipTypeChecking github.com/microsoft/typescript-go/internal/checker.SkipTypeChecking
-func SkipTypeChecking(sourceFile *ast.SourceFile, options *core.CompilerOptions, host checker.Program, ignoreNoCheck bool) bool
 type SourceFileLinks = checker.SourceFileLinks
 type SpreadLinks = checker.SpreadLinks
 type StringLiteralType = checker.StringLiteralType
