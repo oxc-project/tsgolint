@@ -1,3 +1,9 @@
 {
-  "ExtraMethods": {}
+  "ExtraMethods": {
+    "ConfigFileRegistryBuilder": [
+      "ComputeConfigFileName",
+      "FindOrAcquireConfigForFile",
+      "GetAncestorConfigFileName"
+    ]
+  }
 }
