@@ -1,11 +1,11 @@
 {
   "name": "tsgolint",
-  "packageManager": "pnpm@10.26.2",
+  "packageManager": "pnpm@10.27.0",
   "scripts": {
     "fmt": "dprint fmt"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
-    "dprint": "^0.50.1"
+    "dprint": "^0.51.0"
   }
 }

@@ -681,13 +681,10 @@ var NoMisusedPromisesRule = rule.Rule{
 				for current != nil && !ast.IsFunctionLike(current) {
 					current = current.Parent
 				}
-				if current == nil {
-					panic("missing parent function")
-				}
 				return current
 			})()
 
-			if functionNode.Type() != nil && !isPossiblyFunctionType(functionNode.Type()) {
+			if functionNode != nil &&  functionNode.Type() != nil && !isPossiblyFunctionType(functionNode.Type()) {
 				return
 			}
 
