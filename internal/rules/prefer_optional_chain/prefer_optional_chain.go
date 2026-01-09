@@ -1,12 +1,13 @@
 package prefer_optional_chain
 
 import (
+	"strings"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
-	"strings"
 )
 
 func buildPreferOptionalChainMessage() rule.RuleMessage {
@@ -1450,11 +1451,26 @@ outer3:
 	if isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
 
-		comparedExpr := ast.SkipParentheses(binExpr.Left)
-		hasPropertyAccess := utils.IsAccessExpression(comparedExpr)
+		left := ast.SkipParentheses(binExpr.Left)
+		right := ast.SkipParentheses(binExpr.Right)
+		leftIsAccess := utils.IsAccessExpression(left)
+		rightIsAccess := utils.IsAccessExpression(right)
 
-		if utils.IsAccessExpression(binExpr.Right) {
-			comparedExpr = ast.SkipParentheses(binExpr.Right)
+		// If both sides are access expressions with the same base, we can't convert
+		// to optional chaining (e.g., foo && foo.bar === foo.baz)
+		if leftIsAccess && rightIsAccess {
+			leftBase := getBaseIdentifier(left)
+			rightBase := getBaseIdentifier(right)
+			if areNodesStructurallyEqual(leftBase, rightBase) {
+				return Operand{typ: OperandTypeInvalid, node: node}
+			}
+		}
+
+		comparedExpr := left
+		hasPropertyAccess := leftIsAccess
+
+		if rightIsAccess {
+			comparedExpr = right
 			hasPropertyAccess = true
 		}
 
@@ -1467,9 +1483,24 @@ outer3:
 
 	if !isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
-		comparedExpr := ast.SkipParentheses(binExpr.Left)
-		if utils.IsAccessExpression(binExpr.Right) {
-			comparedExpr = ast.SkipParentheses(binExpr.Right)
+		left := ast.SkipParentheses(binExpr.Left)
+		right := ast.SkipParentheses(binExpr.Right)
+		leftIsAccess := utils.IsAccessExpression(left)
+		rightIsAccess := utils.IsAccessExpression(right)
+
+		// If both sides are access expressions with the same base, we can't convert
+		// to optional chaining (e.g., foo == null || foo.bar === foo.baz)
+		if leftIsAccess && rightIsAccess {
+			leftBase := getBaseIdentifier(left)
+			rightBase := getBaseIdentifier(right)
+			if areNodesStructurallyEqual(leftBase, rightBase) {
+				return Operand{typ: OperandTypeInvalid, node: node}
+			}
+		}
+
+		comparedExpr := left
+		if rightIsAccess {
+			comparedExpr = right
 		}
 		return Operand{typ: OperandTypeComparison, node: node, comparedExpr: comparedExpr}
 	}
