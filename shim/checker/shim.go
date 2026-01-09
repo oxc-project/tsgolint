@@ -700,6 +700,8 @@ func NewDiagnosticChainForNode(chain *ast.Diagnostic, node *ast.Node, message *d
 func NewDiagnosticForNode(node *ast.Node, message *diagnostics.Message, args ...any) *ast.Diagnostic
 //go:linkname NewNodeBuilder github.com/microsoft/typescript-go/internal/checker.NewNodeBuilder
 func NewNodeBuilder(ch *checker.Checker, e *printer.EmitContext) *checker.NodeBuilder
+//go:linkname NewNodeBuilderEx github.com/microsoft/typescript-go/internal/checker.NewNodeBuilderEx
+func NewNodeBuilderEx(ch *checker.Checker, e *printer.EmitContext, idToSymbol map[*ast.IdentifierNode]*ast.Symbol) *checker.NodeBuilder
 //go:linkname NewSymbolTrackerImpl github.com/microsoft/typescript-go/internal/checker.NewSymbolTrackerImpl
 func NewSymbolTrackerImpl(context *checker.NodeBuilderContext, tracker nodebuilder.SymbolTracker, tchost checker.Host) *checker.SymbolTrackerImpl
 type NodeBuilder = checker.NodeBuilder

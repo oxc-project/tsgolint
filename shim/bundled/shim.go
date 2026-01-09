@@ -8,6 +8,8 @@ import "github.com/microsoft/typescript-go/internal/vfs"
 import _ "unsafe"
 
 const Embedded = bundled.Embedded
+//go:linkname IsBundled github.com/microsoft/typescript-go/internal/bundled.IsBundled
+func IsBundled(path string) bool
 var LibNames = bundled.LibNames
 //go:linkname LibPath github.com/microsoft/typescript-go/internal/bundled.LibPath
 func LibPath() string
