@@ -45,6 +45,7 @@ const ALL_RULES = [
   'only-throw-error',
   'prefer-includes',
   'prefer-nullish-coalescing',
+  'prefer-optional-chain',
   'prefer-promise-reject-errors',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
@@ -188,7 +189,7 @@ function resolveTestFilePath(relativePath: string): string {
 function generateConfig(
   files: string[],
   rules:
-    readonly ((typeof ALL_RULES)[number] | { name: typeof ALL_RULES[number]; options: Record<string, unknown> })[] =
+    readonly ((typeof ALL_RULES)[number] | { name: (typeof ALL_RULES)[number]; options: Record<string, unknown> })[] =
       ALL_RULES,
   options?: {
     reportSyntactic?: boolean;
@@ -211,10 +212,14 @@ function generateConfig(
     configs: [
       {
         file_paths: files,
-        rules: rules.map((r): {
-          name: typeof ALL_RULES[number];
-          options?: Record<string, unknown>;
-        } => (typeof r === 'string' ? { name: r } : r)),
+        rules: rules.map(
+          (
+            r,
+          ): {
+            name: (typeof ALL_RULES)[number];
+            options?: Record<string, unknown>;
+          } => (typeof r === 'string' ? { name: r } : r),
+        ),
       },
     ],
     ...(options?.reportSyntactic !== undefined && { report_syntactic: options.reportSyntactic }),
@@ -242,9 +247,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       }
     }
 
-    expect(fileSystemRulesList.sort()).toEqual(
-      [...ALL_RULES].sort(),
-    );
+    expect(fileSystemRulesList.sort()).toEqual([...ALL_RULES].sort());
   });
 
   it('should generate consistent diagnostics snapshot', async () => {
@@ -519,18 +522,20 @@ console.log(x);
     const testFiles = await getTestFiles('issue-135');
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(testFiles, [{
-      name: 'no-floating-promises',
-      options: {
-        allowForKnownSafeCalls: [
-          {
-            from: 'package',
-            name: ['test', 'it', 'suite', 'describe'],
-            package: 'node2:test',
-          },
-        ],
+    const config = generateConfig(testFiles, [
+      {
+        name: 'no-floating-promises',
+        options: {
+          allowForKnownSafeCalls: [
+            {
+              from: 'package',
+              name: ['test', 'it', 'suite', 'describe'],
+              package: 'node2:test',
+            },
+          ],
+        },
       },
-    }]);
+    ]);
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,
@@ -547,13 +552,9 @@ console.log(x);
     const testFiles = await getTestFiles('report-type-errors');
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(
-      testFiles,
-      ['no-floating-promises'],
-      {
-        reportSemantic: true,
-      },
-    );
+    const config = generateConfig(testFiles, ['no-floating-promises'], {
+      reportSemantic: true,
+    });
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,

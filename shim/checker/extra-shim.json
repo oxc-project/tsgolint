@@ -33,7 +33,9 @@
       "IsDeprecatedDeclaration",
       "GetShorthandAssignmentValueSymbol",
       "getImmediateAliasedSymbol",
-      "getDeclarationOfAliasSymbol"
+      "getDeclarationOfAliasSymbol",
+      "GetNonNullableType",
+      "IsNullableType"
     ]
   },
   "ExtraFields": {

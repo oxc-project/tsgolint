@@ -51,6 +51,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/only_throw_error"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_includes"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_nullish_coalescing"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_optional_chain"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_promise_reject_errors"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_reduce_type_parameter"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_return_this_type"
@@ -123,6 +124,27 @@ func writeMemProfiles(heapOut string, allocsOut string) {
 	}
 }
 
+func setupProfiling(opts *headlessOptions) (func(), error) {
+	cleanupTrace, err := recordTrace(opts.traceOut)
+	if err != nil {
+		return nil, fmt.Errorf("failed to start trace: %w", err)
+	}
+
+	cleanupCpuProfile, err := recordCpuprof(opts.cpuprofOut)
+	if err != nil {
+		cleanupTrace() // in case tracing started
+		return nil, fmt.Errorf("failed to start cpu profile: %w", err)
+	}
+
+	finalizeMemProfile := func() { writeMemProfiles(opts.heapOut, opts.allocsOut) }
+
+	return func() {
+		cleanupTrace()
+		cleanupCpuProfile()
+		finalizeMemProfile()
+	}, nil
+}
+
 var allRules = []rule.Rule{
 	await_thenable.AwaitThenableRule,
 	no_array_delete.NoArrayDeleteRule,
@@ -153,6 +175,7 @@ var allRules = []rule.Rule{
 	non_nullable_type_assertion_style.NonNullableTypeAssertionStyleRule,
 	only_throw_error.OnlyThrowErrorRule,
 	prefer_includes.PreferIncludesRule,
+	prefer_optional_chain.PreferOptionalChainRule,
 	prefer_nullish_coalescing.PreferNullishCoalescingRule,
 	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
 	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,

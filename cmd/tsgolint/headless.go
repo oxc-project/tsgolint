@@ -26,6 +26,32 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+type headlessOptions struct {
+	traceOut       string
+	cpuprofOut     string
+	heapOut        string
+	allocsOut      string
+	fix            bool
+	fixSuggestions bool
+}
+
+func parseHeadlessOptions(args []string) (*headlessOptions, error) {
+	var opts headlessOptions
+
+	flag.StringVar(&opts.traceOut, "trace", "", "file to put trace to")
+	flag.StringVar(&opts.cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
+	flag.StringVar(&opts.heapOut, "heap", "", "file to put heap profiling to")
+	flag.StringVar(&opts.allocsOut, "allocs", "", "file to put allocs profiling to")
+	flag.BoolVar(&opts.fix, "fix", false, "generate fixes for code problems")
+	flag.BoolVar(&opts.fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
+
+	if err := flag.CommandLine.Parse(args); err != nil {
+		return nil, err
+	}
+
+	return &opts, nil
+}
+
 type headlessRange struct {
 	Pos int `json:"pos"`
 	End int `json:"end"`
@@ -130,40 +156,24 @@ func writeErrorMessage(text string) error {
 
 func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
-
-	var (
-		traceOut       string
-		cpuprofOut     string
-		heapOut        string
-		allocsOut      string
-		fix            bool
-		fixSuggestions bool
-	)
-	flag.StringVar(&traceOut, "trace", "", "file to put trace to")
-	flag.StringVar(&cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
-	flag.StringVar(&heapOut, "heap", "", "file to put heap profiling to")
-	flag.StringVar(&allocsOut, "allocs", "", "file to put allocs profiling to")
-	flag.BoolVar(&fix, "fix", false, "generate fixes for code problems")
-	flag.BoolVar(&fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
-	flag.CommandLine.Parse(args)
-
 	log.SetOutput(os.Stderr)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting tsgolint")
 	}
 
-	if done, err := recordTrace(traceOut); err != nil {
-		os.Stderr.WriteString(err.Error())
+	opts, err := parseHeadlessOptions(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error parsing options: %v", err)
 		return 1
-	} else {
-		defer done()
 	}
-	if done, err := recordCpuprof(cpuprofOut); err != nil {
-		os.Stderr.WriteString(err.Error())
+
+	if cleanup, err := setupProfiling(opts); err != nil {
+		fmt.Fprintf(os.Stderr, "error starting profiling: %v", err)
 		return 1
 	} else {
-		defer done()
+		defer cleanup()
 	}
 
 	cwd, err := os.Getwd()
@@ -172,14 +182,13 @@ func runHeadless(args []string) int {
 		return 1
 	}
 
-	configRaw, err := io.ReadAll(os.Stdin)
+	jsonPayload, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error reading from stdin: %v", err))
 		return 1
 	}
 
-	payload, err := deserializePayload(configRaw)
-
+	payload, err := deserializePayload(jsonPayload)
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error parsing config: %v", err))
 		return 1
@@ -287,7 +296,7 @@ func runHeadless(args []string) int {
 					FilePath:    &filePath,
 				}
 
-				if fix {
+				if opts.fix {
 					hd.Fixes = make([]headlessFix, len(rd.Fixes()))
 					for i, fix := range rd.Fixes() {
 						hd.Fixes[i] = headlessFix{
@@ -296,7 +305,7 @@ func runHeadless(args []string) int {
 						}
 					}
 				}
-				if fixSuggestions {
+				if opts.fixSuggestions {
 					hd.Suggestions = make([]headlessSuggestion, len(rd.GetSuggestions()))
 					for i, suggestion := range rd.GetSuggestions() {
 						hd.Suggestions[i] = headlessSuggestion{
@@ -373,8 +382,8 @@ func runHeadless(args []string) int {
 			diagnosticsChan <- internalToAny(d)
 		},
 		linter.Fixes{
-			Fix:            fix,
-			FixSuggestions: fixSuggestions,
+			Fix:            opts.fix,
+			FixSuggestions: opts.fixSuggestions,
 		},
 		linter.TypeErrors{
 			ReportSyntactic: payload.ReportSyntactic,
@@ -394,8 +403,6 @@ func runHeadless(args []string) int {
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")
 	}
-
-	writeMemProfiles(heapOut, allocsOut)
 
 	return 0
 }

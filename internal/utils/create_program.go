@@ -117,7 +117,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 }
 
 func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, host compiler.CompilerHost, fileNames []string) (*compiler.Program, []diagnostic.Internal, error) {
-	program := compiler.NewProgram(compiler.ProgramOptions{
+	opts := compiler.ProgramOptions{
 		Config: &tsoptions.ParsedCommandLine{
 			ParsedConfig: &core.ParsedOptions{
 				CompilerOptions: &core.CompilerOptions{
@@ -139,7 +139,11 @@ func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, ho
 		},
 		SingleThreaded: core.TSTrue,
 		Host:           host,
-	})
+	}
+	if !singleThreaded {
+		opts.SingleThreaded = core.TSFalse
+	}
+	program := compiler.NewProgram(opts)
 
 	// TODO: report syntactic diagnostics?
 

@@ -127,6 +127,14 @@ func TestRequireArraySortCompare(t *testing.T) {
         }
       `,
 		},
+		{
+			Code: `declare const myArray: Array<"A" | "B">; myArray.sort();`,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+		},
+		{
+			Code: `enum Fruit { Apple = 'apple', Banana = 'banana' }; declare const fruits: Fruit[]; fruits.sort();`,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -319,6 +327,15 @@ func TestRequireArraySortCompare(t *testing.T) {
           a.toSorted();
         }
       `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `declare const myArray: ("A" | "B" | 3)[]; myArray.sort();`,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",

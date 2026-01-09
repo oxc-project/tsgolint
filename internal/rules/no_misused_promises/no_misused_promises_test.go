@@ -1070,6 +1070,7 @@ declare const useCallback: <T extends (...args: unknown[]) => unknown>(
 ) => T;
 useCallback<ReturnsVoid | ReturnsPromiseVoid>(async () => {});
     `},
+	{Code: `if (process.env.SKIP) { return x; }`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `

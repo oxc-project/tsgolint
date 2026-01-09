@@ -62,18 +62,6 @@ func isLogicalOrOperator(node *ast.Node) bool {
 	return op == ast.KindBarBarToken || op == ast.KindBarBarEqualsToken
 }
 
-func isNullLiteral(node *ast.Node) bool {
-	return node.Kind == ast.KindNullKeyword
-}
-
-func isUndefinedIdentifier(node *ast.Node) bool {
-	return ast.IsIdentifier(node) && node.Text() == "undefined"
-}
-
-func isNullLiteralOrUndefinedIdentifier(node *ast.Node) bool {
-	return isNullLiteral(node) || isUndefinedIdentifier(node)
-}
-
 func isMemberAccessLike(node *ast.Node) bool {
 	// Skip parentheses to handle deeply nested patterns like ((((foo.a))))
 	node = ast.SkipParentheses(node)
@@ -615,10 +603,10 @@ var PreferNullishCoalescingRule = rule.Rule{
 						rightBin := binExpr.Right.AsBinaryExpression()
 
 						// Check if one side is a simple nullish comparison (null === null or undefined === undefined)
-						leftIsNullishComparison := isNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(leftBin.Left)) &&
-							isNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(leftBin.Right))
-						rightIsNullishComparison := isNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(rightBin.Left)) &&
-							isNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(rightBin.Right))
+						leftIsNullishComparison := utils.IsNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(leftBin.Left)) &&
+							utils.IsNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(leftBin.Right))
+						rightIsNullishComparison := utils.IsNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(rightBin.Left)) &&
+							utils.IsNullLiteralOrUndefinedIdentifier(ast.SkipParentheses(rightBin.Right))
 
 						if leftIsNullishComparison || rightIsNullishComparison {
 							return "", nil
@@ -724,9 +712,9 @@ var PreferNullishCoalescingRule = rule.Rule{
 					hasUndefinedCheck := false
 
 					for _, testNode := range nodesInsideTest {
-						if isNullLiteral(testNode) {
+						if utils.IsNullLiteral(testNode) {
 							hasNullCheck = true
-						} else if isUndefinedIdentifier(testNode) {
+						} else if utils.IsUndefinedIdentifier(testNode) {
 							hasUndefinedCheck = true
 						} else if areNodesSimilarMemberAccess(testNode, nonNullishBranchUnwrapped) {
 							if nullishCoalescingLeftNode == nil {
@@ -845,9 +833,9 @@ var PreferNullishCoalescingRule = rule.Rule{
 					foundMatchingNode := false
 
 					for _, testNode := range nodesInsideTest {
-						if isNullLiteral(testNode) {
+						if utils.IsNullLiteral(testNode) {
 							hasNullCheck = true
-						} else if isUndefinedIdentifier(testNode) {
+						} else if utils.IsUndefinedIdentifier(testNode) {
 							hasUndefinedCheck = true
 						} else if areNodesSimilarMemberAccess(testNode, nullishCoalescingLeftNode) {
 							foundMatchingNode = true
