@@ -637,6 +637,15 @@ func newChainProcessor(ctx rule.RuleContext, opts PreferOptionalChainOptions) *c
 	}
 }
 
+func (processor *chainProcessor) getNodeRange(node *ast.Node) core.TextRange {
+	return utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
+}
+
+func (processor *chainProcessor) getNodeText(node *ast.Node) string {
+	r := processor.getNodeRange(node)
+	return processor.sourceText[r.Pos():r.End()]
+}
+
 func (processor *chainProcessor) getTypeInfo(node *ast.Node) *TypeInfo {
 	if info, ok := processor.typeCache[node]; ok {
 		return info
@@ -709,10 +718,8 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 		switch {
 		case ast.IsCallExpression(n):
 			call := n.AsCallExpression()
-			exprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, call.Expression)
-			exprText := processor.sourceText[exprRange.Pos():exprRange.End()]
-			fullRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-			fullText := processor.sourceText[fullRange.Pos():fullRange.End()]
+			exprText := processor.getNodeText(call.Expression)
+			fullText := processor.getNodeText(n)
 			signatures[exprText] = fullText
 			visit(call.Expression)
 		case ast.IsPropertyAccessExpression(n):
@@ -743,9 +750,8 @@ func (processor *chainProcessor) validateChainRoot(node *ast.Node, operatorKind 
 }
 
 func (processor *chainProcessor) isChainAlreadySeen(node *ast.Node) bool {
-	nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-	nodeTextRange := textRange{start: nodeRange.Pos(), end: nodeRange.End()}
-	return processor.seenRanges[nodeTextRange]
+	r := processor.getNodeRange(node)
+	return processor.seenRanges[textRange{start: r.Pos(), end: r.End()}]
 }
 
 func (processor *chainProcessor) reportChainWithFixes(node *ast.Node, fixes []rule.RuleFix, useSuggestion bool) {
@@ -1091,11 +1097,8 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 		case ast.IsParenthesizedExpression(n):
 			inner := n.AsParenthesizedExpression().Expression
 			if ast.IsAwaitExpression(inner) || ast.IsYieldExpression(inner) {
-				textRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-				text := processor.sourceText[textRange.Pos():textRange.End()]
-
 				parts = append(parts, ChainPart{
-					text:        text,
+					text:        processor.getNodeText(n),
 					optional:    false,
 					requiresDot: false,
 				})
@@ -1110,8 +1113,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 		case ast.IsPropertyAccessExpression(n):
 			propAccess := n.AsPropertyAccessExpression()
 			visit(propAccess.Expression, false)
-			nameRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, propAccess.Name())
-			nameText := processor.sourceText[nameRange.Pos():nameRange.End()]
+			nameText := processor.getNodeText(propAccess.Name())
 
 			hasNonNull := parentIsNonNull
 			if hasNonNull {
@@ -1131,8 +1133,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 		case ast.IsElementAccessExpression(n):
 			elemAccess := n.AsElementAccessExpression()
 			visit(elemAccess.Expression, false)
-			argRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, elemAccess.ArgumentExpression)
-			argText := processor.sourceText[argRange.Pos():argRange.End()]
+			argText := processor.getNodeText(elemAccess.ArgumentExpression)
 
 			hasNonNull := parentIsNonNull
 			suffix := ""
@@ -1173,8 +1174,7 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 			})
 
 		default:
-			textRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, n)
-			text := processor.sourceText[textRange.Pos():textRange.End()]
+			text := processor.getNodeText(n)
 
 			if parentIsNonNull && ast.IsIdentifier(n) {
 				text += "!"
@@ -1541,8 +1541,8 @@ func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind as
 			collect(binExpr.Left)
 			collect(binExpr.Right)
 			// Mark this binary expression as seen to prevent re-processing
-			binRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, unwrapped)
-			processor.seenRanges[textRange{start: binRange.Pos(), end: binRange.End()}] = true
+			r := processor.getNodeRange(unwrapped)
+			processor.seenRanges[textRange{start: r.Pos(), end: r.End()}] = true
 		} else {
 			operandNodes = append(operandNodes, n)
 		}
@@ -3007,11 +3007,9 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 			opNode := chain[i].node
 			if opNode != nil {
 				fullPos := opNode.Pos()
-				trimmedRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, opNode)
-				trimmedPos := trimmedRange.Pos()
+				trimmedPos := processor.getNodeRange(opNode).Pos()
 				if fullPos < trimmedPos {
-					trivia := processor.sourceText[fullPos:trimmedPos]
-					leadingTrivia.WriteString(trivia)
+					leadingTrivia.WriteString(processor.sourceText[fullPos:trimmedPos])
 				}
 			}
 		}
@@ -3035,52 +3033,43 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 			binExpr := operandForComparison.node.AsBinaryExpression()
 
 			if hasTrailingTypeofCheck {
-				leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
-				comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.comparedExpr)
+				leftRange := processor.getNodeRange(binExpr.Left)
+				comparedExprRange := processor.getNodeRange(operandForComparison.comparedExpr)
 
 				typeofPrefix := processor.sourceText[leftRange.Pos():comparedExprRange.Pos()]
-
-				binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).End()
+				binExprEnd := processor.getNodeRange(operandForComparison.node).End()
 				comparisonSuffix := processor.sourceText[comparedExprRange.End():binExprEnd]
 
 				newCode = typeofPrefix + newCode + comparisonSuffix
 			} else {
-				isYoda := false
-				comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.comparedExpr)
-				leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
-
-				if comparedExprRange.Pos() > leftRange.Pos() {
-					isYoda = true
-				}
+				comparedExprRange := processor.getNodeRange(operandForComparison.comparedExpr)
+				leftRange := processor.getNodeRange(binExpr.Left)
+				isYoda := comparedExprRange.Pos() > leftRange.Pos()
 
 				if isYoda {
-					binExprStart := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).Pos()
-					comparedExprStart := comparedExprRange.Pos()
-					yodaPrefix := processor.sourceText[binExprStart:comparedExprStart]
+					binExprStart := processor.getNodeRange(operandForComparison.node).Pos()
+					yodaPrefix := processor.sourceText[binExprStart:comparedExprRange.Pos()]
 					newCode = yodaPrefix + newCode
 				} else {
-					comparedExprEnd := comparedExprRange.End()
-					binExprEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, operandForComparison.node).End()
-					comparisonSuffix := processor.sourceText[comparedExprEnd:binExprEnd]
+					binExprEnd := processor.getNodeRange(operandForComparison.node).End()
+					comparisonSuffix := processor.sourceText[comparedExprRange.End():binExprEnd]
 					newCode += comparisonSuffix
 				}
 			}
 		}
 
 		if hasComplementaryNullCheck && complementaryTrailingNode != nil {
-			secondLastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-2].node)
-			lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, complementaryTrailingNode)
+			secondLastRange := processor.getNodeRange(chain[len(chain)-2].node)
+			lastRange := processor.getNodeRange(complementaryTrailingNode)
 			betweenText := processor.sourceText[secondLastRange.End():lastRange.Pos()]
-			lastText := processor.sourceText[lastRange.Pos():lastRange.End()]
-			newCode = newCode + betweenText + lastText
+			newCode = newCode + betweenText + processor.getNodeText(complementaryTrailingNode)
 		}
 
 		if hasLooseStrictWithTrailingPlain && looseStrictTrailingPlainNode != nil {
-			secondLastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-2].node)
-			lastRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, looseStrictTrailingPlainNode)
+			secondLastRange := processor.getNodeRange(chain[len(chain)-2].node)
+			lastRange := processor.getNodeRange(looseStrictTrailingPlainNode)
 			betweenText := processor.sourceText[secondLastRange.End():lastRange.Pos()]
-			lastText := processor.sourceText[lastRange.Pos():lastRange.End()]
-			newCode = newCode + betweenText + lastText
+			newCode = newCode + betweenText + processor.getNodeText(looseStrictTrailingPlainNode)
 		}
 	}
 
@@ -3108,14 +3097,12 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	}
 
 	if effectiveChainStart == 0 && len(chain) == len(operandNodes) {
-		nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-		replaceStart = nodeRange.Pos()
-		replaceEnd = nodeRange.End()
+		r := processor.getNodeRange(node)
+		replaceStart = r.Pos()
+		replaceEnd = r.End()
 	} else {
-		firstNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[effectiveChainStart].node)
-		lastNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-1].node)
-		replaceStart = firstNodeRange.Pos()
-		replaceEnd = lastNodeRange.End()
+		replaceStart = processor.getNodeRange(chain[effectiveChainStart].node).Pos()
+		replaceEnd = processor.getNodeRange(chain[len(chain)-1].node).End()
 	}
 
 	fixes := []rule.RuleFix{
@@ -3204,8 +3191,7 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 			lastParts := processor.flattenForFix(lastOp.comparedExpr)
 			secondLastParts := processor.flattenForFix(secondLastOp.comparedExpr)
 			if len(lastParts) > len(secondLastParts) {
-				lastOpRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOp.node)
-				trailingPlainOperand = processor.sourceText[lastOpRange.Pos():lastOpRange.End()]
+				trailingPlainOperand = processor.getNodeText(lastOp.node)
 				chainForOptional = chain[:len(chain)-1]
 			}
 		}
@@ -3282,17 +3268,12 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 		lastOpForFix := chainForOptional[len(chainForOptional)-1]
 		if ast.IsBinaryExpression(lastOpForFix.node) {
 			binExpr := lastOpForFix.node.AsBinaryExpression()
-			isYoda := false
-			comparedExprRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastOpForFix.comparedExpr)
-			leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.Left)
-
-			if comparedExprRange.Pos() > leftRange.Pos() {
-				isYoda = true
-			}
+			comparedExprRange := processor.getNodeRange(lastOpForFix.comparedExpr)
+			leftRange := processor.getNodeRange(binExpr.Left)
+			isYoda := comparedExprRange.Pos() > leftRange.Pos()
 
 			if isYoda {
-				opRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, binExpr.OperatorToken)
-				opText := processor.sourceText[opRange.Pos():opRange.End()]
+				opText := processor.getNodeText(binExpr.OperatorToken)
 				valueText := strings.TrimSpace(processor.sourceText[leftRange.Pos():leftRange.End()])
 				newCode = optionalChainCode + " " + opText + " " + valueText
 			} else {
@@ -3316,24 +3297,20 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	}
 
 	if trailingPlainOperand != "" {
-		lastChainOp := chain[len(chain)-2]
-		trailingOp := chain[len(chain)-1]
-		lastChainEnd := utils.TrimNodeTextRange(processor.ctx.SourceFile, lastChainOp.node).End()
-		trailingStart := utils.TrimNodeTextRange(processor.ctx.SourceFile, trailingOp.node).Pos()
+		lastChainEnd := processor.getNodeRange(chain[len(chain)-2].node).End()
+		trailingStart := processor.getNodeRange(chain[len(chain)-1].node).Pos()
 		separator := processor.sourceText[lastChainEnd:trailingStart]
 		newCode = newCode + separator + trailingPlainOperand
 	}
 
 	var replaceStart, replaceEnd int
 	if len(chain) == len(operandNodes) {
-		nodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, node)
-		replaceStart = nodeRange.Pos()
-		replaceEnd = nodeRange.End()
+		r := processor.getNodeRange(node)
+		replaceStart = r.Pos()
+		replaceEnd = r.End()
 	} else {
-		firstNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[0].node)
-		lastNodeRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, chain[len(chain)-1].node)
-		replaceStart = firstNodeRange.Pos()
-		replaceEnd = lastNodeRange.End()
+		replaceStart = processor.getNodeRange(chain[0].node).Pos()
+		replaceEnd = processor.getNodeRange(chain[len(chain)-1].node).End()
 	}
 
 	fixes := []rule.RuleFix{
@@ -3488,8 +3465,7 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 	}
 
 	leftNode := binExpr.Left
-	leftRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, leftNode)
-	leftText := processor.sourceText[leftRange.Pos():leftRange.End()]
+	leftText := processor.getNodeText(leftNode)
 
 	needsParens := ast.IsAwaitExpression(leftNode) ||
 		ast.IsBinaryExpression(leftNode) ||
@@ -3505,16 +3481,13 @@ func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 		leftText = "(" + leftText + ")"
 	}
 
-	propRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, propNode)
-	propertyText := ""
+	propertyText := processor.getNodeText(propNode)
 	if isComputed {
-		propertyText = "[" + processor.sourceText[propRange.Pos():propRange.End()] + "]"
-	} else {
-		propertyText = processor.sourceText[propRange.Pos():propRange.End()]
+		propertyText = "[" + propertyText + "]"
 	}
 
 	newCode := leftText + "?." + propertyText
-	accessRange := utils.TrimNodeTextRange(processor.ctx.SourceFile, accessExpr)
+	accessRange := processor.getNodeRange(accessExpr)
 
 	fixes := []rule.RuleFix{
 		rule.RuleFixReplaceRange(accessRange, newCode),
