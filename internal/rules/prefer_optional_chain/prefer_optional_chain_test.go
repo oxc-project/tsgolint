@@ -57,6 +57,8 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `foo && foo.bar == undefined;`},
 		{Code: `foo && foo.bar === undeclaredVar;`},
 		{Code: `foo && foo.bar === undefined;`},
+		{Code: `foo && foo.bar === too.bar;`},
+		{Code: `foo && foo.bar === foo.baz;`},
 		{Code: `foo && foo.bar !== 0;`},
 		{Code: `foo && foo.bar !== 1;`},
 		{Code: `foo && foo.bar !== '123';`},
@@ -65,6 +67,8 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `foo && foo.bar !== true;`},
 		{Code: `foo && foo.bar !== null;`},
 		{Code: `foo && foo.bar !== undeclaredVar;`},
+		{Code: `foo && foo.bar !== too.bar;`},
+		{Code: `foo && foo.bar !== foo.baz;`},
 		{Code: `foo && foo.bar != 0;`},
 		{Code: `foo && foo.bar != 1;`},
 		{Code: `foo && foo.bar != '123';`},
@@ -72,6 +76,8 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `foo && foo.bar != false;`},
 		{Code: `foo && foo.bar != true;`},
 		{Code: `foo && foo.bar != undeclaredVar;`},
+		{Code: `foo && foo.bar != too.bar;`},
+		{Code: `foo && foo.bar != foo.baz;`},
 		{Code: `foo != null && foo.bar == undeclaredVar;`},
 		{Code: `foo != null && foo.bar == null;`},
 		{Code: `foo != null && foo.bar == undefined;`},
@@ -251,6 +257,39 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `
         declare const foo: { bar: number };
         foo != null && foo.bar != undeclaredVar;
+      `},
+		// Comparisons to different properties on the same object should not trigger
+		{Code: `
+        declare const foo: { bar: number; baz: number } | null;
+        foo != null && foo.bar == foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => number } | null;
+        foo != null && foo.bar == foo.baz();
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: number } | null;
+        foo != null && foo.bar === foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => number } | null;
+        foo != null && foo.bar === foo.baz();
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: undefined } | null;
+        foo != null && foo.bar != foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => undefined } | null;
+        foo != null && foo.bar != foo.baz();
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: undefined } | null;
+        foo != null && foo.bar !== foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => undefined } | null;
+        foo != null && foo.bar !== foo.baz();
       `},
 		{Code: `
         declare const foo: { bar: number } | 1;
@@ -527,6 +566,39 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `
         declare const foo: { bar: number };
         foo == null || foo.bar !== undeclaredVar;
+      `},
+		// Comparisons to different properties on the same object (|| cases)
+		{Code: `
+        declare const foo: { bar: number; baz: number } | null;
+        foo == null || foo.bar != foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => number } | null;
+        foo == null || foo.bar != foo.baz();
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: undefined } | null;
+        foo == null || foo.bar === foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => undefined } | null;
+        foo == null || foo.bar === foo.baz();
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: undefined } | null;
+        foo == null || foo.bar == foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => undefined } | null;
+        foo == null || foo.bar == foo.baz();
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: number } | null;
+        foo == null || foo.bar !== foo.baz;
+      `},
+		{Code: `
+        declare const foo: { bar: number; baz: () => number } | null;
+        foo == null || foo.bar !== foo.baz();
       `},
 		{Code: `foo == null || foo.bar != undeclaredVar;`},
 		{Code: `foo == null || foo.bar != null;`},
