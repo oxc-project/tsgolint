@@ -1,4 +1,4 @@
-From 72065a69da8b0d636c2735762502f4a6bf2145e0 Mon Sep 17 00:00:00 2001
+From e250d5e4e36339aa4c9a2e67d5430d8e9a352de6 Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 18 Jun 2025 15:24:34 +0300
 Subject: [PATCH] Parallel readDirectory visitor

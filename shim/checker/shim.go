@@ -533,8 +533,6 @@ const FunctionFlagsGenerator = checker.FunctionFlagsGenerator
 const FunctionFlagsInvalid = checker.FunctionFlagsInvalid
 const FunctionFlagsNormal = checker.FunctionFlagsNormal
 type FunctionTypeMapper = checker.FunctionTypeMapper
-//go:linkname GetCombinedLocalAndExportSymbolFlags github.com/microsoft/typescript-go/internal/checker.GetCombinedLocalAndExportSymbolFlags
-func GetCombinedLocalAndExportSymbolFlags(symbol *ast.Symbol) ast.SymbolFlags
 //go:linkname GetDeclarationModifierFlagsFromSymbol github.com/microsoft/typescript-go/internal/checker.GetDeclarationModifierFlagsFromSymbol
 func GetDeclarationModifierFlagsFromSymbol(s *ast.Symbol) ast.ModifierFlags
 //go:linkname GetResolvedSignatureForSignatureHelp github.com/microsoft/typescript-go/internal/checker.GetResolvedSignatureForSignatureHelp

@@ -340,6 +340,8 @@ func GetNodeAtPosition(file *ast.SourceFile, position int, includeJSDoc bool) *a
 func GetNodeId(node *ast.Node) ast.NodeId
 //go:linkname GetNonAssignedNameOfDeclaration github.com/microsoft/typescript-go/internal/ast.GetNonAssignedNameOfDeclaration
 func GetNonAssignedNameOfDeclaration(declaration *ast.Node) *ast.Node
+//go:linkname GetNonAugmentationDeclaration github.com/microsoft/typescript-go/internal/ast.GetNonAugmentationDeclaration
+func GetNonAugmentationDeclaration(symbol *ast.Symbol) *ast.Node
 //go:linkname GetOperatorPrecedence github.com/microsoft/typescript-go/internal/ast.GetOperatorPrecedence
 func GetOperatorPrecedence(nodeKind ast.Kind, operatorKind ast.Kind, flags ast.OperatorPrecedenceFlags) ast.OperatorPrecedence
 //go:linkname GetPragmaArgument github.com/microsoft/typescript-go/internal/ast.GetPragmaArgument
@@ -425,6 +427,8 @@ type ImportClause = ast.ImportClause
 type ImportClauseNode = ast.ImportClauseNode
 type ImportDeclaration = ast.ImportDeclaration
 type ImportEqualsDeclaration = ast.ImportEqualsDeclaration
+//go:linkname ImportFromModuleSpecifier github.com/microsoft/typescript-go/internal/ast.ImportFromModuleSpecifier
+func ImportFromModuleSpecifier(node *ast.Node) *ast.Node
 type ImportSpecifier = ast.ImportSpecifier
 type ImportSpecifierList = ast.ImportSpecifierList
 type ImportSpecifierNode = ast.ImportSpecifierNode
@@ -2197,6 +2201,8 @@ type TokenNode = ast.TokenNode
 func TryGetClassExtendingExpressionWithTypeArguments(node *ast.Node) *ast.ClassLikeDeclaration
 //go:linkname TryGetClassImplementingOrExtendingExpressionWithTypeArguments github.com/microsoft/typescript-go/internal/ast.TryGetClassImplementingOrExtendingExpressionWithTypeArguments
 func TryGetClassImplementingOrExtendingExpressionWithTypeArguments(node *ast.Node) (class *ast.ClassLikeDeclaration, isImplements bool)
+//go:linkname TryGetImportFromModuleSpecifier github.com/microsoft/typescript-go/internal/ast.TryGetImportFromModuleSpecifier
+func TryGetImportFromModuleSpecifier(node *ast.StringLiteralLike) *ast.Node
 //go:linkname TryGetPropertyNameOfBindingOrAssignmentElement github.com/microsoft/typescript-go/internal/ast.TryGetPropertyNameOfBindingOrAssignmentElement
 func TryGetPropertyNameOfBindingOrAssignmentElement(bindingElement *ast.Node) *ast.Node
 //go:linkname TryGetTextOfPropertyName github.com/microsoft/typescript-go/internal/ast.TryGetTextOfPropertyName

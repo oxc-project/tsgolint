@@ -8,6 +8,10 @@ import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "io"
 import _ "unsafe"
 
+type AddAsTypeOnly = lsproto.AddAsTypeOnly
+const AddAsTypeOnlyAllowed = lsproto.AddAsTypeOnlyAllowed
+const AddAsTypeOnlyNotAllowed = lsproto.AddAsTypeOnlyNotAllowed
+const AddAsTypeOnlyRequired = lsproto.AddAsTypeOnlyRequired
 type AnnotatedTextEdit = lsproto.AnnotatedTextEdit
 type ApplyKind = lsproto.ApplyKind
 const ApplyKindMerge = lsproto.ApplyKindMerge
@@ -15,7 +19,13 @@ const ApplyKindReplace = lsproto.ApplyKindReplace
 type ApplyWorkspaceEditParams = lsproto.ApplyWorkspaceEditParams
 type ApplyWorkspaceEditResponse = lsproto.ApplyWorkspaceEditResponse
 type ApplyWorkspaceEditResult = lsproto.ApplyWorkspaceEditResult
-type AutoImportData = lsproto.AutoImportData
+type AutoImportFix = lsproto.AutoImportFix
+type AutoImportFixKind = lsproto.AutoImportFixKind
+const AutoImportFixKindAddNew = lsproto.AutoImportFixKindAddNew
+const AutoImportFixKindAddToExisting = lsproto.AutoImportFixKindAddToExisting
+const AutoImportFixKindJsdocTypeImport = lsproto.AutoImportFixKindJsdocTypeImport
+const AutoImportFixKindPromoteTypeOnly = lsproto.AutoImportFixKindPromoteTypeOnly
+const AutoImportFixKindUseNamespace = lsproto.AutoImportFixKindUseNamespace
 type BaseReader = lsproto.BaseReader
 type BaseSymbolInformation = lsproto.BaseSymbolInformation
 type BaseWriter = lsproto.BaseWriter
@@ -336,7 +346,6 @@ type ExecuteCommandRegistrationOptions = lsproto.ExecuteCommandRegistrationOptio
 type ExecuteCommandResponse = lsproto.ExecuteCommandResponse
 type ExecutionSummary = lsproto.ExecutionSummary
 var ExitInfo = lsproto.ExitInfo
-type ExportInfoMapKey = lsproto.ExportInfoMapKey
 type FailureHandlingKind = lsproto.FailureHandlingKind
 const FailureHandlingKindAbort = lsproto.FailureHandlingKindAbort
 const FailureHandlingKindTextOnlyTransactional = lsproto.FailureHandlingKindTextOnlyTransactional
@@ -396,6 +405,11 @@ type ImplementationOptions = lsproto.ImplementationOptions
 type ImplementationParams = lsproto.ImplementationParams
 type ImplementationRegistrationOptions = lsproto.ImplementationRegistrationOptions
 type ImplementationResponse = lsproto.ImplementationResponse
+type ImportKind = lsproto.ImportKind
+const ImportKindCommonJS = lsproto.ImportKindCommonJS
+const ImportKindDefault = lsproto.ImportKindDefault
+const ImportKindNamed = lsproto.ImportKindNamed
+const ImportKindNamespace = lsproto.ImportKindNamespace
 type InitializationOptions = lsproto.InitializationOptions
 type InitializeError = lsproto.InitializeError
 var InitializeInfo = lsproto.InitializeInfo
