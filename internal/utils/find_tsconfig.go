@@ -217,15 +217,6 @@ func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
 
 		// Search through the config and its references
 		result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
-
-		if result.configFileName != "" {
-			out <- ResolutionResult{
-				config: result.configFileName,
-				file:   file,
-			}
-			continue
-		}
-
 		out <- ResolutionResult{
 			config: result.configFileName,
 			file:   file,
