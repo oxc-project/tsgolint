@@ -63,7 +63,7 @@ func RunLinter(
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
-		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host)
+		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, filePaths)
 
 		if err != nil {
 			return err
@@ -81,23 +81,24 @@ func RunLinter(
 			log.Printf("Program created with %d source files", len(program.GetSourceFiles()))
 		}
 
-		fileSet := make(map[string]struct{}, len(filePaths))
+		fileSet := make(map[tspath.Path]struct{}, len(filePaths))
 		for _, f := range filePaths {
-			fileSet[f] = struct{}{}
+			fileSet[tspath.ToPath(f, currentDirectory, fs.UseCaseSensitiveFileNames())] = struct{}{}
 		}
 
 		sourceFiles := make([]*ast.SourceFile, 0, len(filePaths))
 		for _, sf := range program.SourceFiles() {
-			if _, ok := fileSet[sf.FileName()]; ok {
+			filePath := sf.Path()
+			if _, ok := fileSet[filePath]; ok {
 				sourceFiles = append(sourceFiles, sf)
-				delete(fileSet, sf.FileName())
+				delete(fileSet, filePath)
 			}
 		}
 
 		if len(fileSet) > 0 {
 			var unmatchedFiles []string
 			for k := range fileSet {
-				unmatchedFiles = append(unmatchedFiles, k)
+				unmatchedFiles = append(unmatchedFiles, string(k))
 			}
 			unmatchedFilesString := strings.Join(unmatchedFiles, ", ")
 			log.Println("Unmatched files found:", unmatchedFilesString)

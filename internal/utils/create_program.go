@@ -27,7 +27,7 @@ func enhanceHelpDiagnosticMessage(msg string) string {
 	return msg
 }
 
-func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost) (*compiler.Program, []diagnostic.Internal, error) {
+func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost, rootFileNames []string) (*compiler.Program, []diagnostic.Internal, error) {
 	resolvedConfigPath := tspath.ResolvePath(cwd, tsconfigPath)
 	if !fs.FileExists(resolvedConfigPath) {
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
@@ -73,10 +73,26 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, internalDiags, nil
 	}
 
+	if len(rootFileNames) > 0 {
+		comparePathsOptions := tspath.ComparePathsOptions{
+			CurrentDirectory:          configParseResult.GetCurrentDirectory(),
+			UseCaseSensitiveFileNames: configParseResult.UseCaseSensitiveFileNames(),
+		}
+		override := tsoptions.NewParsedCommandLine(configParseResult.CompilerOptions(), rootFileNames, comparePathsOptions)
+		override.ConfigFile = configParseResult.ConfigFile
+		override.Raw = configParseResult.Raw
+		override.Errors = configParseResult.Errors
+		override.CompileOnSave = configParseResult.CompileOnSave
+		override.ParsedConfig.ProjectReferences = configParseResult.ProjectReferences()
+		override.ParsedConfig.TypeAcquisition = configParseResult.TypeAcquisition()
+		configParseResult = override
+	}
+
 	opts := compiler.ProgramOptions{
-		Config:         configParseResult,
-		SingleThreaded: core.TSTrue,
-		Host:           host,
+		Config:                      configParseResult,
+		UseSourceOfProjectReference: true,
+		SingleThreaded:              core.TSTrue,
+		Host:                        host,
 		// TODO: custom checker pool
 		// CreateCheckerPool: func(p *compiler.Program) compiler.CheckerPool {},
 	}

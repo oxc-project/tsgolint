@@ -73,7 +73,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			tsconfigPath = tsconfigPathOverride
 		}
 
-		program, _, err := utils.CreateProgram(true, fs, rootDir, tsconfigPath, host)
+		program, _, err := utils.CreateProgram(true, fs, rootDir, tsconfigPath, host, nil)
 		assert.NilError(t, err, "couldn't create program. code: "+code)
 
 		files := []*ast.SourceFile{program.GetSourceFile(fileName)}
