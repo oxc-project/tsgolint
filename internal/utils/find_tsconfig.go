@@ -2,8 +2,10 @@ package utils
 
 import (
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/project"
@@ -75,7 +77,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 		visited = &collections.SyncSet[searchNode]{}
 	}
 
-	search := BreadthFirstSearchParallelEx(
+	search := BreadthFirstSearch(
 		searchNode{configFileName: configFileName},
 		func(node searchNode) []searchNode {
 			if config, ok := configs.Load(r.toPath(node.configFileName)); ok && len(config.ProjectReferences()) > 0 {
@@ -193,6 +195,64 @@ func (r *TsConfigResolver) findConfigWithReferences(
 	}
 
 	return configSearchResult{configFileName: ""}
+}
+
+type ResolutionResult struct {
+	file   string
+	config string
+}
+
+func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
+	for file := range in {
+		config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
+		if config == "" {
+			out <- ResolutionResult{
+				file:   file,
+				config: config,
+			}
+			continue
+		}
+
+		fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
+
+		// Search through the config and its references
+		result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
+		out <- ResolutionResult{
+			config: result.configFileName,
+			file:   file,
+		}
+	}
+}
+
+func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]string {
+	in := make(chan string, len(fileNames))
+	out := make(chan ResolutionResult, len(fileNames))
+
+	numWorker := runtime.GOMAXPROCS(0)
+
+	var wg sync.WaitGroup
+	for range numWorker {
+		wg.Go(func() {
+			r.work(in, out)
+		})
+	}
+
+	for i := range fileNames {
+		in <- fileNames[i]
+	}
+	close(in)
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	res := make(map[string]string, len(fileNames))
+	for result := range out {
+		res[result.file] = result.config
+	}
+
+	return res
 }
 
 // Reference: `toPath`: typescript-go/internal/project/projectcollectionbuilder.go:687-689
