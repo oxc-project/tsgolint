@@ -210,6 +210,7 @@ type extra_Checker struct {
   unionTypes map[checker.CacheHashKey]*checker.Type
   unionOfUnionTypes map[checker.UnionOfUnionKey]*checker.Type
   intersectionTypes map[checker.CacheHashKey]*checker.Type
+  propertiesTypes map[checker.PropertiesTypesKey]*checker.Type
   diagnostics ast.DiagnosticsCollection
   suggestionDiagnostics ast.DiagnosticsCollection
   symbolPool core.Pool[ast.Symbol]
@@ -800,6 +801,7 @@ const PredicateSemanticsNever = checker.PredicateSemanticsNever
 const PredicateSemanticsNone = checker.PredicateSemanticsNone
 const PredicateSemanticsSometimes = checker.PredicateSemanticsSometimes
 type Program = checker.Program
+type PropertiesTypesKey = checker.PropertiesTypesKey
 var ReactNames = checker.ReactNames
 type RecursionFlags = checker.RecursionFlags
 const RecursionFlagsBoth = checker.RecursionFlagsBoth
