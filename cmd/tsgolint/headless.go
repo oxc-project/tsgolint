@@ -206,18 +206,14 @@ func runHeadless(args []string) int {
 
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
-	fileConfigs := make(map[string][]headlessRule, totalFileCount)
-	for _, config := range payload.Configs {
-		for _, filePath := range config.FilePaths {
-			fileConfigs[filePath] = config.Rules
-		}
-	}
-
 	normalizedFiles := make([]string, 0, totalFileCount)
+	fileConfigs := make(map[string][]headlessRule, totalFileCount)
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
 			normalized := tspath.NormalizeSlashes(filePath)
 			normalizedFiles = append(normalizedFiles, normalized)
+
+			fileConfigs[normalized] = config.Rules
 		}
 	}
 
