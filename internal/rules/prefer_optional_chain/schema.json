@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "prefer_optional_chain_options": {
+      "type": "object",
+      "properties": {
+        "allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing": {
+          "type": "boolean",
+          "default": false,
+          "description": "Allow autofixers that will change the return type of the expression. This option is considered unsafe as it may break the build."
+        },
+        "checkAny": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check operands that are typed as `any` when inspecting 'loose boolean' operands."
+        },
+        "checkBigInt": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check operands that are typed as `bigint` when inspecting 'loose boolean' operands."
+        },
+        "checkBoolean": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check operands that are typed as `boolean` when inspecting 'loose boolean' operands."
+        },
+        "checkNumber": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check operands that are typed as `number` when inspecting 'loose boolean' operands."
+        },
+        "checkString": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check operands that are typed as `string` when inspecting 'loose boolean' operands."
+        },
+        "checkUnknown": {
+          "type": "boolean",
+          "default": true,
+          "description": "Check operands that are typed as `unknown` when inspecting 'loose boolean' operands."
+        },
+        "requireNullish": {
+          "type": "boolean",
+          "default": false,
+          "description": "Skip operands that are not typed with `null` and/or `undefined` when inspecting 'loose boolean' operands."
+        }
+      }
+    }
+  }
+}
