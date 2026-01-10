@@ -8,6 +8,8 @@ import _ "unsafe"
 
 var AllSupportedExtensions = tspath.AllSupportedExtensions
 var AllSupportedExtensionsWithJson = tspath.AllSupportedExtensionsWithJson
+//go:linkname ChangeAnyExtension github.com/microsoft/typescript-go/internal/tspath.ChangeAnyExtension
+func ChangeAnyExtension(path string, ext string, extensions []string, ignoreCase bool) string
 //go:linkname ChangeExtension github.com/microsoft/typescript-go/internal/tspath.ChangeExtension
 func ChangeExtension(path string, newExtension string) string
 //go:linkname ChangeFullExtension github.com/microsoft/typescript-go/internal/tspath.ChangeFullExtension
@@ -141,12 +143,14 @@ func ResolveTripleslashReference(moduleName string, containingFile string) strin
 func SplitVolumePath(path string) (volume string, rest string, ok bool)
 //go:linkname StartsWithDirectory github.com/microsoft/typescript-go/internal/tspath.StartsWithDirectory
 func StartsWithDirectory(fileName string, directoryName string, useCaseSensitiveFileNames bool) bool
+var SupportedDeclarationExtensions = tspath.SupportedDeclarationExtensions
 var SupportedJSExtensions = tspath.SupportedJSExtensions
 var SupportedJSExtensionsFlat = tspath.SupportedJSExtensionsFlat
 var SupportedTSExtensions = tspath.SupportedTSExtensions
 var SupportedTSExtensionsFlat = tspath.SupportedTSExtensionsFlat
 var SupportedTSExtensionsWithJson = tspath.SupportedTSExtensionsWithJson
 var SupportedTSExtensionsWithJsonFlat = tspath.SupportedTSExtensionsWithJsonFlat
+var SupportedTSImplementationExtensions = tspath.SupportedTSImplementationExtensions
 //go:linkname ToFileNameLowerCase github.com/microsoft/typescript-go/internal/tspath.ToFileNameLowerCase
 func ToFileNameLowerCase(fileName string) string
 //go:linkname ToPath github.com/microsoft/typescript-go/internal/tspath.ToPath

@@ -24,6 +24,7 @@ func ComputeECMALineStarts(text string) core.ECMALineStarts
 //go:linkname ComputeECMALineStartsSeq github.com/microsoft/typescript-go/internal/core.ComputeECMALineStartsSeq
 func ComputeECMALineStartsSeq(text string) iter.Seq[core.TextPos]
 type ECMALineStarts = core.ECMALineStarts
+var EmptyCompilerOptions = core.EmptyCompilerOptions
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
 //go:linkname GetNewLineKind github.com/microsoft/typescript-go/internal/core.GetNewLineKind
 func GetNewLineKind(s string) core.NewLineKind
