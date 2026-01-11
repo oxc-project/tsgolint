@@ -110,7 +110,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 43/59.
+Implemented 45/59.
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
@@ -122,8 +122,6 @@ Implemented 43/59.
 - [ ] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [ ] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
-- [ ] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
-- [ ] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
 - [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
@@ -157,6 +155,8 @@ Implemented 43/59.
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
 - [x] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
+- [x] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
+- [x] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)
