@@ -157,6 +157,27 @@ function foo(): Set<number> {
         }
       }
     `},
+		// Test case: conditional type with ReturnType should correctly resolve property types
+		// When using Unwrap<ReturnType<typeof fn>>, the resolved type's properties should
+		// not be incorrectly inferred as `any`.
+		{Code: `
+      type Wrapper<T> = { value: T };
+      type Unwrap<W> = W extends Wrapper<infer T> ? T : never;
+
+      // Using declare to focus on the type resolution, not the implementation
+      declare function create(): Wrapper<{ id: string }>;
+
+      type Result = Unwrap<ReturnType<typeof create>>;
+      declare const items: Result[];
+      const ids = items.map((i) => i.id);  // i.id should be string, not any
+    `},
+		// Test case for array.map with properly typed callback parameter
+		{Code: `
+      interface Item { id: string; name: string }
+      declare const items: Item[];
+      const ids = items.map((item) => item.id);
+      const names = items.map((item) => item.name);
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
