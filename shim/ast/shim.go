@@ -154,6 +154,8 @@ type ElementAccessExpression = ast.ElementAccessExpression
 type ElementList = ast.ElementList
 type EmptyStatement = ast.EmptyStatement
 type EntityName = ast.EntityName
+//go:linkname EntityNameToString github.com/microsoft/typescript-go/internal/ast.EntityNameToString
+func EntityNameToString(name *ast.Node, getTextOfNode func(*ast.Node) string) string
 type EnumDeclaration = ast.EnumDeclaration
 type EnumDeclarationNode = ast.EnumDeclarationNode
 type EnumMember = ast.EnumMember
@@ -2146,6 +2148,8 @@ type SymbolTable = ast.SymbolTable
 type SyntaxList = ast.SyntaxList
 type SyntheticExpression = ast.SyntheticExpression
 type SyntheticReferenceExpression = ast.SyntheticReferenceExpression
+//go:linkname TagNamesAreEquivalent github.com/microsoft/typescript-go/internal/ast.TagNamesAreEquivalent
+func TagNamesAreEquivalent(lhs *ast.Expression, rhs *ast.Expression) bool
 type TaggedTemplateExpression = ast.TaggedTemplateExpression
 type TemplateExpression = ast.TemplateExpression
 type TemplateHead = ast.TemplateHead
