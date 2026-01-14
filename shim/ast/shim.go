@@ -18,6 +18,8 @@ const AccessKindWrite = ast.AccessKindWrite
 type AccessorDeclaration = ast.AccessorDeclaration
 type AccessorDeclarationBase = ast.AccessorDeclarationBase
 type AllAccessorDeclarations = ast.AllAccessorDeclarations
+type AnyImportOrRequireStatement = ast.AnyImportOrRequireStatement
+type AnyImportSyntax = ast.AnyImportSyntax
 type AnyValidImportOrReExport = ast.AnyValidImportOrReExport
 type ArgumentList = ast.ArgumentList
 type ArrayLiteralExpression = ast.ArrayLiteralExpression
@@ -427,6 +429,7 @@ type ImportAttributes = ast.ImportAttributes
 type ImportAttributesNode = ast.ImportAttributesNode
 type ImportClause = ast.ImportClause
 type ImportClauseNode = ast.ImportClauseNode
+type ImportClauseOrBindingPattern = ast.ImportClauseOrBindingPattern
 type ImportDeclaration = ast.ImportDeclaration
 type ImportEqualsDeclaration = ast.ImportEqualsDeclaration
 //go:linkname ImportFromModuleSpecifier github.com/microsoft/typescript-go/internal/ast.ImportFromModuleSpecifier
