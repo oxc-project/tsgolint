@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/lsp/lsproto
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20260114200604-ac123d5a1ac1
+require github.com/microsoft/typescript-go v0.0.0-20260114234201-f5bcdfc02e65
 
 require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
