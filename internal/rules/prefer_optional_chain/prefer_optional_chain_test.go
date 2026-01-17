@@ -840,6 +840,11 @@ func TestPreferOptionalChainRule(t *testing.T) {
         declare const x: void | (() => void);
         x && x();
       `},
+		// https://github.com/oxc-project/oxc/issues/17968
+		{Code: `const isTagMode = output.mode === 'tags' || output.mode === 'tags-split';`},
+		{Code: `(tag.type === 'track-monitoring' || tag.type === 'simulated-track')`},
+		{Code: `!value || !context.parent.endDate || value <= context.parent.endDate`},
+		{Code: `if (markdownBody && markdownBody.scrollHeight > 150) { markdownBody.classList.add('max-height'); }`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{
