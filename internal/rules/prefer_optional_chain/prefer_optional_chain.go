@@ -1049,6 +1049,14 @@ func (processor *chainProcessor) isOrChainComparisonSafe(op Operand) bool {
 
 	case ast.KindEqualsEqualsToken:
 		return isNull || isUndefined
+
+	// Relational operators are unsafe because undefined/null comparisons
+	// produce unexpected results (e.g., undefined <= 100 is false)
+	case ast.KindLessThanToken,
+		ast.KindGreaterThanToken,
+		ast.KindLessThanEqualsToken,
+		ast.KindGreaterThanEqualsToken:
+		return false
 	}
 
 	return true
@@ -1450,6 +1458,16 @@ outer3:
 
 	if isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
+		op := binExpr.OperatorToken.Kind
+
+		// Relational operators (<, >, <=, >=) should not participate in optional chaining.
+		switch op {
+		case ast.KindLessThanToken,
+			ast.KindGreaterThanToken,
+			ast.KindLessThanEqualsToken,
+			ast.KindGreaterThanEqualsToken:
+			return Operand{typ: OperandTypeInvalid, node: node}
+		}
 
 		left := ast.SkipParentheses(binExpr.Left)
 		right := ast.SkipParentheses(binExpr.Right)
@@ -1483,6 +1501,17 @@ outer3:
 
 	if !isAndChain && ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
+		op := binExpr.OperatorToken.Kind
+
+		// Relational operators (<, >, <=, >=) should not participate in optional chaining.
+		switch op {
+		case ast.KindLessThanToken,
+			ast.KindGreaterThanToken,
+			ast.KindLessThanEqualsToken,
+			ast.KindGreaterThanEqualsToken:
+			return Operand{typ: OperandTypeInvalid, node: node}
+		}
+
 		left := ast.SkipParentheses(binExpr.Left)
 		right := ast.SkipParentheses(binExpr.Right)
 		leftIsAccess := utils.IsAccessExpression(left)
@@ -1849,11 +1878,22 @@ func (processor *chainProcessor) buildOrChains(operands []Operand) [][]Operand {
 		if cmp == NodeSubset || cmp == NodeEqual {
 			if cmp == NodeEqual && op.typ == OperandTypeComparison && len(chain) > 0 && !isNullishComparison(op) {
 				lastOp := chain[len(chain)-1]
+				// When comparing the same expression and the current operand is a non-nullish comparison,
+				// we should break if the previous operand is also a non-nullish comparison (e.g., x === 'a' || x === 'b'),
+				// or if it's a type that shouldn't be extended with a comparison.
 				if lastOp.typ == OperandTypeNot || lastOp.typ == OperandTypeNotStrictEqualNull ||
 					lastOp.typ == OperandTypeNotStrictEqualUndef || lastOp.typ == OperandTypeNotEqualBoth ||
-					lastOp.typ == OperandTypePlain {
+					lastOp.typ == OperandTypePlain ||
+					(lastOp.typ == OperandTypeComparison && !isNullishComparison(lastOp)) {
 					if len(chain) >= 2 {
 						break
+					}
+					// Reset the chain when we have two non-nullish comparisons on the same expression
+					// (e.g., x === 'a' || x === 'b') - this is not an optional chain pattern
+					if lastOp.typ == OperandTypeComparison && !isNullishComparison(lastOp) {
+						chain = nil
+						lastExpr = nil
+						continue
 					}
 				}
 			}
@@ -2253,6 +2293,13 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 					if !isUndefined {
 						unsafe = true
 					}
+				// Relational operators are unsafe because undefined/null comparisons
+				// produce unexpected results
+				case ast.KindLessThanToken,
+					ast.KindGreaterThanToken,
+					ast.KindLessThanEqualsToken,
+					ast.KindGreaterThanEqualsToken:
+					unsafe = true
 				}
 
 				if unsafe && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
