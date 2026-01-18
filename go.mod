@@ -34,7 +34,7 @@ require (
 	github.com/microsoft/typescript-go/shim/vfs/cachedvfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/osvfs v0.0.0
 	golang.org/x/sys v0.40.0
-	golang.org/x/tools v0.40.0
+	golang.org/x/tools v0.41.0
 	gotest.tools/v3 v3.5.2
 )
 
