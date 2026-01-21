@@ -34,7 +34,7 @@
       "GetShorthandAssignmentValueSymbol",
       "getImmediateAliasedSymbol",
       "getDeclarationOfAliasSymbol",
-      "getTypePredicateOfSignature"
+      "getTypePredicateOfSignature",
       "GetNonNullableType",
       "IsNullableType"
     ]
