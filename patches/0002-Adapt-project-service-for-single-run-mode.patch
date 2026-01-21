@@ -1,7 +1,7 @@
-From 4fcba63614ebca721bb8776f117dbb930c713eb3 Mon Sep 17 00:00:00 2001
+From cc47dd0212a2dcb534f5e46fec58d6d16aadc67c Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
-Subject: [PATCH] Adapt project service for single run mode
+Subject: Adapt project service for single run mode
 
 ---
  internal/project/project.go | 3 ++-

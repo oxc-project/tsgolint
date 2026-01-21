@@ -245,7 +245,7 @@ func GetAllAccessorDeclarationsForDeclaration(accessor *ast.AccessorDeclaration,
 //go:linkname GetAssignedName github.com/microsoft/typescript-go/internal/ast.GetAssignedName
 func GetAssignedName(node *ast.Node) *ast.Node
 //go:linkname GetAssignmentDeclarationKind github.com/microsoft/typescript-go/internal/ast.GetAssignmentDeclarationKind
-func GetAssignmentDeclarationKind(bin *ast.BinaryExpression) ast.JSDeclarationKind
+func GetAssignmentDeclarationKind(node *ast.Node) ast.JSDeclarationKind
 //go:linkname GetAssignmentTarget github.com/microsoft/typescript-go/internal/ast.GetAssignmentTarget
 func GetAssignmentTarget(node *ast.Node) *ast.Node
 //go:linkname GetBinaryOperatorPrecedence github.com/microsoft/typescript-go/internal/ast.GetBinaryOperatorPrecedence
@@ -509,6 +509,8 @@ func IsAwaitExpression(node *ast.Node) bool
 func IsBigIntLiteral(node *ast.Node) bool
 //go:linkname IsBinaryExpression github.com/microsoft/typescript-go/internal/ast.IsBinaryExpression
 func IsBinaryExpression(node *ast.Node) bool
+//go:linkname IsBindableObjectDefinePropertyCall github.com/microsoft/typescript-go/internal/ast.IsBindableObjectDefinePropertyCall
+func IsBindableObjectDefinePropertyCall(node *ast.Node) bool
 //go:linkname IsBindableStaticAccessExpression github.com/microsoft/typescript-go/internal/ast.IsBindableStaticAccessExpression
 func IsBindableStaticAccessExpression(node *ast.Node, excludeThisKeyword bool) bool
 //go:linkname IsBindableStaticElementAccessExpression github.com/microsoft/typescript-go/internal/ast.IsBindableStaticElementAccessExpression
@@ -945,6 +947,8 @@ func IsModuleBlock(node *ast.Node) bool
 func IsModuleDeclaration(node *ast.Node) bool
 //go:linkname IsModuleExportsAccessExpression github.com/microsoft/typescript-go/internal/ast.IsModuleExportsAccessExpression
 func IsModuleExportsAccessExpression(node *ast.Node) bool
+//go:linkname IsModuleExportsQualifiedName github.com/microsoft/typescript-go/internal/ast.IsModuleExportsQualifiedName
+func IsModuleExportsQualifiedName(node *ast.Node) bool
 //go:linkname IsModuleIdentifier github.com/microsoft/typescript-go/internal/ast.IsModuleIdentifier
 func IsModuleIdentifier(node *ast.Node) bool
 //go:linkname IsModuleOrEnumDeclaration github.com/microsoft/typescript-go/internal/ast.IsModuleOrEnumDeclaration
@@ -1227,6 +1231,8 @@ func IsVariableLike(node *ast.Node) bool
 func IsVariableStatement(node *ast.Node) bool
 //go:linkname IsVoidExpression github.com/microsoft/typescript-go/internal/ast.IsVoidExpression
 func IsVoidExpression(node *ast.Node) bool
+//go:linkname IsVoidZero github.com/microsoft/typescript-go/internal/ast.IsVoidZero
+func IsVoidZero(node *ast.Node) bool
 //go:linkname IsWhitespaceOnlyJsxText github.com/microsoft/typescript-go/internal/ast.IsWhitespaceOnlyJsxText
 func IsWhitespaceOnlyJsxText(node *ast.Node) bool
 //go:linkname IsWriteAccess github.com/microsoft/typescript-go/internal/ast.IsWriteAccess
@@ -1241,6 +1247,8 @@ type JSDeclarationKind = ast.JSDeclarationKind
 const JSDeclarationKindExportsProperty = ast.JSDeclarationKindExportsProperty
 const JSDeclarationKindModuleExports = ast.JSDeclarationKindModuleExports
 const JSDeclarationKindNone = ast.JSDeclarationKindNone
+const JSDeclarationKindObjectDefinePropertyExports = ast.JSDeclarationKindObjectDefinePropertyExports
+const JSDeclarationKindObjectDefinePropertyValue = ast.JSDeclarationKindObjectDefinePropertyValue
 const JSDeclarationKindProperty = ast.JSDeclarationKindProperty
 const JSDeclarationKindThisProperty = ast.JSDeclarationKindThisProperty
 type JSDoc = ast.JSDoc
