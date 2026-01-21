@@ -46,6 +46,7 @@ const ALL_RULES = [
   'only-throw-error',
   'prefer-includes',
   'prefer-nullish-coalescing',
+  'prefer-optional-chain',
   'prefer-promise-reject-errors',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
@@ -189,7 +190,7 @@ function resolveTestFilePath(relativePath: string): string {
 function generateConfig(
   files: string[],
   rules:
-    readonly ((typeof ALL_RULES)[number] | { name: typeof ALL_RULES[number]; options: Record<string, unknown> })[] =
+    readonly ((typeof ALL_RULES)[number] | { name: (typeof ALL_RULES)[number]; options: Record<string, unknown> })[] =
       ALL_RULES,
   options?: {
     reportSyntactic?: boolean;
@@ -212,10 +213,14 @@ function generateConfig(
     configs: [
       {
         file_paths: files,
-        rules: rules.map((r): {
-          name: typeof ALL_RULES[number];
-          options?: Record<string, unknown>;
-        } => (typeof r === 'string' ? { name: r } : r)),
+        rules: rules.map(
+          (
+            r,
+          ): {
+            name: (typeof ALL_RULES)[number];
+            options?: Record<string, unknown>;
+          } => (typeof r === 'string' ? { name: r } : r),
+        ),
       },
     ],
     ...(options?.reportSyntactic !== undefined && { report_syntactic: options.reportSyntactic }),
@@ -243,9 +248,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       }
     }
 
-    expect(fileSystemRulesList.sort()).toEqual(
-      [...ALL_RULES].sort(),
-    );
+    expect(fileSystemRulesList.sort()).toEqual([...ALL_RULES].sort());
   });
 
   it('should generate consistent diagnostics snapshot', async () => {
@@ -520,18 +523,20 @@ console.log(x);
     const testFiles = await getTestFiles('issue-135');
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(testFiles, [{
-      name: 'no-floating-promises',
-      options: {
-        allowForKnownSafeCalls: [
-          {
-            from: 'package',
-            name: ['test', 'it', 'suite', 'describe'],
-            package: 'node2:test',
-          },
-        ],
+    const config = generateConfig(testFiles, [
+      {
+        name: 'no-floating-promises',
+        options: {
+          allowForKnownSafeCalls: [
+            {
+              from: 'package',
+              name: ['test', 'it', 'suite', 'describe'],
+              package: 'node2:test',
+            },
+          ],
+        },
       },
-    }]);
+    ]);
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,
@@ -548,17 +553,39 @@ console.log(x);
     const testFiles = await getTestFiles('report-type-errors');
     expect(testFiles.length).toBeGreaterThan(0);
 
-    const config = generateConfig(
-      testFiles,
-      ['no-floating-promises'],
-      {
-        reportSemantic: true,
-      },
-    );
+    const config = generateConfig(testFiles, ['no-floating-promises'], {
+      reportSemantic: true,
+    });
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,
       env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
+
+  it('should handle circular project references (issue #297)', async () => {
+    // Regression test for https://github.com/oxc-project/tsgolint/issues/297
+    // This test reproduces the issue where circular tsconfig references
+    // (project1 -> project2 -> project1) caused a panic:
+    // "panic: Expected file '...project2/src/demo/index.ts' to be in program '...project2/tsconfig.json'"
+    const testFiles = await getTestFiles('circular-project-references');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ALL_RULES, {
+      reportSemantic: true,
+      reportSyntactic: true,
+    });
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
     });
 
     let diagnostics = parseHeadlessOutput(output);

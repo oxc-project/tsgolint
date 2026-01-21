@@ -5,6 +5,7 @@ package project
 
 import "github.com/microsoft/typescript-go/internal/ast"
 import "github.com/microsoft/typescript-go/internal/core"
+import "github.com/microsoft/typescript-go/internal/ls/autoimport"
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "github.com/microsoft/typescript-go/internal/project"
 import "github.com/microsoft/typescript-go/internal/project/logging"
@@ -65,7 +66,7 @@ func NewProject(configFileName string, kind project.Kind, currentDirectory strin
 //go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
 func NewSession(init *project.SessionInit) *project.Session
 //go:linkname NewSnapshot github.com/microsoft/typescript-go/internal/project.NewSnapshot
-func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.SessionOptions, parseCache *project.ParseCache, extendedConfigCache *project.ExtendedConfigCache, configFileRegistry *project.ConfigFileRegistry, compilerOptionsForInferredProjects *core.CompilerOptions, config project.Config, toPath func(fileName string) tspath.Path) *project.Snapshot
+func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.SessionOptions, configFileRegistry *project.ConfigFileRegistry, compilerOptionsForInferredProjects *core.CompilerOptions, config project.Config, autoImports *autoimport.Registry, autoImportsWatch *project.WatchedFiles[map[tspath.Path]string], toPath func(fileName string) tspath.Path) *project.Snapshot
 //go:linkname NewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.NewSnapshotFSBuilder
 func NewSnapshotFSBuilder(fs vfs.FS, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
 type Overlay = project.Overlay
@@ -109,6 +110,7 @@ const UpdateReasonRequestedLanguageServiceForFileNotOpen = project.UpdateReasonR
 const UpdateReasonRequestedLanguageServicePendingChanges = project.UpdateReasonRequestedLanguageServicePendingChanges
 const UpdateReasonRequestedLanguageServiceProjectDirty = project.UpdateReasonRequestedLanguageServiceProjectDirty
 const UpdateReasonRequestedLanguageServiceProjectNotLoaded = project.UpdateReasonRequestedLanguageServiceProjectNotLoaded
+const UpdateReasonRequestedLanguageServiceWithAutoImports = project.UpdateReasonRequestedLanguageServiceWithAutoImports
 const UpdateReasonRequestedLoadProjectTree = project.UpdateReasonRequestedLoadProjectTree
 const UpdateReasonUnknown = project.UpdateReasonUnknown
 type WatchedFiles[T any] = project.WatchedFiles[T]

@@ -35,6 +35,8 @@
       "getImmediateAliasedSymbol",
       "getDeclarationOfAliasSymbol",
       "getTypePredicateOfSignature"
+      "GetNonNullableType",
+      "IsNullableType"
     ]
   },
   "ExtraFields": {

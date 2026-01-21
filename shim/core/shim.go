@@ -18,12 +18,15 @@ type BreadthFirstSearchResult[N any] = core.BreadthFirstSearchResult[N]
 type BuildOptions = core.BuildOptions
 //go:linkname CompareBooleans github.com/microsoft/typescript-go/internal/core.CompareBooleans
 func CompareBooleans(a bool, b bool) int
+//go:linkname CompareTextRanges github.com/microsoft/typescript-go/internal/core.CompareTextRanges
+func CompareTextRanges(r1 core.TextRange, r2 core.TextRange) int
 type CompilerOptions = core.CompilerOptions
 //go:linkname ComputeECMALineStarts github.com/microsoft/typescript-go/internal/core.ComputeECMALineStarts
 func ComputeECMALineStarts(text string) core.ECMALineStarts
 //go:linkname ComputeECMALineStartsSeq github.com/microsoft/typescript-go/internal/core.ComputeECMALineStartsSeq
 func ComputeECMALineStartsSeq(text string) iter.Seq[core.TextPos]
 type ECMALineStarts = core.ECMALineStarts
+var EmptyCompilerOptions = core.EmptyCompilerOptions
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
 //go:linkname GetNewLineKind github.com/microsoft/typescript-go/internal/core.GetNewLineKind
 func GetNewLineKind(s string) core.NewLineKind
