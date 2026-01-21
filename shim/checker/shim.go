@@ -203,6 +203,7 @@ type extra_Checker struct {
   unknownSymbol *ast.Symbol
   unresolvedSymbols map[string]*ast.Symbol
   errorTypes map[checker.CacheHashKey]*checker.Type
+  moduleSymbols map[*ast.Node]*ast.Symbol
   globalThisSymbol *ast.Symbol
   resolveName func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
   resolveNameForSymbolSuggestion func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
@@ -442,6 +443,7 @@ type extra_Checker struct {
   ambientModules []*ast.Symbol
   withinUnreachableCode bool
   reportedUnreachableNodes collections.Set[*ast.Node]
+  nonExistentProperties collections.Set[checker.NonExistentPropertyKey]
   mu sync.Mutex
 }
 func Checker_numberType(v *checker.Checker) *checker.Type {
@@ -740,6 +742,7 @@ const NodeCheckFlagsSuperInstance = checker.NodeCheckFlagsSuperInstance
 const NodeCheckFlagsSuperStatic = checker.NodeCheckFlagsSuperStatic
 const NodeCheckFlagsTypeChecked = checker.NodeCheckFlagsTypeChecked
 type NodeLinks = checker.NodeLinks
+type NonExistentPropertyKey = checker.NonExistentPropertyKey
 type ObjectFlags = checker.ObjectFlags
 const ObjectFlagsAnonymous = checker.ObjectFlagsAnonymous
 const ObjectFlagsArrayLiteral = checker.ObjectFlagsArrayLiteral
