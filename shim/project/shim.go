@@ -8,6 +8,7 @@ import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/ls/autoimport"
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "github.com/microsoft/typescript-go/internal/project"
+import "github.com/microsoft/typescript-go/internal/project/dirty"
 import "github.com/microsoft/typescript-go/internal/project/logging"
 import "github.com/microsoft/typescript-go/internal/tsoptions"
 import "github.com/microsoft/typescript-go/internal/tspath"
@@ -68,7 +69,7 @@ func NewSession(init *project.SessionInit) *project.Session
 //go:linkname NewSnapshot github.com/microsoft/typescript-go/internal/project.NewSnapshot
 func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.SessionOptions, configFileRegistry *project.ConfigFileRegistry, compilerOptionsForInferredProjects *core.CompilerOptions, config project.Config, autoImports *autoimport.Registry, autoImportsWatch *project.WatchedFiles[map[tspath.Path]string], toPath func(fileName string) tspath.Path) *project.Snapshot
 //go:linkname NewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.NewSnapshotFSBuilder
-func NewSnapshotFSBuilder(fs vfs.FS, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
+func NewSnapshotFSBuilder(fs vfs.FS, prevOverlays map[tspath.Path]*project.Overlay, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, diskDirectories map[tspath.Path]dirty.CloneableMap[tspath.Path, string], positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
 type Overlay = project.Overlay
 type ParseCache = project.ParseCache
 type ParseCacheKey = project.ParseCacheKey
