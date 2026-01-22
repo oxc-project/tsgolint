@@ -1,4 +1,4 @@
-From 74fa3866b47b488c81bbecf308b148d90cd767b5 Mon Sep 17 00:00:00 2001
+From 61f4feddc7f7afddab7eb4106c5b74e727ff0775 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Mon, 3 Nov 2025 12:44:32 +0000
 Subject: fix: early return from invalid tsconfig for better errors

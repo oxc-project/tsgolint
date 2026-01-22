@@ -1,4 +1,4 @@
-From c8bd1b1ed0129af783ba4158c6596aba4a32b07a Mon Sep 17 00:00:00 2001
+From e7b95ad210693727af1c13fffcf094b57d625ed8 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
 Subject: patch: expose more functions via the shim with type fixes
@@ -8,10 +8,10 @@ Subject: patch: expose more functions via the shim with type fixes
  internal/project/compilerhost.go              |  2 +-
  internal/project/configfileregistrybuilder.go | 68 ++++++++--------
  internal/project/overlayfs.go                 | 20 ++---
- internal/project/projectcollectionbuilder.go  | 66 ++++++++--------
+ internal/project/projectcollectionbuilder.go  | 66 +++++++--------
  internal/project/snapshot.go                  |  4 +-
- internal/project/snapshotfs.go                | 79 +++++++++++--------
- 7 files changed, 126 insertions(+), 117 deletions(-)
+ internal/project/snapshotfs.go                | 81 ++++++++++---------
+ 7 files changed, 127 insertions(+), 118 deletions(-)
 
 diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
 index 620ab02ea..abfd33fc4 100644
@@ -644,7 +644,7 @@ index eefa9ad0d..348e9f018 100644
  					if project.host != nil && project.host.sourceFS.Seen(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 8ddc180e3..8bf7aaf99 100644
+index 8ddc180e3..6185ae807 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -23,7 +23,7 @@ type FileSource interface {
@@ -857,7 +857,7 @@ index 8ddc180e3..8bf7aaf99 100644
  				file.needsReload = true
  			})
  		}
-@@ -341,7 +341,7 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
+@@ -341,14 +341,14 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
  	for uri := range change.Deleted.Keys() {
  		path := s.toPath(uri.FileName())
  		if entry, ok := s.diskFiles.Load(path); ok {
@@ -866,6 +866,14 @@ index 8ddc180e3..8bf7aaf99 100644
  				file.needsReload = true
  			})
  		}
+ 	}
+ }
+ 
+-func (s *snapshotFSBuilder) convertOpenAndCloseToChanges(change FileChangeSummary) FileChangeSummary {
++func (s *SnapshotFSBuilder) convertOpenAndCloseToChanges(change FileChangeSummary) FileChangeSummary {
+ 	if change.Opened != "" && !isDynamicFileName(change.Opened.FileName()) {
+ 		path := s.toPath(change.Opened.FileName())
+ 		if entry, ok := s.diskFiles.Load(path); !ok || entry.Original() == nil {
 @@ -493,3 +493,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
  		}
  	}

@@ -1,4 +1,4 @@
-From b186bf431bf5ab45a47fffa8a4d1177f7fbc93a3 Mon Sep 17 00:00:00 2001
+From f08ba9612d83e626119c5bac597be82960008f07 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Wed, 22 Oct 2025 09:32:18 +0100
 Subject: feat: improve panic message for extracting TS extension
