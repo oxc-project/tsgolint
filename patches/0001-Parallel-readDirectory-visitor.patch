@@ -1,4 +1,4 @@
-From 700ff63c2f77313fddaba0a8f749b42a11291231 Mon Sep 17 00:00:00 2001
+From 15926f7640d372331375873ef170c536108a5859 Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 18 Jun 2025 15:24:34 +0300
 Subject: Parallel readDirectory visitor
