@@ -918,7 +918,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on Promise in an object can cause unexpected behavior. Did you forget to await the promise?",
+      "description": "Using the spread operator on Promise in an object can cause unexpected behavior.",
+      "help": "Did you forget to await the promise before spreading it?",
       "id": "noPromiseSpreadInObject",
     },
     "range": {
@@ -938,7 +939,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the spread operator on Promise in an object can cause unexpected behavior. Did you forget to await the promise?",
+          "description": "Using the spread operator on Promise in an object can cause unexpected behavior.",
+          "help": "Did you forget to await the promise before spreading it?",
           "id": "noPromiseSpreadInObject",
         },
       },
@@ -948,7 +950,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?",
+      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior.",
+      "help": "Did you forget to call the function?",
       "id": "noFunctionSpreadInObject",
     },
     "range": {
@@ -961,7 +964,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on a Map in an object will result in an empty object. Did you mean to use \`Object.fromEntries(map)\` instead?",
+      "description": "Using the spread operator on a Map in an object will result in an empty object.",
+      "help": "Did you mean to use \`Object.fromEntries(map)\` instead?",
       "id": "noMapSpreadInObject",
     },
     "range": {
@@ -1002,7 +1006,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the spread operator on a Map in an object will result in an empty object. Did you mean to use \`Object.fromEntries(map)\` instead?",
+          "description": "Using the spread operator on a Map in an object will result in an empty object.",
+          "help": "Did you mean to use \`Object.fromEntries(map)\` instead?",
           "id": "noMapSpreadInObject",
         },
       },
@@ -1012,8 +1017,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on a string can mishandle special characters, as can \`.split("")\`.
-'- \`...\` produces Unicode code points, which will decompose complex emojis into individual emojis- .split("") produces UTF-16 code units, which breaks rich characters in many languagesConsider using \`Intl.Segmenter\` for locale-aware string decomposition.Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option.",
+      "description": "Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.",
+      "help": "Consider using \`Intl.Segmenter\` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.",
       "id": "noStringSpread",
     },
     "range": {
