@@ -1,0 +1,592 @@
+name: Profile
+
+permissions:
+  pull-requests: write
+  actions: read
+  contents: read
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize]
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+env:
+  # Number of benchmark iterations for statistical validation
+  BENCH_ITERATIONS: 10
+
+jobs:
+  profile:
+    # Run on: push to main (to update cache), or PR with 'bench' label
+    if: |
+      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'bench')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          submodules: true
+          persist-credentials: false
+
+      - uses: oxc-project/setup-node@8958a8e040102244b619c4a94fccb657a44b1c21 # v1.0.6
+
+      - uses: ./.github/actions/setup
+
+      - name: Install profiling dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz
+          # Install benchstat for statistical comparison
+          go install golang.org/x/perf/cmd/benchstat@latest
+
+      - name: Generate test payload
+        id: payload
+        run: |
+          # Find all TypeScript files in e2e/fixtures/basic
+          FILES=$(find "${{ github.workspace }}/e2e/fixtures/basic" \
+            -name "*.ts" -o -name "*.tsx" -o -name "*.mts" -o -name "*.cts" | \
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          # Generate rules list from internal/rules directory
+          # Convert snake_case directory names to kebab-case rule names
+          RULES=$(find "${{ github.workspace }}/internal/rules" -mindepth 1 -maxdepth 1 -type d \
+            ! -name "fixtures" \
+            -exec basename {} \; | \
+            sed 's/_/-/g' | \
+            sort | \
+            jq -R -s -c 'split("\n") | map(select(length > 0)) | map({ "name": . })')
+
+          echo "Found $(echo $RULES | jq 'length') rules"
+
+          # Create the JSON payload
+          jq -n \
+            --argjson files "$FILES" \
+            --argjson rules "$RULES" \
+            '{
+              "version": 2,
+              "configs": [
+                {
+                  "file_paths": $files,
+                  "rules": $rules
+                }
+              ],
+              "report_syntactic": false,
+              "report_semantic": false
+            }' > payload.json
+
+          echo "Payload created with $(echo $FILES | jq 'length') files and $(echo $RULES | jq 'length') rules"
+          cat payload.json
+
+      - name: Restore main branch benchmark cache
+        id: cache-main
+        if: github.event_name != 'push'
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            benchmark-main.txt
+            cpu-main.pprof
+            heap-main.pprof
+            allocs-main.pprof
+          key: pprof-main-${{ hashFiles('go.sum', 'patches/*.patch', 'cmd/**/*.go', 'internal/**/*.go') }}
+
+      - name: Build tsgolint (PR branch)
+        if: github.event_name != 'push'
+        run: |
+          GOEXPERIMENT=greenteagc go build -o tsgolint-pr ./cmd/tsgolint
+          echo "Built tsgolint-pr for PR branch"
+
+      - name: Benchmark and profile PR branch
+        if: github.event_name != 'push'
+        run: |
+          echo "Running benchmarks on PR branch ($BENCH_ITERATIONS iterations)..."
+
+          # Create benchmark output file in Go benchmark format
+          echo "goos: linux" > benchmark-pr.txt
+          echo "goarch: amd64" >> benchmark-pr.txt
+          echo "pkg: tsgolint/headless" >> benchmark-pr.txt
+
+          # Run multiple iterations for statistical significance
+          for i in $(seq 1 $BENCH_ITERATIONS); do
+            echo "Iteration $i/$BENCH_ITERATIONS..."
+            
+            # Measure execution time
+            START_TIME=$(date +%s%N)
+            ./tsgolint-pr headless < payload.json > /dev/null 2>&1
+            END_TIME=$(date +%s%N)
+            
+            # Calculate duration in nanoseconds
+            DURATION_NS=$((END_TIME - START_TIME))
+            
+            # Output in Go benchmark format
+            echo "BenchmarkHeadless-2    1    $DURATION_NS ns/op" >> benchmark-pr.txt
+          done
+
+          echo ""
+          echo "PR benchmark results:"
+          cat benchmark-pr.txt
+
+          # Run one more time with profiling enabled
+          echo ""
+          echo "Generating profiles (CPU, heap, allocs)..."
+          ./tsgolint-pr headless -cpuprof cpu-pr.pprof -heap heap-pr.pprof -allocs allocs-pr.pprof < payload.json > /dev/null 2>&1
+
+          echo "Profiles generated:"
+          ls -la cpu-pr.pprof heap-pr.pprof allocs-pr.pprof
+          ls -la cpu-pr.pprof
+
+      - name: Checkout and build main branch (on cache miss)
+        if: steps.cache-main.outputs.cache-hit != 'true' && github.event_name != 'push'
+        run: |
+          # Create a separate directory for main branch
+          git worktree add ../main-branch origin/main
+
+          # Build main branch
+          pushd ../main-branch
+
+          # Initialize and update submodules in the worktree
+          git submodule update --init --recursive
+
+          # Apply patches to typescript-go
+          pushd typescript-go
+          git am --3way --no-gpg-sign ../patches/*.patch || true
+          popd
+
+          # Copy collections
+          mkdir -p internal/collections
+          find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
+
+          # Build
+          GOEXPERIMENT=greenteagc go build -o tsgolint-main ./cmd/tsgolint
+
+          popd
+          mv ../main-branch/tsgolint-main ./tsgolint-main
+
+          echo "Built tsgolint-main for main branch"
+
+      - name: Benchmark and profile main branch (on cache miss)
+        if: steps.cache-main.outputs.cache-hit != 'true' && github.event_name != 'push'
+        run: |
+          echo "Running benchmarks on main branch ($BENCH_ITERATIONS iterations)..."
+
+          # Create benchmark output file in Go benchmark format
+          echo "goos: linux" > benchmark-main.txt
+          echo "goarch: amd64" >> benchmark-main.txt
+          echo "pkg: tsgolint/headless" >> benchmark-main.txt
+
+          # Run multiple iterations for statistical significance
+          for i in $(seq 1 $BENCH_ITERATIONS); do
+            echo "Iteration $i/$BENCH_ITERATIONS..."
+            
+            # Measure execution time
+            START_TIME=$(date +%s%N)
+            ./tsgolint-main headless < payload.json > /dev/null 2>&1
+            END_TIME=$(date +%s%N)
+            
+            # Calculate duration in nanoseconds
+            DURATION_NS=$((END_TIME - START_TIME))
+            
+            # Output in Go benchmark format
+            echo "BenchmarkHeadless-2    1    $DURATION_NS ns/op" >> benchmark-main.txt
+          done
+
+          echo ""
+          echo "Main benchmark results:"
+          cat benchmark-main.txt
+
+          # Run one more time with profiling enabled
+          echo ""
+          echo "Generating profiles (CPU, heap, allocs)..."
+          ./tsgolint-main headless -cpuprof cpu-main.pprof -heap heap-main.pprof -allocs allocs-main.pprof < payload.json > /dev/null 2>&1
+
+          echo "Profiles generated:"
+          ls -la cpu-main.pprof heap-main.pprof allocs-main.pprof
+
+      - name: Save main branch benchmark cache
+        if: (steps.cache-main.outputs.cache-hit != 'true' && github.event_name != 'push') || github.event_name == 'push'
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: |
+            benchmark-main.txt
+            cpu-main.pprof
+            heap-main.pprof
+            allocs-main.pprof
+          key: pprof-main-${{ hashFiles('go.sum', 'patches/*.patch', 'cmd/**/*.go', 'internal/**/*.go') }}
+
+      # For push to main, we only update the cache and exit
+      - name: Build and benchmark for main branch cache
+        if: github.event_name == 'push'
+        run: |
+          # Build for cache on push to main
+          GOEXPERIMENT=greenteagc go build -o tsgolint-main ./cmd/tsgolint
+
+          echo "Running benchmarks on main branch ($BENCH_ITERATIONS iterations)..."
+
+          # Create benchmark output file in Go benchmark format
+          echo "goos: linux" > benchmark-main.txt
+          echo "goarch: amd64" >> benchmark-main.txt
+          echo "pkg: tsgolint/headless" >> benchmark-main.txt
+
+          # Run multiple iterations for statistical significance
+          for i in $(seq 1 $BENCH_ITERATIONS); do
+            echo "Iteration $i/$BENCH_ITERATIONS..."
+            
+            START_TIME=$(date +%s%N)
+            ./tsgolint-main headless < payload.json > /dev/null 2>&1
+            END_TIME=$(date +%s%N)
+            
+            DURATION_NS=$((END_TIME - START_TIME))
+            echo "BenchmarkHeadless-2    1    $DURATION_NS ns/op" >> benchmark-main.txt
+          done
+
+          # Generate profiles (CPU, heap, allocs)
+          ./tsgolint-main headless -cpuprof cpu-main.pprof -heap heap-main.pprof -allocs allocs-main.pprof < payload.json > /dev/null 2>&1
+
+          echo "Cache updated for main branch"
+          cat benchmark-main.txt
+
+      - name: Generate visualizations
+        if: github.event_name != 'push'
+        run: |
+          # Generate flame graph SVG from CPU pprof
+          go tool pprof -svg -output=flamegraph-cpu-pr.svg cpu-pr.pprof
+
+          # Generate top functions text reports
+          go tool pprof -top -nodecount=50 cpu-pr.pprof > top-cpu-pr.txt
+          go tool pprof -top -nodecount=50 heap-pr.pprof > top-heap-pr.txt
+          go tool pprof -top -nodecount=50 allocs-pr.pprof > top-allocs-pr.txt
+
+          # Generate heap and allocs flame graphs
+          go tool pprof -svg -output=flamegraph-heap-pr.svg heap-pr.pprof
+          go tool pprof -svg -output=flamegraph-allocs-pr.svg allocs-pr.pprof
+
+          if [ -f cpu-main.pprof ]; then
+            go tool pprof -svg -output=flamegraph-cpu-main.svg cpu-main.pprof
+            go tool pprof -top -nodecount=50 cpu-main.pprof > top-cpu-main.txt
+          fi
+
+          if [ -f heap-main.pprof ]; then
+            go tool pprof -svg -output=flamegraph-heap-main.svg heap-main.pprof
+            go tool pprof -top -nodecount=50 heap-main.pprof > top-heap-main.txt
+          fi
+
+          if [ -f allocs-main.pprof ]; then
+            go tool pprof -svg -output=flamegraph-allocs-main.svg allocs-main.pprof
+            go tool pprof -top -nodecount=50 allocs-main.pprof > top-allocs-main.txt
+          fi
+
+          echo "Visualizations generated"
+          ls -la *.svg *.txt 2>/dev/null || true
+
+      - name: Statistical comparison
+        if: github.event_name != 'push'
+        id: metrics
+        run: |
+          echo "=== Statistical Comparison ==="
+          echo ""
+
+          # Use benchstat for statistical comparison if main benchmark exists
+          if [ -f benchmark-main.txt ]; then
+            echo "Running benchstat comparison..."
+            benchstat benchmark-main.txt benchmark-pr.txt > benchstat-output.txt 2>&1 || true
+            cat benchstat-output.txt
+            
+            # Parse benchstat output for the comparison
+            # Format: name old new delta
+            BENCHSTAT_LINE=$(grep "BenchmarkHeadless" benchstat-output.txt | head -1 || echo "")
+            
+            if [ -n "$BENCHSTAT_LINE" ]; then
+              # Extract values - benchstat format varies, try to parse
+              MAIN_TIME=$(echo "$BENCHSTAT_LINE" | awk '{print $2}')
+              PR_TIME=$(echo "$BENCHSTAT_LINE" | awk '{print $3}')
+              DELTA_INFO=$(echo "$BENCHSTAT_LINE" | awk '{print $4, $5}')
+              
+              echo ""
+              echo "Parsed results:"
+              echo "  Main: $MAIN_TIME"
+              echo "  PR: $PR_TIME"
+              echo "  Delta: $DELTA_INFO"
+            fi
+          else
+            echo "No main branch benchmark available for comparison"
+            BENCHSTAT_LINE=""
+          fi
+
+          # Calculate our own statistics from raw data
+          echo ""
+          echo "=== Detailed Statistics ==="
+
+          # Extract times from benchmark files (skip header lines)
+          PR_TIMES=$(grep "BenchmarkHeadless" benchmark-pr.txt | awk '{print $3}')
+
+          # Calculate statistics for PR
+          PR_MEAN=$(echo "$PR_TIMES" | awk '{sum+=$1; count++} END {printf "%.0f", sum/count}')
+          PR_MIN=$(echo "$PR_TIMES" | sort -n | head -1)
+          PR_MAX=$(echo "$PR_TIMES" | sort -n | tail -1)
+
+          # Calculate standard deviation for PR
+          PR_STDDEV=$(echo "$PR_TIMES" | awk -v mean="$PR_MEAN" '{
+            sum += ($1 - mean)^2
+            count++
+          } END {
+            if (count > 1) printf "%.0f", sqrt(sum/(count-1))
+            else print 0
+          }')
+
+          # Convert to milliseconds for display
+          PR_MEAN_MS=$(echo "scale=2; $PR_MEAN / 1000000" | bc)
+          PR_STDDEV_MS=$(echo "scale=2; $PR_STDDEV / 1000000" | bc)
+          PR_MIN_MS=$(echo "scale=2; $PR_MIN / 1000000" | bc)
+          PR_MAX_MS=$(echo "scale=2; $PR_MAX / 1000000" | bc)
+
+          echo "PR Statistics:"
+          echo "  Mean: ${PR_MEAN_MS}ms"
+          echo "  Std Dev: ${PR_STDDEV_MS}ms"
+          echo "  Min: ${PR_MIN_MS}ms"
+          echo "  Max: ${PR_MAX_MS}ms"
+
+          if [ -f benchmark-main.txt ]; then
+            MAIN_TIMES=$(grep "BenchmarkHeadless" benchmark-main.txt | awk '{print $3}')
+            
+            MAIN_MEAN=$(echo "$MAIN_TIMES" | awk '{sum+=$1; count++} END {printf "%.0f", sum/count}')
+            MAIN_MIN=$(echo "$MAIN_TIMES" | sort -n | head -1)
+            MAIN_MAX=$(echo "$MAIN_TIMES" | sort -n | tail -1)
+            
+            MAIN_STDDEV=$(echo "$MAIN_TIMES" | awk -v mean="$MAIN_MEAN" '{
+              sum += ($1 - mean)^2
+              count++
+            } END {
+              if (count > 1) printf "%.0f", sqrt(sum/(count-1))
+              else print 0
+            }')
+            
+            MAIN_MEAN_MS=$(echo "scale=2; $MAIN_MEAN / 1000000" | bc)
+            MAIN_STDDEV_MS=$(echo "scale=2; $MAIN_STDDEV / 1000000" | bc)
+            MAIN_MIN_MS=$(echo "scale=2; $MAIN_MIN / 1000000" | bc)
+            MAIN_MAX_MS=$(echo "scale=2; $MAIN_MAX / 1000000" | bc)
+            
+            echo ""
+            echo "Main Statistics:"
+            echo "  Mean: ${MAIN_MEAN_MS}ms"
+            echo "  Std Dev: ${MAIN_STDDEV_MS}ms"
+            echo "  Min: ${MAIN_MIN_MS}ms"
+            echo "  Max: ${MAIN_MAX_MS}ms"
+            
+            # Calculate delta
+            DELTA_NS=$((PR_MEAN - MAIN_MEAN))
+            DELTA_MS=$(echo "scale=2; $DELTA_NS / 1000000" | bc)
+            
+            if [ "$MAIN_MEAN" -gt 0 ]; then
+              DELTA_PCT=$(echo "scale=2; ($DELTA_NS * 100) / $MAIN_MEAN" | bc)
+            else
+              DELTA_PCT="0"
+            fi
+            
+            # Determine significance (rough heuristic: delta > 2*combined_stddev)
+            COMBINED_STDDEV=$(echo "scale=0; sqrt($PR_STDDEV^2 + $MAIN_STDDEV^2)" | bc)
+            DELTA_ABS=${DELTA_NS#-}  # Absolute value
+            
+            if [ "$DELTA_ABS" -gt $((2 * COMBINED_STDDEV)) ]; then
+              SIGNIFICANT="true"
+              if [ "$DELTA_NS" -gt 0 ]; then
+                DELTA_EMOJI="🔴"
+                VERDICT="**Regression detected** (statistically significant)"
+              else
+                DELTA_EMOJI="🟢"
+                VERDICT="**Improvement detected** (statistically significant)"
+              fi
+            else
+              SIGNIFICANT="false"
+              DELTA_EMOJI="⚪"
+              VERDICT="No significant change (within noise threshold)"
+            fi
+            
+            echo ""
+            echo "Comparison:"
+            echo "  Delta: ${DELTA_MS}ms (${DELTA_PCT}%)"
+            echo "  Significant: $SIGNIFICANT"
+            echo "  Verdict: $VERDICT"
+          else
+            MAIN_MEAN_MS="N/A"
+            MAIN_STDDEV_MS="N/A"
+            DELTA_MS="N/A"
+            DELTA_PCT="N/A"
+            DELTA_EMOJI="❓"
+            VERDICT="No baseline available"
+          fi
+
+          # Save metrics to output
+          echo "pr_mean=${PR_MEAN_MS}ms" >> $GITHUB_OUTPUT
+          echo "pr_stddev=±${PR_STDDEV_MS}ms" >> $GITHUB_OUTPUT
+          echo "pr_min=${PR_MIN_MS}ms" >> $GITHUB_OUTPUT
+          echo "pr_max=${PR_MAX_MS}ms" >> $GITHUB_OUTPUT
+          echo "main_mean=${MAIN_MEAN_MS}ms" >> $GITHUB_OUTPUT
+          echo "main_stddev=±${MAIN_STDDEV_MS}ms" >> $GITHUB_OUTPUT
+          echo "main_min=${MAIN_MIN_MS:-N/A}ms" >> $GITHUB_OUTPUT
+          echo "main_max=${MAIN_MAX_MS:-N/A}ms" >> $GITHUB_OUTPUT
+          echo "delta=${DELTA_MS}ms" >> $GITHUB_OUTPUT
+          echo "delta_pct=${DELTA_PCT}%" >> $GITHUB_OUTPUT
+          echo "delta_emoji=$DELTA_EMOJI" >> $GITHUB_OUTPUT
+          echo "verdict=$VERDICT" >> $GITHUB_OUTPUT
+          echo "iterations=$BENCH_ITERATIONS" >> $GITHUB_OUTPUT
+
+          # Extract heap and allocs metrics from pprof
+          echo ""
+          echo "=== Memory Profiling Metrics ==="
+
+          # Get heap metrics for PR
+          PR_HEAP_TOTAL=$(go tool pprof -top -nodecount=1 heap-pr.pprof 2>/dev/null | grep -E '^Showing|flat' | head -1 | grep -oE '[0-9.]+[kMG]?B' | head -1 || echo "N/A")
+          PR_ALLOCS_TOTAL=$(go tool pprof -top -nodecount=1 allocs-pr.pprof 2>/dev/null | grep -E '^Showing|flat' | head -1 | grep -oE '[0-9.]+[kMG]?B?' | head -1 || echo "N/A")
+
+          # Get detailed heap info using -text
+          PR_HEAP_INFO=$(go tool pprof -text -nodecount=0 heap-pr.pprof 2>/dev/null | head -5)
+          PR_ALLOCS_INFO=$(go tool pprof -text -nodecount=0 allocs-pr.pprof 2>/dev/null | head -5)
+
+          # Parse the "Showing X of Y total" line for totals
+          PR_HEAP_SHOWING=$(go tool pprof -top heap-pr.pprof 2>/dev/null | grep "Showing" | head -1 || echo "")
+          PR_ALLOCS_SHOWING=$(go tool pprof -top allocs-pr.pprof 2>/dev/null | grep "Showing" | head -1 || echo "")
+
+          # Extract total from "Showing nodes accounting for X, Y% of Z total"
+          PR_HEAP_BYTES=$(echo "$PR_HEAP_SHOWING" | grep -oE 'of [0-9.]+[kMG]?B' | sed 's/of //' || echo "N/A")
+          PR_ALLOCS_COUNT=$(echo "$PR_ALLOCS_SHOWING" | grep -oE 'of [0-9.]+[kMG]?' | sed 's/of //' || echo "N/A")
+
+          echo "PR Heap: $PR_HEAP_BYTES"
+          echo "PR Allocs: $PR_ALLOCS_COUNT"
+
+          if [ -f heap-main.pprof ]; then
+            MAIN_HEAP_SHOWING=$(go tool pprof -top heap-main.pprof 2>/dev/null | grep "Showing" | head -1 || echo "")
+            MAIN_ALLOCS_SHOWING=$(go tool pprof -top allocs-main.pprof 2>/dev/null | grep "Showing" | head -1 || echo "")
+            
+            MAIN_HEAP_BYTES=$(echo "$MAIN_HEAP_SHOWING" | grep -oE 'of [0-9.]+[kMG]?B' | sed 's/of //' || echo "N/A")
+            MAIN_ALLOCS_COUNT=$(echo "$MAIN_ALLOCS_SHOWING" | grep -oE 'of [0-9.]+[kMG]?' | sed 's/of //' || echo "N/A")
+            
+            echo "Main Heap: $MAIN_HEAP_BYTES"
+            echo "Main Allocs: $MAIN_ALLOCS_COUNT"
+          else
+            MAIN_HEAP_BYTES="N/A"
+            MAIN_ALLOCS_COUNT="N/A"
+          fi
+
+          echo "pr_heap=$PR_HEAP_BYTES" >> $GITHUB_OUTPUT
+          echo "pr_allocs=$PR_ALLOCS_COUNT" >> $GITHUB_OUTPUT
+          echo "main_heap=$MAIN_HEAP_BYTES" >> $GITHUB_OUTPUT
+          echo "main_allocs=$MAIN_ALLOCS_COUNT" >> $GITHUB_OUTPUT
+
+      - name: Upload profile artifacts
+        if: github.event_name != 'push'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pprof-profiles
+          path: |
+            cpu-pr.pprof
+            cpu-main.pprof
+            heap-pr.pprof
+            heap-main.pprof
+            allocs-pr.pprof
+            allocs-main.pprof
+            flamegraph-cpu-pr.svg
+            flamegraph-cpu-main.svg
+            flamegraph-heap-pr.svg
+            flamegraph-heap-main.svg
+            flamegraph-allocs-pr.svg
+            flamegraph-allocs-main.svg
+            top-cpu-pr.txt
+            top-cpu-main.txt
+            top-heap-pr.txt
+            top-heap-main.txt
+            top-allocs-pr.txt
+            top-allocs-main.txt
+            benchmark-pr.txt
+            benchmark-main.txt
+            benchstat-output.txt
+          retention-days: 30
+
+      - name: Find existing comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- tsgolint-profile -->"
+
+      - name: Create or update PR comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- tsgolint-profile -->
+            ## 📊 Performance Profile Results
+
+            ${{ steps.metrics.outputs.delta_emoji }} ${{ steps.metrics.outputs.verdict }}
+
+            ### Benchmark Results (${{ steps.metrics.outputs.iterations }} iterations)
+
+            | Branch | Mean | Std Dev | Min | Max |
+            |--------|------|---------|-----|-----|
+            | **main** | ${{ steps.metrics.outputs.main_mean }} | ${{ steps.metrics.outputs.main_stddev }} | ${{ steps.metrics.outputs.main_min }} | ${{ steps.metrics.outputs.main_max }} |
+            | **PR** | ${{ steps.metrics.outputs.pr_mean }} | ${{ steps.metrics.outputs.pr_stddev }} | ${{ steps.metrics.outputs.pr_min }} | ${{ steps.metrics.outputs.pr_max }} |
+
+            | Delta | % Change |
+            |-------|----------|
+            | ${{ steps.metrics.outputs.delta }} | ${{ steps.metrics.outputs.delta_pct }} |
+
+            ### Memory Profiling
+
+            | Profile | main | PR |
+            |---------|------|----|
+            | **Heap (in use)** | ${{ steps.metrics.outputs.main_heap }} | ${{ steps.metrics.outputs.pr_heap }} |
+            | **Allocations** | ${{ steps.metrics.outputs.main_allocs }} | ${{ steps.metrics.outputs.pr_allocs }} |
+
+            <details>
+            <summary>📥 Artifacts</summary>
+
+            Download the full profiling data from the [workflow artifacts](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+            **Available files:**
+            - **CPU profiles**: `cpu-pr.pprof` / `cpu-main.pprof`
+            - **Heap profiles**: `heap-pr.pprof` / `heap-main.pprof`
+            - **Allocation profiles**: `allocs-pr.pprof` / `allocs-main.pprof`
+            - **Flame graphs**: `flamegraph-{cpu,heap,allocs}-{pr,main}.svg`
+            - **Top functions**: `top-{cpu,heap,allocs}-{pr,main}.txt`
+            - **Benchmark data**: `benchmark-*.txt`, `benchstat-output.txt`
+
+            </details>
+
+            <details>
+            <summary>🔍 How to analyze locally</summary>
+
+            ```bash
+            # Download artifacts and extract
+
+            # Interactive pprof web UI (CPU)
+            go tool pprof -http=:8080 cpu-pr.pprof
+
+            # Compare CPU profiles between main and PR
+            go tool pprof -diff_base=cpu-main.pprof cpu-pr.pprof
+
+            # Analyze heap allocations
+            go tool pprof -http=:8080 heap-pr.pprof
+
+            # Analyze allocation counts
+            go tool pprof -http=:8080 allocs-pr.pprof
+
+            # Top functions by CPU time
+            go tool pprof -top cpu-pr.pprof
+            ```
+
+            </details>
+
+            ---
+            <sub>Profile generated at ${{ github.event.pull_request.head.sha }} using Go pprof with ${{ steps.metrics.outputs.iterations }} iterations</sub>
