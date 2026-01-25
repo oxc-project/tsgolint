@@ -7,7 +7,7 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type RestrictTemplateExpressionsOptions struct {
 	// Allow corresponds to the JSON schema field "allow".
-	Allow []RestrictTemplateExpressionsOptionsAllowElem `json:"allow"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow"`
 
 	// AllowAny corresponds to the JSON schema field "allowAny".
 	AllowAny bool `json:"allowAny,omitempty"`
@@ -31,8 +31,6 @@ type RestrictTemplateExpressionsOptions struct {
 	AllowRegExp bool `json:"allowRegExp,omitempty"`
 }
 
-type RestrictTemplateExpressionsOptionsAllowElem = utils.TypeOrValueSpecifier
-
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *RestrictTemplateExpressionsOptions) UnmarshalJSON(value []byte) error {
 	var raw map[string]interface{}
@@ -45,8 +43,8 @@ func (j *RestrictTemplateExpressionsOptions) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	if v, ok := raw["allow"]; !ok || v == nil {
-		plain.Allow = []RestrictTemplateExpressionsOptionsAllowElem{
-			utils.TypeOrValueSpecifier{
+		plain.Allow = []utils.TypeOrValueSpecifier{
+			{
 				From: utils.TypeOrValueSpecifierFromLib,
 				Name: []string{"Error", "URL", "URLSearchParams"},
 			},

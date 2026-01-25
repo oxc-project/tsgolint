@@ -7,10 +7,8 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type NoDeprecatedOptions struct {
 	// Allow corresponds to the JSON schema field "allow".
-	Allow []NoDeprecatedOptionsAllowElem `json:"allow,omitempty"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty"`
 }
-
-type NoDeprecatedOptionsAllowElem = utils.TypeOrValueSpecifier
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *NoDeprecatedOptions) UnmarshalJSON(value []byte) error {
@@ -24,7 +22,7 @@ func (j *NoDeprecatedOptions) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	if v, ok := raw["allow"]; !ok || v == nil {
-		plain.Allow = []NoDeprecatedOptionsAllowElem{}
+		plain.Allow = []utils.TypeOrValueSpecifier{}
 	}
 	*j = NoDeprecatedOptions(plain)
 	return nil
