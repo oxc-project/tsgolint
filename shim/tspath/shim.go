@@ -110,6 +110,8 @@ func HasTrailingDirectorySeparator(path string) bool
 func IsDeclarationFileName(fileName string) bool
 //go:linkname IsDiskPathRoot github.com/microsoft/typescript-go/internal/tspath.IsDiskPathRoot
 func IsDiskPathRoot(path string) bool
+//go:linkname IsDynamicFileName github.com/microsoft/typescript-go/internal/tspath.IsDynamicFileName
+func IsDynamicFileName(fileName string) bool
 //go:linkname IsExternalModuleNameRelative github.com/microsoft/typescript-go/internal/tspath.IsExternalModuleNameRelative
 func IsExternalModuleNameRelative(moduleName string) bool
 //go:linkname IsRootedDiskPath github.com/microsoft/typescript-go/internal/tspath.IsRootedDiskPath

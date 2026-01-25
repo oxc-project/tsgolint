@@ -1,4 +1,4 @@
-From e7b95ad210693727af1c13fffcf094b57d625ed8 Mon Sep 17 00:00:00 2001
+From 10f9cf092c951ee1385eaf19b43482d3a21b501c Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
 Subject: patch: expose more functions via the shim with type fixes
@@ -6,15 +6,15 @@ Subject: patch: expose more functions via the shim with type fixes
 ---
  internal/project/autoimport.go                |  4 +-
  internal/project/compilerhost.go              |  2 +-
- internal/project/configfileregistrybuilder.go | 68 ++++++++--------
+ internal/project/configfileregistrybuilder.go | 66 +++++++--------
  internal/project/overlayfs.go                 | 20 ++---
  internal/project/projectcollectionbuilder.go  | 66 +++++++--------
  internal/project/snapshot.go                  |  4 +-
  internal/project/snapshotfs.go                | 81 ++++++++++---------
- 7 files changed, 127 insertions(+), 118 deletions(-)
+ 7 files changed, 126 insertions(+), 117 deletions(-)
 
 diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
-index 620ab02ea..abfd33fc4 100644
+index 9dcc8228f..8145d5506 100644
 --- a/internal/project/autoimport.go
 +++ b/internal/project/autoimport.go
 @@ -14,7 +14,7 @@ import (
@@ -36,7 +36,7 @@ index 620ab02ea..abfd33fc4 100644
  	toPath func(fileName string) tspath.Path,
  ) *autoImportRegistryCloneHost {
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
-index 9e329ec4c..cbd049b12 100644
+index 1af21a828..fb0db1b09 100644
 --- a/internal/project/compilerhost.go
 +++ b/internal/project/compilerhost.go
 @@ -86,7 +86,7 @@ func (c *compilerHost) GetResolvedProjectReference(fileName string, path tspath.
@@ -49,7 +49,7 @@ index 9e329ec4c..cbd049b12 100644
  }
  
 diff --git a/internal/project/configfileregistrybuilder.go b/internal/project/configfileregistrybuilder.go
-index c47f527cd..d2c6ebeac 100644
+index 956241be4..3a86a16d0 100644
 --- a/internal/project/configfileregistrybuilder.go
 +++ b/internal/project/configfileregistrybuilder.go
 @@ -16,14 +16,14 @@ import (
@@ -184,7 +184,7 @@ index c47f527cd..d2c6ebeac 100644
  // or files are associated with the config entry, it will be removed on the next call to `cleanup`.
 -func (c *configFileRegistryBuilder) didCloseFile(path tspath.Path) {
 +func (c *ConfigFileRegistryBuilder) didCloseFile(path tspath.Path) {
- 	if isDynamicFileName(string(path)) {
+ 	if tspath.IsDynamicFileName(string(path)) {
  		return
  	}
 @@ -325,7 +325,7 @@ func (r changeFileResult) IsEmpty() bool {
@@ -229,7 +229,7 @@ index c47f527cd..d2c6ebeac 100644
  
 -func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, path tspath.Path, logger *logging.LogTree) string {
 +func (c *ConfigFileRegistryBuilder) getConfigFileNameForFile(fileName string, path tspath.Path, logger *logging.LogTree) string {
- 	if isDynamicFileName(fileName) {
+ 	if tspath.IsDynamicFileName(fileName) {
  		return ""
  	}
 @@ -573,7 +573,7 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
@@ -241,24 +241,22 @@ index c47f527cd..d2c6ebeac 100644
  	if c.isOpenFile(path) {
  		c.configFileNames.Add(path, &configFileNames{
  			nearestConfigFileName: configName,
-@@ -582,8 +582,8 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
+@@ -582,7 +582,7 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
  	return configName
  }
  
 -func (c *configFileRegistryBuilder) forEachConfigFileNameFor(path tspath.Path, cb func(configFileName string)) {
--	if isDynamicFileName(string(path)) {
-+func (c *ConfigFileRegistryBuilder) forEachConfigFileNameFor(fileName string, path tspath.Path, cb func(configFileName string)) {
-+	if isDynamicFileName(fileName) {
++func (c *ConfigFileRegistryBuilder) forEachConfigFileNameFor(path tspath.Path, cb func(configFileName string)) {
+ 	if tspath.IsDynamicFileName(string(path)) {
  		return
  	}
- 
 @@ -600,7 +600,7 @@ func (c *configFileRegistryBuilder) forEachConfigFileNameFor(path tspath.Path, c
  	}
  }
  
 -func (c *configFileRegistryBuilder) getAncestorConfigFileName(fileName string, path tspath.Path, configFileName string, logger *logging.LogTree) string {
 +func (c *ConfigFileRegistryBuilder) GetAncestorConfigFileName(fileName string, path tspath.Path, configFileName string, logger *logging.LogTree) string {
- 	if isDynamicFileName(fileName) {
+ 	if tspath.IsDynamicFileName(fileName) {
  		return ""
  	}
 @@ -615,7 +615,7 @@ func (c *configFileRegistryBuilder) getAncestorConfigFileName(fileName string, p
@@ -301,7 +299,7 @@ index c47f527cd..d2c6ebeac 100644
  		entry.DeleteIf(func(value *configFileEntry) bool {
  			return len(value.retainingProjects) == 0 && len(value.retainingOpenFiles) == 0 && len(value.retainingConfigs) == 0
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index 8c6cc187e..d018cdcb0 100644
+index e968e9c44..28faeb11f 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
 @@ -68,13 +68,13 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
@@ -356,7 +354,7 @@ index 8c6cc187e..d018cdcb0 100644
  			fileName: f.fileName,
  			content:  f.content,
 diff --git a/internal/project/projectcollectionbuilder.go b/internal/project/projectcollectionbuilder.go
-index a8cbdae6b..22492b515 100644
+index a8cbdae6b..763b252eb 100644
 --- a/internal/project/projectcollectionbuilder.go
 +++ b/internal/project/projectcollectionbuilder.go
 @@ -16,13 +16,13 @@ import (
@@ -440,7 +438,7 @@ index a8cbdae6b..22492b515 100644
  			// Retain all the ancestor projects
 -			b.configFileRegistryBuilder.forEachConfigFileNameFor(openFilePath, func(configFileName string) {
 -				if ancestor := b.findOrCreateProject(configFileName, b.toPath(configFileName), projectLoadKindFind, logger); ancestor != nil {
-+			b.ConfigFileRegistryBuilder.forEachConfigFileNameFor(openFile, openFilePath, func(configFileName string) {
++			b.ConfigFileRegistryBuilder.forEachConfigFileNameFor(openFilePath, func(configFileName string) {
 +				if ancestor := b.findOrCreateProject(configFileName, b.toPath(configFileName), ProjectLoadKindFind, logger); ancestor != nil {
  					retainProjectAndReferences(ancestor.Value())
  				}
@@ -622,7 +620,7 @@ index a8cbdae6b..22492b515 100644
  	project.Delete()
  }
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index eefa9ad0d..348e9f018 100644
+index 0b7688e8e..237c23cce 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
 @@ -265,7 +265,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
@@ -644,7 +642,7 @@ index eefa9ad0d..348e9f018 100644
  					if project.host != nil && project.host.sourceFS.Seen(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 8ddc180e3..6185ae807 100644
+index a8629d0f7..a2fad571a 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -23,7 +23,7 @@ type FileSource interface {
@@ -871,7 +869,7 @@ index 8ddc180e3..6185ae807 100644
  
 -func (s *snapshotFSBuilder) convertOpenAndCloseToChanges(change FileChangeSummary) FileChangeSummary {
 +func (s *SnapshotFSBuilder) convertOpenAndCloseToChanges(change FileChangeSummary) FileChangeSummary {
- 	if change.Opened != "" && !isDynamicFileName(change.Opened.FileName()) {
+ 	if change.Opened != "" && !tspath.IsDynamicFileName(change.Opened.FileName()) {
  		path := s.toPath(change.Opened.FileName())
  		if entry, ok := s.diskFiles.Load(path); !ok || entry.Original() == nil {
 @@ -493,3 +493,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
