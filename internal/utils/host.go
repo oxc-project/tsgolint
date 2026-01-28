@@ -16,11 +16,12 @@ import (
 var _ compiler.CompilerHost = (*compilerHost)(nil)
 
 type compilerHost struct {
-	currentDirectory    string
-	fs                  vfs.FS
-	defaultLibraryPath  string
-	extendedConfigCache tsoptions.ExtendedConfigCache
-	trace               func(msg *ast.DiagnosticsMessage, args ...any)
+	currentDirectory          string
+	fs                        vfs.FS
+	defaultLibraryPath        string
+	extendedConfigCache       tsoptions.ExtendedConfigCache
+	trace                     func(msg *ast.DiagnosticsMessage, args ...any)
+	resolvedProjectReferences collections.SyncMap[tspath.Path, *tsoptions.ParsedCommandLine]
 }
 
 func NewCachedFSCompilerHost(
@@ -107,6 +108,10 @@ func (h *compilerHost) GetSourceFile(opts ast.SourceFileParseOptions) *ast.Sourc
 }
 
 func (h *compilerHost) GetResolvedProjectReference(fileName string, path tspath.Path) *tsoptions.ParsedCommandLine {
+	if cached, ok := h.resolvedProjectReferences.Load(path); ok {
+		return cached
+	}
 	commandLine, _ := tsoptions.GetParsedCommandLineOfConfigFilePath(fileName, path, nil, nil, h, h.extendedConfigCache)
-	return commandLine
+	result, _ := h.resolvedProjectReferences.LoadOrStore(path, commandLine)
+	return result
 }

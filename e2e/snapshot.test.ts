@@ -566,4 +566,30 @@ console.log(x);
 
     expect(diagnostics).toMatchSnapshot();
   });
+
+  it('should handle circular project references (issue #297)', async () => {
+    // Regression test for https://github.com/oxc-project/tsgolint/issues/297
+    // This test reproduces the issue where circular tsconfig references
+    // (project1 -> project2 -> project1) caused a panic:
+    // "panic: Expected file '...project2/src/demo/index.ts' to be in program '...project2/tsconfig.json'"
+    const testFiles = await getTestFiles('circular-project-references');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ALL_RULES, {
+      reportSemantic: true,
+      reportSyntactic: true,
+    });
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
 });

@@ -8,11 +8,11 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-var messageBase = "Promises must be awaited."
+var messageBase = "Promises must be awaited, add await operator."
 
 var messageBaseHelp = "The promise must end with a call to .catch, or end with a call to .then with a rejection handler."
 
-var messageBaseVoid = "Promises must be awaited."
+var messageBaseVoid = "Promises must be awaited, add void operator to ignore."
 
 var messageBaseVoidHelp = "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator."
 
