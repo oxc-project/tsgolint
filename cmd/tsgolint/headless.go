@@ -215,37 +215,35 @@ func runHeadless(args []string) int {
 
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
+	normalizedFiles := make([]string, 0, totalFileCount)
 	fileConfigs := make(map[string][]headlessRule, totalFileCount)
-
-	idx := 0
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
-			if logLevel == utils.LogLevelDebug {
-				log.Printf("[%d/%d] Processing file: %s", idx+1, totalFileCount, filePath)
-			}
+			normalized := tspath.NormalizeSlashes(filePath)
+			normalizedFiles = append(normalizedFiles, normalized)
 
-			normalizedFilePath := tspath.NormalizeSlashes(filePath)
+			fileConfigs[normalized] = config.Rules
+		}
+	}
 
-			tsconfig, found := tsConfigResolver.FindTsconfigForFile(normalizedFilePath, false)
-			if logLevel == utils.LogLevelDebug {
-				tsconfigStr := "<none>"
-				if found {
-					tsconfigStr = tsconfig
-				}
-				log.Printf("Got tsconfig for file %s: %s", normalizedFilePath, tsconfigStr)
-			}
-
-			if !found {
-				workload.UnmatchedFiles = append(workload.UnmatchedFiles, normalizedFilePath)
-			} else {
-				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], normalizedFilePath)
-			}
-			fileConfigs[normalizedFilePath] = config.Rules
-			idx++
+	result := tsConfigResolver.FindTsConfigParallel(normalizedFiles)
+	for file, tsconfig := range result {
+		if tsconfig == "" {
+			workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
+		} else {
+			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], file)
 		}
 	}
 
 	if logLevel == utils.LogLevelDebug {
+		for file, tsconfig := range result {
+			tsconfigStr := "<none>"
+			if tsconfig != "" {
+				tsconfigStr = tsconfig
+			}
+			log.Printf("Got tsconfig for file %s: %s", file, tsconfigStr)
+		}
+
 		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
 		for program, files := range workload.Programs {
 			log.Printf("  Program %s: %d files", program, len(files))
