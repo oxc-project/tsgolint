@@ -125,52 +125,65 @@ for (const schemaDir of schemaDirs) {
     }
 
     // If the schema uses shared_schemas.json (TypeOrValueSpecifier), replace generated
-    // interface{} types with proper utils.TypeOrValueSpecifier imports
-    if (content.includes('type TypeOrValueSpecifier interface{}')) {
+    // interface{} types with proper utils.TypeOrValueSpecifier imports.
+    const hasTypeOrValueSpecifier = /\bTypeOrValueSpecifier\b/.test(content);
+    if (hasTypeOrValueSpecifier) {
       // 1. Replace element type aliases to use utils.TypeOrValueSpecifier
       const elemTypePattern = /^type (\w+Elem) interface\{\}$/gm;
       content = content.replace(elemTypePattern, 'type $1 = utils.TypeOrValueSpecifier');
 
-      // 2. Remove TypeOrValueSpecifier interface definition
+      // 2. Remove TypeOrValueSpecifier interface definition (if generated)
       content = content.replace(/^type TypeOrValueSpecifier interface\{\}\s*\n/gm, '');
 
       // 3. Remove FileSpecifier, LibSpecifier, and PackageSpecifier types (including comments and UnmarshalJSON)
       // These are duplicates - we'll use the ones from utils instead
-
-      // Remove FileSpecifier (struct + UnmarshalJSON method)
       content = content.replace(
         /\/\/ Describes specific types.*?[\s\S]*?type FileSpecifier struct \{[\s\S]*?\n\}\s*\n\s*\n\/\/ UnmarshalJSON[\s\S]*?func \(j \*FileSpecifier\) UnmarshalJSON[\s\S]*?\n\}\s*\n/,
         '',
       );
-
-      // Remove LibSpecifier (struct + UnmarshalJSON method)
       content = content.replace(
         /\/\/ Describes specific types.*?lib\.\*\.d\.ts[\s\S]*?type LibSpecifier struct \{[\s\S]*?\n\}\s*\n\s*\n\/\/ UnmarshalJSON[\s\S]*?func \(j \*LibSpecifier\) UnmarshalJSON[\s\S]*?\n\}\s*\n/,
         '',
       );
-
-      // Remove PackageSpecifier (struct + UnmarshalJSON method)
       content = content.replace(
         /\/\/ Describes specific types.*?packages\.[\s\S]*?type PackageSpecifier struct \{[\s\S]*?\n\}\s*\n\s*\n\/\/ UnmarshalJSON[\s\S]*?func \(j \*PackageSpecifier\) UnmarshalJSON[\s\S]*?\n\}\s*\n/,
         '',
       );
 
+      // 4. Replace remaining unqualified references to TypeOrValueSpecifier
+      content = content.replace(/\bTypeOrValueSpecifier\b/g, (match, offset) => {
+        const prev = offset > 0 ? content[offset - 1] : '';
+        return prev === '.' ? match : 'utils.TypeOrValueSpecifier';
+      });
+
       // Clean up multiple consecutive empty lines
       content = content.replace(/\n{3,}/g, '\n\n');
 
-      // 4. Add utils import if not present
+      // 5. Add utils import if not present
       if (!content.includes('"github.com/typescript-eslint/tsgolint/internal/utils"')) {
-        content = content.replace(
-          /^import "github\.com\/go-json-experiment\/json"/m,
-          'import "github.com/go-json-experiment/json"\nimport "github.com/typescript-eslint/tsgolint/internal/utils"',
-        );
+        if (content.includes('import "github.com/go-json-experiment/json"')) {
+          content = content.replace(
+            /^import "github\.com\/go-json-experiment\/json"/m,
+            'import "github.com/go-json-experiment/json"\nimport "github.com/typescript-eslint/tsgolint/internal/utils"',
+          );
+        } else if (content.includes('import (')) {
+          content = content.replace(
+            /^import \(/m,
+            'import (\n\t"github.com/typescript-eslint/tsgolint/internal/utils"',
+          );
+        } else {
+          content = content.replace(
+            /^(package \w+)\n/m,
+            '$1\n\nimport "github.com/typescript-eslint/tsgolint/internal/utils"\n',
+          );
+        }
       }
 
       if (!content.includes('json.')) {
         content = content.replace(/^import "github\.com\/go-json-experiment\/json"\n/gm, '');
       }
 
-      // 5. Remove unused imports if no longer needed (since we removed UnmarshalJSON methods)
+      // 6. Remove unused imports if no longer needed (since we removed UnmarshalJSON methods)
       if (!content.includes('fmt.')) {
         content = content.replace(/^import "fmt"\n/gm, '');
       }
@@ -187,15 +200,15 @@ for (const schemaDir of schemaDirs) {
       // Without this, empty slices get omitted during JSON marshaling, causing
       // the default to be applied when it shouldn't be.
       content = content.replace(
-        /Allow \[\]RestrictTemplateExpressionsOptionsAllowElem `json:"allow,omitempty"`/,
-        'Allow []RestrictTemplateExpressionsOptionsAllowElem `json:"allow"`',
+        /Allow (\[\][^ ]+) `json:"allow,omitempty"`/,
+        'Allow $1 `json:"allow"`',
       );
 
       // Fix default value initialization - need to properly construct utils.TypeOrValueSpecifier
       content = content.replace(
-        /plain\.Allow = \[\]RestrictTemplateExpressionsOptionsAllowElem\{\s*map\[string\]interface\{\}\{[\s\S]*?\},\s*\}\s*\}\s*$/m,
-        `plain.Allow = []RestrictTemplateExpressionsOptionsAllowElem{
-			utils.TypeOrValueSpecifier{
+        /plain\.Allow = \[\](?:RestrictTemplateExpressionsOptionsAllowElem|TypeOrValueSpecifier|utils\.TypeOrValueSpecifier)\{\s*map\[string\]interface\{\}\{[\s\S]*?\},\s*\}\s*\}\s*$/m,
+        `plain.Allow = []utils.TypeOrValueSpecifier{
+			{
 				From: utils.TypeOrValueSpecifierFromLib,
 				Name: []string{"Error", "URL", "URLSearchParams"},
 			},

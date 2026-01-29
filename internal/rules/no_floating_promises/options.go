@@ -8,11 +8,11 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 type NoFloatingPromisesOptions struct {
 	// AllowForKnownSafeCalls corresponds to the JSON schema field
 	// "allowForKnownSafeCalls".
-	AllowForKnownSafeCalls []NoFloatingPromisesOptionsAllowForKnownSafeCallsElem `json:"allowForKnownSafeCalls,omitempty"`
+	AllowForKnownSafeCalls []utils.TypeOrValueSpecifier `json:"allowForKnownSafeCalls,omitempty"`
 
 	// AllowForKnownSafePromises corresponds to the JSON schema field
 	// "allowForKnownSafePromises".
-	AllowForKnownSafePromises []NoFloatingPromisesOptionsAllowForKnownSafePromisesElem `json:"allowForKnownSafePromises,omitempty"`
+	AllowForKnownSafePromises []utils.TypeOrValueSpecifier `json:"allowForKnownSafePromises,omitempty"`
 
 	// CheckThenables corresponds to the JSON schema field "checkThenables".
 	CheckThenables bool `json:"checkThenables,omitempty"`
@@ -23,10 +23,6 @@ type NoFloatingPromisesOptions struct {
 	// IgnoreVoid corresponds to the JSON schema field "ignoreVoid".
 	IgnoreVoid bool `json:"ignoreVoid,omitempty"`
 }
-
-type NoFloatingPromisesOptionsAllowForKnownSafeCallsElem = utils.TypeOrValueSpecifier
-
-type NoFloatingPromisesOptionsAllowForKnownSafePromisesElem = utils.TypeOrValueSpecifier
 
 // UnmarshalJSON implements json.Unmarshaler.
 func (j *NoFloatingPromisesOptions) UnmarshalJSON(value []byte) error {
@@ -40,10 +36,10 @@ func (j *NoFloatingPromisesOptions) UnmarshalJSON(value []byte) error {
 		return err
 	}
 	if v, ok := raw["allowForKnownSafeCalls"]; !ok || v == nil {
-		plain.AllowForKnownSafeCalls = []NoFloatingPromisesOptionsAllowForKnownSafeCallsElem{}
+		plain.AllowForKnownSafeCalls = []utils.TypeOrValueSpecifier{}
 	}
 	if v, ok := raw["allowForKnownSafePromises"]; !ok || v == nil {
-		plain.AllowForKnownSafePromises = []NoFloatingPromisesOptionsAllowForKnownSafePromisesElem{}
+		plain.AllowForKnownSafePromises = []utils.TypeOrValueSpecifier{}
 	}
 	if v, ok := raw["checkThenables"]; !ok || v == nil {
 		plain.CheckThenables = false

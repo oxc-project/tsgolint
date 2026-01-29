@@ -36,7 +36,8 @@ func buildNoClassInstanceSpreadInObjectMessage() rule.RuleMessage {
 func buildNoFunctionSpreadInObjectMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noFunctionSpreadInObject",
-		Description: "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?",
+		Description: "Using the spread operator on a function without additional properties can cause unexpected behavior.",
+		Help:        "Did you forget to call the function?",
 	}
 }
 func buildNoIterableSpreadInObjectMessage() rule.RuleMessage {
@@ -48,23 +49,22 @@ func buildNoIterableSpreadInObjectMessage() rule.RuleMessage {
 func buildNoMapSpreadInObjectMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noMapSpreadInObject",
-		Description: "Using the spread operator on a Map in an object will result in an empty object. Did you mean to use `Object.fromEntries(map)` instead?",
+		Description: "Using the spread operator on a Map in an object will result in an empty object.",
+		Help:        "Did you mean to use `Object.fromEntries(map)` instead?",
 	}
 }
 func buildNoPromiseSpreadInObjectMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noPromiseSpreadInObject",
-		Description: "Using the spread operator on Promise in an object can cause unexpected behavior. Did you forget to await the promise?",
+		Description: "Using the spread operator on Promise in an object can cause unexpected behavior.",
+		Help:        "Did you forget to await the promise before spreading it?",
 	}
 }
 func buildNoStringSpreadMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id: "noStringSpread",
-		Description: "Using the spread operator on a string can mishandle special characters, as can `.split(\"\")`.\n'" +
-			"- `...` produces Unicode code points, which will decompose complex emojis into individual emojis" +
-			"- .split(\"\") produces UTF-16 code units, which breaks rich characters in many languages" +
-			"Consider using `Intl.Segmenter` for locale-aware string decomposition." +
-			"Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option.",
+		Id:          "noStringSpread",
+		Description: "Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.",
+		Help:        "Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.",
 	}
 }
 func buildReplaceMapSpreadInObjectMessage() rule.RuleMessage {

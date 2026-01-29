@@ -6,7 +6,5 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type NoMisusedSpreadOptions struct {
 	// Types to allow spreading in object or array/call expressions
-	Allow []NoMisusedSpreadOptionsAllowElem `json:"allow,omitempty"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty"`
 }
-
-type NoMisusedSpreadOptionsAllowElem = utils.TypeOrValueSpecifier

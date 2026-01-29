@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "composite": true,
+    "declaration": true,
+    "paths": {
+      "@demo/project1/*": ["../project1/src/*"]
+    }
+  },
+  "references": [
+    { "path": "../project1" }
+  ],
+  "include": ["./src/**/*.ts"]
+}

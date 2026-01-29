@@ -203,6 +203,7 @@ type extra_Checker struct {
   unknownSymbol *ast.Symbol
   unresolvedSymbols map[string]*ast.Symbol
   errorTypes map[checker.CacheHashKey]*checker.Type
+  moduleSymbols map[*ast.Node]*ast.Symbol
   globalThisSymbol *ast.Symbol
   resolveName func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
   resolveNameForSymbolSuggestion func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
@@ -210,6 +211,7 @@ type extra_Checker struct {
   unionTypes map[checker.CacheHashKey]*checker.Type
   unionOfUnionTypes map[checker.UnionOfUnionKey]*checker.Type
   intersectionTypes map[checker.CacheHashKey]*checker.Type
+  propertiesTypes map[checker.PropertiesTypesKey]*checker.Type
   diagnostics ast.DiagnosticsCollection
   suggestionDiagnostics ast.DiagnosticsCollection
   symbolPool core.Pool[ast.Symbol]
@@ -441,6 +443,7 @@ type extra_Checker struct {
   ambientModules []*ast.Symbol
   withinUnreachableCode bool
   reportedUnreachableNodes collections.Set[*ast.Node]
+  nonExistentProperties collections.Set[checker.NonExistentPropertyKey]
   mu sync.Mutex
 }
 func Checker_numberType(v *checker.Checker) *checker.Type {
@@ -533,8 +536,6 @@ const FunctionFlagsGenerator = checker.FunctionFlagsGenerator
 const FunctionFlagsInvalid = checker.FunctionFlagsInvalid
 const FunctionFlagsNormal = checker.FunctionFlagsNormal
 type FunctionTypeMapper = checker.FunctionTypeMapper
-//go:linkname GetCombinedLocalAndExportSymbolFlags github.com/microsoft/typescript-go/internal/checker.GetCombinedLocalAndExportSymbolFlags
-func GetCombinedLocalAndExportSymbolFlags(symbol *ast.Symbol) ast.SymbolFlags
 //go:linkname GetDeclarationModifierFlagsFromSymbol github.com/microsoft/typescript-go/internal/checker.GetDeclarationModifierFlagsFromSymbol
 func GetDeclarationModifierFlagsFromSymbol(s *ast.Symbol) ast.ModifierFlags
 //go:linkname GetResolvedSignatureForSignatureHelp github.com/microsoft/typescript-go/internal/checker.GetResolvedSignatureForSignatureHelp
@@ -741,6 +742,7 @@ const NodeCheckFlagsSuperInstance = checker.NodeCheckFlagsSuperInstance
 const NodeCheckFlagsSuperStatic = checker.NodeCheckFlagsSuperStatic
 const NodeCheckFlagsTypeChecked = checker.NodeCheckFlagsTypeChecked
 type NodeLinks = checker.NodeLinks
+type NonExistentPropertyKey = checker.NonExistentPropertyKey
 type ObjectFlags = checker.ObjectFlags
 const ObjectFlagsAnonymous = checker.ObjectFlagsAnonymous
 const ObjectFlagsArrayLiteral = checker.ObjectFlagsArrayLiteral
@@ -802,6 +804,7 @@ const PredicateSemanticsNever = checker.PredicateSemanticsNever
 const PredicateSemanticsNone = checker.PredicateSemanticsNone
 const PredicateSemanticsSometimes = checker.PredicateSemanticsSometimes
 type Program = checker.Program
+type PropertiesTypesKey = checker.PropertiesTypesKey
 var ReactNames = checker.ReactNames
 type RecursionFlags = checker.RecursionFlags
 const RecursionFlagsBoth = checker.RecursionFlagsBoth

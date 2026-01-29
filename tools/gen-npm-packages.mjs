@@ -34,6 +34,7 @@ const binariesMatrix = Object.entries(GOOS2PROCESS_PLATFORM).flatMap(
 
 const commonPackageJson = {
   version: npmPackageVersion,
+  description: 'High-performance type-aware TypeScript linter powered by typescript-go, for use with oxlint.',
   license: 'MIT',
   author: 'auvred <aauvred@gmail.com>',
   repository: 'github:oxc-project/tsgolint',
