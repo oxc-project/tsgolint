@@ -14,6 +14,13 @@ func buildMissingAsyncMessage() rule.RuleMessage {
 	}
 }
 
+func buildMissingAsyncHybridReturnMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "missingAsyncHybridReturn",
+		Description: "Functions that return promises must be async. Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.",
+	}
+}
+
 var PromiseFunctionAsyncRule = rule.Rule{
 	Name: "promise-function-async",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -75,6 +82,8 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				return
 			}
 
+			hasExplicitReturnType := node.Type() != nil
+
 			everySignatureReturnsPromise := true
 			for _, signature := range signatures {
 				returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature)
@@ -89,7 +98,7 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				everySignatureReturnsPromise = everySignatureReturnsPromise && containsAllTypesByName(
 					returnType,
 					// If no return type is explicitly set, we check if any parts of the return type match a Promise (instead of requiring all to match).
-					node.Type() != nil,
+					hasExplicitReturnType,
 				)
 			}
 
@@ -97,12 +106,39 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				return
 			}
 
+			// Check if any signature has a hybrid return type (union with both promise and non-promise parts)
+			// This only applies when there's no explicit return type annotation
+			isHybridReturnType := false
+			if !hasExplicitReturnType {
+				for _, signature := range signatures {
+					returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature)
+					if utils.IsUnionType(returnType) {
+						// Check if not every part of the union is a promise type
+						allPartsArePromise := utils.Every(returnType.Types(), func(part *checker.Type) bool {
+							return containsAllTypesByName(part, true)
+						})
+						if !allPartsArePromise {
+							isHybridReturnType = true
+							break
+						}
+					}
+				}
+			}
+
 			insertAsyncBeforeNode := node
 			if ast.IsMethodDeclaration(node) {
 				insertAsyncBeforeNode = node.Name()
 			}
+
+			var message rule.RuleMessage
+			if isHybridReturnType {
+				message = buildMissingAsyncHybridReturnMessage()
+			} else {
+				message = buildMissingAsyncMessage()
+			}
+
 			// TODO(port): getFunctionHeadLoc
-			ctx.ReportNodeWithFixes(node, buildMissingAsyncMessage(), func() []rule.RuleFix {
+			ctx.ReportNodeWithFixes(node, message, func() []rule.RuleFix {
 				return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")}
 			})
 		}
