@@ -21,6 +21,13 @@ func buildMissingAsyncHybridReturnMessage() rule.RuleMessage {
 	}
 }
 
+func buildMissingAsyncHybridReturnSuggestionMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "missingAsyncHybridReturnSuggestion",
+		Description: "Add `async` keyword to the function.",
+	}
+}
+
 var PromiseFunctionAsyncRule = rule.Rule{
 	Name: "promise-function-async",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -130,17 +137,20 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				insertAsyncBeforeNode = node.Name()
 			}
 
-			var message rule.RuleMessage
-			if isHybridReturnType {
-				message = buildMissingAsyncHybridReturnMessage()
-			} else {
-				message = buildMissingAsyncMessage()
-			}
-
 			// TODO(port): getFunctionHeadLoc
-			ctx.ReportNodeWithFixes(node, message, func() []rule.RuleFix {
-				return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")}
-			})
+			if isHybridReturnType {
+				// Use suggestion instead of auto-fix for hybrid return types
+				ctx.ReportNodeWithSuggestions(node, buildMissingAsyncHybridReturnMessage(), func() []rule.RuleSuggestion {
+					return []rule.RuleSuggestion{{
+						Message:  buildMissingAsyncHybridReturnSuggestionMessage(),
+						FixesArr: []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")},
+					}}
+				})
+			} else {
+				ctx.ReportNodeWithFixes(node, buildMissingAsyncMessage(), func() []rule.RuleFix {
+					return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")}
+				})
+			}
 		}
 
 		if opts.CheckArrowFunctions {

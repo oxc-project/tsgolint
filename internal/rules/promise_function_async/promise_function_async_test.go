@@ -806,15 +806,19 @@ function promiseInUnionWithoutExplicitReturnType(p: boolean) {
   return p ? Promise.resolve(5) : 5;
 }
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
  async function promiseInUnionWithoutExplicitReturnType(p: boolean) {
   return p ? Promise.resolve(5) : 5;
 }
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "missingAsyncHybridReturn",
+						},
+					},
 				},
 			},
 		},
@@ -830,7 +834,13 @@ function test1(a?: number) {
   return Math.random() > 0.5 ? 'one' : Promise.resolve('one');
 }
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
 function test1(): 'one' | Promise<'one'>;
 function test1(a: number): Promise<number>;
  async function test1(a?: number) {
@@ -841,10 +851,8 @@ function test1(a: number): Promise<number>;
   return Math.random() > 0.5 ? 'one' : Promise.resolve('one');
 }
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "missingAsyncHybridReturn",
+						},
+					},
 				},
 			},
 		},
@@ -858,7 +866,14 @@ function promiseInUnionWithoutExplicitReturnType(p: boolean) {
   return p ? new PromiseType() : 5;
 }
       `,
-			Output: []string{`
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowedPromiseNames": ["PromiseType"]}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
 class PromiseType {
   s?: string;
 }
@@ -867,11 +882,8 @@ class PromiseType {
   return p ? new PromiseType() : 5;
 }
       `,
-			},
-			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowedPromiseNames": ["PromiseType"]}`),
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "missingAsyncHybridReturn",
+						},
+					},
 				},
 			},
 		},
