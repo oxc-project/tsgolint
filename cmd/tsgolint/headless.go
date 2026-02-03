@@ -23,6 +23,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/stats"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
@@ -348,6 +349,12 @@ func runHeadless(args []string) int {
 		log.Printf("Running Linter")
 	}
 
+	// Create stats collector if enabled
+	var lintStats *stats.LintStats
+	if stats.Enabled() {
+		lintStats = stats.NewLintStats(Version, core.Version(), runtime.GOMAXPROCS(0))
+	}
+
 	err = linter.RunLinter(
 		logLevel,
 		cwd,
@@ -387,6 +394,7 @@ func runHeadless(args []string) int {
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
+		lintStats,
 	)
 
 	close(diagnosticsChan)
@@ -397,6 +405,11 @@ func runHeadless(args []string) int {
 	}
 
 	wg.Wait()
+
+	// Print stats if enabled
+	if lintStats != nil {
+		lintStats.Print(os.Stderr)
+	}
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")
