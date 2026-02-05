@@ -407,10 +407,8 @@ func runHeadless(args []string) int {
 
 	wg.Wait()
 
-	if report != nil {
-		report.SetTotal(time.Since(start))
-		stats.PrintReport(os.Stderr, report, cwd)
-	}
+	report.SetTotal(time.Since(start))
+	stats.PrintReport(os.Stderr, report, cwd)
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")

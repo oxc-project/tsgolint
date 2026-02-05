@@ -116,9 +116,7 @@ func RunLinter(
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		if lintStats != nil {
-			lintStats.AddProgram(configFileName, time.Since(programStart), len(sourceFiles))
-		}
+		lintStats.AddProgram(configFileName, time.Since(programStart), len(sourceFiles))
 
 		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors, lintStats)
 		if err != nil {
@@ -153,9 +151,7 @@ func RunLinter(
 			files = append(files, sf)
 		}
 
-		if lintStats != nil {
-			lintStats.AddProgram("inferred program", time.Since(inferredStart), len(files))
-		}
+		lintStats.AddProgram("inferred program", time.Since(inferredStart), len(files))
 
 		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors, lintStats)
 		if err != nil {
@@ -168,10 +164,7 @@ func RunLinter(
 }
 
 func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors, lintStats *stats.Report) error {
-	var lintStart time.Time
-	if lintStats != nil {
-		lintStart = time.Now()
-	}
+	lintStart := time.Now()
 	var ruleTimesMu sync.Mutex
 	ruleTimes := make(map[string]time.Duration)
 	var lintCPUMu sync.Mutex
@@ -249,10 +242,7 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 			}
 			registeredListeners := make(map[ast.Kind][]timedListener, 20)
 			localRuleTimes := make(map[string]time.Duration)
-			var workerStart time.Time
-			if lintStats != nil {
-				workerStart = time.Now()
-			}
+			workerStart := time.Now()
 
 			for w := range workloadQueue {
 				for file := range w.queue {
@@ -415,30 +405,26 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 				}
 			}
 
-			if lintStats != nil && len(localRuleTimes) > 0 {
+			if len(localRuleTimes) > 0 {
 				ruleTimesMu.Lock()
 				for ruleName, duration := range localRuleTimes {
 					ruleTimes[ruleName] += duration
 				}
 				ruleTimesMu.Unlock()
 			}
-			if lintStats != nil {
-				localWorkerCPU := time.Since(workerStart)
-				lintCPUMu.Lock()
-				lintCPUTime += localWorkerCPU
-				lintCPUMu.Unlock()
-			}
+			localWorkerCPU := time.Since(workerStart)
+			lintCPUMu.Lock()
+			lintCPUTime += localWorkerCPU
+			lintCPUMu.Unlock()
 		})
 	}
 	wg.RunAndWait()
 
-	if lintStats != nil {
-		for ruleName, duration := range ruleTimes {
-			lintStats.AddRule(ruleName, duration)
-		}
-		lintStats.AddLintCPU(lintCPUTime)
-		lintStats.AddLintWall(time.Since(lintStart))
+	for ruleName, duration := range ruleTimes {
+		lintStats.AddRule(ruleName, duration)
 	}
+	lintStats.AddLintCPU(lintCPUTime)
+	lintStats.AddLintWall(time.Since(lintStart))
 
 	return nil
 }

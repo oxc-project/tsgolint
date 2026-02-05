@@ -34,6 +34,9 @@ func NewReport() *Report {
 }
 
 func (s *Report) AddProgram(name string, d time.Duration, fileCount int) {
+	if s == nil {
+		return
+	}
 	s.Programs = append(s.Programs, Program{
 		Name:      name,
 		Time:      d,
@@ -44,17 +47,29 @@ func (s *Report) AddProgram(name string, d time.Duration, fileCount int) {
 }
 
 func (s *Report) AddRule(rule string, d time.Duration) {
+	if s == nil {
+		return
+	}
 	s.Rules[rule] += d
 }
 
 func (s *Report) AddLintWall(d time.Duration) {
+	if s == nil {
+		return
+	}
 	s.LintWall += d
 }
 
 func (s *Report) AddLintCPU(d time.Duration) {
+	if s == nil {
+		return
+	}
 	s.LintCPU += d
 }
 
 func (s *Report) SetTotal(d time.Duration) {
+	if s == nil {
+		return
+	}
 	s.Total = d
 }

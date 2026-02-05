@@ -18,6 +18,9 @@ const (
 
 // PrintReport prints the stats report to w, using currentDir to display relative paths.
 func PrintReport(w io.Writer, s *Report, cwd string) {
+	if s == nil {
+		return
+	}
 	fmt.Fprint(w, "\n")
 
 	fmt.Fprintln(w, "Typecheck:")
