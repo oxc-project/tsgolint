@@ -14,9 +14,10 @@ const (
 	colName   = 56 // first column width (name/label), positions 5-60 on screen
 	colValue  = 10 // second column width (time/value)
 	colFiles  = 10 // third column width (files count)
+
+	maxRules = 5
 )
 
-// PrintReport prints the stats report to w, using currentDir to display relative paths.
 func PrintReport(w io.Writer, s *Report, cwd string) {
 	if s == nil {
 		return
@@ -54,20 +55,21 @@ func printTypecheckSection(w io.Writer, s *Report, cwd string) {
 		return programs[i].Time > programs[j].Time
 	})
 
-	fmt.Fprintf(w, "%s%-*s%*s%*s\n", colIndent, colName, "Program", colValue, "Wall Time", colFiles, "Files")
-
-	totalFiles := 0
-	for _, p := range programs {
+	names := make([]string, len(programs))
+	for i, p := range programs {
 		name := displayName(cwd, p.Name)
 		if len(name) > colName {
 			name = "..." + name[len(name)-colName+3:]
 		}
-		fmt.Fprintf(w, "%s%-*s%*s%*d\n", colIndent, colName, name, colValue, formatDuration(p.Time), colFiles, p.FileCount)
-		totalFiles += p.FileCount
+		names[i] = name
 	}
 
+	fmt.Fprintf(w, "%s%-*s%*s%*s\n", colIndent, colName, "Program", colValue, "Wall Time", colFiles, "Files")
+	for i, p := range programs {
+		fmt.Fprintf(w, "%s%-*s%*s%*d\n", colIndent, colName, names[i], colValue, formatDuration(p.Time), colFiles, p.FileCount)
+	}
 	fmt.Fprintf(w, "%s%s\n", colIndent, strings.Repeat("─", colName+colValue+colFiles))
-	fmt.Fprintf(w, "%s%-*s%*s%*d\n", colIndent, colName, "Total", colValue, formatDuration(s.Compile), colFiles, totalFiles)
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Total", colValue, formatDuration(s.Compile))
 }
 
 func printLintSection(w io.Writer, s *Report) {
@@ -79,28 +81,28 @@ func printLintSection(w io.Writer, s *Report) {
 		return rules[i].Time > rules[j].Time
 	})
 
-	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Rule", colValue, "CPU Time")
-
-	displayCount := min(5, len(rules))
-	for i := range displayCount {
-		fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, rules[i].Name, colValue, formatDuration(rules[i].Time))
-	}
-
-	if len(rules) > 5 {
-		remainingCount := len(rules) - 5
-		var remainingTime time.Duration
-		for i := 5; i < len(rules); i++ {
-			remainingTime += rules[i].Time
-		}
-		fmt.Fprintf(w, "%s... %d more rules (%s)\n", colIndent, remainingCount, formatDuration(remainingTime))
-	}
+	displayCount := min(maxRules, len(rules))
+	hiddenCount := len(rules) - displayCount
 
 	var totalRules time.Duration
 	for _, r := range rules {
 		totalRules += r.Time
 	}
+
+	var hiddenTime time.Duration
+	for i := displayCount; i < len(rules); i++ {
+		hiddenTime += rules[i].Time
+	}
+
 	traversal := max(s.LintCPU-totalRules, 0)
 
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Rule", colValue, "CPU Time")
+	for i := range displayCount {
+		fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, rules[i].Name, colValue, formatDuration(rules[i].Time))
+	}
+	if hiddenCount > 0 {
+		fmt.Fprintf(w, "%s... %d more rules (%s)\n", colIndent, hiddenCount, formatDuration(hiddenTime))
+	}
 	fmt.Fprintf(w, "%s%s\n", colIndent, strings.Repeat("─", colName+colValue))
 	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Traversal+overhead", colValue, formatDuration(traversal))
 	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Total", colValue, formatDuration(s.LintCPU))

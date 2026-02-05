@@ -236,11 +236,11 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	wg := core.NewWorkGroup(workers == 1)
 	for range workers {
 		wg.Queue(func() {
-			type timedListener struct {
+			type ruleHandler struct {
 				ruleName string
 				fn       func(node *ast.Node)
 			}
-			registeredListeners := make(map[ast.Kind][]timedListener, 20)
+			registeredListeners := make(map[ast.Kind][]ruleHandler, 20)
 			localRuleTimes := make(map[string]time.Duration)
 			workerStart := time.Now()
 
@@ -313,9 +313,9 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						for kind, listener := range r.Run(ctx) {
 							listeners, ok := registeredListeners[kind]
 							if !ok {
-								listeners = make([]timedListener, 0, len(rules))
+								listeners = make([]ruleHandler, 0, len(rules))
 							}
-							registeredListeners[kind] = append(listeners, timedListener{ruleName: r.Name, fn: listener})
+							registeredListeners[kind] = append(listeners, ruleHandler{ruleName: r.Name, fn: listener})
 						}
 					}
 
