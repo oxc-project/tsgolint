@@ -9,72 +9,95 @@ import (
 	"time"
 )
 
-type ProgramStat struct {
+const (
+	colIndent  = "    "
+	colName    = 56 // first column width (name/label), positions 5-60 on screen
+	colValue   = 10 // second column width (time/value)
+	colFiles   = 10 // third column width (files count)
+	colVersion = colValue + colFiles
+)
+
+type Program struct {
 	Name      string
 	Time      time.Duration
 	FileCount int
 }
 
-type RuleStat struct {
+type Rule struct {
 	Name string
 	Time time.Duration
 }
 
-type LintStats struct {
-	TsgolintVersion string
-	TsgoVersion     string
-	ThreadCount     int
-	TsconfigCount   int
-	Programs        []ProgramStat
-	Rules           map[string]time.Duration
-	CompileTime     time.Duration
-	LintTime        time.Duration
-	LintCPUTime     time.Duration
-	TotalWallTime   time.Duration
+type Report struct {
+	TsgolintVersion  string
+	TsgoVersion      string
+	ThreadCount      int
+	TsconfigCount    int
+	CurrentDirectory string
+	Programs         []Program
+	Rules            map[string]time.Duration
+	Compile          time.Duration
+	LintWall         time.Duration
+	LintCPU          time.Duration
+	Total            time.Duration
 }
 
-func NewLintStats(tsgolintVersion, tsgoVersion string, threadCount int) *LintStats {
-	return &LintStats{
-		TsgolintVersion: tsgolintVersion,
-		TsgoVersion:     tsgoVersion,
-		ThreadCount:     threadCount,
-		Programs:        make([]ProgramStat, 0),
-		Rules:           make(map[string]time.Duration),
+func NewReport(tsgolintVersion, tsgoVersion string, currentDirectory string) *Report {
+	return &Report{
+		TsgolintVersion:  tsgolintVersion,
+		TsgoVersion:      tsgoVersion,
+		CurrentDirectory: currentDirectory,
+		Programs:         make([]Program, 0),
+		Rules:            make(map[string]time.Duration),
 	}
 }
 
-func (s *LintStats) AddProgramStat(name string, duration time.Duration, fileCount int) {
-	s.Programs = append(s.Programs, ProgramStat{
+func (s *Report) AddProgram(name string, d time.Duration, fileCount int) {
+	s.Programs = append(s.Programs, Program{
 		Name:      name,
-		Time:      duration,
+		Time:      d,
 		FileCount: fileCount,
 	})
 	s.TsconfigCount++
-	s.CompileTime += duration
+	s.Compile += d
 }
 
-func (s *LintStats) AddRuleTime(ruleName string, duration time.Duration) {
-	s.Rules[ruleName] += duration
+func (s *Report) AddRule(rule string, d time.Duration) {
+	s.Rules[rule] += d
 }
 
-func (s *LintStats) AddLintTime(duration time.Duration) {
-	s.LintTime += duration
+func (s *Report) AddLintWall(d time.Duration) {
+	s.LintWall += d
 }
 
-func (s *LintStats) AddLintCPUTime(duration time.Duration) {
-	s.LintCPUTime += duration
+func (s *Report) AddLintCPU(d time.Duration) {
+	s.LintCPU += d
 }
 
-func (s *LintStats) SetTotalTime(duration time.Duration) {
-	s.TotalWallTime = duration
+func (s *Report) SetTotal(d time.Duration) {
+	s.Total = d
 }
 
 func Enabled() bool {
 	return os.Getenv("OXC_TSGOLINT_STATS") != ""
 }
 
-func (s *LintStats) Print(w io.Writer) {
-	fmt.Fprintf(w, "\ntsgolint stats (%d tsconfigs, %d threads)\n\n", s.TsconfigCount, s.ThreadCount)
+func (s *Report) displayName(name string) string {
+	if s.CurrentDirectory == "" {
+		return name
+	}
+	prefix := s.CurrentDirectory
+	if !strings.HasSuffix(prefix, "/") {
+		prefix += "/"
+	}
+	if rel, ok := strings.CutPrefix(name, prefix); ok {
+		return rel
+	}
+	return name
+}
+
+func (s *Report) Print(w io.Writer) {
+	fmt.Fprint(w, "\n")
 
 	fmt.Fprintln(w, "Version:")
 	s.printVersionRow(w, "tsgolint", s.TsgolintVersion)
@@ -90,77 +113,51 @@ func (s *LintStats) Print(w io.Writer) {
 	fmt.Fprintln(w)
 
 	fmt.Fprintln(w, "Summary:")
-	s.printSummaryRow(w, "Compile", s.CompileTime)
-	s.printSummaryRow(w, "Lint", s.LintTime)
-	other := s.TotalWallTime - s.CompileTime - s.LintTime
-	if other < 0 {
-		other = 0
-	}
-	s.printSummaryRow(w, "Other", other)
-	s.printSummaryRow(w, "Total", s.TotalWallTime)
+	s.printSummarySection(w)
+	fmt.Fprintln(w)
 }
 
-func (s *LintStats) printVersionRow(w io.Writer, name, version string) {
-	fmt.Fprintf(w, "    %-36s %s\n", name+":", version)
+func (s *Report) printVersionRow(w io.Writer, name, version string) {
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, name, colVersion, version)
 }
 
-func (s *LintStats) printTypecheckSection(w io.Writer) {
-	programs := make([]ProgramStat, len(s.Programs))
+func (s *Report) printTypecheckSection(w io.Writer) {
+	programs := make([]Program, len(s.Programs))
 	copy(programs, s.Programs)
 	sort.Slice(programs, func(i, j int) bool {
 		return programs[i].Time > programs[j].Time
 	})
 
-	maxNameLen := len("Program")
-	for _, p := range programs {
-		if len(p.Name) > maxNameLen {
-			maxNameLen = len(p.Name)
-		}
-	}
-	if maxNameLen > 40 {
-		maxNameLen = 40
-	}
-
-	fmt.Fprintf(w, "    %-*s  %10s  %8s\n", maxNameLen, "Program", "Time", "Files")
+	fmt.Fprintf(w, "%s%-*s%*s%*s\n", colIndent, colName, "Program", colValue, "Wall Time", colFiles, "Files")
 
 	totalFiles := 0
 	for _, p := range programs {
-		name := p.Name
-		if len(name) > maxNameLen {
-			name = "..." + name[len(name)-maxNameLen+3:]
+		name := s.displayName(p.Name)
+		if len(name) > colName {
+			name = "..." + name[len(name)-colName+3:]
 		}
-		fmt.Fprintf(w, "    %-*s  %10s  %8d\n", maxNameLen, name, formatDuration(p.Time), p.FileCount)
+		fmt.Fprintf(w, "%s%-*s%*s%*d\n", colIndent, colName, name, colValue, formatDuration(p.Time), colFiles, p.FileCount)
 		totalFiles += p.FileCount
 	}
 
-	fmt.Fprintf(w, "    %s\n", strings.Repeat("-", maxNameLen+22))
-	fmt.Fprintf(w, "    %-*s  %10s  %8d\n", maxNameLen, "Total", formatDuration(s.CompileTime), totalFiles)
+	fmt.Fprintf(w, "%s%s\n", colIndent, strings.Repeat("─", colName+colValue+colFiles))
+	fmt.Fprintf(w, "%s%-*s%*s%*d\n", colIndent, colName, "Total", colValue, formatDuration(s.Compile), colFiles, totalFiles)
 }
 
-func (s *LintStats) printLintSection(w io.Writer) {
-	rules := make([]RuleStat, 0, len(s.Rules))
+func (s *Report) printLintSection(w io.Writer) {
+	rules := make([]Rule, 0, len(s.Rules))
 	for name, duration := range s.Rules {
-		rules = append(rules, RuleStat{Name: name, Time: duration})
+		rules = append(rules, Rule{Name: name, Time: duration})
 	}
 	sort.Slice(rules, func(i, j int) bool {
 		return rules[i].Time > rules[j].Time
 	})
 
-	maxNameLen := len("Rule")
-	for _, r := range rules {
-		if len(r.Name) > maxNameLen {
-			maxNameLen = len(r.Name)
-		}
-	}
-	if maxNameLen > 40 {
-		maxNameLen = 40
-	}
-
-	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Rule", "Time")
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Rule", colValue, "CPU Time")
 
 	displayCount := min(5, len(rules))
 	for i := range displayCount {
-		fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, rules[i].Name, formatDuration(rules[i].Time))
+		fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, rules[i].Name, colValue, formatDuration(rules[i].Time))
 	}
 
 	if len(rules) > 5 {
@@ -169,25 +166,24 @@ func (s *LintStats) printLintSection(w io.Writer) {
 		for i := 5; i < len(rules); i++ {
 			remainingTime += rules[i].Time
 		}
-		fmt.Fprintf(w, "    ... %d more rules (%s)\n", remainingCount, formatDuration(remainingTime))
+		fmt.Fprintf(w, "%s... %d more rules (%s)\n", colIndent, remainingCount, formatDuration(remainingTime))
 	}
 
 	var totalRules time.Duration
 	for _, r := range rules {
 		totalRules += r.Time
 	}
-	traversal := s.LintCPUTime - totalRules
-	if traversal < 0 {
-		traversal = 0
-	}
+	traversal := max(s.LintCPU-totalRules, 0)
 
-	fmt.Fprintf(w, "    %s\n", strings.Repeat("-", maxNameLen+12))
-	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Traversal+overhead", formatDuration(traversal))
-	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Total", formatDuration(s.LintCPUTime))
+	fmt.Fprintf(w, "%s%s\n", colIndent, strings.Repeat("─", colName+colValue))
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Traversal+overhead", colValue, formatDuration(traversal))
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Total", colValue, formatDuration(s.LintCPU))
 }
 
-func (s *LintStats) printSummaryRow(w io.Writer, name string, duration time.Duration) {
-	fmt.Fprintf(w, "    %-36s %s\n", name+":", formatDuration(duration))
+func (s *Report) printSummarySection(w io.Writer) {
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "Category", colValue, "Wall time")
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "typecheck", colValue, formatDuration(s.Compile))
+	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, "lint", colValue, formatDuration(s.LintWall))
 }
 
 func formatDuration(d time.Duration) string {

@@ -54,7 +54,7 @@ func RunLinter(
 	onInternalDiagnostic func(d diagnostic.Internal),
 	fixState Fixes,
 	typeErrors TypeErrors,
-	lintStats *stats.LintStats,
+	lintStats *stats.Report,
 ) error {
 
 	idx := 0
@@ -117,7 +117,7 @@ func RunLinter(
 		}
 
 		if lintStats != nil {
-			lintStats.AddProgramStat(configFileName, time.Since(programStart), len(sourceFiles))
+			lintStats.AddProgram(configFileName, time.Since(programStart), len(sourceFiles))
 		}
 
 		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors, lintStats)
@@ -154,7 +154,7 @@ func RunLinter(
 		}
 
 		if lintStats != nil {
-			lintStats.AddProgramStat("inferred program", time.Since(inferredStart), len(files))
+			lintStats.AddProgram("inferred program", time.Since(inferredStart), len(files))
 		}
 
 		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors, lintStats)
@@ -167,7 +167,7 @@ func RunLinter(
 
 }
 
-func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors, lintStats *stats.LintStats) error {
+func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors, lintStats *stats.Report) error {
 	var lintStart time.Time
 	if lintStats != nil {
 		lintStart = time.Now()
@@ -434,10 +434,10 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 
 	if lintStats != nil {
 		for ruleName, duration := range ruleTimes {
-			lintStats.AddRuleTime(ruleName, duration)
+			lintStats.AddRule(ruleName, duration)
 		}
-		lintStats.AddLintCPUTime(lintCPUTime)
-		lintStats.AddLintTime(time.Since(lintStart))
+		lintStats.AddLintCPU(lintCPUTime)
+		lintStats.AddLintWall(time.Since(lintStart))
 	}
 
 	return nil

@@ -351,9 +351,9 @@ func runHeadless(args []string) int {
 		log.Printf("Running Linter")
 	}
 
-	var lintStats *stats.LintStats
+	var report *stats.Report
 	if stats.Enabled() {
-		lintStats = stats.NewLintStats(Version, core.Version(), runtime.GOMAXPROCS(0))
+		report = stats.NewReport(Version, core.Version(), cwd)
 	}
 
 	err = linter.RunLinter(
@@ -395,7 +395,7 @@ func runHeadless(args []string) int {
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
-		lintStats,
+		report,
 	)
 
 	close(diagnosticsChan)
@@ -407,9 +407,9 @@ func runHeadless(args []string) int {
 
 	wg.Wait()
 
-	if lintStats != nil {
-		lintStats.SetTotalTime(time.Since(start))
-		lintStats.Print(os.Stderr)
+	if report != nil {
+		report.SetTotal(time.Since(start))
+		report.Print(os.Stderr)
 	}
 
 	if logLevel == utils.LogLevelDebug {
