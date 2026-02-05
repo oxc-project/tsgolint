@@ -28,12 +28,14 @@ func buildBaseArrayJoinMessage(name string, certainty usefulness) rule.RuleMessa
 	return rule.RuleMessage{
 		Id:          "baseArrayJoin",
 		Description: fmt.Sprintf("Using `join()` for %v %v use Object's default stringification format ('[object Object]') when stringified.", name, certaintyToString(certainty)),
+		Help:        "Consider mapping the values to a meaningful string (e.g. pick a property or call a formatter) before calling `join()`, or implementing a custom `toString()`/`toLocaleString()` on the element type.",
 	}
 }
 func buildBaseToStringMessage(name string, certainty usefulness) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "baseToString",
 		Description: fmt.Sprintf("'%v' %v use Object's default stringification format ('[object Object]') when stringified.", name, certaintyToString(certainty)),
+		Help:        "Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.",
 	}
 }
 
