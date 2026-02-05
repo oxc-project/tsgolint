@@ -352,8 +352,8 @@ func runHeadless(args []string) int {
 	}
 
 	var report *stats.Report
-	if stats.Enabled() {
-		report = stats.NewReport(Version, core.Version(), cwd)
+	if os.Getenv("OXC_TSGOLINT_STATS") != "" {
+		report = stats.NewReport(Version, core.Version())
 	}
 
 	err = linter.RunLinter(
@@ -409,7 +409,7 @@ func runHeadless(args []string) int {
 
 	if report != nil {
 		report.SetTotal(time.Since(start))
-		report.Print(os.Stderr)
+		stats.PrintReport(os.Stderr, report, cwd)
 	}
 
 	if logLevel == utils.LogLevelDebug {
