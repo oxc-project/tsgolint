@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/go-json-experiment/json"
 
@@ -159,6 +160,7 @@ func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 	log.SetOutput(os.Stderr)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	start := time.Now()
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting tsgolint")
@@ -349,7 +351,6 @@ func runHeadless(args []string) int {
 		log.Printf("Running Linter")
 	}
 
-	// Create stats collector if enabled
 	var lintStats *stats.LintStats
 	if stats.Enabled() {
 		lintStats = stats.NewLintStats(Version, core.Version(), runtime.GOMAXPROCS(0))
@@ -406,8 +407,8 @@ func runHeadless(args []string) int {
 
 	wg.Wait()
 
-	// Print stats if enabled
 	if lintStats != nil {
+		lintStats.SetTotalTime(time.Since(start))
 		lintStats.Print(os.Stderr)
 	}
 

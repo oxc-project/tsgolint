@@ -24,6 +24,8 @@ func TestLintStats_Print(t *testing.T) {
 	stats.AddRuleTime("no_deprecated", 1*time.Millisecond)
 	stats.AddRuleTime("rule6", 500*time.Microsecond)
 	stats.AddRuleTime("rule7", 400*time.Microsecond)
+	stats.AddLintCPUTime(300 * time.Millisecond)
+	stats.SetTotalTime(500 * time.Millisecond)
 
 	var buf bytes.Buffer
 	stats.Print(&buf)
@@ -60,6 +62,12 @@ func TestLintStats_Print(t *testing.T) {
 	if !strings.Contains(output, "no_misused_promises") {
 		t.Errorf("no_misused_promises rule not found in output:\n%s", output)
 	}
+	if !strings.Contains(output, "Traversal+overhead") {
+		t.Errorf("Traversal+overhead line not found in output:\n%s", output)
+	}
+	if !strings.Contains(output, "Total") {
+		t.Errorf("Total line not found in output:\n%s", output)
+	}
 	// Should show "2 more rules" for rule6 and rule7
 	if !strings.Contains(output, "2 more rules") {
 		t.Errorf("collapsed rules line not found in output:\n%s", output)
@@ -75,6 +83,12 @@ func TestLintStats_Print(t *testing.T) {
 	if !strings.Contains(output, "Lint:") {
 		t.Errorf("Lint line not found in output:\n%s", output)
 	}
+	if !strings.Contains(output, "Other:") {
+		t.Errorf("Other line not found in output:\n%s", output)
+	}
+	if !strings.Contains(output, "Total:") {
+		t.Errorf("Total line not found in output:\n%s", output)
+	}
 
 	t.Logf("Output:\n%s", output)
 }
@@ -82,6 +96,8 @@ func TestLintStats_Print(t *testing.T) {
 func TestLintStats_NoRules(t *testing.T) {
 	stats := NewLintStats("dev", "unknown", 4)
 	stats.AddProgramStat("tsconfig.json", 100*time.Millisecond, 50)
+	stats.AddLintCPUTime(10 * time.Millisecond)
+	stats.SetTotalTime(100 * time.Millisecond)
 
 	var buf bytes.Buffer
 	stats.Print(&buf)
@@ -91,11 +107,16 @@ func TestLintStats_NoRules(t *testing.T) {
 	if !strings.Contains(output, "Lint:") {
 		t.Errorf("Lint section should still be present:\n%s", output)
 	}
+	if !strings.Contains(output, "Traversal+overhead") {
+		t.Errorf("Traversal+overhead line should still be present:\n%s", output)
+	}
 }
 
 func TestLintStats_FewRules(t *testing.T) {
 	stats := NewLintStats("dev", "unknown", 4)
 	stats.AddProgramStat("tsconfig.json", 100*time.Millisecond, 50)
+	stats.AddLintCPUTime(20 * time.Millisecond)
+	stats.SetTotalTime(100 * time.Millisecond)
 
 	// Only 3 rules - should not show "more rules" line
 	stats.AddRuleTime("rule1", 10*time.Millisecond)

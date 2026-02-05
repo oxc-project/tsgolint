@@ -116,7 +116,6 @@ func RunLinter(
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		// Record program compile time
 		if lintStats != nil {
 			lintStats.AddProgramStat(configFileName, time.Since(programStart), len(sourceFiles))
 		}
@@ -154,7 +153,6 @@ func RunLinter(
 			files = append(files, sf)
 		}
 
-		// Record inferred program compile time
 		if lintStats != nil {
 			lintStats.AddProgramStat("inferred program", time.Since(inferredStart), len(files))
 		}
@@ -170,9 +168,14 @@ func RunLinter(
 }
 
 func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors, lintStats *stats.LintStats) error {
-	// Thread-safe rule timing accumulator
+	var lintStart time.Time
+	if lintStats != nil {
+		lintStart = time.Now()
+	}
 	var ruleTimesMu sync.Mutex
 	ruleTimes := make(map[string]time.Duration)
+	var lintCPUMu sync.Mutex
+	var lintCPUTime time.Duration
 	type checkerWorkload struct {
 		checker *checker.Checker
 		program *compiler.Program
@@ -240,14 +243,16 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	wg := core.NewWorkGroup(workers == 1)
 	for range workers {
 		wg.Queue(func() {
-			// Listener with associated rule name for timing
 			type timedListener struct {
 				ruleName string
 				fn       func(node *ast.Node)
 			}
 			registeredListeners := make(map[ast.Kind][]timedListener, 20)
-			// Per-worker rule timing (to reduce lock contention)
 			localRuleTimes := make(map[string]time.Duration)
+			var workerStart time.Time
+			if lintStats != nil {
+				workerStart = time.Now()
+			}
 
 			for w := range workloadQueue {
 				for file := range w.queue {
@@ -410,7 +415,6 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 				}
 			}
 
-			// Merge local rule times into shared map
 			if lintStats != nil && len(localRuleTimes) > 0 {
 				ruleTimesMu.Lock()
 				for ruleName, duration := range localRuleTimes {
@@ -418,15 +422,22 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 				}
 				ruleTimesMu.Unlock()
 			}
+			if lintStats != nil {
+				localWorkerCPU := time.Since(workerStart)
+				lintCPUMu.Lock()
+				lintCPUTime += localWorkerCPU
+				lintCPUMu.Unlock()
+			}
 		})
 	}
 	wg.RunAndWait()
 
-	// Transfer accumulated rule times to stats
 	if lintStats != nil {
 		for ruleName, duration := range ruleTimes {
 			lintStats.AddRuleTime(ruleName, duration)
 		}
+		lintStats.AddLintCPUTime(lintCPUTime)
+		lintStats.AddLintTime(time.Since(lintStart))
 	}
 
 	return nil

@@ -9,20 +9,17 @@ import (
 	"time"
 )
 
-// ProgramStat holds timing and file count for a single TypeScript program
 type ProgramStat struct {
 	Name      string
 	Time      time.Duration
 	FileCount int
 }
 
-// RuleStat holds timing for a single lint rule
 type RuleStat struct {
 	Name string
 	Time time.Duration
 }
 
-// LintStats collects performance statistics for a lint run
 type LintStats struct {
 	TsgolintVersion string
 	TsgoVersion     string
@@ -32,9 +29,10 @@ type LintStats struct {
 	Rules           map[string]time.Duration
 	CompileTime     time.Duration
 	LintTime        time.Duration
+	LintCPUTime     time.Duration
+	TotalWallTime   time.Duration
 }
 
-// NewLintStats creates a new LintStats instance
 func NewLintStats(tsgolintVersion, tsgoVersion string, threadCount int) *LintStats {
 	return &LintStats{
 		TsgolintVersion: tsgolintVersion,
@@ -45,7 +43,6 @@ func NewLintStats(tsgolintVersion, tsgoVersion string, threadCount int) *LintSta
 	}
 }
 
-// AddProgramStat adds timing stats for a program
 func (s *LintStats) AddProgramStat(name string, duration time.Duration, fileCount int) {
 	s.Programs = append(s.Programs, ProgramStat{
 		Name:      name,
@@ -56,42 +53,51 @@ func (s *LintStats) AddProgramStat(name string, duration time.Duration, fileCoun
 	s.CompileTime += duration
 }
 
-// AddRuleTime adds execution time for a rule (thread-safe accumulation should be done externally)
 func (s *LintStats) AddRuleTime(ruleName string, duration time.Duration) {
 	s.Rules[ruleName] += duration
+}
+
+func (s *LintStats) AddLintTime(duration time.Duration) {
 	s.LintTime += duration
 }
 
-// Enabled returns true if OXC_TSGOLINT_STATS environment variable is set
+func (s *LintStats) AddLintCPUTime(duration time.Duration) {
+	s.LintCPUTime += duration
+}
+
+func (s *LintStats) SetTotalTime(duration time.Duration) {
+	s.TotalWallTime = duration
+}
+
 func Enabled() bool {
 	return os.Getenv("OXC_TSGOLINT_STATS") != ""
 }
 
-// Print outputs the stats to the given writer
 func (s *LintStats) Print(w io.Writer) {
-	// Header
 	fmt.Fprintf(w, "\ntsgolint stats (%d tsconfigs, %d threads)\n\n", s.TsconfigCount, s.ThreadCount)
 
-	// Version section
 	fmt.Fprintln(w, "Version:")
 	s.printVersionRow(w, "tsgolint", s.TsgolintVersion)
 	s.printVersionRow(w, "tsgo", s.TsgoVersion)
 	fmt.Fprintln(w)
 
-	// Typecheck section
 	fmt.Fprintln(w, "Typecheck:")
 	s.printTypecheckSection(w)
 	fmt.Fprintln(w)
 
-	// Lint section
 	fmt.Fprintln(w, "Lint:")
 	s.printLintSection(w)
 	fmt.Fprintln(w)
 
-	// Summary section
 	fmt.Fprintln(w, "Summary:")
 	s.printSummaryRow(w, "Compile", s.CompileTime)
 	s.printSummaryRow(w, "Lint", s.LintTime)
+	other := s.TotalWallTime - s.CompileTime - s.LintTime
+	if other < 0 {
+		other = 0
+	}
+	s.printSummaryRow(w, "Other", other)
+	s.printSummaryRow(w, "Total", s.TotalWallTime)
 }
 
 func (s *LintStats) printVersionRow(w io.Writer, name, version string) {
@@ -99,14 +105,12 @@ func (s *LintStats) printVersionRow(w io.Writer, name, version string) {
 }
 
 func (s *LintStats) printTypecheckSection(w io.Writer) {
-	// Sort programs by time (descending)
 	programs := make([]ProgramStat, len(s.Programs))
 	copy(programs, s.Programs)
 	sort.Slice(programs, func(i, j int) bool {
 		return programs[i].Time > programs[j].Time
 	})
 
-	// Calculate column widths
 	maxNameLen := len("Program")
 	for _, p := range programs {
 		if len(p.Name) > maxNameLen {
@@ -117,10 +121,8 @@ func (s *LintStats) printTypecheckSection(w io.Writer) {
 		maxNameLen = 40
 	}
 
-	// Header
 	fmt.Fprintf(w, "    %-*s  %10s  %8s\n", maxNameLen, "Program", "Time", "Files")
 
-	// Programs
 	totalFiles := 0
 	for _, p := range programs {
 		name := p.Name
@@ -131,13 +133,11 @@ func (s *LintStats) printTypecheckSection(w io.Writer) {
 		totalFiles += p.FileCount
 	}
 
-	// Separator and total
 	fmt.Fprintf(w, "    %s\n", strings.Repeat("-", maxNameLen+22))
 	fmt.Fprintf(w, "    %-*s  %10s  %8d\n", maxNameLen, "Total", formatDuration(s.CompileTime), totalFiles)
 }
 
 func (s *LintStats) printLintSection(w io.Writer) {
-	// Convert map to slice and sort by time (descending)
 	rules := make([]RuleStat, 0, len(s.Rules))
 	for name, duration := range s.Rules {
 		rules = append(rules, RuleStat{Name: name, Time: duration})
@@ -146,7 +146,6 @@ func (s *LintStats) printLintSection(w io.Writer) {
 		return rules[i].Time > rules[j].Time
 	})
 
-	// Calculate column width
 	maxNameLen := len("Rule")
 	for _, r := range rules {
 		if len(r.Name) > maxNameLen {
@@ -157,16 +156,13 @@ func (s *LintStats) printLintSection(w io.Writer) {
 		maxNameLen = 40
 	}
 
-	// Header
 	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Rule", "Time")
 
-	// Show top 5 rules
 	displayCount := min(5, len(rules))
-	for i := 0; i < displayCount; i++ {
+	for i := range displayCount {
 		fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, rules[i].Name, formatDuration(rules[i].Time))
 	}
 
-	// Collapsed remaining rules
 	if len(rules) > 5 {
 		remainingCount := len(rules) - 5
 		var remainingTime time.Duration
@@ -176,9 +172,18 @@ func (s *LintStats) printLintSection(w io.Writer) {
 		fmt.Fprintf(w, "    ... %d more rules (%s)\n", remainingCount, formatDuration(remainingTime))
 	}
 
-	// Separator and total
+	var totalRules time.Duration
+	for _, r := range rules {
+		totalRules += r.Time
+	}
+	traversal := s.LintCPUTime - totalRules
+	if traversal < 0 {
+		traversal = 0
+	}
+
 	fmt.Fprintf(w, "    %s\n", strings.Repeat("-", maxNameLen+12))
-	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Total", formatDuration(s.LintTime))
+	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Traversal+overhead", formatDuration(traversal))
+	fmt.Fprintf(w, "    %-*s  %10s\n", maxNameLen, "Total", formatDuration(s.LintCPUTime))
 }
 
 func (s *LintStats) printSummaryRow(w io.Writer, name string, duration time.Duration) {
