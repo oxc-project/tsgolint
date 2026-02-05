@@ -35,6 +35,7 @@ type headlessOptions struct {
 	allocsOut      string
 	fix            bool
 	fixSuggestions bool
+	stats          bool
 }
 
 func parseHeadlessOptions(args []string) (*headlessOptions, error) {
@@ -46,6 +47,7 @@ func parseHeadlessOptions(args []string) (*headlessOptions, error) {
 	flag.StringVar(&opts.allocsOut, "allocs", "", "file to put allocs profiling to")
 	flag.BoolVar(&opts.fix, "fix", false, "generate fixes for code problems")
 	flag.BoolVar(&opts.fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
+	flag.BoolVar(&opts.stats, "stats", false, "output performance stats")
 
 	if err := flag.CommandLine.Parse(args); err != nil {
 		return nil, err
@@ -352,7 +354,7 @@ func runHeadless(args []string) int {
 	}
 
 	var report *stats.Report
-	if os.Getenv("OXC_TSGOLINT_STATS") != "" {
+	if opts.stats {
 		report = stats.NewReport()
 	}
 
