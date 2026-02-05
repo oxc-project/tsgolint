@@ -353,7 +353,7 @@ func runHeadless(args []string) int {
 
 	var report *stats.Report
 	if os.Getenv("OXC_TSGOLINT_STATS") != "" {
-		report = stats.NewReport(Version, core.Version())
+		report = stats.NewReport()
 	}
 
 	err = linter.RunLinter(

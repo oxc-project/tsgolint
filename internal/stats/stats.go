@@ -16,24 +16,20 @@ type Rule struct {
 }
 
 type Report struct {
-	TsgolintVersion string
-	TsgoVersion     string
-	ThreadCount     int
-	TsconfigCount   int
-	Programs        []Program
-	Rules           map[string]time.Duration
-	Compile         time.Duration
-	LintWall        time.Duration
-	LintCPU         time.Duration
-	Total           time.Duration
+	ThreadCount   int
+	TsconfigCount int
+	Programs      []Program
+	Rules         map[string]time.Duration
+	Compile       time.Duration
+	LintWall      time.Duration
+	LintCPU       time.Duration
+	Total         time.Duration
 }
 
-func NewReport(tsgolintVersion, tsgoVersion string) *Report {
+func NewReport() *Report {
 	return &Report{
-		TsgolintVersion: tsgolintVersion,
-		TsgoVersion:     tsgoVersion,
-		Programs:        make([]Program, 0),
-		Rules:           make(map[string]time.Duration),
+		Programs: make([]Program, 0),
+		Rules:    make(map[string]time.Duration),
 	}
 }
 

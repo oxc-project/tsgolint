@@ -6,13 +6,7 @@ import (
 )
 
 func TestNewReport(t *testing.T) {
-	r := NewReport("v1.0.0", "7.0.0")
-	if r.TsgolintVersion != "v1.0.0" {
-		t.Errorf("TsgolintVersion = %q, want %q", r.TsgolintVersion, "v1.0.0")
-	}
-	if r.TsgoVersion != "7.0.0" {
-		t.Errorf("TsgoVersion = %q, want %q", r.TsgoVersion, "7.0.0")
-	}
+	r := NewReport()
 	if len(r.Programs) != 0 {
 		t.Errorf("Programs should be empty, got %d", len(r.Programs))
 	}
@@ -22,7 +16,7 @@ func TestNewReport(t *testing.T) {
 }
 
 func TestAddProgram(t *testing.T) {
-	r := NewReport("dev", "unknown")
+	r := NewReport()
 	r.AddProgram("tsconfig.json", 100*time.Millisecond, 50)
 	r.AddProgram("tsconfig.app.json", 200*time.Millisecond, 30)
 
@@ -38,7 +32,7 @@ func TestAddProgram(t *testing.T) {
 }
 
 func TestAddRule(t *testing.T) {
-	r := NewReport("dev", "unknown")
+	r := NewReport()
 	r.AddRule("no_misused_promises", 100*time.Millisecond)
 	r.AddRule("no_misused_promises", 50*time.Millisecond) // same rule, should accumulate
 
@@ -48,7 +42,7 @@ func TestAddRule(t *testing.T) {
 }
 
 func TestAddLintTimings(t *testing.T) {
-	r := NewReport("dev", "unknown")
+	r := NewReport()
 	r.AddLintWall(100 * time.Millisecond)
 	r.AddLintCPU(200 * time.Millisecond)
 	r.SetTotal(500 * time.Millisecond)

@@ -10,21 +10,15 @@ import (
 )
 
 const (
-	colIndent  = "    "
-	colName    = 56 // first column width (name/label), positions 5-60 on screen
-	colValue   = 10 // second column width (time/value)
-	colFiles   = 10 // third column width (files count)
-	colVersion = colValue + colFiles
+	colIndent = "    "
+	colName   = 56 // first column width (name/label), positions 5-60 on screen
+	colValue  = 10 // second column width (time/value)
+	colFiles  = 10 // third column width (files count)
 )
 
 // PrintReport prints the stats report to w, using currentDir to display relative paths.
 func PrintReport(w io.Writer, s *Report, cwd string) {
 	fmt.Fprint(w, "\n")
-
-	fmt.Fprintln(w, "Version:")
-	printVersionRow(w, "tsgolint", s.TsgolintVersion)
-	printVersionRow(w, "tsgo", s.TsgoVersion)
-	fmt.Fprintln(w)
 
 	fmt.Fprintln(w, "Typecheck:")
 	printTypecheckSection(w, s, cwd)
@@ -48,10 +42,6 @@ func displayName(cwd, configPath string) string {
 		return configPath
 	}
 	return rel
-}
-
-func printVersionRow(w io.Writer, name, version string) {
-	fmt.Fprintf(w, "%s%-*s%*s\n", colIndent, colName, name, colVersion, version)
 }
 
 func printTypecheckSection(w io.Writer, s *Report, cwd string) {

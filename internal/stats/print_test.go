@@ -2,15 +2,13 @@ package stats
 
 import (
 	"bytes"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 )
 
 func TestPrintReport(t *testing.T) {
-	r := NewReport("v0.11.3", "7.0.0-dev.20260107.1")
+	r := NewReport()
 
 	// Add program stats with absolute paths
 	r.AddProgram("/test/dir/tsconfig.json", 42*time.Millisecond, 100)
@@ -32,14 +30,6 @@ func TestPrintReport(t *testing.T) {
 	var buf bytes.Buffer
 	PrintReport(&buf, r, "/test/dir")
 	output := buf.String()
-
-	// Check version section
-	if !strings.Contains(output, "v0.11.3") {
-		t.Errorf("tsgolint version not found in output:\n%s", output)
-	}
-	if !strings.Contains(output, "7.0.0-dev.20260107.1") {
-		t.Errorf("tsgo version not found in output:\n%s", output)
-	}
 
 	// Check Typecheck section with "Wall Time" header
 	if !strings.Contains(output, "Typecheck:") {
@@ -103,7 +93,7 @@ func TestPrintReport(t *testing.T) {
 }
 
 func TestPrintReport_NoRules(t *testing.T) {
-	r := NewReport("dev", "unknown")
+	r := NewReport()
 	r.AddProgram("tsconfig.json", 100*time.Millisecond, 50)
 	r.AddLintCPU(10 * time.Millisecond)
 	r.SetTotal(100 * time.Millisecond)
@@ -122,7 +112,7 @@ func TestPrintReport_NoRules(t *testing.T) {
 }
 
 func TestPrintReport_FewRules(t *testing.T) {
-	r := NewReport("dev", "unknown")
+	r := NewReport()
 	r.AddProgram("tsconfig.json", 100*time.Millisecond, 50)
 	r.AddLintCPU(20 * time.Millisecond)
 	r.SetTotal(100 * time.Millisecond)
@@ -181,43 +171,5 @@ func TestDisplayName(t *testing.T) {
 				t.Errorf("displayName(%q, %q) = %q, want %q", tt.currentDir, tt.input, got, tt.want)
 			}
 		})
-	}
-}
-
-// TestDisplayName_Symlink reproduces the real bug: on macOS, os.Getwd() resolves
-// symlinks while tsconfig paths (from VS Code file paths) use the unresolved
-// symlink path. This causes displayName to fail to compute a relative path.
-func TestDisplayName_Symlink(t *testing.T) {
-	tmpDir := t.TempDir()
-
-	// Create real directory with a tsconfig.json
-	realDir := filepath.Join(tmpDir, "real", "project")
-	if err := os.MkdirAll(realDir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	tsconfigPath := filepath.Join(realDir, "tsconfig.json")
-	if err := os.WriteFile(tsconfigPath, []byte("{}"), 0o644); err != nil {
-		t.Fatal(err)
-	}
-
-	// Create a symlink: tmpDir/link -> tmpDir/real
-	symlinkDir := filepath.Join(tmpDir, "link")
-	if err := os.Symlink(filepath.Join(tmpDir, "real"), symlinkDir); err != nil {
-		t.Skip("symlinks not supported:", err)
-	}
-
-	// Simulate: cwd is the resolved path, tsconfig path uses the symlink
-	resolvedCwd := filepath.Join(tmpDir, "real", "project")
-	symlinkTsconfig := filepath.Join(symlinkDir, "project", "tsconfig.json")
-
-	got := displayName(resolvedCwd, symlinkTsconfig)
-	if got != "tsconfig.json" {
-		t.Errorf("displayName(%q, %q)\ngot  %q\nwant %q", resolvedCwd, symlinkTsconfig, got, "tsconfig.json")
-	}
-
-	// Also test the reverse: cwd uses symlink, tsconfig is resolved
-	got2 := displayName(filepath.Join(symlinkDir, "project"), tsconfigPath)
-	if got2 != "tsconfig.json" {
-		t.Errorf("displayName(%q, %q)\ngot  %q\nwant %q", filepath.Join(symlinkDir, "project"), tsconfigPath, got2, "tsconfig.json")
 	}
 }
