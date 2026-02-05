@@ -213,6 +213,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'({})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -226,6 +227,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -239,6 +241,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -2468,6 +2471,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'obj' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -3897,6 +3901,7 @@ exports[`TSGoLint E2E Snapshot Tests > should handle circular project references
     "kind": 0,
     "message": {
       "description": "'demo()' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
