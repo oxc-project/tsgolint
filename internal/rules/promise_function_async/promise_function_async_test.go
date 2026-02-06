@@ -8,6 +8,7 @@ import (
 )
 
 func TestPromiseFunctionAsyncRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &PromiseFunctionAsyncRule, []rule_tester.ValidTestCase{
 		{Code: `
 const nonAsyncNonPromiseArrowFunction = (n: number) => n;

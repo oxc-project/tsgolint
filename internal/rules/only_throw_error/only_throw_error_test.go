@@ -8,6 +8,7 @@ import (
 )
 
 func TestOnlyThrowErrorRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &OnlyThrowErrorRule, []rule_tester.ValidTestCase{
 		{Code: "throw new Error();"},
 		{Code: "throw new Error('error');"},

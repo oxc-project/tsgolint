@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoUnnecessaryTemplateExpressionRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTemplateExpressionRule, []rule_tester.ValidTestCase{
 		{Code: "const string = 'a';"},
 		{Code: "const string = `a`;"},

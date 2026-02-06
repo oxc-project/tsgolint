@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoUnsafeReturnRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.noImplicitThis.json", t, &NoUnsafeReturnRule, []rule_tester.ValidTestCase{
 		{Code: `
 function foo() {

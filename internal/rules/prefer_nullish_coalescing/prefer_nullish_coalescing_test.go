@@ -9,6 +9,7 @@ import (
 )
 
 func TestPreferNullishCoalescingRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferNullishCoalescingRule, []rule_tester.ValidTestCase{
 		{Code: `x !== undefined && x !== null ? x : y;`, Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: true}},
 		{Code: `

@@ -8,6 +8,7 @@ import (
 )
 
 func TestPreferIncludesRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferIncludesRule, []rule_tester.ValidTestCase{
 		{Code: `
       function f(a: string): void {
