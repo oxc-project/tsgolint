@@ -806,15 +806,84 @@ function promiseInUnionWithoutExplicitReturnType(p: boolean) {
   return p ? Promise.resolve(5) : 5;
 }
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
  async function promiseInUnionWithoutExplicitReturnType(p: boolean) {
   return p ? Promise.resolve(5) : 5;
 }
       `,
+						},
+					},
+				},
 			},
+		},
+		{
+			Code: `
+function test1(): 'one' | Promise<'one'>;
+function test1(a: number): Promise<number>;
+function test1(a?: number) {
+  if (a) {
+    return Promise.resolve(a);
+  }
+
+  return Math.random() > 0.5 ? 'one' : Promise.resolve('one');
+}
+      `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "missingAsync",
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
+function test1(): 'one' | Promise<'one'>;
+function test1(a: number): Promise<number>;
+ async function test1(a?: number) {
+  if (a) {
+    return Promise.resolve(a);
+  }
+
+  return Math.random() > 0.5 ? 'one' : Promise.resolve('one');
+}
+      `,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+class PromiseType {
+  s?: string;
+}
+
+function promiseInUnionWithoutExplicitReturnType(p: boolean) {
+  return p ? new PromiseType() : 5;
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[PromiseFunctionAsyncOptions](`{"allowedPromiseNames": ["PromiseType"]}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
+class PromiseType {
+  s?: string;
+}
+
+ async function promiseInUnionWithoutExplicitReturnType(p: boolean) {
+  return p ? new PromiseType() : 5;
+}
+      `,
+						},
+					},
 				},
 			},
 		},
