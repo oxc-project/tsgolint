@@ -9,6 +9,7 @@ import (
 )
 
 func TestPreferOptionalChainRule(t *testing.T) {
+	t.Parallel()
 	validCases := []rule_tester.ValidTestCase{
 		{Code: `foo || {};`},
 		{Code: `foo || ({} as any);`},

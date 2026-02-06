@@ -18,6 +18,7 @@ func FlatMap[A, B any](input []A, f func(A) []B) []B {
 	return result
 }
 func TestNoBaseToStringRule(t *testing.T) {
+	t.Parallel()
 	literalListBasic := []string{
 		"''",
 		"'text'",

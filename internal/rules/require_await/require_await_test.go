@@ -8,6 +8,7 @@ import (
 )
 
 func TestRequireAwaitRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &RequireAwaitRule, []rule_tester.ValidTestCase{
 		{Code: `
 function numberOne(): number {
