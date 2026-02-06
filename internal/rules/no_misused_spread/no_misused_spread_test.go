@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoMisusedSpreadRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMisusedSpreadRule, []rule_tester.ValidTestCase{
 		{Code: "const a = [...[1, 2, 3]];"},
 		{Code: "const a = [...([1, 2, 3] as const)];"},

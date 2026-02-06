@@ -8,6 +8,7 @@
     "lib": ["esnext"],
     "experimentalDecorators": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "types": []
   }
 }

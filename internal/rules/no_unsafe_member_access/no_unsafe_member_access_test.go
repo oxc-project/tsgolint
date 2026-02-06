@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoUnsafeMemberAccessRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.noImplicitThis.json", t, &NoUnsafeMemberAccessRule, []rule_tester.ValidTestCase{
 		{Code: `
 function foo(x: { a: number }, y: any) {

@@ -8,6 +8,7 @@ import (
 )
 
 func TestPreferReduceTypeParameterRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &PreferReduceTypeParameterRule, []rule_tester.ValidTestCase{
 		{Code: `
       new (class Mine {

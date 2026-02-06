@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoUnsafeTypeAssertionRule_BasicAssertions(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
 declare const a: string;

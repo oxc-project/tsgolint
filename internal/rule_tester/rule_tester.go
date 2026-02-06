@@ -8,8 +8,11 @@ import (
 
 	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/microsoft/typescript-go/shim/tspath"
+	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
+	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
@@ -17,6 +20,8 @@ import (
 
 	"gotest.tools/v3/assert"
 )
+
+var cachedBaseFS = cachedvfs.From(bundled.WrapFS(osvfs.FS()))
 
 type ValidTestCase struct {
 	Code     string
@@ -65,7 +70,8 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			fileName = "react.tsx"
 		}
 
-		fs := utils.NewOverlayVFSForFile(tspath.ResolvePath(rootDir, fileName), code)
+		virtualFiles := map[string]string{tspath.ResolvePath(rootDir, fileName): code}
+		fs := utils.NewOverlayVFS(cachedBaseFS, virtualFiles)
 		host := utils.CreateCompilerHost(rootDir, fs)
 
 		tsconfigPath := tsconfigPath
