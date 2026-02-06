@@ -40,8 +40,8 @@ require (
 
 require (
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
-	github.com/zeebo/xxh3 v1.0.2 // indirect
+	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
+	github.com/zeebo/xxh3 v1.1.0 // indirect
 	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 )
@@ -49,6 +49,6 @@ require (
 require (
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e
-	github.com/microsoft/typescript-go v0.0.0-20260121030332-01cac67dfdfc // indirect
+	github.com/microsoft/typescript-go v0.0.0-20260206031118-7d8e77a0cd98 // indirect
 	golang.org/x/text v0.33.0
 )

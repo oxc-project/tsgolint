@@ -6,6 +6,7 @@ package project
 import "github.com/microsoft/typescript-go/internal/ast"
 import "github.com/microsoft/typescript-go/internal/core"
 import "github.com/microsoft/typescript-go/internal/ls/autoimport"
+import "github.com/microsoft/typescript-go/internal/ls/lsutil"
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "github.com/microsoft/typescript-go/internal/project"
 import "github.com/microsoft/typescript-go/internal/project/dirty"
@@ -20,7 +21,6 @@ type APISnapshotRequest = project.APISnapshotRequest
 type ATAStateChange = project.ATAStateChange
 type CheckerPool = project.CheckerPool
 type Client = project.Client
-type Config = project.Config
 type ConfigFileRegistry = project.ConfigFileRegistry
 type ConfigFileRegistryBuilder = project.ConfigFileRegistryBuilder
 //go:linkname ConfigFileRegistryBuilder_FindOrAcquireConfigForFile github.com/microsoft/typescript-go/internal/project.(*ConfigFileRegistryBuilder).FindOrAcquireConfigForFile
@@ -67,7 +67,7 @@ func NewProject(configFileName string, kind project.Kind, currentDirectory strin
 //go:linkname NewSession github.com/microsoft/typescript-go/internal/project.NewSession
 func NewSession(init *project.SessionInit) *project.Session
 //go:linkname NewSnapshot github.com/microsoft/typescript-go/internal/project.NewSnapshot
-func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.SessionOptions, configFileRegistry *project.ConfigFileRegistry, compilerOptionsForInferredProjects *core.CompilerOptions, config project.Config, autoImports *autoimport.Registry, autoImportsWatch *project.WatchedFiles[map[tspath.Path]string], toPath func(fileName string) tspath.Path) *project.Snapshot
+func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.SessionOptions, configFileRegistry *project.ConfigFileRegistry, compilerOptionsForInferredProjects *core.CompilerOptions, allUserPreferences *lsutil.UserConfig, autoImports *autoimport.Registry, autoImportsWatch *project.WatchedFiles[map[tspath.Path]string], toPath func(fileName string) tspath.Path) *project.Snapshot
 //go:linkname NewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.NewSnapshotFSBuilder
 func NewSnapshotFSBuilder(fs vfs.FS, prevOverlays map[tspath.Path]*project.Overlay, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, diskDirectories map[tspath.Path]dirty.CloneableMap[tspath.Path, string], positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
 type Overlay = project.Overlay

@@ -117,6 +117,8 @@ type CommentRange = ast.CommentRange
 type CommonJSExport = ast.CommonJSExport
 //go:linkname CompareDiagnostics github.com/microsoft/typescript-go/internal/ast.CompareDiagnostics
 func CompareDiagnostics(d1 *ast.Diagnostic, d2 *ast.Diagnostic) int
+//go:linkname CompareNodePositions github.com/microsoft/typescript-go/internal/ast.CompareNodePositions
+func CompareNodePositions(n1 *ast.Node, n2 *ast.Node) int
 type ComputedPropertyName = ast.ComputedPropertyName
 type ConditionalExpression = ast.ConditionalExpression
 type ConditionalTypeNode = ast.ConditionalTypeNode
@@ -354,6 +356,8 @@ func GetPragmaArgument(pragma *ast.Pragma, name string) string
 func GetPragmaFromSourceFile(file *ast.SourceFile, name string) *ast.Pragma
 //go:linkname GetPropertyNameForPropertyNameNode github.com/microsoft/typescript-go/internal/ast.GetPropertyNameForPropertyNameNode
 func GetPropertyNameForPropertyNameNode(name *ast.Node) string
+//go:linkname GetReparsedNodeForNode github.com/microsoft/typescript-go/internal/ast.GetReparsedNodeForNode
+func GetReparsedNodeForNode(node *ast.Node) *ast.Node
 //go:linkname GetRestIndicatorOfBindingOrAssignmentElement github.com/microsoft/typescript-go/internal/ast.GetRestIndicatorOfBindingOrAssignmentElement
 func GetRestIndicatorOfBindingOrAssignmentElement(bindingElement *ast.Node) *ast.Node
 //go:linkname GetRestParameterElementType github.com/microsoft/typescript-go/internal/ast.GetRestParameterElementType
