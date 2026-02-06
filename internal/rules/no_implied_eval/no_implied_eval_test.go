@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoImpliedEvalRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoImpliedEvalRule, []rule_tester.ValidTestCase{
 		{Code: "foo.setImmediate(null);"},
 		{Code: "foo.setInterval(null);"},

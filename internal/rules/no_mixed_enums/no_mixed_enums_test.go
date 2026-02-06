@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoMixedEnumsRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMixedEnumsRule, []rule_tester.ValidTestCase{
 		{Code: `
       enum Fruit {}
