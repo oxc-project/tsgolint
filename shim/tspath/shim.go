@@ -86,6 +86,8 @@ func GetPathComponents(path string, currentDirectory string) []string
 func GetPathComponentsRelativeTo(from string, to string, options tspath.ComparePathsOptions) []string
 //go:linkname GetPathFromPathComponents github.com/microsoft/typescript-go/internal/tspath.GetPathFromPathComponents
 func GetPathFromPathComponents(pathComponents []string) string
+//go:linkname GetPossibleOriginalInputExtensionForExtension github.com/microsoft/typescript-go/internal/tspath.GetPossibleOriginalInputExtensionForExtension
+func GetPossibleOriginalInputExtensionForExtension(path string) []string
 //go:linkname GetRelativePathFromDirectory github.com/microsoft/typescript-go/internal/tspath.GetRelativePathFromDirectory
 func GetRelativePathFromDirectory(fromDirectory string, to string, options tspath.ComparePathsOptions) string
 //go:linkname GetRelativePathFromFile github.com/microsoft/typescript-go/internal/tspath.GetRelativePathFromFile
