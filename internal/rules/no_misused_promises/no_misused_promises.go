@@ -684,7 +684,7 @@ var NoMisusedPromisesRule = rule.Rule{
 				return current
 			})()
 
-			if functionNode != nil &&  functionNode.Type() != nil && !isPossiblyFunctionType(functionNode.Type()) {
+			if functionNode != nil && functionNode.Type() != nil && !isPossiblyFunctionType(functionNode.Type()) {
 				return
 			}
 
