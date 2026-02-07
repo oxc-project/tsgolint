@@ -8,9 +8,8 @@ import (
 )
 
 func TestNoDeprecatedRule(t *testing.T) {
-		t.Parallel()
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.includeTypes.json", t, &NoDeprecatedRule, []rule_tester.ValidTestCase{
-
 
 		{Code: `/** @deprecated */ var a;`},
 		{Code: `/** @deprecated */ var a = 1;`},
