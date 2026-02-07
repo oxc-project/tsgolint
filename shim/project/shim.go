@@ -115,4 +115,3 @@ const UpdateReasonRequestedLanguageServiceWithAutoImports = project.UpdateReason
 const UpdateReasonRequestedLoadProjectTree = project.UpdateReasonRequestedLoadProjectTree
 const UpdateReasonUnknown = project.UpdateReasonUnknown
 type WatchedFiles[T any] = project.WatchedFiles[T]
-type WatcherID = project.WatcherID

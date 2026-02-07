@@ -324,6 +324,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
+      "description": "Unnecessary conditional, value is always falsy.",
+      "id": "alwaysFalsy",
+    },
+    "range": {
+      "end": 255,
+      "pos": 245,
+    },
+    "rule": "no-unnecessary-condition",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "kind": 0,
+    "message": {
       "description": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
       "id": "conditionErrorAny",
     },
@@ -1476,6 +1489,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 89,
     },
     "rule": "no-mixed-enums",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unnecessary comparison between literal values.",
+      "id": "comparisonBetweenLiteralTypes",
+    },
+    "range": {
+      "end": 242,
+      "pos": 217,
+    },
+    "rule": "no-unnecessary-condition",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
