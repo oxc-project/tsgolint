@@ -38,6 +38,7 @@ lint:
 
 fmt:
   gofmt -w internal cmd tools
+  pnpm run fmt
 
 shim:
   go run tools/gen_shims/main.go
