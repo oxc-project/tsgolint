@@ -2320,7 +2320,7 @@ declare const foo: { bar: number };
 foo.bar ??= 1;
       `,
 			TSConfig: "tsconfig.exactOptionalPropertyTypes.json",
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
 		},
 
 		// Function return values with optional chaining
@@ -2569,7 +2569,7 @@ if (test[0]?.a) {
 }
       `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain"}},
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain"}},
 		},
 		{
 			Code: `
@@ -2591,7 +2591,7 @@ if (arr[0]) {
 }
       `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
 		},
 		{
 			Code: `
@@ -2601,7 +2601,7 @@ if (arr[42] && arr[42]) {
 }
       `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 	})
 }
