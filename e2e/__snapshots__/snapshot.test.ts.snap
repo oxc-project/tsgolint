@@ -1274,6 +1274,231 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unnecessary-type-assertion",
   },
   {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This type conversion does not change the type or value of the expression.",
+      "id": "unnecessaryTypeConversion",
+    },
+    "range": {
+      "end": 87,
+      "pos": 81,
+    },
+    "rule": "no-unnecessary-type-conversion",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 95,
+              "pos": 81,
+            },
+            "text": "'asdf'",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 95,
+              "pos": 81,
+            },
+            "text": "'asdf' satisfies string",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This type conversion does not change the type or value of the expression.",
+      "id": "unnecessaryTypeConversion",
+    },
+    "range": {
+      "end": 124,
+      "pos": 114,
+    },
+    "rule": "no-unnecessary-type-conversion",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 124,
+              "pos": 107,
+            },
+            "text": "'asdf'",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 124,
+              "pos": 107,
+            },
+            "text": "'asdf' satisfies string",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This type conversion does not change the type or value of the expression.",
+      "id": "unnecessaryTypeConversion",
+    },
+    "range": {
+      "end": 141,
+      "pos": 136,
+    },
+    "rule": "no-unnecessary-type-conversion",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 147,
+              "pos": 136,
+            },
+            "text": "'asdf'",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 147,
+              "pos": 136,
+            },
+            "text": "'asdf' satisfies string",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This type conversion does not change the type or value of the expression.",
+      "id": "unnecessaryTypeConversion",
+    },
+    "range": {
+      "end": 165,
+      "pos": 159,
+    },
+    "rule": "no-unnecessary-type-conversion",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 170,
+              "pos": 159,
+            },
+            "text": "123",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 170,
+              "pos": 159,
+            },
+            "text": "123 satisfies number",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This type conversion does not change the type or value of the expression.",
+      "id": "unnecessaryTypeConversion",
+    },
+    "range": {
+      "end": 184,
+      "pos": 182,
+    },
+    "rule": "no-unnecessary-type-conversion",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 188,
+              "pos": 182,
+            },
+            "text": "true",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 188,
+              "pos": 182,
+            },
+            "text": "true satisfies boolean",
+          },
+        ],
+        "message": {
+          "description": "This type conversion does not change the type or value of the expression.",
+          "id": "unnecessaryTypeConversion",
+        },
+      },
+    ],
+  },
+  {
     "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
     "kind": 0,
     "message": {

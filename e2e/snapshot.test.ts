@@ -32,6 +32,7 @@ const ALL_RULES = [
   'no-unnecessary-boolean-literal-compare',
   'no-unnecessary-condition',
   'no-unnecessary-template-expression',
+  'no-unnecessary-type-conversion',
   'no-unnecessary-type-arguments',
   'no-unnecessary-type-assertion',
   'no-unsafe-argument',

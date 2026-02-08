@@ -40,6 +40,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_template_expression"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_arguments"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_assertion"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_conversion"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_argument"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_assignment"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_call"
@@ -164,6 +165,7 @@ var allRules = []rule.Rule{
 	no_unnecessary_boolean_literal_compare.NoUnnecessaryBooleanLiteralCompareRule,
 	no_unnecessary_condition.NoUnnecessaryConditionRule,
 	no_unnecessary_template_expression.NoUnnecessaryTemplateExpressionRule,
+	no_unnecessary_type_conversion.NoUnnecessaryTypeConversionRule,
 	no_unnecessary_type_arguments.NoUnnecessaryTypeArgumentsRule,
 	no_unnecessary_type_assertion.NoUnnecessaryTypeAssertionRule,
 	no_unsafe_argument.NoUnsafeArgumentRule,

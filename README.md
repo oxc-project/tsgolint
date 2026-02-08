@@ -110,19 +110,18 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 46/59.
+Implemented 47/59.
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [no-unnecessary-qualifier](https://typescript-eslint.io/rules/no-unnecessary-qualifier)
-- [ ] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
 - [ ] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [ ] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
-- [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
+- [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
@@ -144,6 +143,7 @@ Implemented 46/59.
 - [x] [no-unnecessary-template-expression](https://typescript-eslint.io/rules/no-unnecessary-template-expression)
 - [x] [no-unnecessary-type-arguments](https://typescript-eslint.io/rules/no-unnecessary-type-arguments)
 - [x] [no-unnecessary-type-assertion](https://typescript-eslint.io/rules/no-unnecessary-type-assertion)
+- [x] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
 - [x] [no-unsafe-argument](https://typescript-eslint.io/rules/no-unsafe-argument)
 - [x] [no-unsafe-assignment](https://typescript-eslint.io/rules/no-unsafe-assignment)
 - [x] [no-unsafe-call](https://typescript-eslint.io/rules/no-unsafe-call)
