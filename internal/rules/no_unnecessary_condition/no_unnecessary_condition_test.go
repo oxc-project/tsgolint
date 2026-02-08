@@ -9,6 +9,7 @@ import (
 )
 
 func TestNoUnnecessaryConditionRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnnecessaryConditionRule, []rule_tester.ValidTestCase{
 		// Basic boolean conditions
 		{Code: `
