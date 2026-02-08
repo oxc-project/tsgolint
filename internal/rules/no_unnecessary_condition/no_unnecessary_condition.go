@@ -23,26 +23,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-// NoUnnecessaryConditionOptions configures the no-unnecessary-condition rule.
-type NoUnnecessaryConditionOptions struct {
-	// AllowConstantLoopConditions controls whether constant loop conditions are allowed.
-	// Values: "never" (default) | "always" | "only-allowed-literals" | boolean
-	// - "never": Disallow all constant loop conditions
-	// - "always": Allow all constant loop conditions
-	// - "only-allowed-literals": Allow only literal true/false/0/1
-	AllowConstantLoopConditions any
-
-	// CheckTypePredicates enables checking of type predicate functions.
-	// When true, reports when type guards are used on values that already match the predicate type.
-	// Default: false
-	CheckTypePredicates *bool
-
-	// AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing allows the rule to run
-	// without strictNullChecks enabled. Not recommended.
-	// Default: false (DEPRECATED - will be removed in future versions)
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing *bool
-}
-
 func buildAlwaysTruthyMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "alwaysTruthy",
@@ -241,22 +221,7 @@ func isSameExpression(a, b *ast.Node) bool {
 var NoUnnecessaryConditionRule = rule.Rule{
 	Name: "no-unnecessary-condition",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts, ok := options.(NoUnnecessaryConditionOptions)
-		if !ok {
-			opts = NoUnnecessaryConditionOptions{}
-		}
-		if opts.AllowConstantLoopConditions == nil {
-			opts.AllowConstantLoopConditions = "never"
-		}
-		if opts.CheckTypePredicates == nil {
-			opts.CheckTypePredicates = utils.Ref(false)
-		}
-
-		// https://typescript-eslint.io/rules/no-unnecessary-condition/#:~:text=Default%3A%20false.-,DEPRECATED,-This%20option%20will
-		// TLDR: This option will be removed in the next major version of typescript-eslint.
-		if opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing == nil {
-			opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = utils.Ref(false)
-		}
+		opts := utils.UnmarshalOptions[NoUnnecessaryConditionOptions](options, "no-unnecessary-condition")
 
 		compilerOptions := ctx.Program.Options()
 		isStrictNullChecks := utils.IsStrictCompilerOptionEnabled(
@@ -264,7 +229,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !*opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
@@ -587,7 +552,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			// Skip checking in this case unless the user explicitly allows it
 			// When AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing is true,
 			// skip checking Object types in non-strict mode as they might be nullable
-			if !isStrictNullChecks && *opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+			if !isStrictNullChecks && opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
 				flags := checker.Type_flags(nodeType)
 				if flags&(checker.TypeFlagsObject|checker.TypeFlagsNonPrimitive) != 0 {
 					return
@@ -1605,13 +1570,13 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
 					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
 						if arg := callExpr.Arguments.Nodes[0]; arg != nil {
-							checkPredicateFunction(ctx, arg, *opts.CheckTypePredicates)
+							checkPredicateFunction(ctx, arg, opts.CheckTypePredicates)
 						}
 					}
 				}
 
 				// Check type guard or assertion function calls only if CheckTypePredicates is enabled
-				if !*opts.CheckTypePredicates {
+				if !opts.CheckTypePredicates {
 					return
 				}
 

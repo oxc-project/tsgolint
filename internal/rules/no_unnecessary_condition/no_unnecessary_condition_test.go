@@ -921,7 +921,7 @@ declare const x: string[] | null;
 if (x) {
 }
       `,
-			Options:  NoUnnecessaryConditionOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: utils.Ref(true)},
+			Options:  NoUnnecessaryConditionOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: true},
 			TSConfig: "tsconfig.unstrict.json",
 		},
 
@@ -1086,7 +1086,7 @@ declare function assert(x: unknown): asserts x;
 
 assert(Math.random() > 0.5);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
@@ -1094,14 +1094,14 @@ declare function assert(x: unknown, y: unknown): asserts x;
 
 assert(Math.random() > 0.5, true);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
 declare function assert(x: unknown): asserts x;
 assert(true);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: false},
 		},
 		{
 			Code: `
@@ -1112,7 +1112,7 @@ class ThisAsserter {
 const thisAsserter: ThisAsserter = new ThisAsserter();
 thisAsserter.assertThis(true);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
@@ -1123,21 +1123,21 @@ class ThisAsserter {
 const thisAsserter: ThisAsserter = new ThisAsserter();
 thisAsserter.assertThis(Math.random());
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
 declare function assert(x: unknown): asserts x;
 assert(...[]);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
 declare function assert(x: unknown): asserts x;
 assert(...[], {});
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
@@ -1145,7 +1145,7 @@ declare function assertString(x: unknown): asserts x is string;
 declare const a: string;
 assertString(a);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: false},
 		},
 		{
 			Code: `
@@ -1153,21 +1153,21 @@ declare function isString(x: unknown): x is string;
 declare const a: string;
 isString(a);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: false},
 		},
 		{
 			Code: `
 declare function assertString(x: unknown): asserts x is string;
 assertString('falafel');
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
 			Code: `
 declare function isString(x: unknown): x is string;
 isString('falafel');
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 
 		// Mapped types
@@ -2382,7 +2382,7 @@ foo?.['bar']?.()?.toExponential();
 declare function assert(x: unknown): asserts x;
 assert(true);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -2390,7 +2390,7 @@ assert(true);
 declare function assert(x: unknown): asserts x;
 assert(false);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysFalsy"}},
 		},
 		{
@@ -2399,7 +2399,7 @@ declare function assert(x: unknown, y: unknown): asserts x;
 
 assert(true, Math.random() > 0.5);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -2407,7 +2407,7 @@ assert(true, Math.random() > 0.5);
 declare function assert(x: unknown): asserts x;
 assert({});
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -2416,7 +2416,7 @@ declare function assertsString(x: unknown): asserts x is string;
 declare const a: string;
 assertsString(a);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "typeGuardAlreadyIsType"}},
 		},
 		{
@@ -2425,7 +2425,7 @@ declare function isString(x: unknown): x is string;
 declare const a: string;
 isString(a);
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "typeGuardAlreadyIsType"}},
 		},
 		{
@@ -2434,7 +2434,7 @@ declare function isString(x: unknown): x is string;
 declare const a: string;
 isString('fa' + 'lafel');
       `,
-			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "typeGuardAlreadyIsType"}},
 		},
 
