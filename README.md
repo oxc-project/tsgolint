@@ -110,13 +110,12 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 45/59.
+Implemented 46/59.
 
 - [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
-- [ ] [no-unnecessary-condition](https://typescript-eslint.io/rules/no-unnecessary-condition)
 - [ ] [no-unnecessary-qualifier](https://typescript-eslint.io/rules/no-unnecessary-qualifier)
 - [ ] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
 - [ ] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
@@ -141,6 +140,7 @@ Implemented 45/59.
 - [x] [no-mixed-enums](https://typescript-eslint.io/rules/no-mixed-enums)
 - [x] [no-redundant-type-constituents](https://typescript-eslint.io/rules/no-redundant-type-constituents)
 - [x] [no-unnecessary-boolean-literal-compare](https://typescript-eslint.io/rules/no-unnecessary-boolean-literal-compare)
+- [x] [no-unnecessary-condition](https://typescript-eslint.io/rules/no-unnecessary-condition)
 - [x] [no-unnecessary-template-expression](https://typescript-eslint.io/rules/no-unnecessary-template-expression)
 - [x] [no-unnecessary-type-arguments](https://typescript-eslint.io/rules/no-unnecessary-type-arguments)
 - [x] [no-unnecessary-type-assertion](https://typescript-eslint.io/rules/no-unnecessary-type-assertion)

@@ -4,6 +4,7 @@
 package lsproto
 
 import "context"
+import "github.com/microsoft/typescript-go/internal/jsonrpc"
 import "github.com/microsoft/typescript-go/internal/lsp/lsproto"
 import "io"
 import _ "unsafe"
@@ -220,6 +221,8 @@ type CreateFilesParams = lsproto.CreateFilesParams
 type CustomClosingTagCompletion = lsproto.CustomClosingTagCompletion
 type CustomClosingTagCompletionOrNull = lsproto.CustomClosingTagCompletionOrNull
 type CustomClosingTagCompletionResponse = lsproto.CustomClosingTagCompletionResponse
+var CustomInitializeAPISessionInfo = lsproto.CustomInitializeAPISessionInfo
+type CustomInitializeAPISessionResponse = lsproto.CustomInitializeAPISessionResponse
 var CustomRunGCInfo = lsproto.CustomRunGCInfo
 var CustomSaveAllocProfileInfo = lsproto.CustomSaveAllocProfileInfo
 var CustomSaveHeapProfileInfo = lsproto.CustomSaveHeapProfileInfo
@@ -332,10 +335,6 @@ type DocumentSymbolResponse = lsproto.DocumentSymbolResponse
 type DocumentUri = lsproto.DocumentUri
 type DocumentUriOrNull = lsproto.DocumentUriOrNull
 type EditRangeWithInsertReplace = lsproto.EditRangeWithInsertReplace
-var ErrInvalidContentLength = lsproto.ErrInvalidContentLength
-var ErrInvalidHeader = lsproto.ErrInvalidHeader
-var ErrInvalidJSONRPCVersion = lsproto.ErrInvalidJSONRPCVersion
-var ErrNoContentLength = lsproto.ErrNoContentLength
 type ErrorCode = lsproto.ErrorCode
 const ErrorCodeContentModified = lsproto.ErrorCodeContentModified
 const ErrorCodeInternalError = lsproto.ErrorCodeInternalError
@@ -408,7 +407,6 @@ type HoverOrNull = lsproto.HoverOrNull
 type HoverParams = lsproto.HoverParams
 type HoverRegistrationOptions = lsproto.HoverRegistrationOptions
 type HoverResponse = lsproto.HoverResponse
-type ID = lsproto.ID
 type ImplementationClientCapabilities = lsproto.ImplementationClientCapabilities
 type ImplementationOptions = lsproto.ImplementationOptions
 type ImplementationParams = lsproto.ImplementationParams
@@ -420,6 +418,8 @@ const ImportKindDefault = lsproto.ImportKindDefault
 const ImportKindNamed = lsproto.ImportKindNamed
 const ImportKindNamespace = lsproto.ImportKindNamespace
 type InitializationOptions = lsproto.InitializationOptions
+type InitializeAPISessionParams = lsproto.InitializeAPISessionParams
+type InitializeAPISessionResult = lsproto.InitializeAPISessionResult
 type InitializeError = lsproto.InitializeError
 var InitializeInfo = lsproto.InitializeInfo
 type InitializeParams = lsproto.InitializeParams
@@ -477,7 +477,6 @@ const InsertTextModeAdjustIndentation = lsproto.InsertTextModeAdjustIndentation
 const InsertTextModeAsIs = lsproto.InsertTextModeAsIs
 type IntegerOrNull = lsproto.IntegerOrNull
 type IntegerOrString = lsproto.IntegerOrString
-type JSONRPCVersion = lsproto.JSONRPCVersion
 type LSPAnyOrNull = lsproto.LSPAnyOrNull
 type LanguageKind = lsproto.LanguageKind
 const LanguageKindABAP = lsproto.LanguageKindABAP
@@ -568,10 +567,6 @@ const MarkupKindPlainText = lsproto.MarkupKindPlainText
 type Message = lsproto.Message
 type MessageActionItem = lsproto.MessageActionItem
 type MessageActionItemOrNull = lsproto.MessageActionItemOrNull
-type MessageKind = lsproto.MessageKind
-const MessageKindNotification = lsproto.MessageKindNotification
-const MessageKindRequest = lsproto.MessageKindRequest
-const MessageKindResponse = lsproto.MessageKindResponse
 type MessageType = lsproto.MessageType
 const MessageTypeDebug = lsproto.MessageTypeDebug
 const MessageTypeError = lsproto.MessageTypeError
@@ -587,6 +582,7 @@ const MethodClientUnregisterCapability = lsproto.MethodClientUnregisterCapabilit
 const MethodCodeActionResolve = lsproto.MethodCodeActionResolve
 const MethodCodeLensResolve = lsproto.MethodCodeLensResolve
 const MethodCompletionItemResolve = lsproto.MethodCompletionItemResolve
+const MethodCustomInitializeAPISession = lsproto.MethodCustomInitializeAPISession
 const MethodCustomRunGC = lsproto.MethodCustomRunGC
 const MethodCustomSaveAllocProfile = lsproto.MethodCustomSaveAllocProfile
 const MethodCustomSaveHeapProfile = lsproto.MethodCustomSaveHeapProfile
@@ -696,9 +692,7 @@ func NewBaseReader(r io.Reader) *lsproto.BaseReader
 //go:linkname NewBaseWriter github.com/microsoft/typescript-go/internal/lsp/lsproto.NewBaseWriter
 func NewBaseWriter(w io.Writer) *lsproto.BaseWriter
 //go:linkname NewID github.com/microsoft/typescript-go/internal/lsp/lsproto.NewID
-func NewID(rawValue lsproto.IntegerOrString) *lsproto.ID
-//go:linkname NewIDString github.com/microsoft/typescript-go/internal/lsp/lsproto.NewIDString
-func NewIDString(str string) *lsproto.ID
+func NewID(rawValue lsproto.IntegerOrString) *jsonrpc.ID
 type NotebookCell = lsproto.NotebookCell
 type NotebookCellArrayChange = lsproto.NotebookCellArrayChange
 type NotebookCellKind = lsproto.NotebookCellKind
@@ -871,7 +865,6 @@ type ResourceOperationKind = lsproto.ResourceOperationKind
 const ResourceOperationKindCreate = lsproto.ResourceOperationKindCreate
 const ResourceOperationKindDelete = lsproto.ResourceOperationKindDelete
 const ResourceOperationKindRename = lsproto.ResourceOperationKindRename
-type ResponseError = lsproto.ResponseError
 type ResponseMessage = lsproto.ResponseMessage
 type RunGCResponse = lsproto.RunGCResponse
 type SaveAllocProfileResponse = lsproto.SaveAllocProfileResponse
