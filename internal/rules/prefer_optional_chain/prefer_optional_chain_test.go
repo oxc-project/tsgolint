@@ -9,6 +9,7 @@ import (
 )
 
 func TestPreferOptionalChainRule(t *testing.T) {
+	t.Parallel()
 	validCases := []rule_tester.ValidTestCase{
 		{Code: `foo || {};`},
 		{Code: `foo || ({} as any);`},
@@ -840,6 +841,78 @@ func TestPreferOptionalChainRule(t *testing.T) {
         declare const x: void | (() => void);
         x && x();
       `},
+		// https://github.com/oxc-project/oxc/issues/17968
+		// https://github.com/oxc-project/tsgolint/issues/585
+		{Code: `const isTagMode = output.mode === 'tags' || output.mode === 'tags-split';`},
+		{Code: `(tag.type === 'track-monitoring' || tag.type === 'simulated-track')`},
+		{Code: `!value || !context.parent.endDate || value <= context.parent.endDate`},
+		{Code: `if (markdownBody && markdownBody.scrollHeight > 150) { markdownBody.classList.add('max-height'); }`},
+		{Code: `
+			declare const options: {watch?: string | boolean | (string | boolean)[] | undefined};
+			export const w =  !(options.watch === true || options.watch === "true")
+		`},
+		{Code: `
+			type NotificationType = "banner" | "psa" | "error" | "message";
+			const type: NotificationType = "banner";
+			if (type === "banner" || type === "psa") {
+				console.log("is banner or psa");
+			}
+		`},
+		{Code: `
+			class Foo {}
+			class Bar {}
+			const value: Foo | Bar | null = new Foo();
+			if (value instanceof Foo || value instanceof Bar) {
+				console.log("is Foo or Bar");
+			}
+		`},
+		{Code: `
+			declare const language: string | undefined | null;
+			if (language === undefined || language === null) {
+				return "default";
+			}
+		`},
+		{Code: `
+			interface User {
+				verified?: boolean;
+			}
+			const user: User = {};
+			if (user.verified === false || user.verified === undefined) {
+				console.log("not verified");
+			}
+		`},
+		{Code: `
+			interface Event {
+				keySpacing: "toolong" | number[];
+			}
+			const event: Event = { keySpacing: [1, 2, 3] };
+			if (event.keySpacing !== "toolong" && event.keySpacing.length > 0) {
+				console.log("has key spacing data");
+			}
+		`},
+		{Code: `
+			const items: string[] | undefined = [];
+			if (items !== undefined && items.length > 0) {
+				console.log("has items");
+			}
+		`},
+		{Code: `
+			interface KeyboardEvent {
+				code: string;
+				key: string;
+			}
+			const event: KeyboardEvent = { code: "", key: "a" };
+			if (event.code === "" || event.code === undefined || event.key === "Unidentified") {
+				console.log("invalid event");
+			}
+		`},
+		{Code: `
+			const element = document.activeElement;
+			const isInteractive =
+				document.activeElement?.tagName === "INPUT" ||
+				document.activeElement?.tagName === "TEXTAREA" ||
+				document.activeElement?.tagName === "SELECT";
+		`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{

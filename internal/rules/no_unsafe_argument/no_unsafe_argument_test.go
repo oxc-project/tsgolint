@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoUnsafeArgumentRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeArgumentRule, []rule_tester.ValidTestCase{
 		{Code: `
 doesNotExist(1 as any);

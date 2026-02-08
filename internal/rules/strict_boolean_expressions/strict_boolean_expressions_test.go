@@ -8,6 +8,7 @@ import (
 )
 
 func TestStrictBooleanExpressionsRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(
 		fixtures.GetRootDir(),
 		"tsconfig.minimal.json",

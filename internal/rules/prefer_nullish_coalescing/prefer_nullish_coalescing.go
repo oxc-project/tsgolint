@@ -533,7 +533,12 @@ var PreferNullishCoalescingRule = rule.Rule{
 					// Check if the node is already wrapped in parentheses
 					if !ast.IsParenthesizedExpression(node.Parent) {
 						leftExpr := binExpr.Left
-						if ast.IsLogicalExpression(leftExpr) && !isLogicalOrOperator(leftExpr.AsBinaryExpression().Left) {
+						// Only apply special logical expression handling when leftExpr is
+						// directly a binary expression. If it's wrapped in parentheses,
+						// the parentheses already provide visual grouping, so we insert
+						// before binExpr.Left instead.
+						// See: https://github.com/oxc-project/tsgolint/issues/604
+						if ast.IsBinaryExpression(leftExpr) && ast.IsLogicalExpression(leftExpr) && !isLogicalOrOperator(leftExpr.AsBinaryExpression().Left) {
 							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, leftExpr.AsBinaryExpression().Right, "("))
 						} else {
 							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Left, "("))

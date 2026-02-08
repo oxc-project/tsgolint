@@ -213,6 +213,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'({})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -226,6 +227,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -239,6 +241,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'({foo: 'bar'})' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -486,7 +489,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -507,7 +510,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -523,7 +526,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -534,7 +537,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -555,7 +558,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -571,7 +574,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -582,7 +585,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -603,7 +606,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -619,7 +622,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -630,7 +633,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -651,7 +654,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -667,7 +670,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -931,7 +934,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on Promise in an object can cause unexpected behavior. Did you forget to await the promise?",
+      "description": "Using the spread operator on Promise in an object can cause unexpected behavior.",
+      "help": "Did you forget to await the promise before spreading it?",
       "id": "noPromiseSpreadInObject",
     },
     "range": {
@@ -951,7 +955,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the spread operator on Promise in an object can cause unexpected behavior. Did you forget to await the promise?",
+          "description": "Using the spread operator on Promise in an object can cause unexpected behavior.",
+          "help": "Did you forget to await the promise before spreading it?",
           "id": "noPromiseSpreadInObject",
         },
       },
@@ -961,7 +966,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior. Did you forget to call the function?",
+      "description": "Using the spread operator on a function without additional properties can cause unexpected behavior.",
+      "help": "Did you forget to call the function?",
       "id": "noFunctionSpreadInObject",
     },
     "range": {
@@ -974,7 +980,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on a Map in an object will result in an empty object. Did you mean to use \`Object.fromEntries(map)\` instead?",
+      "description": "Using the spread operator on a Map in an object will result in an empty object.",
+      "help": "Did you mean to use \`Object.fromEntries(map)\` instead?",
       "id": "noMapSpreadInObject",
     },
     "range": {
@@ -1015,7 +1022,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the spread operator on a Map in an object will result in an empty object. Did you mean to use \`Object.fromEntries(map)\` instead?",
+          "description": "Using the spread operator on a Map in an object will result in an empty object.",
+          "help": "Did you mean to use \`Object.fromEntries(map)\` instead?",
           "id": "noMapSpreadInObject",
         },
       },
@@ -1025,8 +1033,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
     "message": {
-      "description": "Using the spread operator on a string can mishandle special characters, as can \`.split("")\`.
-'- \`...\` produces Unicode code points, which will decompose complex emojis into individual emojis- .split("") produces UTF-16 code units, which breaks rich characters in many languagesConsider using \`Intl.Segmenter\` for locale-aware string decomposition.Otherwise, if you don't need to preserve emojis or other non-Ascii characters, disable this lint rule on this line or configure the 'allow' rule option.",
+      "description": "Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.",
+      "help": "Consider using \`Intl.Segmenter\` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.",
       "id": "noStringSpread",
     },
     "range": {
@@ -1892,7 +1900,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -1913,7 +1921,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -1929,7 +1937,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -1940,7 +1948,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -1961,7 +1969,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -1977,7 +1985,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -1988,7 +1996,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2009,7 +2017,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2025,7 +2033,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2036,7 +2044,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2057,7 +2065,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2073,7 +2081,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2084,7 +2092,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2105,7 +2113,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2121,7 +2129,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2489,6 +2497,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "'obj' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -2793,7 +2802,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2814,7 +2823,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2830,7 +2839,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2841,7 +2850,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2862,7 +2871,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2878,7 +2887,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2889,7 +2898,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2910,7 +2919,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2926,7 +2935,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2937,7 +2946,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -2958,7 +2967,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -2974,7 +2983,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3080,7 +3089,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3101,7 +3110,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3117,7 +3126,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3128,7 +3137,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3149,7 +3158,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3165,7 +3174,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3176,7 +3185,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3197,7 +3206,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3213,7 +3222,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3224,7 +3233,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3245,7 +3254,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3261,7 +3270,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3367,7 +3376,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3388,7 +3397,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3404,7 +3413,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3415,7 +3424,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3436,7 +3445,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3452,7 +3461,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3463,7 +3472,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3484,7 +3493,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3500,7 +3509,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3511,7 +3520,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3532,7 +3541,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3548,7 +3557,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3654,7 +3663,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3675,7 +3684,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3691,7 +3700,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3702,7 +3711,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3723,7 +3732,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3739,7 +3748,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3750,7 +3759,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3771,7 +3780,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3787,7 +3796,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3798,7 +3807,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
@@ -3819,7 +3828,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3835,7 +3844,7 @@ If your function does not access \`this\`, you can annotate it with \`this: void
           },
         ],
         "message": {
-          "description": "Promises must be awaited.",
+          "description": "Promises must be awaited, add void operator to ignore.",
           "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
           "id": "floatingVoid",
         },
@@ -3918,6 +3927,7 @@ exports[`TSGoLint E2E Snapshot Tests > should handle circular project references
     "kind": 0,
     "message": {
       "description": "'demo()' will use Object's default stringification format ('[object Object]') when stringified.",
+      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
       "id": "baseToString",
     },
     "range": {
@@ -4004,7 +4014,7 @@ exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `
     "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
     "kind": 0,
     "message": {
-      "description": "Promises must be awaited.",
+      "description": "Promises must be awaited, add await operator.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler.",
       "id": "floating",
     },

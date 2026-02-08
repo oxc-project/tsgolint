@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoUnsafeEnumComparisonRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeEnumComparisonRule, []rule_tester.ValidTestCase{
 		{Code: "'a' > 'b';"},
 		{Code: "'a' < 'b';"},

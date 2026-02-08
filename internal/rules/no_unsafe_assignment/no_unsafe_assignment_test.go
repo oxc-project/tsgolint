@@ -63,6 +63,7 @@ func assignmentTest(
 }
 
 func TestNoUnsafeAssignmentRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.noImplicitThis.json", t, &NoUnsafeAssignmentRule, []rule_tester.ValidTestCase{
 		{Code: "const x = 1;"},
 		{Code: "const x: number = 1;"},

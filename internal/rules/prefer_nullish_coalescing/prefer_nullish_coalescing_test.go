@@ -9,6 +9,7 @@ import (
 )
 
 func TestPreferNullishCoalescingRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferNullishCoalescingRule, []rule_tester.ValidTestCase{
 		{Code: `x !== undefined && x !== null ? x : y;`, Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: true}},
 		{Code: `
@@ -2763,6 +2764,74 @@ c ?? (c ? 1 : 2);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+				},
+			},
+		},
+		// https://github.com/oxc-project/tsgolint/issues/604
+		// Test for parenthesized logical expressions
+		{
+			Code: `
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = (a && b) || c || 'd';
+      `,
+			Output: []string{`
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = ((a && b) ?? c) || 'd';
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+				},
+			},
+		},
+		// https://github.com/oxc-project/tsgolint/issues/604
+		// Test for deeply nested parenthesized logical expressions
+		{
+			Code: `
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = ((a && b)) || c || 'd';
+      `,
+			Output: []string{`
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = (((a && b)) ?? c) || 'd';
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+				},
+			},
+		},
+		// https://github.com/oxc-project/tsgolint/issues/604
+		// Test for non-parenthesized logical expression
+		{
+			Code: `
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = a && b || c || 'd';
+      `,
+			Output: []string{`
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = a && (b ?? c) || 'd';
+      `, `
+declare let a: string | null;
+declare let b: string;
+declare let c: string;
+const x = a && (b ?? c) ?? 'd';
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
 				},
 			},
 		},

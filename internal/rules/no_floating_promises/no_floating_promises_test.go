@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoFloatingPromisesRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoFloatingPromisesRule, []rule_tester.ValidTestCase{
 		{Code: `
 async function test() {

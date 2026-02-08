@@ -86,6 +86,8 @@ func GetPathComponents(path string, currentDirectory string) []string
 func GetPathComponentsRelativeTo(from string, to string, options tspath.ComparePathsOptions) []string
 //go:linkname GetPathFromPathComponents github.com/microsoft/typescript-go/internal/tspath.GetPathFromPathComponents
 func GetPathFromPathComponents(pathComponents []string) string
+//go:linkname GetPossibleOriginalInputExtensionForExtension github.com/microsoft/typescript-go/internal/tspath.GetPossibleOriginalInputExtensionForExtension
+func GetPossibleOriginalInputExtensionForExtension(path string) []string
 //go:linkname GetRelativePathFromDirectory github.com/microsoft/typescript-go/internal/tspath.GetRelativePathFromDirectory
 func GetRelativePathFromDirectory(fromDirectory string, to string, options tspath.ComparePathsOptions) string
 //go:linkname GetRelativePathFromFile github.com/microsoft/typescript-go/internal/tspath.GetRelativePathFromFile
@@ -110,6 +112,8 @@ func HasTrailingDirectorySeparator(path string) bool
 func IsDeclarationFileName(fileName string) bool
 //go:linkname IsDiskPathRoot github.com/microsoft/typescript-go/internal/tspath.IsDiskPathRoot
 func IsDiskPathRoot(path string) bool
+//go:linkname IsDynamicFileName github.com/microsoft/typescript-go/internal/tspath.IsDynamicFileName
+func IsDynamicFileName(fileName string) bool
 //go:linkname IsExternalModuleNameRelative github.com/microsoft/typescript-go/internal/tspath.IsExternalModuleNameRelative
 func IsExternalModuleNameRelative(moduleName string) bool
 //go:linkname IsRootedDiskPath github.com/microsoft/typescript-go/internal/tspath.IsRootedDiskPath

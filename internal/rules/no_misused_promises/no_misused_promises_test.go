@@ -8,6 +8,7 @@ import (
 )
 
 func TestNoMisusedPromisesRule(t *testing.T) {
+	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMisusedPromisesRule, []rule_tester.ValidTestCase{
 		{Code: `
 if (true) {
@@ -1070,7 +1071,7 @@ declare const useCallback: <T extends (...args: unknown[]) => unknown>(
 ) => T;
 useCallback<ReturnsVoid | ReturnsPromiseVoid>(async () => {});
     `},
-	{Code: `if (process.env.SKIP) { return x; }`},
+		{Code: `if (process.env.SKIP) { return x; }`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
