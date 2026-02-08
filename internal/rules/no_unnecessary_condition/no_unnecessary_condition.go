@@ -400,6 +400,57 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return node != nil && node.Kind == ast.KindCallExpression
 		}
 
+		// Helper to check if an expression has optional chaining
+		var hasOptionalChain func(*ast.Node) bool
+		hasOptionalChain = func(n *ast.Node) bool {
+			if n == nil {
+				return false
+			}
+			n = ast.SkipParentheses(n)
+			// Check if this node has optional chaining
+			if isPropertyAccess(n) && n.AsPropertyAccessExpression().QuestionDotToken != nil {
+				return true
+			}
+			if isElementAccess(n) && n.AsElementAccessExpression().QuestionDotToken != nil {
+				return true
+			}
+			if isCallExpr(n) && n.AsCallExpression().QuestionDotToken != nil {
+				return true
+			}
+			// Check in the expression chain
+			if isPropertyAccess(n) {
+				return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
+			}
+			if isElementAccess(n) {
+				return hasOptionalChain(n.AsElementAccessExpression().Expression)
+			}
+			if isCallExpr(n) {
+				return hasOptionalChain(n.AsCallExpression().Expression)
+			}
+			return false
+		}
+
+		// Helper to check if an expression contains an element access
+		var containsElementAccess func(*ast.Node) bool
+		containsElementAccess = func(n *ast.Node) bool {
+			if n == nil {
+				return false
+			}
+			n = ast.SkipParentheses(n)
+			if isElementAccess(n) {
+				return true
+			}
+			// Check in property access chains
+			if isPropertyAccess(n) {
+				return containsElementAccess(n.AsPropertyAccessExpression().Expression)
+			}
+			// Check in call expressions
+			if isCallExpr(n) {
+				return containsElementAccess(n.AsCallExpression().Expression)
+			}
+			return false
+		}
+
 		checkCondition := func(node *ast.Node) {
 			skipNode := ast.SkipParentheses(node)
 
@@ -1259,57 +1310,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// In this case, the ?? is justified even if the type appears non-nullish
 					// EXCEPT when the element type itself is always nullish (e.g., null[])
 
-					// Helper to check if an expression has optional chaining
-					var hasOptionalChain func(*ast.Node) bool
-					hasOptionalChain = func(n *ast.Node) bool {
-						if n == nil {
-							return false
-						}
-						n = ast.SkipParentheses(n)
-						// Check if this node has optional chaining
-						if isPropertyAccess(n) && n.AsPropertyAccessExpression().QuestionDotToken != nil {
-							return true
-						}
-						if isElementAccess(n) && n.AsElementAccessExpression().QuestionDotToken != nil {
-							return true
-						}
-						if isCallExpr(n) && n.AsCallExpression().QuestionDotToken != nil {
-							return true
-						}
-						// Check in the expression chain
-						if isPropertyAccess(n) {
-							return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
-						}
-						if isElementAccess(n) {
-							return hasOptionalChain(n.AsElementAccessExpression().Expression)
-						}
-						if isCallExpr(n) {
-							return hasOptionalChain(n.AsCallExpression().Expression)
-						}
-						return false
-					}
-
-					// Helper to check if an expression contains an element access
-					var containsElementAccess func(*ast.Node) bool
-					containsElementAccess = func(n *ast.Node) bool {
-						if n == nil {
-							return false
-						}
-						n = ast.SkipParentheses(n)
-						if isElementAccess(n) {
-							return true
-						}
-						// Check in property access chains
-						if isPropertyAccess(n) {
-							return containsElementAccess(n.AsPropertyAccessExpression().Expression)
-						}
-						// Check in call expressions
-						if isCallExpr(n) {
-							return containsElementAccess(n.AsCallExpression().Expression)
-						}
-						return false
-					}
-
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
 						// Don't report on indeterminate types
@@ -1357,57 +1357,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check nullish coalescing assignment operator (??=)
 				if opKind == ast.KindQuestionQuestionEqualsToken {
-					// Helper to check if an expression has optional chaining
-					var hasOptionalChain func(*ast.Node) bool
-					hasOptionalChain = func(n *ast.Node) bool {
-						if n == nil {
-							return false
-						}
-						n = ast.SkipParentheses(n)
-						// Check if this node has optional chaining
-						if isPropertyAccess(n) && n.AsPropertyAccessExpression().QuestionDotToken != nil {
-							return true
-						}
-						if isElementAccess(n) && n.AsElementAccessExpression().QuestionDotToken != nil {
-							return true
-						}
-						if isCallExpr(n) && n.AsCallExpression().QuestionDotToken != nil {
-							return true
-						}
-						// Check in the expression chain
-						if isPropertyAccess(n) {
-							return hasOptionalChain(n.AsPropertyAccessExpression().Expression)
-						}
-						if isElementAccess(n) {
-							return hasOptionalChain(n.AsElementAccessExpression().Expression)
-						}
-						if isCallExpr(n) {
-							return hasOptionalChain(n.AsCallExpression().Expression)
-						}
-						return false
-					}
-
-					// Helper to check if an expression contains an element access
-					var containsElementAccess func(*ast.Node) bool
-					containsElementAccess = func(n *ast.Node) bool {
-						if n == nil {
-							return false
-						}
-						n = ast.SkipParentheses(n)
-						if isElementAccess(n) {
-							return true
-						}
-						// Check in property access chains
-						if isPropertyAccess(n) {
-							return containsElementAccess(n.AsPropertyAccessExpression().Expression)
-						}
-						// Check in call expressions
-						if isCallExpr(n) {
-							return containsElementAccess(n.AsCallExpression().Expression)
-						}
-						return false
-					}
-
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
 						// Don't report on indeterminate types
