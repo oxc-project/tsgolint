@@ -161,7 +161,7 @@ func getTypeParameterListRemovalRange(ctx rule.RuleContext, typeParameters []*as
 
 	text := ctx.SourceFile.Text()
 	start := typeParameters[index-1].End()
-	for i := typeParameters[index-1].End(); i < int(targetTypeParameter.Pos()) && i < len(text); i++ {
+	for i := typeParameters[index-1].End(); i < targetTypeParameter.Pos() && i < len(text); i++ {
 		if text[i] == ',' {
 			start = i
 			break
