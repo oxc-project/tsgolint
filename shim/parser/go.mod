@@ -2,7 +2,7 @@ module github.com/microsoft/typescript-go/shim/parser
 
 go 1.25.0
 
-require github.com/microsoft/typescript-go v0.0.0-20260207160609-5597f4c8ecf4
+require github.com/microsoft/typescript-go v0.0.0-20260209153434-ffa96d57ad5a
 
 require (
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e // indirect

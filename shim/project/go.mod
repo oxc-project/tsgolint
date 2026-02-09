@@ -3,7 +3,7 @@ module github.com/microsoft/typescript-go/shim/project
 go 1.25.0
 
 require (
-	github.com/microsoft/typescript-go v0.0.0-20260207160609-5597f4c8ecf4
+	github.com/microsoft/typescript-go v0.0.0-20260209153434-ffa96d57ad5a
 	github.com/zeebo/xxh3 v1.1.0
 )
 
