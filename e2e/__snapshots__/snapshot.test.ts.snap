@@ -165,6 +165,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unsafe-call",
   },
   {
+    "file_path": "fixtures/basic/rules/consistent-return/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Function 'maybe' expected a return value.",
+      "id": "missingReturnValue",
+    },
+    "range": {
+      "end": 81,
+      "pos": 74,
+    },
+    "rule": "consistent-return",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-array-delete/index.ts",
     "kind": 0,
     "message": {
@@ -2102,6 +2115,35 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
+          "end": 201,
+          "pos": 191,
+        },
+        "text": "",
+      },
+      {
+        "range": {
+          "end": 191,
+          "pos": 191,
+        },
+        "text": "!",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use a ! assertion to more succinctly remove null and undefined from the type.",
+      "id": "preferNonNullAssertion",
+    },
+    "range": {
+      "end": 201,
+      "pos": 186,
+    },
+    "rule": "non-nullable-type-assertion-style",
+  },
+  {
+    "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
+    "fixes": [
+      {
+        "range": {
           "end": 276,
           "pos": 266,
         },
@@ -2912,6 +2954,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
     ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Function 'handleStatus' expected a return value.",
+      "id": "missingReturnValue",
+    },
+    "range": {
+      "end": 327,
+      "pos": 120,
+    },
+    "rule": "consistent-return",
   },
   {
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",

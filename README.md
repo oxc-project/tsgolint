@@ -110,9 +110,8 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 48/59.
+Implemented 49/59.
 
-- [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
@@ -124,6 +123,7 @@ Implemented 48/59.
 - [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
+- [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
 - [x] [no-base-to-string](https://typescript-eslint.io/rules/no-base-to-string)
 - [x] [no-confusing-void-expression](https://typescript-eslint.io/rules/no-confusing-void-expression)
