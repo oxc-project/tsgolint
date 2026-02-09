@@ -1499,6 +1499,76 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
   },
   {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Type parameter T is used only once in the function signature.",
+      "id": "sole",
+    },
+    "range": {
+      "end": 91,
+      "pos": 90,
+    },
+    "rule": "no-unnecessary-type-parameters",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 110,
+              "pos": 109,
+            },
+            "text": "unknown",
+          },
+          {
+            "range": {
+              "end": 139,
+              "pos": 138,
+            },
+            "text": "unknown",
+          },
+          {
+            "range": {
+              "end": 92,
+              "pos": 89,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Type parameter T is used only once in the function signature.",
+          "id": "sole",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "id": "unsafeToAnyTypeAssertion",
+    },
+    "range": {
+      "end": 134,
+      "pos": 122,
+    },
+    "rule": "no-unsafe-type-assertion",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "id": "unsafeOfAnyTypeAssertion",
+    },
+    "range": {
+      "end": 139,
+      "pos": 122,
+    },
+    "rule": "no-unsafe-type-assertion",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-unsafe-argument/index.ts",
     "kind": 0,
     "message": {

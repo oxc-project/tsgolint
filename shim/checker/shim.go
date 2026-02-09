@@ -465,6 +465,25 @@ type CompositeTypeCacheIdentity = checker.CompositeTypeCacheIdentity
 type CompositeTypeMapper = checker.CompositeTypeMapper
 type ConditionalRoot = checker.ConditionalRoot
 type ConditionalType = checker.ConditionalType
+type extra_ConditionalType struct {
+  checker.ConstrainedType
+  root *checker.ConditionalRoot
+  checkType *checker.Type
+  extendsType *checker.Type
+  resolvedTrueType *checker.Type
+  resolvedFalseType *checker.Type
+  resolvedInferredTrueType *checker.Type
+  resolvedDefaultConstraint *checker.Type
+  resolvedConstraintOfDistributive *checker.Type
+  mapper *checker.TypeMapper
+  combinedMapper *checker.TypeMapper
+}
+func ConditionalType_checkType(v *checker.ConditionalType) *checker.Type {
+  return ((*extra_ConditionalType)(unsafe.Pointer(v))).checkType
+}
+func ConditionalType_extendsType(v *checker.ConditionalType) *checker.Type {
+  return ((*extra_ConditionalType)(unsafe.Pointer(v))).extendsType
+}
 type ConstrainedType = checker.ConstrainedType
 type ContainingSymbolLinks = checker.ContainingSymbolLinks
 type ContextFlags = checker.ContextFlags
@@ -554,6 +573,18 @@ type IndexInfo = checker.IndexInfo
 type IndexSymbolLinks = checker.IndexSymbolLinks
 type IndexType = checker.IndexType
 type IndexedAccessType = checker.IndexedAccessType
+type extra_IndexedAccessType struct {
+  checker.ConstrainedType
+  objectType *checker.Type
+  indexType *checker.Type
+  accessFlags checker.AccessFlags
+}
+func IndexedAccessType_objectType(v *checker.IndexedAccessType) *checker.Type {
+  return ((*extra_IndexedAccessType)(unsafe.Pointer(v))).objectType
+}
+func IndexedAccessType_indexType(v *checker.IndexedAccessType) *checker.Type {
+  return ((*extra_IndexedAccessType)(unsafe.Pointer(v))).indexType
+}
 type InferenceContext = checker.InferenceContext
 type InferenceContextInfo = checker.InferenceContextInfo
 type InferenceFlags = checker.InferenceFlags
@@ -678,6 +709,26 @@ type LiteralType = checker.LiteralType
 const MAX_REVERSE_MAPPED_NESTING_INSPECTION_DEPTH = checker.MAX_REVERSE_MAPPED_NESTING_INSPECTION_DEPTH
 type MappedSymbolLinks = checker.MappedSymbolLinks
 type MappedType = checker.MappedType
+type extra_MappedType struct {
+  checker.ObjectType
+  declaration *ast.MappedTypeNode
+  typeParameter *checker.Type
+  constraintType *checker.Type
+  nameType *checker.Type
+  templateType *checker.Type
+  modifiersType *checker.Type
+  resolvedApparentType *checker.Type
+  containsError bool
+}
+func MappedType_typeParameter(v *checker.MappedType) *checker.Type {
+  return ((*extra_MappedType)(unsafe.Pointer(v))).typeParameter
+}
+func MappedType_constraintType(v *checker.MappedType) *checker.Type {
+  return ((*extra_MappedType)(unsafe.Pointer(v))).constraintType
+}
+func MappedType_templateType(v *checker.MappedType) *checker.Type {
+  return ((*extra_MappedType)(unsafe.Pointer(v))).templateType
+}
 type MappedTypeModifiers = checker.MappedTypeModifiers
 const MappedTypeModifiersExcludeOptional = checker.MappedTypeModifiersExcludeOptional
 const MappedTypeModifiersExcludeReadonly = checker.MappedTypeModifiersExcludeReadonly
@@ -862,6 +913,9 @@ func Signature_parameters(v *checker.Signature) []*ast.Symbol {
 func Signature_declaration(v *checker.Signature) *ast.Node {
   return ((*extra_Signature)(unsafe.Pointer(v))).declaration
 }
+func Signature_resolvedTypePredicate(v *checker.Signature) *checker.TypePredicate {
+  return ((*extra_Signature)(unsafe.Pointer(v))).resolvedTypePredicate
+}
 type SignatureCheckMode = checker.SignatureCheckMode
 const SignatureCheckModeBivariantCallback = checker.SignatureCheckModeBivariantCallback
 const SignatureCheckModeCallback = checker.SignatureCheckModeCallback
@@ -939,6 +993,9 @@ type extra_TupleType struct {
 }
 func TupleType_combinedFlags(v *checker.TupleType) checker.ElementFlags {
   return ((*extra_TupleType)(unsafe.Pointer(v))).combinedFlags
+}
+func TupleType_readonly(v *checker.TupleType) bool {
+  return ((*extra_TupleType)(unsafe.Pointer(v))).readonly
 }
 type Type = checker.Type
 type extra_Type struct {
@@ -1224,7 +1281,7 @@ const WideningKindGeneratorYield = checker.WideningKindGeneratorYield
 const WideningKindNormal = checker.WideningKindNormal
 //go:linkname GetFunctionFlags github.com/microsoft/typescript-go/internal/checker.getFunctionFlags
 func GetFunctionFlags(node *ast.Node) checker.FunctionFlags
-//go:linkname IsNonDeferredTypeReference github.com/microsoft/typescript-go/internal/checker.isNonDeferredTypeReference
-func IsNonDeferredTypeReference(t *checker.Type) bool
 //go:linkname GetMappedTypeModifiers github.com/microsoft/typescript-go/internal/checker.getMappedTypeModifiers
 func GetMappedTypeModifiers(t *checker.Type) checker.MappedTypeModifiers
+//go:linkname IsNonDeferredTypeReference github.com/microsoft/typescript-go/internal/checker.isNonDeferredTypeReference
+func IsNonDeferredTypeReference(t *checker.Type) bool
