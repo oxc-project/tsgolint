@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "no_invalid_void_type_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowAsThisParameter": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether a `this` parameter of a function may be `void`."
+        },
+        "allowInGenericTypeArguments": {
+          "description": "Whether `void` can be used as a valid value for generic type parameters.",
+          "default": true,
+          "oneOf": [
+            {
+              "type": "boolean",
+              "description": "Whether `void` can be used as a valid value for all generic type parameters."
+            },
+            {
+              "type": "array",
+              "description": "Allowlist of types that may accept `void` as a generic type parameter.",
+              "items": {
+                "type": "string"
+              },
+              "minItems": 1
+            }
+          ]
+        }
+      }
+    }
+  }
+}

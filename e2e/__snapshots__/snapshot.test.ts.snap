@@ -874,6 +874,95 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-implied-eval",
   },
   {
+    "file_path": "fixtures/basic/rules/no-invalid-void-type/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "void is only valid as a return type or generic type argument.",
+      "id": "invalidVoidNotReturnOrGeneric",
+    },
+    "range": {
+      "end": 82,
+      "pos": 78,
+    },
+    "rule": "no-invalid-void-type",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-invalid-void-type/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "void is not valid as a constituent in a union type",
+      "id": "invalidVoidUnionConstituent",
+    },
+    "range": {
+      "end": 118,
+      "pos": 114,
+    },
+    "rule": "no-invalid-void-type",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-invalid-void-type/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "void is only valid as a return type or generic type argument.",
+      "id": "invalidVoidNotReturnOrGeneric",
+    },
+    "range": {
+      "end": 154,
+      "pos": 150,
+    },
+    "rule": "no-invalid-void-type",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-invalid-void-type/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "void is only valid as a return type or generic type argument.",
+      "id": "invalidVoidNotReturnOrGeneric",
+    },
+    "range": {
+      "end": 234,
+      "pos": 230,
+    },
+    "rule": "no-invalid-void-type",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-invalid-void-type/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Type parameter T is used only once in the function signature.",
+      "id": "sole",
+    },
+    "range": {
+      "end": 186,
+      "pos": 185,
+    },
+    "rule": "no-unnecessary-type-parameters",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 192,
+              "pos": 191,
+            },
+            "text": "unknown",
+          },
+          {
+            "range": {
+              "end": 187,
+              "pos": 184,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Type parameter T is used only once in the function signature.",
+          "id": "sole",
+        },
+      },
+    ],
+  },
+  {
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
     "kind": 0,
     "message": {

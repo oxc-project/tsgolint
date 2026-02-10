@@ -31,6 +31,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_floating_promises"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_for_in_array"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_implied_eval"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_invalid_void_type"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_meaningless_void_operator"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_misused_promises"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_misused_spread"
@@ -166,6 +167,7 @@ var allRules = []rule.Rule{
 	no_floating_promises.NoFloatingPromisesRule,
 	no_for_in_array.NoForInArrayRule,
 	no_implied_eval.NoImpliedEvalRule,
+	no_invalid_void_type.NoInvalidVoidTypeRule,
 	no_meaningless_void_operator.NoMeaninglessVoidOperatorRule,
 	no_misused_promises.NoMisusedPromisesRule,
 	no_misused_spread.NoMisusedSpreadRule,

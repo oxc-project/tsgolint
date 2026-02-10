@@ -12,7 +12,10 @@ const __dirname = dirname(__filename);
 const ROOT_DIR = resolve(__dirname, '..');
 const E2E_DIR = __dirname;
 const FIXTURES_DIR = join(E2E_DIR, 'fixtures');
-const TSGOLINT_BIN = join(ROOT_DIR, `tsgolint${process.platform === 'win32' ? '.exe' : ''}`);
+const TSGOLINT_BIN = join(
+  ROOT_DIR,
+  `tsgolint${process.platform === 'win32' ? '.exe' : ''}`,
+);
 
 const ALL_RULES = [
   'await-thenable',
@@ -25,6 +28,7 @@ const ALL_RULES = [
   'no-floating-promises',
   'no-for-in-array',
   'no-implied-eval',
+  'no-invalid-void-type',
   'no-meaningless-void-operator',
   'no-misused-promises',
   'no-misused-spread',
@@ -177,7 +181,12 @@ function sortDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
 }
 
 async function getTestFiles(testPath: string): Promise<string[]> {
-  const patterns = [`${testPath}/**/*.ts`, `${testPath}/**/*.tsx`, `${testPath}/**/*.mts`, `${testPath}/**/*.cts`];
+  const patterns = [
+    `${testPath}/**/*.ts`,
+    `${testPath}/**/*.tsx`,
+    `${testPath}/**/*.mts`,
+    `${testPath}/**/*.cts`,
+  ];
   const allFiles: string[] = [];
 
   for (const pattern of patterns) {
@@ -198,9 +207,10 @@ function resolveTestFilePath(relativePath: string): string {
 
 function generateConfig(
   files: string[],
-  rules:
-    readonly ((typeof ALL_RULES)[number] | { name: (typeof ALL_RULES)[number]; options: Record<string, unknown> })[] =
-      ALL_RULES,
+  rules: readonly (
+    | (typeof ALL_RULES)[number]
+    | { name: (typeof ALL_RULES)[number]; options: Record<string, unknown> }
+  )[] = ALL_RULES,
   options?: {
     reportSyntactic?: boolean;
     reportSemantic?: boolean;
@@ -232,8 +242,12 @@ function generateConfig(
         ),
       },
     ],
-    ...(options?.reportSyntactic !== undefined && { report_syntactic: options.reportSyntactic }),
-    ...(options?.reportSemantic !== undefined && { report_semantic: options.reportSemantic }),
+    ...(options?.reportSyntactic !== undefined && {
+      report_syntactic: options.reportSyntactic,
+    }),
+    ...(options?.reportSemantic !== undefined && {
+      report_semantic: options.reportSemantic,
+    }),
   } as const;
   return JSON.stringify(config);
 }
@@ -251,7 +265,9 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       const entryPath = join(rulesDir, entry);
       const stat = await fs.stat(entryPath);
       if (!stat.isDirectory()) continue;
-      const ruleFileStat = await fs.stat(join(entryPath, `${entry}.go`)).catch(() => null);
+      const ruleFileStat = await fs
+        .stat(join(entryPath, `${entry}.go`))
+        .catch(() => null);
       if (ruleFileStat?.isFile()) {
         fileSystemRulesList.push(entry.replace(/_/g, '-'));
       }
@@ -271,10 +287,14 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     const env = { ...process.env, GOMAXPROCS: '1' };
 
     let output: Buffer;
-    output = execFileSync(TSGOLINT_BIN, ['headless', '-fix', '-fix-suggestions'], {
-      input: config,
-      env,
-    });
+    output = execFileSync(
+      TSGOLINT_BIN,
+      ['headless', '-fix', '-fix-suggestions'],
+      {
+        input: config,
+        env,
+      },
+    );
 
     let diagnostics = parseHeadlessOutput(output);
     diagnostics = sortDiagnostics(diagnostics);
@@ -285,7 +305,9 @@ describe('TSGoLint E2E Snapshot Tests', () => {
   });
 
   it('supports passing rule config', async () => {
-    const testFile = resolveTestFilePath('basic/rules/no-floating-promises/void.ts');
+    const testFile = resolveTestFilePath(
+      'basic/rules/no-floating-promises/void.ts',
+    );
     const config = (ignoreVoid: boolean) => ({
       version: 2,
       configs: [
@@ -329,7 +351,13 @@ describe('TSGoLint E2E Snapshot Tests', () => {
       // but TypeScript program has forward slashes, causing:
       // "panic: Expected file 'E:\oxc\...\index.ts' to be in program"
 
-      const testFile = join(FIXTURES_DIR, 'basic', 'rules', 'no-floating-promises', 'index.ts');
+      const testFile = join(
+        FIXTURES_DIR,
+        'basic',
+        'rules',
+        'no-floating-promises',
+        'index.ts',
+      );
 
       // On Windows, convert forward slashes to backslashes to simulate Rust input
       const rustStylePath = testFile.replace(/\//g, '\\');
@@ -452,7 +480,9 @@ promise;
     diagnostics = sortDiagnostics(diagnostics);
 
     expect(diagnostics.length).toBe(1);
-    expect(diagnostics[0].kind == DiagnosticKind.Rule && diagnostics[0].rule).toBe('no-floating-promises');
+    expect(
+      diagnostics[0].kind == DiagnosticKind.Rule && diagnostics[0].rule,
+    ).toBe('no-floating-promises');
     expect(diagnostics[0].file_path).toContain('original.ts');
   });
 
@@ -471,7 +501,10 @@ console.log(x);
       configs: [
         {
           file_paths: [testFile],
-          rules: [{ name: 'no-floating-promises' }, { name: 'no-unsafe-assignment' }],
+          rules: [
+            { name: 'no-floating-promises' },
+            { name: 'no-unsafe-assignment' },
+          ],
         },
       ],
       source_overrides: {
