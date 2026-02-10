@@ -24,6 +24,7 @@
       "getContextualType",
       "getAwaitedType",
       "getTypeOfSymbol",
+      "getTypeOfPropertyOfType",
       "getReturnTypeOfSignature",
       "getContextualTypeForArgumentAtIndex",
       "getResolvedSignature",
@@ -37,7 +38,9 @@
       "getDeclarationOfAliasSymbol",
       "getTypePredicateOfSignature",
       "GetNonNullableType",
-      "IsNullableType"
+      "IsNullableType",
+      "getIndexInfosOfType",
+      "isReadonlySymbol"
     ]
   },
   "ExtraFields": {

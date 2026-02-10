@@ -110,13 +110,12 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 54/59.
+Implemented 55/59.
 
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
-- [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
@@ -156,6 +155,7 @@ Implemented 54/59.
 - [x] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
 - [x] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
+- [x] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
 - [x] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)

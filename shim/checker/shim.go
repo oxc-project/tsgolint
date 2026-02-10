@@ -81,6 +81,8 @@ type Checker = checker.Checker
 func Checker_getImmediateAliasedSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Symbol
 //go:linkname Checker_getResolvedSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getResolvedSignature
 func Checker_getResolvedSignature(recv *checker.Checker, node *ast.Node, candidatesOutArray *[]*checker.Signature, checkMode checker.CheckMode) *checker.Signature
+//go:linkname Checker_isReadonlySymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).isReadonlySymbol
+func Checker_isReadonlySymbol(recv *checker.Checker, symbol *ast.Symbol) bool
 //go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
 func Checker_IsDeprecatedDeclaration(recv *checker.Checker, declaration *ast.Node) bool
 //go:linkname Checker_getDeclarationOfAliasSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getDeclarationOfAliasSymbol
@@ -97,8 +99,12 @@ func Checker_IsNullableType(recv *checker.Checker, t *checker.Type) bool
 func Checker_getPropertiesOfType(recv *checker.Checker, t *checker.Type) []*ast.Symbol
 //go:linkname Checker_getPropertyOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getPropertyOfType
 func Checker_getPropertyOfType(recv *checker.Checker, t *checker.Type, name string) *ast.Symbol
+//go:linkname Checker_getTypeOfPropertyOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfPropertyOfType
+func Checker_getTypeOfPropertyOfType(recv *checker.Checker, t *checker.Type, name string) *checker.Type
 //go:linkname Checker_getSignaturesOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getSignaturesOfType
 func Checker_getSignaturesOfType(recv *checker.Checker, t *checker.Type, kind checker.SignatureKind) []*checker.Signature
+//go:linkname Checker_getIndexInfosOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getIndexInfosOfType
+func Checker_getIndexInfosOfType(recv *checker.Checker, t *checker.Type) []*checker.IndexInfo
 //go:linkname Checker_getIndexTypeOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getIndexTypeOfType
 func Checker_getIndexTypeOfType(recv *checker.Checker, t *checker.Type, keyType *checker.Type) *checker.Type
 //go:linkname Checker_getBaseTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseTypes

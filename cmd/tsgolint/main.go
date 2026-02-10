@@ -60,6 +60,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_optional_chain"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_promise_reject_errors"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_readonly"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_readonly_parameter_types"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_reduce_type_parameter"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_regexp_exec"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_return_this_type"
@@ -193,6 +194,7 @@ var allRules = []rule.Rule{
 	prefer_optional_chain.PreferOptionalChainRule,
 	prefer_nullish_coalescing.PreferNullishCoalescingRule,
 	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
+	prefer_readonly_parameter_types.PreferReadonlyParameterTypesRule,
 	prefer_regexp_exec.PreferRegexpExecRule,
 	prefer_readonly.PreferReadonlyRule,
 	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,

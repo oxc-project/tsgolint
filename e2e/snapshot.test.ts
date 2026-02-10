@@ -55,6 +55,7 @@ const ALL_RULES = [
   'prefer-promise-reject-errors',
   'prefer-regexp-exec',
   'prefer-readonly',
+  'prefer-readonly-parameter-types',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
   'prefer-string-starts-ends-with',

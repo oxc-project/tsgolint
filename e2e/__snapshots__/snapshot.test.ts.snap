@@ -2598,6 +2598,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "prefer-promise-reject-errors",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-readonly-parameter-types/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Parameter should be a readonly type.",
+      "id": "shouldBeReadonly",
+    },
+    "range": {
+      "end": 81,
+      "pos": 62,
+    },
+    "rule": "prefer-readonly-parameter-types",
+  },
+  {
     "file_path": "fixtures/basic/rules/prefer-readonly/index.ts",
     "fixes": [
       {
@@ -2650,6 +2663,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Parameter should be a readonly type.",
+      "id": "shouldBeReadonly",
+    },
+    "range": {
+      "end": 271,
+      "pos": 258,
+    },
+    "rule": "prefer-readonly-parameter-types",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
     "fixes": [
       {
         "range": {
@@ -2676,6 +2702,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 330,
     },
     "rule": "prefer-reduce-type-parameter",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-regexp-exec/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Parameter should be a readonly type.",
+      "id": "shouldBeReadonly",
+    },
+    "range": {
+      "end": 255,
+      "pos": 245,
+    },
+    "rule": "prefer-readonly-parameter-types",
   },
   {
     "file_path": "fixtures/basic/rules/prefer-regexp-exec/index.ts",
@@ -2800,6 +2839,32 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 188,
     },
     "rule": "prefer-string-starts-ends-with",
+  },
+  {
+    "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Parameter should be a readonly type.",
+      "id": "shouldBeReadonly",
+    },
+    "range": {
+      "end": 183,
+      "pos": 180,
+    },
+    "rule": "prefer-readonly-parameter-types",
+  },
+  {
+    "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Parameter should be a readonly type.",
+      "id": "shouldBeReadonly",
+    },
+    "range": {
+      "end": 331,
+      "pos": 328,
+    },
+    "rule": "prefer-readonly-parameter-types",
   },
   {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",

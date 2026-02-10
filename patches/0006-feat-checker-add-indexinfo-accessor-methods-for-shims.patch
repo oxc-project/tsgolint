@@ -1,0 +1,31 @@
+From b2d8a45ebf40cb3b274345c62aa94e9dc32db1f8 Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Tue, 10 Feb 2026 19:52:02 +0000
+Subject: [PATCH] feat(checker): add IndexInfo accessor methods for shims
+
+---
+ internal/checker/types.go | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/internal/checker/types.go b/internal/checker/types.go
+index 3e2aafbd4c..946983577d 100644
+--- a/internal/checker/types.go
++++ b/internal/checker/types.go
+@@ -1201,6 +1201,14 @@ type IndexInfo struct {
+ 	components  []*ast.Node // ElementWithComputedPropertyName
+ }
+ 
++func (indexInfo *IndexInfo) ValueType() *Type {
++	return indexInfo.valueType
++}
++
++func (indexInfo *IndexInfo) IsReadonly() bool {
++	return indexInfo.isReadonly
++}
++
+ /**
+  * Ternary values are defined such that
+  * x & y picks the lesser in the order False < Unknown < Maybe < True, and
+-- 
+2.50.1 (Apple Git-155)
+
