@@ -58,6 +58,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_optional_chain"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_promise_reject_errors"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_reduce_type_parameter"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_regexp_exec"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_return_this_type"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_string_starts_ends_with"
 	"github.com/typescript-eslint/tsgolint/internal/rules/promise_function_async"
@@ -187,6 +188,7 @@ var allRules = []rule.Rule{
 	prefer_optional_chain.PreferOptionalChainRule,
 	prefer_nullish_coalescing.PreferNullishCoalescingRule,
 	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
+	prefer_regexp_exec.PreferRegexpExecRule,
 	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,
 	prefer_return_this_type.PreferReturnThisTypeRule,
 	prefer_string_starts_ends_with.PreferStringStartsEndsWithRule,

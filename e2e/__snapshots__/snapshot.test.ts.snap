@@ -2590,6 +2590,50 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "prefer-reduce-type-parameter",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-regexp-exec/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 104,
+          "pos": 85,
+        },
+        "text": "/thing/.exec(text)",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use the \`RegExp#exec()\` method instead.",
+      "id": "regExpExecOverStringMatch",
+    },
+    "range": {
+      "end": 95,
+      "pos": 90,
+    },
+    "rule": "prefer-regexp-exec",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-regexp-exec/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 178,
+          "pos": 160,
+        },
+        "text": "RegExp(search).exec(text)",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use the \`RegExp#exec()\` method instead.",
+      "id": "regExpExecOverStringMatch",
+    },
+    "range": {
+      "end": 170,
+      "pos": 165,
+    },
+    "rule": "prefer-regexp-exec",
+  },
+  {
     "file_path": "fixtures/basic/rules/prefer-return-this-type/index.ts",
     "fixes": [
       {

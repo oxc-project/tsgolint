@@ -51,6 +51,7 @@ const ALL_RULES = [
   'prefer-nullish-coalescing',
   'prefer-optional-chain',
   'prefer-promise-reject-errors',
+  'prefer-regexp-exec',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
   'prefer-string-starts-ends-with',
