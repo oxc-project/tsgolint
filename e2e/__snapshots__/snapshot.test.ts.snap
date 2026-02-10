@@ -178,6 +178,35 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "consistent-return",
   },
   {
+    "file_path": "fixtures/basic/rules/dot-notation/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 92,
+          "pos": 92,
+        },
+        "text": ".",
+      },
+      {
+        "range": {
+          "end": 99,
+          "pos": 92,
+        },
+        "text": "bar",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "["bar"] is better written in dot notation.",
+      "id": "useDot",
+    },
+    "range": {
+      "end": 98,
+      "pos": 93,
+    },
+    "rule": "dot-notation",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-array-delete/index.ts",
     "kind": 0,
     "message": {
@@ -1921,6 +1950,35 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 217,
     },
     "rule": "no-unnecessary-condition",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 191,
+          "pos": 191,
+        },
+        "text": ".",
+      },
+      {
+        "range": {
+          "end": 198,
+          "pos": 191,
+        },
+        "text": "key",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "["key"] is better written in dot notation.",
+      "id": "useDot",
+    },
+    "range": {
+      "end": 197,
+      "pos": 192,
+    },
+    "rule": "dot-notation",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",

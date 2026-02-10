@@ -20,6 +20,7 @@ const TSGOLINT_BIN = join(
 const ALL_RULES = [
   'await-thenable',
   'consistent-return',
+  'dot-notation',
   'no-array-delete',
   'no-base-to-string',
   'no-confusing-void-expression',
