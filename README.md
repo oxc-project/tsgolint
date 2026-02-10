@@ -110,13 +110,12 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 53/59.
+Implemented 54/59.
 
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
-- [ ] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
 - [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
@@ -151,6 +150,7 @@ Implemented 53/59.
 - [x] [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
+- [x] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
 - [x] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
 - [x] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
 - [x] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)

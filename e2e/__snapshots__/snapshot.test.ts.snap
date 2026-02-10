@@ -2256,6 +2256,43 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "only-throw-error",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-find/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Prefer .find(...) instead of .filter(...)[0].",
+      "id": "preferFind",
+    },
+    "range": {
+      "end": 51,
+      "pos": 12,
+    },
+    "rule": "prefer-find",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 28,
+              "pos": 22,
+            },
+            "text": "find",
+          },
+          {
+            "range": {
+              "end": 51,
+              "pos": 48,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Prefer .find(...) instead of .filter(...)[0].",
+          "id": "preferFind",
+        },
+      },
+    ],
+  },
+  {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {

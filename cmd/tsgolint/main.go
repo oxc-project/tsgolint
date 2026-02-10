@@ -54,6 +54,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_unary_minus"
 	"github.com/typescript-eslint/tsgolint/internal/rules/non_nullable_type_assertion_style"
 	"github.com/typescript-eslint/tsgolint/internal/rules/only_throw_error"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_find"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_includes"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_nullish_coalescing"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_optional_chain"
@@ -187,6 +188,7 @@ var allRules = []rule.Rule{
 	no_unsafe_unary_minus.NoUnsafeUnaryMinusRule,
 	non_nullable_type_assertion_style.NonNullableTypeAssertionStyleRule,
 	only_throw_error.OnlyThrowErrorRule,
+	prefer_find.PreferFindRule,
 	prefer_includes.PreferIncludesRule,
 	prefer_optional_chain.PreferOptionalChainRule,
 	prefer_nullish_coalescing.PreferNullishCoalescingRule,
