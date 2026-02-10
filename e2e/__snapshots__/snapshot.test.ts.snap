@@ -2539,6 +2539,35 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "prefer-promise-reject-errors",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-readonly/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 26,
+          "pos": 26,
+        },
+        "text": "readonly ",
+      },
+      {
+        "range": {
+          "end": 31,
+          "pos": 31,
+        },
+        "text": ": number",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Member 'value' is never reassigned; mark it as \`readonly\`.",
+      "id": "preferReadonly",
+    },
+    "range": {
+      "end": 31,
+      "pos": 18,
+    },
+    "rule": "prefer-readonly",
+  },
+  {
     "file_path": "fixtures/basic/rules/prefer-reduce-type-parameter/index.ts",
     "fixes": [
       {
