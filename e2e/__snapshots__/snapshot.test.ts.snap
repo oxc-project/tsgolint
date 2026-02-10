@@ -2612,6 +2612,64 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "prefer-return-this-type",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-string-starts-ends-with/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 131,
+          "pos": 123,
+        },
+        "text": ".startsWith(",
+      },
+      {
+        "range": {
+          "end": 134,
+          "pos": 134,
+        },
+        "text": ")",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use 'String#startsWith' method instead.",
+      "id": "preferStartsWith",
+    },
+    "range": {
+      "end": 134,
+      "pos": 122,
+    },
+    "rule": "prefer-string-starts-ends-with",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-string-starts-ends-with/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 204,
+          "pos": 189,
+        },
+        "text": ".endsWith(",
+      },
+      {
+        "range": {
+          "end": 209,
+          "pos": 209,
+        },
+        "text": ")",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use 'String#endsWith' method instead.",
+      "id": "preferEndsWith",
+    },
+    "range": {
+      "end": 209,
+      "pos": 188,
+    },
+    "rule": "prefer-string-starts-ends-with",
+  },
+  {
     "file_path": "fixtures/basic/rules/promise-function-async/index.ts",
     "fixes": [
       {

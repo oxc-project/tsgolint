@@ -53,6 +53,7 @@ const ALL_RULES = [
   'prefer-promise-reject-errors',
   'prefer-reduce-type-parameter',
   'prefer-return-this-type',
+  'prefer-string-starts-ends-with',
   'promise-function-async',
   'related-getter-setter-pairs',
   'require-array-sort-compare',

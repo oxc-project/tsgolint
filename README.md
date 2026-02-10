@@ -110,7 +110,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 49/59.
+Implemented 50/59.
 
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
@@ -121,7 +121,6 @@ Implemented 49/59.
 - [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
 - [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
-- [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
@@ -160,6 +159,7 @@ Implemented 49/59.
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)
+- [x] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
 - [x] [promise-function-async](https://typescript-eslint.io/rules/promise-function-async)
 - [x] [related-getter-setter-pairs](https://typescript-eslint.io/rules/related-getter-setter-pairs)
 - [x] [require-array-sort-compare](https://typescript-eslint.io/rules/require-array-sort-compare)
