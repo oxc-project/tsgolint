@@ -1173,6 +1173,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unnecessary-boolean-literal-compare",
   },
   {
+    "file_path": "fixtures/basic/rules/no-unnecessary-qualifier/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 118,
+          "pos": 116,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Qualifier is unnecessary since 'B' is in scope.",
+      "id": "unnecessaryQualifier",
+    },
+    "range": {
+      "end": 117,
+      "pos": 116,
+    },
+    "rule": "no-unnecessary-qualifier",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
     "kind": 0,
     "message": {
