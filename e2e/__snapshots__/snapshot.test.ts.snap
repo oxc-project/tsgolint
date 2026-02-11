@@ -296,7 +296,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+      "description": "Placing a void expression inside another expression is forbidden.",
+      "help": "Move it to its own statement instead.",
       "id": "invalidVoidExpr",
     },
     "range": {
@@ -309,7 +310,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+      "description": "Placing a void expression inside another expression is forbidden.",
+      "help": "Move it to its own statement instead.",
       "id": "invalidVoidExpr",
     },
     "range": {
@@ -518,7 +520,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "Returning a void expression from an arrow function shorthand is forbidden. Please add braces to the arrow function.",
+      "description": "Returning a void expression from an arrow function shorthand is forbidden.",
+      "help": "Add braces to the arrow function.",
       "id": "invalidVoidExprArrow",
     },
     "range": {
@@ -802,7 +805,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
     "kind": 0,
     "message": {
-      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
+      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.",
+      "help": "Use a more robust iteration method such as for-of or array.forEach instead.",
       "id": "forInViolation",
     },
     "range": {
@@ -815,7 +819,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
     "kind": 0,
     "message": {
-      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
+      "description": "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.",
+      "help": "Use a more robust iteration method such as for-of or array.forEach instead.",
       "id": "forInViolation",
     },
     "range": {
@@ -906,7 +911,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
     "kind": 0,
     "message": {
-      "description": "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+      "description": "Placing a void expression inside another expression is forbidden.",
+      "help": "Move it to its own statement instead.",
       "id": "invalidVoidExpr",
     },
     "range": {
@@ -3324,8 +3330,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
     "message": {
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
-If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
+      "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
       "id": "unboundWithoutThisAnnotation",
     },
     "range": {
@@ -3338,8 +3344,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
     "message": {
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
-If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
+      "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
       "id": "unboundWithoutThisAnnotation",
     },
     "range": {
@@ -3352,8 +3358,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
     "message": {
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
-If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
+      "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
       "id": "unboundWithoutThisAnnotation",
     },
     "range": {
@@ -3366,8 +3372,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
     "message": {
-      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.
-If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
+      "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
+      "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
       "id": "unboundWithoutThisAnnotation",
     },
     "range": {
@@ -3452,7 +3458,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     ],
     "kind": 0,
     "message": {
-      "description": "Returning a void expression from an arrow function shorthand is forbidden. Please add braces to the arrow function.",
+      "description": "Returning a void expression from an arrow function shorthand is forbidden.",
+      "help": "Add braces to the arrow function.",
       "id": "invalidVoidExprArrow",
     },
     "range": {
@@ -3739,7 +3746,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     ],
     "kind": 0,
     "message": {
-      "description": "Returning a void expression from an arrow function shorthand is forbidden. Please add braces to the arrow function.",
+      "description": "Returning a void expression from an arrow function shorthand is forbidden.",
+      "help": "Add braces to the arrow function.",
       "id": "invalidVoidExprArrow",
     },
     "range": {
@@ -4026,7 +4034,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     ],
     "kind": 0,
     "message": {
-      "description": "Returning a void expression from an arrow function shorthand is forbidden. Please add braces to the arrow function.",
+      "description": "Returning a void expression from an arrow function shorthand is forbidden.",
+      "help": "Add braces to the arrow function.",
       "id": "invalidVoidExprArrow",
     },
     "range": {
@@ -4313,7 +4322,8 @@ If your function does not access \`this\`, you can annotate it with \`this: void
     ],
     "kind": 0,
     "message": {
-      "description": "Returning a void expression from an arrow function shorthand is forbidden. Please add braces to the arrow function.",
+      "description": "Returning a void expression from an arrow function shorthand is forbidden.",
+      "help": "Add braces to the arrow function.",
       "id": "invalidVoidExprArrow",
     },
     "range": {

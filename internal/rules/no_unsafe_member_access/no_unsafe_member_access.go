@@ -33,9 +33,9 @@ func buildUnsafeMemberExpressionMessage(property, t string) rule.RuleMessage {
 }
 func buildUnsafeThisMemberExpressionMessage(property string) rule.RuleMessage {
 	return rule.RuleMessage{
-		Id: "unsafeThisMemberExpression",
-		Description: fmt.Sprintf("Unsafe member access %v on an `any` value. `this` is typed as `any`.", property) +
-			"You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
+		Id:          "unsafeThisMemberExpression",
+		Description: fmt.Sprintf("Unsafe member access %v on an `any` value. `this` is typed as `any`.", property),
+		Help:        "You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
 	}
 }
 

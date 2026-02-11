@@ -17,9 +17,9 @@ func buildUnsafeCallMessage(t string) rule.RuleMessage {
 }
 func buildUnsafeCallThisMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
-		Id: "unsafeCallThis",
-		Description: fmt.Sprintf("Unsafe call of a(n) %v typed value. `this` is typed as %v.\n", t, t) +
-			"You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
+		Id:          "unsafeCallThis",
+		Description: fmt.Sprintf("Unsafe call of a(n) %v typed value. `this` is typed as %v.\n", t, t),
+		Help:        "You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
 	}
 }
 func buildUnsafeNewMessage(t string) rule.RuleMessage {

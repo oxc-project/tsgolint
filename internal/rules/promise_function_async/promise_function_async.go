@@ -17,7 +17,8 @@ func buildMissingAsyncMessage() rule.RuleMessage {
 func buildMissingAsyncHybridReturnMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "missingAsyncHybridReturn",
-		Description: "Functions that return promises must be async. Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.",
+		Description: "Functions that return promises must be async.",
+		Help:        "Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.",
 	}
 }
 

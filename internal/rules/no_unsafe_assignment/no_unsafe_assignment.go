@@ -24,9 +24,9 @@ func buildAnyAssignmentMessage(sender *checker.Type) rule.RuleMessage {
 }
 func buildAnyAssignmentThisMessage(sender *checker.Type) rule.RuleMessage {
 	return rule.RuleMessage{
-		Id: "anyAssignmentThis",
-		Description: fmt.Sprintf("Unsafe assignment of an %v value. `this` is typed as `any`.\n", formatSenderType(sender)) +
-			"You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
+		Id:          "anyAssignmentThis",
+		Description: fmt.Sprintf("Unsafe assignment of an %v value. `this` is typed as `any`.\n", formatSenderType(sender)),
+		Help:        "You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
 	}
 }
 func buildUnsafeArrayPatternMessage(sender *checker.Type) rule.RuleMessage {

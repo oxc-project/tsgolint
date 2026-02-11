@@ -23,9 +23,9 @@ func buildUnsafeReturnAssignmentMessage(sender, receiver string) rule.RuleMessag
 }
 func buildUnsafeReturnThisMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
-		Id: "unsafeReturnThis",
-		Description: fmt.Sprintf("Unsafe return of a value of type `%v`. `this` is typed as `any`.", t) +
-			"You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
+		Id:          "unsafeReturnThis",
+		Description: fmt.Sprintf("Unsafe return of a value of type `%v`. `this` is typed as `any`.", t),
+		Help:        "You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
 	}
 }
 
