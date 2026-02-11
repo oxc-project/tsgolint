@@ -233,6 +233,16 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 							SourceFile:  file,
 							Program:     w.program,
 							TypeChecker: w.checker,
+							ReportDiagnostic: func(diagnostic rule.RuleDiagnostic) {
+								onDiagnostic(rule.RuleDiagnostic{
+									RuleName:      r.Name,
+									Message:       diagnostic.Message,
+									FixesPtr:      diagnostic.FixesPtr,
+									Suggestions:   diagnostic.Suggestions,
+									SourceFile:    file,
+									LabeledRanges: diagnostic.LabeledRanges,
+								})
+							},
 							ReportRange: func(textRange core.TextRange, msg rule.RuleMessage) {
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:   r.Name,

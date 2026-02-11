@@ -47,6 +47,11 @@ type RuleFix struct {
 	Range core.TextRange
 }
 
+type RuleLabeledRange struct {
+	Label string         `json:"label"`
+	Range core.TextRange `json:"range"`
+}
+
 func RuleFixInsertBefore(file *ast.SourceFile, node *ast.Node, text string) RuleFix {
 	trimmed := utils.TrimNodeTextRange(file, node)
 	return RuleFix{
@@ -92,8 +97,9 @@ type RuleDiagnostic struct {
 	// nil if no fixes were provided
 	FixesPtr *[]RuleFix
 	// nil if no suggestions were provided
-	Suggestions *[]RuleSuggestion
-	SourceFile  *ast.SourceFile
+	Suggestions   *[]RuleSuggestion
+	SourceFile    *ast.SourceFile
+	LabeledRanges []RuleLabeledRange
 }
 
 func (d RuleDiagnostic) Fixes() []RuleFix {
@@ -113,6 +119,7 @@ type RuleContext struct {
 	SourceFile                 *ast.SourceFile
 	Program                    *compiler.Program
 	TypeChecker                *checker.Checker
+	ReportDiagnostic           func(diagnostic RuleDiagnostic)
 	ReportRange                func(textRange core.TextRange, msg RuleMessage)
 	ReportRangeWithSuggestions func(textRange core.TextRange, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
 	ReportNode                 func(node *ast.Node, msg RuleMessage)

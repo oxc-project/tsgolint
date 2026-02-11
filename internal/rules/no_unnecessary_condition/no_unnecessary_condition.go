@@ -16,6 +16,8 @@
 package no_unnecessary_condition
 
 import (
+	"fmt"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -86,10 +88,22 @@ func buildLiteralBinaryExpressionMessage() rule.RuleMessage {
 	}
 }
 
-func buildNoOverlapMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "noOverlapBooleanExpression",
-		Description: "This condition will always return the same value since the types have no overlap.",
+func buildNoOverlapDiagnostic(leftType string, leftRange core.TextRange, rightType string, rightRange core.TextRange) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Message: rule.RuleMessage{
+			Id:          "noOverlapBooleanExpression",
+			Description: "This condition will always return the same value since the types have no overlap.",
+		},
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Type: %v", leftType),
+				Range: leftRange,
+			},
+			{
+				Label: fmt.Sprintf("Type: %v", rightType),
+				Range: rightRange,
+			},
+		},
 	}
 }
 
@@ -1551,7 +1565,12 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 
 							// Types don't overlap, report it
-							ctx.ReportNode(node, buildNoOverlapMessage())
+							ctx.ReportDiagnostic(buildNoOverlapDiagnostic(
+								ctx.TypeChecker.TypeToString(leftType),
+								binExpr.Left.Loc,
+								ctx.TypeChecker.TypeToString(rightType),
+								binExpr.Right.Loc,
+							))
 						}
 					}
 				}
