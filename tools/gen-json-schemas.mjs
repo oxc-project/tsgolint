@@ -239,6 +239,23 @@ func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
       console.log(`  Post-processed ${ruleName} to add null handling for default value`);
     }
 
+    if (ruleName === 'naming_convention') {
+      // Remove the NamingConventionOptions array type alias — consumers use
+      // []NamingConventionOption directly.
+      content = content.replace(/^type NamingConventionOptions \[\]NamingConventionOption\s*\n/m, '');
+
+      // The Format field is oneOf [array, null] which generates interface{}.
+      // Replace with *[]string so nil pointer = null (no format enforcement) and
+      // non-nil pointer = explicit format list, matching consumer expectations.
+      content = content.replace(
+        /Format\s+interface\{\}\s+`json:"format"`/,
+        'Format *[]string `json:"format"`',
+      );
+
+      modified = true;
+      console.log(`  Post-processed ${ruleName} to fix Format type and remove array alias`);
+    }
+
     // Handle oneOf patterns with boolean + object (e.g., ignorePrimitives)
     // These generate `interface{}` which requires manual type switching. Replace with utils.BoolOr[T].
     // Skip rules that already have manual handling for these patterns.
