@@ -85,9 +85,6 @@ See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 ### In Development 🚧
 
 - Additional typescript-eslint rules
-- Disable Comments
-- Rule Configuration
-- IDE usage
 
 ## Architecture
 
