@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "strict_void_return_options": {
+      "type": "object",
+      "properties": {
+        "allowReturnAny": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}

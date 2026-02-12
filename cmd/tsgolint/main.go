@@ -74,6 +74,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/restrict_template_expressions"
 	"github.com/typescript-eslint/tsgolint/internal/rules/return_await"
 	"github.com/typescript-eslint/tsgolint/internal/rules/strict_boolean_expressions"
+	"github.com/typescript-eslint/tsgolint/internal/rules/strict_void_return"
 	"github.com/typescript-eslint/tsgolint/internal/rules/switch_exhaustiveness_check"
 	"github.com/typescript-eslint/tsgolint/internal/rules/unbound_method"
 	"github.com/typescript-eslint/tsgolint/internal/rules/use_unknown_in_catch_callback_variable"
@@ -210,6 +211,7 @@ var allRules = []rule.Rule{
 	restrict_template_expressions.RestrictTemplateExpressionsRule,
 	return_await.ReturnAwaitRule,
 	strict_boolean_expressions.StrictBooleanExpressionsRule,
+	strict_void_return.StrictVoidReturnRule,
 	switch_exhaustiveness_check.SwitchExhaustivenessCheckRule,
 	unbound_method.UnboundMethodRule,
 	use_unknown_in_catch_callback_variable.UseUnknownInCatchCallbackVariableRule,
