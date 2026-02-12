@@ -55,7 +55,7 @@ Configure type-aware rules in `.oxlintrc.json`:
 }
 ```
 
-Over 30 TypeScript-specific type-aware rules are available. For detailed setup and configuration, see the [Oxlint Type-Aware Linting guide](https://oxc.rs/blog/2025-08-17-oxlint-type-aware.html).
+Over 50 TypeScript-specific type-aware rules are available. For detailed setup and configuration, see the [Oxlint Type-Aware Linting guide](https://oxc.rs/docs/guide/usage/linter/type-aware.html).
 
 > [!NOTE]
 > Non-type-aware TypeScript rules can be found in [Oxlint's TypeScript rules](https://oxc.rs/docs/guide/usage/linter/rules.html) under the TypeScript source.
