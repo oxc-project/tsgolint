@@ -913,6 +913,76 @@ func TestPreferOptionalChainRule(t *testing.T) {
 				document.activeElement?.tagName === "TEXTAREA" ||
 				document.activeElement?.tagName === "SELECT";
 		`},
+		{Code: `
+			export function foo(vals: { min: number | undefined; }) {
+				return vals.min !== undefined && vals.min !== null;
+			};
+		`},
+		{Code: `
+			export function useFoo() {
+				const foo: { id: number | null } | undefined = { id: 1 };
+
+				return foo && foo?.id === null;
+			}
+		`},
+		{Code: `
+			function check(x: { value: string | null | undefined }) {
+				return x.value !== null && x.value !== undefined;
+			}
+		`},
+		{Code: `
+			function check(x: { value: string | null | undefined }) {
+				return x.value !== undefined && x.value !== null;
+			}
+		`},
+		{Code: `
+			const obj: { a: { b: number | null | undefined } } = { a: { b: 1 } };
+			obj.a.b !== null && obj.a.b !== undefined;
+		`},
+		{Code: `
+			const obj: { a: { b: number | null | undefined } } = { a: { b: 1 } };
+			obj.a.b !== undefined && obj.a.b !== null;
+		`},
+		{Code: `
+			function test(x: { prop: number | null } | undefined) {
+				return x && x?.prop === null;
+			}
+		`},
+		{Code: `
+			function test(x: { prop: number | null } | undefined) {
+				return x && x?.prop !== null;
+			}
+		`},
+		{Code: `
+			function test(x: { nested: { value: number } } | undefined) {
+				return x && x?.nested?.value === 0;
+			}
+		`},
+		{Code: `
+			function test(x: { items: number[] } | undefined) {
+				return x && x?.items?.length === 0;
+			}
+		`},
+		{Code: `
+			function check(x: { value: string | undefined }) {
+				return typeof x.value !== 'undefined' && x.value !== null;
+			}
+		`},
+		{Code: `
+			function test(obj: { status: string } | undefined) {
+				return obj && obj?.status === 'active';
+			}
+		`},
+		{Code: `
+			function test(obj: { count: number } | undefined) {
+				return obj && obj?.count === 0;
+			}
+		`},
+		{Code: `
+			function test(obj: { flag: boolean } | undefined) {
+				return obj && obj?.flag === false;
+			}
+		`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{
@@ -3786,6 +3856,91 @@ const baz = foo?.bar;
                 declare const foo: { bar: () => { baz: number } | null | undefined };
                 foo.bar?.() === undefined || foo.bar?.().baz;
               `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferOptionalChain",
+				},
+			},
+		},
+		{
+			Code: `
+				declare const obj: { prop: { nested: number } | null | undefined };
+				obj.prop !== undefined && obj.prop !== null && obj.prop.nested;
+			`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferOptionalChain",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "optionalChainSuggest",
+							Output: `
+				declare const obj: { prop: { nested: number } | null | undefined };
+				obj.prop?.nested;
+			`,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+				declare const obj: { prop: { nested: number } | null | undefined };
+				obj.prop !== null && obj.prop !== undefined && obj.prop.nested;
+			`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferOptionalChain",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "optionalChainSuggest",
+							Output: `
+				declare const obj: { prop: { nested: number } | null | undefined };
+				obj.prop?.nested;
+			`,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+				declare const foo: { id: number | null } | undefined;
+				foo && foo.id === null;
+			`,
+			Output: []string{`
+				declare const foo: { id: number | null } | undefined;
+				foo?.id === null;
+			`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferOptionalChain",
+				},
+			},
+		},
+		{
+			Code: `
+				declare const foo: { status: string } | undefined;
+				foo && foo.status === 'active';
+			`,
+			Output: []string{`
+				declare const foo: { status: string } | undefined;
+				foo?.status === 'active';
+			`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferOptionalChain",
+				},
+			},
+		},
+		{
+			Code: `
+				declare const obj: { a: { b: { c: number } } } | undefined;
+				obj && obj.a && obj.a.b && obj.a.b.c;
+			`,
+			Output: []string{`
+				declare const obj: { a: { b: { c: number } } } | undefined;
+				obj?.a?.b?.c;
+			`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferOptionalChain",
