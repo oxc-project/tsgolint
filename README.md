@@ -107,11 +107,13 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 56/59.
+Implemented 56/61.
 
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
+- [ ] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
+- [ ] [strict-void-return](https://typescript-eslint.io/rules/strict-void-return)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
