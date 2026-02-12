@@ -3,7 +3,7 @@
 [`eslint.config.mjs`](./eslint.config.mjs) includes only those rules implemented in **tsgolint**.
 
 > [!NOTE]
-> Oxlint, Biome and `deno lint` are not considered in this benchmark because they [do not support typed linting](https://www.joshuakgoldberg.com/blog/why-typed-linting-needs-typescript-today/).
+> Biome and `deno lint` are not considered in this benchmark because they [do not support typed linting](https://www.joshuakgoldberg.com/blog/why-typed-linting-needs-typescript-today/).
 
 ## Results
 
