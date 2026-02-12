@@ -1,0 +1,844 @@
+
+[TestNoMisusedSpreadRule/invalid-0 - 1]
+Diagnostic 1: noStringSpread (1:12 - 1:20)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   1 | const a = [...'test'];
+     |            ~~~~~~~~~
+---
+
+[TestNoMisusedSpreadRule/invalid-1 - 1]
+Diagnostic 1: noStringSpread (3:19 - 3:25)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         function withText<Text extends string>(text: Text) {
+   3 |           return [...text];
+     |                   ~~~~~~~
+   4 |         }
+---
+
+[TestNoMisusedSpreadRule/invalid-10 - 1]
+Diagnostic 1: noStringSpread (6:22 - 6:28)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   5 | 
+   6 |         textIdentity(...text, 'and', ...text);
+     |                      ~~~~~~~
+   7 |       
+
+Diagnostic 2: noStringSpread (6:38 - 6:44)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   5 | 
+   6 |         textIdentity(...text, 'and', ...text);
+     |                                      ~~~~~~~
+   7 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-11 - 1]
+Diagnostic 1: noStringSpread (5:24 - 5:30)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   4 |         function withText<Text extends string>(text: Text) {
+   5 |           textIdentity(...text);
+     |                        ~~~~~~~
+   6 |         }
+---
+
+[TestNoMisusedSpreadRule/invalid-12 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:33)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare function getString<T extends string>(): T;
+   3 |         const a = [...getString()];
+     |                    ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-13 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:33)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare function getString(): string & { __brand: 'test' };
+   3 |         const a = [...getString()];
+     |                    ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-14 - 1]
+Diagnostic 1: noArraySpreadInObject (1:13 - 1:24)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   1 | const o = { ...[1, 2, 3] };
+     |             ~~~~~~~~~~~~
+---
+
+[TestNoMisusedSpreadRule/invalid-15 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         const arr = [1, 2, 3];
+   3 |         const o = { ...arr };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-16 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         const arr = [1, 2, 3] as const;
+   3 |         const o = { ...arr };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-17 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         declare const arr: number[];
+   3 |         const o = { ...arr };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-18 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         declare const arr: readonly number[];
+   3 |         const o = { ...arr };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-19 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         declare const arr: number[] | string[];
+   3 |         const o = { ...arr };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-2 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:26)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         const test = 'hello';
+   3 |         const a = [...test];
+     |                    ~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-20 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         declare const arr: number[] & string[];
+   3 |         const o = { ...arr };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-21 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:33)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         declare function getArray(): number[];
+   3 |         const o = { ...getArray() };
+     |                     ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-22 - 1]
+Diagnostic 1: noArraySpreadInObject (3:21 - 3:33)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   2 |         declare function getArray(): readonly number[];
+   3 |         const o = { ...getArray() };
+     |                     ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-23 - 1]
+Diagnostic 1: noIterableSpreadInObject (1:13 - 1:33)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   1 | const o = { ...new Set([1, 2, 3]) };
+     |             ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMisusedSpreadRule/invalid-24 - 1]
+Diagnostic 1: noIterableSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   2 |         const set = new Set([1, 2, 3]);
+   3 |         const o = { ...set };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-25 - 1]
+Diagnostic 1: noIterableSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   2 |         declare const set: Set<number>;
+   3 |         const o = { ...set };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-26 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on class instances will lose their class prototype.
+   2 |         declare const set: WeakSet<object>;
+   3 |         const o = { ...set };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-27 - 1]
+Diagnostic 1: noIterableSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   2 |         declare const set: ReadonlySet<number>;
+   3 |         const o = { ...set };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-28 - 1]
+Diagnostic 1: noIterableSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   2 |         declare const set: Set<number> | { a: number };
+   3 |         const o = { ...set };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-29 - 1]
+Diagnostic 1: noIterableSpreadInObject (3:21 - 3:31)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   2 |         declare function getSet(): Set<number>;
+   3 |         const o = { ...getSet() };
+     |                     ~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-3 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:26)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         const test = `he${'ll'}o`;
+   3 |         const a = [...test];
+     |                    ~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-30 - 1]
+Diagnostic 1: noMapSpreadInObject (3:11 - 6:12)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         const o = {
+   3 |           ...new Map([
+     |           ~~~~~~~~~~~~
+   4 |             ['test-1', 1],
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |             ['test-2', 2],
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |           ]),
+     | ~~~~~~~~~~~~
+   7 |         };
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-31 - 1]
+Diagnostic 1: noMapSpreadInObject (7:21 - 7:26)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   6 | 
+   7 |         const o = { ...map };
+     |                     ~~~~~~
+   8 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-32 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: Map<string, number>;
+   3 |         const o = { ...map };
+     |                     ~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-33 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:28)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: Map<string, number>;
+   3 |         const o = { ...(map) };
+     |                     ~~~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-34 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:33)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: Map<string, number>;
+   3 |         const o = { ...(map, map) };
+     |                     ~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-35 - 1]
+Diagnostic 1: noMapSpreadInObject (4:21 - 4:26)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   3 |         const others = { a: 1 };
+   4 |         const o = { ...map, ...others };
+     |                     ~~~~~~
+   5 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-36 - 1]
+Diagnostic 1: noMapSpreadInObject (3:31 - 3:36)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: Map<string, number>;
+   3 |         const o = { other: 1, ...map };
+     |                               ~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-37 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: ReadonlyMap<string, number>;
+   3 |         const o = { ...map };
+     |                     ~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-38 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: WeakMap<{ a: number }, string>;
+   3 |         const o = { ...map };
+     |                     ~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-39 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const map: Map<string, number> | { a: number };
+   3 |         const o = { ...map };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-4 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:26)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare const test: string;
+   3 |         const a = [...test];
+     |                    ~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-40 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:31)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare function getMap(): Map<string, number>;
+   3 |         const o = { ...getMap() };
+     |                     ~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-41 - 1]
+Diagnostic 1: noMapSpreadInObject (3:21 - 3:24)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   2 |         declare const a: Map<boolean, string> & Set<number>;
+   3 |         const o = { ...a };
+     |                     ~~~~
+   4 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-42 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (3:21 - 3:26)
+Message: Using the spread operator on class instances will lose their class prototype.
+   2 |         const ref = new WeakRef({ a: 1 });
+   3 |         const o = { ...ref };
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-43 - 1]
+Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:30)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   2 |         const promise = new Promise(() => {});
+   3 |         const o = { ...promise };
+     |                     ~~~~~~~~~~
+   4 |       
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-44 - 1]
+Diagnostic 1: noPromiseSpreadInObject (4:20 - 4:37)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   3 |         async function foo() {
+   4 |           return { ...(promise || {}) };
+     |                    ~~~~~~~~~~~~~~~~~~
+   5 |         }
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-45 - 1]
+Diagnostic 1: noPromiseSpreadInObject (4:20 - 4:58)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   3 |         async function foo() {
+   4 |           return { ...(Math.random() < 0.5 ? promise : {}) };
+     |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-46 - 1]
+Diagnostic 1: noPromiseSpreadInObject (3:20 - 3:29)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   2 |         function withPromise<P extends Promise<void>>(promise: P) {
+   3 |           return { ...promise };
+     |                    ~~~~~~~~~~
+   4 |         }
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-47 - 1]
+Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:35)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   2 |         declare const maybePromise: Promise<number> | { a: number };
+   3 |         const o = { ...maybePromise };
+     |                     ~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-48 - 1]
+Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:30)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   2 |         declare const promise: Promise<number> & { a: number };
+   3 |         const o = { ...promise };
+     |                     ~~~~~~~~~~
+   4 |       
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-49 - 1]
+Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:35)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   2 |         declare function getPromise(): Promise<number>;
+   3 |         const o = { ...getPromise() };
+     |                     ~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-5 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:26)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare const test: string | number[];
+   3 |         const a = [...test];
+     |                    ~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-50 - 1]
+Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:35)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   2 |         declare function getPromise<T extends Promise<number>>(arg: T): T;
+   3 |         const o = { ...getPromise() };
+     |                     ~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-51 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...f };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-52 - 1]
+Diagnostic 1: noFunctionSpreadInObject (11:21 - 11:26)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+  10 | 
+  11 |         const o = { ...obj };
+     |                     ~~~~~~
+  12 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-53 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...f };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-54 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...f };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-55 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:36)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...getFunction() };
+     |                     ~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-56 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...f };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-57 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...f };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-58 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:32)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...generator };
+     |                     ~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-59 - 1]
+Diagnostic 1: noIterableSpreadInObject (8:21 - 8:31)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   7 | 
+   8 |         const o = { ...iterator };
+     |                     ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-6 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:26)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare const test: string & { __brand: 'test' };
+   3 |         const a = [...test];
+     |                    ~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-60 - 1]
+Diagnostic 1: noIterableSpreadInObject (12:21 - 12:31)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+  11 | 
+  12 |         const a = { ...iterator };
+     |                     ~~~~~~~~~~~
+  13 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-62 - 1]
+Diagnostic 1: noIterableSpreadInObject (4:21 - 4:31)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...iterator };
+     |                     ~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-63 - 1]
+Diagnostic 1: noIterableSpreadInObject (4:21 - 4:31)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...iterator };
+     |                     ~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-64 - 1]
+Diagnostic 1: noIterableSpreadInObject (4:21 - 4:36)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   3 | 
+   4 |         const o = { ...getIterable() };
+     |                     ~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-65 - 1]
+Diagnostic 1: noIterableSpreadInObject (12:21 - 12:30)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+  11 | 
+  12 |         const a = { ...new A() };
+     |                     ~~~~~~~~~~
+  13 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-66 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (2:21 - 2:33)
+Message: Using the spread operator on class instances will lose their class prototype.
+   1 | 
+   2 |         const o = { ...new Date() };
+     |                     ~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-67 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (4:21 - 4:30)
+Message: Using the spread operator on class instances will lose their class prototype.
+   3 |         declare const element: HTMLElementLike;
+   4 |         const o = { ...element };
+     |                     ~~~~~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-68 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (3:21 - 3:28)
+Message: Using the spread operator on class instances will lose their class prototype.
+   2 |         declare const regex: RegExp;
+   3 |         const o = { ...regex };
+     |                     ~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-69 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (10:21 - 10:30)
+Message: Using the spread operator on class instances will lose their class prototype.
+   9 | 
+  10 |         const o = { ...new A() };
+     |                     ~~~~~~~~~~
+  11 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-7 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:26)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare const test: number | (boolean | (string & { __brand: true }));
+   3 |         const a = [...test];
+     |                    ~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-70 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:24)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...a };
+     |                     ~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-71 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:24)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...a };
+     |                     ~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-72 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:29)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...getA() };
+     |                     ~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-73 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:29)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...getA() };
+     |                     ~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-74 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:30)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...new B() };
+     |                     ~~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-75 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:24)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...a };
+     |                     ~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-76 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (8:21 - 8:24)
+Message: Using the spread operator on class instances will lose their class prototype.
+   7 | 
+   8 |         const o = { ...a };
+     |                     ~~~~
+   9 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-77 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+   3 | 
+   4 |         const o = { ...A };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-78 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+   3 | 
+   4 |         const o = { ...A };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-79 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (11:21 - 11:29)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+  10 | 
+  11 |         const o = { ...either };
+     |                     ~~~~~~~~~
+  12 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-8 - 1]
+Diagnostic 1: noStringSpread (3:20 - 3:33)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   2 |         declare function getString(): string;
+   3 |         const a = [...getString()];
+     |                    ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-80 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (4:21 - 4:24)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+   3 | 
+   4 |         const o = { ...A };
+     |                     ~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-81 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (3:11 - 6:11)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+   2 |         const a = {
+   3 |           ...class A {
+     |           ~~~~~~~~~~~~
+   4 |             static value = 1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |             nonStatic = 2;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |           },
+     | ~~~~~~~~~~~
+   7 |         };
+---
+
+[TestNoMisusedSpreadRule/invalid-82 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (2:21 - 2:53)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+   1 | 
+   2 |         const a = { ...(class A { static value = 1 }) }
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-83 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (2:21 - 2:60)
+Message: Using the spread operator on class instances will lose their class prototype.
+   1 | 
+   2 |         const a = { ...new (class A { static value = 1; })() };
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-84 - 1]
+Diagnostic 1: noArraySpreadInObject (2:24 - 2:37)
+Message: Using the spread operator on an array in an object will result in a list of indices.
+   1 | 
+   2 |         const o = <div {...[1, 2, 3]} />;
+     |                        ~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-85 - 1]
+Diagnostic 1: noClassDeclarationSpreadInObject (4:24 - 4:29)
+Message: Using the spread operator on class declarations will spread only their static properties, and will lose their class prototype.
+   3 | 
+   4 |         const o = <div {...A} />;
+     |                        ~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-86 - 1]
+Diagnostic 1: noClassInstanceSpreadInObject (2:24 - 2:38)
+Message: Using the spread operator on class instances will lose their class prototype.
+   1 | 
+   2 |         const o = <div {...new Date()} />;
+     |                        ~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-87 - 1]
+Diagnostic 1: noFunctionSpreadInObject (4:24 - 4:29)
+Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+   3 | 
+   4 |         const o = <div {...f} />;
+     |                        ~~~~~~
+   5 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-88 - 1]
+Diagnostic 1: noIterableSpreadInObject (2:24 - 2:46)
+Message: Using the spread operator on an Iterable in an object can cause unexpected behavior.
+   1 | 
+   2 |         const o = <div {...new Set([1, 2, 3])} />;
+     |                        ~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-89 - 1]
+Diagnostic 1: noMapSpreadInObject (4:24 - 4:31)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+   3 | 
+   4 |         const o = <div {...map} />;
+     |                        ~~~~~~~~
+   5 |       
+  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
+---
+
+[TestNoMisusedSpreadRule/invalid-9 - 1]
+Diagnostic 1: noStringSpread (6:22 - 6:28)
+Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+   5 | 
+   6 |         textIdentity(...text);
+     |                      ~~~~~~~
+   7 |       
+---
+
+[TestNoMisusedSpreadRule/invalid-90 - 1]
+Diagnostic 1: noPromiseSpreadInObject (4:24 - 4:35)
+Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+   3 | 
+   4 |         const o = <div {...promise} />;
+     |                        ~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [addAwait] Add await operator.
+---

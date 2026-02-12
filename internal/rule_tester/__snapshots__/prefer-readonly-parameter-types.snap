@@ -1,0 +1,374 @@
+
+[TestPreferReadonlyParameterTypesRule/invalid-0 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:26)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: string[]) {}
+     |              ~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-1 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:31)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: Array<string>) {}
+     |              ~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-10 - 1]
+Diagnostic 1: shouldBeReadonly (2:22 - 2:51)
+Message: Parameter should be a readonly type.
+   1 | 
+   2 |         function foo(arg: { [key: string]: string }) {}
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-11 - 1]
+Diagnostic 1: shouldBeReadonly (2:22 - 2:51)
+Message: Parameter should be a readonly type.
+   1 | 
+   2 |         function foo(arg: { [key: number]: string }) {}
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-12 - 1]
+Diagnostic 1: shouldBeReadonly (6:14 - 6:22)
+Message: Parameter should be a readonly type.
+   5 | }
+   6 | function foo(arg: Test) {}
+     |              ~~~~~~~~~
+   7 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-13 - 1]
+Diagnostic 1: shouldBeReadonly (5:14 - 5:22)
+Message: Parameter should be a readonly type.
+   4 | };
+   5 | function foo(arg: Test) {}
+     |              ~~~~~~~~~
+   6 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-14 - 1]
+Diagnostic 1: shouldBeReadonly (5:22 - 5:30)
+Message: Parameter should be a readonly type.
+   4 |         }
+   5 |         function foo(arg: Test) {}
+     |                      ~~~~~~~~~
+   6 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-15 - 1]
+Diagnostic 1: shouldBeReadonly (5:22 - 5:30)
+Message: Parameter should be a readonly type.
+   4 |         }
+   5 |         function foo(arg: Test) {}
+     |                      ~~~~~~~~~
+   6 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-16 - 1]
+Diagnostic 1: shouldBeReadonly (4:21 - 4:34)
+Message: Parameter should be a readonly type.
+   3 |           constructor(
+   4 |             private arg1: string[],
+     |                     ~~~~~~~~~~~~~~
+   5 |             public arg2: string[],
+
+Diagnostic 2: shouldBeReadonly (5:20 - 5:33)
+Message: Parameter should be a readonly type.
+   4 |             private arg1: string[],
+   5 |             public arg2: string[],
+     |                    ~~~~~~~~~~~~~~
+   6 |             protected arg3: string[],
+
+Diagnostic 3: shouldBeReadonly (6:23 - 6:36)
+Message: Parameter should be a readonly type.
+   5 |             public arg2: string[],
+   6 |             protected arg3: string[],
+     |                       ~~~~~~~~~~~~~~
+   7 |             readonly arg4: string[],
+
+Diagnostic 4: shouldBeReadonly (7:22 - 7:35)
+Message: Parameter should be a readonly type.
+   6 |             protected arg3: string[],
+   7 |             readonly arg4: string[],
+     |                      ~~~~~~~~~~~~~~
+   8 |           ) {}
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-17 - 1]
+Diagnostic 1: shouldBeReadonly (8:13 - 8:26)
+Message: Parameter should be a readonly type.
+   7 |             readonly arg4: readonly string[],
+   8 |             arg5: string[],
+     |             ~~~~~~~~~~~~~~
+   9 |           ) {}
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-18 - 1]
+Diagnostic 1: shouldBeReadonly (3:12 - 3:24)
+Message: Parameter should be a readonly type.
+   2 |         interface Foo {
+   3 |           (arg: string[]): void;
+     |            ~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-19 - 1]
+Diagnostic 1: shouldBeReadonly (3:16 - 3:28)
+Message: Parameter should be a readonly type.
+   2 |         interface Foo {
+   3 |           new (arg: string[]): void;
+     |                ~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-2 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:26)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: [string]) {}
+     |              ~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-20 - 1]
+Diagnostic 1: shouldBeReadonly (1:17 - 1:29)
+Message: Parameter should be a readonly type.
+   1 | class Foo { foo(arg: string[]): void; };
+     |                 ~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-21 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:26)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: string[]);
+     |              ~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-22 - 1]
+Diagnostic 1: shouldBeReadonly (1:13 - 1:25)
+Message: Parameter should be a readonly type.
+   1 | type Foo = (arg: string[]) => void;
+     |             ~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-23 - 1]
+Diagnostic 1: shouldBeReadonly (3:15 - 3:27)
+Message: Parameter should be a readonly type.
+   2 |         interface Foo {
+   3 |           foo(arg: string[]): void;
+     |               ~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-24 - 1]
+Diagnostic 1: shouldBeReadonly (5:22 - 5:29)
+Message: Parameter should be a readonly type.
+   4 |         }
+   5 |         function foo(arg: Foo) {}
+     |                      ~~~~~~~~
+   6 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-25 - 1]
+Diagnostic 1: shouldBeReadonly (5:22 - 5:39)
+Message: Parameter should be a readonly type.
+   4 |         }
+   5 |         function foo(arg: Readonly<Foo>) {}
+     |                      ~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-26 - 1]
+Diagnostic 1: shouldBeReadonly (8:22 - 8:29)
+Message: Parameter should be a readonly type.
+   7 |         }
+   8 |         function foo(arg: Foo) {}
+     |                      ~~~~~~~~
+   9 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-27 - 1]
+Diagnostic 1: shouldBeReadonly (8:22 - 8:39)
+Message: Parameter should be a readonly type.
+   7 |         }
+   8 |         function foo(arg: Readonly<Foo>) {}
+     |                      ~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-28 - 1]
+Diagnostic 1: shouldBeReadonly (8:22 - 8:29)
+Message: Parameter should be a readonly type.
+   7 |         }
+   8 |         function foo(arg: Foo) {}
+     |                      ~~~~~~~~
+   9 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-29 - 1]
+Diagnostic 1: shouldBeReadonly (6:14 - 6:22)
+Message: Parameter should be a readonly type.
+   5 | };
+   6 | function foo(arg: Test) {}
+     |              ~~~~~~~~~
+   7 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-3 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:37)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: readonly string[][]) {}
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-30 - 1]
+Diagnostic 1: shouldBeReadonly (8:26 - 8:40)
+Message: Parameter should be a readonly type.
+   7 | 
+   8 |         const willNot = (foo: WithSymbol) => {};
+     |                          ~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-31 - 1]
+Diagnostic 1: shouldBeReadonly (10:43 - 10:66)
+Message: Parameter should be a readonly type.
+   9 | 
+  10 |         acceptsCallback<CallbackOptions>((options: CallbackOptions) => {});
+     |                                           ~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-32 - 1]
+Diagnostic 1: shouldBeReadonly (6:22 - 6:32)
+Message: Parameter should be a readonly type.
+   5 |         };
+   6 |         function foo(arg: MyType) {}
+     |                      ~~~~~~~~~~~
+   7 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-33 - 1]
+Diagnostic 1: shouldBeReadonly (6:53 - 6:68)
+Message: Parameter should be a readonly type.
+   5 | 
+   6 |         function method<A extends any[] = string[]>(value: MyType<A>) {
+     |                                                     ~~~~~~~~~~~~~~~~
+   7 |           return value;
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-34 - 1]
+Diagnostic 1: shouldBeReadonly (3:35 - 3:35)
+Message: Parameter should be a readonly type.
+   2 |         declare const fooFactory: <T>(x: readonly T[]) => (f: (x: T) => void) => void;
+   3 |         fooFactory([{ abc: 42 }])(x => {});
+     |                                   ~
+   4 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-35 - 1]
+Diagnostic 1: shouldBeReadonly (2:22 - 2:32)
+Message: Parameter should be a readonly type.
+   1 | 
+   2 |         function foo(arg: RegExp) {}
+     |                      ~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-36 - 1]
+Diagnostic 1: shouldBeReadonly (6:22 - 6:29)
+Message: Parameter should be a readonly type.
+   5 | 
+   6 |         function foo(arg: Foo) {}
+     |                      ~~~~~~~~
+   7 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-37 - 1]
+Diagnostic 1: shouldBeReadonly (6:22 - 6:29)
+Message: Parameter should be a readonly type.
+   5 | 
+   6 |         function foo(arg: Foo) {}
+     |                      ~~~~~~~~
+   7 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-38 - 1]
+Diagnostic 1: shouldBeReadonly (6:22 - 6:29)
+Message: Parameter should be a readonly type.
+   5 | 
+   6 |         function foo(arg: Foo) {}
+     |                      ~~~~~~~~
+   7 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-39 - 1]
+Diagnostic 1: shouldBeReadonly (2:22 - 2:32)
+Message: Parameter should be a readonly type.
+   1 | 
+   2 |         function foo(arg: RegExp) {}
+     |                      ~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-4 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:38)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: Readonly<string[][]>) {}
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-40 - 1]
+Diagnostic 1: shouldBeReadonly (2:22 - 2:32)
+Message: Parameter should be a readonly type.
+   1 | 
+   2 |         function foo(arg: RegExp) {}
+     |                      ~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-5 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:46)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: ReadonlyArray<Array<string>>) {}
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-6 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:29)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: { foo: '' }) {}
+     |              ~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-7 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:44)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: { foo: readonly string[] }) {}
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-8 - 1]
+Diagnostic 1: shouldBeReadonly (1:14 - 1:33)
+Message: Parameter should be a readonly type.
+   1 | function foo(arg: { foo(): void }) {}
+     |              ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferReadonlyParameterTypesRule/invalid-9 - 1]
+Diagnostic 1: shouldBeReadonly (2:22 - 6:9)
+Message: Parameter should be a readonly type.
+   1 | 
+   2 |         function foo(arg: {
+     |                      ~~~~~~
+   3 |           readonly foo: {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |             bar: string;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           };
+     | ~~~~~~~~~~~~
+   6 |         }) {}
+     | ~~~~~~~~~
+   7 |       
+---

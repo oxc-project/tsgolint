@@ -1,0 +1,102 @@
+
+[TestPreferRegexpExecRule/invalid-0 - 1]
+Diagnostic 1: regExpExecOverStringMatch (1:13 - 1:17)
+Message: Use the `RegExp#exec()` method instead.
+   1 | 'something'.match(/thing/);
+     |             ~~~~~
+---
+
+[TestPreferRegexpExecRule/invalid-1 - 1]
+Diagnostic 1: regExpExecOverStringMatch (1:13 - 1:17)
+Message: Use the `RegExp#exec()` method instead.
+   1 | 'something'.match('^[a-z]+thing/?$');
+     |             ~~~~~
+---
+
+[TestPreferRegexpExecRule/invalid-10 - 1]
+Diagnostic 1: regExpExecOverStringMatch (3:8 - 3:12)
+Message: Use the `RegExp#exec()` method instead.
+   2 | function temp(text: string): void {
+   3 |   text.match(new RegExp(`${'hello'}`));
+     |        ~~~~~
+   4 |   text.match(new RegExp(`${'hello'.toString()}`));
+
+Diagnostic 2: regExpExecOverStringMatch (4:8 - 4:12)
+Message: Use the `RegExp#exec()` method instead.
+   3 |   text.match(new RegExp(`${'hello'}`));
+   4 |   text.match(new RegExp(`${'hello'.toString()}`));
+     |        ~~~~~
+   5 | }
+---
+
+[TestPreferRegexpExecRule/invalid-2 - 1]
+Diagnostic 1: regExpExecOverStringMatch (4:6 - 4:10)
+Message: Use the `RegExp#exec()` method instead.
+   3 | const search = /thing/;
+   4 | text.match(search);
+     |      ~~~~~
+   5 |       
+---
+
+[TestPreferRegexpExecRule/invalid-3 - 1]
+Diagnostic 1: regExpExecOverStringMatch (4:6 - 4:10)
+Message: Use the `RegExp#exec()` method instead.
+   3 | const search = 'thing';
+   4 | text.match(search);
+     |      ~~~~~
+   5 |       
+---
+
+[TestPreferRegexpExecRule/invalid-4 - 1]
+Diagnostic 1: regExpExecOverStringMatch (3:8 - 3:12)
+Message: Use the `RegExp#exec()` method instead.
+   2 | function test(text: string, pattern: string) {
+   3 |   text.match(pattern);
+     |        ~~~~~
+   4 | }
+---
+
+[TestPreferRegexpExecRule/invalid-5 - 1]
+Diagnostic 1: regExpExecOverStringMatch (3:5 - 3:9)
+Message: Use the `RegExp#exec()` method instead.
+   2 | function f(s: 'a' | 'b') {
+   3 |   s.match('a');
+     |     ~~~~~
+   4 | }
+---
+
+[TestPreferRegexpExecRule/invalid-6 - 1]
+Diagnostic 1: regExpExecOverStringMatch (4:5 - 4:9)
+Message: Use the `RegExp#exec()` method instead.
+   3 | function f(s: SafeString) {
+   4 |   s.match(/thing/);
+     |     ~~~~~
+   5 | }
+---
+
+[TestPreferRegexpExecRule/invalid-7 - 1]
+Diagnostic 1: regExpExecOverStringMatch (3:5 - 3:9)
+Message: Use the `RegExp#exec()` method instead.
+   2 | function f<T extends 'a' | 'b'>(s: T) {
+   3 |   s.match(/thing/);
+     |     ~~~~~
+   4 | }
+---
+
+[TestPreferRegexpExecRule/invalid-8 - 1]
+Diagnostic 1: regExpExecOverStringMatch (4:6 - 4:10)
+Message: Use the `RegExp#exec()` method instead.
+   3 | const search = new RegExp('test', '');
+   4 | text.match(search);
+     |      ~~~~~
+   5 |       
+---
+
+[TestPreferRegexpExecRule/invalid-9 - 1]
+Diagnostic 1: regExpExecOverStringMatch (3:11 - 3:15)
+Message: Use the `RegExp#exec()` method instead.
+   2 | function test(pattern: string) {
+   3 |   'check'.match(new RegExp(pattern, undefined));
+     |           ~~~~~
+   4 | }
+---

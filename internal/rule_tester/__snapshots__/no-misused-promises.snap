@@ -1,0 +1,1009 @@
+
+[TestNoMisusedPromisesRule/invalid-0 - 1]
+Diagnostic 1: conditional (2:5 - 2:21)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | 
+   2 | if (Promise.resolve()) {
+     |     ~~~~~~~~~~~~~~~~~
+   3 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-1 - 1]
+Diagnostic 1: conditional (2:5 - 2:21)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | 
+   2 | if (Promise.resolve()) {
+     |     ~~~~~~~~~~~~~~~~~
+   3 | } else if (Promise.resolve()) {
+
+Diagnostic 2: conditional (3:12 - 3:28)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | if (Promise.resolve()) {
+   3 | } else if (Promise.resolve()) {
+     |            ~~~~~~~~~~~~~~~~~
+   4 | } else {
+---
+
+[TestNoMisusedPromisesRule/invalid-10 - 1]
+Diagnostic 1: voidReturnArgument (6:23 - 8:1)
+Message: Promise returned in function argument where a void return was expected.
+   5 | 
+   6 | fnWithCallback('val', async (err, res) => {
+     |                       ~~~~~~~~~~~~~~~~~~~~~
+   7 |   await res;
+     | ~~~~~~~~~~~~
+   8 | });
+     | ~
+   9 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-11 - 1]
+Diagnostic 1: voidReturnArgument (6:23 - 6:56)
+Message: Promise returned in function argument where a void return was expected.
+   5 | 
+   6 | fnWithCallback('val', (err, res) => Promise.resolve(res));
+     |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-12 - 1]
+Diagnostic 1: voidReturnArgument (6:23 - 12:1)
+Message: Promise returned in function argument where a void return was expected.
+   5 | 
+   6 | fnWithCallback('val', (err, res) => {
+     |                       ~~~~~~~~~~~~~~~
+   7 |   if (err) {
+     | ~~~~~~~~~~~~
+   8 |     return 'abc';
+     | ~~~~~~~~~~~~~~~~~
+   9 |   } else {
+     | ~~~~~~~~~~
+  10 |     return Promise.resolve(res);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |   }
+     | ~~~
+  12 | });
+     | ~
+  13 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-13 - 1]
+Diagnostic 1: voidReturnArgument (8:25 - 8:58)
+Message: Promise returned in function argument where a void return was expected.
+   7 | 
+   8 | fnWithCallback?.('val', (err, res) => Promise.resolve(res));
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-14 - 1]
+Diagnostic 1: voidReturnArgument (8:23 - 14:1)
+Message: Promise returned in function argument where a void return was expected.
+   7 | 
+   8 | fnWithCallback('val', (err, res) => {
+     |                       ~~~~~~~~~~~~~~~
+   9 |   if (err) {
+     | ~~~~~~~~~~~~
+  10 |     return 'abc';
+     | ~~~~~~~~~~~~~~~~~
+  11 |   } else {
+     | ~~~~~~~~~~
+  12 |     return Promise.resolve(res);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  13 |   }
+     | ~~~
+  14 | });
+     | ~
+  15 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-15 - 1]
+Diagnostic 1: conditional (3:15 - 3:15)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | function test(bool: boolean, p: Promise<void>) {
+   3 |   if (bool || p) {
+     |               ~
+   4 |   }
+---
+
+[TestNoMisusedPromisesRule/invalid-16 - 1]
+Diagnostic 1: conditional (3:15 - 3:15)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | function test(bool: boolean, p: Promise<void>) {
+   3 |   if (bool && p) {
+     |               ~
+   4 |   }
+---
+
+[TestNoMisusedPromisesRule/invalid-17 - 1]
+Diagnostic 1: conditional (3:12 - 3:12)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | function test(a: any, p: Promise<void>) {
+   3 |   if (a ?? p) {
+     |            ~
+   4 |   }
+---
+
+[TestNoMisusedPromisesRule/invalid-18 - 1]
+Diagnostic 1: conditional (3:12 - 3:27)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | function test(p: Promise<void> | undefined) {
+   3 |   if (p ?? Promise.reject()) {
+     |            ~~~~~~~~~~~~~~~~
+   4 |   }
+---
+
+[TestNoMisusedPromisesRule/invalid-19 - 1]
+Diagnostic 1: voidReturnVariable (3:5 - 5:1)
+Message: Promise-returning function provided to variable where a void return was expected.
+   2 | let f: () => void;
+   3 | f = async () => {
+     |     ~~~~~~~~~~~~~
+   4 |   return 3;
+     | ~~~~~~~~~~~
+   5 | };
+     | ~
+   6 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-2 - 1]
+Diagnostic 1: conditional (1:13 - 1:29)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | for (let i; Promise.resolve(); i++) {}
+     |             ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMisusedPromisesRule/invalid-20 - 1]
+Diagnostic 1: voidReturnVariable (3:5 - 5:1)
+Message: Promise-returning function provided to variable where a void return was expected.
+   2 | let f: () => void;
+   3 | f = async () => {
+     |     ~~~~~~~~~~~~~
+   4 |   return 3;
+     | ~~~~~~~~~~~
+   5 | };
+     | ~
+   6 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-21 - 1]
+Diagnostic 1: voidReturnVariable (2:23 - 4:1)
+Message: Promise-returning function provided to variable where a void return was expected.
+   1 | 
+   2 | const f: () => void = async () => {
+     |                       ~~~~~~~~~~~~~
+   3 |   return 0;
+     | ~~~~~~~~~~~
+   4 | };
+     | ~
+   5 | const g = async () => 1,
+
+Diagnostic 2: voidReturnVariable (6:19 - 6:32)
+Message: Promise-returning function provided to variable where a void return was expected.
+   5 | const g = async () => 1,
+   6 |   h: () => void = async () => {};
+     |                   ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-22 - 1]
+Diagnostic 1: voidReturnVariable (5:9 - 7:1)
+Message: Promise-returning function provided to variable where a void return was expected.
+   4 | } = {};
+   5 | obj.f = async () => {
+     |         ~~~~~~~~~~~~~
+   6 |   return 0;
+     | ~~~~~~~~~~~
+   7 | };
+     | ~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-23 - 1]
+Diagnostic 1: voidReturnProperty (4:6 - 4:22)
+Message: Promise-returning function provided to property where a void return was expected.
+   3 | const obj: O = {
+   4 |   f: async () => 'foo',
+     |      ~~~~~~~~~~~~~~~~~
+   5 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-24 - 1]
+Diagnostic 1: voidReturnProperty (4:6 - 4:22)
+Message: Promise-returning function provided to property where a void return was expected.
+   3 | const obj: O = {
+   4 |   f: async () => 'foo',
+     |      ~~~~~~~~~~~~~~~~~
+   5 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-25 - 1]
+Diagnostic 1: voidReturnProperty (5:3 - 5:3)
+Message: Promise-returning function provided to property where a void return was expected.
+   4 | const obj: O = {
+   5 |   f,
+     |   ~
+   6 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-26 - 1]
+Diagnostic 1: voidReturnProperty (4:3 - 6:3)
+Message: Promise-returning function provided to property where a void return was expected.
+   3 | const obj: O = {
+   4 |   async f() {
+     |   ~~~~~~~~~~~
+   5 |     return 0;
+     | ~~~~~~~~~~~~~
+   6 |   },
+     | ~~~
+   7 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-27 - 1]
+Diagnostic 1: voidReturnProperty (6:5 - 8:5)
+Message: Promise-returning function provided to property where a void return was expected.
+   5 |   return {
+   6 |     async f() {
+     |     ~~~~~~~~~~~
+   7 |       return 123;
+     | ~~~~~~~~~~~~~~~~~
+   8 |     },
+     | ~~~~~
+   9 |     g: async () => 0,
+
+Diagnostic 2: voidReturnProperty (9:8 - 9:20)
+Message: Promise-returning function provided to property where a void return was expected.
+   8 |     },
+   9 |     g: async () => 0,
+     |        ~~~~~~~~~~~~~
+  10 |     h,
+
+Diagnostic 3: voidReturnProperty (10:5 - 10:5)
+Message: Promise-returning function provided to property where a void return was expected.
+   9 |     g: async () => 0,
+  10 |     h,
+     |     ~
+  11 |   };
+---
+
+[TestNoMisusedPromisesRule/invalid-28 - 1]
+Diagnostic 1: voidReturnReturnValue (3:10 - 3:22)
+Message: Promise-returning function provided to return value where a void return was expected.
+   2 | function f(): () => void {
+   3 |   return async () => 0;
+     |          ~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-29 - 1]
+Diagnostic 1: voidReturnReturnValue (3:10 - 3:22)
+Message: Promise-returning function provided to return value where a void return was expected.
+   2 | function f(): () => void {
+   3 |   return async () => 0;
+     |          ~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-3 - 1]
+Diagnostic 1: conditional (1:14 - 1:30)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | do {} while (Promise.resolve());
+     |              ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMisusedPromisesRule/invalid-30 - 1]
+Diagnostic 1: voidReturnAttribute (6:17 - 6:31)
+Message: Promise-returning function provided to attribute where a void return was expected.
+   5 | const Component = (obj: O) => null;
+   6 | <Component func={async () => 0} />;
+     |                 ~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-32 - 1]
+Diagnostic 1: voidReturnAttribute (7:17 - 7:19)
+Message: Promise-returning function provided to attribute where a void return was expected.
+   6 | const Component = (obj: O) => null;
+   7 | <Component func={g} />;
+     |                 ~~~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-33 - 1]
+Diagnostic 1: voidReturnArgument (9:8 - 9:21)
+Message: Promise returned in function argument where a void return was expected.
+   8 | 
+   9 | it('', async () => {});
+     |        ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-34 - 1]
+Diagnostic 1: voidReturnArgument (11:8 - 11:21)
+Message: Promise returned in function argument where a void return was expected.
+  10 | 
+  11 | it('', async () => {});
+     |        ~~~~~~~~~~~~~~
+  12 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-35 - 1]
+Diagnostic 1: voidReturnArgument (11:8 - 11:21)
+Message: Promise returned in function argument where a void return was expected.
+  10 | 
+  11 | it('', async () => {});
+     |        ~~~~~~~~~~~~~~
+  12 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-36 - 1]
+Diagnostic 1: spread (2:18 - 2:45)
+Message: Expected a non-Promise value to be spread in an object.
+   1 | 
+   2 | console.log({ ...Promise.resolve({ key: 42 }) });
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-37 - 1]
+Diagnostic 1: spread (6:6 - 6:14)
+Message: Expected a non-Promise value to be spread in an object.
+   5 |   someData: 42,
+   6 |   ...getData(),
+     |      ~~~~~~~~~
+   7 | });
+---
+
+[TestNoMisusedPromisesRule/invalid-38 - 1]
+Diagnostic 1: spread (4:18 - 4:60)
+Message: Expected a non-Promise value to be spread in an object.
+   3 | 
+   4 | console.log({ ...(condition && Promise.resolve({ key: 42 })) });
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
+
+Diagnostic 2: spread (5:18 - 5:60)
+Message: Expected a non-Promise value to be spread in an object.
+   4 | console.log({ ...(condition && Promise.resolve({ key: 42 })) });
+   5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
+
+Diagnostic 3: spread (6:18 - 6:64)
+Message: Expected a non-Promise value to be spread in an object.
+   5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
+   6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
+
+Diagnostic 4: spread (7:18 - 7:64)
+Message: Expected a non-Promise value to be spread in an object.
+   6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
+   7 | console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-39 - 1]
+Diagnostic 1: voidReturnArgument (6:3 - 6:29)
+Message: Promise returned in function argument where a void return was expected.
+   5 |   true,
+   6 |   () => Promise.resolve(true),
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   () => Promise.resolve(null),
+
+Diagnostic 2: voidReturnArgument (7:3 - 7:29)
+Message: Promise returned in function argument where a void return was expected.
+   6 |   () => Promise.resolve(true),
+   7 |   () => Promise.resolve(null),
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   () => true,
+
+Diagnostic 3: voidReturnArgument (9:3 - 9:32)
+Message: Promise returned in function argument where a void return was expected.
+   8 |   () => true,
+   9 |   () => Promise.resolve('Hello'),
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 | );
+---
+
+[TestNoMisusedPromisesRule/invalid-4 - 1]
+Diagnostic 1: conditional (1:8 - 1:24)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | while (Promise.resolve()) {}
+     |        ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMisusedPromisesRule/invalid-40 - 1]
+Diagnostic 1: voidReturnArgument (5:29 - 5:55)
+Message: Promise returned in function argument where a void return was expected.
+   4 | function restUnion(first: string, ...callbacks: Array<MyUnion>): void {}
+   5 | restUnion('Testing', false, () => Promise.resolve(true));
+     |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-41 - 1]
+Diagnostic 1: voidReturnArgument (3:27 - 3:50)
+Message: Promise returned in function argument where a void return was expected.
+   2 | function restTupleOne(first: string, ...callbacks: [() => void]): void {}
+   3 | restTupleOne('My string', () => Promise.resolve(1));
+     |                           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-42 - 1]
+Diagnostic 1: voidReturnArgument (7:31 - 7:57)
+Message: Promise returned in function argument where a void return was expected.
+   6 | 
+   7 | restTupleTwo(true, undefined, () => Promise.resolve(true), undefined);
+     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-43 - 1]
+Diagnostic 1: voidReturnArgument (9:3 - 9:29)
+Message: Promise returned in function argument where a void return was expected.
+   8 |   1,
+   9 |   () => Promise.resolve(true),
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |   false,
+
+Diagnostic 2: voidReturnArgument (12:3 - 12:26)
+Message: Promise returned in function argument where a void return was expected.
+  11 |   () => {},
+  12 |   () => Promise.resolve(1),
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~
+  13 | );
+---
+
+[TestNoMisusedPromisesRule/invalid-44 - 1]
+Diagnostic 1: voidReturnArgument (11:3 - 11:29)
+Message: Promise returned in function argument where a void return was expected.
+  10 |   () => {},
+  11 |   () => Promise.resolve(true),
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | );
+---
+
+[TestNoMisusedPromisesRule/invalid-45 - 1]
+Diagnostic 1: voidReturnArgument (7:17 - 7:40)
+Message: Promise returned in function argument where a void return was expected.
+   6 | restTuple();
+   7 | restTuple(true, () => Promise.resolve(1));
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-46 - 1]
+Diagnostic 1: voidReturnProperty (5:26 - 5:39)
+Message: Promise-returning function provided to property where a void return was expected.
+   4 | const test: ReturnsRecord = () => {
+   5 |   return { asynchronous: async () => {} };
+     |                          ~~~~~~~~~~~~~~
+   6 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-47 - 1]
+Diagnostic 1: voidReturnVariable (3:22 - 3:35)
+Message: Promise-returning function provided to variable where a void return was expected.
+   2 | let value: Record<string, () => void>;
+   3 | value.asynchronous = async () => {};
+     |                      ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-48 - 1]
+Diagnostic 1: voidReturnProperty (7:12 - 7:23)
+Message: Promise-returning function provided to property where a void return was expected.
+   6 | const test: ReturnsRecord = () => {
+   7 |   return { asynchronous };
+     |            ~~~~~~~~~~~~
+   8 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-49 - 1]
+Diagnostic 1: voidReturnArgument (4:5 - 4:7)
+Message: Promise returned in function argument where a void return was expected.
+   3 | declare const bar: undefined | (() => Promise<void>);
+   4 | foo(bar);
+     |     ~~~
+   5 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-5 - 1]
+Diagnostic 1: conditional (1:1 - 1:17)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | Promise.resolve() ? 123 : 456;
+     | ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMisusedPromisesRule/invalid-50 - 1]
+Diagnostic 1: voidReturnArgument (4:5 - 4:7)
+Message: Promise returned in function argument where a void return was expected.
+   3 | declare const bar: string & (() => Promise<void>);
+   4 | foo(bar);
+     |     ~~~
+   5 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-51 - 1]
+Diagnostic 1: voidReturnArgument (7:9 - 7:14)
+Message: Promise returned in function argument where a void return was expected.
+   6 | ];
+   7 | consume(...cbs);
+     |         ~~~~~~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-52 - 1]
+Diagnostic 1: voidReturnArgument (4:9 - 4:14)
+Message: Promise returned in function argument where a void return was expected.
+   3 | let cbs = [() => Promise.resolve(true), () => Promise.resolve(true)] as const;
+   4 | consume(...cbs);
+     |         ~~~~~~
+   5 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-53 - 1]
+Diagnostic 1: voidReturnArgument (4:9 - 4:14)
+Message: Promise returned in function argument where a void return was expected.
+   3 | let cbs = [() => Promise.resolve(true), () => Promise.resolve(true)];
+   4 | consume(...cbs);
+     |         ~~~~~~
+   5 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-54 - 1]
+Diagnostic 1: voidReturnInheritedMethod (9:3 - 11:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+   8 | class MySubclassExtendsMyClass extends MyClass {
+   9 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |   }
+     | ~~~
+  12 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-55 - 1]
+Diagnostic 1: voidReturnInheritedMethod (9:3 - 9:37)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+   8 | abstract class MyAbstractClassExtendsMyClass extends MyClass {
+   9 |   abstract setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-56 - 1]
+Diagnostic 1: voidReturnInheritedMethod (9:3 - 9:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+   8 | interface MyInterfaceExtendsMyClass extends MyClass {
+   9 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-57 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 9:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyAbstractClass'.
+   6 | class MySubclassExtendsMyAbstractClass extends MyAbstractClass {
+   7 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   }
+     | ~~~
+  10 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-58 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:37)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyAbstractClass'.
+   6 | abstract class MyAbstractSubclassExtendsMyAbstractClass extends MyAbstractClass {
+   7 |   abstract setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-59 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyAbstractClass'.
+   6 | interface MyInterfaceExtendsMyAbstractClass extends MyAbstractClass {
+   7 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-6 - 1]
+Diagnostic 1: conditional (2:6 - 2:22)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | 
+   2 | if (!Promise.resolve()) {
+     |      ~~~~~~~~~~~~~~~~~
+   3 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-60 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 9:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
+   6 | class MyInterfaceSubclass implements MyInterface {
+   7 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   }
+     | ~~~
+  10 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-61 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:37)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
+   6 | abstract class MyAbstractClassImplementsMyInterface implements MyInterface {
+   7 |   abstract setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-62 - 1]
+Diagnostic 1: voidReturnInheritedMethod (9:3 - 11:4)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+   8 | class MySubclassExtendsMyClass extends MyClass {
+   9 |   accessor setThing = async (): Promise<void> => {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |   };
+     | ~~~~
+  12 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-63 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:50)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+   6 | abstract class MySubclassExtendsMyClass extends MyClass {
+   7 |   abstract accessor setThing: () => Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-64 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
+   6 | interface MySubInterface extends MyInterface {
+   7 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-65 - 1]
+Diagnostic 1: voidReturnInheritedMethod (6:3 - 8:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyTypeIntersection'.
+   5 |   thing = 1;
+   6 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   }
+     | ~~~
+   9 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-66 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type '{ setThing(): void; }'.
+   6 | interface MyAsyncInterface extends MyGenericType<false> {
+   7 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-67 - 1]
+Diagnostic 1: voidReturnInheritedMethod (11:3 - 11:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
+  10 | interface MyThirdInterface extends MyInterface, MyOtherInterface {
+  11 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | }
+
+Diagnostic 2: voidReturnInheritedMethod (11:3 - 11:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyOtherInterface'.
+  10 | interface MyThirdInterface extends MyInterface, MyOtherInterface {
+  11 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-68 - 1]
+Diagnostic 1: voidReturnInheritedMethod (15:3 - 15:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+  14 | interface MyInterface extends MyClass, MyOtherClass {
+  15 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  16 | }
+
+Diagnostic 2: voidReturnInheritedMethod (15:3 - 15:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyOtherClass'.
+  14 | interface MyInterface extends MyClass, MyOtherClass {
+  15 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  16 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-69 - 1]
+Diagnostic 1: voidReturnInheritedMethod (17:3 - 19:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
+  16 | class MySubclass extends MyClass implements MyAsyncInterface, MySyncInterface {
+  17 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  18 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  19 |   }
+     | ~~~
+  20 | }
+
+Diagnostic 2: voidReturnInheritedMethod (17:3 - 19:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MySyncInterface'.
+  16 | class MySubclass extends MyClass implements MyAsyncInterface, MySyncInterface {
+  17 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  18 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  19 |   }
+     | ~~~
+  20 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-7 - 1]
+Diagnostic 1: conditional (1:1 - 1:17)
+Message: Expected non-Promise value in a boolean conditional.
+   1 | Promise.resolve() || false;
+     | ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMisusedPromisesRule/invalid-70 - 1]
+Diagnostic 1: voidReturnInheritedMethod (7:3 - 9:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
+   6 | const MyClassExpressionExtendsMyClass = class implements MyInterface {
+   7 |   setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   }
+     | ~~~
+  10 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-71 - 1]
+Diagnostic 1: voidReturnInheritedMethod (9:3 - 11:3)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClassExpression'.
+   8 | class MyClassExtendsMyClassExpression extends MyClassExpression {
+   9 |   async setThing(): Promise<void> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |   }
+     | ~~~
+  12 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-72 - 1]
+Diagnostic 1: voidReturnInheritedMethod (10:3 - 10:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'typeof MyClassExpression'.
+   9 | interface MyInterfaceExtendsMyClassExpression extends MyClassExpressionType {
+  10 |   setThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-73 - 1]
+Diagnostic 1: voidReturnInheritedMethod (16:3 - 16:28)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MySyncInterface'.
+  15 |   [key: number]: () => Promise<void>;
+  16 |   myMethod(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  17 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-74 - 1]
+Diagnostic 1: voidReturnInheritedMethod (29:3 - 29:31)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyMethods'.
+  28 |   [key: number]: () => void;
+  29 |   doSyncThing(): Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  30 |   doAsyncThing(): Promise<void>;
+
+Diagnostic 2: voidReturnInheritedMethod (31:3 - 31:42)
+Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyMethods'.
+  30 |   doAsyncThing(): Promise<void>;
+  31 |   syncMethodProperty: () => Promise<void>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  32 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-75 - 1]
+Diagnostic 1: predicate (3:18 - 3:25)
+Message: Expected a non-Promise value to be returned.
+   2 | declare function isTruthy(value: unknown): Promise<boolean>;
+   3 | [0, 1, 2].filter(isTruthy);
+     |                  ~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-76 - 1]
+Diagnostic 1: predicate (3:13 - 3:39)
+Message: Expected a non-Promise value to be returned.
+   2 | const array: number[] = [];
+   3 | array.every(() => Promise.resolve(true));
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-77 - 1]
+Diagnostic 1: predicate (3:13 - 3:39)
+Message: Expected a non-Promise value to be returned.
+   2 | const array: (string[] & { foo: 'bar' }) | (number[] & { bar: 'foo' }) = [];
+   3 | array.every(() => Promise.resolve(true));
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-78 - 1]
+Diagnostic 1: predicate (3:12 - 3:39)
+Message: Expected a non-Promise value to be returned.
+   2 | const tuple: [number, number, number] = [1, 2, 3];
+   3 | tuple.find(() => Promise.resolve(false));
+     |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-79 - 1]
+Diagnostic 1: voidReturnArgument (7:26 - 7:39)
+Message: Promise returned in function argument where a void return was expected.
+   6 | declare const useCallbackReturningVoid: typeof useCallback<ReturnsVoid>;
+   7 | useCallbackReturningVoid(async () => {});
+     |                          ~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-8 - 1]
+Diagnostic 1: voidReturnArgument (2:47 - 4:1)
+Message: Promise returned in function argument where a void return was expected.
+   1 | 
+   2 | [Promise.resolve(), Promise.reject()].forEach(async val => {
+     |                                               ~~~~~~~~~~~~~~
+   3 |   await val;
+     | ~~~~~~~~~~~~
+   4 | });
+     | ~
+   5 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-80 - 1]
+Diagnostic 1: voidReturnArgument (6:26 - 6:39)
+Message: Promise returned in function argument where a void return was expected.
+   5 | ) => T;
+   6 | useCallback<ReturnsVoid>(async () => {});
+     |                          ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-81 - 1]
+Diagnostic 1: voidReturnArgument (8:5 - 8:18)
+Message: Promise returned in function argument where a void return was expected.
+   7 | 
+   8 | foo(async () => {});
+     |     ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-82 - 1]
+Diagnostic 1: voidReturnArgument (6:3 - 6:16)
+Message: Promise returned in function argument where a void return was expected.
+   5 | tupleFn<() => void>(
+   6 |   async () => {},
+     |   ~~~~~~~~~~~~~~
+   7 |   'foo',
+
+Diagnostic 2: voidReturnArgument (8:3 - 8:16)
+Message: Promise returned in function argument where a void return was expected.
+   7 |   'foo',
+   8 |   async () => {},
+     |   ~~~~~~~~~~~~~~
+   9 | );
+---
+
+[TestNoMisusedPromisesRule/invalid-83 - 1]
+Diagnostic 1: voidReturnArgument (6:3 - 6:16)
+Message: Promise returned in function argument where a void return was expected.
+   5 | arrayFn<() => void>(
+   6 |   async () => {},
+     |   ~~~~~~~~~~~~~~
+   7 |   'foo',
+
+Diagnostic 2: voidReturnArgument (8:3 - 8:16)
+Message: Promise returned in function argument where a void return was expected.
+   7 |   'foo',
+   8 |   async () => {},
+     |   ~~~~~~~~~~~~~~
+   9 | );
+---
+
+[TestNoMisusedPromisesRule/invalid-84 - 1]
+Diagnostic 1: voidReturnProperty (7:3 - 9:3)
+Message: Promise-returning function provided to property where a void return was expected.
+   6 | const o: HasVoidMethod = {
+   7 |   async f() {
+     |   ~~~~~~~~~~~
+   8 |     return 3;
+     | ~~~~~~~~~~~~~
+   9 |   },
+     | ~~~
+  10 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-85 - 1]
+Diagnostic 1: voidReturnProperty (7:14 - 7:28)
+Message: Promise-returning function provided to property where a void return was expected.
+   6 | const o: HasVoidMethod = {
+   7 |   async f(): Promise<number> {
+     |              ~~~~~~~~~~~~~~~
+   8 |     return 3;
+---
+
+[TestNoMisusedPromisesRule/invalid-86 - 1]
+Diagnostic 1: voidReturnProperty (6:3 - 8:3)
+Message: Promise-returning function provided to property where a void return was expected.
+   5 | const obj: HasVoidMethod = {
+   6 |   f() {
+     |   ~~~~~
+   7 |     return Promise.resolve('foo');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   },
+     | ~~~
+   9 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-87 - 1]
+Diagnostic 1: voidReturnProperty (6:8 - 6:20)
+Message: Promise-returning function provided to property where a void return was expected.
+   5 | const obj: HasVoidMethod = {
+   6 |   f(): Promise<void> {
+     |        ~~~~~~~~~~~~~
+   7 |     throw new Error();
+---
+
+[TestNoMisusedPromisesRule/invalid-88 - 1]
+Diagnostic 1: voidReturnProperty (5:6 - 5:18)
+Message: Promise-returning function provided to property where a void return was expected.
+   4 | const obj: O = {
+   5 |   f: asyncFunction,
+     |      ~~~~~~~~~~~~~
+   6 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-89 - 1]
+Diagnostic 1: voidReturnProperty (4:16 - 4:30)
+Message: Promise-returning function provided to property where a void return was expected.
+   3 | const obj: O = {
+   4 |   f: async (): Promise<string> => 'foo',
+     |                ~~~~~~~~~~~~~~~
+   5 | };
+---
+
+[TestNoMisusedPromisesRule/invalid-9 - 1]
+Diagnostic 1: voidReturnArgument (2:13 - 5:1)
+Message: Promise returned in function argument where a void return was expected.
+   1 | 
+   2 | new Promise(async (resolve, reject) => {
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   resolve();
+     | ~~~~~~~~~~~~
+   5 | });
+     | ~
+   6 |       
+---

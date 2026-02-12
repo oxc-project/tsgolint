@@ -1,0 +1,63 @@
+
+[TestRelatedGetterSetterPairs/invalid-0 - 1]
+Diagnostic 1: mismatch (3:16 - 3:33)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   2 | interface Example {
+   3 |   get value(): string | undefined;
+     |                ~~~~~~~~~~~~~~~~~~
+   4 |   set value(newValue: string);
+---
+
+[TestRelatedGetterSetterPairs/invalid-1 - 1]
+Diagnostic 1: mismatch (3:16 - 3:21)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   2 | interface Example {
+   3 |   get value(): number;
+     |                ~~~~~~
+   4 |   set value(newValue: string);
+---
+
+[TestRelatedGetterSetterPairs/invalid-2 - 1]
+Diagnostic 1: mismatch (3:16 - 3:21)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   2 | type Example = {
+   3 |   get value(): number;
+     |                ~~~~~~
+   4 |   set value(newValue: string);
+---
+
+[TestRelatedGetterSetterPairs/invalid-3 - 1]
+Diagnostic 1: mismatch (3:16 - 3:22)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   2 | class Example {
+   3 |   get value(): boolean {
+     |                ~~~~~~~
+   4 |     return true;
+---
+
+[TestRelatedGetterSetterPairs/invalid-4 - 1]
+Diagnostic 1: mismatch (5:12 - 5:18)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   4 | declare class Foo {
+   5 |   get a(): GetType;
+     |            ~~~~~~~
+   6 | 
+---
+
+[TestRelatedGetterSetterPairs/invalid-5 - 1]
+Diagnostic 1: mismatch (7:12 - 7:18)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   6 | declare class Foo {
+   7 |   get a(): GetType;
+     |            ~~~~~~~
+   8 | 
+---
+
+[TestRelatedGetterSetterPairs/invalid-6 - 1]
+Diagnostic 1: mismatch (7:12 - 7:18)
+Message: `get()` type should be assignable to its equivalent `set()` type.
+   6 | declare class Foo {
+   7 |   get a(): GetType;
+     |            ~~~~~~~
+   8 | 
+---

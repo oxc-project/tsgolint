@@ -33,6 +33,9 @@ test: build
   cd e2e && pnpm run test --run && cd ..
   go test ./internal/...
 
+update-snaps:
+  UPDATE_SNAPS=true go test ./internal/...
+
 lint:
   golangci-lint run
 

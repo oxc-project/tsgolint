@@ -1,0 +1,326 @@
+
+[TestNoUnnecessaryTypeConversion/invalid-0 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | String('asdf');
+     | ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-1 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:8 - 1:17)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 'asdf'.toString();
+     |        ~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-10 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | !!true;
+     | ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-11 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | BigInt(3n);
+     | ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-12 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:23)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends string>(x: T) {
+   3 |           return String(x);
+     |                  ~~~~~~
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-13 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:23)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends number>(x: T) {
+   3 |           return Number(x);
+     |                  ~~~~~~
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-14 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:24)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends boolean>(x: T) {
+   3 |           return Boolean(x);
+     |                  ~~~~~~~
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-15 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:23)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends bigint>(x: T) {
+   3 |           return BigInt(x);
+     |                  ~~~~~~
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-16 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:47 - 1:50)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends string>(x: T) { return x + ''; }
+     |                                               ~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-17 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:45 - 1:49)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends string>(x: T) { return '' + x; }
+     |                                             ~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-18 - 1]
+Diagnostic 1: unnecessaryTypeConversion (2:1 - 2:7)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends string>(x: T) {
+   2 | x += '';
+     | ~~~~~~~
+   3 | return x;
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-19 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:45 - 1:45)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends number>(x: T) { return +x; }
+     |                                             ~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-2 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:5)
+Message: This type conversion does not change the type or value of the expression.
+   1 | '' + 'asdf';
+     | ~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-20 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:46 - 1:47)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends boolean>(x: T) { return !!x; }
+     |                                              ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-21 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:44 - 1:45)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends 3 | 4>(x: T) { return ~~x; }
+     |                                            ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-22 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | String('a' + 'b').length;
+     | ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-23 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:13 - 1:22)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ('a' + 'b').toString().length;
+     |             ~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-24 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:5 - 1:5)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 2 * +(2 + 2);
+     |     ~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-25 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:5 - 1:10)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 2 * Number(2 + 2);
+     |     ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-26 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:10 - 1:11)
+Message: This type conversion does not change the type or value of the expression.
+   1 | false && !!(false || true);
+     |          ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-27 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:10 - 1:16)
+Message: This type conversion does not change the type or value of the expression.
+   1 | false && Boolean(false || true);
+     |          ~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-28 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:6 - 1:11)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 2n * BigInt(2n + 2n);
+     |      ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-29 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:9 - 3:14)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         let str = 'asdf';
+   3 |         String(str).length;
+     |         ~~~~~~
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-3 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:8 - 1:11)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 'asdf' + '';
+     |        ~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-30 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:13 - 3:22)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         let str = 'asdf';
+   3 |         str.toString().length;
+     |             ~~~~~~~~~~
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-31 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ~~1;
+     | ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-32 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ~~-1;
+     | ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-33 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:9 - 3:10)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         declare const threeOrFour: 3 | 4;
+   3 |         ~~threeOrFour;
+     |         ~~
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-4 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:1 - 3:9)
+Message: This type conversion does not change the type or value of the expression.
+   2 | let str = 'asdf';
+   3 | str += '';
+     | ~~~~~~~~~
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-5 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:11 - 3:19)
+Message: This type conversion does not change the type or value of the expression.
+   2 | let str = 'asdf';
+   3 | 'asdf' + (str += '');
+     |           ~~~~~~~~~
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-6 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | Number(123);
+     | ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-7 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:1)
+Message: This type conversion does not change the type or value of the expression.
+   1 | +123;
+     | ~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-8 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ~~123;
+     | ~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-9 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:7)
+Message: This type conversion does not change the type or value of the expression.
+   1 | Boolean(true);
+     | ~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---

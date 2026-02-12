@@ -1,0 +1,322 @@
+
+[TestPreferFindRule/invalid-0 - 1]
+Diagnostic 1: preferFind (3:1 - 3:37)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: string[];
+   3 | arr.filter(item => item === 'aha')[0];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-1 - 1]
+Diagnostic 1: preferFind (4:1 - 4:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = 0;
+   4 | arr.filter(item => item === 'aha')[zero];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-10 - 1]
+Diagnostic 1: preferFind (1:1 - 1:74)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | (([] as unknown[]))?.["filter"] ((item) => { return item === 2 }  ) [ 0  ] ;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-11 - 1]
+Diagnostic 1: preferFind (3:1 - 3:38)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const nullableArray: unknown[] | undefined | null;
+   3 | nullableArray?.filter(item => true)[0];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-12 - 1]
+Diagnostic 1: preferFind (1:1 - 1:18)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | ([]?.filter(f))[0];
+     | ~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-13 - 1]
+Diagnostic 1: preferFind (4:13 - 4:70)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | declare function cond(x: unknown): boolean;
+   4 | console.log((1, 2, objectWithArrayProperty?.arr['filter'](cond)).at(0));
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-14 - 1]
+Diagnostic 1: preferFind (2:1 - 2:36)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | 
+   2 | [1, 2, 3].filter(x => x > 0).at(NaN);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-15 - 1]
+Diagnostic 1: preferFind (3:1 - 3:44)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | const idxToLookUp = -0.12635678;
+   3 | [1, 2, 3].filter(x => x > 0).at(idxToLookUp);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-16 - 1]
+Diagnostic 1: preferFind (2:1 - 2:37)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | 
+   2 | [1, 2, 3].filter(x => x > 0)[`at`](0);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-17 - 1]
+Diagnostic 1: preferFind (5:1 - 8:10)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   4 | const a = { arr };
+   5 | a?.arr
+     | ~~~~~~
+   6 |   .filter(cond) /* what a bad spot for a comment. Let's make sure
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   there's some yucky symbols too. [ . ?. <>   ' ' \'] */
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   .at('0');
+     | ~~~~~~~~~~
+   9 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-18 - 1]
+Diagnostic 1: preferFind (9:6 - 11:13)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   8 |   // line comment!
+   9 |   ...imNotActuallyAnArray[/* comment */ 'filter' /* another comment */](
+     |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |     x => x[1] > 0,
+     | ~~~~~~~~~~~~~~~~~~
+  11 |   ) /**/[`0`]!,
+     | ~~~~~~~~~~~~~
+  12 | );
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-19 - 1]
+Diagnostic 1: preferFind (3:10 - 5:3)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | function actingOnArray<T extends string[]>(values: T) {
+   3 |   return values.filter(filter => filter === 'filter')[
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |     /* filter */ -0.0 /* filter */
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   ];
+     | ~~~
+   6 | }
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-2 - 1]
+Diagnostic 1: preferFind (4:1 - 4:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = 0n;
+   4 | arr.filter(item => item === 'aha')[zero];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-20 - 1]
+Diagnostic 1: preferFind (5:3 - 9:67)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   4 |   2,
+   5 |   (1,
+     |   ~~~
+   6 |   2,
+     | ~~~~
+   7 |   3,
+     | ~~~~
+   8 |   (1, 2, 3, 4),
+     | ~~~~~~~~~~~~~~~
+   9 |   (1, 2, 3, 4, 5, [1, 2, 3, 4, 5, 6].filter(x => x % 2 == 0)))['0']);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-21 - 1]
+Diagnostic 1: preferFind (3:1 - 3:25)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: { a: 1 }[] & { b: 2 }[];
+   3 | arr.filter(f, thisArg)[0];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-22 - 1]
+Diagnostic 1: preferFind (3:1 - 3:25)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: { a: 1 }[] & ({ b: 2 }[] | { c: 3 }[]);
+   3 | arr.filter(f, thisArg)[0];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-23 - 1]
+Diagnostic 1: preferFind (2:1 - 4:35)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | 
+   2 | (Math.random() < 0.5
+     | ~~~~~~~~~~~~~~~~~~~~
+   3 |   ? [1, 2, 3].filter(x => false)
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   : [1, 2, 3].filter(x => true))[0];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-24 - 1]
+Diagnostic 1: preferFind (4:5 - 4:34)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 |   ? [1, 2, 3].find(x => true)
+   4 |   : [1, 2, 3].filter(x => true)[0];
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-25 - 1]
+Diagnostic 1: preferFind (4:25 - 10:9)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 |   g: (arg0: unknown) => boolean;
+   4 | const nestedTernaries = (
+     |                         ~
+   5 |   Math.random() < 0.5
+     | ~~~~~~~~~~~~~~~~~~~~~
+   6 |     ? Math.random() < 0.5
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       ? [1, 2, 3].filter(f)
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       : []?.filter(x => 'shrug')
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |     : [2, 3, 4]['filter'](g)
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 | ).at(0.2);
+     | ~~~~~~~~~
+  11 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-26 - 1]
+Diagnostic 1: preferFind (3:47 - 9:9)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const f: (arg0: unknown) => boolean, g: (arg0: unknown) => boolean;
+   3 | const nestedTernariesWithSequenceExpression = (
+     |                                               ~
+   4 |   Math.random() < 0.5
+     | ~~~~~~~~~~~~~~~~~~~~~
+   5 |     ? ('sequence',
+     | ~~~~~~~~~~~~~~~~~~
+   6 |       'expression',
+     | ~~~~~~~~~~~~~~~~~~~
+   7 |       Math.random() < 0.5 ? [1, 2, 3].filter(f) : []?.filter(x => 'shrug'))
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |     : [2, 3, 4]['filter'](g)
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 | ).at(0.2);
+     | ~~~~~~~~~
+  10 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-27 - 1]
+Diagnostic 1: preferFind (3:1 - 3:37)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const spreadArgs: [(x: unknown) => boolean];
+   3 | [1, 2, 3].filter(...spreadArgs).at(0);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-3 - 1]
+Diagnostic 1: preferFind (4:1 - 4:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = -0n;
+   4 | arr.filter(item => item === 'aha')[zero];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-4 - 1]
+Diagnostic 1: preferFind (3:1 - 3:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: readonly string[];
+   3 | arr.filter(item => item === 'aha').at(0);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-5 - 1]
+Diagnostic 1: preferFind (3:1 - 3:53)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: ReadonlyArray<string>;
+   3 | (undefined, arr.filter(item => item === 'aha')).at(0);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-6 - 1]
+Diagnostic 1: preferFind (4:1 - 4:43)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = 0;
+   4 | arr.filter(item => item === 'aha').at(zero);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-7 - 1]
+Diagnostic 1: preferFind (3:1 - 3:39)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: string[];
+   3 | arr.filter(item => item === 'aha')['0'];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-8 - 1]
+Diagnostic 1: preferFind (1:13 - 1:51)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | const two = [1, 2, 3].filter(item => item === 2)[0];
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-9 - 1]
+Diagnostic 1: preferFind (1:24 - 1:91)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | const fltr = "filter"; (([] as unknown[]))[fltr] ((item) => { return item === 2 }  ) [ 0  ] ;
+     |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
