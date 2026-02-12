@@ -40,7 +40,8 @@
       "GetNonNullableType",
       "IsNullableType",
       "getIndexInfosOfType",
-      "isReadonlySymbol"
+      "isReadonlySymbol",
+      "getContextFreeTypeOfExpression"
     ]
   },
   "ExtraFields": {

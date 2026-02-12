@@ -10,3 +10,5 @@ const result = getString() as string; // unnecessary, getString() already return
 
 const num = 42;
 const alsoRedundant = num as 42; // unnecessary if TypeScript can infer literal type
+
+export {};

@@ -186,6 +186,14 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return utils.IsTypeFlagSet(t, checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral)
 		}
 
+		shouldUseContextFreeType := func(node *ast.Node) bool {
+			return ast.IsIdentifier(node) ||
+				ast.IsAwaitExpression(node) ||
+				ast.IsCallExpression(node) ||
+				ast.IsPropertyAccessExpression(node) ||
+				ast.IsElementAccessExpression(node)
+		}
+
 		checkTypeAssertion := func(node *ast.Node) {
 			typeNode := node.Type()
 			if slices.Contains(opts.TypesToIgnore, strings.TrimSpace(ctx.SourceFile.Text()[typeNode.Pos():typeNode.End()])) {
@@ -201,7 +209,15 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			expression := node.Expression()
-			uncastType := ctx.TypeChecker.GetTypeAtLocation(expression)
+			expressionForType := ast.SkipParentheses(expression)
+			uncastType := ctx.TypeChecker.GetTypeAtLocation(expressionForType)
+
+			if !castTypeIsLiteral && uncastType == castType && shouldUseContextFreeType(expressionForType) {
+				if contextFreeType := checker.Checker_getContextFreeTypeOfExpression(ctx.TypeChecker, expressionForType); contextFreeType != nil {
+					uncastType = contextFreeType
+				}
+			}
+
 			typeIsUnchanged := isTypeUnchanged(uncastType, castType)
 
 			var wouldSameTypeBeInferred bool

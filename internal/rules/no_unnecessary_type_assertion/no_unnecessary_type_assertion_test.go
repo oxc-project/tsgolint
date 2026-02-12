@@ -419,6 +419,46 @@ enum T {
 declare const a: T.Value1;
 const b = a as const;
 		`},
+		{Code: `
+function filterProps(props: PropertyKey[]): string[] {
+  return props.filter((prop) =>
+    !['foo', 'bar'].includes(prop as string)
+  ) as string[];
+}
+		`},
+		{Code: `
+function filterProps(props: PropertyKey[]): string[] {
+  return <string[]>props.filter((prop) =>
+    !['foo', 'bar'].includes(<string>prop)
+  );
+}
+		`},
+		{Code: `
+async function mergeWithDefaults(loadModule: () => Promise<unknown>) {
+  const mod = (await loadModule()) as Record<string, unknown>;
+  return { ...mod, extra: true };
+}
+		`},
+		{Code: `
+async function mergeWithDefaults(loadModule: () => Promise<unknown>) {
+  const mod = <Record<string, unknown>>(await loadModule());
+  return { ...mod, extra: true };
+}
+		`},
+		{Code: `
+type Wrapper<T> = { value: number; meta: T };
+
+function unwrap<T>(input: number | string | Wrapper<T>): number {
+  return typeof input === 'string' ? parseFloat(input) : (input as number);
+}
+		`},
+		{Code: `
+type Wrapper<T> = { value: number; meta: T };
+
+function unwrap<T>(input: number | string | Wrapper<T>): number {
+  return typeof input === 'string' ? parseFloat(input) : <number>input;
+}
+		`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -439,6 +479,23 @@ const b = a as const;
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
 					Column:    13,
+				},
+			},
+		},
+		{
+			Code: `
+const num = 42;
+const alsoRedundant = num as 42;
+      `,
+			Output: []string{`
+const num = 42;
+const alsoRedundant = num;
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
 				},
 			},
 		},
@@ -669,6 +726,63 @@ const bar = <Foo>foo;
 			Output: []string{`
 declare const foo: Foo;
 const bar = foo;
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+				},
+			},
+		},
+		{
+			Code: `
+declare const prop: string;
+['foo', 'bar'].includes(prop as string);
+      `,
+			Output: []string{`
+declare const prop: string;
+['foo', 'bar'].includes(prop);
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+				},
+			},
+		},
+		{
+			Code: `
+async function mergeWithDefaults(loadModule: () => Promise<Record<string, unknown>>) {
+  const mod = (await loadModule()) as Record<string, unknown>;
+  return { ...mod, extra: true };
+}
+      `,
+			Output: []string{`
+async function mergeWithDefaults(loadModule: () => Promise<Record<string, unknown>>) {
+  const mod = (await loadModule());
+  return { ...mod, extra: true };
+}
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+				},
+			},
+		},
+		{
+			Code: `
+function unwrap(input: string | number): number {
+  return typeof input === 'string' ? parseFloat(input) : (input as number);
+}
+      `,
+			Output: []string{`
+function unwrap(input: string | number): number {
+  return typeof input === 'string' ? parseFloat(input) : (input);
+}
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
