@@ -23,7 +23,7 @@ Key highlights:
 This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint). Fork permission is granted by @auvred.
 
 > [!IMPORTANT]
-> **tsgolint** is a prototype in the early stages of development.
+> **tsgolint** is currently in alpha.
 > This is a community effort. Feel free to ask to be assigned to any of the [good first issues](https://github.com/oxc-project/tsgolint/contribute).
 
 ## Installation & Usage
@@ -107,11 +107,13 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 56/59.
+Implemented 56/61.
 
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
+- [ ] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
+- [ ] [strict-void-return](https://typescript-eslint.io/rules/strict-void-return)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
