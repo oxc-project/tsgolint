@@ -109,7 +109,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 Implemented 57/61.
 
-- [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
+- [x] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)

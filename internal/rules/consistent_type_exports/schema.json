@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "consistent_type_exports_options": {
+      "type": "object",
+      "properties": {
+        "fixMixedExportsWithInlineTypeSpecifier": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  }
+}
