@@ -1346,6 +1346,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has type '"asdf"'.",
+        "range": {
+          "end": 94,
+          "pos": 88,
+        },
+      },
+    ],
     "message": {
       "description": "This type conversion does not change the type or value of the expression.",
       "id": "unnecessaryTypeConversion",
@@ -1391,6 +1400,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has type '"asdf"'.",
+        "range": {
+          "end": 113,
+          "pos": 107,
+        },
+      },
+    ],
     "message": {
       "description": "This type conversion does not change the type or value of the expression.",
       "id": "unnecessaryTypeConversion",
@@ -1436,6 +1454,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has type '"asdf"'.",
+        "range": {
+          "end": 147,
+          "pos": 141,
+        },
+      },
+    ],
     "message": {
       "description": "This type conversion does not change the type or value of the expression.",
       "id": "unnecessaryTypeConversion",
@@ -1481,6 +1508,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has type '123'.",
+        "range": {
+          "end": 169,
+          "pos": 166,
+        },
+      },
+    ],
     "message": {
       "description": "This type conversion does not change the type or value of the expression.",
       "id": "unnecessaryTypeConversion",
@@ -1526,6 +1562,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-conversion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has type 'true'.",
+        "range": {
+          "end": 188,
+          "pos": 184,
+        },
+      },
+    ],
     "message": {
       "description": "This type conversion does not change the type or value of the expression.",
       "id": "unnecessaryTypeConversion",
