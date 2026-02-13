@@ -1,0 +1,669 @@
+
+[TestPreferPromiseRejectErrors/invalid-0 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:17)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(5);
+     | ~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-1 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:21)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject('foo');
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-10 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:26)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject({ foo: 1 });
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-11 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:25)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject([1, 2, 3]);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-12 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Error | undefined;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-13 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:27)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: () => Promise<string>;
+   3 | Promise.reject(await foo());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-14 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:34)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: boolean;
+   3 | Promise.reject(foo && new Error());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-15 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:12)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | const foo = Promise;
+   3 | foo.reject();
+     | ~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-16 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:19)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject?.(5);
+     | ~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-17 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:18)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise?.reject(5);
+     | ~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-18 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:20)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise?.reject?.(5);
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-19 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:20)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | (Promise?.reject)(5);
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-2 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:21)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(`foo`);
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-20 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:22)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | (Promise?.reject)?.(5);
+     | ~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-21 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:20)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise['reject'](5);
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-22 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:36)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject((foo += new Error()));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-23 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:36)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject((foo -= new Error()));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-24 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:37)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject((foo **= new Error()));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-25 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:37)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject((foo <<= new Error()));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-26 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:36)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject((foo |= new Error()));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-27 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:36)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject((foo &= new Error()));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-28 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: never;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-29 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: unknown;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-3 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:36)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject('foo', somethingElse);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-30 - 1]
+Diagnostic 1: rejectAnError (4:1 - 4:19)
+Message: Expected the Promise rejection reason to be an Error.
+   3 | declare const foo: FakeReadonly<Error>;
+   4 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-31 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<'error'>;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-32 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Error | 'error'>;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-33 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Error> | 'error';
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-34 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Error> | Readonly<TypeError> | Readonly<'error'>;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-35 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<'error'>>;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-36 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<Readonly<Error> | 'error'>>;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-37 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<Readonly<Error> & TypeError>> | 'error';
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-38 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<Error>> | Readonly<TypeError> | 'error';
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-39 - 1]
+Diagnostic 1: rejectAnError (4:1 - 4:19)
+Message: Expected the Promise rejection reason to be an Error.
+   3 | declare const foo: Wrapper<Error | 'error'>['foo'][5];
+   4 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-4 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:21)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(false);
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-40 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Error[];
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-41 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: ReadonlyArray<Error>;
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-42 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:19)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: [Error];
+   3 | Promise.reject(foo);
+     | ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-43 - 1]
+Diagnostic 1: rejectAnError (3:3 - 3:10)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | new Promise(function (resolve, reject) {
+   3 |   reject();
+     |   ~~~~~~~~
+   4 | });
+---
+
+[TestPreferPromiseRejectErrors/invalid-44 - 1]
+Diagnostic 1: rejectAnError (3:3 - 3:11)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | new Promise(function (resolve, reject) {
+   3 |   reject(5);
+     |   ~~~~~~~~~
+   4 | });
+---
+
+[TestPreferPromiseRejectErrors/invalid-45 - 1]
+Diagnostic 1: rejectAnError (3:3 - 3:10)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | new Promise((resolve, reject) => {
+   3 |   reject();
+     |   ~~~~~~~~
+   4 | });
+---
+
+[TestPreferPromiseRejectErrors/invalid-46 - 1]
+Diagnostic 1: rejectAnError (1:34 - 1:42)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | new Promise((resolve, reject) => reject(5));
+     |                                  ~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-47 - 1]
+Diagnostic 1: rejectAnError (4:14 - 4:37)
+Message: Expected the Promise rejection reason to be an Error.
+   3 |   fs.readFile('foo.txt', (err, file) => {
+   4 |     if (err) reject('File not found');
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |     else resolve(file);
+---
+
+[TestPreferPromiseRejectErrors/invalid-48 - 1]
+Diagnostic 1: rejectAnError (1:26 - 1:30)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | new Promise((yes, no) => no(5));
+     |                          ~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-49 - 1]
+Diagnostic 1: rejectAnError (1:44 - 1:52)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | new Promise(({ foo, bar, baz }, reject) => reject(5));
+     |                                            ~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-5 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:26)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(void `foo`);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-51 - 1]
+Diagnostic 1: rejectAnError (3:3 - 3:14)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | new Promise(function (foo, arguments) {
+   3 |   arguments(5);
+     |   ~~~~~~~~~~~~
+   4 | });
+---
+
+[TestPreferPromiseRejectErrors/invalid-52 - 1]
+Diagnostic 1: rejectAnError (1:33 - 1:44)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | new Promise((foo, arguments) => arguments(5));
+     |                                 ~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-53 - 1]
+Diagnostic 1: rejectAnError (3:3 - 3:11)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | new Promise(function ({}, reject) {
+   3 |   reject(5);
+     |   ~~~~~~~~~
+   4 | });
+---
+
+[TestPreferPromiseRejectErrors/invalid-54 - 1]
+Diagnostic 1: rejectAnError (1:29 - 1:37)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | new Promise(({}, reject) => reject(5));
+     |                             ~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-55 - 1]
+Diagnostic 1: rejectAnError (1:47 - 1:55)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | new Promise((resolve, reject, somethingElse = reject(5)) => {});
+     |                                               ~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-56 - 1]
+Diagnostic 1: rejectAnError (5:34 - 5:42)
+Message: Expected the Promise rejection reason to be an Error.
+   4 | };
+   5 | new foo.bar((resolve, reject) => reject(5));
+     |                                  ~~~~~~~~~
+   6 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-57 - 1]
+Diagnostic 1: rejectAnError (5:37 - 5:45)
+Message: Expected the Promise rejection reason to be an Error.
+   4 | };
+   5 | new (foo?.bar)((resolve, reject) => reject(5));
+     |                                     ~~~~~~~~~
+   6 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-58 - 1]
+Diagnostic 1: rejectAnError (3:30 - 3:38)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | const foo = Promise;
+   3 | new foo((resolve, reject) => reject(5));
+     |                              ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-59 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: never;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-6 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:16)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject();
+     | ~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-60 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: unknown;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-61 - 1]
+Diagnostic 1: rejectAnError (4:34 - 4:44)
+Message: Expected the Promise rejection reason to be an Error.
+   3 | declare const foo: FakeReadonly<Error>;
+   4 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-62 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<'error'>;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-63 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Error | 'error'>;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-64 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Error> | 'error';
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-65 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Error> | Readonly<TypeError> | Readonly<'error'>;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-66 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<'error'>>;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-67 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<Readonly<Error> | 'error'>>;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-68 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<Readonly<Error> & TypeError>> | 'error';
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-69 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Readonly<Readonly<Error>> | Readonly<TypeError> | 'error';
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-7 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:25)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-70 - 1]
+Diagnostic 1: rejectAnError (4:34 - 4:44)
+Message: Expected the Promise rejection reason to be an Error.
+   3 | declare const foo: Wrapper<Error | 'error'>['foo'][5];
+   4 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-71 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: Error[];
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-72 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: ReadonlyArray<Error>;
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-73 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:44)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: [Error];
+   3 | new Promise((resolve, reject) => reject(foo));
+     |                                  ~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-74 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:13)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | class Foo extends Promise<number> {}
+   3 | Foo.reject(5);
+     | ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-75 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:13)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | declare const foo: PromiseConstructor & string;
+   3 | foo.reject(5);
+     | ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-76 - 1]
+Diagnostic 1: rejectAnError (4:1 - 4:13)
+Message: Expected the Promise rejection reason to be an Error.
+   3 | class Bar extends Foo {}
+   4 | Bar.reject(5);
+     | ~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-77 - 1]
+Diagnostic 1: rejectAnError (4:3 - 4:15)
+Message: Expected the Promise rejection reason to be an Error.
+   3 | function fun<T extends number>(t: T): void {
+   4 |   foo.reject(t);
+     |   ~~~~~~~~~~~~~
+   5 | }
+---
+
+[TestPreferPromiseRejectErrors/invalid-78 - 1]
+Diagnostic 1: rejectAnError (3:9 - 3:36)
+Message: Expected the Promise rejection reason to be an Error.
+   2 |         declare const someAnyValue: any;
+   3 |         Promise.reject(someAnyValue);
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-79 - 1]
+Diagnostic 1: rejectAnError (3:9 - 3:40)
+Message: Expected the Promise rejection reason to be an Error.
+   2 |         declare const someUnknownValue: unknown;
+   3 |         Promise.reject(someUnknownValue);
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-8 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:25)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-80 - 1]
+Diagnostic 1: rejectAnError (3:9 - 3:40)
+Message: Expected the Promise rejection reason to be an Error.
+   2 |         declare const someUnknownValue: unknown;
+   3 |         Promise.reject(someUnknownValue);
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-81 - 1]
+Diagnostic 1: rejectAnError (3:9 - 3:36)
+Message: Expected the Promise rejection reason to be an Error.
+   2 |         declare const someAnyValue: any;
+   3 |         Promise.reject(someAnyValue);
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-9 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:20)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(null);
+     | ~~~~~~~~~~~~~~~~~~~~
+---

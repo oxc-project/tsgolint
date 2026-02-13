@@ -1,0 +1,1025 @@
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-0 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:5)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${1}`;
+     |  ~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-1 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:6)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${1n}`;
+     |  ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-10 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:17)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    'a' + 'b'    }`;
+     |  ~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-100 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:60 - 2:84)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | 
+   2 | `template literal with interpolations followed by newline: ${` ${'interpolation'} `}
+     |                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 | `;
+
+Diagnostic 2: noUnnecessaryTemplateExpression (2:64 - 2:81)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | 
+   2 | `template literal with interpolations followed by newline: ${` ${'interpolation'} `}
+     |                                                                ~~~~~~~~~~~~~~~~~~
+   3 | `;
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-101 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:12 - 3:17)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 |         function func<T extends string>(arg: T) {
+   3 |           `${arg}`;
+     |            ~~~~~~
+   4 |         }
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-102 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:15 - 3:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 |         declare const b: 'b';
+   3 |         `a${b}${'c'}`;
+     |               ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-103 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:5 - 3:38)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | declare const nested: string, interpolation: string;
+   3 | `use${`less${nested}${interpolation}`}`;
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-104 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:10 - 3:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 |         declare const string: 'a';
+   3 |         `${   string   }`;
+     |          ~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-105 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:10 - 3:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 |         declare const string: 'a';
+   3 |         `${string}`;
+     |          ~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-106 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:10 - 3:24)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 |         declare const intersection: string & { _brand: 'test-brand' };
+   3 |         `${intersection}`;
+     |          ~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-107 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:23)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | true ? `${'test' || ''}`.trim() : undefined;
+     |         ~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-108 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:13 - 1:16)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type Foo = `${1}`;
+     |             ~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-109 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:13 - 1:19)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type Foo = `${null}`;
+     |             ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-11 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${true}`;
+     |  ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-110 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:13 - 1:24)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type Foo = `${undefined}`;
+     |             ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-111 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:13 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type Foo = `${'foo'}`;
+     |             ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-112 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:13 - 3:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | type Foo = 'A' | 'B';
+   3 | type Bar = `${Foo}`;
+     |             ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-113 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:13 - 3:23)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | type Foo = 'A' | 'B';
+   3 | type Bar = `${`${Foo}`}`;
+     |             ~~~~~~~~~~~
+   4 |       
+
+Diagnostic 2: noUnnecessaryTemplateExpression (3:16 - 3:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | type Foo = 'A' | 'B';
+   3 | type Bar = `${`${Foo}`}`;
+     |                ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-114 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:22 - 1:29)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type FooBarBaz = `foo${'bar'}baz`;
+     |                      ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-115 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:19 - 1:26)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type FooBar = `foo${`bar`}`;
+     |                   ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-116 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:16 - 1:31)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | type FooBar = `${'foo' | 'bar'}`;
+     |                ~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-12 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:16)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    true    }`;
+     |  ~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-13 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${null}`;
+     |  ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-14 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:16)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    null    }`;
+     |  ~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-15 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${undefined}`;
+     |  ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-16 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    undefined    }`;
+     |  ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-17 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${Infinity}`;
+     |  ~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-18 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${NaN}`;
+     |  ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-19 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:14)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'a'} ${'b'}`;
+     |         ~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:2 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'a'} ${'b'}`;
+     |  ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-2 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0o25}`;
+     |  ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-20 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:15 - 1:26)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${   'a'   } ${   'b'   }`;
+     |               ~~~~~~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:2 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${   'a'   } ${   'b'   }`;
+     |  ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-21 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:5 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `use${'less'}`;
+     |     ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-22 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:5 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `use${`less`}`;
+     |     ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-23 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (6:2 - 8:1)
+Message: Template literal expression is unnecessary and can be simplified.
+   5 | 
+   6 | }${
+     |  ~~
+   7 |   `le${  `ss`  }`
+     | ~~~~~~~~~~~~~~~~~
+   8 | }`;
+     | ~
+   9 |       
+
+Diagnostic 2: noUnnecessaryTemplateExpression (7:6 - 7:16)
+Message: Template literal expression is unnecessary and can be simplified.
+   6 | }${
+   7 |   `le${  `ss`  }`
+     |      ~~~~~~~~~~~
+   8 | }`;
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-24 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:5 - 4:1)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | 
+   2 | `use${
+     |     ~~
+   3 |   `less`
+     | ~~~~~~~~
+   4 | }`;
+     | ~
+   5 |       
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-25 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:15 - 1:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'1 + 1 ='} ${2}`;
+     |               ~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:2 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'1 + 1 ='} ${2}`;
+     |  ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-26 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'a'} ${true}`;
+     |         ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:2 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'a'} ${true}`;
+     |  ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-27 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:30)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${String(Symbol.for('test'))}`;
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-28 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'`'}`;
+     |  ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-29 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:6 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `back${'`'}tick`;
+     |      ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-3 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:12 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0b1010} ${0b1111}`;
+     |            ~~~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:2 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0b1010} ${0b1111}`;
+     |  ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-30 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:8 - 1:29)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `dollar${'${`this is test`}'}sign`;
+     |        ~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-31 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:29)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `complex${'`${"`${test}`"}`'}case`;
+     |         ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-32 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${'\\${test}'} string`;
+     |       ~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-33 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:14)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${'\\`'} string`;
+     |       ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-34 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/`/} string`;
+     |       ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-35 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/\`/} string`;
+     |       ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-36 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:14)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/\\`/} string`;
+     |       ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-37 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/\\\`/} string`;
+     |       ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-38 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:14)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/${}/} string`;
+     |       ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-39 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/$ {}/} string`;
+     |       ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-4 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0x25}`;
+     |  ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-40 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/\\/} string`;
+     |       ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-41 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/\\\b/} string`;
+     |       ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-42 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `some ${/\\\\/} string`;
+     |       ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-43 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${''} `;
+     |   ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-44 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${""} `;
+     |   ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-45 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${``} `;
+     |   ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-46 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:9)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\`'} `;
+     |   ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-47 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\\`'} `;
+     |   ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-48 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}{} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-49 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:9)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\$'}{} `;
+     |   ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-5 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:7)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${/a/}`;
+     |  ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-50 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\\$'}{} `;
+     |   ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-51 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\\$ '}{} `;
+     |   ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-52 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\\\$'}{} `;
+     |   ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-53 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:5 - 1:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` \\${'\\$'}{} `;
+     |     ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-54 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:4 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'{$'}{} `;
+     |    ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-55 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:4 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'${$'}{} `;
+     |    ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-56 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'foo$'}{} `;
+     |   ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-57 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`$`} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-58 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`$`}{} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-59 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`$`} {} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-6 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${/a/gim}`;
+     |  ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-60 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`$`}${undefined}{} `;
+     |         ~~~~~~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`$`}${undefined}{} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-61 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`foo$`}{} `;
+     |   ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-62 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${''}{} `;
+     |         ~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${''}{} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-63 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${``}{} `;
+     |         ~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${``}{} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-64 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:17 - 1:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'foo$'}${''}${``}{} `;
+     |                 ~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:12 - 1:16)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'foo$'}${''}${``}{} `;
+     |            ~~~~~
+
+Diagnostic 3: noUnnecessaryTemplateExpression (1:3 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'foo$'}${''}${``}{} `;
+     |   ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-65 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:4 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'{}'} `;
+     |    ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-66 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:16 - 1:22)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${undefined}${'{}'} `;
+     |                ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${undefined}${'{}'} `;
+     |    ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-67 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:21 - 1:27)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${undefined}${'{}'} `;
+     |                     ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:9 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${undefined}${'{}'} `;
+     |         ~~~~~~~~~~~~
+
+Diagnostic 3: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${undefined}${'{}'} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-68 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:5 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` \$${'{}'} `;
+     |     ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-69 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:12 - 1:17)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'foo'}${'{'} `;
+     |            ~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'foo'}${'{'} `;
+     |    ~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-7 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    1    }`;
+     |  ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-70 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:14 - 1:19)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'{ foo'}${'{'} `;
+     |              ~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${'{ foo'}${'{'} `;
+     |    ~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-71 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:6 - 1:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` \\$${'{}'} `;
+     |      ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-72 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` \\\$${'{}'} `;
+     |       ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-73 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:7 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` foo$${'{}'} `;
+     |       ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-74 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${'{}'} `;
+     |         ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${'{}'} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-75 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-76 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:4 - 1:10)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${`{}`} `;
+     |    ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-77 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${``}${`{}`} `;
+     |         ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${``}${`{}`} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-78 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${``}${`foo{}`} `;
+     |         ~~~~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${``}${`foo{}`} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-79 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:24 - 1:31)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
+     |                        ~~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:23)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
+     |    ~~~~~~~~~~~~~~~~~~~~
+
+Diagnostic 3: noUnnecessaryTemplateExpression (1:12 - 1:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
+     |            ~~~~~~~~~~
+
+Diagnostic 4: noUnnecessaryTemplateExpression (1:7 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
+     |       ~~~~~
+
+Diagnostic 5: noUnnecessaryTemplateExpression (1:15 - 1:19)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
+     |               ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-8 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    'a'    }`;
+     |  ~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-80 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${`{}`} `;
+     |         ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${`{}`} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-81 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${``}${'{}'} `;
+     |         ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${``}${'{}'} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-82 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:14 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${``}${'{}'} `;
+     |              ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:9 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${``}${'{}'} `;
+     |         ~~~~~
+
+Diagnostic 3: noUnnecessaryTemplateExpression (1:4 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` $${''}${``}${'{}'} `;
+     |    ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-83 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-84 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:15)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${'{}'} `;
+     |         ~~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${'{}'} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-85 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:14 - 1:19)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${''}${'{'} `;
+     |              ~~~~~~
+
+Diagnostic 2: noUnnecessaryTemplateExpression (1:9 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${''}${'{'} `;
+     |         ~~~~~
+
+Diagnostic 3: noUnnecessaryTemplateExpression (1:3 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'$'}${''}${'{'} `;
+     |   ~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-86 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 2:4)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`
+     |   ~~~
+   2 | \$`}{} `;
+     | ~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-87 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 2:5)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`
+     |   ~~~
+   2 | \\$`}{} `;
+     | ~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-88 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'\u00E5'}`;
+     |  ~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-89 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'\n'}`;
+     |  ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-9 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:11)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${    "a"    }`;
+     |  ~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-90 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\u00E5'} `;
+     |   ~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-91 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:9)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\n'} `;
+     |   ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-92 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:9)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${"\n"} `;
+     |   ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-93 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:9)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${`\n`} `;
+     |   ~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-94 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:22)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${ 'A\u0307\u0323' } `;
+     |   ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-95 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:14)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'👨‍👩‍👧‍👦'} `;
+     |   ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-96 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:3 - 1:19)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | ` ${'\ud83d\udc68'} `;
+     |   ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-97 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:46 - 3:51)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | `
+   3 | this code does not have trailing whitespace: ${' '}\n even though it might look it.`;
+     |                                              ~~~~~~
+   4 |     
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-98 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:53 - 3:81)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | `
+   3 | this code has trailing position template expression ${'but it isn\'t whitespace'}
+     |                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |     `;
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-99 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:59 - 2:64)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | 
+   2 | `trailing whitespace followed by escaped windows newline: ${' '}\r\n`;
+     |                                                           ~~~~~~
+   3 |     
+---

@@ -1,0 +1,621 @@
+
+[TestPreferStringStartsEndsWithRule/invalid-0 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:22)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[0] === 'a';
+     |           ~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-1 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:24)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s?.[0] === 'a';
+     |           ~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-10 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:26)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           (s)[0] === ("a")
+     |           ~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-11 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:29)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(0) === 'a';
+     |           ~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-12 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:29)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(0) !== 'a';
+     |           ~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-13 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:28)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(0) == 'a';
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-14 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:28)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(0) != 'a';
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-15 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:29)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(0) === 'あ';
+     |           ~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-16 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:29)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(0) === '👍'; // the length is 2.
+     |           ~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-17 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:27)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string, t: string) {
+   3 |           s.charAt(0) === t; // the length of t is unknown.
+     |           ~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-18 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:40)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.charAt(s.length - 1) === 'a';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-19 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:31)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           (s).charAt(0) === "a";
+     |           ~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-2 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:22)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[0] !== 'a';
+     |           ~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-20 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.indexOf(needle) === 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-21 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:34)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s?.indexOf(needle) === 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-22 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.indexOf(needle) !== 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-23 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:32)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.indexOf(needle) == 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-24 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:32)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.indexOf(needle) != 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-25 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:47)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.lastIndexOf('bar') === s.length - 3;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-26 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:47)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.lastIndexOf('bar') !== s.length - 3;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-27 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:46)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.lastIndexOf('bar') == s.length - 3;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-28 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:46)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.lastIndexOf('bar') != s.length - 3;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-29 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:58)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.lastIndexOf('bar') === s.length - 'bar'.length;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-3 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:24)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s?.[0] !== 'a';
+     |           ~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-30 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:60)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.lastIndexOf(needle) === s.length - needle.length;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-31 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:34)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/^bar/) !== null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-32 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:35)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s?.match(/^bar/) !== null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-33 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/^bar/) != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-34 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:38)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/^bar/) != undefined;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-35 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:34)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/bar$/) !== null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-36 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:33)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/bar$/) != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-37 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:34)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/^bar/) === null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-38 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/^bar/) == null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-39 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:38)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/^bar/) == undefined;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-4 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:21)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[0] == 'a';
+     |           ~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-40 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:34)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/bar$/) === null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-41 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:33)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.match(/bar$/) == null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-42 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:34)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: string) {
+   4 |           s.match(pattern) != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-43 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:34)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: string) {
+   4 |           s.match(pattern) != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-44 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:34)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: string) {
+   4 |           s.match(pattern) != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-45 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(0, 3) === 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-46 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:34)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s?.slice(0, 3) === 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-47 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(0, 3) !== 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-48 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:32)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(0, 3) == 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-49 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:32)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(0, 3) != 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-5 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:21)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[0] != 'a';
+     |           ~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-50 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:46)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(0, needle.length) === needle;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-51 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:45)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(0, needle.length) == needle; // hating implicit type conversion
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-52 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:31)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(-3) === 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-53 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:31)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(-3) !== 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-54 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:44)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(-needle.length) === needle;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-55 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:54)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.slice(s.length - needle.length) === needle;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-56 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:37)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.substring(0, 3) === 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-57 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:35)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.substring(-3) === 'bar'; // the code is probably mistake.
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-58 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:55)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s.substring(s.length - 3, s.length) === 'bar';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-59 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:24)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           /^bar/.test(s);
+     |           ~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-6 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:22)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[0] === 'あ';
+     |           ~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-60 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:25)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           /^bar/?.test(s);
+     |           ~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-61 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:24)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           /bar$/.test(s);
+     |           ~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-62 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:25)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: string) {
+   4 |           pattern.test(s);
+     |           ~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-63 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:25)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: string) {
+   4 |           pattern.test(s);
+     |           ~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-64 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:25)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: string) {
+   4 |           pattern.test(s);
+     |           ~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-65 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:28)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           /^bar/.test(a + b);
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-66 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: 'a' | 'b') {
+   3 |           s.indexOf(needle) === 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-67 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:33)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f<T extends 'a' | 'b'>(s: T) {
+   3 |           s.indexOf(needle) === 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-68 - 1]
+Diagnostic 1: preferStartsWith (4:11 - 4:33)
+Message: Use 'String#startsWith' method instead.
+   3 |         function f(s: SafeString) {
+   4 |           s.indexOf(needle) === 0;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-7 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:22)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[0] === '👍'; // the length is 2.
+     |           ~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-8 - 1]
+Diagnostic 1: preferStartsWith (3:11 - 3:20)
+Message: Use 'String#startsWith' method instead.
+   2 |         function f(s: string, t: string) {
+   3 |           s[0] === t; // the length of t is unknown.
+     |           ~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferStringStartsEndsWithRule/invalid-9 - 1]
+Diagnostic 1: preferEndsWith (3:11 - 3:33)
+Message: Use 'String#endsWith' method instead.
+   2 |         function f(s: string) {
+   3 |           s[s.length - 1] === 'a';
+     |           ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---

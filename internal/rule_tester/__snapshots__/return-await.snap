@@ -1,0 +1,491 @@
+
+[TestReturnAwait/invalid-0 - 1]
+Diagnostic 1: nonPromiseAwait (3:18 - 3:24)
+Message: Returning an awaited value that is not a promise is not allowed.
+   2 |         async function test() {
+   3 |           return await 1;
+     |                  ~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-1 - 1]
+Diagnostic 1: nonPromiseAwait (4:18 - 4:30)
+Message: Returning an awaited value that is not a promise is not allowed.
+   3 |           const foo = 1;
+   4 |           return await { foo };
+     |                  ~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestReturnAwait/invalid-10 - 1]
+Diagnostic 1: nonPromiseAwait (3:18 - 3:24)
+Message: Returning an awaited value that is not a promise is not allowed.
+   2 |         async function test() {
+   3 |           return await 1;
+     |                  ~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-11 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:32)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await 1;
+     |                          ~~~~~~~
+---
+
+[TestReturnAwait/invalid-12 - 1]
+Diagnostic 1: disallowedPromiseAwait (1:26 - 1:49)
+Message: Returning an awaited promise is not allowed in this context.
+   1 | const test = async () => await Promise.resolve(1);
+     |                          ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestReturnAwait/invalid-13 - 1]
+Diagnostic 1: disallowedPromiseAwait (3:18 - 3:41)
+Message: Returning an awaited promise is not allowed in this context.
+   2 |         async function test() {
+   3 |           return await Promise.resolve(1);
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-14 - 1]
+Diagnostic 1: nonPromiseAwait (3:18 - 3:24)
+Message: Returning an awaited value that is not a promise is not allowed.
+   2 |         async function test() {
+   3 |           return await 1;
+     |                  ~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-15 - 1]
+Diagnostic 1: disallowedPromiseAwait (4:20 - 4:43)
+Message: Returning an awaited promise is not allowed in this context.
+   3 |           try {
+   4 |             return await Promise.resolve(1);
+     |                    ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           } catch (e) {
+  Suggestion 1: [disallowedPromiseAwaitSuggestion] Remove `await` before the expression. Use caution as this may impact control flow.
+
+Diagnostic 2: disallowedPromiseAwait (6:20 - 6:43)
+Message: Returning an awaited promise is not allowed in this context.
+   5 |           } catch (e) {
+   6 |             return await Promise.resolve(2);
+     |                    ~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |           } finally {
+  Suggestion 1: [disallowedPromiseAwaitSuggestion] Remove `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-16 - 1]
+Diagnostic 1: disallowedPromiseAwait (3:18 - 3:41)
+Message: Returning an awaited promise is not allowed in this context.
+   2 |         async function test() {
+   3 |           return await Promise.resolve(1);
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-17 - 1]
+Diagnostic 1: nonPromiseAwait (3:18 - 3:24)
+Message: Returning an awaited value that is not a promise is not allowed.
+   2 |         async function test() {
+   3 |           return await 1;
+     |                  ~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-18 - 1]
+Diagnostic 1: requiredPromiseAwait (3:18 - 3:35)
+Message: Returning an awaited promise is required in this context.
+   2 |         async function test() {
+   3 |           return Promise.resolve(1);
+     |                  ~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestReturnAwait/invalid-19 - 1]
+Diagnostic 1: requiredPromiseAwait (1:26 - 1:43)
+Message: Returning an awaited promise is required in this context.
+   1 | const test = async () => Promise.resolve(1);
+     |                          ~~~~~~~~~~~~~~~~~~
+---
+
+[TestReturnAwait/invalid-2 - 1]
+Diagnostic 1: nonPromiseAwait (4:18 - 4:26)
+Message: Returning an awaited value that is not a promise is not allowed.
+   3 |           const foo = 1;
+   4 |           return await foo;
+     |                  ~~~~~~~~~
+   5 |         }
+---
+
+[TestReturnAwait/invalid-20 - 1]
+Diagnostic 1: requiredPromiseAwait (7:34 - 7:38)
+Message: Returning an awaited promise is required in this context.
+   6 | async function buzz() {
+   7 |   return (await foo()) ? bar() : baz();
+     |                                  ~~~~~
+   8 | }
+
+Diagnostic 2: requiredPromiseAwait (7:26 - 7:30)
+Message: Returning an awaited promise is required in this context.
+   6 | async function buzz() {
+   7 |   return (await foo()) ? bar() : baz();
+     |                          ~~~~~
+   8 | }
+---
+
+[TestReturnAwait/invalid-21 - 1]
+Diagnostic 1: requiredPromiseAwait (10:23 - 10:27)
+Message: Returning an awaited promise is required in this context.
+   9 |       bar ? bar() : baz()
+  10 |     ) : baz ? baz() : bar();
+     |                       ~~~~~
+  11 | }
+
+Diagnostic 2: requiredPromiseAwait (10:15 - 10:19)
+Message: Returning an awaited promise is required in this context.
+   9 |       bar ? bar() : baz()
+  10 |     ) : baz ? baz() : bar();
+     |               ~~~~~
+  11 | }
+
+Diagnostic 3: requiredPromiseAwait (9:21 - 9:25)
+Message: Returning an awaited promise is required in this context.
+   8 |     ? (
+   9 |       bar ? bar() : baz()
+     |                     ~~~~~
+  10 |     ) : baz ? baz() : bar();
+
+Diagnostic 4: requiredPromiseAwait (9:13 - 9:17)
+Message: Returning an awaited promise is required in this context.
+   8 |     ? (
+   9 |       bar ? bar() : baz()
+     |             ~~~~~
+  10 |     ) : baz ? baz() : bar();
+---
+
+[TestReturnAwait/invalid-22 - 1]
+Diagnostic 1: requiredPromiseAwait (5:36 - 5:40)
+Message: Returning an awaited promise is required in this context.
+   4 | async function buzz() {
+   5 |   return (await foo()) ? await 1 : bar();
+     |                                    ~~~~~
+   6 | }
+
+Diagnostic 2: nonPromiseAwait (5:26 - 5:32)
+Message: Returning an awaited value that is not a promise is not allowed.
+   4 | async function buzz() {
+   5 |   return (await foo()) ? await 1 : bar();
+     |                          ~~~~~~~
+   6 | }
+---
+
+[TestReturnAwait/invalid-23 - 1]
+Diagnostic 1: requiredPromiseAwait (5:51 - 5:55)
+Message: Returning an awaited promise is required in this context.
+   4 | async function baz() {}
+   5 | const buzz = async () => ((await foo()) ? bar() : baz());
+     |                                                   ~~~~~
+   6 |       
+
+Diagnostic 2: requiredPromiseAwait (5:43 - 5:47)
+Message: Returning an awaited promise is required in this context.
+   4 | async function baz() {}
+   5 | const buzz = async () => ((await foo()) ? bar() : baz());
+     |                                           ~~~~~
+   6 |       
+---
+
+[TestReturnAwait/invalid-24 - 1]
+Diagnostic 1: requiredPromiseAwait (4:53 - 4:57)
+Message: Returning an awaited promise is required in this context.
+   3 | async function bar() {}
+   4 | const buzz = async () => ((await foo()) ? await 1 : bar());
+     |                                                     ~~~~~
+   5 |       
+
+Diagnostic 2: nonPromiseAwait (4:43 - 4:49)
+Message: Returning an awaited value that is not a promise is not allowed.
+   3 | async function bar() {}
+   4 | const buzz = async () => ((await foo()) ? await 1 : bar());
+     |                                           ~~~~~~~
+   5 |       
+---
+
+[TestReturnAwait/invalid-25 - 1]
+Diagnostic 1: requiredPromiseAwait (5:12 - 5:35)
+Message: Returning an awaited promise is required in this context.
+   4 |   try {
+   5 |     return res.json() as Promise<T>;
+     |            ~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   } catch (err) {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-26 - 1]
+Diagnostic 1: requiredPromiseAwait (10:20 - 10:41)
+Message: Returning an awaited promise is required in this context.
+   9 |             const callback6 = async () => {};
+  10 |             return Promise.resolve('try');
+     |                    ~~~~~~~~~~~~~~~~~~~~~~
+  11 |           } finally {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-27 - 1]
+Diagnostic 1: requiredPromiseAwait (5:20 - 5:37)
+Message: Returning an awaited promise is required in this context.
+   4 |           try {
+   5 |             return undefined || bar();
+     |                    ~~~~~~~~~~~~~~~~~~
+   6 |           } catch {}
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-28 - 1]
+Diagnostic 1: requiredPromiseAwait (5:20 - 5:46)
+Message: Returning an awaited promise is required in this context.
+   4 |           try {
+   5 |             return bar() || undefined || bar();
+     |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |           } catch {}
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-29 - 1]
+Diagnostic 1: requiredPromiseAwait (5:12 - 5:24)
+Message: Returning an awaited promise is required in this context.
+   4 |   try {
+   5 |     return null ?? bar();
+     |            ~~~~~~~~~~~~~
+   6 |   } catch {}
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-3 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:32)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await 1;
+     |                          ~~~~~~~
+---
+
+[TestReturnAwait/invalid-30 - 1]
+Diagnostic 1: requiredPromiseAwait (5:12 - 5:21)
+Message: Returning an awaited promise is required in this context.
+   4 |   try {
+   5 |     return 1 && bar();
+     |            ~~~~~~~~~~
+   6 |   } catch {}
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-31 - 1]
+Diagnostic 1: requiredPromiseAwait (7:12 - 7:20)
+Message: Returning an awaited promise is required in this context.
+   6 |   try {
+   7 |     return foo.bar();
+     |            ~~~~~~~~~
+   8 |   } catch {}
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-32 - 1]
+Diagnostic 1: requiredPromiseAwait (8:22 - 8:31)
+Message: Returning an awaited promise is required in this context.
+   7 |             try {
+   8 |               return this.bar();
+     |                      ~~~~~~~~~~
+   9 |             } catch {}
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-33 - 1]
+Diagnostic 1: disallowedPromiseAwait (10:20 - 10:49)
+Message: Returning an awaited promise is not allowed in this context.
+   9 |           } catch (error) {
+  10 |             return await Promise.resolve('error');
+     |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |           }
+---
+
+[TestReturnAwait/invalid-34 - 1]
+Diagnostic 1: requiredPromiseAwait (7:14 - 7:29)
+Message: Returning an awaited promise is required in this context.
+   6 |       // affects error handling of outer catch
+   7 |       return Promise.reject();
+     |              ~~~~~~~~~~~~~~~~
+   8 |     }
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-35 - 1]
+Diagnostic 1: requiredPromiseAwait (7:14 - 7:29)
+Message: Returning an awaited promise is required in this context.
+   6 |       // affects error handling of outer catch
+   7 |       return Promise.reject();
+     |              ~~~~~~~~~~~~~~~~
+   8 |     }
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-36 - 1]
+Diagnostic 1: requiredPromiseAwait (9:16 - 9:31)
+Message: Returning an awaited promise is required in this context.
+   8 |       } catch {
+   9 |         return Promise.reject();
+     |                ~~~~~~~~~~~~~~~~
+  10 |       }
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-37 - 1]
+Diagnostic 1: requiredPromiseAwait (7:14 - 7:31)
+Message: Returning an awaited promise is required in this context.
+   6 |     if (anotherCondition) {
+   7 |       return Promise.resolve(2);
+     |              ~~~~~~~~~~~~~~~~~~
+   8 |     }
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-38 - 1]
+Diagnostic 1: requiredPromiseAwait (7:14 - 7:31)
+Message: Returning an awaited promise is required in this context.
+   6 |     if (anotherCondition) {
+   7 |       return Promise.resolve(2);
+     |              ~~~~~~~~~~~~~~~~~~
+   8 |     }
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-39 - 1]
+Diagnostic 1: requiredPromiseAwait (7:12 - 7:29)
+Message: Returning an awaited promise is required in this context.
+   6 |   } else if (anotherCondition) {
+   7 |     return Promise.resolve(2);
+     |            ~~~~~~~~~~~~~~~~~~
+   8 |   }
+---
+
+[TestReturnAwait/invalid-4 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:46)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await /* comment */ 1;
+     |                          ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestReturnAwait/invalid-40 - 1]
+Diagnostic 1: disallowedPromiseAwait (11:12 - 11:26)
+Message: Returning an awaited promise is not allowed in this context.
+  10 |   async function innerFunction() {
+  11 |     return await asyncFn();
+     |            ~~~~~~~~~~~~~~~
+  12 |   }
+---
+
+[TestReturnAwait/invalid-41 - 1]
+Diagnostic 1: disallowedPromiseAwait (10:37 - 10:51)
+Message: Returning an awaited promise is not allowed in this context.
+   9 | 
+  10 |   const innerFunction = async () => await asyncFn();
+     |                                     ~~~~~~~~~~~~~~~
+  11 | }
+---
+
+[TestReturnAwait/invalid-42 - 1]
+Diagnostic 1: nonPromiseAwait (3:10 - 3:20)
+Message: Returning an awaited value that is not a promise is not allowed.
+   2 | async function wrapper<T extends number>(value: T) {
+   3 |   return await value;
+     |          ~~~~~~~~~~~
+   4 | }
+---
+
+[TestReturnAwait/invalid-43 - 1]
+Diagnostic 1: nonPromiseAwait (4:12 - 4:22)
+Message: Returning an awaited value that is not a promise is not allowed.
+   3 |   async wrapper<T extends string>(value: T) {
+   4 |     return await value;
+     |            ~~~~~~~~~~~
+   5 |   }
+---
+
+[TestReturnAwait/invalid-44 - 1]
+Diagnostic 1: nonPromiseAwait (4:12 - 4:22)
+Message: Returning an awaited value that is not a promise is not allowed.
+   3 |   async wrapper<T extends R>(value: T) {
+   4 |     return await value;
+     |            ~~~~~~~~~~~
+   5 |   }
+---
+
+[TestReturnAwait/invalid-5 - 1]
+Diagnostic 1: disallowedPromiseAwait (1:26 - 1:49)
+Message: Returning an awaited promise is not allowed in this context.
+   1 | const test = async () => await Promise.resolve(1);
+     |                          ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestReturnAwait/invalid-6 - 1]
+Diagnostic 1: requiredPromiseAwait (4:20 - 4:37)
+Message: Returning an awaited promise is required in this context.
+   3 |           try {
+   4 |             return Promise.resolve(1);
+     |                    ~~~~~~~~~~~~~~~~~~
+   5 |           } catch (e) {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+
+Diagnostic 2: requiredPromiseAwait (6:20 - 6:37)
+Message: Returning an awaited promise is required in this context.
+   5 |           } catch (e) {
+   6 |             return Promise.resolve(2);
+     |                    ~~~~~~~~~~~~~~~~~~
+   7 |           } finally {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-7 - 1]
+Diagnostic 1: requiredPromiseAwait (4:20 - 4:37)
+Message: Returning an awaited promise is required in this context.
+   3 |           try {
+   4 |             return Promise.resolve(1);
+     |                    ~~~~~~~~~~~~~~~~~~
+   5 |           } catch (e) {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+
+Diagnostic 2: requiredPromiseAwait (6:20 - 6:37)
+Message: Returning an awaited promise is required in this context.
+   5 |           } catch (e) {
+   6 |             return Promise.resolve(2);
+     |                    ~~~~~~~~~~~~~~~~~~
+   7 |           } finally {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-8 - 1]
+Diagnostic 1: requiredPromiseAwait (4:20 - 4:37)
+Message: Returning an awaited promise is required in this context.
+   3 |           try {
+   4 |             return Promise.resolve(1);
+     |                    ~~~~~~~~~~~~~~~~~~
+   5 |           } catch (e) {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+
+Diagnostic 2: requiredPromiseAwait (6:20 - 6:37)
+Message: Returning an awaited promise is required in this context.
+   5 |           } catch (e) {
+   6 |             return Promise.resolve(2);
+     |                    ~~~~~~~~~~~~~~~~~~
+   7 |           } finally {
+  Suggestion 1: [requiredPromiseAwaitSuggestion] Add `await` before the expression. Use caution as this may impact control flow.
+---
+
+[TestReturnAwait/invalid-9 - 1]
+Diagnostic 1: disallowedPromiseAwait (3:18 - 3:41)
+Message: Returning an awaited promise is not allowed in this context.
+   2 |         async function test() {
+   3 |           return await Promise.resolve(1);
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---

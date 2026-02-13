@@ -1,0 +1,419 @@
+
+[TestNoDuplicateTypeConstituentsRule/invalid-0 - 1]
+Diagnostic 1: duplicate (1:14 - 1:14)
+Message: Union type constituent is duplicated with  1.
+   1 | type T = 1 | 1;
+     |              ~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-1 - 1]
+Diagnostic 1: duplicate (1:17 - 1:20)
+Message: Intersection type constituent is duplicated with  true.
+   1 | type T = true & true;
+     |                 ~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-10 - 1]
+Diagnostic 1: duplicate (1:23 - 1:32)
+Message: Union type constituent is duplicated with  string[][].
+   1 | type T = string[][] | string[][];
+     |                       ~~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-11 - 1]
+Diagnostic 1: duplicate (1:22 - 1:30)
+Message: Union type constituent is duplicated with  [1, 2, 3].
+   1 | type T = [1, 2, 3] | [1, 2, 3];
+     |                      ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-12 - 1]
+Diagnostic 1: duplicate (1:25 - 1:30)
+Message: Union type constituent is duplicated with  string.
+   1 | type T = () => string | string;
+     |                         ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-13 - 1]
+Diagnostic 1: duplicate (1:23 - 1:26)
+Message: Union type constituent is duplicated with  null.
+   1 | type T = () => null | null;
+     |                       ~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-14 - 1]
+Diagnostic 1: duplicate (1:25 - 1:30)
+Message: Union type constituent is duplicated with  string.
+   1 | type T = (arg: string | string) => void;
+     |                         ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-15 - 1]
+Diagnostic 1: duplicate (1:16 - 1:18)
+Message: Union type constituent is duplicated with  'A'.
+   1 | type T = 'A' | 'A';
+     |                ~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-16 - 1]
+Diagnostic 1: duplicate (3:14 - 3:14)
+Message: Union type constituent is duplicated with  A.
+   2 | type A = 'A';
+   3 | type T = A | A;
+     |              ~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-17 - 1]
+Diagnostic 1: duplicate (3:14 - 3:14)
+Message: Union type constituent is duplicated with  A.
+   2 | type A = 'A';
+   3 | const a: A | A = 'A';
+     |              ~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-18 - 1]
+Diagnostic 1: duplicate (3:28 - 3:28)
+Message: Union type constituent is duplicated with  A.
+   2 | type A = 'A';
+   3 | type T = A | /* comment */ A;
+     |                            ~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-19 - 1]
+Diagnostic 1: duplicate (5:15 - 5:16)
+Message: Union type constituent is duplicated with  A1.
+   4 | type A3 = 'A';
+   5 | type T = A1 | A2 | A3;
+     |               ~~
+   6 |       
+
+Diagnostic 2: duplicate (5:20 - 5:21)
+Message: Union type constituent is duplicated with  A1.
+   4 | type A3 = 'A';
+   5 | type T = A1 | A2 | A3;
+     |                    ~~
+   6 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-2 - 1]
+Diagnostic 1: duplicate (1:17 - 1:20)
+Message: Union type constituent is duplicated with  null.
+   1 | type T = null | null;
+     |                 ~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-20 - 1]
+Diagnostic 1: duplicate (4:18 - 4:18)
+Message: Union type constituent is duplicated with  A.
+   3 | type B = 'B';
+   4 | type T = A | B | A;
+     |                  ~
+   5 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-21 - 1]
+Diagnostic 1: duplicate (4:18 - 4:18)
+Message: Union type constituent is duplicated with  A.
+   3 | type B = 'B';
+   4 | type T = A | B | A | B;
+     |                  ~
+   5 |       
+
+Diagnostic 2: duplicate (4:22 - 4:22)
+Message: Union type constituent is duplicated with  B.
+   3 | type B = 'B';
+   4 | type T = A | B | A | B;
+     |                      ~
+   5 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-22 - 1]
+Diagnostic 1: duplicate (4:18 - 4:18)
+Message: Union type constituent is duplicated with  A.
+   3 | type B = 'B';
+   4 | type T = A | B | A | A;
+     |                  ~
+   5 |       
+
+Diagnostic 2: duplicate (4:22 - 4:22)
+Message: Union type constituent is duplicated with  A.
+   3 | type B = 'B';
+   4 | type T = A | B | A | A;
+     |                      ~
+   5 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-23 - 1]
+Diagnostic 1: duplicate (5:18 - 5:18)
+Message: Union type constituent is duplicated with  A.
+   4 | type C = 'C';
+   5 | type T = A | B | A | C;
+     |                  ~
+   6 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-24 - 1]
+Diagnostic 1: duplicate (4:20 - 4:26)
+Message: Union type constituent is duplicated with  (A | B).
+   3 | type B = 'B';
+   4 | type T = (A | B) | (A | B);
+     |                    ~~~~~~~
+   5 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-25 - 1]
+Diagnostic 1: duplicate (3:14 - 3:20)
+Message: Union type constituent is duplicated with  A.
+   2 | type A = 'A';
+   3 | type T = A | (A | A);
+     |              ~~~~~~~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-26 - 1]
+Diagnostic 1: duplicate (6:20 - 6:26)
+Message: Union type constituent is duplicated with  (A | B).
+   5 | type D = 'D';
+   6 | type F = (A | B) | (A | B) | ((C | D) & (A | B)) | (A | B);
+     |                    ~~~~~~~
+   7 |       
+
+Diagnostic 2: duplicate (6:52 - 6:58)
+Message: Union type constituent is duplicated with  (A | B).
+   5 | type D = 'D';
+   6 | type F = (A | B) | (A | B) | ((C | D) & (A | B)) | (A | B);
+     |                                                    ~~~~~~~
+   7 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-27 - 1]
+Diagnostic 1: duplicate (4:20 - 4:20)
+Message: Union type constituent is duplicated with A.
+   3 | type B = 'B';
+   4 | type C = (A | B) | A | B | (A | B);
+     |                    ~
+   5 |       
+
+Diagnostic 2: duplicate (4:24 - 4:24)
+Message: Union type constituent is duplicated with  B.
+   3 | type B = 'B';
+   4 | type C = (A | B) | A | B | (A | B);
+     |                        ~
+   5 |       
+
+Diagnostic 3: duplicate (4:28 - 4:34)
+Message: Union type constituent is duplicated with  (A | B).
+   3 | type B = 'B';
+   4 | type C = (A | B) | A | B | (A | B);
+     |                            ~~~~~~~
+   5 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-28 - 1]
+Diagnostic 1: duplicate (1:30 - 1:35)
+Message: Union type constituent is duplicated with number.
+   1 | type A = (number | string) | number | string;
+     |                              ~~~~~~
+
+Diagnostic 2: duplicate (1:39 - 1:44)
+Message: Union type constituent is duplicated with  string.
+   1 | type A = (number | string) | number | string;
+     |                                       ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-29 - 1]
+Diagnostic 1: duplicate (1:39 - 1:64)
+Message: Union type constituent is duplicated with  (number | (string | null)).
+   1 | type A = (number | (string | null)) | (string | (null | number));
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-3 - 1]
+Diagnostic 1: duplicate (1:16 - 1:18)
+Message: Union type constituent is duplicated with  any.
+   1 | type T = any | any;
+     |                ~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-30 - 1]
+Diagnostic 1: duplicate (1:30 - 1:35)
+Message: Intersection type constituent is duplicated with number.
+   1 | type A = (number & string) & number & string;
+     |                              ~~~~~~
+
+Diagnostic 2: duplicate (1:39 - 1:44)
+Message: Intersection type constituent is duplicated with  string.
+   1 | type A = (number & string) & number & string;
+     |                                       ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-31 - 1]
+Diagnostic 1: duplicate (1:29 - 1:34)
+Message: Intersection type constituent is duplicated with  number.
+   1 | type A = number & string & (number & string);
+     |                             ~~~~~~
+
+Diagnostic 2: duplicate (1:38 - 1:43)
+Message: Intersection type constituent is duplicated with  string.
+   1 | type A = number & string & (number & string);
+     |                                      ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-32 - 1]
+Diagnostic 1: duplicate (3:29 - 3:29)
+Message: Union type constituent is duplicated with  A.
+   2 | type A = 'A';
+   3 | type T = Record<string, A | A>;
+     |                             ~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-33 - 1]
+Diagnostic 1: duplicate (1:27 - 1:32)
+Message: Union type constituent is duplicated with  string.
+   1 | type T = A | A | string | string;
+     |                           ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-34 - 1]
+Diagnostic 1: unnecessary (1:15 - 1:23)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | (a?: string | undefined) => {};
+     |               ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-35 - 1]
+Diagnostic 1: unnecessary (3:16 - 3:16)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   2 |         type T = undefined;
+   3 |         (arg?: T | string) => {};
+     |                ~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-36 - 1]
+Diagnostic 1: unnecessary (3:25 - 3:33)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   2 |         interface F {
+   3 |           (a?: string | undefined): void;
+     |                         ~~~~~~~~~
+   4 |         }
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-37 - 1]
+Diagnostic 1: unnecessary (1:29 - 1:37)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | type fn = new (a?: string | undefined) => void;
+     |                             ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-38 - 1]
+Diagnostic 1: unnecessary (1:25 - 1:33)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | function f(a?: string | undefined) {}
+     |                         ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-39 - 1]
+Diagnostic 1: unnecessary (1:28 - 1:36)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | f = function (a?: string | undefined) {};
+     |                            ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-4 - 1]
+Diagnostic 1: duplicate (1:24 - 1:29)
+Message: Union type constituent is duplicated with  string.
+   1 | type T = { a: string | string };
+     |                        ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-40 - 1]
+Diagnostic 1: unnecessary (1:33 - 1:41)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | declare function f(a?: string | undefined): void;
+     |                                 ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-41 - 1]
+Diagnostic 1: unnecessary (3:26 - 3:34)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   2 |         declare class bb {
+   3 |           f(a?: string | undefined): void;
+     |                          ~~~~~~~~~
+   4 |         }
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-42 - 1]
+Diagnostic 1: unnecessary (3:26 - 3:34)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   2 |         interface ee {
+   3 |           f(a?: string | undefined): void;
+     |                          ~~~~~~~~~
+   4 |         }
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-43 - 1]
+Diagnostic 1: unnecessary (3:29 - 3:37)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   2 |         interface ee {
+   3 |           new (a?: string | undefined): void;
+     |                             ~~~~~~~~~
+   4 |         }
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-44 - 1]
+Diagnostic 1: unnecessary (1:25 - 1:33)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | type fn = (a?: string | undefined) => void;
+     |                         ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-45 - 1]
+Diagnostic 1: unnecessary (1:26 - 1:34)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | type fn = (a?: string | (undefined | number)) => void;
+     |                          ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-46 - 1]
+Diagnostic 1: unnecessary (1:17 - 1:25)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | type fn = (a?: (undefined | number) | string) => void;
+     |                 ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-47 - 1]
+Diagnostic 1: unnecessary (3:35 - 3:43)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   2 |         abstract class cc {
+   3 |           abstract f(a?: string | undefined): void;
+     |                                   ~~~~~~~~~
+   4 |         }
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-7 - 1]
+Diagnostic 1: duplicate (1:24 - 1:34)
+Message: Union type constituent is duplicated with  Set<string>.
+   1 | type T = Set<string> | Set<string>;
+     |                        ~~~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-8 - 1]
+Diagnostic 1: duplicate (3:45 - 3:59)
+Message: Union type constituent is duplicated with  IsArray<number>.
+   2 | type IsArray<T> = T extends any[] ? true : false;
+   3 | type ActuallyDuplicated = IsArray<number> | IsArray<string>;
+     |                                             ~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-9 - 1]
+Diagnostic 1: duplicate (1:21 - 1:28)
+Message: Union type constituent is duplicated with  string[].
+   1 | type T = string[] | string[];
+     |                     ~~~~~~~~
+---

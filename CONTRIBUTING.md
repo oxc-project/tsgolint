@@ -118,6 +118,9 @@ go test ./internal/...
 
 # Run tests with verbose output
 go test -v ./internal/...
+
+# Run tests and update snapshots
+just update-snaps
 ```
 
 The test suite includes:

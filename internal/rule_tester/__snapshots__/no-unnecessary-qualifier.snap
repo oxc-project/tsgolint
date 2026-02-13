@@ -1,0 +1,90 @@
+
+[TestNoUnnecessaryQualifierRule/invalid-0 - 1]
+Diagnostic 1: unnecessaryQualifier (4:12 - 4:12)
+Message: Qualifier is unnecessary since 'B' is in scope.
+   3 |   export type B = number;
+   4 |   const x: A.B = 3;
+     |            ~
+   5 | }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-1 - 1]
+Diagnostic 1: unnecessaryQualifier (4:20 - 4:20)
+Message: Qualifier is unnecessary since 'x' is in scope.
+   3 |   export const x = 3;
+   4 |   export const y = A.x;
+     |                    ~
+   5 | }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-2 - 1]
+Diagnostic 1: unnecessaryQualifier (5:14 - 5:14)
+Message: Qualifier is unnecessary since 'T' is in scope.
+   4 |   export namespace B {
+   5 |     const x: A.T = 3;
+     |              ~
+   6 |   }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-3 - 1]
+Diagnostic 1: unnecessaryQualifier (5:14 - 5:16)
+Message: Qualifier is unnecessary since 'T' is in scope.
+   4 |     export type T = number;
+   5 |     const x: A.B.T = 3;
+     |              ~~~
+   6 |   }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-4 - 1]
+Diagnostic 1: unnecessaryQualifier (5:14 - 5:18)
+Message: Qualifier is unnecessary since 'D' is in scope.
+   4 |     export type D = number;
+   5 |     const x: A.B.C.D = 3;
+     |              ~~~~~
+   6 |   }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-5 - 1]
+Diagnostic 1: unnecessaryQualifier (5:12 - 5:16)
+Message: Qualifier is unnecessary since 'T' is in scope.
+   4 |   export namespace A.B {}
+   5 |   const x: Outer.T = 3;
+     |            ~~~~~
+   6 | }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-6 - 1]
+Diagnostic 1: unnecessaryQualifier (5:15 - 5:17)
+Message: Qualifier is unnecessary since 'x' is in scope.
+   4 |     export const x = 3;
+   5 |     const y = A.B.x;
+     |               ~~~
+   6 |   }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-7 - 1]
+Diagnostic 1: unnecessaryQualifier (4:7 - 4:7)
+Message: Qualifier is unnecessary since 'B' is in scope.
+   3 |   B,
+   4 |   C = A.B,
+     |       ~
+   5 | }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-8 - 1]
+Diagnostic 1: unnecessaryQualifier (5:9 - 5:13)
+Message: Qualifier is unnecessary since 'B' is in scope.
+   4 |     B,
+   5 |     C = Foo.A.B,
+     |         ~~~~~
+   6 |   }
+---
+
+[TestNoUnnecessaryQualifierRule/invalid-9 - 1]
+Diagnostic 1: unnecessaryQualifier (4:12 - 4:14)
+Message: Qualifier is unnecessary since 'T' is in scope.
+   3 | declare module './foo' {
+   4 |   const x: Foo.T = 3;
+     |            ~~~
+   5 | }
+---

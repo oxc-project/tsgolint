@@ -1,0 +1,494 @@
+
+[TestNoConfusingVoidExpression/invalid-0 - 1]
+Diagnostic 1: invalidVoidExpr (2:19 - 2:36)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         const x = console.log('foo');
+     |                   ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-1 - 1]
+Diagnostic 1: invalidVoidExpr (2:19 - 2:37)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         const x = console?.log('foo');
+     |                   ~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-10 - 1]
+Diagnostic 1: invalidVoidExpr (3:17 - 3:34)
+Message: Placing a void expression inside another expression is forbidden.
+   2 | function notcool(input: string) {
+   3 |   return input, console.log(input);
+     |                 ~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-11 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:7 - 1:24)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | () => console.log('foo');
+     |       ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-12 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:15 - 1:30)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | foo => foo && console.log(foo);
+     |               ~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-13 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:28 - 1:43)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | (foo: undefined) => foo && console.log(foo);
+     |                            ~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-14 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:15 - 1:30)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | foo => foo || console.log(foo);
+     |               ~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-15 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:28 - 1:43)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | (foo: undefined) => foo || console.log(foo);
+     |                            ~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-16 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:23 - 1:38)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | (foo: void) => foo || console.log(foo);
+     |                       ~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-17 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:15 - 1:31)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | foo => (foo ? console.log(true) : console.log(false));
+     |               ~~~~~~~~~~~~~~~~~
+
+Diagnostic 2: invalidVoidExprArrow (1:35 - 1:52)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | foo => (foo ? console.log(true) : console.log(false));
+     |                                   ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-18 - 1]
+Diagnostic 1: invalidVoidExprReturn (3:18 - 3:35)
+Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+   2 |         function f() {
+   3 |           return console.log('foo');
+     |                  ~~~~~~~~~~~~~~~~~~
+   4 |           console.log('bar');
+---
+
+[TestNoConfusingVoidExpression/invalid-19 - 1]
+Diagnostic 1: invalidVoidExprReturn (4:18 - 4:52)
+Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+   3 |           console.log('foo')
+   4 |           return ['bar', 'baz'].forEach(console.log)
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           console.log('quux')
+---
+
+[TestNoConfusingVoidExpression/invalid-2 - 1]
+Diagnostic 1: invalidVoidExpr (2:23 - 2:40)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         console.error(console.log('foo'));
+     |                       ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-20 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:18 - 4:35)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |           console.log('foo');
+   4 |           return console.log('bar');
+     |                  ~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoConfusingVoidExpression/invalid-21 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:18 - 4:52)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |           console.log('foo')
+   4 |           return ['bar', 'baz'].forEach(console.log)
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoConfusingVoidExpression/invalid-22 - 1]
+Diagnostic 1: invalidVoidExprReturn (4:20 - 4:39)
+Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+   3 |           if (cond) {
+   4 |             return console.error('foo');
+     |                    ~~~~~~~~~~~~~~~~~~~~
+   5 |           }
+---
+
+[TestNoConfusingVoidExpression/invalid-23 - 1]
+Diagnostic 1: invalidVoidExprReturn (3:28 - 3:47)
+Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+   2 |         const f = function () {
+   3 |           if (cond) return console.error('foo');
+     |                            ~~~~~~~~~~~~~~~~~~~~
+   4 |           console.log('bar');
+---
+
+[TestNoConfusingVoidExpression/invalid-24 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:24 - 4:41)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |           let num = 1;
+   4 |           return num ? console.log('foo') : num;
+     |                        ~~~~~~~~~~~~~~~~~~
+   5 |         };
+---
+
+[TestNoConfusingVoidExpression/invalid-25 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:26 - 4:43)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |           let undef = undefined;
+   4 |           return undef ? console.log('foo') : undef;
+     |                          ~~~~~~~~~~~~~~~~~~
+   5 |         };
+---
+
+[TestNoConfusingVoidExpression/invalid-26 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:25 - 4:42)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |           let num = 1;
+   4 |           return num || console.log('foo');
+     |                         ~~~~~~~~~~~~~~~~~~
+   5 |         };
+---
+
+[TestNoConfusingVoidExpression/invalid-27 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:25 - 4:42)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |           let bar = void 0;
+   4 |           return bar || console.log('foo');
+     |                         ~~~~~~~~~~~~~~~~~~
+   5 |         };
+---
+
+[TestNoConfusingVoidExpression/invalid-28 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:34 - 3:51)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 |         let num = 1;
+   3 |         const foo = () => (num ? console.log('foo') : num);
+     |                                  ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-29 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:34 - 3:51)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 |         let bar = void 0;
+   3 |         const foo = () => (bar ? console.log('foo') : bar);
+     |                                  ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-3 - 1]
+Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         [console.log('foo')];
+     |          ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-30 - 1]
+Diagnostic 1: invalidVoidExprReturnWrapVoid (1:8 - 1:25)
+Message: Void expressions returned from a function must be marked explicitly with the `void` operator.
+   1 | return console.log('foo');
+     |        ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-31 - 1]
+Diagnostic 1: invalidVoidExprWrapVoid (1:15 - 1:32)
+Message: Void expressions used inside another expression must be moved to its own statement or marked explicitly with the `void` operator.
+   1 | console.error(console.log('foo'));
+     |               ~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [voidExprWrapVoid] Mark with an explicit `void` operator.
+---
+
+[TestNoConfusingVoidExpression/invalid-32 - 1]
+Diagnostic 1: invalidVoidExprWrapVoid (1:1 - 1:18)
+Message: Void expressions used inside another expression must be moved to its own statement or marked explicitly with the `void` operator.
+   1 | console.log('foo') ? true : false;
+     | ~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [voidExprWrapVoid] Mark with an explicit `void` operator.
+---
+
+[TestNoConfusingVoidExpression/invalid-33 - 1]
+Diagnostic 1: invalidVoidExprWrapVoid (1:18 - 1:35)
+Message: Void expressions used inside another expression must be moved to its own statement or marked explicitly with the `void` operator.
+   1 | const x = foo ?? console.log('foo');
+     |                  ~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [voidExprWrapVoid] Mark with an explicit `void` operator.
+---
+
+[TestNoConfusingVoidExpression/invalid-34 - 1]
+Diagnostic 1: invalidVoidExprArrowWrapVoid (1:15 - 1:30)
+Message: Void expressions returned from an arrow function shorthand must be marked explicitly with the `void` operator.
+   1 | foo => foo || console.log(foo);
+     |               ~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-35 - 1]
+Diagnostic 1: invalidVoidExprWrapVoid (1:3 - 1:20)
+Message: Void expressions used inside another expression must be moved to its own statement or marked explicitly with the `void` operator.
+   1 | !!console.log('foo');
+     |   ~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [voidExprWrapVoid] Mark with an explicit `void` operator.
+---
+
+[TestNoConfusingVoidExpression/invalid-36 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:27)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   2 | function test() {
+   3 |   return console.log('foo');
+     |          ~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-37 - 1]
+Diagnostic 1: invalidVoidExprArrow (1:20 - 1:37)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | const test = () => console.log('foo');
+     |                    ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoConfusingVoidExpression/invalid-38 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:27)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   2 | const test = () => {
+   3 |   return console.log('foo');
+     |          ~~~~~~~~~~~~~~~~~~
+   4 | };
+---
+
+[TestNoConfusingVoidExpression/invalid-39 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:12 - 4:24)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |   const bar = () => {
+   4 |     return console.log();
+     |            ~~~~~~~~~~~~~
+   5 |   };
+---
+
+[TestNoConfusingVoidExpression/invalid-4 - 1]
+Diagnostic 1: invalidVoidExpr (2:15 - 2:32)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         ({ x: console.log('foo') });
+     |               ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-40 - 1]
+Diagnostic 1: invalidVoidExprArrow (2:20 - 2:37)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | 
+   2 |         (): any => console.log('foo');
+     |                    ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-41 - 1]
+Diagnostic 1: invalidVoidExprArrow (2:24 - 2:41)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   1 | 
+   2 |         (): unknown => console.log('foo');
+     |                        ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-42 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:15 - 3:27)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | function test(): void {
+   3 |   () => () => console.log();
+     |               ~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-43 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:12 - 3:24)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | type Foo = any;
+   3 | (): Foo => console.log();
+     |            ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-44 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:12 - 3:24)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | type Foo = unknown;
+   3 | (): Foo => console.log();
+     |            ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-45 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:15 - 3:27)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | function test(): any {
+   3 |   () => () => console.log();
+     |               ~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-46 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:22)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   2 | function test(): unknown {
+   3 |   return console.log();
+     |          ~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-47 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:22)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   2 | function test(): any {
+   3 |   return console.log();
+     |          ~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-48 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:18 - 3:30)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | type Foo = () => any;
+   3 | (): Foo => () => console.log();
+     |                  ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-49 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:18 - 3:30)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | type Foo = () => unknown;
+   3 | (): Foo => () => console.log();
+     |                  ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-5 - 1]
+Diagnostic 1: invalidVoidExpr (2:14 - 2:31)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         void console.log('foo');
+     |              ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-50 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:25 - 3:37)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | type Foo = () => any;
+   3 | const test: Foo = () => console.log();
+     |                         ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-51 - 1]
+Diagnostic 1: invalidVoidExprArrow (3:25 - 3:37)
+Message: Returning a void expression from an arrow function shorthand is forbidden.
+   2 | type Foo = () => unknown;
+   3 | const test: Foo = () => console.log();
+     |                         ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-52 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (6:12 - 6:24)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   5 |   function bar() {
+   6 |     return console.log();
+     |            ~~~~~~~~~~~~~
+   7 |   }
+---
+
+[TestNoConfusingVoidExpression/invalid-53 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (4:12 - 4:24)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   3 |   function bar() {
+   4 |     return console.log();
+     |            ~~~~~~~~~~~~~
+   5 |   }
+---
+
+[TestNoConfusingVoidExpression/invalid-54 - 1]
+Diagnostic 1: invalidVoidExprReturn (2:8 - 2:25)
+Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+   1 | 
+   2 | return console.log('foo');
+     |        ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-55 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (8:10 - 8:22)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   7 |   }
+   8 |   return console.log();
+     |          ~~~~~~~~~~~~~
+   9 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-56 - 1]
+Diagnostic 1: invalidVoidExprReturnLast (8:10 - 8:22)
+Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+   7 |   }
+   8 |   return console.log();
+     |          ~~~~~~~~~~~~~
+   9 | }
+---
+
+[TestNoConfusingVoidExpression/invalid-6 - 1]
+Diagnostic 1: invalidVoidExpr (2:9 - 2:26)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         console.log('foo') ? true : false;
+     |         ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-7 - 1]
+Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         (console.log('foo') && true) || false;
+     |          ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-8 - 1]
+Diagnostic 1: invalidVoidExpr (2:18 - 2:34)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         (cond && console.log('ok')) || console.log('error');
+     |                  ~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-9 - 1]
+Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
+Message: Placing a void expression inside another expression is forbidden.
+   1 | 
+   2 |         !console.log('foo');
+     |          ~~~~~~~~~~~~~~~~~~
+   3 |       
+---

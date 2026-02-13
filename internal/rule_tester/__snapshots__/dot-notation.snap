@@ -1,0 +1,215 @@
+
+[TestDotNotation/invalid-0 - 1]
+Diagnostic 1: useDot (7:3 - 7:13)
+Message: ["priv_prop"] is better written in dot notation.
+   6 | const x = new X();
+   7 | x['priv_prop'] = 123;
+     |   ~~~~~~~~~~~
+   8 |       
+---
+
+[TestDotNotation/invalid-1 - 1]
+Diagnostic 1: useDot (7:3 - 7:12)
+Message: ["pub_prop"] is better written in dot notation.
+   6 | const x = new X();
+   7 | x['pub_prop'] = 123;
+     |   ~~~~~~~~~~
+   8 |       
+---
+
+[TestDotNotation/invalid-10 - 1]
+Diagnostic 1: useDot (1:3 - 1:11)
+Message: ["_dangle"] is better written in dot notation.
+   1 | a['_dangle'];
+     |   ~~~~~~~~~
+---
+
+[TestDotNotation/invalid-11 - 1]
+Diagnostic 1: useDot (1:3 - 1:14)
+Message: ["SHOUT_CASE"] is better written in dot notation.
+   1 | a['SHOUT_CASE'];
+     |   ~~~~~~~~~~~~
+---
+
+[TestDotNotation/invalid-12 - 1]
+Diagnostic 1: useDot (3:4 - 3:15)
+Message: ["SHOUT_CASE"] is better written in dot notation.
+   2 | a
+   3 |   ['SHOUT_CASE'];
+     |    ~~~~~~~~~~~~
+   4 |       
+---
+
+[TestDotNotation/invalid-13 - 1]
+Diagnostic 1: useDot (3:6 - 3:12)
+Message: ["catch"] is better written in dot notation.
+   2 |     .then(function(){})
+   3 |     ["catch"](function(){})
+     |      ~~~~~~~
+   4 |     .then(function(){})
+
+Diagnostic 2: useDot (5:6 - 5:12)
+Message: ["catch"] is better written in dot notation.
+   4 |     .then(function(){})
+   5 |     ["catch"](function(){});
+     |      ~~~~~~~
+---
+
+[TestDotNotation/invalid-14 - 1]
+Diagnostic 1: useBrackets (3:4 - 3:8)
+Message: .while is a syntax error.
+   2 | foo
+   3 |   .while;
+     |    ~~~~~
+   4 |       
+---
+
+[TestDotNotation/invalid-15 - 1]
+Diagnostic 1: useDot (1:19 - 1:23)
+Message: ["bar"] is better written in dot notation.
+   1 | foo[/* comment */ 'bar'];
+     |                   ~~~~~
+---
+
+[TestDotNotation/invalid-16 - 1]
+Diagnostic 1: useDot (1:5 - 1:9)
+Message: ["bar"] is better written in dot notation.
+   1 | foo['bar' /* comment */];
+     |     ~~~~~
+---
+
+[TestDotNotation/invalid-17 - 1]
+Diagnostic 1: useDot (1:5 - 1:9)
+Message: ["bar"] is better written in dot notation.
+   1 | foo['bar'];
+     |     ~~~~~
+---
+
+[TestDotNotation/invalid-18 - 1]
+Diagnostic 1: useBrackets (1:19 - 1:23)
+Message: .while is a syntax error.
+   1 | foo./* comment */ while;
+     |                   ~~~~~
+---
+
+[TestDotNotation/invalid-19 - 1]
+Diagnostic 1: useDot (1:5 - 1:8)
+Message: [null] is better written in dot notation.
+   1 | foo[null];
+     |     ~~~~
+---
+
+[TestDotNotation/invalid-2 - 1]
+Diagnostic 1: useDot (1:3 - 1:8)
+Message: ["true"] is better written in dot notation.
+   1 | a['true'];
+     |   ~~~~~~
+---
+
+[TestDotNotation/invalid-20 - 1]
+Diagnostic 1: useDot (1:5 - 1:9)
+Message: ["bar"] is better written in dot notation.
+   1 | foo['bar'] instanceof baz;
+     |     ~~~~~
+---
+
+[TestDotNotation/invalid-21 - 1]
+Diagnostic 1: useBrackets (1:5 - 1:6)
+Message: .if is a syntax error.
+   1 | let.if();
+     |     ~~
+---
+
+[TestDotNotation/invalid-22 - 1]
+Diagnostic 1: useDot (7:3 - 7:18)
+Message: ["protected_prop"] is better written in dot notation.
+   6 | const x = new X();
+   7 | x['protected_prop'] = 123;
+     |   ~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestDotNotation/invalid-23 - 1]
+Diagnostic 1: useDot (8:3 - 8:8)
+Message: ["prop"] is better written in dot notation.
+   7 | const x = new X();
+   8 | x['prop'] = 'hello';
+     |   ~~~~~~
+   9 |       
+---
+
+[TestDotNotation/invalid-24 - 1]
+Diagnostic 1: useDot (6:5 - 6:13)
+Message: ["key_baz"] is better written in dot notation.
+   5 | };
+   6 | foo['key_baz'];
+     |     ~~~~~~~~~
+   7 |       
+---
+
+[TestDotNotation/invalid-25 - 1]
+Diagnostic 1: useDot (10:5 - 10:14)
+Message: ["extraKey"] is better written in dot notation.
+   9 | function f<T extends Foo>(x: T) {
+  10 |   x['extraKey'];
+     |     ~~~~~~~~~~
+  11 | }
+---
+
+[TestDotNotation/invalid-26 - 1]
+Diagnostic 1: useDot (7:5 - 7:10)
+Message: [`prop`] is better written in dot notation.
+   6 | declare const foo: Foo;
+   7 | foo[`prop`];
+     |     ~~~~~~
+   8 |       
+---
+
+[TestDotNotation/invalid-3 - 1]
+Diagnostic 1: useDot (1:3 - 1:8)
+Message: ["time"] is better written in dot notation.
+   1 | a['time'];
+     |   ~~~~~~
+---
+
+[TestDotNotation/invalid-4 - 1]
+Diagnostic 1: useDot (1:3 - 1:6)
+Message: [null] is better written in dot notation.
+   1 | a[null];
+     |   ~~~~
+---
+
+[TestDotNotation/invalid-5 - 1]
+Diagnostic 1: useDot (1:3 - 1:6)
+Message: [true] is better written in dot notation.
+   1 | a[true];
+     |   ~~~~
+---
+
+[TestDotNotation/invalid-6 - 1]
+Diagnostic 1: useDot (1:3 - 1:7)
+Message: [false] is better written in dot notation.
+   1 | a[false];
+     |   ~~~~~
+---
+
+[TestDotNotation/invalid-7 - 1]
+Diagnostic 1: useDot (1:3 - 1:5)
+Message: ["b"] is better written in dot notation.
+   1 | a['b'];
+     |   ~~~
+---
+
+[TestDotNotation/invalid-8 - 1]
+Diagnostic 1: useDot (1:3 - 1:5)
+Message: ["π"] is better written in dot notation.
+   1 | a['π'];
+     |   ~~~
+---
+
+[TestDotNotation/invalid-9 - 1]
+Diagnostic 1: useDot (1:5 - 1:7)
+Message: ["c"] is better written in dot notation.
+   1 | a.b['c'];
+     |     ~~~
+---
