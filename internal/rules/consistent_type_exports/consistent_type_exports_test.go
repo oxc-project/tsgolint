@@ -1,6 +1,7 @@
 package consistent_type_exports
 
 import (
+	"path"
 	"testing"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
@@ -11,7 +12,7 @@ func TestConsistentTypeExports(t *testing.T) {
 	t.Parallel()
 
 	rule_tester.RunRuleTester(
-		fixtures.GetRootDir(),
+	path.Join(	fixtures.GetRootDir(), "consistent-type-exports"),
 		"tsconfig.json",
 		t,
 		&ConsistentTypeExportsRule,
