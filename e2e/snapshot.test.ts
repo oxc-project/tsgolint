@@ -68,6 +68,7 @@ const ALL_RULES = [
   'restrict-template-expressions',
   'return-await',
   'strict-boolean-expressions',
+  'strict-void-return',
   'switch-exhaustiveness-check',
   'unbound-method',
   'use-unknown-in-catch-callback-variable',
