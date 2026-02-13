@@ -1,0 +1,1208 @@
+
+[TestStrictVoidReturnRule/invalid-0 - 1]
+Diagnostic 1: nonVoidReturn (3:11 - 3:14)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function foo(cb: () => void): void;
+   3 | foo(() => null);
+     |           ~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-1 - 1]
+Diagnostic 1: nonVoidReturn (3:11 - 3:20)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function foo(cb: () => void): void;
+   3 | foo(() => (((true))));
+     |           ~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-10 - 1]
+Diagnostic 1: asyncFunc (5:11 - 5:24)
+Message: Async function used in a context where a void function is expected.
+   4 | 
+   5 | foo(null, async () => {});
+     |           ~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestStrictVoidReturnRule/invalid-100 - 1]
+Diagnostic 1: nonVoidReturn (3:19 - 3:23)
+Message: Value returned in a context where a void return is expected.
+   2 | declare let foo: () => () => void;
+   3 | foo = () => () => 1 + 1;
+     |                   ~~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-101 - 1]
+Diagnostic 1: nonVoidReturn (3:19 - 3:31)
+Message: Value returned in a context where a void return is expected.
+   2 | declare let foo: () => () => void;
+   3 | foo = () => () => Math.random();
+     |                   ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-102 - 1]
+Diagnostic 1: nonVoidFunc (4:13 - 4:14)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | declare const cb: () => null | false;
+   4 | foo = () => cb;
+     |             ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-103 - 1]
+Diagnostic 1: nonVoidReturn (5:18 - 5:19)
+Message: Value returned in a context where a void return is expected.
+   4 |   f() {
+   5 |     return () => cb;
+     |                  ~~
+   6 |   },
+---
+
+[TestStrictVoidReturnRule/invalid-104 - 1]
+Diagnostic 1: nonVoidReturn (5:5 - 5:16)
+Message: Value returned in a context where a void return is expected.
+   4 |   return () => {
+   5 |     return null;
+     |     ~~~~~~~~~~~~
+   6 |   };
+---
+
+[TestStrictVoidReturnRule/invalid-105 - 1]
+Diagnostic 1: nonVoidReturn (4:3 - 4:23)
+Message: Value returned in a context where a void return is expected.
+   3 | foo = () => () => {
+   4 |   return 'asd' + 'zxc';
+     |   ~~~~~~~~~~~~~~~~~~~~~
+   5 | };
+---
+
+[TestStrictVoidReturnRule/invalid-106 - 1]
+Diagnostic 1: asyncFunc (4:10 - 4:23)
+Message: Async function used in a context where a void function is expected.
+   3 | foo(function () {
+   4 |   return async () => {};
+     |          ~~~~~~~~~~~~~~
+   5 | });
+---
+
+[TestStrictVoidReturnRule/invalid-107 - 1]
+Diagnostic 1: nonVoidReturn (6:5 - 6:26)
+Message: Value returned in a context where a void return is expected.
+   5 |     console.log('asd')
+   6 |     return [1].map(x => x)
+     |     ~~~~~~~~~~~~~~~~~~~~~~
+   7 |   }
+
+Diagnostic 2: nonVoidReturn (10:5 - 10:25)
+Message: Value returned in a context where a void return is expected.
+   9 |     console.log('asd')
+  10 |     return -Math.random()
+     |     ~~~~~~~~~~~~~~~~~~~~~
+  11 |   }
+
+Diagnostic 3: nonVoidReturn (14:5 - 14:28)
+Message: Value returned in a context where a void return is expected.
+  13 |     console.log('asd')
+  14 |     return "x".toUpperCase()
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~
+  15 |   }
+
+Diagnostic 4: nonVoidReturn (16:3 - 16:31)
+Message: Value returned in a context where a void return is expected.
+  15 |   }
+  16 |   return <i>{Math.random()}</i>
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  17 | });
+---
+
+[TestStrictVoidReturnRule/invalid-108 - 1]
+Diagnostic 1: nonVoidFunc (5:10 - 5:11)
+Message: Value-returning function used in a context where a void function is expected.
+   4 | foo((arg: string) => {
+   5 |   return cb;
+     |          ~~
+   6 | });
+---
+
+[TestStrictVoidReturnRule/invalid-11 - 1]
+Diagnostic 1: asyncFunc (4:5 - 6:1)
+Message: Async function used in a context where a void function is expected.
+   3 | declare function foo(cb: () => any): void;
+   4 | foo(async () => {
+     |     ~~~~~~~~~~~~~
+   5 |   return Math.random();
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+   6 | });
+     | ~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-12 - 1]
+Diagnostic 1: nonVoidFunc (3:5 - 3:6)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | declare function foo(cb: { (): void }): void;
+   3 | foo(cb);
+     |     ~~
+   4 | async function cb() {}
+---
+
+[TestStrictVoidReturnRule/invalid-13 - 1]
+Diagnostic 1: nonVoidReturn (5:3 - 5:11)
+Message: Value returned in a context where a void return is expected.
+   4 |   console.log('a');
+   5 |   return 1;
+     |   ~~~~~~~~~
+   6 | });
+---
+
+[TestStrictVoidReturnRule/invalid-14 - 1]
+Diagnostic 1: nonVoidFunc (4:7 - 4:8)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | function bar<Cb extends () => number>(cb: Cb) {
+   4 |   foo(cb);
+     |       ~~
+   5 | }
+---
+
+[TestStrictVoidReturnRule/invalid-15 - 1]
+Diagnostic 1: nonVoidFunc (4:6 - 4:7)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | const cb = () => dunno;
+   4 | foo!(cb);
+     |      ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-16 - 1]
+Diagnostic 1: nonVoidReturn (5:18 - 5:43)
+Message: Value returned in a context where a void return is expected.
+   4 | };
+   5 | foo(false, () => Promise.resolve(undefined));
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestStrictVoidReturnRule/invalid-17 - 1]
+Diagnostic 1: nonVoidReturn (7:9 - 7:26)
+Message: Value returned in a context where a void return is expected.
+   6 |   () => Promise.resolve(1),
+   7 |   () => Promise.resolve(1),
+     |         ~~~~~~~~~~~~~~~~~~
+   8 | );
+---
+
+[TestStrictVoidReturnRule/invalid-18 - 1]
+Diagnostic 1: asyncFunc (5:9 - 5:22)
+Message: Async function used in a context where a void function is expected.
+   4 | };
+   5 | new Foo(async () => {});
+     |         ~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestStrictVoidReturnRule/invalid-19 - 1]
+Diagnostic 1: nonVoidReturn (6:18 - 6:29)
+Message: Value returned in a context where a void return is expected.
+   5 |     for (const i of [1, 2, 3]) {
+   6 |       if (maybe) return null;
+     |                  ~~~~~~~~~~~~
+   7 |       else return null;
+
+Diagnostic 2: nonVoidReturn (7:12 - 7:23)
+Message: Value returned in a context where a void return is expected.
+   6 |       if (maybe) return null;
+   7 |       else return null;
+     |            ~~~~~~~~~~~~
+   8 |     }
+---
+
+[TestStrictVoidReturnRule/invalid-2 - 1]
+Diagnostic 1: nonVoidReturn (5:5 - 5:23)
+Message: Value returned in a context where a void return is expected.
+   4 |   if (maybe) {
+   5 |     return (((1) + 1));
+     |     ~~~~~~~~~~~~~~~~~~~
+   6 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-20 - 1]
+Diagnostic 1: nonVoidReturn (8:7 - 8:18)
+Message: Value returned in a context where a void return is expected.
+   7 |     } catch (e) {
+   8 |       return null;
+     |       ~~~~~~~~~~~~
+   9 |     } finally {
+---
+
+[TestStrictVoidReturnRule/invalid-21 - 1]
+Diagnostic 1: asyncFunc (3:5 - 9:1)
+Message: Async function used in a context where a void function is expected.
+   2 | declare function foo(cb: () => void): void;
+   3 | foo(async () => {
+     |     ~~~~~~~~~~~~~
+   4 |   try {
+     | ~~~~~~~
+   5 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   } catch {
+     | ~~~~~~~~~~~
+   7 |     console.error('fail');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   }
+     | ~~~
+   9 | });
+     | ~
+  10 |       
+---
+
+[TestStrictVoidReturnRule/invalid-22 - 1]
+Diagnostic 1: nonVoidReturn (6:15 - 6:19)
+Message: Value returned in a context where a void return is expected.
+   5 | };
+   6 | new Foo(() => false);
+     |               ~~~~~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-23 - 1]
+Diagnostic 1: nonVoidReturn (6:11 - 6:15)
+Message: Value returned in a context where a void return is expected.
+   5 | };
+   6 | Foo(() => false);
+     |           ~~~~~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-24 - 1]
+Diagnostic 1: nonVoidFunc (7:5 - 7:6)
+Message: Value-returning function used in a context where a void function is expected.
+   6 | declare function foo(cb: Cb): void;
+   7 | foo(cb);
+     |     ~~
+   8 | function cb() {
+---
+
+[TestStrictVoidReturnRule/invalid-25 - 1]
+Diagnostic 1: nonVoidFunc (5:5 - 5:6)
+Message: Value-returning function used in a context where a void function is expected.
+   4 | ): void;
+   5 | foo(cb);
+     |     ~~
+   6 | function cb() {
+---
+
+[TestStrictVoidReturnRule/invalid-26 - 1]
+Diagnostic 1: nonVoidFunc (4:5 - 4:6)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | declare function cb(): boolean;
+   4 | foo(cb);
+     |     ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-27 - 1]
+Diagnostic 1: nonVoidReturn (5:9 - 5:13)
+Message: Value returned in a context where a void return is expected.
+   4 |   () => {},
+   5 |   () => false,
+     |         ~~~~~
+   6 |   () => 0,
+
+Diagnostic 2: nonVoidReturn (6:9 - 6:9)
+Message: Value returned in a context where a void return is expected.
+   5 |   () => false,
+   6 |   () => 0,
+     |         ~
+   7 |   () => '',
+
+Diagnostic 3: nonVoidReturn (7:9 - 7:10)
+Message: Value returned in a context where a void return is expected.
+   6 |   () => 0,
+   7 |   () => '',
+     |         ~~
+   8 | );
+---
+
+[TestStrictVoidReturnRule/invalid-28 - 1]
+Diagnostic 1: nonVoidReturn (5:9 - 5:21)
+Message: Value returned in a context where a void return is expected.
+   4 |   () => {},
+   5 |   () => Math.random(),
+     |         ~~~~~~~~~~~~~
+   6 |   () => (1).toString(),
+
+Diagnostic 2: nonVoidReturn (6:9 - 6:22)
+Message: Value returned in a context where a void return is expected.
+   5 |   () => Math.random(),
+   6 |   () => (1).toString(),
+     |         ~~~~~~~~~~~~~~
+   7 | );
+---
+
+[TestStrictVoidReturnRule/invalid-29 - 1]
+Diagnostic 1: nonVoidReturn (21:48 - 21:49)
+Message: Value returned in a context where a void return is expected.
+  20 | declare const win: Win;
+  21 | win.addEventListener('DOMContentLoaded', ev => ev);
+     |                                                ~~
+  22 | win.addEventListener('custom', ev => ev);
+
+Diagnostic 2: nonVoidReturn (22:38 - 22:39)
+Message: Value returned in a context where a void return is expected.
+  21 | win.addEventListener('DOMContentLoaded', ev => ev);
+  22 | win.addEventListener('custom', ev => ev);
+     |                                      ~~
+  23 |       
+---
+
+[TestStrictVoidReturnRule/invalid-3 - 1]
+Diagnostic 1: nonVoidReturn (3:14 - 3:14)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function foo(arg: number, cb: () => void): void;
+   3 | foo(0, () => 0);
+     |              ~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-30 - 1]
+Diagnostic 1: asyncFunc (4:9 - 4:22)
+Message: Async function used in a context where a void function is expected.
+   3 | declare function foo(x: unknown, cb: () => any): void;
+   4 | foo({}, async () => {});
+     |         ~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-31 - 1]
+Diagnostic 1: asyncFunc (3:13 - 5:1)
+Message: Async function used in a context where a void function is expected.
+   2 | const arr = [1, 2];
+   3 | arr.forEach(async x => {
+     |             ~~~~~~~~~~~~
+   4 |   console.log(x);
+     | ~~~~~~~~~~~~~~~~~
+   5 | });
+     | ~
+   6 |       
+---
+
+[TestStrictVoidReturnRule/invalid-32 - 1]
+Diagnostic 1: asyncFunc (2:16 - 2:40)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | [1, 2].forEach(async x => console.log(x));
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestStrictVoidReturnRule/invalid-33 - 1]
+Diagnostic 1: nonVoidReturn (2:31 - 2:35)
+Message: Value returned in a context where a void return is expected.
+   1 | 
+   2 | const foo: () => void = () => false;
+     |                               ~~~~~
+   3 |       
+---
+
+[TestStrictVoidReturnRule/invalid-34 - 1]
+Diagnostic 1: nonVoidReturn (3:3 - 3:15)
+Message: Value returned in a context where a void return is expected.
+   2 | const { name }: () => void = function foo() {
+   3 |   return false;
+     |   ~~~~~~~~~~~~~
+   4 | };
+---
+
+[TestStrictVoidReturnRule/invalid-35 - 1]
+Diagnostic 1: nonVoidReturn (3:24 - 3:27)
+Message: Value returned in a context where a void return is expected.
+   2 | declare const foo: Record<string, () => void>;
+   3 | foo['a' + 'b'] = () => true;
+     |                        ~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-36 - 1]
+Diagnostic 1: asyncFunc (2:25 - 2:57)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | const foo: () => void = async () => Promise.resolve(true);
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestStrictVoidReturnRule/invalid-37 - 1]
+Diagnostic 1: nonVoidReturn (1:45 - 1:46)
+Message: Value returned in a context where a void return is expected.
+   1 | const cb: () => void = (): Array<number> => [];
+     |                                             ~~
+---
+
+[TestStrictVoidReturnRule/invalid-38 - 1]
+Diagnostic 1: nonVoidFunc (2:28 - 2:40)
+Message: Value-returning function used in a context where a void function is expected.
+   1 | 
+   2 | const cb: () => void = (): Array<number> => {
+     |                            ~~~~~~~~~~~~~
+   3 |   return [];
+---
+
+[TestStrictVoidReturnRule/invalid-39 - 1]
+Diagnostic 1: nonVoidFunc (1:24 - 1:41)
+Message: Value-returning function used in a context where a void function is expected.
+   1 | const cb: () => void = function* foo() {}
+     |                        ~~~~~~~~~~~~~~~~~~
+---
+
+[TestStrictVoidReturnRule/invalid-4 - 1]
+Diagnostic 1: nonVoidReturn (3:11 - 3:18)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function foo(cb?: { (): void }): void;
+   3 | foo(() => () => {});
+     |           ~~~~~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-40 - 1]
+Diagnostic 1: nonVoidReturn (1:47 - 1:64)
+Message: Value returned in a context where a void return is expected.
+   1 | const cb: () => void = (): Promise<number> => Promise.resolve(1);
+     |                                               ~~~~~~~~~~~~~~~~~~
+---
+
+[TestStrictVoidReturnRule/invalid-41 - 1]
+Diagnostic 1: asyncFunc (2:24 - 6:1)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | const cb: () => void = async (): Promise<number> => {
+     |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   try {
+     | ~~~~~~~
+   4 |     return Promise.resolve(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   } catch {}
+     | ~~~~~~~~~~~~
+   6 | };
+     | ~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-42 - 1]
+Diagnostic 1: asyncFunc (1:24 - 1:70)
+Message: Async function used in a context where a void function is expected.
+   1 | const cb: () => void = async (): Promise<number> => Promise.resolve(1);
+     |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestStrictVoidReturnRule/invalid-43 - 1]
+Diagnostic 1: asyncFunc (2:25 - 6:1)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | const foo: () => void = async () => {
+     |                         ~~~~~~~~~~~~~
+   3 |   try {
+     | ~~~~~~~
+   4 |     return 1;
+     | ~~~~~~~~~~~~~
+   5 |   } catch {}
+     | ~~~~~~~~~~~~
+   6 | };
+     | ~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-44 - 1]
+Diagnostic 1: asyncFunc (2:25 - 7:1)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | const foo: () => void = async (): Promise<void> => {
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   try {
+     | ~~~~~~~
+   4 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   } finally {
+     | ~~~~~~~~~~~~~
+   6 |   }
+     | ~~~
+   7 | };
+     | ~
+   8 |       
+---
+
+[TestStrictVoidReturnRule/invalid-45 - 1]
+Diagnostic 1: asyncFunc (2:25 - 9:1)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | const foo: () => void = async () => {
+     |                         ~~~~~~~~~~~~~
+   3 |   try {
+     | ~~~~~~~
+   4 |     await Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   } catch (err) {
+     | ~~~~~~~~~~~~~~~~~
+   6 |     console.error(err);
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   }
+     | ~~~
+   8 |   console.log('ok');
+     | ~~~~~~~~~~~~~~~~~~~~
+   9 | };
+     | ~
+  10 |       
+---
+
+[TestStrictVoidReturnRule/invalid-46 - 1]
+Diagnostic 1: nonVoidFunc (1:29 - 1:34)
+Message: Value-returning function used in a context where a void function is expected.
+   1 | const foo: () => void = (): number => {};
+     |                             ~~~~~~
+---
+
+[TestStrictVoidReturnRule/invalid-47 - 1]
+Diagnostic 1: nonVoidFunc (3:25 - 3:26)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | declare function cb(): boolean;
+   3 | const foo: () => void = cb;
+     |                         ~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-48 - 1]
+Diagnostic 1: nonVoidReturn (4:5 - 4:16)
+Message: Value returned in a context where a void return is expected.
+   3 |   if (maybe) {
+   4 |     return null;
+     |     ~~~~~~~~~~~~
+   5 |   } else {
+
+Diagnostic 2: nonVoidReturn (6:5 - 6:16)
+Message: Value returned in a context where a void return is expected.
+   5 |   } else {
+   6 |     return null;
+     |     ~~~~~~~~~~~~
+   7 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-49 - 1]
+Diagnostic 1: nonVoidReturn (5:5 - 5:34)
+Message: Value returned in a context where a void return is expected.
+   4 |     console.log('elo');
+   5 |     return { [1]: Math.random() };
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-5 - 1]
+Diagnostic 1: nonVoidReturn (3:16 - 3:31)
+Message: Value returned in a context where a void return is expected.
+   2 | declare const obj: { foo(cb: () => void): void } | null;
+   3 | obj?.foo(() => JSON.parse('{}'));
+     |                ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-50 - 1]
+Diagnostic 1: nonVoidReturn (6:7 - 6:15)
+Message: Value returned in a context where a void return is expected.
+   5 |     case 'number':
+   6 |       return 0;
+     |       ~~~~~~~~~
+   7 |     case 'string':
+
+Diagnostic 2: nonVoidReturn (8:7 - 8:16)
+Message: Value returned in a context where a void return is expected.
+   7 |     case 'string':
+   8 |       return '';
+     |       ~~~~~~~~~~
+   9 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-51 - 1]
+Diagnostic 1: asyncFunc (2:64 - 4:1)
+Message: Async function used in a context where a void function is expected.
+   1 | 
+   2 | const foo: ((arg: number) => void) | ((arg: string) => void) = async () => {
+     |                                                                ~~~~~~~~~~~~~
+   3 |   return 1;
+     | ~~~~~~~~~~~
+   4 | };
+     | ~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-52 - 1]
+Diagnostic 1: nonVoidFunc (3:18 - 3:19)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | type Foo = () => void;
+   3 | const foo: Foo = cb;
+     |                  ~~
+   4 | function cb() {
+---
+
+[TestStrictVoidReturnRule/invalid-53 - 1]
+Diagnostic 1: nonVoidFunc (5:18 - 5:19)
+Message: Value-returning function used in a context where a void function is expected.
+   4 | }
+   5 | const foo: Foo = cb;
+     |                  ~~
+   6 | function cb() {
+---
+
+[TestStrictVoidReturnRule/invalid-54 - 1]
+Diagnostic 1: nonVoidFunc (4:7 - 4:8)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | declare let foo: () => void;
+   4 | foo = cb;
+     |       ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-55 - 1]
+Diagnostic 1: nonVoidReturn (4:3 - 4:17)
+Message: Value returned in a context where a void return is expected.
+   3 | foo.cb = () => {
+   4 |   return 'siema';
+     |   ~~~~~~~~~~~~~~~
+   5 |   console.log('siema');
+---
+
+[TestStrictVoidReturnRule/invalid-56 - 1]
+Diagnostic 1: nonVoidFunc (4:9 - 4:10)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | let foo: (() => void) | null = null;
+   4 | foo ??= cb;
+     |         ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-57 - 1]
+Diagnostic 1: nonVoidFunc (4:9 - 4:10)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | let foo: (() => void) | boolean = false;
+   4 | foo ||= cb;
+     |         ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-58 - 1]
+Diagnostic 1: nonVoidFunc (4:9 - 4:10)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | let foo: (() => void) | boolean = false;
+   4 | foo &&= cb;
+     |         ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-59 - 1]
+Diagnostic 1: nonVoidReturn (3:26 - 3:26)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function Foo(props: { cb: () => void }): unknown;
+   3 | const _ = <Foo cb={() => 1} />;
+     |                          ~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-6 - 1]
+Diagnostic 1: nonVoidReturn (2:35 - 2:35)
+Message: Value returned in a context where a void return is expected.
+   1 | 
+   2 | ((cb: () => void) => cb())!(() => 1);
+     |                                   ~
+   3 |       
+---
+
+[TestStrictVoidReturnRule/invalid-60 - 1]
+Diagnostic 1: nonVoidReturn (7:18 - 7:38)
+Message: Value returned in a context where a void return is expected.
+   6 |     cb={() => {
+   7 |       if (maybe) return Math.random();
+     |                  ~~~~~~~~~~~~~~~~~~~~~
+   8 |       else return getNull();
+
+Diagnostic 2: nonVoidReturn (8:12 - 8:28)
+Message: Value returned in a context where a void return is expected.
+   7 |       if (maybe) return Math.random();
+   8 |       else return getNull();
+     |            ~~~~~~~~~~~~~~~~~
+   9 |     }}
+---
+
+[TestStrictVoidReturnRule/invalid-61 - 1]
+Diagnostic 1: asyncFunc (4:20 - 4:39)
+Message: Async function used in a context where a void function is expected.
+   3 | declare function Foo(props: { cb: Cb; s: string }): unknown;
+   4 | const _ = <Foo cb={async function () {}} s="!@#jp2gmd" />;
+     |                    ~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-62 - 1]
+Diagnostic 1: nonVoidFunc (4:29 - 4:43)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | declare function Foo(props: { n: number; cb?: Cb }): unknown;
+   4 | const _ = <Foo n={2137} cb={function* () {}} />;
+     |                             ~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-63 - 1]
+Diagnostic 1: nonVoidFunc (6:9 - 9:5)
+Message: Value-returning function used in a context where a void function is expected.
+   5 |   <Foo
+   6 |     cb={async function* (arg) {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       await arg;
+     | ~~~~~~~~~~~~~~~~
+   8 |       yield arg;
+     | ~~~~~~~~~~~~~~~~
+   9 |     }}
+     | ~~~~~
+  10 |   />
+---
+
+[TestStrictVoidReturnRule/invalid-64 - 1]
+Diagnostic 1: nonVoidReturn (6:25 - 6:25)
+Message: Value returned in a context where a void return is expected.
+   5 | declare function Foo(props: Props): unknown;
+   6 | const _ = <Foo cb={x => x} />;
+     |                         ~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-65 - 1]
+Diagnostic 1: nonVoidReturn (8:32 - 8:32)
+Message: Value returned in a context where a void return is expected.
+   7 | function App() {
+   8 |   return <Button onClick={x => x} />;
+     |                                ~
+   9 | }
+---
+
+[TestStrictVoidReturnRule/invalid-66 - 1]
+Diagnostic 1: nonVoidReturn (3:25 - 3:25)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function foo(cbs: { arg: number; cb: () => void }): void;
+   3 | foo({ arg: 1, cb: () => 1 });
+     |                         ~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-67 - 1]
+Diagnostic 1: nonVoidReturn (6:5 - 6:13)
+Message: Value returned in a context where a void return is expected.
+   5 |     let x = 'siema';
+   6 |     return x;
+     |     ~~~~~~~~~
+   7 |   },
+---
+
+[TestStrictVoidReturnRule/invalid-68 - 1]
+Diagnostic 1: nonVoidReturn (5:5 - 5:13)
+Message: Value returned in a context where a void return is expected.
+   4 |   cb(n) {
+   5 |     return n;
+     |     ~~~~~~~~~
+   6 |   },
+---
+
+[TestStrictVoidReturnRule/invalid-69 - 1]
+Diagnostic 1: nonVoidReturn (5:5 - 5:13)
+Message: Value returned in a context where a void return is expected.
+   4 |   1234(n) {
+   5 |     return n;
+     |     ~~~~~~~~~
+   6 |   },
+---
+
+[TestStrictVoidReturnRule/invalid-7 - 1]
+Diagnostic 1: nonVoidFunc (4:5 - 4:6)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | declare function cb(): string;
+   4 | foo(cb);
+     |     ~~
+   5 |       
+---
+
+[TestStrictVoidReturnRule/invalid-70 - 1]
+Diagnostic 1: nonVoidReturn (4:40 - 4:40)
+Message: Value returned in a context where a void return is expected.
+   3 | foo = {
+   4 |   1_000_000_000_000_000_000_000: () => 1,
+     |                                        ~
+   5 | };
+---
+
+[TestStrictVoidReturnRule/invalid-71 - 1]
+Diagnostic 1: asyncFunc (4:7 - 8:3)
+Message: Async function used in a context where a void function is expected.
+   3 | foo = {
+   4 |   cb: async () => {
+     |       ~~~~~~~~~~~~~
+   5 |     if (maybe) {
+     | ~~~~~~~~~~~~~~~~
+   6 |       return 'asd';
+     | ~~~~~~~~~~~~~~~~~~~
+   7 |     }
+     | ~~~~~
+   8 |   },
+     | ~~~
+   9 | };
+---
+
+[TestStrictVoidReturnRule/invalid-72 - 1]
+Diagnostic 1: nonVoidFunc (4:8 - 4:9)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | const foo: Record<string, () => void> = {
+   4 |   cb1: cb,
+     |        ~~
+   5 |   cb2: cb,
+
+Diagnostic 2: nonVoidFunc (5:8 - 5:9)
+Message: Value-returning function used in a context where a void function is expected.
+   4 |   cb1: cb,
+   5 |   cb2: cb,
+     |        ~~
+   6 |   ...cb,
+---
+
+[TestStrictVoidReturnRule/invalid-73 - 1]
+Diagnostic 1: nonVoidFunc (3:50 - 3:51)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | declare function cb(): number;
+   3 | const foo: Array<(() => void) | false> = [false, cb, () => cb()];
+     |                                                  ~~
+   4 |       
+
+Diagnostic 2: nonVoidReturn (3:60 - 3:63)
+Message: Value returned in a context where a void return is expected.
+   2 | declare function cb(): number;
+   3 | const foo: Array<(() => void) | false> = [false, cb, () => cb()];
+     |                                                            ~~~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-74 - 1]
+Diagnostic 1: nonVoidFunc (3:58 - 3:59)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | declare function cb(): number;
+   3 | const foo: [string, () => void, (() => void)?] = ['asd', cb];
+     |                                                          ~~
+   4 |       
+---
+
+[TestStrictVoidReturnRule/invalid-75 - 1]
+Diagnostic 1: nonVoidFunc (4:5 - 6:5)
+Message: Value-returning function used in a context where a void function is expected.
+   3 |   cbs: [
+   4 |     function* () {
+     |     ~~~~~~~~~~~~~~
+   5 |       yield 1;
+     | ~~~~~~~~~~~~~~
+   6 |     },
+     | ~~~~~
+   7 |     async () => {
+
+Diagnostic 2: asyncFunc (7:5 - 9:5)
+Message: Async function used in a context where a void function is expected.
+   6 |     },
+   7 |     async () => {
+     |     ~~~~~~~~~~~~~
+   8 |       await 1;
+     | ~~~~~~~~~~~~~~
+   9 |     },
+     | ~~~~~
+  10 |     null,
+---
+
+[TestStrictVoidReturnRule/invalid-76 - 1]
+Diagnostic 1: nonVoidReturn (3:21 - 3:24)
+Message: Value returned in a context where a void return is expected.
+   2 | const foo: { cb: () => void } = class {
+   3 |   static cb = () => ({});
+     |                     ~~~~
+   4 | };
+---
+
+[TestStrictVoidReturnRule/invalid-77 - 1]
+Diagnostic 1: nonVoidReturn (3:27 - 3:28)
+Message: Value returned in a context where a void return is expected.
+   2 | class Foo {
+   3 |   foo: () => void = () => [];
+     |                           ~~
+   4 | }
+---
+
+[TestStrictVoidReturnRule/invalid-78 - 1]
+Diagnostic 1: nonVoidFunc (3:28 - 3:38)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | class Foo {
+   3 |   static foo: () => void = Math.random;
+     |                            ~~~~~~~~~~~
+   4 | }
+---
+
+[TestStrictVoidReturnRule/invalid-79 - 1]
+Diagnostic 1: nonVoidFunc (6:8 - 6:18)
+Message: Value-returning function used in a context where a void function is expected.
+   5 | class Bar extends Foo {
+   6 |   cb = Math.random;
+     |        ~~~~~~~~~~~
+   7 | }
+---
+
+[TestStrictVoidReturnRule/invalid-8 - 1]
+Diagnostic 1: asyncFunc (5:17 - 5:32)
+Message: Async function used in a context where a void function is expected.
+   4 | foo(async () => ({}));
+   5 | foo<() => void>(async () => ({}));
+     |                 ~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestStrictVoidReturnRule/invalid-80 - 1]
+Diagnostic 1: nonVoidFunc (7:8 - 7:18)
+Message: Value-returning function used in a context where a void function is expected.
+   6 | class Bar extends foo() {
+   7 |   cb = Math.random;
+     |        ~~~~~~~~~~~
+   8 | }
+---
+
+[TestStrictVoidReturnRule/invalid-81 - 1]
+Diagnostic 1: nonVoidReturn (10:5 - 10:18)
+Message: Value returned in a context where a void return is expected.
+   9 |   [method]() {
+  10 |     return 'nara';
+     |     ~~~~~~~~~~~~~~
+  11 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-82 - 1]
+No diagnostics
+---
+
+[TestStrictVoidReturnRule/invalid-83 - 1]
+Diagnostic 1: nonVoidReturn (7:5 - 7:25)
+Message: Value returned in a context where a void return is expected.
+   6 |   cb() {
+   7 |     return Math.random();
+     |     ~~~~~~~~~~~~~~~~~~~~~
+   8 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-84 - 1]
+Diagnostic 1: nonVoidReturn (9:15 - 9:27)
+Message: Value returned in a context where a void return is expected.
+   8 | class Baz extends Bar {
+   9 |   cb1 = () => Math.random();
+     |               ~~~~~~~~~~~~~
+  10 |   cb2() {
+
+Diagnostic 2: nonVoidReturn (11:5 - 11:25)
+Message: Value returned in a context where a void return is expected.
+  10 |   cb2() {
+  11 |     return Math.random();
+     |     ~~~~~~~~~~~~~~~~~~~~~
+  12 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-85 - 1]
+Diagnostic 1: nonVoidFunc (10:20 - 10:20)
+Message: Value-returning function used in a context where a void function is expected.
+   9 | class Baz extends Bar implements Foo {
+  10 |   cb: () => void = f;
+     |                    ~
+  11 | }
+---
+
+[TestStrictVoidReturnRule/invalid-86 - 1]
+Diagnostic 1: nonVoidReturn (11:7 - 11:38)
+Message: Value returned in a context where a void return is expected.
+  10 |     if (maybe) {
+  11 |       return Promise.resolve('siema');
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 |     } else {
+
+Diagnostic 2: nonVoidReturn (13:7 - 13:37)
+Message: Value returned in a context where a void return is expected.
+  12 |     } else {
+  13 |       return Promise.resolve('nara');
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |     }
+---
+
+[TestStrictVoidReturnRule/invalid-87 - 1]
+Diagnostic 1: asyncFunc (6:3 - 6:15)
+Message: Async function used in a context where a void function is expected.
+   5 | class Bar extends Foo {
+   6 |   async cb() {}
+     |   ~~~~~~~~~~~~~
+   7 | }
+---
+
+[TestStrictVoidReturnRule/invalid-88 - 1]
+Diagnostic 1: nonVoidFunc (9:3 - 9:10)
+Message: Value-returning function used in a context where a void function is expected.
+   8 | class Bar extends Foo {
+   9 |   *cb() {}
+     |   ~~~~~~~~
+  10 | }
+---
+
+[TestStrictVoidReturnRule/invalid-89 - 1]
+Diagnostic 1: nonVoidFunc (6:8 - 6:18)
+Message: Value-returning function used in a context where a void function is expected.
+   5 | class Bar implements Foo {
+   6 |   cb = Math.random;
+     |        ~~~~~~~~~~~
+   7 | }
+---
+
+[TestStrictVoidReturnRule/invalid-9 - 1]
+Diagnostic 1: nonVoidReturn (6:17 - 6:29)
+Message: Value returned in a context where a void return is expected.
+   5 | 
+   6 | foo(null, () => Math.random());
+     |                 ~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestStrictVoidReturnRule/invalid-90 - 1]
+Diagnostic 1: nonVoidFunc (5:8 - 5:18)
+Message: Value-returning function used in a context where a void function is expected.
+   4 | class Bar implements O {
+   5 |   cb = Math.random;
+     |        ~~~~~~~~~~~
+   6 | }
+---
+
+[TestStrictVoidReturnRule/invalid-91 - 1]
+Diagnostic 1: nonVoidFunc (6:3 - 6:15)
+Message: Value-returning function used in a context where a void function is expected.
+   5 | class Bar extends Foo {
+   6 |   async*cb() {}
+     |   ~~~~~~~~~~~~~
+   7 | }
+---
+
+[TestStrictVoidReturnRule/invalid-92 - 1]
+Diagnostic 1: asyncFunc (6:3 - 8:3)
+Message: Async function used in a context where a void function is expected.
+   5 | class Bar implements Foo {
+   6 |   async cb(): Promise<string> {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |     return Promise.resolve('siema');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   }
+     | ~~~
+   9 | }
+---
+
+[TestStrictVoidReturnRule/invalid-93 - 1]
+Diagnostic 1: asyncFunc (6:3 - 12:3)
+Message: Async function used in a context where a void function is expected.
+   5 | class Bar implements Foo {
+   6 |   async cb() {
+     |   ~~~~~~~~~~~~
+   7 |     try {
+     | ~~~~~~~~~
+   8 |       return { a: ['asdf', 1234] };
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |     } catch {
+     | ~~~~~~~~~~~~~
+  10 |       console.error('error');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |     }
+     | ~~~~~
+  12 |   }
+     | ~~~
+  13 | }
+---
+
+[TestStrictVoidReturnRule/invalid-94 - 1]
+Diagnostic 1: nonVoidReturn (8:7 - 8:32)
+Message: Value returned in a context where a void return is expected.
+   7 |     if (maybe) {
+   8 |       return Promise.resolve(1);
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |     } else {
+---
+
+[TestStrictVoidReturnRule/invalid-95 - 1]
+Diagnostic 1: asyncFunc (9:3 - 9:16)
+Message: Async function used in a context where a void function is expected.
+   8 | class Bar implements Foo1, Foo2 {
+   9 |   async cb1() {}
+     |   ~~~~~~~~~~~~~~
+  10 |   async *cb2() {}
+
+Diagnostic 2: nonVoidFunc (10:3 - 10:17)
+Message: Value-returning function used in a context where a void function is expected.
+   9 |   async cb1() {}
+  10 |   async *cb2() {}
+     |   ~~~~~~~~~~~~~~~
+  11 | }
+---
+
+[TestStrictVoidReturnRule/invalid-96 - 1]
+Diagnostic 1: asyncFunc (12:3 - 12:16)
+Message: Async function used in a context where a void function is expected.
+  11 | class Bar extends Baz implements Foo1, Foo2 {
+  12 |   async cb1() {}
+     |   ~~~~~~~~~~~~~~
+  13 |   async *cb2() {}
+
+Diagnostic 2: nonVoidFunc (13:3 - 13:17)
+Message: Value-returning function used in a context where a void function is expected.
+  12 |   async cb1() {}
+  13 |   async *cb2() {}
+     |   ~~~~~~~~~~~~~~~
+  14 |   cb3() {
+
+Diagnostic 3: nonVoidReturn (15:5 - 15:25)
+Message: Value returned in a context where a void return is expected.
+  14 |   cb3() {
+  15 |     return Math.random();
+     |     ~~~~~~~~~~~~~~~~~~~~~
+  16 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-97 - 1]
+Diagnostic 1: nonVoidReturn (6:5 - 6:25)
+Message: Value returned in a context where a void return is expected.
+   5 |   cb() {
+   6 |     return Math.random();
+     |     ~~~~~~~~~~~~~~~~~~~~~
+   7 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-98 - 1]
+Diagnostic 1: nonVoidReturn (6:5 - 6:25)
+Message: Value returned in a context where a void return is expected.
+   5 |   cb() {
+   6 |     return Math.random();
+     |     ~~~~~~~~~~~~~~~~~~~~~
+   7 |   }
+---
+
+[TestStrictVoidReturnRule/invalid-99 - 1]
+Diagnostic 1: asyncFunc (9:3 - 9:16)
+Message: Async function used in a context where a void function is expected.
+   8 | class Bar implements Foo2 {
+   9 |   async cb1() {}
+     |   ~~~~~~~~~~~~~~
+  10 |   async *cb2() {}
+
+Diagnostic 2: nonVoidFunc (10:3 - 10:17)
+Message: Value-returning function used in a context where a void function is expected.
+   9 |   async cb1() {}
+  10 |   async *cb2() {}
+     |   ~~~~~~~~~~~~~~~
+  11 | }
+---

@@ -3320,6 +3320,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
   },
   {
+    "file_path": "fixtures/basic/rules/strict-void-return/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Value returned in a context where a void return is expected.",
+      "id": "nonVoidReturn",
+    },
+    "range": {
+      "end": 58,
+      "pos": 54,
+    },
+    "rule": "strict-void-return",
+  },
+  {
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
     "kind": 0,
     "message": {
@@ -3370,6 +3383,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 170,
     },
     "rule": "switch-exhaustiveness-check",
+  },
+  {
+    "file_path": "fixtures/basic/rules/unbound-method/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Value-returning function used in a context where a void function is expected.",
+      "id": "nonVoidFunc",
+    },
+    "range": {
+      "end": 565,
+      "pos": 557,
+    },
+    "rule": "strict-void-return",
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
