@@ -67,7 +67,7 @@ var StrictVoidReturnRule = rule.Rule{
 				return
 			}
 
-			if !ast.IsArrowFunction(funcNode) && !ast.IsFunctionExpression(funcNode) {
+			if !ast.IsArrowFunction(funcNode) && !ast.IsFunctionExpression(funcNode) && !ast.IsMethodDeclaration(funcNode) {
 				ctx.ReportNode(funcNode, buildNonVoidFuncMessage())
 				return
 			}
@@ -329,7 +329,7 @@ var StrictVoidReturnRule = rule.Rule{
 					return
 				}
 				expression := attr.Initializer.AsJsxExpression().Expression
-				if expression != nil && expression.Kind != ast.KindJsxEmptyExpression {
+				if expression != nil && !ast.IsOmittedExpression(expression) {
 					checkExpressionNode(expression)
 				}
 			},
