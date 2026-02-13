@@ -459,6 +459,31 @@ function unwrap<T>(input: number | string | Wrapper<T>): number {
   return typeof input === 'string' ? parseFloat(input) : <number>input;
 }
 		`},
+		{Code: `
+const value = ((<T>(input: T): T | undefined => input)(1)) as number;
+		`},
+		{Code: `
+type NumberValueType = number | string;
+type NumberValuePairType = [NumberValueType, NumberValueType];
+
+type NumberCellValueType<T extends NumberValuePairType | NumberValueType> =
+  T extends NumberValuePairType ? NumberValuePairType : NumberValueType;
+
+function processValue<T extends NumberValuePairType | NumberValueType>(
+  value: NumberCellValueType<T>
+): number {
+  if (Array.isArray(value)) {
+    return 0;
+  }
+
+  const numberValue = typeof value === "string" ? parseFloat(value) : (value as number);
+  //                                                                   ^^^^^^^^^^^^^^^^
+  // tsgolint: "This assertion is unnecessary since it does not change the type of the expression."
+  const negative = numberValue < 0;
+  return negative ? -1 : 1;
+}
+		`},
+		{Code: `const cb = async (importOriginal: unknown) => { const actual = (await importOriginal()) as Record<string, unknown>; return { ...actual, useLocation: vi.fn() }; });`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",

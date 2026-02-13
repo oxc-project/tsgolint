@@ -186,12 +186,33 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return utils.IsTypeFlagSet(t, checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral)
 		}
 
-		shouldUseContextFreeType := func(node *ast.Node) bool {
-			return ast.IsIdentifier(node) ||
-				ast.IsAwaitExpression(node) ||
-				ast.IsCallExpression(node) ||
-				ast.IsPropertyAccessExpression(node) ||
-				ast.IsElementAccessExpression(node)
+		isIIFE := func(expression *ast.Node) bool {
+			expression = ast.SkipParentheses(expression)
+			if !ast.IsCallExpression(expression) {
+				return false
+			}
+
+			callee := ast.SkipParentheses(expression.AsCallExpression().Expression)
+			return ast.IsArrowFunction(callee) || ast.IsFunctionExpression(callee)
+		}
+
+		getUncastType := func(node *ast.Node) *checker.Type {
+			expression := ast.SkipParentheses(node.Expression())
+
+			if isIIFE(expression) {
+				if resolvedSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, expression, nil, checker.CheckModeNormal); resolvedSignature != nil {
+					return ctx.TypeChecker.GetReturnTypeOfSignature(resolvedSignature)
+				}
+
+				callee := ast.SkipParentheses(expression.AsCallExpression().Expression)
+				functionType := ctx.TypeChecker.GetTypeAtLocation(callee)
+				signatures := ctx.TypeChecker.GetCallSignatures(functionType)
+				if len(signatures) > 0 {
+					return ctx.TypeChecker.GetReturnTypeOfSignature(signatures[0])
+				}
+			}
+
+			return ctx.TypeChecker.GetTypeAtLocation(expression)
 		}
 
 		checkTypeAssertion := func(node *ast.Node) {
@@ -209,12 +230,15 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			expression := node.Expression()
-			expressionForType := ast.SkipParentheses(expression)
-			uncastType := ctx.TypeChecker.GetTypeAtLocation(expressionForType)
+			uncastType := getUncastType(node)
 
-			if !castTypeIsLiteral && uncastType == castType && shouldUseContextFreeType(expressionForType) {
-				if contextFreeType := checker.Checker_getContextFreeTypeOfExpression(ctx.TypeChecker, expressionForType); contextFreeType != nil {
-					uncastType = contextFreeType
+			expressionForType := ast.SkipParentheses(expression)
+			if uncastType == castType && ast.IsIdentifier(expressionForType) {
+				if symbol := ctx.TypeChecker.GetSymbolAtLocation(expressionForType); symbol != nil {
+					symbolType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, symbol)
+					if symbolType != nil && checker.Type_flags(symbolType)&checker.TypeFlagsConditional != 0 {
+						uncastType = symbolType
+					}
 				}
 			}
 

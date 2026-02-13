@@ -6,3 +6,6 @@ extend-exclude = [
   "patches",
   "shim",
 ]
+
+[default.extend-identifiers]
+IIFEs = "IIFEs"
