@@ -242,6 +242,32 @@ export type { TypeNS };
 			{
 				Code: `
 type T = 1;
+export { type T, T };
+`,
+				Output: []string{`
+type T = 1;
+export type { T, T };
+`},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "typeOverValue"},
+				},
+			},
+			{
+				Code: `
+type T = 1;
+export { type/* */T, type     /* */T, T };
+`,
+				Output: []string{`
+type T = 1;
+export type { /* */T, /* */T, T };
+`},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "typeOverValue"},
+				},
+			},
+			{
+				Code: `
+type T = 1;
 const x = 1;
 export { type T, T, x };
 `,
@@ -280,19 +306,6 @@ export { type T, T };
 				Output: []string{`
 type T = 1;
 export type { T, T };
-`},
-				Errors: []rule_tester.InvalidTestCaseError{
-					{MessageId: "typeOverValue"},
-				},
-			},
-			{
-				Code: `
-type T = 1;
-export { type/* */T, type     /* */T, T };
-`,
-				Output: []string{`
-type T = 1;
-export type { /* */T, /* */T, T };
 `},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "typeOverValue"},
