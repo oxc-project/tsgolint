@@ -166,7 +166,6 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	}
 
 	close(queue)
-	program.BindSourceFiles()
 
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
 
