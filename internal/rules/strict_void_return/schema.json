@@ -3,6 +3,7 @@
   "definitions": {
     "strict_void_return_options": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "allowReturnAny": {
           "type": "boolean",
