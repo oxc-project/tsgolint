@@ -209,18 +209,6 @@ var StrictVoidReturnRule = rule.Rule{
 			return ""
 		}
 
-		getMemberIfExists := func(t *checker.Type, memberName string) *ast.Symbol {
-			if memberName == "" {
-				return nil
-			}
-			if symbol := checker.Type_symbol(t); symbol != nil {
-				if member := symbol.Members[memberName]; member != nil {
-					return member
-				}
-			}
-			return checker.Checker_getPropertyOfType(ctx.TypeChecker, t, memberName)
-		}
-
 		getBaseMemberTypes := func(memberNode *ast.Node) []*checker.Type {
 			classLikeNode := memberNode.Parent
 			if classLikeNode == nil {
@@ -231,8 +219,13 @@ var StrictVoidReturnRule = rule.Rule{
 				return nil
 			}
 
-			memberName := getMemberName(memberNode.Name())
-			if memberName == "" {
+			memberNameNode := memberNode.Name()
+			if memberNameNode == nil {
+				return nil
+			}
+
+			memberSymbol := ctx.TypeChecker.GetSymbolAtLocation(memberNameNode)
+			if memberSymbol == nil {
 				return nil
 			}
 
@@ -240,7 +233,7 @@ var StrictVoidReturnRule = rule.Rule{
 			for _, heritageClause := range heritageClauses.Nodes {
 				for _, heritageTypeNode := range heritageClause.AsHeritageClause().Types.Nodes {
 					heritageType := ctx.TypeChecker.GetTypeAtLocation(heritageTypeNode)
-					heritageMember := getMemberIfExists(heritageType, memberName)
+					heritageMember := checker.Checker_getPropertyOfType(ctx.TypeChecker, heritageType, memberSymbol.Name)
 					if heritageMember == nil {
 						continue
 					}
