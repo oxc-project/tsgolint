@@ -495,7 +495,7 @@ func ConditionalType_extendsType(v *checker.ConditionalType) *checker.Type {
 type ConstrainedType = checker.ConstrainedType
 type ContainingSymbolLinks = checker.ContainingSymbolLinks
 type ContextFlags = checker.ContextFlags
-const ContextFlagsCompletions = checker.ContextFlagsCompletions
+const ContextFlagsIgnoreNodeInferences = checker.ContextFlagsIgnoreNodeInferences
 const ContextFlagsNoConstraints = checker.ContextFlagsNoConstraints
 const ContextFlagsNone = checker.ContextFlagsNone
 const ContextFlagsSignature = checker.ContextFlagsSignature
@@ -769,7 +769,7 @@ func NewNodeBuilder(ch *checker.Checker, e *printer.EmitContext) *checker.NodeBu
 //go:linkname NewNodeBuilderEx github.com/microsoft/typescript-go/internal/checker.NewNodeBuilderEx
 func NewNodeBuilderEx(ch *checker.Checker, e *printer.EmitContext, idToSymbol map[*ast.IdentifierNode]*ast.Symbol) *checker.NodeBuilder
 //go:linkname NewSymbolTrackerImpl github.com/microsoft/typescript-go/internal/checker.NewSymbolTrackerImpl
-func NewSymbolTrackerImpl(context *checker.NodeBuilderContext, tracker nodebuilder.SymbolTracker, tchost checker.Host) *checker.SymbolTrackerImpl
+func NewSymbolTrackerImpl(context *checker.NodeBuilderContext, tracker nodebuilder.SymbolTracker) *checker.SymbolTrackerImpl
 type NodeBuilder = checker.NodeBuilder
 type NodeBuilderContext = checker.NodeBuilderContext
 type NodeBuilderImpl = checker.NodeBuilderImpl

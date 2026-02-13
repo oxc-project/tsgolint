@@ -1,14 +1,14 @@
-From b2d8a45ebf40cb3b274345c62aa94e9dc32db1f8 Mon Sep 17 00:00:00 2001
+From ae5e301dd14a810ad35eacab40de7fa41df31309 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Tue, 10 Feb 2026 19:52:02 +0000
-Subject: [PATCH] feat(checker): add IndexInfo accessor methods for shims
+Subject: [PATCH 5/5] feat(checker): add IndexInfo accessor methods for shims
 
 ---
  internal/checker/types.go | 8 ++++++++
  1 file changed, 8 insertions(+)
 
 diff --git a/internal/checker/types.go b/internal/checker/types.go
-index 3e2aafbd4c..946983577d 100644
+index 80003c2d95..dae9cb0ef3 100644
 --- a/internal/checker/types.go
 +++ b/internal/checker/types.go
 @@ -1201,6 +1201,14 @@ type IndexInfo struct {
