@@ -33,12 +33,12 @@ func buildMultipleExportsAreTypesMessage(exportNames string) rule.RuleMessage {
 }
 
 type analyzedNamedExport struct {
-	node            *ast.Node
-	typeTexts       []string
-	typeBasedNodes  []*ast.Node
-	typeBasedNames  []string
-	valueTexts      []string
-	moduleSource    string
+	node           *ast.Node
+	typeTexts      []string
+	typeBasedNodes []*ast.Node
+	typeBasedNames []string
+	valueTexts     []string
+	moduleSource   string
 }
 
 func isSymbolTypeBased(typeChecker *checker.Checker, symbol *ast.Symbol) (bool, bool) {
@@ -204,11 +204,11 @@ var ConsistentTypeExportsRule = rule.Rule{
 			}
 
 			report := &analyzedNamedExport{
-				node:            node,
-				typeTexts:       make([]string, 0, 2),
-				typeBasedNodes:  make([]*ast.Node, 0, 2),
-				typeBasedNames:  make([]string, 0, 2),
-				valueTexts:      make([]string, 0, 2),
+				node:           node,
+				typeTexts:      make([]string, 0, 2),
+				typeBasedNodes: make([]*ast.Node, 0, 2),
+				typeBasedNames: make([]string, 0, 2),
+				valueTexts:     make([]string, 0, 2),
 			}
 			if exportDecl.ModuleSpecifier != nil {
 				report.moduleSource = strings.TrimSpace(getNodeText(ctx.SourceFile, exportDecl.ModuleSpecifier.AsNode()))

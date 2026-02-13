@@ -12,7 +12,7 @@ func TestConsistentTypeExports(t *testing.T) {
 	t.Parallel()
 
 	rule_tester.RunRuleTester(
-	path.Join(	fixtures.GetRootDir(), "consistent-type-exports"),
+		path.Join(fixtures.GetRootDir(), "consistent-type-exports"),
 		"tsconfig.json",
 		t,
 		&ConsistentTypeExportsRule,
