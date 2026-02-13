@@ -1,6 +1,7 @@
 package no_unnecessary_type_conversion
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
@@ -12,10 +13,19 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildUnnecessaryTypeConversionMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "unnecessaryTypeConversion",
-		Description: "This type conversion does not change the type or value of the expression.",
+func buildUnnecessaryTypeConversionDiagnostic(conversion, expression core.TextRange, expressionType string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Message: rule.RuleMessage{
+			Id:          "unnecessaryTypeConversion",
+			Description: "This type conversion does not change the type or value of the expression.",
+		},
+		Range: conversion,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Range: expression,
+				Label: fmt.Sprintf("This expression already has type '%s'.", expressionType),
+			},
+		},
 	}
 }
 
@@ -176,13 +186,15 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 			if isEmptyStringLiteral(expr.Right) {
 				leftType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, expr.Left)
 				if doesUnderlyingTypeMatchFlag(leftType, checker.TypeFlagsStringLike) {
-					ctx.ReportRangeWithSuggestions(
-						core.NewTextRange(expr.Left.End(), node.End()),
-						buildUnnecessaryTypeConversionMessage(),
+					ctx.ReportDiagnosticWithSuggestions(
+						buildUnnecessaryTypeConversionDiagnostic(
+							core.NewTextRange(expr.Left.End(), node.End()),
+							utils.TrimNodeTextRange(ctx.SourceFile, expr.Left),
+							ctx.TypeChecker.TypeToString(leftType),
+						),
 						func() []rule.RuleSuggestion {
 							return buildSuggestions(node, "string", expr.Left)
-						},
-					)
+						})
 				}
 				return
 			}
@@ -191,9 +203,12 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 				rightType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, expr.Right)
 				if doesUnderlyingTypeMatchFlag(rightType, checker.TypeFlagsStringLike) {
 					rightStart := utils.TrimNodeTextRange(ctx.SourceFile, expr.Right).Pos()
-					ctx.ReportRangeWithSuggestions(
-						core.NewTextRange(utils.TrimNodeTextRange(ctx.SourceFile, node).Pos(), rightStart),
-						buildUnnecessaryTypeConversionMessage(),
+					ctx.ReportDiagnosticWithSuggestions(
+						buildUnnecessaryTypeConversionDiagnostic(
+							core.NewTextRange(utils.TrimNodeTextRange(ctx.SourceFile, node).Pos(), rightStart),
+							utils.TrimNodeTextRange(ctx.SourceFile, expr.Right),
+							ctx.TypeChecker.TypeToString(rightType),
+						),
 						func() []rule.RuleSuggestion {
 							return buildSuggestions(node, "string", expr.Right)
 						},
@@ -216,27 +231,34 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNodeWithSuggestions(node, buildUnnecessaryTypeConversionMessage(), func() []rule.RuleSuggestion {
-				removeFix := buildWrappingFix(node, []*ast.Node{expr.Left}, nil)
-				if ast.IsExpressionStatement(node.Parent) {
-					removeFix = rule.RuleFixRemove(ctx.SourceFile, node.Parent)
-				}
+			ctx.ReportDiagnosticWithSuggestions(
+				buildUnnecessaryTypeConversionDiagnostic(
+					utils.TrimNodeTextRange(ctx.SourceFile, node),
+					utils.TrimNodeTextRange(ctx.SourceFile, expr.Left),
+					ctx.TypeChecker.TypeToString(leftType),
+				),
+				func() []rule.RuleSuggestion {
+					removeFix := buildWrappingFix(node, []*ast.Node{expr.Left}, nil)
+					if ast.IsExpressionStatement(node.Parent) {
+						removeFix = rule.RuleFixRemove(ctx.SourceFile, node.Parent)
+					}
 
-				return []rule.RuleSuggestion{
-					{
-						Message:  buildSuggestRemoveMessage(),
-						FixesArr: []rule.RuleFix{removeFix},
-					},
-					{
-						Message: buildSuggestSatisfiesMessage(),
-						FixesArr: []rule.RuleFix{
-							buildWrappingFix(node, []*ast.Node{expr.Left}, func(code ...string) string {
-								return code[0] + " satisfies string"
-							}),
+					return []rule.RuleSuggestion{
+						{
+							Message:  buildSuggestRemoveMessage(),
+							FixesArr: []rule.RuleFix{removeFix},
 						},
-					},
-				}
-			})
+						{
+							Message: buildSuggestSatisfiesMessage(),
+							FixesArr: []rule.RuleFix{
+								buildWrappingFix(node, []*ast.Node{expr.Left}, func(code ...string) string {
+									return code[0] + " satisfies string"
+								}),
+							},
+						},
+					}
+				},
+			)
 		}
 
 		reportBuiltInConversionCall := func(node *ast.CallExpression) {
@@ -289,9 +311,16 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 			}
 
 			primitiveType := strings.ToLower(callee.AsIdentifier().Text)
-			ctx.ReportNodeWithSuggestions(callee, buildUnnecessaryTypeConversionMessage(), func() []rule.RuleSuggestion {
-				return buildSuggestions(node.AsNode(), primitiveType, arg)
-			})
+			ctx.ReportDiagnosticWithSuggestions(
+				buildUnnecessaryTypeConversionDiagnostic(
+					utils.TrimNodeTextRange(ctx.SourceFile, callee),
+					utils.TrimNodeTextRange(ctx.SourceFile, arg),
+					ctx.TypeChecker.TypeToString(argType),
+				),
+				func() []rule.RuleSuggestion {
+					return buildSuggestions(node.AsNode(), primitiveType, arg)
+				},
+			)
 		}
 
 		reportStringToStringCall := func(node *ast.CallExpression) {
@@ -313,9 +342,12 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportRangeWithSuggestions(
-				core.NewTextRange(memberExpr.Name().Pos(), node.AsNode().End()),
-				buildUnnecessaryTypeConversionMessage(),
+			ctx.ReportDiagnosticWithSuggestions(
+				buildUnnecessaryTypeConversionDiagnostic(
+					core.NewTextRange(memberExpr.Name().Pos(), node.AsNode().End()),
+					utils.TrimNodeTextRange(ctx.SourceFile, memberExpr.Expression),
+					ctx.TypeChecker.TypeToString(objectType),
+				),
 				func() []rule.RuleSuggestion {
 					return buildSuggestions(node.AsNode(), "string", memberExpr.Expression)
 				},
@@ -333,12 +365,15 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportRangeWithSuggestions(
-				core.NewTextRange(
-					utils.TrimNodeTextRange(ctx.SourceFile, node).Pos(),
-					utils.TrimNodeTextRange(ctx.SourceFile, expr.Operand).Pos(),
+			ctx.ReportDiagnosticWithSuggestions(
+				buildUnnecessaryTypeConversionDiagnostic(
+					core.NewTextRange(
+						utils.TrimNodeTextRange(ctx.SourceFile, node).Pos(),
+						utils.TrimNodeTextRange(ctx.SourceFile, expr.Operand).Pos(),
+					),
+					utils.TrimNodeTextRange(ctx.SourceFile, expr.Operand),
+					ctx.TypeChecker.TypeToString(argType),
 				),
-				buildUnnecessaryTypeConversionMessage(),
 				func() []rule.RuleSuggestion {
 					return buildSuggestions(node, "number", expr.Operand)
 				},
@@ -362,9 +397,12 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 
 			outerStart := utils.TrimNodeTextRange(ctx.SourceFile, outerNode).Pos()
 			innerStart := utils.TrimNodeTextRange(ctx.SourceFile, node).Pos()
-			ctx.ReportRangeWithSuggestions(
-				core.NewTextRange(outerStart, innerStart+1),
-				buildUnnecessaryTypeConversionMessage(),
+			ctx.ReportDiagnosticWithSuggestions(
+				buildUnnecessaryTypeConversionDiagnostic(
+					core.NewTextRange(outerStart, innerStart+1),
+					utils.TrimNodeTextRange(ctx.SourceFile, expr.Operand),
+					ctx.TypeChecker.TypeToString(argType),
+				),
 				func() []rule.RuleSuggestion {
 					return buildSuggestions(outerNode, "boolean", expr.Operand)
 				},
@@ -388,9 +426,12 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 			outerNode := node.Parent
 			outerStart := utils.TrimNodeTextRange(ctx.SourceFile, outerNode).Pos()
 			innerStart := utils.TrimNodeTextRange(ctx.SourceFile, node).Pos()
-			ctx.ReportRangeWithSuggestions(
-				core.NewTextRange(outerStart, innerStart+1),
-				buildUnnecessaryTypeConversionMessage(),
+			ctx.ReportDiagnosticWithSuggestions(
+				buildUnnecessaryTypeConversionDiagnostic(
+					core.NewTextRange(outerStart, innerStart+1),
+					utils.TrimNodeTextRange(ctx.SourceFile, expr.Operand),
+					ctx.TypeChecker.TypeToString(argType),
+				),
 				func() []rule.RuleSuggestion {
 					return buildSuggestions(outerNode, "number", expr.Operand)
 				},

@@ -165,7 +165,7 @@ OXC_LOG=debug tsgolint
 - `cmd/tsgolint/*` - CLI implementation
 - `e2e/*` - End-to-end tests
 - `benchmarks/*` - Performance tests
-- Documentation files (*.md)
+- Documentation files (\*.md)
 
 ### DO NOT Modify
 
@@ -243,6 +243,9 @@ just pull
 
 # Run specific rule tests
 go test ./internal/rules/rule_name/...
+
+# Update all rule output snapshots
+just update-snaps
 
 # Profile performance
 tsgolint -cpuprof cpu.prof <files>

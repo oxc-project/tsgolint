@@ -1,0 +1,481 @@
+
+[TestPromiseFunctionAsyncRule/invalid-0 - 1]
+Diagnostic 1: missingAsync (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | function returnsAny(): any {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return 0;
+     | ~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-1 - 1]
+Diagnostic 1: missingAsync (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | function returnsUnknown(): unknown {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return 0;
+     | ~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-10 - 1]
+Diagnostic 1: missingAsync (2:43 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseFunctionExpression = function (p: Promise<void>) {
+     |                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p;
+     | ~~~~~~~~~~~
+   4 | };
+     | ~
+   5 | 
+
+Diagnostic 2: missingAsync (6:1 - 8:1)
+Message: Functions that return promises must be async.
+   5 | 
+   6 | function nonAsyncPromiseFunctionDeclaration(p: Promise<void>) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   return p;
+     | ~~~~~~~~~~~
+   8 | }
+     | ~
+   9 | 
+
+Diagnostic 3: missingAsync (13:3 - 15:3)
+Message: Functions that return promises must be async.
+  12 | class Test {
+  13 |   public nonAsyncPromiseMethod(p: Promise<void>) {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |     return p;
+     | ~~~~~~~~~~~~~
+  15 |   }
+     | ~~~
+  16 | }
+---
+
+[TestPromiseFunctionAsyncRule/invalid-11 - 1]
+Diagnostic 1: missingAsync (2:43 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseFunctionExpression = function (p: Promise<void>) {
+     |                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p;
+     | ~~~~~~~~~~~
+   4 | };
+     | ~
+   5 | 
+
+Diagnostic 2: missingAsync (10:38 - 10:60)
+Message: Functions that return promises must be async.
+   9 | 
+  10 | const nonAsyncPromiseArrowFunction = (p: Promise<void>) => p;
+     |                                      ~~~~~~~~~~~~~~~~~~~~~~~
+  11 | 
+
+Diagnostic 3: missingAsync (13:3 - 15:3)
+Message: Functions that return promises must be async.
+  12 | class Test {
+  13 |   public nonAsyncPromiseMethod(p: Promise<void>) {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |     return p;
+     | ~~~~~~~~~~~~~
+  15 |   }
+     | ~~~
+  16 | }
+---
+
+[TestPromiseFunctionAsyncRule/invalid-12 - 1]
+Diagnostic 1: missingAsync (6:1 - 8:1)
+Message: Functions that return promises must be async.
+   5 | 
+   6 | function nonAsyncPromiseFunctionDeclaration(p: Promise<void>) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   return p;
+     | ~~~~~~~~~~~
+   8 | }
+     | ~
+   9 | 
+
+Diagnostic 2: missingAsync (10:38 - 10:60)
+Message: Functions that return promises must be async.
+   9 | 
+  10 | const nonAsyncPromiseArrowFunction = (p: Promise<void>) => p;
+     |                                      ~~~~~~~~~~~~~~~~~~~~~~~
+  11 | 
+
+Diagnostic 3: missingAsync (13:3 - 15:3)
+Message: Functions that return promises must be async.
+  12 | class Test {
+  13 |   public nonAsyncPromiseMethod(p: Promise<void>) {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |     return p;
+     | ~~~~~~~~~~~~~
+  15 |   }
+     | ~~~
+  16 | }
+---
+
+[TestPromiseFunctionAsyncRule/invalid-13 - 1]
+Diagnostic 1: missingAsync (2:43 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseFunctionExpression = function (p: Promise<void>) {
+     |                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p;
+     | ~~~~~~~~~~~
+   4 | };
+     | ~
+   5 | 
+
+Diagnostic 2: missingAsync (6:1 - 8:1)
+Message: Functions that return promises must be async.
+   5 | 
+   6 | function nonAsyncPromiseFunctionDeclaration(p: Promise<void>) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   return p;
+     | ~~~~~~~~~~~
+   8 | }
+     | ~
+   9 | 
+
+Diagnostic 3: missingAsync (10:38 - 10:60)
+Message: Functions that return promises must be async.
+   9 | 
+  10 | const nonAsyncPromiseArrowFunction = (p: Promise<void>) => p;
+     |                                      ~~~~~~~~~~~~~~~~~~~~~~~
+  11 | 
+---
+
+[TestPromiseFunctionAsyncRule/invalid-14 - 1]
+Diagnostic 1: missingAsync (4:27 - 4:49)
+Message: Functions that return promises must be async.
+   3 | 
+   4 | const returnAllowedType = () => new PromiseType();
+     |                           ~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-15 - 1]
+Diagnostic 1: missingAsync (3:1 - 7:1)
+Message: Functions that return promises must be async.
+   2 | interface SPromise<T> extends Promise<T> {}
+   3 | function foo(): Promise<string> | SPromise<boolean> {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   return Math.random() > 0.5
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |     ? Promise.resolve('value')
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |     : Promise.resolve(false);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+     | ~
+   8 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-16 - 1]
+Diagnostic 1: missingAsync (3:3 - 6:3)
+Message: Functions that return promises must be async.
+   2 | class Test {
+   3 |   @decorator
+     |   ~~~~~~~~~~
+   4 |   public test() {
+     | ~~~~~~~~~~~~~~~~~
+   5 |     return Promise.resolve(123);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   }
+     | ~~~
+   7 | }
+---
+
+[TestPromiseFunctionAsyncRule/invalid-17 - 1]
+Diagnostic 1: missingAsync (3:3 - 6:3)
+Message: Functions that return promises must be async.
+   2 | class Test {
+   3 |   @decorator(async () => {})
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   static protected[(1)]() {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |     return Promise.resolve(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   }
+     | ~~~
+   7 |   public'bar'() {
+
+Diagnostic 2: missingAsync (7:3 - 9:3)
+Message: Functions that return promises must be async.
+   6 |   }
+   7 |   public'bar'() {
+     |   ~~~~~~~~~~~~~~~
+   8 |     return Promise.resolve(2);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   }
+     | ~~~
+  10 |   private['baz']() {
+
+Diagnostic 3: missingAsync (10:3 - 12:3)
+Message: Functions that return promises must be async.
+   9 |   }
+  10 |   private['baz']() {
+     |   ~~~~~~~~~~~~~~~~~~
+  11 |     return Promise.resolve(3);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 |   }
+     | ~~~
+  13 | }
+---
+
+[TestPromiseFunctionAsyncRule/invalid-18 - 1]
+Diagnostic 1: missingAsync (3:3 - 5:3)
+Message: Functions that return promises must be async.
+   2 | class Foo {
+   3 |   catch() {
+     |   ~~~~~~~~~
+   4 |     return Promise.resolve(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   }
+     | ~~~
+   6 | 
+
+Diagnostic 2: missingAsync (7:3 - 9:3)
+Message: Functions that return promises must be async.
+   6 | 
+   7 |   public default() {
+     |   ~~~~~~~~~~~~~~~~~~
+   8 |     return Promise.resolve(2);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   }
+     | ~~~
+  10 | 
+
+Diagnostic 3: missingAsync (11:3 - 14:3)
+Message: Functions that return promises must be async.
+  10 | 
+  11 |   @decorator
+     |   ~~~~~~~~~~
+  12 |   private case<T>() {
+     | ~~~~~~~~~~~~~~~~~~~~~
+  13 |     return Promise.resolve(3);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |   }
+     | ~~~
+  15 | }
+---
+
+[TestPromiseFunctionAsyncRule/invalid-19 - 1]
+Diagnostic 1: missingAsync (3:3 - 5:3)
+Message: Functions that return promises must be async.
+   2 | const foo = {
+   3 |   catch() {
+     |   ~~~~~~~~~
+   4 |     return Promise.resolve(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   },
+     | ~~~
+   6 | };
+---
+
+[TestPromiseFunctionAsyncRule/invalid-2 - 1]
+Diagnostic 1: missingAsync (2:44 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseFunctionExpressionA = function (p: Promise<void>) {
+     |                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p;
+     | ~~~~~~~~~~~
+   4 | };
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-20 - 1]
+Diagnostic 1: missingAsyncHybridReturn (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | function promiseInUnionWithoutExplicitReturnType(p: boolean) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p ? Promise.resolve(5) : 5;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+  Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
+---
+
+[TestPromiseFunctionAsyncRule/invalid-21 - 1]
+Diagnostic 1: missingAsyncHybridReturn (4:1 - 10:1)
+Message: Functions that return promises must be async.
+   3 | function test1(a: number): Promise<number>;
+   4 | function test1(a?: number) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   if (a) {
+     | ~~~~~~~~~~
+   6 |     return Promise.resolve(a);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   }
+     | ~~~
+   8 | 
+   9 |   return Math.random() > 0.5 ? 'one' : Promise.resolve('one');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 | }
+     | ~
+  11 |       
+  Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
+---
+
+[TestPromiseFunctionAsyncRule/invalid-22 - 1]
+Diagnostic 1: missingAsyncHybridReturn (6:1 - 8:1)
+Message: Functions that return promises must be async.
+   5 | 
+   6 | function promiseInUnionWithoutExplicitReturnType(p: boolean) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   return p ? new PromiseType() : 5;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+     | ~
+   9 |       
+  Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
+---
+
+[TestPromiseFunctionAsyncRule/invalid-23 - 1]
+Diagnostic 1: missingAsync (4:1 - 8:1)
+Message: Functions that return promises must be async.
+   3 | function overloadingThatCanReturnPromise(a: boolean): Promise<string>;
+   4 | function overloadingThatCanReturnPromise(
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   a?: boolean,
+     | ~~~~~~~~~~~~~~
+   6 | ): Promise<number | string> {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   return Promise.resolve(5);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+     | ~
+   9 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-24 - 1]
+Diagnostic 1: missingAsync (4:1 - 6:1)
+Message: Functions that return promises must be async.
+   3 | function overloadingThatIncludeAny(a: boolean): any;
+   4 | function overloadingThatIncludeAny(a?: boolean): any | number {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   return Promise.resolve(5);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+     | ~
+   7 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-25 - 1]
+Diagnostic 1: missingAsync (4:1 - 6:1)
+Message: Functions that return promises must be async.
+   3 | function overloadingThatIncludeUnknown(a: boolean): unknown;
+   4 | function overloadingThatIncludeUnknown(a?: boolean): unknown | number {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   return Promise.resolve(5);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+     | ~
+   7 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-3 - 1]
+Diagnostic 1: missingAsync (2:44 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseFunctionExpressionB = function () {
+     |                                            ~~~~~~~~~~~~~
+   3 |   return new Promise<void>();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | };
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-4 - 1]
+Diagnostic 1: missingAsync (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | function nonAsyncPromiseFunctionDeclarationA(p: Promise<void>) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p;
+     | ~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-5 - 1]
+Diagnostic 1: missingAsync (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | function nonAsyncPromiseFunctionDeclarationB() {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return new Promise<void>();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-6 - 1]
+Diagnostic 1: missingAsync (2:39 - 2:61)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseArrowFunctionA = (p: Promise<void>) => p;
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-7 - 1]
+Diagnostic 1: missingAsync (2:39 - 2:63)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | const nonAsyncPromiseArrowFunctionB = () => new Promise<void>();
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-8 - 1]
+Diagnostic 1: missingAsync (3:3 - 5:3)
+Message: Functions that return promises must be async.
+   2 | const functions = {
+   3 |   nonAsyncPromiseMethod() {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |     return Promise.resolve(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   },
+     | ~~~
+   6 | };
+---
+
+[TestPromiseFunctionAsyncRule/invalid-9 - 1]
+Diagnostic 1: missingAsync (3:3 - 5:3)
+Message: Functions that return promises must be async.
+   2 | class Test {
+   3 |   public nonAsyncPromiseMethodA(p: Promise<void>) {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |     return p;
+     | ~~~~~~~~~~~~~
+   5 |   }
+     | ~~~
+   6 | 
+
+Diagnostic 2: missingAsync (7:3 - 9:3)
+Message: Functions that return promises must be async.
+   6 | 
+   7 |   public static nonAsyncPromiseMethodB() {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |     return new Promise<void>();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   }
+     | ~~~
+  10 | }
+---

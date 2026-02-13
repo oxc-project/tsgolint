@@ -1,0 +1,63 @@
+
+[TestNoUnsafeUnaryMinusRule/invalid-0 - 1]
+Diagnostic 1: unaryMinus (1:16 - 1:17)
+Message: Argument of unary negation should be assignable to number | bigint but is string instead.
+   1 | (a: string) => -a;
+     |                ~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-1 - 1]
+Diagnostic 1: unaryMinus (1:12 - 1:13)
+Message: Argument of unary negation should be assignable to number | bigint but is {} instead.
+   1 | (a: {}) => -a;
+     |            ~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-2 - 1]
+Diagnostic 1: unaryMinus (1:18 - 1:19)
+Message: Argument of unary negation should be assignable to number | bigint but is number[] instead.
+   1 | (a: number[]) => -a;
+     |                  ~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-3 - 1]
+Diagnostic 1: unaryMinus (1:1 - 1:8)
+Message: Argument of unary negation should be assignable to number | bigint but is "hello" instead.
+   1 | -'hello';
+     | ~~~~~~~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-4 - 1]
+Diagnostic 1: unaryMinus (1:1 - 1:8)
+Message: Argument of unary negation should be assignable to number | bigint but is "hello" instead.
+   1 | -`hello`;
+     | ~~~~~~~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-5 - 1]
+Diagnostic 1: unaryMinus (1:23 - 1:24)
+Message: Argument of unary negation should be assignable to number | bigint but is { x: number; } instead.
+   1 | (a: { x: number }) => -a;
+     |                       ~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-6 - 1]
+Diagnostic 1: unaryMinus (1:17 - 1:18)
+Message: Argument of unary negation should be assignable to number | bigint but is unknown instead.
+   1 | (a: unknown) => -a;
+     |                 ~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-7 - 1]
+Diagnostic 1: unaryMinus (1:14 - 1:15)
+Message: Argument of unary negation should be assignable to number | bigint but is void instead.
+   1 | (a: void) => -a;
+     |              ~~
+---
+
+[TestNoUnsafeUnaryMinusRule/invalid-8 - 1]
+Diagnostic 1: unaryMinus (1:15 - 1:16)
+Message: Argument of unary negation should be assignable to number | bigint but is T instead.
+   1 | <T,>(t: T) => -t;
+     |               ~~
+---

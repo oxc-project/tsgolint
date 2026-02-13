@@ -1,0 +1,90 @@
+
+[TestNonNullableTypeAssertionStyleRule/invalid-0 - 1]
+Diagnostic 1: preferNonNullAssertion (3:13 - 3:27)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   2 | declare const maybe: string | undefined;
+   3 | const bar = maybe as string;
+     |             ~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-1 - 1]
+Diagnostic 1: preferNonNullAssertion (3:13 - 3:27)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   2 | declare const maybe: string | null;
+   3 | const bar = maybe as string;
+     |             ~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-2 - 1]
+Diagnostic 1: preferNonNullAssertion (3:13 - 3:27)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   2 | declare const maybe: string | null | undefined;
+   3 | const bar = maybe as string;
+     |             ~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-3 - 1]
+Diagnostic 1: preferNonNullAssertion (4:13 - 4:25)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   3 | declare const maybe: Type | undefined;
+   4 | const bar = maybe as Type;
+     |             ~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-4 - 1]
+Diagnostic 1: preferNonNullAssertion (6:13 - 6:30)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   5 | declare const maybe: Interface | undefined;
+   6 | const bar = maybe as Interface;
+     |             ~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-5 - 1]
+Diagnostic 1: preferNonNullAssertion (5:11 - 5:29)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   4 | 
+   5 | const y = x as NonNullable<T>;
+     |           ~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-6 - 1]
+Diagnostic 1: preferNonNullAssertion (5:11 - 5:29)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   4 | 
+   5 | const y = x as NonNullable<T>;
+     |           ~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-7 - 1]
+Diagnostic 1: preferNonNullAssertion (5:10 - 5:44)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   4 | async function fn(): Promise<string> {
+   5 |   return (await nullablePromise()) as string;
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+---
+
+[TestNonNullableTypeAssertionStyleRule/invalid-8 - 1]
+Diagnostic 1: preferNonNullAssertion (4:11 - 4:36)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   3 | 
+   4 | const b = (a || undefined) as string;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNonNullableTypeAssertionStyleRule_noUncheckedIndexedAccess/invalid-0 - 1]
+Diagnostic 1: preferNonNullAssertion (3:30 - 3:42)
+Message: Use a ! assertion to more succinctly remove null and undefined from the type.
+   2 | function first<T extends string | number>(array: ArrayLike<T>): T | null {
+   3 |   return array.length > 0 ? (array[0] as T) : null;
+     |                              ~~~~~~~~~~~~~
+   4 | }
+---

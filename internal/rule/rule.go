@@ -116,15 +116,16 @@ func (d RuleDiagnostic) GetSuggestions() []RuleSuggestion {
 }
 
 type RuleContext struct {
-	SourceFile                 *ast.SourceFile
-	Program                    *compiler.Program
-	TypeChecker                *checker.Checker
-	ReportDiagnostic           func(diagnostic RuleDiagnostic)
-	ReportRange                func(textRange core.TextRange, msg RuleMessage)
-	ReportRangeWithSuggestions func(textRange core.TextRange, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
-	ReportNode                 func(node *ast.Node, msg RuleMessage)
-	ReportNodeWithFixes        func(node *ast.Node, msg RuleMessage, fixesFn func() []RuleFix)
-	ReportNodeWithSuggestions  func(node *ast.Node, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
+	SourceFile                      *ast.SourceFile
+	Program                         *compiler.Program
+	TypeChecker                     *checker.Checker
+	ReportDiagnostic                func(diagnostic RuleDiagnostic)
+	ReportDiagnosticWithSuggestions func(diagnostic RuleDiagnostic, suggestionsFn func() []RuleSuggestion)
+	ReportRange                     func(textRange core.TextRange, msg RuleMessage)
+	ReportRangeWithSuggestions      func(textRange core.TextRange, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
+	ReportNode                      func(node *ast.Node, msg RuleMessage)
+	ReportNodeWithFixes             func(node *ast.Node, msg RuleMessage, fixesFn func() []RuleFix)
+	ReportNodeWithSuggestions       func(node *ast.Node, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
 }
 
 func ReportNodeWithFixesOrSuggestions(ctx RuleContext, node *ast.Node, fix bool, msg RuleMessage, suggestionMsg RuleMessage, fixes ...RuleFix) {
