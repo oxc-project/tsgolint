@@ -107,13 +107,12 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 56/61.
+Implemented 57/61.
 
 - [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
-- [ ] [strict-void-return](https://typescript-eslint.io/rules/strict-void-return)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
@@ -167,6 +166,7 @@ Implemented 56/61.
 - [x] [restrict-template-expressions](https://typescript-eslint.io/rules/restrict-template-expressions)
 - [x] [return-await](https://typescript-eslint.io/rules/return-await)
 - [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
+- [x] [strict-void-return](https://typescript-eslint.io/rules/strict-void-return)
 - [x] [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)
 - [x] [unbound-method](https://typescript-eslint.io/rules/unbound-method)
 - [x] [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable)
