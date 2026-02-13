@@ -38,7 +38,6 @@ type analyzedNamedExport struct {
 	typeBasedNodes  []*ast.Node
 	typeBasedNames  []string
 	valueTexts      []string
-	hasModuleSource bool
 	moduleSource    string
 }
 
@@ -167,7 +166,8 @@ var ConsistentTypeExportsRule = rule.Rule{
 
 			hasAnyValueExport := false
 			for _, propertySymbol := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, moduleType) {
-				if checker.Checker_getPropertyOfType(ctx.TypeChecker, moduleType, propertySymbol.Name) != nil {
+				isTypeBased, resolved := isSymbolTypeBased(ctx.TypeChecker, propertySymbol)
+				if !resolved || !isTypeBased {
 					hasAnyValueExport = true
 					break
 				}
@@ -209,7 +209,6 @@ var ConsistentTypeExportsRule = rule.Rule{
 				typeBasedNodes:  make([]*ast.Node, 0, 2),
 				typeBasedNames:  make([]string, 0, 2),
 				valueTexts:      make([]string, 0, 2),
-				hasModuleSource: exportDecl.ModuleSpecifier != nil,
 			}
 			if exportDecl.ModuleSpecifier != nil {
 				report.moduleSource = strings.TrimSpace(getNodeText(ctx.SourceFile, exportDecl.ModuleSpecifier.AsNode()))

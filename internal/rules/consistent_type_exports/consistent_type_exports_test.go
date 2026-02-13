@@ -53,6 +53,7 @@ namespace NonTypeNS {
 
 export { NonTypeNS };
 `},
+			{Code: "export * from './unknown-module';"},
 			{Code: "export * from './consistent-type-exports';"},
 			{Code: "export type * from './type-only-exports';"},
 			{Code: "export type * from './type-only-reexport';"},
@@ -70,6 +71,20 @@ export { Foo };
 import { Type1 } from './consistent-type-exports';
 const Type1 = 1;
 export { Type1 };
+`},
+			{Code: `
+export { A } from './reexport-2-named';
+`},
+			{Code: `
+import { A } from './reexport-2-named';
+export { A };
+`},
+			{Code: `
+export { A } from './reexport-2-namespace';
+`},
+			{Code: `
+import { A } from './reexport-2-namespace';
+export { A };
 `},
 		},
 		[]rule_tester.InvalidTestCase{
@@ -261,9 +276,23 @@ export { type T, x };
 type T = 1;
 export { type T, T };
 `,
+				Options: rule_tester.OptionsFromJSON[ConsistentTypeExportsOptions](`{"fixMixedExportsWithInlineTypeSpecifier": true}`),
 				Output: []string{`
 type T = 1;
 export type { T, T };
+`},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "typeOverValue"},
+				},
+			},
+			{
+				Code: `
+type T = 1;
+export { type/* */T, type     /* */T, T };
+`,
+				Output: []string{`
+type T = 1;
+export type { /* */T, /* */T, T };
 `},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "typeOverValue"},
@@ -312,6 +341,30 @@ export {
 			{
 				Code:   "export * from './type-only-exports';",
 				Output: []string{"export type * from './type-only-exports';"},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "typeOverValue"},
+				},
+			},
+			{
+				Code:   "export * from './type-only-reexport';",
+				Output: []string{"export type * from './type-only-reexport';"},
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "typeOverValue"},
+				},
+			},
+			{
+				Code: `
+/* comment 1 */ export
+	/* comment 2 */ *
+		// comment 3
+		from './type-only-exports';
+`,
+				Output: []string{`
+/* comment 1 */ export
+	/* comment 2 */ type *
+		// comment 3
+		from './type-only-exports';
+`},
 				Errors: []rule_tester.InvalidTestCaseError{
 					{MessageId: "typeOverValue"},
 				},

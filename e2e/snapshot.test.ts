@@ -17,6 +17,7 @@ const TSGOLINT_BIN = join(ROOT_DIR, `tsgolint${process.platform === 'win32' ? '.
 const ALL_RULES = [
   'await-thenable',
   'consistent-return',
+  'consistent-type-exports',
   'dot-notation',
   'no-array-delete',
   'no-base-to-string',
