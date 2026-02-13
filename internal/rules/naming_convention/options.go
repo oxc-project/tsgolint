@@ -86,4 +86,3 @@ func (j *NamingConventionOption) UnmarshalJSON(value []byte) error {
 	*j = NamingConventionOption(plain)
 	return nil
 }
-
