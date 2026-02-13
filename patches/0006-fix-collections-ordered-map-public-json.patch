@@ -1,0 +1,73 @@
+From cdb4430eea6aad96c4d16f531b9ca837d495fdb3 Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Fri, 13 Feb 2026 18:37:25 +0000
+Subject: [PATCH] fix(collections): avoid internal json import in ordered_map
+
+---
+ internal/collections/ordered_map.go | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/internal/collections/ordered_map.go b/internal/collections/ordered_map.go
+index df66ec6401..02f0a56781 100644
+--- a/internal/collections/ordered_map.go
++++ b/internal/collections/ordered_map.go
+@@ -9,7 +9,8 @@ import (
+ 	"slices"
+ 	"strconv"
+ 
+-	"github.com/microsoft/typescript-go/internal/json"
++	"github.com/go-json-experiment/json"
++	"github.com/go-json-experiment/json/jsontext"
+ )
+ 
+ // OrderedMap is an insertion ordered map.
+@@ -214,8 +215,8 @@ func (m *OrderedMap[K, V]) clone() OrderedMap[K, V] {
+ 
+ var _ json.MarshalerTo = (*OrderedMap[string, string])(nil)
+ 
+-func (m *OrderedMap[K, V]) MarshalJSONTo(enc *json.Encoder) error {
+-	if err := enc.WriteToken(json.BeginObject); err != nil {
++func (m *OrderedMap[K, V]) MarshalJSONTo(enc *jsontext.Encoder) error {
++	if err := enc.WriteToken(jsontext.BeginObject); err != nil {
+ 		return err
+ 	}
+ 
+@@ -235,7 +236,7 @@ func (m *OrderedMap[K, V]) MarshalJSONTo(enc *json.Encoder) error {
+ 		}
+ 	}
+ 
+-	return enc.WriteToken(json.EndObject)
++	return enc.WriteToken(jsontext.EndObject)
+ }
+ 
+ func resolveKeyName(k reflect.Value) (string, error) {
+@@ -260,22 +261,22 @@ func resolveKeyName(k reflect.Value) (string, error) {
+ 
+ var _ json.UnmarshalerFrom = (*OrderedMap[string, string])(nil)
+ 
+-func (m *OrderedMap[K, V]) UnmarshalJSONFrom(dec *json.Decoder) error {
++func (m *OrderedMap[K, V]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
+ 	token, err := dec.ReadToken()
+ 	if err != nil {
+ 		return err
+ 	}
+-	if token.Kind() == 'n' { // json.Null.Kind()
++	if token.Kind() == 'n' { // jsontext.Null.Kind()
+ 		// By convention, to approximate the behavior of Unmarshal itself,
+ 		// Unmarshalers implement UnmarshalJSON([]byte("null")) as a no-op.
+ 		// https://pkg.go.dev/encoding/json#Unmarshaler
+ 		// TODO: reconsider
+ 		return nil
+ 	}
+-	if token.Kind() != '{' { // json.ObjectStart.Kind()
++	if token.Kind() != '{' { // jsontext.ObjectStart.Kind()
+ 		return errors.New("cannot unmarshal non-object JSON value into Map")
+ 	}
+-	for dec.PeekKind() != '}' { // json.ObjectEnd.Kind()
++	for dec.PeekKind() != '}' { // jsontext.ObjectEnd.Kind()
+ 		var key K
+ 		var value V
+ 		if err := json.UnmarshalDecode(dec, &key); err != nil {
+-- 
+2.50.1 (Apple Git-155)
+
