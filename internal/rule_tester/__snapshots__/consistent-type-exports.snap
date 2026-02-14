@@ -146,11 +146,21 @@ Message: All exports in the declaration are only used as types. Use `export type
 ---
 
 [TestConsistentTypeExportsRule/invalid-21 - 1]
-No diagnostics
+Diagnostic 1: typeOverValue (2:9 - 2:69)
+Message: All exports in the declaration are only used as types. Use `export type`.
+   1 | 
+   2 |         export * from './consistent-type-exports/type-only-reexport';
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
 ---
 
 [TestConsistentTypeExportsRule/invalid-22 - 1]
-No diagnostics
+Diagnostic 1: typeOverValue (2:9 - 2:76)
+Message: All exports in the declaration are only used as types. Use `export type`.
+   1 | 
+   2 |         export * as foo from './consistent-type-exports/type-only-reexport';
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
 ---
 
 [TestConsistentTypeExportsRule/invalid-23 - 1]

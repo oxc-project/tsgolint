@@ -146,7 +146,7 @@ var ConsistentTypeExportsRule = rule.Rule{
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[ConsistentTypeExportsOptions](options, "consistent-type-exports")
 
-		reportStarExport := func(node *ast.Node) {
+		checkStarExport := func(node *ast.Node) {
 			exportDecl := node.AsExportDeclaration()
 			if exportDecl.IsTypeOnly || exportDecl.ModuleSpecifier == nil {
 				return
@@ -159,20 +159,20 @@ var ConsistentTypeExportsRule = rule.Rule{
 			if moduleSymbol == nil {
 				return
 			}
-			moduleType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, moduleSymbol)
-			if moduleType == nil {
+			sourceFileType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, moduleSymbol)
+			if sourceFileType == nil {
 				return
 			}
 
-			hasAnyValueExport := false
-			for _, propertySymbol := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, moduleType) {
-				isTypeBased, resolved := isSymbolTypeBased(ctx.TypeChecker, propertySymbol)
-				if !resolved || !isTypeBased {
-					hasAnyValueExport = true
+			isThereAnyExportedValue := false
+
+			for _, propertyTypeSymbol := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, sourceFileType) {
+				if checker.Checker_getPropertyOfType(ctx.TypeChecker, sourceFileType, propertyTypeSymbol.Name) != nil {
+					isThereAnyExportedValue = true
 					break
 				}
 			}
-			if hasAnyValueExport {
+			if isThereAnyExportedValue {
 				return
 			}
 
@@ -245,7 +245,7 @@ var ConsistentTypeExportsRule = rule.Rule{
 			return report
 		}
 
-		reportNamedExportViolation := func(report *analyzedNamedExport) {
+		checkNamedExport := func(report *analyzedNamedExport) {
 			if report == nil || len(report.typeBasedNodes) == 0 {
 				return
 			}
@@ -288,16 +288,12 @@ var ConsistentTypeExportsRule = rule.Rule{
 		return rule.RuleListeners{
 			ast.KindExportDeclaration: func(node *ast.Node) {
 				exportDecl := node.AsExportDeclaration()
-				if exportDecl.ExportClause == nil {
-					reportStarExport(node)
-					return
-				}
-				if ast.IsNamespaceExport(exportDecl.ExportClause.AsNode()) {
-					reportStarExport(node)
+				if exportDecl.ExportClause == nil || ast.IsNamespaceExport(exportDecl.ExportClause.AsNode()) {
+					checkStarExport(node)
 					return
 				}
 				if ast.IsNamedExports(exportDecl.ExportClause.AsNode()) {
-					reportNamedExportViolation(analyzeNamedExport(node))
+					checkNamedExport(analyzeNamedExport(node))
 				}
 			},
 		}
