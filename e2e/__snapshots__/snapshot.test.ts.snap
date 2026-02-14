@@ -2216,6 +2216,45 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unsafe-unary-minus",
   },
   {
+    "file_path": "fixtures/basic/rules/no-useless-default-assignment/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 21,
+          "pos": 16,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Default value",
+        "range": {
+          "end": 21,
+          "pos": 19,
+        },
+      },
+      {
+        "label": "parameter type \`number\` is not nullish",
+        "range": {
+          "end": 16,
+          "pos": 15,
+        },
+      },
+    ],
+    "message": {
+      "description": "Default value is useless because the parameter has type \`number\` (not nullish). This default assignment will never be used.",
+      "help": "Remove the default assignment",
+      "id": "uselessDefaultAssignment",
+    },
+    "range": {
+      "end": 21,
+      "pos": 19,
+    },
+    "rule": "no-useless-default-assignment",
+  },
+  {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
     "message": {

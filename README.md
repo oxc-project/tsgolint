@@ -107,10 +107,9 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 58/61.
+Implemented 59/61.
 
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
-- [ ] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
@@ -145,6 +144,7 @@ Implemented 58/61.
 - [x] [no-unsafe-return](https://typescript-eslint.io/rules/no-unsafe-return)
 - [x] [no-unsafe-type-assertion](https://typescript-eslint.io/rules/no-unsafe-type-assertion)
 - [x] [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)
+- [x] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
 - [x] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
@@ -152,8 +152,8 @@ Implemented 58/61.
 - [x] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
 - [x] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
-- [x] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [x] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
+- [x] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
 - [x] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)

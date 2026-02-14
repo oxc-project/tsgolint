@@ -54,6 +54,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_return"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_type_assertion"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_unary_minus"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_useless_default_assignment"
 	"github.com/typescript-eslint/tsgolint/internal/rules/non_nullable_type_assertion_style"
 	"github.com/typescript-eslint/tsgolint/internal/rules/only_throw_error"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_find"
@@ -184,6 +185,7 @@ var allRules = []rule.Rule{
 	no_unnecessary_type_arguments.NoUnnecessaryTypeArgumentsRule,
 	no_unnecessary_type_parameters.NoUnnecessaryTypeParametersRule,
 	no_unnecessary_type_assertion.NoUnnecessaryTypeAssertionRule,
+	no_useless_default_assignment.NoUselessDefaultAssignmentRule,
 	no_unsafe_argument.NoUnsafeArgumentRule,
 	no_unsafe_assignment.NoUnsafeAssignmentRule,
 	no_unsafe_call.NoUnsafeCallRule,
