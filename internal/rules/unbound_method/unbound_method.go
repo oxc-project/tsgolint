@@ -20,7 +20,8 @@ func buildUnboundMessage() rule.RuleMessage {
 func buildUnboundWithoutThisAnnotationMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unboundWithoutThisAnnotation",
-		Description: baseMessage + "\nIf your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.",
+		Description: baseMessage,
+		Help:        "If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.",
 	}
 }
 

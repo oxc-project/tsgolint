@@ -10,7 +10,8 @@ import (
 func buildForInViolationMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "forInViolation",
-		Description: "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties. Use a more robust iteration method such as for-of or array.forEach instead.",
+		Description: "For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.",
+		Help:        "Use a more robust iteration method such as for-of or array.forEach instead.",
 	}
 }
 

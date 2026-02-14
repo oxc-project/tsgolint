@@ -1,6 +1,6 @@
 module github.com/typescript-eslint/tsgolint
 
-go 1.25.0
+go 1.26
 
 replace (
 	github.com/microsoft/typescript-go/shim/ast => ./shim/ast
@@ -33,7 +33,7 @@ require (
 	github.com/microsoft/typescript-go/shim/vfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/cachedvfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/osvfs v0.0.0
-	golang.org/x/sys v0.40.0
+	golang.org/x/sys v0.41.0
 	golang.org/x/tools v0.41.0
 	gotest.tools/v3 v3.5.2
 )
@@ -49,6 +49,6 @@ require (
 require (
 	github.com/dlclark/regexp2 v1.11.5
 	github.com/go-json-experiment/json v0.0.0-20251027170946-4849db3c2f7e
-	github.com/microsoft/typescript-go v0.0.0-20260206031118-7d8e77a0cd98 // indirect
+	github.com/microsoft/typescript-go v0.0.0-20260207160609-5597f4c8ecf4 // indirect
 	golang.org/x/text v0.33.0
 )

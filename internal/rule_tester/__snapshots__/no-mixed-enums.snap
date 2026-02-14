@@ -1,0 +1,196 @@
+
+[TestNoMixedEnumsRule/invalid-0 - 1]
+Diagnostic 1: mixed (4:20 - 4:27)
+Message: Mixing number and string enums can be confusing.
+   3 |           Apple,
+   4 |           Banana = 'banana',
+     |                    ~~~~~~~~
+   5 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-1 - 1]
+Diagnostic 1: mixed (4:20 - 4:27)
+Message: Mixing number and string enums can be confusing.
+   3 |           Apple,
+   4 |           Banana = 'banana',
+     |                    ~~~~~~~~
+   5 |           Cherry = 'cherry',
+---
+
+[TestNoMixedEnumsRule/invalid-10 - 1]
+Diagnostic 1: mixed (6:15 - 6:17)
+Message: Mixing number and string enums can be confusing.
+   5 |         enum Foo {
+   6 |           B = 'b',
+     |               ~~~
+   7 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-11 - 1]
+Diagnostic 1: mixed (6:11 - 6:11)
+Message: Mixing number and string enums can be confusing.
+   5 |         enum Foo {
+   6 |           B,
+     |           ~
+   7 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-12 - 1]
+Diagnostic 1: mixed (6:15 - 6:15)
+Message: Mixing number and string enums can be confusing.
+   5 |         enum Foo {
+   6 |           B = 0,
+     |               ~
+   7 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-13 - 1]
+Diagnostic 1: mixed (6:15 - 6:17)
+Message: Mixing number and string enums can be confusing.
+   5 |         enum Foo {
+   6 |           B = 'b',
+     |               ~~~
+   7 |         }
+
+Diagnostic 2: mixed (9:15 - 9:17)
+Message: Mixing number and string enums can be confusing.
+   8 |         enum Foo {
+   9 |           C = 'c',
+     |               ~~~
+  10 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-14 - 1]
+Diagnostic 1: mixed (6:15 - 6:17)
+Message: Mixing number and string enums can be confusing.
+   5 |         enum Foo {
+   6 |           B = 'b',
+     |               ~~~
+   7 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-15 - 1]
+Diagnostic 1: mixed (9:15 - 9:17)
+Message: Mixing number and string enums can be confusing.
+   8 |         enum Foo {
+   9 |           C = 'c',
+     |               ~~~
+  10 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-16 - 1]
+Diagnostic 1: mixed (6:15 - 6:15)
+Message: Mixing number and string enums can be confusing.
+   5 |   enum Enum {
+   6 |     Numeric = 0,
+     |               ~
+   7 |   }
+---
+
+[TestNoMixedEnumsRule/invalid-17 - 1]
+Diagnostic 1: mixed (6:7 - 6:9)
+Message: Mixing number and string enums can be confusing.
+   5 | enum Foo {
+   6 |   B = 'B',
+     |       ~~~
+   7 | }
+---
+
+[TestNoMixedEnumsRule/invalid-18 - 1]
+Diagnostic 1: mixed (9:9 - 9:11)
+Message: Mixing number and string enums can be confusing.
+   8 |   export enum Bar {
+   9 |     B = 'B',
+     |         ~~~
+  10 |   }
+---
+
+[TestNoMixedEnumsRule/invalid-19 - 1]
+Diagnostic 1: mixed (9:9 - 9:11)
+Message: Mixing number and string enums can be confusing.
+   8 |   export enum Bar {
+   9 |     B = 'B',
+     |         ~~~
+  10 |   }
+---
+
+[TestNoMixedEnumsRule/invalid-2 - 1]
+Diagnostic 1: mixed (5:20 - 5:27)
+Message: Mixing number and string enums can be confusing.
+   4 |           Banana,
+   5 |           Cherry = 'cherry',
+     |                    ~~~~~~~~
+   6 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-20 - 1]
+Diagnostic 1: mixed (12:11 - 12:13)
+Message: Mixing number and string enums can be confusing.
+  11 |     export enum Bar {
+  12 |       B = 'B',
+     |           ~~~
+  13 |     }
+---
+
+[TestNoMixedEnumsRule/invalid-3 - 1]
+Diagnostic 1: mixed (4:20 - 4:27)
+Message: Mixing number and string enums can be confusing.
+   3 |           Apple = 0,
+   4 |           Banana = 'banana',
+     |                    ~~~~~~~~
+   5 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-4 - 1]
+Diagnostic 1: mixed (5:20 - 5:27)
+Message: Mixing number and string enums can be confusing.
+   4 |           Apple = getValue(),
+   5 |           Banana = 'banana',
+     |                    ~~~~~~~~
+   6 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-5 - 1]
+Diagnostic 1: mixed (5:20 - 5:29)
+Message: Mixing number and string enums can be confusing.
+   4 |           Apple,
+   5 |           Banana = getValue(),
+     |                    ~~~~~~~~~~
+   6 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-6 - 1]
+Diagnostic 1: mixed (5:20 - 5:20)
+Message: Mixing number and string enums can be confusing.
+   4 |           Apple = getValue(),
+   5 |           Banana = 0,
+     |                    ~
+   6 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-7 - 1]
+Diagnostic 1: mixed (8:15 - 8:17)
+Message: Mixing number and string enums can be confusing.
+   7 |           A = First.A,
+   8 |           B = 'b',
+     |               ~~~
+   9 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-8 - 1]
+Diagnostic 1: mixed (8:15 - 8:15)
+Message: Mixing number and string enums can be confusing.
+   7 |           A = First.A,
+   8 |           B = 1,
+     |               ~
+   9 |         }
+---
+
+[TestNoMixedEnumsRule/invalid-9 - 1]
+Diagnostic 1: mixed (6:15 - 6:17)
+Message: Mixing number and string enums can be confusing.
+   5 |         enum Foo {
+   6 |           B = 'b',
+     |               ~~~
+   7 |         }
+---

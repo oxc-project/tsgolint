@@ -1,0 +1,343 @@
+
+[TestNoUselessDefaultAssignmentRule/invalid-0 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:30 - 2:31)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                              ~~
+   3 |           return foo;
+  Label: Default value (2:30 - 2:31)
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                              ^^ Default value
+   3 |           return foo;
+  Label: property type `string` is not nullish (2:24 - 2:26)
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                        ^^^ property type `string` is not nullish
+   3 |           return foo;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-1 - 1]
+Diagnostic 1: uselessDefaultAssignment (3:33 - 3:34)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   2 |         class C {
+   3 |           public method({ foo = '' }: { foo: string }) {
+     |                                 ~~
+   4 |             return foo;
+  Label: Default value (3:33 - 3:34)
+   2 |         class C {
+   3 |           public method({ foo = '' }: { foo: string }) {
+     |                                 ^^ Default value
+   4 |             return foo;
+  Label: property type `string` is not nullish (3:27 - 3:29)
+   2 |         class C {
+   3 |           public method({ foo = '' }: { foo: string }) {
+     |                           ^^^ property type `string` is not nullish
+   4 |             return foo;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-10 - 1]
+Diagnostic 1: uselessUndefined (2:21 - 2:29)
+Message: Default value is useless because it is undefined. Optional properties are already undefined by default.
+   1 | 
+   2 |         const { a = undefined } = {};
+     |                     ~~~~~~~~~
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-11 - 1]
+Diagnostic 1: uselessUndefined (2:20 - 2:28)
+Message: Default value is useless because it is undefined. Optional properties are already undefined by default.
+   1 | 
+   2 |         const [a = undefined] = [];
+     |                    ~~~~~~~~~
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-12 - 1]
+Diagnostic 1: uselessUndefined (2:28 - 2:36)
+Message: Default value is useless because it is undefined. Optional properties are already undefined by default.
+   1 | 
+   2 |         function foo({ a = undefined }) {}
+     |                            ~~~~~~~~~
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-13 - 1]
+Diagnostic 1: preferOptionalSyntax (2:66 - 2:74)
+Message: Using `= undefined` to make a parameter optional adds unnecessary runtime logic. Use the `?` optional syntax instead.
+   1 | 
+   2 |         function myFunction(p1: string, p2: number | undefined = undefined) {
+     |                                                                  ~~~~~~~~~
+   3 |           console.log(p1, p2);
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-14 - 1]
+Diagnostic 1: preferOptionalSyntax (4:104 - 4:112)
+Message: Using `= undefined` to make a parameter optional adds unnecessary runtime logic. Use the `?` optional syntax instead.
+   3 |         function f(
+   4 |           /* comment */ x /* comment 2 */ : /* comment 3 */ SomeType /* comment 4 */ = /* comment 5 */ undefined,
+     |                                                                                                        ~~~~~~~~~
+   5 |         ) {}
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-15 - 1]
+Diagnostic 1: noStrictNullCheck
+Message: This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.
+
+Diagnostic 2: uselessDefaultAssignment (2:30 - 2:31)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                              ~~
+   3 |           return foo;
+  Label: Default value (2:30 - 2:31)
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                              ^^ Default value
+   3 |           return foo;
+  Label: property type `string` is not nullish (2:24 - 2:26)
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                        ^^^ property type `string` is not nullish
+   3 |           return foo;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-16 - 1]
+Diagnostic 1: noStrictNullCheck
+Message: This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.
+
+Diagnostic 2: uselessUndefined (2:26 - 2:34)
+Message: Default value is useless because it is undefined. Optional parameters are already undefined by default.
+   1 | 
+   2 |         function foo(a = undefined) {}
+     |                          ~~~~~~~~~
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-17 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:30 - 2:31)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                              ~~
+   3 |           return foo;
+  Label: Default value (2:30 - 2:31)
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                              ^^ Default value
+   3 |           return foo;
+  Label: property type `string` is not nullish (2:24 - 2:26)
+   1 | 
+   2 |         function Bar({ foo = '' }: { foo: string }) {
+     |                        ^^^ property type `string` is not nullish
+   3 |           return foo;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-18 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+   1 | 
+   2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
+     |                     ~~~~~
+   3 |       
+  Label: Default value (2:21 - 2:25)
+   1 | 
+   2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
+     |                     ^^^^^ Default value
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-19 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+   1 | 
+   2 |         const { a = 'baz' } =
+     |                     ~~~~~
+   3 |           Math.random() < 0.5
+  Label: Default value (2:21 - 2:25)
+   1 | 
+   2 |         const { a = 'baz' } =
+     |                     ^^^^^ Default value
+   3 |           Math.random() < 0.5
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-2 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:45 - 2:53)
+Message: Default value is useless because the property has type `"value"` (not nullish). This default assignment will never be used.
+   1 | 
+   2 |         const { 'literal-key': literalKey = 'default' } = { 'literal-key': 'value' };
+     |                                             ~~~~~~~~~
+   3 |       
+  Label: Default value (2:45 - 2:53)
+   1 | 
+   2 |         const { 'literal-key': literalKey = 'default' } = { 'literal-key': 'value' };
+     |                                             ^^^^^^^^^ Default value
+   3 |       
+  Label: property type `"value"` is not nullish (2:32 - 2:41)
+   1 | 
+   2 |         const { 'literal-key': literalKey = 'default' } = { 'literal-key': 'value' };
+     |                                ^^^^^^^^^^ property type `"value"` is not nullish
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-20 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+   1 | 
+   2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
+     |                     ~~~~~
+   3 |       
+  Label: Default value (2:21 - 2:25)
+   1 | 
+   2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
+     |                     ^^^^^ Default value
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-21 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+   1 | 
+   2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
+     |                     ~~~~~
+   3 |       
+  Label: Default value (2:21 - 2:25)
+   1 | 
+   2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
+     |                     ^^^^^ Default value
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-22 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:23)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+   1 | 
+   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
+     |                     ~~~
+   3 |       
+  Label: Default value (2:21 - 2:23)
+   1 | 
+   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
+     |                     ^^^ Default value
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-3 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:28 - 2:29)
+Message: Default value is useless because the parameter has type `number` (not nullish). This default assignment will never be used.
+   1 | 
+   2 |         [1, 2, 3].map((a = 42) => a + 1);
+     |                            ~~
+   3 |       
+  Label: Default value (2:28 - 2:29)
+   1 | 
+   2 |         [1, 2, 3].map((a = 42) => a + 1);
+     |                            ^^ Default value
+   3 |       
+  Label: parameter type `number` is not nullish (2:24 - 2:24)
+   1 | 
+   2 |         [1, 2, 3].map((a = 42) => a + 1);
+     |                        ^ parameter type `number` is not nullish
+   3 |       
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-4 - 1]
+Diagnostic 1: uselessDefaultAssignment (4:37 - 4:38)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   3 |         function getValue(box: { value: string }): string;
+   4 |         function getValue({ value = '' }: { value: string } = {}): string | undefined {
+     |                                     ~~
+   5 |           return value;
+  Label: Default value (4:37 - 4:38)
+   3 |         function getValue(box: { value: string }): string;
+   4 |         function getValue({ value = '' }: { value: string } = {}): string | undefined {
+     |                                     ^^ Default value
+   5 |           return value;
+  Label: property type `string` is not nullish (4:29 - 4:33)
+   3 |         function getValue(box: { value: string }): string;
+   4 |         function getValue({ value = '' }: { value: string } = {}): string | undefined {
+     |                             ^^^^^ property type `string` is not nullish
+   5 |           return value;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-5 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:36 - 2:37)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   1 | 
+   2 |         function getValue([value = '']: [string]) {
+     |                                    ~~
+   3 |           return value;
+  Label: Default value (2:36 - 2:37)
+   1 | 
+   2 |         function getValue([value = '']: [string]) {
+     |                                    ^^ Default value
+   3 |           return value;
+  Label: property type `string` is not nullish (2:28 - 2:32)
+   1 | 
+   2 |         function getValue([value = '']: [string]) {
+     |                            ^^^^^ property type `string` is not nullish
+   3 |           return value;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-6 - 1]
+Diagnostic 1: uselessDefaultAssignment (5:28 - 5:29)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   4 |         const {
+   5 |           hello: { world = '' },
+     |                            ~~
+   6 |         } = x;
+  Label: Default value (5:28 - 5:29)
+   4 |         const {
+   5 |           hello: { world = '' },
+     |                            ^^ Default value
+   6 |         } = x;
+  Label: property type `string` is not nullish (5:20 - 5:24)
+   4 |         const {
+   5 |           hello: { world = '' },
+     |                    ^^^^^ property type `string` is not nullish
+   6 |         } = x;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-7 - 1]
+Diagnostic 1: uselessDefaultAssignment (5:29 - 5:30)
+Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+   4 |         const {
+   5 |           hello: [{ world = '' }],
+     |                             ~~
+   6 |         } = x;
+  Label: Default value (5:29 - 5:30)
+   4 |         const {
+   5 |           hello: [{ world = '' }],
+     |                             ^^ Default value
+   6 |         } = x;
+  Label: property type `string` is not nullish (5:21 - 5:25)
+   4 |         const {
+   5 |           hello: [{ world = '' }],
+     |                     ^^^^^ property type `string` is not nullish
+   6 |         } = x;
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-8 - 1]
+Diagnostic 1: uselessDefaultAssignment (7:21 - 7:25)
+Message: Default value is useless because the parameter is not nullish. This default assignment will never be used.
+   6 |         const h: B = {
+   7 |           foo: (b = false) => {},
+     |                     ~~~~~
+   8 |         };
+  Label: Default value (7:21 - 7:25)
+   6 |         const h: B = {
+   7 |           foo: (b = false) => {},
+     |                     ^^^^^ Default value
+   8 |         };
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-9 - 1]
+Diagnostic 1: uselessUndefined (2:26 - 2:34)
+Message: Default value is useless because it is undefined. Optional parameters are already undefined by default.
+   1 | 
+   2 |         function foo(a = undefined) {}
+     |                          ~~~~~~~~~
+   3 |       
+---

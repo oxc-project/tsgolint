@@ -1,0 +1,26 @@
+
+[TestNoMeaninglessVoidOperatorRule/invalid-0 - 1]
+Diagnostic 1: meaninglessVoidOperator (1:1 - 1:17)
+Message: void operator shouldn't be used on void; it should convey that a return value is being ignored
+   1 | void (() => {})();
+     | ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-1 - 1]
+Diagnostic 1: meaninglessVoidOperator (3:1 - 3:10)
+Message: void operator shouldn't be used on void; it should convey that a return value is being ignored
+   2 | function foo() {}
+   3 | void foo();
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-2 - 1]
+Diagnostic 1: meaninglessVoidOperator (3:3 - 3:8)
+Message: void operator shouldn't be used on never; it should convey that a return value is being ignored
+   2 | function bar(x: never) {
+   3 |   void x;
+     |   ~~~~~~
+   4 | }
+  Suggestion 1: [removeVoid] Remove 'void'
+---

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "prefer_readonly_parameter_types_options": {
+      "type": "object",
+      "properties": {
+        "allow": {
+          "type": "array",
+          "items": {
+            "$ref": "../shared_schemas.json#/definitions/typeOrValueSpecifier"
+          },
+          "default": [],
+          "description": "An array of type specifiers to ignore."
+        },
+        "checkParameterProperties": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to check class parameter properties."
+        },
+        "ignoreInferredTypes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to ignore parameters which don't explicitly specify a type."
+        },
+        "treatMethodsAsReadonly": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to treat all mutable methods as though they are readonly."
+        }
+      }
+    }
+  }
+}

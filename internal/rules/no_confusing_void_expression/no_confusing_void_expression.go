@@ -11,13 +11,15 @@ import (
 func buildInvalidVoidExprMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "invalidVoidExpr",
-		Description: "Placing a void expression inside another expression is forbidden. Move it to its own statement instead.",
+		Description: "Placing a void expression inside another expression is forbidden.",
+		Help:        "Move it to its own statement instead.",
 	}
 }
 func buildInvalidVoidExprArrowMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "invalidVoidExprArrow",
-		Description: "Returning a void expression from an arrow function shorthand is forbidden. Please add braces to the arrow function.",
+		Description: "Returning a void expression from an arrow function shorthand is forbidden.",
+		Help:        "Add braces to the arrow function.",
 	}
 }
 func buildInvalidVoidExprArrowWrapVoidMessage() rule.RuleMessage {

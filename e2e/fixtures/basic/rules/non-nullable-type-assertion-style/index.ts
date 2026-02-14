@@ -7,3 +7,5 @@ const result1 = value as string;
 
 declare const maybe: number | undefined;
 const result2 = maybe as number;
+
+export {};

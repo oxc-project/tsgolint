@@ -1791,6 +1791,7 @@ func (processor *chainProcessor) buildAndChains(operands []Operand) [][]Operand 
 			}
 		}
 
+		// Handle complementary pairs (e.g., x !== null && x !== undefined) checking the same expression
 		if cmp == NodeEqual && i+1 < len(operands) {
 			if pair := processor.tryMergeComplementaryPair(op, operands[i+1], ast.KindAmpersandAmpersandToken); pair != nil {
 				currentChain = append(currentChain, pair...)
@@ -2060,9 +2061,9 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 	}
 
 	if processor.allOperandsCheckSameExpression(chain) {
-		if !processor.isSplitStrictEqualsPattern(chain) {
-			return nil
-		}
+		// When all operands check the same expression (e.g., x !== undefined && x !== null),
+		// skip flagging - this is already optimal code.
+		return nil
 	}
 
 	if processor.shouldSkipOptimalStrictChecks(chain) {
@@ -2074,8 +2075,14 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 		secondOp := chain[1]
 
 		if processor.containsOptionalChain(secondOp.comparedExpr) {
-			firstParts := processor.flattenForFix(firstOp.node)
-			secondParts := processor.flattenForFix(secondOp.node)
+			firstParts := processor.flattenForFix(firstOp.comparedExpr)
+			// For comparison operands, use comparedExpr (the access expression) instead of node
+			// so we properly compare the chain structure
+			secondExpr := secondOp.comparedExpr
+			if secondExpr == nil {
+				secondExpr = secondOp.node
+			}
+			secondParts := processor.flattenForFix(secondExpr)
 
 			isRedundantCheck := false
 			if len(secondParts) == len(firstParts)+1 {
@@ -2114,6 +2121,14 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 						}
 					}
 				}
+			}
+
+			// When the second operand is a comparison (e.g., foo?.id === null) and already
+			// contains optional chaining, and bases match, skip flagging. Converting
+			// `foo && foo?.id === null` to `foo?.id === null` would change the return type
+			// from `foo | boolean` to just `boolean`.
+			if secondOp.typ == OperandTypeComparison && isRedundantCheck {
+				return nil
 			}
 		}
 	}

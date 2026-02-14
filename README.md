@@ -23,7 +23,7 @@ Key highlights:
 This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint). Fork permission is granted by @auvred.
 
 > [!IMPORTANT]
-> **tsgolint** is a prototype in the early stages of development.
+> **tsgolint** is currently in alpha.
 > This is a community effort. Feel free to ask to be assigned to any of the [good first issues](https://github.com/oxc-project/tsgolint/contribute).
 
 ## Installation & Usage
@@ -55,7 +55,7 @@ Configure type-aware rules in `.oxlintrc.json`:
 }
 ```
 
-Over 30 TypeScript-specific type-aware rules are available. For detailed setup and configuration, see the [Oxlint Type-Aware Linting guide](https://oxc.rs/blog/2025-08-17-oxlint-type-aware.html).
+Over 50 TypeScript-specific type-aware rules are available. For detailed setup and configuration, see the [Oxlint Type-Aware Linting guide](https://oxc.rs/docs/guide/usage/linter/type-aware.html).
 
 > [!NOTE]
 > Non-type-aware TypeScript rules can be found in [Oxlint's TypeScript rules](https://oxc.rs/docs/guide/usage/linter/rules.html) under the TypeScript source.
@@ -85,9 +85,6 @@ See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 ### In Development 🚧
 
 - Additional typescript-eslint rules
-- Disable Comments
-- Rule Configuration
-- IDE usage
 
 ## Architecture
 
@@ -110,23 +107,14 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 45/59.
+Implemented 59/61.
 
-- [ ] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
-- [ ] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
-- [ ] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
-- [ ] [no-unnecessary-condition](https://typescript-eslint.io/rules/no-unnecessary-condition)
-- [ ] [no-unnecessary-qualifier](https://typescript-eslint.io/rules/no-unnecessary-qualifier)
-- [ ] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
-- [ ] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
-- [ ] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
-- [ ] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
-- [ ] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
-- [ ] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
-- [ ] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
+- [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
+- [x] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
+- [x] [dot-notation](https://typescript-eslint.io/rules/dot-notation)
 - [x] [no-array-delete](https://typescript-eslint.io/rules/no-array-delete)
 - [x] [no-base-to-string](https://typescript-eslint.io/rules/no-base-to-string)
 - [x] [no-confusing-void-expression](https://typescript-eslint.io/rules/no-confusing-void-expression)
@@ -141,9 +129,13 @@ Implemented 45/59.
 - [x] [no-mixed-enums](https://typescript-eslint.io/rules/no-mixed-enums)
 - [x] [no-redundant-type-constituents](https://typescript-eslint.io/rules/no-redundant-type-constituents)
 - [x] [no-unnecessary-boolean-literal-compare](https://typescript-eslint.io/rules/no-unnecessary-boolean-literal-compare)
+- [x] [no-unnecessary-condition](https://typescript-eslint.io/rules/no-unnecessary-condition)
+- [x] [no-unnecessary-qualifier](https://typescript-eslint.io/rules/no-unnecessary-qualifier)
 - [x] [no-unnecessary-template-expression](https://typescript-eslint.io/rules/no-unnecessary-template-expression)
 - [x] [no-unnecessary-type-arguments](https://typescript-eslint.io/rules/no-unnecessary-type-arguments)
 - [x] [no-unnecessary-type-assertion](https://typescript-eslint.io/rules/no-unnecessary-type-assertion)
+- [x] [no-unnecessary-type-conversion](https://typescript-eslint.io/rules/no-unnecessary-type-conversion)
+- [x] [no-unnecessary-type-parameters](https://typescript-eslint.io/rules/no-unnecessary-type-parameters)
 - [x] [no-unsafe-argument](https://typescript-eslint.io/rules/no-unsafe-argument)
 - [x] [no-unsafe-assignment](https://typescript-eslint.io/rules/no-unsafe-assignment)
 - [x] [no-unsafe-call](https://typescript-eslint.io/rules/no-unsafe-call)
@@ -152,14 +144,20 @@ Implemented 45/59.
 - [x] [no-unsafe-return](https://typescript-eslint.io/rules/no-unsafe-return)
 - [x] [no-unsafe-type-assertion](https://typescript-eslint.io/rules/no-unsafe-type-assertion)
 - [x] [no-unsafe-unary-minus](https://typescript-eslint.io/rules/no-unsafe-unary-minus)
+- [x] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
+- [x] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
 - [x] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
 - [x] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
 - [x] [prefer-optional-chain](https://typescript-eslint.io/rules/prefer-optional-chain)
 - [x] [prefer-promise-reject-errors](https://typescript-eslint.io/rules/prefer-promise-reject-errors)
+- [x] [prefer-readonly-parameter-types](https://typescript-eslint.io/rules/prefer-readonly-parameter-types)
+- [x] [prefer-readonly](https://typescript-eslint.io/rules/prefer-readonly)
 - [x] [prefer-reduce-type-parameter](https://typescript-eslint.io/rules/prefer-reduce-type-parameter)
+- [x] [prefer-regexp-exec](https://typescript-eslint.io/rules/prefer-regexp-exec)
 - [x] [prefer-return-this-type](https://typescript-eslint.io/rules/prefer-return-this-type)
+- [x] [prefer-string-starts-ends-with](https://typescript-eslint.io/rules/prefer-string-starts-ends-with)
 - [x] [promise-function-async](https://typescript-eslint.io/rules/promise-function-async)
 - [x] [related-getter-setter-pairs](https://typescript-eslint.io/rules/related-getter-setter-pairs)
 - [x] [require-array-sort-compare](https://typescript-eslint.io/rules/require-array-sort-compare)
@@ -168,6 +166,7 @@ Implemented 45/59.
 - [x] [restrict-template-expressions](https://typescript-eslint.io/rules/restrict-template-expressions)
 - [x] [return-await](https://typescript-eslint.io/rules/return-await)
 - [x] [strict-boolean-expressions](https://typescript-eslint.io/rules/strict-boolean-expressions)
+- [x] [strict-void-return](https://typescript-eslint.io/rules/strict-void-return)
 - [x] [switch-exhaustiveness-check](https://typescript-eslint.io/rules/switch-exhaustiveness-check)
 - [x] [unbound-method](https://typescript-eslint.io/rules/unbound-method)
 - [x] [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable)

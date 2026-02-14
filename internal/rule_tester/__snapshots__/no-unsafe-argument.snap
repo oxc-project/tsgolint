@@ -1,0 +1,215 @@
+
+[TestNoUnsafeArgumentRule/invalid-0 - 1]
+Diagnostic 1: unsafeArgument (3:5 - 3:12)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   2 | declare function foo(arg: number): void;
+   3 | foo(1 as any);
+     |     ~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-1 - 1]
+Diagnostic 1: unsafeArgument (3:5 - 3:9)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   2 | declare function foo(arg: number): void;
+   3 | foo(error);
+     |     ~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-10 - 1]
+Diagnostic 1: unsafeTupleSpread (3:5 - 3:47)
+Message: Unsafe spread of a tuple type. The argument is of type any and is assigned to a parameter of type number.
+   2 | declare function foo(arg1: string, arg2: number): void;
+   3 | foo(...(['foo', 1, 2] as [string, any, number]));
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-11 - 1]
+Diagnostic 1: unsafeArgument (5:16 - 5:23)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   4 | const x = [1] as const;
+   5 | foo('a', ...x, 1 as any);
+     |                ~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-12 - 1]
+Diagnostic 1: unsafeArgument (5:16 - 5:23)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   4 | const x = [1, 2] as [number, ...number[]];
+   5 | foo('a', ...x, 1 as any);
+     |                ~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-13 - 1]
+Diagnostic 1: unsafeArgument (5:5 - 5:18)
+Message: Unsafe argument of type Set<any> assigned to a parameter of type Set<string>.
+   4 | const x = [new Map<any, string>()] as const;
+   5 | foo(new Set<any>(), ...x);
+     |     ~~~~~~~~~~~~~~
+   6 |       
+
+Diagnostic 2: unsafeTupleSpread (5:21 - 5:24)
+Message: Unsafe spread of a tuple type. The argument is of type Map<any, string> and is assigned to a parameter of type Map<string, string>.
+   4 | const x = [new Map<any, string>()] as const;
+   5 | foo(new Set<any>(), ...x);
+     |                     ~~~~
+   6 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-14 - 1]
+Diagnostic 1: unsafeArgument (3:5 - 3:12)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   2 | declare function foo(...params: [number, string, any]): void;
+   3 | foo(1 as any, 'a' as any, 1 as any);
+     |     ~~~~~~~~
+   4 |       
+
+Diagnostic 2: unsafeArgument (3:15 - 3:24)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   2 | declare function foo(...params: [number, string, any]): void;
+   3 | foo(1 as any, 'a' as any, 1 as any);
+     |               ~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-15 - 1]
+Diagnostic 1: unsafeArgument (3:10 - 3:17)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   2 | declare function foo(param1: string, ...params: [number, string, any]): void;
+   3 | foo('a', 1 as any, 'a' as any, 1 as any);
+     |          ~~~~~~~~
+   4 |       
+
+Diagnostic 2: unsafeArgument (3:20 - 3:29)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   2 | declare function foo(param1: string, ...params: [number, string, any]): void;
+   3 | foo('a', 1 as any, 'a' as any, 1 as any);
+     |                    ~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-16 - 1]
+Diagnostic 1: unsafeArgument (5:5 - 5:12)
+Message: Unsafe argument of type any assigned to a parameter of type T.
+   4 | declare const t: T;
+   5 | foo(t as any);
+     |     ~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-17 - 1]
+Diagnostic 1: unsafeArgument (9:15 - 9:17)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   8 | declare const arg: any;
+   9 | foo<number>`${arg}${arg}${arg}`;
+     |               ~~~
+  10 |       
+
+Diagnostic 2: unsafeArgument (9:27 - 9:29)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   8 | declare const arg: any;
+   9 | foo<number>`${arg}${arg}${arg}`;
+     |                           ~~~
+  10 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-18 - 1]
+Diagnostic 1: unsafeArgument (4:7 - 4:9)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   3 | declare const arg: any;
+   4 | foo`${arg}`;
+     |       ~~~
+   5 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-19 - 1]
+Diagnostic 1: unsafeArgument (5:7 - 5:9)
+Message: Unsafe argument of type any assigned to a parameter of type T.
+   4 | declare const arg: any;
+   5 | foo`${arg}`;
+     |       ~~~
+   6 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-2 - 1]
+Diagnostic 1: unsafeArgument (3:8 - 3:15)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   2 | declare function foo(arg1: number, arg2: string): void;
+   3 | foo(1, 1 as any);
+     |        ~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-3 - 1]
+Diagnostic 1: unsafeArgument (3:14 - 3:21)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   2 | declare function foo(...arg: number[]): void;
+   3 | foo(1, 2, 3, 1 as any);
+     |              ~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-4 - 1]
+Diagnostic 1: unsafeArgument (3:5 - 3:12)
+Message: Unsafe argument of type any assigned to a parameter of type string.
+   2 | declare function foo(arg: string, ...arg: number[]): void;
+   3 | foo(1 as any, 1 as any);
+     |     ~~~~~~~~
+   4 |       
+
+Diagnostic 2: unsafeArgument (3:15 - 3:22)
+Message: Unsafe argument of type any assigned to a parameter of type number.
+   2 | declare function foo(arg: string, ...arg: number[]): void;
+   3 | foo(1 as any, 1 as any);
+     |               ~~~~~~~~
+   4 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-5 - 1]
+Diagnostic 1: unsafeSpread (4:5 - 4:17)
+Message: Unsafe spread of an any type.
+   3 | 
+   4 | foo(...(x as any));
+     |     ~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-6 - 1]
+Diagnostic 1: unsafeArraySpread (4:5 - 4:19)
+Message: Unsafe spread of an any[] array type.
+   3 | 
+   4 | foo(...(x as any[]));
+     |     ~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-7 - 1]
+Diagnostic 1: unsafeArraySpread (6:5 - 6:13)
+Message: Unsafe spread of an error array type.
+   5 | 
+   6 | foo(...errors);
+     |     ~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-8 - 1]
+Diagnostic 1: unsafeTupleSpread (5:5 - 5:8)
+Message: Unsafe spread of a tuple type. The argument is of type any and is assigned to a parameter of type number.
+   4 | const x = ['a', 1 as any] as const;
+   5 | foo(...x);
+     |     ~~~~
+   6 |       
+---
+
+[TestNoUnsafeArgumentRule/invalid-9 - 1]
+Diagnostic 1: unsafeTupleSpread (5:5 - 5:8)
+Message: Unsafe spread of a tuple type. The argument is of type any and is assigned to a parameter of type number.
+   4 | const x = ['a', error] as const;
+   5 | foo(...x);
+     |     ~~~~
+   6 |       
+---

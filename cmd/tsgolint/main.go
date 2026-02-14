@@ -22,6 +22,9 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 
 	"github.com/typescript-eslint/tsgolint/internal/rules/await_thenable"
+	"github.com/typescript-eslint/tsgolint/internal/rules/consistent_return"
+	"github.com/typescript-eslint/tsgolint/internal/rules/consistent_type_exports"
+	"github.com/typescript-eslint/tsgolint/internal/rules/dot_notation"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_array_delete"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_base_to_string"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_confusing_void_expression"
@@ -36,9 +39,13 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_mixed_enums"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_redundant_type_constituents"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_boolean_literal_compare"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_condition"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_qualifier"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_template_expression"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_arguments"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_assertion"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_conversion"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_parameters"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_argument"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_assignment"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_call"
@@ -47,14 +54,20 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_return"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_type_assertion"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_unary_minus"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_useless_default_assignment"
 	"github.com/typescript-eslint/tsgolint/internal/rules/non_nullable_type_assertion_style"
 	"github.com/typescript-eslint/tsgolint/internal/rules/only_throw_error"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_find"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_includes"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_nullish_coalescing"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_optional_chain"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_promise_reject_errors"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_readonly"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_readonly_parameter_types"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_reduce_type_parameter"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_regexp_exec"
 	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_return_this_type"
+	"github.com/typescript-eslint/tsgolint/internal/rules/prefer_string_starts_ends_with"
 	"github.com/typescript-eslint/tsgolint/internal/rules/promise_function_async"
 	"github.com/typescript-eslint/tsgolint/internal/rules/related_getter_setter_pairs"
 	"github.com/typescript-eslint/tsgolint/internal/rules/require_array_sort_compare"
@@ -63,6 +76,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/restrict_template_expressions"
 	"github.com/typescript-eslint/tsgolint/internal/rules/return_await"
 	"github.com/typescript-eslint/tsgolint/internal/rules/strict_boolean_expressions"
+	"github.com/typescript-eslint/tsgolint/internal/rules/strict_void_return"
 	"github.com/typescript-eslint/tsgolint/internal/rules/switch_exhaustiveness_check"
 	"github.com/typescript-eslint/tsgolint/internal/rules/unbound_method"
 	"github.com/typescript-eslint/tsgolint/internal/rules/use_unknown_in_catch_callback_variable"
@@ -147,6 +161,9 @@ func setupProfiling(opts *headlessOptions) (func(), error) {
 
 var allRules = []rule.Rule{
 	await_thenable.AwaitThenableRule,
+	consistent_return.ConsistentReturnRule,
+	consistent_type_exports.ConsistentTypeExportsRule,
+	dot_notation.DotNotationRule,
 	no_array_delete.NoArrayDeleteRule,
 	no_base_to_string.NoBaseToStringRule,
 	no_confusing_void_expression.NoConfusingVoidExpressionRule,
@@ -161,9 +178,14 @@ var allRules = []rule.Rule{
 	no_mixed_enums.NoMixedEnumsRule,
 	no_redundant_type_constituents.NoRedundantTypeConstituentsRule,
 	no_unnecessary_boolean_literal_compare.NoUnnecessaryBooleanLiteralCompareRule,
+	no_unnecessary_condition.NoUnnecessaryConditionRule,
+	no_unnecessary_qualifier.NoUnnecessaryQualifierRule,
 	no_unnecessary_template_expression.NoUnnecessaryTemplateExpressionRule,
+	no_unnecessary_type_conversion.NoUnnecessaryTypeConversionRule,
 	no_unnecessary_type_arguments.NoUnnecessaryTypeArgumentsRule,
+	no_unnecessary_type_parameters.NoUnnecessaryTypeParametersRule,
 	no_unnecessary_type_assertion.NoUnnecessaryTypeAssertionRule,
+	no_useless_default_assignment.NoUselessDefaultAssignmentRule,
 	no_unsafe_argument.NoUnsafeArgumentRule,
 	no_unsafe_assignment.NoUnsafeAssignmentRule,
 	no_unsafe_call.NoUnsafeCallRule,
@@ -174,12 +196,17 @@ var allRules = []rule.Rule{
 	no_unsafe_unary_minus.NoUnsafeUnaryMinusRule,
 	non_nullable_type_assertion_style.NonNullableTypeAssertionStyleRule,
 	only_throw_error.OnlyThrowErrorRule,
+	prefer_find.PreferFindRule,
 	prefer_includes.PreferIncludesRule,
 	prefer_optional_chain.PreferOptionalChainRule,
 	prefer_nullish_coalescing.PreferNullishCoalescingRule,
 	prefer_promise_reject_errors.PreferPromiseRejectErrorsRule,
+	prefer_readonly_parameter_types.PreferReadonlyParameterTypesRule,
+	prefer_regexp_exec.PreferRegexpExecRule,
+	prefer_readonly.PreferReadonlyRule,
 	prefer_reduce_type_parameter.PreferReduceTypeParameterRule,
 	prefer_return_this_type.PreferReturnThisTypeRule,
+	prefer_string_starts_ends_with.PreferStringStartsEndsWithRule,
 	promise_function_async.PromiseFunctionAsyncRule,
 	related_getter_setter_pairs.RelatedGetterSetterPairsRule,
 	require_array_sort_compare.RequireArraySortCompareRule,
@@ -188,6 +215,7 @@ var allRules = []rule.Rule{
 	restrict_template_expressions.RestrictTemplateExpressionsRule,
 	return_await.ReturnAwaitRule,
 	strict_boolean_expressions.StrictBooleanExpressionsRule,
+	strict_void_return.StrictVoidReturnRule,
 	switch_exhaustiveness_check.SwitchExhaustivenessCheckRule,
 	unbound_method.UnboundMethodRule,
 	use_unknown_in_catch_callback_variable.UseUnknownInCatchCallbackVariableRule,

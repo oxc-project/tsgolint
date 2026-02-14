@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "prefer_string_starts_ends_with_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowSingleElementEquality": {
+          "type": "string",
+          "description": "Whether to allow equality checks against the first or last element of a string.",
+          "enum": ["always", "never"]
+        }
+      }
+    }
+  }
+}

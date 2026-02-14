@@ -1,0 +1,1492 @@
+
+[TestNoFloatingPromisesRule/invalid-0 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:27)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   Promise.resolve('value');
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   Promise.resolve('value').then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (4:3 - 4:42)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |   Promise.resolve('value');
+   4 |   Promise.resolve('value').then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   Promise.resolve('value').catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (5:3 - 5:35)
+Message: Promises must be awaited, add void operator to ignore.
+   4 |   Promise.resolve('value').then(() => {});
+   5 |   Promise.resolve('value').catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   Promise.resolve('value').finally();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (6:3 - 6:37)
+Message: Promises must be awaited, add void operator to ignore.
+   5 |   Promise.resolve('value').catch();
+   6 |   Promise.resolve('value').finally();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-1 - 1]
+Diagnostic 1: floatingVoid (11:3 - 11:19)
+Message: Promises must be awaited, add void operator to ignore.
+  10 | ): Promise<void> => {
+  11 |   obj1.a?.b?.c?.();
+     |   ~~~~~~~~~~~~~~~~~
+  12 |   obj2.a?.b?.c();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (12:3 - 12:17)
+Message: Promises must be awaited, add void operator to ignore.
+  11 |   obj1.a?.b?.c?.();
+  12 |   obj2.a?.b?.c();
+     |   ~~~~~~~~~~~~~~~
+  13 |   obj3.a?.b.c?.();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (13:3 - 13:18)
+Message: Promises must be awaited, add void operator to ignore.
+  12 |   obj2.a?.b?.c();
+  13 |   obj3.a?.b.c?.();
+     |   ~~~~~~~~~~~~~~~~
+  14 |   obj4.a.b.c?.();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (14:3 - 14:17)
+Message: Promises must be awaited, add void operator to ignore.
+  13 |   obj3.a?.b.c?.();
+  14 |   obj4.a.b.c?.();
+     |   ~~~~~~~~~~~~~~~
+  15 |   obj5.a?.().b?.c?.();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 5: floatingVoid (15:3 - 15:22)
+Message: Promises must be awaited, add void operator to ignore.
+  14 |   obj4.a.b.c?.();
+  15 |   obj5.a?.().b?.c?.();
+     |   ~~~~~~~~~~~~~~~~~~~~
+  16 |   obj6?.a.b.c?.();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 6: floatingVoid (16:3 - 16:18)
+Message: Promises must be awaited, add void operator to ignore.
+  15 |   obj5.a?.().b?.c?.();
+  16 |   obj6?.a.b.c?.();
+     |   ~~~~~~~~~~~~~~~~
+  17 | 
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 7: floatingVoid (18:3 - 18:15)
+Message: Promises must be awaited, add void operator to ignore.
+  17 | 
+  18 |   callback?.();
+     |   ~~~~~~~~~~~~~
+  19 | };
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 8: floatingVoid (21:1 - 21:14)
+Message: Promises must be awaited, add void operator to ignore.
+  20 | 
+  21 | doSomething();
+     | ~~~~~~~~~~~~~~
+  22 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-10 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:25)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   Promise.resolve(), 123;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   123, Promise.resolve();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (4:3 - 4:25)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |   Promise.resolve(), 123;
+   4 |   123, Promise.resolve();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   123, Promise.resolve(), 123;
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (5:3 - 5:30)
+Message: Promises must be awaited, add void operator to ignore.
+   4 |   123, Promise.resolve();
+   5 |   123, Promise.resolve(), 123;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-11 - 1]
+Diagnostic 1: floating (3:3 - 3:25)
+Message: Promises must be awaited, add await operator.
+   2 | async function test() {
+   3 |   void Promise.resolve();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-12 - 1]
+Diagnostic 1: floating (4:3 - 4:10)
+Message: Promises must be awaited, add await operator.
+   3 |   const promise = new Promise((resolve, reject) => resolve('value'));
+   4 |   promise;
+     |   ~~~~~~~~
+   5 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-13 - 1]
+Diagnostic 1: floating (5:1 - 5:22)
+Message: Promises must be awaited, add await operator.
+   4 | }
+   5 | void returnsPromise();
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-14 - 1]
+Diagnostic 1: floating (5:1 - 5:32)
+Message: Promises must be awaited, add await operator.
+   4 | }
+   5 | void /* ... */ returnsPromise();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-15 - 1]
+Diagnostic 1: floating (5:1 - 5:20)
+Message: Promises must be awaited, add await operator.
+   4 | }
+   5 | 1, returnsPromise();
+     | ~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-16 - 1]
+Diagnostic 1: floating (5:1 - 5:31)
+Message: Promises must be awaited, add await operator.
+   4 | }
+   5 | bool ? returnsPromise() : null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-17 - 1]
+Diagnostic 1: floatingVoid (4:3 - 4:10)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |   const obj = { foo: Promise.resolve() };
+   4 |   obj.foo;
+     |   ~~~~~~~~
+   5 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-18 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:36)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   new Promise(resolve => resolve());
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-19 - 1]
+Diagnostic 1: floatingVoid (5:3 - 5:15)
+Message: Promises must be awaited, add void operator to ignore.
+   4 | async function test() {
+   5 |   promiseValue;
+     |   ~~~~~~~~~~~~~
+   6 |   promiseValue.then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (6:3 - 6:30)
+Message: Promises must be awaited, add void operator to ignore.
+   5 |   promiseValue;
+   6 |   promiseValue.then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   promiseValue.catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (7:3 - 7:23)
+Message: Promises must be awaited, add void operator to ignore.
+   6 |   promiseValue.then(() => {});
+   7 |   promiseValue.catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~
+   8 |   promiseValue.finally();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (8:3 - 8:25)
+Message: Promises must be awaited, add void operator to ignore.
+   7 |   promiseValue.catch();
+   8 |   promiseValue.finally();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   9 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-2 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:11)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | declare const myTag: (strings: TemplateStringsArray) => Promise<void>;
+   3 | myTag`abc`;
+     | ~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-20 - 1]
+Diagnostic 1: floatingVoid (5:3 - 5:15)
+Message: Promises must be awaited, add void operator to ignore.
+   4 | async function test() {
+   5 |   promiseUnion;
+     |   ~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-21 - 1]
+Diagnostic 1: floatingVoid (5:3 - 5:22)
+Message: Promises must be awaited, add void operator to ignore.
+   4 | async function test() {
+   5 |   promiseIntersection;
+     |   ~~~~~~~~~~~~~~~~~~~~
+   6 |   promiseIntersection.then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (6:3 - 6:37)
+Message: Promises must be awaited, add void operator to ignore.
+   5 |   promiseIntersection;
+   6 |   promiseIntersection.then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   promiseIntersection.catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (7:3 - 7:30)
+Message: Promises must be awaited, add void operator to ignore.
+   6 |   promiseIntersection.then(() => {});
+   7 |   promiseIntersection.catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-22 - 1]
+Diagnostic 1: floatingVoid (6:3 - 6:10)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | 
+   6 |   canThen;
+     |   ~~~~~~~~
+   7 |   canThen.then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (7:3 - 7:25)
+Message: Promises must be awaited, add void operator to ignore.
+   6 |   canThen;
+   7 |   canThen.then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   canThen.catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (8:3 - 8:18)
+Message: Promises must be awaited, add void operator to ignore.
+   7 |   canThen.then(() => {});
+   8 |   canThen.catch();
+     |   ~~~~~~~~~~~~~~~~
+   9 |   canThen.finally();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (9:3 - 9:20)
+Message: Promises must be awaited, add void operator to ignore.
+   8 |   canThen.catch();
+   9 |   canThen.finally();
+     |   ~~~~~~~~~~~~~~~~~~
+  10 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-23 - 1]
+Diagnostic 1: floatingVoid (10:3 - 10:11)
+Message: Promises must be awaited, add void operator to ignore.
+   9 | 
+  10 |   thenable;
+     |   ~~~~~~~~~
+  11 |   thenable.then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (11:3 - 11:26)
+Message: Promises must be awaited, add void operator to ignore.
+  10 |   thenable;
+  11 |   thenable.then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-24 - 1]
+Diagnostic 1: floatingVoid (18:3 - 18:10)
+Message: Promises must be awaited, add void operator to ignore.
+  17 | 
+  18 |   promise;
+     |   ~~~~~~~~
+  19 |   promise.then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (19:3 - 19:25)
+Message: Promises must be awaited, add void operator to ignore.
+  18 |   promise;
+  19 |   promise.then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+  20 |   promise.catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (20:3 - 20:18)
+Message: Promises must be awaited, add void operator to ignore.
+  19 |   promise.then(() => {});
+  20 |   promise.catch();
+     |   ~~~~~~~~~~~~~~~~
+  21 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-25 - 1]
+Diagnostic 1: floatingVoid (2:9 - 4:13)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 |         (async () => {
+     |         ~~~~~~~~~~~~~~
+   3 |           await something();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         })();
+     | ~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-26 - 1]
+Diagnostic 1: floatingVoid (2:9 - 4:13)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 |         (async () => {
+     |         ~~~~~~~~~~~~~~
+   3 |           something();
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   4 |         })();
+     | ~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-27 - 1]
+Diagnostic 1: floatingVoid (1:1 - 1:28)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | (async function foo() {})();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-28 - 1]
+Diagnostic 1: floatingVoid (3:11 - 3:38)
+Message: Promises must be awaited, add void operator to ignore.
+   2 |         function foo() {
+   3 |           (async function bar() {})();
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-29 - 1]
+Diagnostic 1: floatingVoid (4:13 - 6:17)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |           new Promise(res => {
+   4 |             (async function () {
+     |             ~~~~~~~~~~~~~~~~~~~~
+   5 |               await res(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |             })();
+     | ~~~~~~~~~~~~~~~~~
+   7 |           });
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-3 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:26)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | declare const myTag: (strings: TemplateStringsArray) => Promise<void>;
+   3 | myTag`abc`.then(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-30 - 1]
+Diagnostic 1: floatingVoid (2:9 - 4:13)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 |         (async function () {
+     |         ~~~~~~~~~~~~~~~~~~~~
+   3 |           await res(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         })();
+     | ~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-31 - 1]
+Diagnostic 1: floatingVoid (3:11 - 3:28)
+Message: Promises must be awaited, add void operator to ignore.
+   2 |         (async function () {
+   3 |           Promise.resolve();
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |         })();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-32 - 1]
+Diagnostic 1: floatingVoid (4:3 - 4:22)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | (async function () {
+   4 |   promiseIntersection;
+     |   ~~~~~~~~~~~~~~~~~~~~
+   5 |   promiseIntersection.then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (5:3 - 5:37)
+Message: Promises must be awaited, add void operator to ignore.
+   4 |   promiseIntersection;
+   5 |   promiseIntersection.then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   promiseIntersection.catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (6:3 - 6:30)
+Message: Promises must be awaited, add void operator to ignore.
+   5 |   promiseIntersection.then(() => {});
+   6 |   promiseIntersection.catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   promiseIntersection.finally();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (7:3 - 7:32)
+Message: Promises must be awaited, add void operator to ignore.
+   6 |   promiseIntersection.catch();
+   7 |   promiseIntersection.finally();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | })();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-33 - 1]
+Diagnostic 1: floatingVoid (6:3 - 6:32)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | 
+   6 |   void condition || myPromise();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-34 - 1]
+Diagnostic 1: floating (6:3 - 6:35)
+Message: Promises must be awaited, add await operator.
+   5 | 
+   6 |   (await condition) && myPromise();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-35 - 1]
+Diagnostic 1: floatingVoid (6:3 - 6:27)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | 
+   6 |   condition && myPromise();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-36 - 1]
+Diagnostic 1: floatingVoid (6:3 - 6:27)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | 
+   6 |   condition || myPromise();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-37 - 1]
+Diagnostic 1: floatingVoid (6:3 - 6:27)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | 
+   6 |   condition ?? myPromise();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-38 - 1]
+Diagnostic 1: floating (5:3 - 5:25)
+Message: Promises must be awaited, add await operator.
+   4 |   let condition = true;
+   5 |   condition && myPromise;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-39 - 1]
+Diagnostic 1: floating (5:3 - 5:25)
+Message: Promises must be awaited, add await operator.
+   4 |   let condition = false;
+   5 |   condition || myPromise;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-4 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:29)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | declare const myTag: (strings: TemplateStringsArray) => Promise<void>;
+   3 | myTag`abc`.finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-40 - 1]
+Diagnostic 1: floating (5:3 - 5:25)
+Message: Promises must be awaited, add await operator.
+   4 |   let condition = null;
+   5 |   condition ?? myPromise;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-41 - 1]
+Diagnostic 1: floatingVoid (6:3 - 6:40)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | 
+   6 |   condition || condition || myPromise();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-42 - 1]
+Diagnostic 1: floatingUselessRejectionHandlerVoid (4:1 - 4:44)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | declare const definitelyCallable: () => void;
+   4 | Promise.resolve().then(() => {}, undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | Promise.resolve().then(() => {}, null);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingUselessRejectionHandlerVoid (5:1 - 5:39)
+Message: Promises must be awaited, add void operator to ignore.
+   4 | Promise.resolve().then(() => {}, undefined);
+   5 | Promise.resolve().then(() => {}, null);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | Promise.resolve().then(() => {}, 3);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingUselessRejectionHandlerVoid (6:1 - 6:36)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | Promise.resolve().then(() => {}, null);
+   6 | Promise.resolve().then(() => {}, 3);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | Promise.resolve().then(() => {}, maybeCallable);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingUselessRejectionHandlerVoid (7:1 - 7:48)
+Message: Promises must be awaited, add void operator to ignore.
+   6 | Promise.resolve().then(() => {}, 3);
+   7 | Promise.resolve().then(() => {}, maybeCallable);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | Promise.resolve().then(() => {}, definitelyCallable);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 5: floatingUselessRejectionHandlerVoid (10:1 - 10:35)
+Message: Promises must be awaited, add void operator to ignore.
+   9 | 
+  10 | Promise.resolve().catch(undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 | Promise.resolve().catch(null);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 6: floatingUselessRejectionHandlerVoid (11:1 - 11:30)
+Message: Promises must be awaited, add void operator to ignore.
+  10 | Promise.resolve().catch(undefined);
+  11 | Promise.resolve().catch(null);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | Promise.resolve().catch(3);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 7: floatingUselessRejectionHandlerVoid (12:1 - 12:27)
+Message: Promises must be awaited, add void operator to ignore.
+  11 | Promise.resolve().catch(null);
+  12 | Promise.resolve().catch(3);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  13 | Promise.resolve().catch(maybeCallable);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 8: floatingUselessRejectionHandlerVoid (13:1 - 13:39)
+Message: Promises must be awaited, add void operator to ignore.
+  12 | Promise.resolve().catch(3);
+  13 | Promise.resolve().catch(maybeCallable);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 | Promise.resolve().catch(definitelyCallable);
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-43 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:22)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | Promise.reject() || 3;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-44 - 1]
+Diagnostic 1: floatingUselessRejectionHandler (2:1 - 2:49)
+Message: Promises must be awaited, add await operator.
+   1 | 
+   2 | void Promise.resolve().then(() => {}, undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-45 - 1]
+Diagnostic 1: floatingUselessRejectionHandler (3:1 - 3:48)
+Message: Promises must be awaited, add await operator.
+   2 | declare const maybeCallable: string | (() => void);
+   3 | Promise.resolve().then(() => {}, maybeCallable);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-46 - 1]
+Diagnostic 1: floatingUselessRejectionHandler (4:1 - 4:44)
+Message: Promises must be awaited, add await operator.
+   3 | declare const definitelyCallable: () => void;
+   4 | Promise.resolve().then(() => {}, undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | Promise.resolve().then(() => {}, null);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingUselessRejectionHandler (5:1 - 5:39)
+Message: Promises must be awaited, add await operator.
+   4 | Promise.resolve().then(() => {}, undefined);
+   5 | Promise.resolve().then(() => {}, null);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | Promise.resolve().then(() => {}, 3);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingUselessRejectionHandler (6:1 - 6:36)
+Message: Promises must be awaited, add await operator.
+   5 | Promise.resolve().then(() => {}, null);
+   6 | Promise.resolve().then(() => {}, 3);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | Promise.resolve().then(() => {}, maybeCallable);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingUselessRejectionHandler (7:1 - 7:48)
+Message: Promises must be awaited, add await operator.
+   6 | Promise.resolve().then(() => {}, 3);
+   7 | Promise.resolve().then(() => {}, maybeCallable);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | Promise.resolve().then(() => {}, definitelyCallable);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 5: floatingUselessRejectionHandler (10:1 - 10:35)
+Message: Promises must be awaited, add await operator.
+   9 | 
+  10 | Promise.resolve().catch(undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 | Promise.resolve().catch(null);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 6: floatingUselessRejectionHandler (11:1 - 11:30)
+Message: Promises must be awaited, add await operator.
+  10 | Promise.resolve().catch(undefined);
+  11 | Promise.resolve().catch(null);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | Promise.resolve().catch(3);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 7: floatingUselessRejectionHandler (12:1 - 12:27)
+Message: Promises must be awaited, add await operator.
+  11 | Promise.resolve().catch(null);
+  12 | Promise.resolve().catch(3);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  13 | Promise.resolve().catch(maybeCallable);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 8: floatingUselessRejectionHandler (13:1 - 13:39)
+Message: Promises must be awaited, add await operator.
+  12 | Promise.resolve().catch(3);
+  13 | Promise.resolve().catch(maybeCallable);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 | Promise.resolve().catch(definitelyCallable);
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-47 - 1]
+Diagnostic 1: floating (2:1 - 2:22)
+Message: Promises must be awaited, add await operator.
+   1 | 
+   2 | Promise.reject() || 3;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-48 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:35)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | Promise.reject().finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-49 - 1]
+Diagnostic 1: floating (2:1 - 4:21)
+Message: Promises must be awaited, add await operator.
+   1 | 
+   2 | Promise.reject()
+     | ~~~~~~~~~~~~~~~~
+   3 |   .finally(() => {})
+     | ~~~~~~~~~~~~~~~~~~~~
+   4 |   .finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-5 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:27)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   Promise.resolve('value');
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-50 - 1]
+Diagnostic 1: floatingVoid (2:1 - 5:21)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | Promise.reject()
+     | ~~~~~~~~~~~~~~~~
+   3 |   .finally(() => {})
+     | ~~~~~~~~~~~~~~~~~~~~
+   4 |   .finally(() => {})
+     | ~~~~~~~~~~~~~~~~~~~~
+   5 |   .finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-51 - 1]
+Diagnostic 1: floatingVoid (2:1 - 4:21)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | Promise.reject()
+     | ~~~~~~~~~~~~~~~~
+   3 |   .then(() => {})
+     | ~~~~~~~~~~~~~~~~~
+   4 |   .finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-52 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:36)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | declare const returnsPromise: () => Promise<void> | null;
+   3 | returnsPromise()?.finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-53 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:38)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | const promiseIntersection: Promise<number> & number;
+   3 | promiseIntersection.finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-54 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:41)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | Promise.resolve().finally(() => {}), 123;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-55 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:31)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | (async () => true)().finally();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-56 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:55)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | Promise.reject(new Error('message')).finally(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-57 - 1]
+Diagnostic 1: floatingVoid (5:3 - 5:25)
+Message: Promises must be awaited, add void operator to ignore.
+   4 | ): void {
+   5 |   maybePromiseArray?.[0];
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-58 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (2:1 - 2:38)
+Message: An array of Promises may be unintentional.
+   1 | 
+   2 | [1, 2, 3].map(() => Promise.reject());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-59 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:1 - 3:34)
+Message: An array of Promises may be unintentional.
+   2 | declare const array: unknown[];
+   3 | array.map(() => Promise.reject());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-6 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:39)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   Promise.reject(new Error('message'));
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   Promise.reject(new Error('message')).then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (4:3 - 4:54)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |   Promise.reject(new Error('message'));
+   4 |   Promise.reject(new Error('message')).then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   Promise.reject(new Error('message')).catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (5:3 - 5:47)
+Message: Promises must be awaited, add void operator to ignore.
+   4 |   Promise.reject(new Error('message')).then(() => {});
+   5 |   Promise.reject(new Error('message')).catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   Promise.reject(new Error('message')).finally();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (6:3 - 6:49)
+Message: Promises must be awaited, add void operator to ignore.
+   5 |   Promise.reject(new Error('message')).catch();
+   6 |   Promise.reject(new Error('message')).finally();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-60 - 1]
+Diagnostic 1: floatingPromiseArray (3:1 - 3:18)
+Message: An array of Promises may be unintentional.
+   2 | declare const promiseArray: Array<Promise<unknown>>;
+   3 | void promiseArray;
+     | ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-61 - 1]
+Diagnostic 1: floatingPromiseArray (4:3 - 4:21)
+Message: An array of Promises may be unintentional.
+   3 | async function f() {
+   4 |   await promiseArray;
+     |   ~~~~~~~~~~~~~~~~~~~
+   5 | }
+---
+
+[TestNoFloatingPromisesRule/invalid-62 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (2:1 - 2:28)
+Message: An array of Promises may be unintentional.
+   1 | 
+   2 | [1, 2, Promise.reject(), 3];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-63 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (2:1 - 2:44)
+Message: An array of Promises may be unintentional.
+   1 | 
+   2 | [1, 2, Promise.reject().catch(() => {}), 3];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-64 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:1 - 5:3)
+Message: An array of Promises may be unintentional.
+   2 | const data = ['test'];
+   3 | data.map(async () => {
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   4 |   await new Promise((_res, rej) => setTimeout(rej, 1000));
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | });
+     | ~~~
+   6 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-65 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (5:3 - 5:30)
+Message: An array of Promises may be unintentional.
+   4 | ): void {
+   5 |   maybePromiseArrayArray?.[0];
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+---
+
+[TestNoFloatingPromisesRule/invalid-66 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:3 - 3:4)
+Message: An array of Promises may be unintentional.
+   2 | function f<T extends Array<Promise<number>>>(a: T): void {
+   3 |   a;
+     |   ~~
+   4 | }
+---
+
+[TestNoFloatingPromisesRule/invalid-67 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:1 - 3:2)
+Message: An array of Promises may be unintentional.
+   2 | declare const a: Array<Promise<number>> | undefined;
+   3 | a;
+     | ~~
+   4 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-68 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:3 - 3:4)
+Message: An array of Promises may be unintentional.
+   2 | function f<T extends Array<Promise<number>>>(a: T | undefined): void {
+   3 |   a;
+     |   ~~
+   4 | }
+---
+
+[TestNoFloatingPromisesRule/invalid-69 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (2:1 - 2:28)
+Message: An array of Promises may be unintentional.
+   1 | 
+   2 | [Promise.reject()] as const;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-7 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:23)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   (async () => true)();
+     |   ~~~~~~~~~~~~~~~~~~~~~
+   4 |   (async () => true)().then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (4:3 - 4:38)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |   (async () => true)();
+   4 |   (async () => true)().then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   (async () => true)().catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (5:3 - 5:31)
+Message: Promises must be awaited, add void operator to ignore.
+   4 |   (async () => true)().then(() => {});
+   5 |   (async () => true)().catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-70 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:1 - 3:9)
+Message: An array of Promises may be unintentional.
+   2 | declare function cursed(): [Promise<number>, Promise<string>];
+   3 | cursed();
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-71 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (2:1 - 8:11)
+Message: An array of Promises may be unintentional.
+   1 | 
+   2 | [
+     | ~
+   3 |   'Type Argument number ',
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   1,
+     | ~~~~
+   5 |   'is not',
+     | ~~~~~~~~~~~
+   6 |   Promise.resolve(),
+     | ~~~~~~~~~~~~~~~~~~~~
+   7 |   'but it still is flagged',
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | ] as const;
+     | ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-72 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (5:9 - 5:28)
+Message: An array of Promises may be unintentional.
+   4 |           | [number, number, Promise<unknown>, string];
+   5 |         arrayOrPromiseTuple;
+     |         ~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-73 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (3:9 - 3:30)
+Message: An array of Promises may be unintentional.
+   2 |         declare const okArrayOrPromiseArray: Array<number> | Array<Promise<unknown>>;
+   3 |         okArrayOrPromiseArray;
+     |         ~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-74 - 1]
+Diagnostic 1: floatingVoid (15:1 - 15:8)
+Message: Promises must be awaited, add void operator to ignore.
+  14 | let promise: UnsafeThenable<number> = Promise.resolve(5);
+  15 | promise;
+     | ~~~~~~~~
+  16 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-75 - 1]
+Diagnostic 1: floatingVoid (4:1 - 4:16)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | let promise: SafePromise<number> = Promise.resolve(5);
+   4 | promise.catch();
+     | ~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-76 - 1]
+Diagnostic 1: floatingVoid (4:1 - 4:20)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | let promise: () => UnsafePromise<number> = async () => 5;
+   4 | promise().finally();
+     | ~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-77 - 1]
+Diagnostic 1: floatingVoid (4:1 - 4:24)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | let promise: UnsafePromise = Promise.resolve(5);
+   4 | 0 ? promise.catch() : 2;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-78 - 1]
+Diagnostic 1: floatingVoid (4:1 - 4:26)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | let promise: () => UnsafePromise = async () => 5;
+   4 | null ?? promise().catch();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-79 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (4:1 - 4:20)
+Message: An array of Promises may be unintentional.
+   3 | declare const arrayOrPromiseTuple: Foo<unknown>[];
+   4 | arrayOrPromiseTuple;
+     | ~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-8 - 1]
+Diagnostic 1: floatingVoid (5:3 - 5:19)
+Message: Promises must be awaited, add void operator to ignore.
+   4 | 
+   5 |   returnsPromise();
+     |   ~~~~~~~~~~~~~~~~~
+   6 |   returnsPromise().then(() => {});
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (6:3 - 6:34)
+Message: Promises must be awaited, add void operator to ignore.
+   5 |   returnsPromise();
+   6 |   returnsPromise().then(() => {});
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   returnsPromise().catch();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floatingVoid (7:3 - 7:27)
+Message: Promises must be awaited, add void operator to ignore.
+   6 |   returnsPromise().then(() => {});
+   7 |   returnsPromise().catch();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   returnsPromise().finally();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 4: floatingVoid (8:3 - 8:29)
+Message: Promises must be awaited, add void operator to ignore.
+   7 |   returnsPromise().catch();
+   8 |   returnsPromise().finally();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-80 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (5:1 - 5:4)
+Message: An array of Promises may be unintentional.
+   4 | let bar = [Promise.resolve(2), foo];
+   5 | bar;
+     | ~~~~
+   6 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-81 - 1]
+Diagnostic 1: floatingPromiseArrayVoid (4:1 - 4:20)
+Message: An array of Promises may be unintentional.
+   3 | declare const arrayOrPromiseTuple: [Foo<unknown>, 5];
+   4 | arrayOrPromiseTuple;
+     | ~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoFloatingPromisesRule/invalid-82 - 1]
+Diagnostic 1: floatingVoid (4:1 - 4:11)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | declare const myTag: (strings: TemplateStringsArray) => SafePromise;
+   4 | myTag`abc`;
+     | ~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-83 - 1]
+Diagnostic 1: floatingVoid (4:9 - 4:32)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | 
+   4 |         unsafe('...', () => {});
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-84 - 1]
+Diagnostic 1: floatingVoid (4:9 - 4:43)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | 
+   4 |         it('...', () => {}).then(() => {});
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-85 - 1]
+Diagnostic 1: floatingVoid (4:9 - 4:46)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | 
+   4 |         it('...', () => {}).finally(() => {});
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-86 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:16)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | declare const createPromise: () => PromiseLike<number>;
+   3 | createPromise();
+     | ~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-87 - 1]
+Diagnostic 1: floatingVoid (8:1 - 8:19)
+Message: Promises must be awaited, add void operator to ignore.
+   7 | 
+   8 | createMyThenable();
+     | ~~~~~~~~~~~~~~~~~~~
+   9 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-88 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:16)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | declare const createPromise: () => Promise<number>;
+   3 | createPromise();
+     | ~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-89 - 1]
+Diagnostic 1: floatingVoid (4:1 - 4:18)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | declare const createMyPromise: () => MyPromise<number>;
+   4 | createMyPromise();
+     | ~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-9 - 1]
+Diagnostic 1: floatingVoid (3:3 - 3:49)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | async function test() {
+   3 |   Math.random() > 0.5 ? Promise.resolve() : null;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   Math.random() > 0.5 ? null : Promise.resolve();
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floatingVoid (4:3 - 4:49)
+Message: Promises must be awaited, add void operator to ignore.
+   3 |   Math.random() > 0.5 ? Promise.resolve() : null;
+   4 |   Math.random() > 0.5 ? null : Promise.resolve();
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-90 - 1]
+Diagnostic 1: floatingVoid (6:1 - 6:18)
+Message: Promises must be awaited, add void operator to ignore.
+   5 | declare const createMyPromise: () => MyPromise<number>;
+   6 | createMyPromise();
+     | ~~~~~~~~~~~~~~~~~~
+   7 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-91 - 1]
+Diagnostic 1: floatingVoid (4:3 - 4:10)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | function* generator(): Generator<number, void, Promise<number>> {
+   4 |   yield x;
+     |   ~~~~~~~~
+   5 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-92 - 1]
+Diagnostic 1: floatingVoid (4:3 - 4:11)
+Message: Promises must be awaited, add void operator to ignore.
+   3 | function* generator(): Generator<number, void, void> {
+   4 |   yield* x;
+     |   ~~~~~~~~~
+   5 | }
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-93 - 1]
+Diagnostic 1: floatingVoid (3:1 - 3:25)
+Message: Promises must be awaited, add void operator to ignore.
+   2 | const value = {};
+   3 | value as Promise<number>;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-94 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:33)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | ({}) as Promise<number> & number;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-95 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:44)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | ({}) as Promise<number> & { yolo?: string };
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-96 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:20)
+Message: Promises must be awaited, add void operator to ignore.
+   1 | 
+   2 | <Promise<number>>{};
+     | ~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---

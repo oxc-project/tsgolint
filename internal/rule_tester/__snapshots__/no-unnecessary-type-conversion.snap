@@ -1,0 +1,448 @@
+
+[TestNoUnnecessaryTypeConversion/invalid-0 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | String('asdf');
+     | ~~~~~~
+  Label: This expression already has type '"asdf"'. (1:8 - 1:13)
+   1 | String('asdf');
+     |        ^^^^^^ This expression already has type '"asdf"'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-1 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:8 - 1:17)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 'asdf'.toString();
+     |        ~~~~~~~~~~
+  Label: This expression already has type '"asdf"'. (1:1 - 1:6)
+   1 | 'asdf'.toString();
+     | ^^^^^^ This expression already has type '"asdf"'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-10 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | !!true;
+     | ~~
+  Label: This expression already has type 'true'. (1:3 - 1:6)
+   1 | !!true;
+     |   ^^^^ This expression already has type 'true'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-11 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | BigInt(3n);
+     | ~~~~~~
+  Label: This expression already has type '3n'. (1:8 - 1:9)
+   1 | BigInt(3n);
+     |        ^^ This expression already has type '3n'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-12 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:23)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends string>(x: T) {
+   3 |           return String(x);
+     |                  ~~~~~~
+   4 |         }
+  Label: This expression already has type 'string'. (3:25 - 3:25)
+   2 |         function f<T extends string>(x: T) {
+   3 |           return String(x);
+     |                         ^ This expression already has type 'string'.
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-13 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:23)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends number>(x: T) {
+   3 |           return Number(x);
+     |                  ~~~~~~
+   4 |         }
+  Label: This expression already has type 'number'. (3:25 - 3:25)
+   2 |         function f<T extends number>(x: T) {
+   3 |           return Number(x);
+     |                         ^ This expression already has type 'number'.
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-14 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:24)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends boolean>(x: T) {
+   3 |           return Boolean(x);
+     |                  ~~~~~~~
+   4 |         }
+  Label: This expression already has type 'boolean'. (3:26 - 3:26)
+   2 |         function f<T extends boolean>(x: T) {
+   3 |           return Boolean(x);
+     |                          ^ This expression already has type 'boolean'.
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-15 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:18 - 3:23)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         function f<T extends bigint>(x: T) {
+   3 |           return BigInt(x);
+     |                  ~~~~~~
+   4 |         }
+  Label: This expression already has type 'bigint'. (3:25 - 3:25)
+   2 |         function f<T extends bigint>(x: T) {
+   3 |           return BigInt(x);
+     |                         ^ This expression already has type 'bigint'.
+   4 |         }
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-16 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:47 - 1:50)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends string>(x: T) { return x + ''; }
+     |                                               ~~~~
+  Label: This expression already has type 'string'. (1:45 - 1:45)
+   1 | function f<T extends string>(x: T) { return x + ''; }
+     |                                             ^ This expression already has type 'string'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-17 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:45 - 1:49)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends string>(x: T) { return '' + x; }
+     |                                             ~~~~~
+  Label: This expression already has type 'string'. (1:50 - 1:50)
+   1 | function f<T extends string>(x: T) { return '' + x; }
+     |                                                  ^ This expression already has type 'string'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-18 - 1]
+Diagnostic 1: unnecessaryTypeConversion (2:1 - 2:7)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends string>(x: T) {
+   2 | x += '';
+     | ~~~~~~~
+   3 | return x;
+  Label: This expression already has type 'string'. (2:1 - 2:1)
+   1 | function f<T extends string>(x: T) {
+   2 | x += '';
+     | ^ This expression already has type 'string'.
+   3 | return x;
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-19 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:45 - 1:45)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends number>(x: T) { return +x; }
+     |                                             ~
+  Label: This expression already has type 'number'. (1:46 - 1:46)
+   1 | function f<T extends number>(x: T) { return +x; }
+     |                                              ^ This expression already has type 'number'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-2 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:5)
+Message: This type conversion does not change the type or value of the expression.
+   1 | '' + 'asdf';
+     | ~~~~~
+  Label: This expression already has type '"asdf"'. (1:6 - 1:11)
+   1 | '' + 'asdf';
+     |      ^^^^^^ This expression already has type '"asdf"'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-20 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:46 - 1:47)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends boolean>(x: T) { return !!x; }
+     |                                              ~~
+  Label: This expression already has type 'boolean'. (1:48 - 1:48)
+   1 | function f<T extends boolean>(x: T) { return !!x; }
+     |                                                ^ This expression already has type 'boolean'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-21 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:44 - 1:45)
+Message: This type conversion does not change the type or value of the expression.
+   1 | function f<T extends 3 | 4>(x: T) { return ~~x; }
+     |                                            ~~
+  Label: This expression already has type '3 | 4'. (1:46 - 1:46)
+   1 | function f<T extends 3 | 4>(x: T) { return ~~x; }
+     |                                              ^ This expression already has type '3 | 4'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-22 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | String('a' + 'b').length;
+     | ~~~~~~
+  Label: This expression already has type 'string'. (1:8 - 1:16)
+   1 | String('a' + 'b').length;
+     |        ^^^^^^^^^ This expression already has type 'string'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-23 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:13 - 1:22)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ('a' + 'b').toString().length;
+     |             ~~~~~~~~~~
+  Label: This expression already has type 'string'. (1:1 - 1:11)
+   1 | ('a' + 'b').toString().length;
+     | ^^^^^^^^^^^ This expression already has type 'string'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-24 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:5 - 1:5)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 2 * +(2 + 2);
+     |     ~
+  Label: This expression already has type 'number'. (1:6 - 1:12)
+   1 | 2 * +(2 + 2);
+     |      ^^^^^^^ This expression already has type 'number'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-25 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:5 - 1:10)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 2 * Number(2 + 2);
+     |     ~~~~~~
+  Label: This expression already has type 'number'. (1:12 - 1:16)
+   1 | 2 * Number(2 + 2);
+     |            ^^^^^ This expression already has type 'number'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-26 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:10 - 1:11)
+Message: This type conversion does not change the type or value of the expression.
+   1 | false && !!(false || true);
+     |          ~~
+  Label: This expression already has type 'true'. (1:12 - 1:26)
+   1 | false && !!(false || true);
+     |            ^^^^^^^^^^^^^^^ This expression already has type 'true'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-27 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:10 - 1:16)
+Message: This type conversion does not change the type or value of the expression.
+   1 | false && Boolean(false || true);
+     |          ~~~~~~~
+  Label: This expression already has type 'true'. (1:18 - 1:30)
+   1 | false && Boolean(false || true);
+     |                  ^^^^^^^^^^^^^ This expression already has type 'true'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-28 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:6 - 1:11)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 2n * BigInt(2n + 2n);
+     |      ~~~~~~
+  Label: This expression already has type 'bigint'. (1:13 - 1:19)
+   1 | 2n * BigInt(2n + 2n);
+     |             ^^^^^^^ This expression already has type 'bigint'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-29 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:9 - 3:14)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         let str = 'asdf';
+   3 |         String(str).length;
+     |         ~~~~~~
+   4 |       
+  Label: This expression already has type 'string'. (3:16 - 3:18)
+   2 |         let str = 'asdf';
+   3 |         String(str).length;
+     |                ^^^ This expression already has type 'string'.
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-3 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:8 - 1:11)
+Message: This type conversion does not change the type or value of the expression.
+   1 | 'asdf' + '';
+     |        ~~~~
+  Label: This expression already has type '"asdf"'. (1:1 - 1:6)
+   1 | 'asdf' + '';
+     | ^^^^^^ This expression already has type '"asdf"'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-30 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:13 - 3:22)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         let str = 'asdf';
+   3 |         str.toString().length;
+     |             ~~~~~~~~~~
+   4 |       
+  Label: This expression already has type 'string'. (3:9 - 3:11)
+   2 |         let str = 'asdf';
+   3 |         str.toString().length;
+     |         ^^^ This expression already has type 'string'.
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-31 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ~~1;
+     | ~~
+  Label: This expression already has type '1'. (1:3 - 1:3)
+   1 | ~~1;
+     |   ^ This expression already has type '1'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-32 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ~~-1;
+     | ~~
+  Label: This expression already has type '-1'. (1:3 - 1:4)
+   1 | ~~-1;
+     |   ^^ This expression already has type '-1'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-33 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:9 - 3:10)
+Message: This type conversion does not change the type or value of the expression.
+   2 |         declare const threeOrFour: 3 | 4;
+   3 |         ~~threeOrFour;
+     |         ~~
+   4 |       
+  Label: This expression already has type '3 | 4'. (3:11 - 3:21)
+   2 |         declare const threeOrFour: 3 | 4;
+   3 |         ~~threeOrFour;
+     |           ^^^^^^^^^^^ This expression already has type '3 | 4'.
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-4 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:1 - 3:9)
+Message: This type conversion does not change the type or value of the expression.
+   2 | let str = 'asdf';
+   3 | str += '';
+     | ~~~~~~~~~
+   4 |       
+  Label: This expression already has type 'string'. (3:1 - 3:3)
+   2 | let str = 'asdf';
+   3 | str += '';
+     | ^^^ This expression already has type 'string'.
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-5 - 1]
+Diagnostic 1: unnecessaryTypeConversion (3:11 - 3:19)
+Message: This type conversion does not change the type or value of the expression.
+   2 | let str = 'asdf';
+   3 | 'asdf' + (str += '');
+     |           ~~~~~~~~~
+   4 |       
+  Label: This expression already has type 'string'. (3:11 - 3:13)
+   2 | let str = 'asdf';
+   3 | 'asdf' + (str += '');
+     |           ^^^ This expression already has type 'string'.
+   4 |       
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-6 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:6)
+Message: This type conversion does not change the type or value of the expression.
+   1 | Number(123);
+     | ~~~~~~
+  Label: This expression already has type '123'. (1:8 - 1:10)
+   1 | Number(123);
+     |        ^^^ This expression already has type '123'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-7 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:1)
+Message: This type conversion does not change the type or value of the expression.
+   1 | +123;
+     | ~
+  Label: This expression already has type '123'. (1:2 - 1:4)
+   1 | +123;
+     |  ^^^ This expression already has type '123'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-8 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:2)
+Message: This type conversion does not change the type or value of the expression.
+   1 | ~~123;
+     | ~~
+  Label: This expression already has type '123'. (1:3 - 1:5)
+   1 | ~~123;
+     |   ^^^ This expression already has type '123'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---
+
+[TestNoUnnecessaryTypeConversion/invalid-9 - 1]
+Diagnostic 1: unnecessaryTypeConversion (1:1 - 1:7)
+Message: This type conversion does not change the type or value of the expression.
+   1 | Boolean(true);
+     | ~~~~~~~
+  Label: This expression already has type 'true'. (1:9 - 1:12)
+   1 | Boolean(true);
+     |         ^^^^ This expression already has type 'true'.
+  Suggestion 1: [suggestRemove] Remove the type conversion.
+  Suggestion 2: [suggestSatisfies] Instead, assert that the value satisfies the primitive type.
+---

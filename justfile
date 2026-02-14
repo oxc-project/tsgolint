@@ -33,11 +33,15 @@ test: build
   cd e2e && pnpm run test --run && cd ..
   go test ./internal/...
 
+update-snaps:
+  UPDATE_SNAPS=true go test ./internal/...
+
 lint:
   golangci-lint run
 
 fmt:
   gofmt -w internal cmd tools
+  pnpm run fmt
 
 shim:
   go run tools/gen_shims/main.go

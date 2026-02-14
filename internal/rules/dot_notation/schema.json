@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "dot_notation_options": {
+      "type": "object",
+      "properties": {
+        "allowIndexSignaturePropertyAccess": {
+          "type": "boolean",
+          "description": "Whether to allow accessing properties matching an index signature with array notation.",
+          "default": false
+        },
+        "allowKeywords": {
+          "type": "boolean",
+          "description": "Whether to allow keywords such as [\"class\"].",
+          "default": true
+        },
+        "allowPattern": {
+          "type": "string",
+          "description": "Regular expression of names to allow.",
+          "default": ""
+        },
+        "allowPrivateClassPropertyAccess": {
+          "type": "boolean",
+          "description": "Whether to allow accessing class members marked as `private` with array notation.",
+          "default": false
+        },
+        "allowProtectedClassPropertyAccess": {
+          "type": "boolean",
+          "description": "Whether to allow accessing class members marked as `protected` with array notation.",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

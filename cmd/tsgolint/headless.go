@@ -102,11 +102,21 @@ const (
 	headlessDiagnosticKindTsconfig
 )
 
+// A labeled span of source code. Useful for highlighting additional info related to a diagnostic in the context
+// of the source code.
+type headlessLabeledRange struct {
+	// The text label associated with this range.
+	Label string `json:"label"`
+	// The range in the source file that this label applies to.
+	Range headlessRange `json:"range"`
+}
+
 type headlessDiagnostic struct {
-	Kind     headlessDiagnosticKind `json:"kind"`
-	Range    *headlessRange         `json:"range,omitempty"`
-	Message  headlessRuleMessage    `json:"message"`
-	FilePath *string                `json:"file_path"`
+	Kind          headlessDiagnosticKind `json:"kind"`
+	Range         *headlessRange         `json:"range,omitempty"`
+	Message       headlessRuleMessage    `json:"message"`
+	FilePath      *string                `json:"file_path"`
+	LabeledRanges []headlessLabeledRange `json:"labeled_ranges,omitempty"`
 
 	// Only for kind="rule"
 	Rule        *string              `json:"rule,omitempty"`
@@ -290,13 +300,24 @@ func runHeadless(args []string) int {
 				rd := d.ruleDiagnostic
 				filePath := rd.SourceFile.FileName()
 				hd = headlessDiagnostic{
-					Kind:        headlessDiagnosticKindRule,
-					Range:       headlessRangeFromRange(rd.Range),
-					Rule:        &rd.RuleName,
-					Message:     headlessRuleMessageFromRuleMessage(rd.Message),
-					Fixes:       nil,
-					Suggestions: nil,
-					FilePath:    &filePath,
+					Kind:          headlessDiagnosticKindRule,
+					Range:         headlessRangeFromRange(rd.Range),
+					Rule:          &rd.RuleName,
+					Message:       headlessRuleMessageFromRuleMessage(rd.Message),
+					Fixes:         nil,
+					Suggestions:   nil,
+					FilePath:      &filePath,
+					LabeledRanges: nil,
+				}
+
+				if len(rd.LabeledRanges) > 0 {
+					hd.LabeledRanges = make([]headlessLabeledRange, len(rd.LabeledRanges))
+					for i, labeledRange := range rd.LabeledRanges {
+						hd.LabeledRanges[i] = headlessLabeledRange{
+							Label: labeledRange.Label,
+							Range: *headlessRangeFromRange(labeledRange.Range),
+						}
+					}
 				}
 
 				if opts.fix {

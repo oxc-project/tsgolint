@@ -1,7 +1,8 @@
 {
   "ExtraFunctions": [
     "isNonDeferredTypeReference",
-    "getFunctionFlags"
+    "getFunctionFlags",
+    "getMappedTypeModifiers"
   ],
   "ExtraMethods": {
     "Checker": [
@@ -23,6 +24,7 @@
       "getContextualType",
       "getAwaitedType",
       "getTypeOfSymbol",
+      "getTypeOfPropertyOfType",
       "getReturnTypeOfSignature",
       "getContextualTypeForArgumentAtIndex",
       "getResolvedSignature",
@@ -34,8 +36,12 @@
       "GetShorthandAssignmentValueSymbol",
       "getImmediateAliasedSymbol",
       "getDeclarationOfAliasSymbol",
+      "getTypePredicateOfSignature",
       "GetNonNullableType",
-      "IsNullableType"
+      "IsNullableType",
+      "getIndexInfosOfType",
+      "isReadonlySymbol",
+      "getContextFreeTypeOfExpression"
     ]
   },
   "ExtraFields": {
@@ -46,11 +52,13 @@
       "objectFlags"
     ],
     "TupleType": [
-      "combinedFlags"
+      "combinedFlags",
+      "readonly"
     ],
     "Signature": [
       "parameters",
-      "declaration"
+      "declaration",
+      "resolvedTypePredicate"
     ],
     "Checker": [
       "numberType",
@@ -64,6 +72,19 @@
       "kind",
       "t",
       "parameterIndex"
+    ],
+    "IndexedAccessType": [
+      "objectType",
+      "indexType"
+    ],
+    "MappedType": [
+      "typeParameter",
+      "constraintType",
+      "templateType"
+    ],
+    "ConditionalType": [
+      "checkType",
+      "extendsType"
     ]
   }
 }

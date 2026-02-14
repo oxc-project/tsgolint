@@ -182,7 +182,6 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	}
 
 	close(queue)
-	program.BindSourceFiles()
 
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
 
@@ -255,6 +254,32 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 							SourceFile:  file,
 							Program:     w.program,
 							TypeChecker: w.checker,
+							ReportDiagnostic: func(diagnostic rule.RuleDiagnostic) {
+								onDiagnostic(rule.RuleDiagnostic{
+									RuleName:      r.Name,
+									Range:         diagnostic.Range,
+									Message:       diagnostic.Message,
+									FixesPtr:      diagnostic.FixesPtr,
+									Suggestions:   diagnostic.Suggestions,
+									SourceFile:    file,
+									LabeledRanges: diagnostic.LabeledRanges,
+								})
+							},
+							ReportDiagnosticWithSuggestions: func(diagnostic rule.RuleDiagnostic, suggestionsFn func() []rule.RuleSuggestion) {
+								var suggestions []rule.RuleSuggestion = nil
+								if fixState.FixSuggestions {
+									suggestions = suggestionsFn()
+								}
+								onDiagnostic(rule.RuleDiagnostic{
+									RuleName:      r.Name,
+									Range:         diagnostic.Range,
+									Message:       diagnostic.Message,
+									FixesPtr:      diagnostic.FixesPtr,
+									Suggestions:   &suggestions,
+									SourceFile:    file,
+									LabeledRanges: diagnostic.LabeledRanges,
+								})
+							},
 							ReportRange: func(textRange core.TextRange, msg rule.RuleMessage) {
 								onDiagnostic(rule.RuleDiagnostic{
 									RuleName:   r.Name,

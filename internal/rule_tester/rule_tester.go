@@ -169,6 +169,8 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 				outputs = append(outputs, fixedCode)
 			}
 
+			newSnapshotter(r.Name).MatchSnapshot(t, formatDiagnosticsSnapshot(testCase.Code, initialDiagnostics))
+
 			if len(testCase.Output) == len(outputs) {
 				for i, expected := range testCase.Output {
 					assert.Equal(t, expected, outputs[i], "Expected code after fix")

@@ -1,0 +1,564 @@
+
+[TestNoImpliedEvalRule/invalid-0 - 1]
+Diagnostic 1: noImpliedEvalError (2:12 - 2:18)
+Message: Implied eval. Consider passing a function.
+   1 | 
+   2 | setTimeout('x = 1', 0);
+     |            ~~~~~~~
+   3 | setInterval('x = 1', 0);
+
+Diagnostic 2: noImpliedEvalError (3:13 - 3:19)
+Message: Implied eval. Consider passing a function.
+   2 | setTimeout('x = 1', 0);
+   3 | setInterval('x = 1', 0);
+     |             ~~~~~~~
+   4 | setImmediate('x = 1');
+
+Diagnostic 3: noImpliedEvalError (4:14 - 4:20)
+Message: Implied eval. Consider passing a function.
+   3 | setInterval('x = 1', 0);
+   4 | setImmediate('x = 1');
+     |              ~~~~~~~
+   5 | execScript('x = 1');
+
+Diagnostic 4: noImpliedEvalError (5:12 - 5:18)
+Message: Implied eval. Consider passing a function.
+   4 | setImmediate('x = 1');
+   5 | execScript('x = 1');
+     |            ~~~~~~~
+   6 |       
+---
+
+[TestNoImpliedEvalRule/invalid-1 - 1]
+Diagnostic 1: noImpliedEvalError (2:12 - 2:20)
+Message: Implied eval. Consider passing a function.
+   1 | 
+   2 | setTimeout(undefined, 0);
+     |            ~~~~~~~~~
+   3 | setInterval(undefined, 0);
+
+Diagnostic 2: noImpliedEvalError (3:13 - 3:21)
+Message: Implied eval. Consider passing a function.
+   2 | setTimeout(undefined, 0);
+   3 | setInterval(undefined, 0);
+     |             ~~~~~~~~~
+   4 | setImmediate(undefined);
+
+Diagnostic 3: noImpliedEvalError (4:14 - 4:22)
+Message: Implied eval. Consider passing a function.
+   3 | setInterval(undefined, 0);
+   4 | setImmediate(undefined);
+     |              ~~~~~~~~~
+   5 | execScript(undefined);
+
+Diagnostic 4: noImpliedEvalError (5:12 - 5:20)
+Message: Implied eval. Consider passing a function.
+   4 | setImmediate(undefined);
+   5 | execScript(undefined);
+     |            ~~~~~~~~~
+   6 |       
+---
+
+[TestNoImpliedEvalRule/invalid-10 - 1]
+Diagnostic 1: noImpliedEvalError (3:14 - 3:16)
+Message: Implied eval. Consider passing a function.
+   2 | const fn = (foo: string | any) => {
+   3 |   setTimeout(foo, 0);
+     |              ~~~
+   4 |   setInterval(foo, 0);
+
+Diagnostic 2: noImpliedEvalError (4:15 - 4:17)
+Message: Implied eval. Consider passing a function.
+   3 |   setTimeout(foo, 0);
+   4 |   setInterval(foo, 0);
+     |               ~~~
+   5 |   setImmediate(foo);
+
+Diagnostic 3: noImpliedEvalError (5:16 - 5:18)
+Message: Implied eval. Consider passing a function.
+   4 |   setInterval(foo, 0);
+   5 |   setImmediate(foo);
+     |                ~~~
+   6 |   execScript(foo);
+
+Diagnostic 4: noImpliedEvalError (6:14 - 6:16)
+Message: Implied eval. Consider passing a function.
+   5 |   setImmediate(foo);
+   6 |   execScript(foo);
+     |              ~~~
+   7 | };
+---
+
+[TestNoImpliedEvalRule/invalid-11 - 1]
+Diagnostic 1: noImpliedEvalError (5:12 - 5:41)
+Message: Implied eval. Consider passing a function.
+   4 | 
+   5 | setTimeout(Math.radom() > 0.5 ? foo : bar, 0);
+     |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoImpliedEvalRule/invalid-12 - 1]
+Diagnostic 1: noImpliedEvalError (2:19 - 2:20)
+Message: Implied eval. Consider passing a function.
+   1 | 
+   2 | window.setTimeout(``, 0);
+     |                   ~~
+   3 | window['setTimeout'](``, 0);
+
+Diagnostic 2: noImpliedEvalError (3:22 - 3:23)
+Message: Implied eval. Consider passing a function.
+   2 | window.setTimeout(``, 0);
+   3 | window['setTimeout'](``, 0);
+     |                      ~~
+   4 | 
+
+Diagnostic 3: noImpliedEvalError (5:20 - 5:21)
+Message: Implied eval. Consider passing a function.
+   4 | 
+   5 | window.setInterval(``, 0);
+     |                    ~~
+   6 | window['setInterval'](``, 0);
+
+Diagnostic 4: noImpliedEvalError (6:23 - 6:24)
+Message: Implied eval. Consider passing a function.
+   5 | window.setInterval(``, 0);
+   6 | window['setInterval'](``, 0);
+     |                       ~~
+   7 | 
+
+Diagnostic 5: noImpliedEvalError (8:21 - 8:22)
+Message: Implied eval. Consider passing a function.
+   7 | 
+   8 | window.setImmediate(``);
+     |                     ~~
+   9 | window['setImmediate'](``);
+
+Diagnostic 6: noImpliedEvalError (9:24 - 9:25)
+Message: Implied eval. Consider passing a function.
+   8 | window.setImmediate(``);
+   9 | window['setImmediate'](``);
+     |                        ~~
+  10 | 
+
+Diagnostic 7: noImpliedEvalError (11:19 - 11:20)
+Message: Implied eval. Consider passing a function.
+  10 | 
+  11 | window.execScript(``);
+     |                   ~~
+  12 | window['execScript'](``);
+
+Diagnostic 8: noImpliedEvalError (12:22 - 12:23)
+Message: Implied eval. Consider passing a function.
+  11 | window.execScript(``);
+  12 | window['execScript'](``);
+     |                      ~~
+  13 |       
+---
+
+[TestNoImpliedEvalRule/invalid-13 - 1]
+Diagnostic 1: noImpliedEvalError (2:19 - 2:20)
+Message: Implied eval. Consider passing a function.
+   1 | 
+   2 | global.setTimeout(``, 0);
+     |                   ~~
+   3 | global['setTimeout'](``, 0);
+
+Diagnostic 2: noImpliedEvalError (3:22 - 3:23)
+Message: Implied eval. Consider passing a function.
+   2 | global.setTimeout(``, 0);
+   3 | global['setTimeout'](``, 0);
+     |                      ~~
+   4 | 
+
+Diagnostic 3: noImpliedEvalError (5:20 - 5:21)
+Message: Implied eval. Consider passing a function.
+   4 | 
+   5 | global.setInterval(``, 0);
+     |                    ~~
+   6 | global['setInterval'](``, 0);
+
+Diagnostic 4: noImpliedEvalError (6:23 - 6:24)
+Message: Implied eval. Consider passing a function.
+   5 | global.setInterval(``, 0);
+   6 | global['setInterval'](``, 0);
+     |                       ~~
+   7 | 
+
+Diagnostic 5: noImpliedEvalError (8:21 - 8:22)
+Message: Implied eval. Consider passing a function.
+   7 | 
+   8 | global.setImmediate(``);
+     |                     ~~
+   9 | global['setImmediate'](``);
+
+Diagnostic 6: noImpliedEvalError (9:24 - 9:25)
+Message: Implied eval. Consider passing a function.
+   8 | global.setImmediate(``);
+   9 | global['setImmediate'](``);
+     |                        ~~
+  10 | 
+
+Diagnostic 7: noImpliedEvalError (11:19 - 11:20)
+Message: Implied eval. Consider passing a function.
+  10 | 
+  11 | global.execScript(``);
+     |                   ~~
+  12 | global['execScript'](``);
+
+Diagnostic 8: noImpliedEvalError (12:22 - 12:23)
+Message: Implied eval. Consider passing a function.
+  11 | global.execScript(``);
+  12 | global['execScript'](``);
+     |                      ~~
+  13 |       
+---
+
+[TestNoImpliedEvalRule/invalid-14 - 1]
+Diagnostic 1: noImpliedEvalError (2:23 - 2:24)
+Message: Implied eval. Consider passing a function.
+   1 | 
+   2 | globalThis.setTimeout(``, 0);
+     |                       ~~
+   3 | globalThis['setTimeout'](``, 0);
+
+Diagnostic 2: noImpliedEvalError (3:26 - 3:27)
+Message: Implied eval. Consider passing a function.
+   2 | globalThis.setTimeout(``, 0);
+   3 | globalThis['setTimeout'](``, 0);
+     |                          ~~
+   4 | 
+
+Diagnostic 3: noImpliedEvalError (5:24 - 5:25)
+Message: Implied eval. Consider passing a function.
+   4 | 
+   5 | globalThis.setInterval(``, 0);
+     |                        ~~
+   6 | globalThis['setInterval'](``, 0);
+
+Diagnostic 4: noImpliedEvalError (6:27 - 6:28)
+Message: Implied eval. Consider passing a function.
+   5 | globalThis.setInterval(``, 0);
+   6 | globalThis['setInterval'](``, 0);
+     |                           ~~
+   7 | 
+
+Diagnostic 5: noImpliedEvalError (8:25 - 8:26)
+Message: Implied eval. Consider passing a function.
+   7 | 
+   8 | globalThis.setImmediate(``);
+     |                         ~~
+   9 | globalThis['setImmediate'](``);
+
+Diagnostic 6: noImpliedEvalError (9:28 - 9:29)
+Message: Implied eval. Consider passing a function.
+   8 | globalThis.setImmediate(``);
+   9 | globalThis['setImmediate'](``);
+     |                            ~~
+  10 | 
+
+Diagnostic 7: noImpliedEvalError (11:23 - 11:24)
+Message: Implied eval. Consider passing a function.
+  10 | 
+  11 | globalThis.execScript(``);
+     |                       ~~
+  12 | globalThis['execScript'](``);
+
+Diagnostic 8: noImpliedEvalError (12:26 - 12:27)
+Message: Implied eval. Consider passing a function.
+  11 | globalThis.execScript(``);
+  12 | globalThis['execScript'](``);
+     |                          ~~
+  13 |       
+---
+
+[TestNoImpliedEvalRule/invalid-15 - 1]
+Diagnostic 1: noImpliedEvalError (5:12 - 5:21)
+Message: Implied eval. Consider passing a function.
+   4 | 
+   5 | setTimeout(foo || bar, 500);
+     |            ~~~~~~~~~~
+   6 |       
+---
+
+[TestNoImpliedEvalRule/invalid-16 - 1]
+Diagnostic 1: noFunctionConstructor (1:12 - 1:21)
+Message: Implied eval. Do not use the Function constructor to create functions.
+   1 | const fn = Function();
+     |            ~~~~~~~~~~
+---
+
+[TestNoImpliedEvalRule/invalid-17 - 1]
+Diagnostic 1: noFunctionConstructor (1:12 - 1:49)
+Message: Implied eval. Do not use the Function constructor to create functions.
+   1 | const fn = new Function('a', 'b', 'return a + b');
+     |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoImpliedEvalRule/invalid-18 - 1]
+Diagnostic 1: noFunctionConstructor (1:12 - 1:28)
+Message: Implied eval. Do not use the Function constructor to create functions.
+   1 | const fn = window.Function();
+     |            ~~~~~~~~~~~~~~~~~
+---
+
+[TestNoImpliedEvalRule/invalid-19 - 1]
+Diagnostic 1: noFunctionConstructor (1:12 - 1:32)
+Message: Implied eval. Do not use the Function constructor to create functions.
+   1 | const fn = new window.Function();
+     |            ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoImpliedEvalRule/invalid-2 - 1]
+Diagnostic 1: noImpliedEvalError (2:12 - 2:30)
+Message: Implied eval. Consider passing a function.
+   1 | 
+   2 | setTimeout(1 + '' + (() => {}), 0);
+     |            ~~~~~~~~~~~~~~~~~~~
+   3 | setInterval(1 + '' + (() => {}), 0);
+
+Diagnostic 2: noImpliedEvalError (3:13 - 3:31)
+Message: Implied eval. Consider passing a function.
+   2 | setTimeout(1 + '' + (() => {}), 0);
+   3 | setInterval(1 + '' + (() => {}), 0);
+     |             ~~~~~~~~~~~~~~~~~~~
+   4 | setImmediate(1 + '' + (() => {}));
+
+Diagnostic 3: noImpliedEvalError (4:14 - 4:32)
+Message: Implied eval. Consider passing a function.
+   3 | setInterval(1 + '' + (() => {}), 0);
+   4 | setImmediate(1 + '' + (() => {}));
+     |              ~~~~~~~~~~~~~~~~~~~
+   5 | execScript(1 + '' + (() => {}));
+
+Diagnostic 4: noImpliedEvalError (5:12 - 5:30)
+Message: Implied eval. Consider passing a function.
+   4 | setImmediate(1 + '' + (() => {}));
+   5 | execScript(1 + '' + (() => {}));
+     |            ~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoImpliedEvalRule/invalid-20 - 1]
+Diagnostic 1: noFunctionConstructor (1:12 - 1:31)
+Message: Implied eval. Do not use the Function constructor to create functions.
+   1 | const fn = window['Function']();
+     |            ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoImpliedEvalRule/invalid-21 - 1]
+Diagnostic 1: noFunctionConstructor (1:12 - 1:35)
+Message: Implied eval. Do not use the Function constructor to create functions.
+   1 | const fn = new window['Function']();
+     |            ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoImpliedEvalRule/invalid-3 - 1]
+Diagnostic 1: noImpliedEvalError (4:12 - 4:14)
+Message: Implied eval. Consider passing a function.
+   3 | 
+   4 | setTimeout(foo, 0);
+     |            ~~~
+   5 | setInterval(foo, 0);
+
+Diagnostic 2: noImpliedEvalError (5:13 - 5:15)
+Message: Implied eval. Consider passing a function.
+   4 | setTimeout(foo, 0);
+   5 | setInterval(foo, 0);
+     |             ~~~
+   6 | setImmediate(foo);
+
+Diagnostic 3: noImpliedEvalError (6:14 - 6:16)
+Message: Implied eval. Consider passing a function.
+   5 | setInterval(foo, 0);
+   6 | setImmediate(foo);
+     |              ~~~
+   7 | execScript(foo);
+
+Diagnostic 4: noImpliedEvalError (7:12 - 7:14)
+Message: Implied eval. Consider passing a function.
+   6 | setImmediate(foo);
+   7 | execScript(foo);
+     |            ~~~
+   8 |       
+---
+
+[TestNoImpliedEvalRule/invalid-4 - 1]
+Diagnostic 1: noImpliedEvalError (6:12 - 6:16)
+Message: Implied eval. Consider passing a function.
+   5 | 
+   6 | setTimeout(foo(), 0);
+     |            ~~~~~
+   7 | setInterval(foo(), 0);
+
+Diagnostic 2: noImpliedEvalError (7:13 - 7:17)
+Message: Implied eval. Consider passing a function.
+   6 | setTimeout(foo(), 0);
+   7 | setInterval(foo(), 0);
+     |             ~~~~~
+   8 | setImmediate(foo());
+
+Diagnostic 3: noImpliedEvalError (8:14 - 8:18)
+Message: Implied eval. Consider passing a function.
+   7 | setInterval(foo(), 0);
+   8 | setImmediate(foo());
+     |              ~~~~~
+   9 | execScript(foo());
+
+Diagnostic 4: noImpliedEvalError (9:12 - 9:16)
+Message: Implied eval. Consider passing a function.
+   8 | setImmediate(foo());
+   9 | execScript(foo());
+     |            ~~~~~
+  10 |       
+---
+
+[TestNoImpliedEvalRule/invalid-5 - 1]
+Diagnostic 1: noImpliedEvalError (6:12 - 6:18)
+Message: Implied eval. Consider passing a function.
+   5 | 
+   6 | setTimeout(foo()(), 0);
+     |            ~~~~~~~
+   7 | setInterval(foo()(), 0);
+
+Diagnostic 2: noImpliedEvalError (7:13 - 7:19)
+Message: Implied eval. Consider passing a function.
+   6 | setTimeout(foo()(), 0);
+   7 | setInterval(foo()(), 0);
+     |             ~~~~~~~
+   8 | setImmediate(foo()());
+
+Diagnostic 3: noImpliedEvalError (8:14 - 8:20)
+Message: Implied eval. Consider passing a function.
+   7 | setInterval(foo()(), 0);
+   8 | setImmediate(foo()());
+     |              ~~~~~~~
+   9 | execScript(foo()());
+
+Diagnostic 4: noImpliedEvalError (9:12 - 9:18)
+Message: Implied eval. Consider passing a function.
+   8 | setImmediate(foo()());
+   9 | execScript(foo()());
+     |            ~~~~~~~
+  10 |       
+---
+
+[TestNoImpliedEvalRule/invalid-6 - 1]
+Diagnostic 1: noImpliedEvalError (4:12 - 4:18)
+Message: Implied eval. Consider passing a function.
+   3 | 
+   4 | setTimeout(fn + '', 0);
+     |            ~~~~~~~
+   5 | setInterval(fn + '', 0);
+
+Diagnostic 2: noImpliedEvalError (5:13 - 5:19)
+Message: Implied eval. Consider passing a function.
+   4 | setTimeout(fn + '', 0);
+   5 | setInterval(fn + '', 0);
+     |             ~~~~~~~
+   6 | setImmediate(fn + '');
+
+Diagnostic 3: noImpliedEvalError (6:14 - 6:20)
+Message: Implied eval. Consider passing a function.
+   5 | setInterval(fn + '', 0);
+   6 | setImmediate(fn + '');
+     |              ~~~~~~~
+   7 | execScript(fn + '');
+
+Diagnostic 4: noImpliedEvalError (7:12 - 7:18)
+Message: Implied eval. Consider passing a function.
+   6 | setImmediate(fn + '');
+   7 | execScript(fn + '');
+     |            ~~~~~~~
+   8 |       
+---
+
+[TestNoImpliedEvalRule/invalid-7 - 1]
+Diagnostic 1: noImpliedEvalError (4:12 - 4:14)
+Message: Implied eval. Consider passing a function.
+   3 | 
+   4 | setTimeout(foo, 0);
+     |            ~~~
+   5 | setInterval(foo, 0);
+
+Diagnostic 2: noImpliedEvalError (5:13 - 5:15)
+Message: Implied eval. Consider passing a function.
+   4 | setTimeout(foo, 0);
+   5 | setInterval(foo, 0);
+     |             ~~~
+   6 | setImmediate(foo);
+
+Diagnostic 3: noImpliedEvalError (6:14 - 6:16)
+Message: Implied eval. Consider passing a function.
+   5 | setInterval(foo, 0);
+   6 | setImmediate(foo);
+     |              ~~~
+   7 | execScript(foo);
+
+Diagnostic 4: noImpliedEvalError (7:12 - 7:14)
+Message: Implied eval. Consider passing a function.
+   6 | setImmediate(foo);
+   7 | execScript(foo);
+     |            ~~~
+   8 |       
+---
+
+[TestNoImpliedEvalRule/invalid-8 - 1]
+Diagnostic 1: noImpliedEvalError (4:12 - 4:14)
+Message: Implied eval. Consider passing a function.
+   3 | 
+   4 | setTimeout(foo, 0);
+     |            ~~~
+   5 | setInterval(foo, 0);
+
+Diagnostic 2: noImpliedEvalError (5:13 - 5:15)
+Message: Implied eval. Consider passing a function.
+   4 | setTimeout(foo, 0);
+   5 | setInterval(foo, 0);
+     |             ~~~
+   6 | setImmediate(foo);
+
+Diagnostic 3: noImpliedEvalError (6:14 - 6:16)
+Message: Implied eval. Consider passing a function.
+   5 | setInterval(foo, 0);
+   6 | setImmediate(foo);
+     |              ~~~
+   7 | execScript(foo);
+
+Diagnostic 4: noImpliedEvalError (7:12 - 7:14)
+Message: Implied eval. Consider passing a function.
+   6 | setImmediate(foo);
+   7 | execScript(foo);
+     |            ~~~
+   8 |       
+---
+
+[TestNoImpliedEvalRule/invalid-9 - 1]
+Diagnostic 1: noImpliedEvalError (4:12 - 4:21)
+Message: Implied eval. Consider passing a function.
+   3 | 
+   4 | setTimeout(foo as any, 0);
+     |            ~~~~~~~~~~
+   5 | setInterval(foo as any, 0);
+
+Diagnostic 2: noImpliedEvalError (5:13 - 5:22)
+Message: Implied eval. Consider passing a function.
+   4 | setTimeout(foo as any, 0);
+   5 | setInterval(foo as any, 0);
+     |             ~~~~~~~~~~
+   6 | setImmediate(foo as any);
+
+Diagnostic 3: noImpliedEvalError (6:14 - 6:23)
+Message: Implied eval. Consider passing a function.
+   5 | setInterval(foo as any, 0);
+   6 | setImmediate(foo as any);
+     |              ~~~~~~~~~~
+   7 | execScript(foo as any);
+
+Diagnostic 4: noImpliedEvalError (7:12 - 7:21)
+Message: Implied eval. Consider passing a function.
+   6 | setImmediate(foo as any);
+   7 | execScript(foo as any);
+     |            ~~~~~~~~~~
+   8 |       
+---
