@@ -349,6 +349,15 @@ Message: Expected an error object to be thrown.
    4 | });
 ---
 
+[TestOnlyThrowErrorRule/invalid-47 - 1]
+Diagnostic 1: object (3:7 - 3:19)
+Message: Expected an error object to be thrown.
+   2 | import { createError } from 'errors-like';
+   3 | throw createError();
+     |       ~~~~~~~~~~~~~
+   4 |       
+---
+
 [TestOnlyThrowErrorRule/invalid-5 - 1]
 Diagnostic 1: object (1:7 - 1:10)
 Message: Expected an error object to be thrown.
