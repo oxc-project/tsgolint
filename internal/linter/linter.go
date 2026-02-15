@@ -108,7 +108,15 @@ func RunLinter(
 			}
 			log.Printf("Program source files (%d): %s", len(programFiles), strings.Join(programFiles, ", "))
 
-			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
+			for _, f := range unmatchedFiles {
+				onInternalDiagnostic(diagnostic.Internal{
+					Id:          "circular-project-references",
+					Description: fmt.Sprintf("File was not found in program '%s'. This is likely caused by circular project references, which are not supported by TypeScript (TS6202).", configFileName),
+					FilePath:    &f,
+				})
+			}
+			idx++
+			continue
 		}
 
 		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)

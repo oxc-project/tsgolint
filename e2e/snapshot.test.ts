@@ -148,6 +148,12 @@ function parseHeadlessOutput(data: Buffer): Diagnostic[] {
         if (filePath.includes('fixtures/')) {
           diagnostic.file_path = 'fixtures/' + filePath.split('fixtures/').pop();
         }
+        if (diagnostic.message?.description && diagnostic.message.description.includes('fixtures/')) {
+          diagnostic.message.description = diagnostic.message.description.replace(
+            /\/[^\s']*fixtures\//g,
+            'fixtures/',
+          );
+        }
         diagnostics.push(diagnostic);
       } catch {
         continue;

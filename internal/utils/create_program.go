@@ -74,10 +74,9 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	}
 
 	opts := compiler.ProgramOptions{
-		Config:                      configParseResult,
-		SingleThreaded:              core.TSTrue,
-		Host:                        host,
-		UseSourceOfProjectReference: true,
+		Config:         configParseResult,
+		SingleThreaded: core.TSTrue,
+		Host:           host,
 		// TODO: custom checker pool
 		// CreateCheckerPool: func(p *compiler.Program) compiler.CheckerPool {},
 	}
