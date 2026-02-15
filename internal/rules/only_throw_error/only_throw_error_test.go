@@ -195,9 +195,55 @@ Promise.reject('foo').catch(e => {
         import { createError } from 'errors';
         throw createError();
       `,
-			// TODO(port): type_matches_specifier doesn't support this yet
-			Skip:    true,
 			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "errors"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Files: map[string]string{
+				"node_modules/errors/package.json": `{
+          "name": "errors",
+          "version": "1.0.0",
+          "types": "index.d.ts"
+        }`,
+				"node_modules/errors/index.d.ts": `
+          export interface ErrorLike extends Error {}
+          export function createError(): ErrorLike;
+        `,
+			},
+		},
+		{
+			Code: `
+        import type { ErrorLike } from '@apollo/client/core/types';
+
+        declare const error: ErrorLike;
+        throw error;
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "@apollo/client"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Files: map[string]string{
+				"node_modules/@apollo/client/package.json": `{
+          "name": "@apollo/client",
+          "version": "1.0.0",
+          "types": "core/types.d.ts"
+        }`,
+				"node_modules/@apollo/client/core/types.d.ts": `
+          export interface ErrorLike extends Error {}
+        `,
+			},
+		},
+		{
+			Code: `
+        import { createError } from 'errors-like';
+        throw createError();
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "errors-like"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Files: map[string]string{
+				"node_modules/@types/errors-like/package.json": `{
+          "name": "@types/errors-like",
+          "version": "1.0.0",
+          "types": "index.d.ts"
+        }`,
+				"node_modules/@types/errors-like/index.d.ts": `
+          export interface ErrorLike extends Error {}
+          export function createError(): ErrorLike;
+        `,
+			},
 		},
 		{
 			Code: `
@@ -724,6 +770,31 @@ Promise.reject('foo').then(e => {
 });
       `,
 			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allowRethrowing": true, "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "object",
+				},
+			},
+		},
+		{
+			Code: `
+import { createError } from 'errors-like';
+throw createError();
+      `,
+			Options: rule_tester.OptionsFromJSON[OnlyThrowErrorOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "errors"}], "allowThrowingAny": false, "allowThrowingUnknown": false}`),
+			Files: map[string]string{
+				"node_modules/errors-like/package.json": `{
+  "name": "errors-like",
+  "version": "1.0.0",
+  "types": "index.d.ts"
+}`,
+				"node_modules/errors-like/index.d.ts": `
+export interface ErrorLike {
+  message: string;
+}
+export function createError(): ErrorLike;
+`,
+			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "object",

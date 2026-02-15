@@ -224,33 +224,133 @@ func typeDeclaredInDeclareModule(
 	})
 }
 
+func getSourceFilePackageName(
+	program *compiler.Program,
+	sourceFile *ast.SourceFile,
+) (string, bool) {
+	if program == nil || sourceFile == nil {
+		return "", false
+	}
+	return findSourceFilePackageName(program, sourceFile)
+}
+
+func findSourceFilePackageName(
+	program *compiler.Program,
+	sourceFile *ast.SourceFile,
+) (string, bool) {
+	fileName := tspath.NormalizeSlashes(sourceFile.FileName())
+	if !containsNodeModulesSegment(fileName) {
+		return "", false
+	}
+
+	if name, ok := findPackageNameFromNearestPackageJSON(program, fileName); ok {
+		return name, true
+	}
+
+	return findPackageNameFromNodeModulesPath(fileName)
+}
+
+func findPackageNameFromNearestPackageJSON(
+	program *compiler.Program,
+	fileName string,
+) (string, bool) {
+	fs := program.Host().FS()
+	currentDir := tspath.GetDirectoryPath(fileName)
+	for currentDir != "" && containsNodeModulesSegment(currentDir) {
+		packageJSONPath := tspath.CombinePaths(currentDir, "package.json")
+		if contents, ok := fs.ReadFile(packageJSONPath); ok {
+			var packageJSON struct {
+				Name string `json:"name"`
+			}
+			if err := json.Unmarshal([]byte(contents), &packageJSON); err == nil && packageJSON.Name != "" {
+				return packageJSON.Name, true
+			}
+		}
+
+		parentDir := tspath.GetDirectoryPath(currentDir)
+		if parentDir == currentDir {
+			break
+		}
+		currentDir = parentDir
+	}
+
+	return "", false
+}
+
+func findPackageNameFromNodeModulesPath(fileName string) (string, bool) {
+	segments := strings.Split(tspath.NormalizeSlashes(fileName), "/")
+	for i := len(segments) - 1; i >= 0; i-- {
+		if segments[i] != "node_modules" {
+			continue
+		}
+
+		next := i + 1
+		if next >= len(segments) {
+			continue
+		}
+
+		name := segments[next]
+		if name == "" || name == "." || name == ".." {
+			continue
+		}
+
+		if strings.HasPrefix(name, "@") {
+			if next+1 < len(segments) && segments[next+1] != "" {
+				return name + "/" + segments[next+1], true
+			}
+			continue
+		}
+
+		return name, true
+	}
+
+	return "", false
+}
+
+func containsNodeModulesSegment(path string) bool {
+	normalized := "/" + tspath.NormalizeSlashes(path) + "/"
+	return strings.Contains(normalized, "/node_modules/")
+}
+
 func typeDeclaredInDeclarationFile(
 	packageName string,
 	declarationFiles []*ast.SourceFile,
 	program *compiler.Program,
 ) bool {
-	// typesPackageName := ""
-	//  // Handle scoped packages: if the name starts with @, remove it and replace / with __
-	// slashIndex := strings.Index(packageName, "/")
-	// if packageName[0] == '@' && slashIndex >= 0 {
-	// 	typesPackageName = packageName[1:slashIndex] + "__" + packageName[slashIndex+1:]
-	// }
+	if packageName == "" {
+		return false
+	}
 
-	// TODO(port): there is no sourceFileToPackageName anymore
-	// it looks like there is no other way to know sourceFile2PackageName,
-	// other than set package name for ast.SourceFile in resolver
+	typesPackageName := getTypesPackageName(packageName)
+	return Some(declarationFiles, func(declaration *ast.SourceFile) bool {
+		if declaration == nil {
+			return false
+		}
 
-	return false
+		packageIdName, ok := getSourceFilePackageName(program, declaration)
+		if !ok || packageIdName == "" {
+			return false
+		}
 
-	// const matcher = new RegExp(`${packageName}|${typesPackageName}`);
-	// return declarationFiles.some(declaration => {
-	//   const packageIdName = program.sourceFileToPackageName.get(declaration.path);
-	//   return (
-	//     packageIdName != null &&
-	//     matcher.test(packageIdName) &&
-	//     program.isSourceFileFromExternalLibrary(declaration)
-	//   );
-	// });
+		return (packageIdName == packageName ||
+			packageIdName == typesPackageName ||
+			packageIdName == "@types/"+packageName ||
+			packageIdName == "@types/"+typesPackageName) &&
+			program.IsSourceFileFromExternalLibrary(declaration)
+	})
+}
+
+func getTypesPackageName(packageName string) string {
+	if packageName == "" || packageName[0] != '@' {
+		return packageName
+	}
+
+	slashIndex := strings.Index(packageName, "/")
+	if slashIndex <= 1 || slashIndex+1 >= len(packageName) {
+		return packageName
+	}
+
+	return packageName[1:slashIndex] + "__" + packageName[slashIndex+1:]
 }
 
 func typeDeclaredInPackageDeclarationFile(
