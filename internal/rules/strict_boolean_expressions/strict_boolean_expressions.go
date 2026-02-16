@@ -105,8 +105,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 		opts := utils.UnmarshalOptions[StrictBooleanExpressionsOptions](options, "strict-boolean-expressions")
 
 		compilerOptions := ctx.Program.Options()
-		if !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing &&
-			!utils.IsStrictCompilerOptionEnabled(compilerOptions, compilerOptions.StrictNullChecks) {
+		if !utils.IsStrictCompilerOptionEnabled(compilerOptions, compilerOptions.StrictNullChecks) {
 			ctx.ReportRange(
 				core.NewTextRange(0, 0),
 				buildNoStrictNullCheckMessage(),

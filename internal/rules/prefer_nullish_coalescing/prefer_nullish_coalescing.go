@@ -326,7 +326,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 		compilerOptions := ctx.Program.Options()
 		isStrictNullChecks := utils.IsStrictCompilerOptionEnabled(compilerOptions, compilerOptions.StrictNullChecks)
 
-		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 

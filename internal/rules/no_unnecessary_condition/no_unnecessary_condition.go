@@ -243,7 +243,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
@@ -556,20 +556,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 					}
-				}
-			}
-
-			// Without strict null checks, null/undefined are valid values for all types
-			// This means we can't reliably check conditions because:
-			// - `string | null` becomes just `string` (null is already a valid string value)
-			// - Objects can be null even if not explicitly typed as nullable
-			// Skip checking in this case unless the user explicitly allows it
-			// When AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing is true,
-			// skip checking Object types in non-strict mode as they might be nullable
-			if !isStrictNullChecks && opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
-				flags := checker.Type_flags(nodeType)
-				if flags&(checker.TypeFlagsObject|checker.TypeFlagsNonPrimitive) != 0 {
-					return
 				}
 			}
 

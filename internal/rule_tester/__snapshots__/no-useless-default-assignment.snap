@@ -117,50 +117,45 @@ Message: Default value is useless because it is undefined. Optional parameters a
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-17 - 1]
-Diagnostic 1: uselessDefaultAssignment (2:30 - 2:31)
-Message: Default value is useless because the property has type `string` (not nullish). This default assignment will never be used.
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
    1 | 
-   2 |         function Bar({ foo = '' }: { foo: string }) {
-     |                              ~~
-   3 |           return foo;
-  Label: Default value (2:30 - 2:31)
+   2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
+     |                     ~~~~~
+   3 |       
+  Label: Default value (2:21 - 2:25)
    1 | 
-   2 |         function Bar({ foo = '' }: { foo: string }) {
-     |                              ^^ Default value
-   3 |           return foo;
-  Label: property type `string` is not nullish (2:24 - 2:26)
-   1 | 
-   2 |         function Bar({ foo = '' }: { foo: string }) {
-     |                        ^^^ property type `string` is not nullish
-   3 |           return foo;
+   2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
+     |                     ^^^^^ Default value
+   3 |       
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-18 - 1]
 Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
 Message: Default value is useless because the property is not nullish. This default assignment will never be used.
    1 | 
-   2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
+   2 |         const { a = 'baz' } =
      |                     ~~~~~
-   3 |       
+   3 |           Math.random() < 0.5
   Label: Default value (2:21 - 2:25)
    1 | 
-   2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
+   2 |         const { a = 'baz' } =
      |                     ^^^^^ Default value
-   3 |       
+   3 |           Math.random() < 0.5
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-19 - 1]
 Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
 Message: Default value is useless because the property is not nullish. This default assignment will never be used.
    1 | 
-   2 |         const { a = 'baz' } =
+   2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
      |                     ~~~~~
-   3 |           Math.random() < 0.5
+   3 |       
   Label: Default value (2:21 - 2:25)
    1 | 
-   2 |         const { a = 'baz' } =
+   2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
      |                     ^^^^^ Default value
-   3 |           Math.random() < 0.5
+   3 |       
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-2 - 1]
@@ -186,27 +181,27 @@ Message: Default value is useless because the property has type `"value"` (not n
 Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
 Message: Default value is useless because the property is not nullish. This default assignment will never be used.
    1 | 
-   2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
+   2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
      |                     ~~~~~
    3 |       
   Label: Default value (2:21 - 2:25)
    1 | 
-   2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
+   2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
      |                     ^^^^^ Default value
    3 |       
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-21 - 1]
-Diagnostic 1: uselessDefaultAssignment (2:21 - 2:25)
+Diagnostic 1: uselessDefaultAssignment (2:21 - 2:23)
 Message: Default value is useless because the property is not nullish. This default assignment will never be used.
    1 | 
-   2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
-     |                     ~~~~~
+   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
+     |                     ~~~
    3 |       
-  Label: Default value (2:21 - 2:25)
+  Label: Default value (2:21 - 2:23)
    1 | 
-   2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
-     |                     ^^^^^ Default value
+   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
+     |                     ^^^ Default value
    3 |       
 ---
 

@@ -27,10 +27,6 @@ type StrictBooleanExpressionsOptions struct {
 	// AllowNumber corresponds to the JSON schema field "allowNumber".
 	AllowNumber bool `json:"allowNumber,omitempty"`
 
-	// AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing corresponds to the JSON
-	// schema field "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing".
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing bool `json:"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing,omitempty"`
-
 	// AllowString corresponds to the JSON schema field "allowString".
 	AllowString bool `json:"allowString,omitempty"`
 }
@@ -66,9 +62,6 @@ func (j *StrictBooleanExpressionsOptions) UnmarshalJSON(value []byte) error {
 	}
 	if v, ok := raw["allowNumber"]; !ok || v == nil {
 		plain.AllowNumber = true
-	}
-	if v, ok := raw["allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing"]; !ok || v == nil {
-		plain.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = false
 	}
 	if v, ok := raw["allowString"]; !ok || v == nil {
 		plain.AllowString = true

@@ -118,15 +118,6 @@ const extendsUnknown: <T extends unknown>(
   }
 };
     `},
-		{
-			Code: `
-function test(a?: boolean): boolean {
-  // eslint-disable-next-line
-  return a !== false;
-}
-      `,
-			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true}`),
-		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "true === true;",
@@ -617,7 +608,6 @@ function test(a?: boolean): boolean {
 			Code: `
 function foo(): boolean {}
       `,
-			Options:  rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": false}`),
 			TSConfig: "tsconfig.unstrict.json",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{

@@ -35,10 +35,6 @@
         "allowNumber": {
           "type": "boolean",
           "default": true
-        },
-        "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
-          "type": "boolean",
-          "default": false
         }
       }
     }

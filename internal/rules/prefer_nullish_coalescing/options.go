@@ -47,11 +47,6 @@ func (j *IgnorePrimitivesOptions) UnmarshalJSON(value []byte) error {
 }
 
 type PreferNullishCoalescingOptions struct {
-	// Unless this is set to `true`, the rule will error on every file whose
-	// `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or
-	// `strict`) set to `true`.
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing bool `json:"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing,omitempty"`
-
 	// Whether to ignore arguments to the `Boolean` constructor
 	IgnoreBooleanCoercion bool `json:"ignoreBooleanCoercion,omitempty"`
 
@@ -85,9 +80,6 @@ func (j *PreferNullishCoalescingOptions) UnmarshalJSON(value []byte) error {
 	var plain Plain
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
-	}
-	if v, ok := raw["allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing"]; !ok || v == nil {
-		plain.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = false
 	}
 	if v, ok := raw["ignoreBooleanCoercion"]; !ok || v == nil {
 		plain.IgnoreBooleanCoercion = false

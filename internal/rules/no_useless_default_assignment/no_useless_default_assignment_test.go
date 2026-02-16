@@ -437,22 +437,6 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 			},
 		},
 		{
-			Code:     "\n        function Bar({ foo = '' }: { foo: string }) {\n          return foo;\n        }\n      ",
-			TSConfig: "tsconfig.unstrict.json",
-			Options:  rule_tester.OptionsFromJSON[NoUselessDefaultAssignmentOptions]("{\"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing\":true}"),
-			Output: []string{
-				"\n        function Bar({ foo }: { foo: string }) {\n          return foo;\n        }\n      ",
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "uselessDefaultAssignment",
-					Line:      2,
-					Column:    30,
-					EndColumn: 32,
-				},
-			},
-		},
-		{
 			Code: "\n        const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };\n      ",
 			Output: []string{
 				"\n        const { a } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };\n      ",

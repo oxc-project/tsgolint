@@ -214,15 +214,13 @@ func hasPropertyInAllBranches(expression *ast.Node, propertyName string) bool {
 var NoUselessDefaultAssignmentRule = rule.Rule{
 	Name: noUselessDefaultAssignmentRuleName,
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts := utils.UnmarshalOptions[NoUselessDefaultAssignmentOptions](options, "no-useless-default-assignment")
-
 		compilerOptions := ctx.Program.Options()
 		isStrictNullChecks := utils.IsStrictCompilerOptionEnabled(
 			compilerOptions,
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 

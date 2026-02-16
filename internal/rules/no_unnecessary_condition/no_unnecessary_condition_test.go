@@ -913,18 +913,6 @@ if (!(booleanTyped || unknownTyped)) {
 }
     `},
 
-		// Unstrict mode with option
-		{
-			Code: `
-declare const x: string[] | null;
-// eslint-disable-next-line
-if (x) {
-}
-      `,
-			Options:  NoUnnecessaryConditionOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: true},
-			TSConfig: "tsconfig.unstrict.json",
-		},
-
 		// Index signatures with tuple types
 		{Code: `
 interface Foo {

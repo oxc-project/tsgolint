@@ -25,11 +25,6 @@
           "type": "boolean",
           "description": "Whether to check type predicate functions.",
           "default": false
-        },
-        "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
-          "type": "boolean",
-          "description": "DEPRECATED: Allow this rule to run without strictNullChecks enabled.",
-          "default": false
         }
       }
     }
