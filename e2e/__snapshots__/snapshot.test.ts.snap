@@ -1616,6 +1616,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This is the only usage of type parameter T in the signature.",
+        "range": {
+          "end": 110,
+          "pos": 109,
+        },
+      },
+    ],
     "message": {
       "description": "Type parameter T is used only once in the function signature.",
       "id": "sole",

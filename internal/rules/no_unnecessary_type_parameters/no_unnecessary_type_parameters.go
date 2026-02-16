@@ -13,10 +13,20 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildSoleMessage(name string, uses string, descriptor string) rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "sole",
-		Description: fmt.Sprintf("Type parameter %s is %s in the %s signature.", name, uses, descriptor),
+func buildSoleMessage(typeParameterRange core.TextRange, typeParameterReference core.TextRange, name string, uses string, descriptor string) rule.RuleDiagnostic {
+
+	return rule.RuleDiagnostic{
+		Message: rule.RuleMessage{
+			Id:          "sole",
+			Description: fmt.Sprintf("Type parameter %s is %s in the %s signature.", name, uses, descriptor),
+		},
+		Range: typeParameterRange,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("This is the only usage of type parameter %s in the signature.", name),
+				Range: typeParameterReference,
+			},
+		},
 	}
 }
 
@@ -535,30 +545,42 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 
 		typeParameterName := typeParameterNameNode.Text()
 		constraintText, constraintNode := getTypeParameterConstraintText(ctx, typeParameter)
+		typeParameterReferenceRange := utils.TrimNodeTextRange(ctx.SourceFile, typeParameterNameNode)
+		if len(references) > 0 {
+			typeParameterReferenceRange = utils.TrimNodeTextRange(ctx.SourceFile, references[0])
+		}
 
-		ctx.ReportNodeWithSuggestions(typeParameter, buildSoleMessage(typeParameterName, uses, descriptor), func() []rule.RuleSuggestion {
-			removalRange := getTypeParameterListRemovalRange(ctx, typeParameters, typeParameter)
-			fixes := make([]rule.RuleFix, 0, len(references)+1)
+		ctx.ReportDiagnosticWithSuggestions(
+			buildSoleMessage(
+				utils.TrimNodeTextRange(ctx.SourceFile, typeParameter),
+				typeParameterReferenceRange,
+				typeParameterName,
+				uses,
+				descriptor,
+			),
+			func() []rule.RuleSuggestion {
+				removalRange := getTypeParameterListRemovalRange(ctx, typeParameters, typeParameter)
+				fixes := make([]rule.RuleFix, 0, len(references)+1)
 
-			for _, reference := range references {
-				referenceRange := utils.TrimNodeTextRange(ctx.SourceFile, reference)
-				if referenceRange.Pos() < removalRange.End() && referenceRange.End() > removalRange.Pos() {
-					continue
+				for _, reference := range references {
+					referenceRange := utils.TrimNodeTextRange(ctx.SourceFile, reference)
+					if referenceRange.Pos() < removalRange.End() && referenceRange.End() > removalRange.Pos() {
+						continue
+					}
+					replacement := constraintText
+					if isComplexConstraint(constraintNode) && hasMatchingAncestorType(reference) {
+						replacement = "(" + replacement + ")"
+					}
+					fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, reference, replacement))
 				}
-				replacement := constraintText
-				if isComplexConstraint(constraintNode) && hasMatchingAncestorType(reference) {
-					replacement = "(" + replacement + ")"
-				}
-				fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, reference, replacement))
-			}
 
-			fixes = append(fixes, rule.RuleFixRemoveRange(removalRange))
+				fixes = append(fixes, rule.RuleFixRemoveRange(removalRange))
 
-			return []rule.RuleSuggestion{{
-				Message:  buildReplaceUsagesWithConstraintMessage(),
-				FixesArr: fixes,
-			}}
-		})
+				return []rule.RuleSuggestion{{
+					Message:  buildReplaceUsagesWithConstraintMessage(),
+					FixesArr: fixes,
+				}}
+			})
 	}
 }
 
