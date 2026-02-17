@@ -115,7 +115,8 @@ for (const schemaDir of schemaDirs) {
   console.log(`Generating Go struct for schema: ${schemaPath} and outputting to: ${outputPath}`);
   try {
     execSync(
-      `go-jsonschema  "${schemaPath}" -o "${outputPath}" -p ${path.basename(schemaDir)
+      `go-jsonschema  "${schemaPath}" -o "${outputPath}" -p ${
+        path.basename(schemaDir)
       } --tags json --resolve-extension json`,
       {
         stdio: 'inherit',
