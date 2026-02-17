@@ -3,9 +3,64 @@ package prefer_destructuring
 import (
 	"testing"
 
+	"github.com/go-json-experiment/json"
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
+
+type testLegacyPreferDestructuringOptions struct {
+	AssignmentExpression                    *DestructuringTypeConfig `json:"AssignmentExpression,omitempty"`
+	VariableDeclarator                      *DestructuringTypeConfig `json:"VariableDeclarator,omitempty"`
+	Array                                   *bool                    `json:"array,omitempty"`
+	Object                                  *bool                    `json:"object,omitempty"`
+	EnforceForDeclarationWithTypeAnnotation *bool                    `json:"enforceForDeclarationWithTypeAnnotation,omitempty"`
+	EnforceForRenamedProperties             *bool                    `json:"enforceForRenamedProperties,omitempty"`
+}
+
+func preferDestructuringTupleOptionsFromJSON(jsonStr string) any {
+	opts := rule_tester.OptionsFromJSON[testLegacyPreferDestructuringOptions](jsonStr)
+
+	var tuple []any
+
+	enabledTypes := map[string]any{}
+	if opts.AssignmentExpression != nil {
+		enabledTypes["AssignmentExpression"] = opts.AssignmentExpression
+	}
+	if opts.VariableDeclarator != nil {
+		enabledTypes["VariableDeclarator"] = opts.VariableDeclarator
+	}
+	if opts.Array != nil {
+		enabledTypes["array"] = *opts.Array
+	}
+	if opts.Object != nil {
+		enabledTypes["object"] = *opts.Object
+	}
+	if len(enabledTypes) > 0 {
+		tuple = append(tuple, enabledTypes)
+	}
+
+	additionalOptions := map[string]any{}
+	if opts.EnforceForDeclarationWithTypeAnnotation != nil {
+		additionalOptions["enforceForDeclarationWithTypeAnnotation"] = *opts.EnforceForDeclarationWithTypeAnnotation
+	}
+	if opts.EnforceForRenamedProperties != nil {
+		additionalOptions["enforceForRenamedProperties"] = *opts.EnforceForRenamedProperties
+	}
+	if len(additionalOptions) > 0 {
+		if len(tuple) == 0 {
+			tuple = append(tuple, map[string]any{})
+		}
+		tuple = append(tuple, additionalOptions)
+	}
+
+	// Roundtrip to plain any to mirror runtime option payload shape.
+	tupleBytes, err := json.Marshal(tuple)
+	if err != nil {
+		panic("preferDestructuringTupleOptionsFromJSON: failed to marshal tuple options: " + err.Error())
+	}
+
+	return rule_tester.OptionsFromJSON[any](string(tupleBytes))
+}
 
 func TestPreferDestructuringRule(t *testing.T) {
 	t.Parallel()
@@ -23,31 +78,31 @@ func TestPreferDestructuringRule(t *testing.T) {
 		{Code: `
         declare const object: { foo: string };
         var { foo } = object;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare const object: { foo: string };
         var { foo }: { foo: number } = object;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare const array: number[];
         var [foo] = array;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare const array: number[];
         var [foo]: [foo: number] = array;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare const object: { bar: string };
         var foo: unknown = object.bar;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare const object: { foo: string };
         var { foo: bar } = object;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare const object: { foo: boolean };
         var { foo: bar }: { foo: boolean } = object;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         declare class Foo {
           foo: string;
@@ -58,7 +113,7 @@ func TestPreferDestructuringRule(t *testing.T) {
             var foo: any = super.foo;
           }
         }
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 
 		// numeric property for iterable / non-iterable
 		{Code: `
@@ -104,66 +159,66 @@ func TestPreferDestructuringRule(t *testing.T) {
 		{Code: `
         let x: { 0: unknown };
         let { 0: y } = x;
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: { 0: unknown };
         ({ 0: y } = x);
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: { 0: unknown };
         let y = x[0];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: { 0: unknown };
         y = x[0];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: { 0: unknown };
         let y = x[0];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"AssignmentExpression":{"array":true,"object":true},"VariableDeclarator":{"array":true,"object":false},"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"AssignmentExpression":{"array":true,"object":true},"VariableDeclarator":{"array":true,"object":false},"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: { 0: unknown };
         y = x[0];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"AssignmentExpression":{"array":true,"object":false},"VariableDeclarator":{"array":true,"object":true},"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"AssignmentExpression":{"array":true,"object":false},"VariableDeclarator":{"array":true,"object":true},"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: Record<number, unknown>;
         let i: number = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: Record<number, unknown>;
         let i: 0 = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: Record<number, unknown>;
         let i: 0 | 1 | 2 = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: unknown[];
         let i: number = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: unknown[];
         let i: 0 = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: unknown[];
         let i: 0 | 1 | 2 = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":false,"enforceForRenamedProperties":true}`)},
 		{Code: `
         let x: unknown[];
         let i: number = 0;
         y = x[i];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":false}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":false}`)},
 		{Code: `
         let x: { 0: unknown };
         y += x[0];
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
 		{Code: `
         class Bar {
           public [0]: unknown;
@@ -173,7 +228,7 @@ func TestPreferDestructuringRule(t *testing.T) {
             let y = super[0];
           }
         }
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
 		{Code: `
         class Bar {
           public [0]: unknown;
@@ -183,7 +238,7 @@ func TestPreferDestructuringRule(t *testing.T) {
             y = super[0];
           }
         }
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`)},
 
 		// already destructured
 		{Code: `
@@ -284,7 +339,7 @@ func TestPreferDestructuringRule(t *testing.T) {
             const bar: unknown = this.#foo;
           }
         }
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         class C {
           #foo: string;
@@ -294,7 +349,7 @@ func TestPreferDestructuringRule(t *testing.T) {
             bar: unknown = another.#foo;
           }
         }
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 		{Code: `
         class C {
           #foo: string;
@@ -303,22 +358,22 @@ func TestPreferDestructuringRule(t *testing.T) {
             const foo: unknown = this.#foo;
           }
         }
-      `, Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+      `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
 	}, []rule_tester.InvalidTestCase{
 		// enforceForDeclarationWithTypeAnnotation: true
 		{
 			Code:    `var foo: string = object.foo;`,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
 			Code:    `var foo: string = array[0];`,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"enforceForDeclarationWithTypeAnnotation":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"enforceForDeclarationWithTypeAnnotation":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
 			Code:    `var foo: unknown = object.bar;`,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForDeclarationWithTypeAnnotation":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForDeclarationWithTypeAnnotation":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 
@@ -416,7 +471,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: { 0: string };
         let y = x[0];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -424,7 +479,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: { 0: string };
         y = x[0];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -432,7 +487,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: { 0: string };
         let y = x[0];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"AssignmentExpression":{"array":false,"object":false},"VariableDeclarator":{"array":false,"object":true},"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"AssignmentExpression":{"array":false,"object":false},"VariableDeclarator":{"array":false,"object":true},"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -440,7 +495,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: { 0: string };
         y = x[0];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"AssignmentExpression":{"array":false,"object":true},"VariableDeclarator":{"array":false,"object":false},"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"AssignmentExpression":{"array":false,"object":true},"VariableDeclarator":{"array":false,"object":false},"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -449,7 +504,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let i: number = 0;
         y = x[i];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -458,7 +513,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let i: 0 = 0;
         y = x[i];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -467,7 +522,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let i: 0 | 1 | 2 = 0;
         y = x[i];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -476,7 +531,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let i: number = 0;
         y = x[i];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -485,7 +540,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let i: 0 = 0;
         y = x[i];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -494,7 +549,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let i: 0 | 1 | 2 = 0;
         y = x[i];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -502,7 +557,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: { 0: unknown } | unknown[];
         let y = x[0];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -510,7 +565,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: { 0: unknown } | unknown[];
         y = x[0];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 
@@ -586,7 +641,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let obj = { foo: 'bar' };
         const x = obj.foo;
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -595,7 +650,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: unknown;
         x = obj.foo;
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -604,7 +659,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let key = 'abc';
         const x = obj[key];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 		{
@@ -614,7 +669,7 @@ func TestPreferDestructuringRule(t *testing.T) {
         let x: unknown;
         x = obj[key];
       `,
-			Options: rule_tester.OptionsFromJSON[PreferDestructuringOptions](`{"object":true,"enforceForRenamedProperties":true}`),
+			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 	})
