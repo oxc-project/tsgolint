@@ -14,30 +14,43 @@
       "additionalProperties": false
     },
     "prefer_destructuring_options": {
-      "type": "object",
-      "properties": {
-        "array": {
-          "type": "boolean"
+      "type": "array",
+      "maxItems": 2,
+      "items": [
+        {
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "AssignmentExpression": {
+                  "$ref": "#/definitions/destructuring_type_config"
+                },
+                "VariableDeclarator": {
+                  "$ref": "#/definitions/destructuring_type_config"
+                }
+              },
+              "additionalProperties": false
+            },
+            {
+              "$ref": "#/definitions/destructuring_type_config"
+            }
+          ]
         },
-        "object": {
-          "type": "boolean"
-        },
-        "AssignmentExpression": {
-          "$ref": "#/definitions/destructuring_type_config"
-        },
-        "VariableDeclarator": {
-          "$ref": "#/definitions/destructuring_type_config"
-        },
-        "enforceForDeclarationWithTypeAnnotation": {
-          "type": "boolean",
-          "default": false
-        },
-        "enforceForRenamedProperties": {
-          "type": "boolean",
-          "default": false
+        {
+          "type": "object",
+          "properties": {
+            "enforceForDeclarationWithTypeAnnotation": {
+              "type": "boolean",
+              "default": false
+            },
+            "enforceForRenamedProperties": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "additionalProperties": false
         }
-      },
-      "additionalProperties": false
+      ]
     }
   }
 }
