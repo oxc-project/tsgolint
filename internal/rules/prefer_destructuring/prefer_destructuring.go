@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -24,6 +25,18 @@ type normalizedOptions struct {
 	enforceForRenamedProperties             bool
 }
 
+type tupleEnabledTypes struct {
+	AssignmentExpression *DestructuringTypeConfig `json:"AssignmentExpression,omitempty"`
+	VariableDeclarator   *DestructuringTypeConfig `json:"VariableDeclarator,omitempty"`
+	Array                *bool                    `json:"array,omitempty"`
+	Object               *bool                    `json:"object,omitempty"`
+}
+
+type tupleAdditionalOptions struct {
+	EnforceForDeclarationWithTypeAnnotation *bool `json:"enforceForDeclarationWithTypeAnnotation,omitempty"`
+	EnforceForRenamedProperties             *bool `json:"enforceForRenamedProperties,omitempty"`
+}
+
 func buildPreferDestructuringMessage(kind string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "preferDestructuring",
@@ -35,7 +48,31 @@ func boolPtrValue(value *bool) bool {
 	return value != nil && *value
 }
 
-func normalizeOptions(opts PreferDestructuringOptions) normalizedOptions {
+func normalizeTupleEnabledTypes(result *normalizedOptions, enabledTypes tupleEnabledTypes) {
+	if enabledTypes.Array != nil || enabledTypes.Object != nil {
+		normalized := destructuringEnabled{
+			array:  boolPtrValue(enabledTypes.Array),
+			object: boolPtrValue(enabledTypes.Object),
+		}
+		result.assignment = normalized
+		result.variable = normalized
+	}
+
+	if enabledTypes.AssignmentExpression != nil {
+		result.assignment = destructuringEnabled{
+			array:  boolPtrValue(enabledTypes.AssignmentExpression.Array),
+			object: boolPtrValue(enabledTypes.AssignmentExpression.Object),
+		}
+	}
+	if enabledTypes.VariableDeclarator != nil {
+		result.variable = destructuringEnabled{
+			array:  boolPtrValue(enabledTypes.VariableDeclarator.Array),
+			object: boolPtrValue(enabledTypes.VariableDeclarator.Object),
+		}
+	}
+}
+
+func parseOptions(options any) normalizedOptions {
 	result := normalizedOptions{
 		assignment: destructuringEnabled{
 			array:  true,
@@ -45,30 +82,44 @@ func normalizeOptions(opts PreferDestructuringOptions) normalizedOptions {
 			array:  true,
 			object: true,
 		},
-		enforceForDeclarationWithTypeAnnotation: opts.EnforceForDeclarationWithTypeAnnotation,
-		enforceForRenamedProperties:             opts.EnforceForRenamedProperties,
 	}
 
-	if opts.Array != nil || opts.Object != nil {
-		normalized := destructuringEnabled{
-			array:  boolPtrValue(opts.Array),
-			object: boolPtrValue(opts.Object),
-		}
-		result.assignment = normalized
-		result.variable = normalized
+	optsBytes, err := json.Marshal(options)
+	if err != nil {
+		panic("prefer-destructuring: failed to marshal options: " + err.Error())
 	}
 
-	if opts.AssignmentExpression != nil {
-		result.assignment = destructuringEnabled{
-			array:  boolPtrValue(opts.AssignmentExpression.Array),
-			object: boolPtrValue(opts.AssignmentExpression.Object),
-		}
+	// prefer-destructuring options are a tuple: [enabledTypes?, additionalOptions?].
+	var tuple []any
+	if err := json.Unmarshal(optsBytes, &tuple); err != nil {
+		panic("prefer-destructuring: expected tuple options [enabledTypes?, additionalOptions?]: " + err.Error())
 	}
-	if opts.VariableDeclarator != nil {
-		result.variable = destructuringEnabled{
-			array:  boolPtrValue(opts.VariableDeclarator.Array),
-			object: boolPtrValue(opts.VariableDeclarator.Object),
+
+	if len(tuple) > 0 && tuple[0] != nil {
+		enabledBytes, marshalErr := json.Marshal(tuple[0])
+		if marshalErr != nil {
+			panic("prefer-destructuring: failed to marshal tuple enabledTypes: " + marshalErr.Error())
 		}
+
+		var enabledTypes tupleEnabledTypes
+		if unmarshalErr := json.Unmarshal(enabledBytes, &enabledTypes); unmarshalErr != nil {
+			panic("prefer-destructuring: failed to unmarshal tuple enabledTypes: " + unmarshalErr.Error())
+		}
+		normalizeTupleEnabledTypes(&result, enabledTypes)
+	}
+
+	if len(tuple) > 1 && tuple[1] != nil {
+		additionalBytes, marshalErr := json.Marshal(tuple[1])
+		if marshalErr != nil {
+			panic("prefer-destructuring: failed to marshal tuple additionalOptions: " + marshalErr.Error())
+		}
+
+		var additional tupleAdditionalOptions
+		if unmarshalErr := json.Unmarshal(additionalBytes, &additional); unmarshalErr != nil {
+			panic("prefer-destructuring: failed to unmarshal tuple additionalOptions: " + unmarshalErr.Error())
+		}
+		result.enforceForDeclarationWithTypeAnnotation = boolPtrValue(additional.EnforceForDeclarationWithTypeAnnotation)
+		result.enforceForRenamedProperties = boolPtrValue(additional.EnforceForRenamedProperties)
 	}
 
 	return result
@@ -163,7 +214,7 @@ func getEnabledForNode(options normalizedOptions, node *ast.Node) destructuringE
 var PreferDestructuringRule = rule.Rule{
 	Name: "prefer-destructuring",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts := normalizeOptions(utils.UnmarshalOptions[PreferDestructuringOptions](options, "prefer-destructuring"))
+		opts := parseOptions(options)
 
 		performCheck := func(leftNode *ast.Node, rightNode *ast.Node, reportNode *ast.Node) {
 			if leftNode == nil || rightNode == nil || reportNode == nil {
