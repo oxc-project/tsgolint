@@ -1,6 +1,7 @@
 package no_unnecessary_type_assertion
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 
@@ -12,16 +13,28 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildContextuallyUnnecessaryMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "contextuallyUnnecessary",
-		Description: "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+func buildContextuallyUnnecessaryMessage(assertion core.TextRange) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: assertion,
+		Message: rule.RuleMessage{
+			Id:          "contextuallyUnnecessary",
+			Description: "This assertion is unnecessary since the receiver accepts the original type of the expression.",
+		},
 	}
 }
-func buildUnnecessaryAssertionMessage() rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "unnecessaryAssertion",
-		Description: "This assertion is unnecessary since it does not change the type of the expression.",
+func buildUnnecessaryAssertionDiagnostic(assertion core.TextRange, expression core.TextRange, expressionType string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: assertion,
+		Message: rule.RuleMessage{
+			Id:          "unnecessaryAssertion",
+			Description: "This assertion is unnecessary since it does not change the type of the expression.",
+		},
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("This expression already has the type '%s'", expressionType),
+				Range: expression,
+			},
+		},
 	}
 }
 
@@ -255,77 +268,90 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return
 			}
 
-			msg := buildUnnecessaryAssertionMessage()
-
 			if node.Kind == ast.KindAsExpression {
-				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
-					s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
+				s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
 
-					// Get the text range of the `as` keyword token.
-					// Example: `const x = y as T;`
-					//                      ^^
-					asKeywordRange := s.TokenRange()
+				// Get the text range of the `as` keyword token.
+				// Example: `const x = y as T;`
+				//                      ^^
+				asKeywordRange := s.TokenRange()
 
-					// Get the text range of the type node (includes any trailing trivia).
-					// Example: `const x = y as T;`
-					//                         ^
-					typeNodeRange := typeNode.Loc
+				// Get the text range of the type node (includes any trailing trivia).
+				// Example: `const x = y as T;`
+				//                         ^
+				typeNodeRange := typeNode.Loc
 
-					// Extend the `as` keyword range backwards to include any leading whitespace.
-					// Input:
-					// `x /* comment 1 */ as /* comment 2 */ SomeType`
-					//                   ^^ `asKeywordRange`
-					// Output:
-					// `x /* comment 1 */ as /* comment 2 */ SomeType`
-					//                   ^^^ `asKeywordRange`
-					// Input:
-					// `x  as /* comment 2 */ SomeType`
-					//     ^^ `asKeywordRange`
-					// Output:
-					// `x  as /* comment 2 */ SomeType`
-					//   ^^^^ `asKeywordRange`
-					//
-					for {
-						previousCharPos := asKeywordRange.Pos() - 1
-						// Don't extend past the end of the expression being asserted
-						if previousCharPos < expression.End() {
-							break
+				// Report the `as T` part of `const x = y as T;` for the main diagnostic message
+				assertionRange := asKeywordRange.WithEnd(typeNodeRange.End())
+
+				ctx.ReportDiagnosticWithFixes(
+					buildUnnecessaryAssertionDiagnostic(
+						assertionRange,
+						expressionForType.Loc,
+						ctx.TypeChecker.TypeToString(uncastType),
+					), func() []rule.RuleFix {
+						// Extend the `as` keyword range backwards to include any leading whitespace.
+						// Input:
+						// `x /* comment 1 */ as /* comment 2 */ SomeType`
+						//                   ^^ `asKeywordRange`
+						// Output:
+						// `x /* comment 1 */ as /* comment 2 */ SomeType`
+						//                   ^^^ `asKeywordRange`
+						// Input:
+						// `x  as /* comment 2 */ SomeType`
+						//     ^^ `asKeywordRange`
+						// Output:
+						// `x  as /* comment 2 */ SomeType`
+						//   ^^^^ `asKeywordRange`
+						//
+						for {
+							previousCharPos := asKeywordRange.Pos() - 1
+							// Don't extend past the end of the expression being asserted
+							if previousCharPos < expression.End() {
+								break
+							}
+							previousChar := ctx.SourceFile.Text()[previousCharPos]
+							// Stop when we hit a non-whitespace character (expression or comment)
+							if !utils.IsStrWhiteSpace(rune(previousChar)) {
+								break
+							}
+							asKeywordRange = asKeywordRange.WithPos(previousCharPos)
 						}
-						previousChar := ctx.SourceFile.Text()[previousCharPos]
-						// Stop when we hit a non-whitespace character (expression or comment)
-						if !utils.IsStrWhiteSpace(rune(previousChar)) {
-							break
+
+						typeNodePos := utils.TrimNodeTextRange(ctx.SourceFile, typeNode).Pos()
+
+						// If the text between the `as` token and `SomeType` is only whitespace,
+						// the two fixes can be merged into one. This produces cleaner output.
+						// `x as /* comment 1 */ as /* comment 2 */ SomeType`
+						//                         ^^^^^^^^^^^^^^^^^
+						betweenText := ctx.SourceFile.Text()[asKeywordRange.End():typeNodePos]
+						if !utils.IsStringWhiteSpace(betweenText) {
+							return []rule.RuleFix{
+								rule.RuleFixRemoveRange(asKeywordRange),
+								rule.RuleFixRemove(ctx.SourceFile, typeNode),
+							}
 						}
-						asKeywordRange = asKeywordRange.WithPos(previousCharPos)
-					}
 
-					typeNodePos := utils.TrimNodeTextRange(ctx.SourceFile, typeNode).Pos()
-
-					// If the text between the `as` token and `SomeType` is only whitespace,
-					// the two fixes can be merged into one. This produces cleaner output.
-					// `x as /* comment 1 */ as /* comment 2 */ SomeType`
-					//                         ^^^^^^^^^^^^^^^^^
-					betweenText := ctx.SourceFile.Text()[asKeywordRange.End():typeNodePos]
-					if !utils.IsStringWhiteSpace(betweenText) {
 						return []rule.RuleFix{
-							rule.RuleFixRemoveRange(asKeywordRange),
-							rule.RuleFixRemove(ctx.SourceFile, typeNode),
+							rule.RuleFixRemoveRange(core.NewTextRange(asKeywordRange.Pos(), typeNodeRange.End())),
 						}
-					}
-
-					return []rule.RuleFix{
-						rule.RuleFixRemoveRange(core.NewTextRange(asKeywordRange.Pos(), typeNodeRange.End())),
-					}
-				})
+					})
 			} else {
-				ctx.ReportNodeWithFixes(node, msg, func() []rule.RuleFix {
-					s := scanner.GetScannerForSourceFile(ctx.SourceFile, node.Pos())
-					openingAngleBracket := s.TokenRange()
-					s.ResetPos(typeNode.End())
-					s.Scan()
-					closingAngleBracket := s.TokenRange()
-					return []rule.RuleFix{rule.RuleFixRemoveRange(openingAngleBracket.WithEnd(closingAngleBracket.End()))}
-				})
+				s := scanner.GetScannerForSourceFile(ctx.SourceFile, node.Pos())
+				openingAngleBracket := s.TokenRange()
+				s.ResetPos(typeNode.End())
+				s.Scan()
+				closingAngleBracket := s.TokenRange()
+				assertionRange := openingAngleBracket.WithEnd(closingAngleBracket.End())
+				ctx.ReportDiagnosticWithFixes(
+					buildUnnecessaryAssertionDiagnostic(
+						assertionRange,
+						expressionForType.Loc,
+						ctx.TypeChecker.TypeToString(uncastType),
+					),
+					func() []rule.RuleFix {
+						return []rule.RuleFix{rule.RuleFixRemoveRange(assertionRange)}
+					})
 			}
 			// TODO - add contextually unnecessary check for this
 		}
@@ -337,14 +363,19 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			ast.KindNonNullExpression: func(node *ast.Node) {
 				expression := node.Expression()
 
-				buildRemoveExclamationFix := func() rule.RuleFix {
+				getExclamationTokenRange := func() core.TextRange {
 					s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
-					return rule.RuleFixRemoveRange(s.TokenRange())
+					return s.TokenRange()
+				}
+
+				buildRemoveExclamationFix := func(exclamation core.TextRange) rule.RuleFix {
+					return rule.RuleFixRemoveRange(exclamation)
 				}
 
 				if ast.IsAssignmentExpression(node.Parent, true) {
 					if node.Parent.AsBinaryExpression().Left == node {
-						ctx.ReportNodeWithFixes(node, buildContextuallyUnnecessaryMessage(), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix()} })
+						exclamationRange := getExclamationTokenRange()
+						ctx.ReportDiagnosticWithFixes(buildContextuallyUnnecessaryMessage(exclamationRange), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix(exclamationRange)} })
 					}
 					// for all other = assignments we ignore non-null checks
 					// this is because non-null assertions can change the type-flow of the code
@@ -367,7 +398,15 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					if ast.IsIdentifier(expression) && isPossiblyUsedBeforeAssigned(expression) {
 						return
 					}
-					ctx.ReportNodeWithFixes(node, buildUnnecessaryAssertionMessage(), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix()} })
+					exclamationRange := getExclamationTokenRange()
+					ctx.ReportDiagnosticWithFixes(
+						buildUnnecessaryAssertionDiagnostic(
+							exclamationRange,
+							expression.Loc,
+							ctx.TypeChecker.TypeToString(t),
+						),
+						func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix(exclamationRange)} },
+					)
 				} else {
 					// we know it's a nullable type
 					// so figure out if the variable is used in a place that accepts nullable types
@@ -399,7 +438,8 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 						isValidVoid := !typeIncludesVoid || contextualTypeIncludesVoid
 
 						if isValidUndefined && isValidNull && isValidVoid {
-							ctx.ReportNodeWithFixes(node, buildContextuallyUnnecessaryMessage(), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix()} })
+							exclamationRange := getExclamationTokenRange()
+							ctx.ReportDiagnosticWithFixes(buildContextuallyUnnecessaryMessage(exclamationRange), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix(exclamationRange)} })
 						}
 					}
 				}

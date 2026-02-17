@@ -1289,13 +1289,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'string'",
+        "range": {
+          "end": 120,
+          "pos": 116,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 130,
-      "pos": 117,
+      "pos": 121,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -1311,13 +1320,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'string'",
+        "range": {
+          "end": 248,
+          "pos": 236,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 258,
-      "pos": 237,
+      "pos": 249,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -1333,13 +1351,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type '42'",
+        "range": {
+          "end": 353,
+          "pos": 349,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 359,
-      "pos": 350,
+      "pos": 354,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -1730,13 +1757,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'any'",
+        "range": {
+          "end": 228,
+          "pos": 219,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 235,
-      "pos": 220,
+      "pos": 229,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -2808,13 +2844,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'number'",
+        "range": {
+          "end": 173,
+          "pos": 130,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 183,
-      "pos": 131,
+      "pos": 174,
     },
     "rule": "no-unnecessary-type-assertion",
   },

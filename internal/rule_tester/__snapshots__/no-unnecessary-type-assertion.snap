@@ -1,276 +1,388 @@
 
 [TestNoUnnecessaryTypeAssertion/invalid-0 - 1]
-Diagnostic 1: unnecessaryAssertion (1:13 - 1:16)
+Diagnostic 1: unnecessaryAssertion (1:13 - 1:15)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const foo = <3>3;
-     |             ~~~~
+     |             ~~~
+  Label: This expression already has the type '3' (1:16 - 1:16)
+   1 | const foo = <3>3;
+     |                ^ This expression already has the type '3'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-1 - 1]
-Diagnostic 1: unnecessaryAssertion (1:13 - 1:18)
+Diagnostic 1: unnecessaryAssertion (1:15 - 1:18)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const foo = 3 as 3;
-     |             ~~~~~~
+     |               ~~~~
+  Label: This expression already has the type '3' (1:13 - 1:13)
+   1 | const foo = 3 as 3;
+     |             ^ This expression already has the type '3'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-10 - 1]
-Diagnostic 1: unnecessaryAssertion (3:1 - 3:4)
+Diagnostic 1: unnecessaryAssertion (3:4 - 3:4)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | let bar: number = 1;
    3 | bar! + 1;
-     | ~~~~
+     |    ~
+   4 |       
+  Label: This expression already has the type 'number' (3:1 - 3:3)
+   2 | let bar: number = 1;
+   3 | bar! + 1;
+     | ^^^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-11 - 1]
-Diagnostic 1: unnecessaryAssertion (3:1 - 3:4)
+Diagnostic 1: unnecessaryAssertion (3:4 - 3:4)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | let bar!: number;
    3 | bar! + 1;
-     | ~~~~
+     |    ~
+   4 |       
+  Label: This expression already has the type 'number' (3:1 - 3:3)
+   2 | let bar!: number;
+   3 | bar! + 1;
+     | ^^^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-12 - 1]
-Diagnostic 1: unnecessaryAssertion (4:1 - 4:4)
+Diagnostic 1: unnecessaryAssertion (4:4 - 4:4)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | bar = 1;
    4 | bar! + 1;
-     | ~~~~
+     |    ~
+   5 |       
+  Label: This expression already has the type 'number' (4:1 - 4:3)
+   3 | bar = 1;
+   4 | bar! + 1;
+     | ^^^ This expression already has the type 'number'
    5 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-13 - 1]
-Diagnostic 1: unnecessaryAssertion (3:21 - 3:22)
+Diagnostic 1: unnecessaryAssertion (3:22 - 3:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 |         declare const y: number;
    3 |         console.log(y!);
-     |                     ~~
+     |                      ~
+   4 |       
+  Label: This expression already has the type 'number' (3:21 - 3:21)
+   2 |         declare const y: number;
+   3 |         console.log(y!);
+     |                     ^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-14 - 1]
-Diagnostic 1: unnecessaryAssertion (1:1 - 1:6)
+Diagnostic 1: unnecessaryAssertion (1:6 - 1:6)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | Proxy!;
-     | ~~~~~~
+     |      ~
+  Label: This expression already has the type 'ProxyConstructor' (1:1 - 1:5)
+   1 | Proxy!;
+     | ^^^^^ This expression already has the type 'ProxyConstructor'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-15 - 1]
-Diagnostic 1: unnecessaryAssertion (3:10 - 3:13)
+Diagnostic 1: unnecessaryAssertion (3:13 - 3:13)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | function foo<T extends string>(bar: T) {
    3 |   return bar!;
-     |          ~~~~
+     |             ~
+   4 | }
+  Label: This expression already has the type 'string' (3:10 - 3:12)
+   2 | function foo<T extends string>(bar: T) {
+   3 |   return bar!;
+     |          ^^^ This expression already has the type 'string'
    4 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-16 - 1]
-Diagnostic 1: unnecessaryAssertion (3:13 - 3:20)
+Diagnostic 1: unnecessaryAssertion (3:13 - 3:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare const foo: Foo;
    3 | const bar = <Foo>foo;
-     |             ~~~~~~~~
+     |             ~~~~~
+   4 |       
+  Label: This expression already has the type 'Foo' (3:18 - 3:20)
+   2 | declare const foo: Foo;
+   3 | const bar = <Foo>foo;
+     |                  ^^^ This expression already has the type 'Foo'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-17 - 1]
-Diagnostic 1: unnecessaryAssertion (3:25 - 3:38)
+Diagnostic 1: unnecessaryAssertion (3:30 - 3:38)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare const prop: string;
    3 | ['foo', 'bar'].includes(prop as string);
-     |                         ~~~~~~~~~~~~~~
+     |                              ~~~~~~~~~
+   4 |       
+  Label: This expression already has the type 'string' (3:25 - 3:28)
+   2 | declare const prop: string;
+   3 | ['foo', 'bar'].includes(prop as string);
+     |                         ^^^^ This expression already has the type 'string'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-18 - 1]
-Diagnostic 1: unnecessaryAssertion (3:15 - 3:61)
+Diagnostic 1: unnecessaryAssertion (3:36 - 3:61)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | async function mergeWithDefaults(loadModule: () => Promise<Record<string, unknown>>) {
    3 |   const mod = (await loadModule()) as Record<string, unknown>;
-     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   return { ...mod, extra: true };
+  Label: This expression already has the type 'Record<string, unknown>' (3:16 - 3:33)
+   2 | async function mergeWithDefaults(loadModule: () => Promise<Record<string, unknown>>) {
+   3 |   const mod = (await loadModule()) as Record<string, unknown>;
+     |                ^^^^^^^^^^^^^^^^^^ This expression already has the type 'Record<string, unknown>'
    4 |   return { ...mod, extra: true };
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-19 - 1]
-Diagnostic 1: unnecessaryAssertion (3:59 - 3:73)
+Diagnostic 1: unnecessaryAssertion (3:65 - 3:73)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | function unwrap(input: string | number): number {
    3 |   return typeof input === 'string' ? parseFloat(input) : (input as number);
-     |                                                           ~~~~~~~~~~~~~~~
+     |                                                                 ~~~~~~~~~
+   4 | }
+  Label: This expression already has the type 'number' (3:59 - 3:63)
+   2 | function unwrap(input: string | number): number {
+   3 |   return typeof input === 'string' ? parseFloat(input) : (input as number);
+     |                                                           ^^^^^ This expression already has the type 'number'
    4 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-2 - 1]
-Diagnostic 1: unnecessaryAssertion (3:23 - 3:31)
+Diagnostic 1: unnecessaryAssertion (3:27 - 3:31)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const num = 42;
    3 | const alsoRedundant = num as 42;
-     |                       ~~~~~~~~~
+     |                           ~~~~~
+   4 |       
+  Label: This expression already has the type '42' (3:23 - 3:25)
+   2 | const num = 42;
+   3 | const alsoRedundant = num as 42;
+     |                       ^^^ This expression already has the type '42'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-20 - 1]
-Diagnostic 1: contextuallyUnnecessary (4:9 - 4:10)
+Diagnostic 1: contextuallyUnnecessary (4:10 - 4:10)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | let s: string | null = null;
    4 | nonNull(s!);
-     |         ~~
+     |          ~
    5 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-21 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:26 - 3:27)
+Diagnostic 1: contextuallyUnnecessary (3:27 - 3:27)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | const x: number | null = null;
    3 | const y: number | null = x!;
-     |                          ~~
+     |                           ~
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-22 - 1]
-Diagnostic 1: contextuallyUnnecessary (4:25 - 4:26)
+Diagnostic 1: contextuallyUnnecessary (4:26 - 4:26)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | class Foo {
    4 |   prop: number | null = x!;
-     |                         ~~
+     |                          ~
    5 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-23 - 1]
-Diagnostic 1: unnecessaryAssertion (5:6 - 5:7)
+Diagnostic 1: unnecessaryAssertion (5:7 - 5:7)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | class Mx {
    5 |   @a(b!)
-     |      ~~
+     |       ~
+   6 |   private prop = 1;
+  Label: This expression already has the type '"asdf"' (5:6 - 5:6)
+   4 | class Mx {
+   5 |   @a(b!)
+     |      ^ This expression already has the type '"asdf"'
    6 |   private prop = 1;
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-24 - 1]
-Diagnostic 1: contextuallyUnnecessary (9:20 - 9:28)
+Diagnostic 1: contextuallyUnnecessary (9:28 - 9:28)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    8 | function Test(props: { id?: string | number }) {
    9 |   return <div key={props.id!} />;
-     |                    ~~~~~~~~~
+     |                            ~
   10 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-25 - 1]
-Diagnostic 1: contextuallyUnnecessary (5:1 - 5:2)
+Diagnostic 1: contextuallyUnnecessary (5:2 - 5:2)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    4 | y = x!;
    5 | y! = 0;
-     | ~~
+     |  ~
    6 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-26 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:28 - 3:33)
+Diagnostic 1: contextuallyUnnecessary (3:33 - 3:33)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function foo(arg?: number): number | void;
    3 | const bar: number | void = foo()!;
-     |                            ~~~~~~
+     |                                 ~
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-27 - 1]
-Diagnostic 1: unnecessaryAssertion (3:11 - 3:16)
+Diagnostic 1: unnecessaryAssertion (3:16 - 3:16)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function foo(): number;
    3 | const a = foo()!;
-     |           ~~~~~~
+     |                ~
+   4 |       
+  Label: This expression already has the type 'number' (3:11 - 3:15)
+   2 | declare function foo(): number;
+   3 | const a = foo()!;
+     |           ^^^^^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-28 - 1]
-Diagnostic 1: unnecessaryAssertion (2:11 - 2:21)
+Diagnostic 1: unnecessaryAssertion (2:21 - 2:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const b = new Date()!;
-     |           ~~~~~~~~~~~
+     |                     ~
+   3 |       
+  Label: This expression already has the type 'Date' (2:11 - 2:20)
+   1 | 
+   2 | const b = new Date()!;
+     |           ^^^^^^^^^^ This expression already has the type 'Date'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-29 - 1]
-Diagnostic 1: unnecessaryAssertion (2:11 - 2:18)
+Diagnostic 1: unnecessaryAssertion (2:18 - 2:18)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const b = (1 + 1)!;
-     |           ~~~~~~~~
+     |                  ~
+   3 |       
+  Label: This expression already has the type 'number' (2:11 - 2:17)
+   1 | 
+   2 | const b = (1 + 1)!;
+     |           ^^^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-3 - 1]
-Diagnostic 1: unnecessaryAssertion (3:21 - 3:26)
+Diagnostic 1: unnecessaryAssertion (3:21 - 3:25)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 |         type Foo = 3;
    3 |         const foo = <Foo>3;
-     |                     ~~~~~~
+     |                     ~~~~~
+   4 |       
+  Label: This expression already has the type '3' (3:26 - 3:26)
+   2 |         type Foo = 3;
+   3 |         const foo = <Foo>3;
+     |                          ^ This expression already has the type '3'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-30 - 1]
-Diagnostic 1: unnecessaryAssertion (3:11 - 3:25)
+Diagnostic 1: unnecessaryAssertion (3:17 - 3:25)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function foo(): number;
    3 | const a = foo() as number;
-     |           ~~~~~~~~~~~~~~~
+     |                 ~~~~~~~~~
+   4 |       
+  Label: This expression already has the type 'number' (3:11 - 3:15)
+   2 | declare function foo(): number;
+   3 | const a = foo() as number;
+     |           ^^^^^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-31 - 1]
-Diagnostic 1: unnecessaryAssertion (3:11 - 3:23)
+Diagnostic 1: unnecessaryAssertion (3:11 - 3:18)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function foo(): number;
    3 | const a = <number>foo();
-     |           ~~~~~~~~~~~~~
+     |           ~~~~~~~~
+   4 |       
+  Label: This expression already has the type 'number' (3:19 - 3:23)
+   2 | declare function foo(): number;
+   3 | const a = <number>foo();
+     |                   ^^^^^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-32 - 1]
-Diagnostic 1: unnecessaryAssertion (4:2 - 4:12)
+Diagnostic 1: unnecessaryAssertion (4:8 - 4:12)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | declare function foo(): RT;
    4 | (foo() as RT).log;
-     |  ~~~~~~~~~~~
+     |        ~~~~~
+   5 |       
+  Label: This expression already has the type 'RT' (4:2 - 4:6)
+   3 | declare function foo(): RT;
+   4 | (foo() as RT).log;
+     |  ^^^^^ This expression already has the type 'RT'
    5 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-33 - 1]
-Diagnostic 1: unnecessaryAssertion (3:14 - 3:20)
+Diagnostic 1: unnecessaryAssertion (3:20 - 3:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare const arr: object[];
    3 | const item = arr[0]!;
-     |              ~~~~~~~
+     |                    ~
+   4 |       
+  Label: This expression already has the type 'object' (3:14 - 3:19)
+   2 | declare const arr: object[];
+   3 | const item = arr[0]!;
+     |              ^^^^^^ This expression already has the type 'object'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-34 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:33)
+Diagnostic 1: unnecessaryAssertion (2:25 - 2:33)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = (  3 + 5  ) as number;
-     |             ~~~~~~~~~~~~~~~~~~~~~
+     |                         ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:16 - 2:20)
+   1 | 
+   2 | const foo = (  3 + 5  ) as number;
+     |                ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-35 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:40)
+Diagnostic 1: unnecessaryAssertion (2:32 - 2:40)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = (  3 + 5  ) /*as*/ as number;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:16 - 2:20)
+   1 | 
+   2 | const foo = (  3 + 5  ) /*as*/ as number;
+     |                ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-36 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 6:3)
+Diagnostic 1: unnecessaryAssertion (3:12 - 6:3)
 Message: This assertion is unnecessary since it does not change the type of the expression.
-   1 | 
    2 | const foo = (  3 + 5
-     |             ~~~~~~~~
    3 |   ) /*as*/ as //as
-     | ~~~~~~~~~~~~~~~~~~
+     |            ~~~~~~~
    4 |   (
      | ~~~
    5 |     number
@@ -278,337 +390,504 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |   );
      | ~~~
    7 |       
+  Label: This expression already has the type 'number' (2:16 - 2:20)
+   1 | 
+   2 | const foo = (  3 + 5
+     |                ^^^^^ This expression already has the type 'number'
+   3 |   ) /*as*/ as //as
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-37 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:42)
+Diagnostic 1: unnecessaryAssertion (2:34 - 2:42)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = (3 + (5 as number) ) as number;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                  ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:14 - 2:30)
+   1 | 
+   2 | const foo = (3 + (5 as number) ) as number;
+     |              ^^^^^^^^^^^^^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-38 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:33)
+Diagnostic 1: unnecessaryAssertion (2:25 - 2:33)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = 3 + 5/*as*/ as number;
-     |             ~~~~~~~~~~~~~~~~~~~~~
+     |                         ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:13 - 2:17)
+   1 | 
+   2 | const foo = 3 + 5/*as*/ as number;
+     |             ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-39 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:38)
+Diagnostic 1: unnecessaryAssertion (2:30 - 2:38)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = 3 + 5/*a*/ /*b*/ as number;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                              ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:13 - 2:17)
+   1 | 
+   2 | const foo = 3 + 5/*a*/ /*b*/ as number;
+     |             ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-4 - 1]
-Diagnostic 1: unnecessaryAssertion (3:21 - 3:28)
+Diagnostic 1: unnecessaryAssertion (3:23 - 3:28)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 |         type Foo = 3;
    3 |         const foo = 3 as Foo;
-     |                     ~~~~~~~~
+     |                       ~~~~~~
+   4 |       
+  Label: This expression already has the type '3' (3:21 - 3:21)
+   2 |         type Foo = 3;
+   3 |         const foo = 3 as Foo;
+     |                     ^ This expression already has the type '3'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-40 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:29)
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = <(number)>(3 + 5);
-     |             ~~~~~~~~~~~~~~~~~
+     |             ~~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:24 - 2:28)
+   1 | 
+   2 | const foo = <(number)>(3 + 5);
+     |                        ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-41 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:35)
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:26)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = < ( number ) >( 3 + 5 );
-     |             ~~~~~~~~~~~~~~~~~~~~~~~
+     |             ~~~~~~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:29 - 2:33)
+   1 | 
+   2 | const foo = < ( number ) >( 3 + 5 );
+     |                             ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-42 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:36)
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = <number> /* a */ (3 + 5);
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~
+     |             ~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:31 - 2:35)
+   1 | 
+   2 | const foo = <number> /* a */ (3 + 5);
+     |                               ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-43 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:35)
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:28)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = <number /* a */>(3 + 5);
-     |             ~~~~~~~~~~~~~~~~~~~~~~~
+     |             ~~~~~~~~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:30 - 2:34)
+   1 | 
+   2 | const foo = <number /* a */>(3 + 5);
+     |                              ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-44 - 1]
-Diagnostic 1: unnecessaryAssertion (5:9 - 5:17)
+Diagnostic 1: unnecessaryAssertion (5:17 - 5:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 |   for (let i = 0; i < items.length; i++) {
    5 |     foo(items[i]!);
-     |         ~~~~~~~~~
+     |                 ~
+   6 |   }
+  Label: This expression already has the type 'string' (5:9 - 5:16)
+   4 |   for (let i = 0; i < items.length; i++) {
+   5 |     foo(items[i]!);
+     |         ^^^^^^^^ This expression already has the type 'string'
    6 |   }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-45 - 1]
-Diagnostic 1: unnecessaryAssertion (5:13 - 5:39)
+Diagnostic 1: unnecessaryAssertion (5:19 - 5:39)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | };
    5 | const bar = foo.a as string | undefined;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                   ~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Label: This expression already has the type 'string | undefined' (5:13 - 5:17)
+   4 | };
+   5 | const bar = foo.a as string | undefined;
+     |             ^^^^^ This expression already has the type 'string | undefined'
    6 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-46 - 1]
-Diagnostic 1: unnecessaryAssertion (5:13 - 5:39)
+Diagnostic 1: unnecessaryAssertion (5:19 - 5:39)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | };
    5 | const bar = foo.a as string | undefined;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                   ~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+  Label: This expression already has the type 'string | undefined' (5:13 - 5:17)
+   4 | };
+   5 | const bar = foo.a as string | undefined;
+     |             ^^^^^ This expression already has the type 'string | undefined'
    6 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-47 - 1]
-Diagnostic 1: unnecessaryAssertion (2:1 - 2:26)
+Diagnostic 1: unnecessaryAssertion (2:26 - 2:26)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | varDeclarationFromFixture!;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                          ~
+   3 |       
+  Label: This expression already has the type 'number' (2:1 - 2:25)
+   1 | 
+   2 | varDeclarationFromFixture!;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-48 - 1]
-Diagnostic 1: unnecessaryAssertion (3:1 - 3:2)
+Diagnostic 1: unnecessaryAssertion (3:2 - 3:2)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | var x = 1;
    3 | x!;
-     | ~~
+     |  ~
+   4 |       
+  Label: This expression already has the type 'number' (3:1 - 3:1)
+   2 | var x = 1;
+   3 | x!;
+     | ^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-49 - 1]
-Diagnostic 1: unnecessaryAssertion (4:3 - 4:4)
+Diagnostic 1: unnecessaryAssertion (4:4 - 4:4)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | {
    4 |   x!;
-     |   ~~
+     |    ~
+   5 | }
+  Label: This expression already has the type 'number' (4:3 - 4:3)
+   3 | {
+   4 |   x!;
+     |   ^ This expression already has the type 'number'
    5 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-5 - 1]
-Diagnostic 1: unnecessaryAssertion (3:13 - 3:16)
+Diagnostic 1: unnecessaryAssertion (3:16 - 3:16)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const foo = 3;
    3 | const bar = foo!;
-     |             ~~~~
+     |                ~
+   4 |       
+  Label: This expression already has the type '3' (3:13 - 3:15)
+   2 | const foo = 3;
+   3 | const bar = foo!;
+     |             ^^^ This expression already has the type '3'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-50 - 1]
-Diagnostic 1: unnecessaryAssertion (3:16 - 3:21)
+Diagnostic 1: unnecessaryAssertion (3:18 - 3:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | class T {
    3 |   readonly a = 3 as 3;
-     |                ~~~~~~
+     |                  ~~~~
+   4 | }
+  Label: This expression already has the type '3' (3:16 - 3:16)
+   2 | class T {
+   3 |   readonly a = 3 as 3;
+     |                ^ This expression already has the type '3'
    4 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-51 - 1]
-Diagnostic 1: unnecessaryAssertion (5:16 - 5:22)
+Diagnostic 1: unnecessaryAssertion (5:19 - 5:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | class T {
    5 |   readonly a = 10 as S;
-     |                ~~~~~~~
+     |                   ~~~~
+   6 | }
+  Label: This expression already has the type '10' (5:16 - 5:17)
+   4 | class T {
+   5 |   readonly a = 10 as S;
+     |                ^^ This expression already has the type '10'
    6 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-52 - 1]
-Diagnostic 1: unnecessaryAssertion (3:16 - 3:32)
+Diagnostic 1: unnecessaryAssertion (3:24 - 3:32)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | class T {
    3 |   readonly a = (3 + 5) as number;
-     |                ~~~~~~~~~~~~~~~~~
+     |                        ~~~~~~~~~
+   4 | }
+  Label: This expression already has the type 'number' (3:17 - 3:21)
+   2 | class T {
+   3 |   readonly a = (3 + 5) as number;
+     |                 ^^^^^ This expression already has the type 'number'
    4 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-53 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:31 - 3:50)
+Diagnostic 1: contextuallyUnnecessary (3:50 - 3:50)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | const a = '';
    3 | const b: string | undefined = (a ? undefined : a)!;
-     |                               ~~~~~~~~~~~~~~~~~~~~
+     |                                                  ~
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-54 - 1]
-Diagnostic 1: unnecessaryAssertion (8:11 - 8:23)
+Diagnostic 1: unnecessaryAssertion (8:13 - 8:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    7 | declare const a: T.Value1;
    8 | const b = a as T.Value1;
-     |           ~~~~~~~~~~~~~
+     |             ~~~~~~~~~~~
+   9 |       
+  Label: This expression already has the type 'T.Value1' (8:11 - 8:11)
+   7 | declare const a: T.Value1;
+   8 | const b = a as T.Value1;
+     |           ^ This expression already has the type 'T.Value1'
    9 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-55 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:22 - 3:25)
+Diagnostic 1: contextuallyUnnecessary (3:25 - 3:25)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | const foo: unknown = {};
    3 | const bar: unknown = foo!;
-     |                      ~~~~
+     |                         ~
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-56 - 1]
-Diagnostic 1: contextuallyUnnecessary (4:5 - 4:8)
+Diagnostic 1: contextuallyUnnecessary (4:8 - 4:8)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | const baz: unknown = {};
    4 | foo(baz!);
-     |     ~~~~
+     |        ~
    5 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-57 - 1]
-Diagnostic 1: unnecessaryAssertion (7:3 - 7:13)
+Diagnostic 1: unnecessaryAssertion (7:3 - 7:10)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    6 | if (isString(foo)) {
    7 |   <string>foo;
-     |   ~~~~~~~~~~~
+     |   ~~~~~~~~
+   8 | }
+  Label: This expression already has the type 'string' (7:11 - 7:13)
+   6 | if (isString(foo)) {
+   7 |   <string>foo;
+     |           ^^^ This expression already has the type 'string'
    8 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-58 - 1]
-Diagnostic 1: unnecessaryAssertion (4:1 - 4:17)
+Diagnostic 1: unnecessaryAssertion (4:1 - 4:14)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | declare const bar: Promise<Foo>;
    4 | <Promise<Foo>>bar;
-     | ~~~~~~~~~~~~~~~~~
+     | ~~~~~~~~~~~~~~
+   5 |             
+  Label: This expression already has the type 'Promise<Foo>' (4:15 - 4:17)
+   3 | declare const bar: Promise<Foo>;
+   4 | <Promise<Foo>>bar;
+     |               ^^^ This expression already has the type 'Promise<Foo>'
    5 |             
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-59 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:23)
+Diagnostic 1: unnecessaryAssertion (1:16 - 1:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = true as const;
-     |           ~~~~~~~~~~~~~
+     |                ~~~~~~~~
+  Label: This expression already has the type 'true' (1:11 - 1:14)
+   1 | const a = true as const;
+     |           ^^^^ This expression already has the type 'true'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-6 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:29)
+Diagnostic 1: unnecessaryAssertion (2:21 - 2:29)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = (3 + 5) as number;
-     |             ~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:14 - 2:18)
+   1 | 
+   2 | const foo = (3 + 5) as number;
+     |              ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-60 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:21)
+Diagnostic 1: unnecessaryAssertion (1:11 - 1:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>true;
-     |           ~~~~~~~~~~~
+     |           ~~~~~~~
+  Label: This expression already has the type 'true' (1:18 - 1:21)
+   1 | const a = <const>true;
+     |                  ^^^^ This expression already has the type 'true'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-61 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:20)
+Diagnostic 1: unnecessaryAssertion (1:13 - 1:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = 1 as const;
-     |           ~~~~~~~~~~
+     |             ~~~~~~~~
+  Label: This expression already has the type '1' (1:11 - 1:11)
+   1 | const a = 1 as const;
+     |           ^ This expression already has the type '1'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-62 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:18)
+Diagnostic 1: unnecessaryAssertion (1:11 - 1:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>1;
-     |           ~~~~~~~~
+     |           ~~~~~~~
+  Label: This expression already has the type '1' (1:18 - 1:18)
+   1 | const a = <const>1;
+     |                  ^ This expression already has the type '1'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-63 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:21)
+Diagnostic 1: unnecessaryAssertion (1:14 - 1:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = 1n as const;
-     |           ~~~~~~~~~~~
+     |              ~~~~~~~~
+  Label: This expression already has the type '1n' (1:11 - 1:12)
+   1 | const a = 1n as const;
+     |           ^^ This expression already has the type '1n'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-64 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:19)
+Diagnostic 1: unnecessaryAssertion (1:11 - 1:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>1n;
-     |           ~~~~~~~~~
+     |           ~~~~~~~
+  Label: This expression already has the type '1n' (1:18 - 1:19)
+   1 | const a = <const>1n;
+     |                  ^^ This expression already has the type '1n'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-65 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:22)
+Diagnostic 1: unnecessaryAssertion (1:15 - 1:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = `a` as const;
-     |           ~~~~~~~~~~~~
+     |               ~~~~~~~~
+  Label: This expression already has the type '"a"' (1:11 - 1:13)
+   1 | const a = `a` as const;
+     |           ^^^ This expression already has the type '"a"'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-66 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:22)
+Diagnostic 1: unnecessaryAssertion (1:15 - 1:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = 'a' as const;
-     |           ~~~~~~~~~~~~
+     |               ~~~~~~~~
+  Label: This expression already has the type '"a"' (1:11 - 1:13)
+   1 | const a = 'a' as const;
+     |           ^^^ This expression already has the type '"a"'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-67 - 1]
-Diagnostic 1: unnecessaryAssertion (1:11 - 1:20)
+Diagnostic 1: unnecessaryAssertion (1:11 - 1:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>'a';
-     |           ~~~~~~~~~~
+     |           ~~~~~~~
+  Label: This expression already has the type '"a"' (1:18 - 1:20)
+   1 | const a = <const>'a';
+     |                  ^^^ This expression already has the type '"a"'
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-68 - 1]
-Diagnostic 1: unnecessaryAssertion (3:16 - 3:27)
+Diagnostic 1: unnecessaryAssertion (3:20 - 3:27)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | class T {
    3 |   readonly a = 'a' as const;
-     |                ~~~~~~~~~~~~
+     |                    ~~~~~~~~
+   4 | }
+  Label: This expression already has the type '"a"' (3:16 - 3:18)
+   2 | class T {
+   3 |   readonly a = 'a' as const;
+     |                ^^^ This expression already has the type '"a"'
    4 | }
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-69 - 1]
-Diagnostic 1: unnecessaryAssertion (8:11 - 8:20)
+Diagnostic 1: unnecessaryAssertion (8:13 - 8:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    7 | declare const a: T.Value1;
    8 | const b = a as const;
-     |           ~~~~~~~~~~
+     |             ~~~~~~~~
+   9 |       
+  Label: This expression already has the type 'T.Value1' (8:11 - 8:11)
+   7 | declare const a: T.Value1;
+   8 | const b = a as const;
+     |           ^ This expression already has the type 'T.Value1'
    9 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-7 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:27)
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
    2 | const foo = <number>(3 + 5);
-     |             ~~~~~~~~~~~~~~~
+     |             ~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:22 - 2:26)
+   1 | 
+   2 | const foo = <number>(3 + 5);
+     |                      ^^^^^ This expression already has the type 'number'
    3 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-8 - 1]
-Diagnostic 1: unnecessaryAssertion (3:13 - 3:26)
+Diagnostic 1: unnecessaryAssertion (3:21 - 3:26)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | type Foo = number;
    3 | const foo = (3 + 5) as Foo;
-     |             ~~~~~~~~~~~~~~
+     |                     ~~~~~~
+   4 |       
+  Label: This expression already has the type 'number' (3:14 - 3:18)
+   2 | type Foo = number;
+   3 | const foo = (3 + 5) as Foo;
+     |              ^^^^^ This expression already has the type 'number'
    4 |       
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-9 - 1]
-Diagnostic 1: unnecessaryAssertion (3:13 - 3:24)
+Diagnostic 1: unnecessaryAssertion (3:13 - 3:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | type Foo = number;
    3 | const foo = <Foo>(3 + 5);
-     |             ~~~~~~~~~~~~
+     |             ~~~~~
+   4 |       
+  Label: This expression already has the type 'number' (3:19 - 3:23)
+   2 | type Foo = number;
+   3 | const foo = <Foo>(3 + 5);
+     |                   ^^^^^ This expression already has the type 'number'
    4 |       
 ---

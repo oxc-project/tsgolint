@@ -120,6 +120,7 @@ type RuleContext struct {
 	Program                         *compiler.Program
 	TypeChecker                     *checker.Checker
 	ReportDiagnostic                func(diagnostic RuleDiagnostic)
+	ReportDiagnosticWithFixes       func(diagnostic RuleDiagnostic, fixesFn func() []RuleFix)
 	ReportDiagnosticWithSuggestions func(diagnostic RuleDiagnostic, suggestionsFn func() []RuleSuggestion)
 	ReportRange                     func(textRange core.TextRange, msg RuleMessage)
 	ReportRangeWithSuggestions      func(textRange core.TextRange, msg RuleMessage, suggestionsFn func() []RuleSuggestion)
