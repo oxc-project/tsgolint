@@ -3575,8 +3575,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "fixes": [
       {
         "range": {
-          "end": 444,
-          "pos": 428,
+          "end": 453,
+          "pos": 429,
         },
         "text": "{getValue} = calc",
       },
