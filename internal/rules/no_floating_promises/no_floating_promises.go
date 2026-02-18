@@ -202,6 +202,10 @@ var NoFloatingPromisesRule = rule.Rule{
 		}
 
 		isKnownSafePromiseReturn := func(node *ast.Node) bool {
+			if len(opts.AllowForKnownSafeCalls) == 0 {
+				return false
+			}
+
 			if !ast.IsCallExpression(node) {
 				return false
 			}
