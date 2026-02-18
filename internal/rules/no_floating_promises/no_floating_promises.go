@@ -179,8 +179,7 @@ var NoFloatingPromisesRule = rule.Rule{
 			}
 			return false
 		}
-		isPromiseArray := func(node *ast.Node) bool {
-			t := ctx.TypeChecker.GetTypeAtLocation(node)
+		isPromiseArray := func(node *ast.Node, t *checker.Type) bool {
 			for _, typePart := range utils.UnionTypeParts(t) {
 				apparent := checker.Checker_getApparentType(ctx.TypeChecker, typePart)
 
@@ -281,7 +280,8 @@ var NoFloatingPromisesRule = rule.Rule{
 			// Check the type. At this point it can't be unhandled if it isn't a promise
 			// or array thereof.
 
-			if isPromiseArray(node) {
+			t := ctx.TypeChecker.GetTypeAtLocation(node)
+			if isPromiseArray(node, t) {
 				return true, false, true
 			}
 
@@ -294,7 +294,7 @@ var NoFloatingPromisesRule = rule.Rule{
 				return false, false, false
 			}
 
-			if !isPromiseLike(node, nil) {
+			if !isPromiseLike(node, t) {
 				return false, false, false
 			}
 
