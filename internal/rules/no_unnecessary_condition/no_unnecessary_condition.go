@@ -1353,6 +1353,19 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 						}
 
+						// With noUncheckedIndexedAccess enabled, element accesses through index
+						// signatures can still be absent at runtime (e.g. Record<string, T>[key]).
+						// Treat these as potentially nullish for ??=.
+						if ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() && isElementAccess(leftSkip) {
+							elemAccess := leftSkip.AsElementAccessExpression()
+							baseType := getResolvedType(elemAccess.Expression)
+							if baseType != nil &&
+								(ctx.TypeChecker.GetStringIndexType(baseType) != nil ||
+									ctx.TypeChecker.GetNumberIndexType(baseType) != nil) {
+								return
+							}
+						}
+
 						// Skip optional property access - with exactOptionalPropertyTypes,
 						// the type doesn't include undefined but the property can still be absent
 						// Also skip private properties - they have complex semantics
@@ -1500,7 +1513,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					if isEqualityOp {
 						// For equality operators, check if types can ever be equal
 						// Only skip if BOTH sides are nullish OR one side is a union that includes nullish
-						hasOverlap := typesHaveOverlap(leftType, rightType)
+						hasOverlap := typesHaveOverlap(ctx.TypeChecker, leftType, rightType)
 
 						if !hasOverlap {
 							// Check if this is a valid nullish check (e.g., `a: string | null` with `a === null`)
@@ -1958,7 +1971,7 @@ func isAllowedConstantLiteral(node *ast.Node) bool {
 // - Nullish types: null/undefined/void overlap with each other (treated as interchangeable in some contexts)
 // - Literals and base types: overlap (e.g., "hello" overlaps with string)
 // - Union types: checked part by part (e.g., string | number overlaps with "hello")
-func typesHaveOverlap(left, right *checker.Type) bool {
+func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) bool {
 	// Handle any/unknown types - they overlap with everything
 	leftFlags := checker.Type_flags(left)
 	rightFlags := checker.Type_flags(right)
@@ -1985,6 +1998,14 @@ func typesHaveOverlap(left, right *checker.Type) bool {
 
 		for _, rightPart := range rightParts {
 			rightPartFlags := checker.Type_flags(rightPart)
+
+			// Use TypeScript assignability first. This catches subtype/alias
+			// relationships (e.g. Window extends EventTarget, template literals,
+			// branded intersections, unique symbols) that raw TypeFlags miss.
+			if checker.Checker_isTypeAssignableTo(typeChecker, leftPart, rightPart) ||
+				checker.Checker_isTypeAssignableTo(typeChecker, rightPart, leftPart) {
+				return true
+			}
 
 			// Check if both are the same primitive type
 			primitiveFlags := checker.TypeFlagsString | checker.TypeFlagsNumber |

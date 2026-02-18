@@ -349,6 +349,24 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] == null;
 }
     `},
+		// Issue #695 regressions
+		{Code: `function repro1(e: FocusEvent) { if (e.target !== window) return; }`},
+		{Code: `
+function repro2(flag: string & {}, arg: string) {
+  if (arg === flag) return true;
+  return false;
+}
+    `},
+		{Code: `
+const flagPresent = Symbol();
+type FlagPresent = typeof flagPresent;
+function repro3(queryFlag: string[] | FlagPresent) {
+  if (Array.isArray(queryFlag) && queryFlag.length === 0) return true;
+  if (queryFlag === flagPresent) return true;
+  return false;
+}
+    `},
+		{Code: "type PersonalizationId = `${string}_6_main` | `${string}_7_main`;\nfunction repro4(a: PersonalizationId, b: string) {\n  return a === b;\n}\n"},
 
 		// Predicate functions
 		{Code: `
@@ -993,6 +1011,23 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ??= 'default';
 }
     `},
+		{Code: `
+function repro5() {
+  const obj: Record<string, { name: string }> = {};
+  const key: string = 'foo';
+  obj[key] ??= { name: key };
+}
+    `},
+		{
+			Code: `
+function repro5WithNoUncheckedIndexedAccess() {
+  const obj: Record<string, { name: string }> = {};
+  const key: string = 'foo';
+  obj[key] ??= { name: key };
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 
 		// Generic indexed access
 		{Code: `
