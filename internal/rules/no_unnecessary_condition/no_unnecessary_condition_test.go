@@ -367,6 +367,12 @@ function repro3(queryFlag: string[] | FlagPresent) {
 }
     `},
 		{Code: "type PersonalizationId = `${string}_6_main` | `${string}_7_main`;\nfunction repro4(a: PersonalizationId, b: string) {\n  return a === b;\n}\n"},
+		// Issue #699 regression
+		{Code: `
+function test699<T extends 'a' | 'b'>(x: T | undefined, y: T) {
+  return x === y;
+}
+    `},
 
 		// Predicate functions
 		{Code: `
