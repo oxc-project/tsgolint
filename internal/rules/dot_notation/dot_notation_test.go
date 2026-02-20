@@ -49,7 +49,6 @@ func TestDotNotation(t *testing.T) {
 		{Code: "\ntype Key = Lowercase<string>;\ntype Foo = {\n  BAR: boolean;\n  [key: Lowercase<string>]: number;\n};\ndeclare const foo: Foo;\nfoo['bar'];\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
 		{Code: "\ntype ExtraKey = `extra${string}`;\n\ntype Foo = {\n  foo: string;\n  [extraKey: ExtraKey]: number;\n};\n\nfunction f<T extends Foo>(x: T) {\n  x['extraKey'];\n}\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
 		{Code: "\ntype Foo = {\n  [key: string]: number;\n};\ndeclare const foo: Foo;\nfoo[`key_baz`];\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
-		// Hyphenated property names are not valid JS identifiers and must use bracket notation
 		{Code: "a['X-Amzn-Trace-Id'];"},
 		{Code: "a['X-Amzn-Trace-Id'];", Tsx: true},
 		{Code: "a['has space'];"},
