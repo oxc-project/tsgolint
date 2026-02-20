@@ -143,7 +143,7 @@ var DotNotationRule = rule.Rule{
 				return
 			}
 
-			if !scanner.IsIdentifierText(value, ctx.SourceFile.LanguageVariant) {
+			if !scanner.IsIdentifierText(value, core.LanguageVariantStandard) {
 				return
 			}
 
