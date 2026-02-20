@@ -60,6 +60,12 @@ const x: number | undefined = getMaybeNumber();
 x || undefined;
       `,
 		},
+		{
+			Code: `
+declare const maybeObj: { name: string } | undefined;
+maybeObj || { name: 'fallback' };
+      `,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -93,6 +99,72 @@ const x: bigint = getBigInt();
 x;
       `},
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "uselessCoalescing"}},
+		},
+		{
+			Code: `
+const myVar = 'hello';
+myVar || undefined;
+      `,
+			Output: []string{`
+const myVar = 'hello';
+myVar;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "uselessCoalescing"}},
+		},
+		{
+			Code: `
+declare const myLiteral: 'hello';
+myLiteral || undefined;
+      `,
+			Output: []string{`
+declare const myLiteral: 'hello';
+myLiteral;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "uselessCoalescing"}},
+		},
+		{
+			Code: `
+declare const maybeLiteral: 'hello' | undefined;
+maybeLiteral || undefined;
+      `,
+			Output: []string{`
+declare const maybeLiteral: 'hello' | undefined;
+maybeLiteral;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "redundantUndefinedFallback"}},
+		},
+		{
+			Code: `
+declare const obj: { name: string };
+obj || undefined;
+      `,
+			Output: []string{`
+declare const obj: { name: string };
+obj;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "uselessCoalescing"}},
+		},
+		{
+			Code: `
+declare const obj: { name: string };
+obj || { name: 'fallback' };
+      `,
+			Output: []string{`
+declare const obj: { name: string };
+obj;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "uselessCoalescing"}},
+		},
+		{
+			Code: `
+declare const maybeObj: { name: string } | undefined;
+maybeObj || undefined;
+      `,
+			Output: []string{`
+declare const maybeObj: { name: string } | undefined;
+maybeObj;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "redundantUndefinedFallback"}},
 		},
 		{
 			Code: `

@@ -18,90 +18,6 @@ Message: This coalescing/defaulting operation is unnecessary and can be removed.
 ---
 
 [TestNoUselessCoalescingRule/invalid-10 - 1]
-Diagnostic 1: redundantUndefinedFallback (3:2 - 3:15)
-Message: Fallback to `undefined` is redundant for this expression.
-   2 | declare const x: string[] | undefined;
-   3 | (x || undefined);
-     |  ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-11 - 1]
-Diagnostic 1: noStrictNullCheck
-Message: This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.
-
-Diagnostic 2: uselessCoalescing (3:1 - 3:7)
-Message: This coalescing/defaulting operation is unnecessary and can be removed.
-   2 | const x: string = getString();
-   3 | x || '';
-     | ~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-12 - 1]
-Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
-   2 | declare const x: string | undefined;
-   3 | x || undefined;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-13 - 1]
-Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
-   2 | declare const x: number | undefined;
-   3 | x || undefined;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-14 - 1]
-Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
-   2 | declare const x: boolean | undefined;
-   3 | x || undefined;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-15 - 1]
-Diagnostic 1: falsyUndefinedNormalization (7:1 - 7:23)
-Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
-   6 | declare const user: User | undefined;
-   7 | user?.name || undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
-   8 |       
----
-
-[TestNoUselessCoalescingRule/invalid-16 - 1]
-Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
-   2 | declare const x: string | null | undefined;
-   3 | x || undefined;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-2 - 1]
-Diagnostic 1: uselessCoalescing (3:1 - 3:7)
-Message: This coalescing/defaulting operation is unnecessary and can be removed.
-   2 | const x: bigint = getBigInt();
-   3 | x || 0n;
-     | ~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-3 - 1]
-Diagnostic 1: redundantUndefinedFallback (3:1 - 3:14)
-Message: Fallback to `undefined` is redundant for this expression.
-   2 | declare const x: string[] | undefined;
-   3 | x || undefined;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUselessCoalescingRule/invalid-4 - 1]
 Diagnostic 1: redundantUndefinedFallback (3:1 - 3:11)
 Message: Fallback to `undefined` is redundant for this expression.
    2 | declare const x: string[] | undefined;
@@ -110,7 +26,7 @@ Message: Fallback to `undefined` is redundant for this expression.
    4 |       
 ---
 
-[TestNoUselessCoalescingRule/invalid-5 - 1]
+[TestNoUselessCoalescingRule/invalid-11 - 1]
 Diagnostic 1: uselessCoalescing (3:1 - 3:15)
 Message: This coalescing/defaulting operation is unnecessary and can be removed.
    2 | const x: string = getString();
@@ -119,7 +35,7 @@ Message: This coalescing/defaulting operation is unnecessary and can be removed.
    4 |       
 ---
 
-[TestNoUselessCoalescingRule/invalid-6 - 1]
+[TestNoUselessCoalescingRule/invalid-12 - 1]
 Diagnostic 1: redundantUndefinedFallback (3:1 - 3:14)
 Message: Fallback to `undefined` is redundant for this expression.
    2 | declare const x: string | undefined;
@@ -128,7 +44,7 @@ Message: Fallback to `undefined` is redundant for this expression.
    4 |       
 ---
 
-[TestNoUselessCoalescingRule/invalid-7 - 1]
+[TestNoUselessCoalescingRule/invalid-13 - 1]
 Diagnostic 1: redundantUndefinedFallback (3:1 - 3:11)
 Message: Fallback to `undefined` is redundant for this expression.
    2 | declare const x: string | undefined;
@@ -137,7 +53,7 @@ Message: Fallback to `undefined` is redundant for this expression.
    4 |       
 ---
 
-[TestNoUselessCoalescingRule/invalid-8 - 1]
+[TestNoUselessCoalescingRule/invalid-14 - 1]
 Diagnostic 1: redundantUndefinedFallback (3:1 - 3:14)
 Message: Fallback to `undefined` is redundant for this expression.
    2 | declare const x: true | undefined;
@@ -146,7 +62,7 @@ Message: Fallback to `undefined` is redundant for this expression.
    4 |       
 ---
 
-[TestNoUselessCoalescingRule/invalid-9 - 1]
+[TestNoUselessCoalescingRule/invalid-15 - 1]
 Diagnostic 1: redundantUndefinedFallback (3:18 - 3:66)
 Message: Fallback to `undefined` is redundant for this expression.
    2 | declare const maybeArray: string[] | undefined;
@@ -166,5 +82,143 @@ Message: Fallback to `undefined` is redundant for this expression.
    2 | declare const maybeArray: string[] | undefined;
    3 | const sample10 = maybeArray || undefined || undefined || undefined;
      |                  ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-16 - 1]
+Diagnostic 1: redundantUndefinedFallback (3:2 - 3:15)
+Message: Fallback to `undefined` is redundant for this expression.
+   2 | declare const x: string[] | undefined;
+   3 | (x || undefined);
+     |  ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-17 - 1]
+Diagnostic 1: noStrictNullCheck
+Message: This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.
+
+Diagnostic 2: uselessCoalescing (3:1 - 3:7)
+Message: This coalescing/defaulting operation is unnecessary and can be removed.
+   2 | const x: string = getString();
+   3 | x || '';
+     | ~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-18 - 1]
+Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
+   2 | declare const x: string | undefined;
+   3 | x || undefined;
+     | ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-19 - 1]
+Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
+   2 | declare const x: number | undefined;
+   3 | x || undefined;
+     | ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-2 - 1]
+Diagnostic 1: uselessCoalescing (3:1 - 3:7)
+Message: This coalescing/defaulting operation is unnecessary and can be removed.
+   2 | const x: bigint = getBigInt();
+   3 | x || 0n;
+     | ~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-20 - 1]
+Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
+   2 | declare const x: boolean | undefined;
+   3 | x || undefined;
+     | ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-21 - 1]
+Diagnostic 1: falsyUndefinedNormalization (7:1 - 7:23)
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
+   6 | declare const user: User | undefined;
+   7 | user?.name || undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-22 - 1]
+Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
+   2 | declare const x: string | null | undefined;
+   3 | x || undefined;
+     | ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-3 - 1]
+Diagnostic 1: uselessCoalescing (3:1 - 3:18)
+Message: This coalescing/defaulting operation is unnecessary and can be removed.
+   2 | const myVar = 'hello';
+   3 | myVar || undefined;
+     | ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-4 - 1]
+Diagnostic 1: uselessCoalescing (3:1 - 3:22)
+Message: This coalescing/defaulting operation is unnecessary and can be removed.
+   2 | declare const myLiteral: 'hello';
+   3 | myLiteral || undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-5 - 1]
+Diagnostic 1: redundantUndefinedFallback (3:1 - 3:25)
+Message: Fallback to `undefined` is redundant for this expression.
+   2 | declare const maybeLiteral: 'hello' | undefined;
+   3 | maybeLiteral || undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-6 - 1]
+Diagnostic 1: uselessCoalescing (3:1 - 3:16)
+Message: This coalescing/defaulting operation is unnecessary and can be removed.
+   2 | declare const obj: { name: string };
+   3 | obj || undefined;
+     | ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-7 - 1]
+Diagnostic 1: uselessCoalescing (3:1 - 3:27)
+Message: This coalescing/defaulting operation is unnecessary and can be removed.
+   2 | declare const obj: { name: string };
+   3 | obj || { name: 'fallback' };
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-8 - 1]
+Diagnostic 1: redundantUndefinedFallback (3:1 - 3:21)
+Message: Fallback to `undefined` is redundant for this expression.
+   2 | declare const maybeObj: { name: string } | undefined;
+   3 | maybeObj || undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUselessCoalescingRule/invalid-9 - 1]
+Diagnostic 1: redundantUndefinedFallback (3:1 - 3:14)
+Message: Fallback to `undefined` is redundant for this expression.
+   2 | declare const x: string[] | undefined;
+   3 | x || undefined;
+     | ~~~~~~~~~~~~~~
    4 |       
 ---
