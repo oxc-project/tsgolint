@@ -2261,6 +2261,50 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unsafe-unary-minus",
   },
   {
+    "file_path": "fixtures/basic/rules/no-useless-coalescing/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 72,
+          "pos": 59,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Fallback to \`undefined\` is redundant for this expression.",
+      "id": "redundantUndefinedFallback",
+    },
+    "range": {
+      "end": 72,
+      "pos": 49,
+    },
+    "rule": "no-useless-coalescing",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-useless-coalescing/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 62,
+          "pos": 60,
+        },
+        "text": "??",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Prefer using nullish coalescing operator (\`??\`) instead of a logical or (\`||\`), as it is a safer operator.",
+      "id": "preferNullishOverOr",
+    },
+    "range": {
+      "end": 62,
+      "pos": 60,
+    },
+    "rule": "prefer-nullish-coalescing",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-useless-default-assignment/index.ts",
     "fixes": [
       {

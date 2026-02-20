@@ -40,6 +40,7 @@ const ALL_RULES = [
   'no-unnecessary-type-arguments',
   'no-unnecessary-type-parameters',
   'no-unnecessary-type-assertion',
+  'no-useless-coalescing',
   'no-useless-default-assignment',
   'no-unsafe-argument',
   'no-unsafe-assignment',
