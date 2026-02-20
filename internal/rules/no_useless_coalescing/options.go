@@ -5,8 +5,8 @@ package no_useless_coalescing
 import "github.com/go-json-experiment/json"
 
 type NoUselessCoalescingOptions struct {
-	// Whether to also report technically-correct `|| undefined` normalizations for
-	// nullish-capable primitive types.
+	// Whether to also report `|| undefined` fallbacks that normalize falsy values
+	// on nullish-capable primitive types.
 	DetectFalsyValues bool `json:"detectFalsyValues,omitempty"`
 }
 

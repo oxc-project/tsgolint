@@ -31,7 +31,7 @@ Message: This coalescing/defaulting operation is unnecessary and can be removed.
 
 [TestNoUselessCoalescingRule/invalid-11 - 1]
 Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy primitive values and is likely unnecessary noise.
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
    2 | declare const x: string | undefined;
    3 | x || undefined;
      | ~~~~~~~~~~~~~~
@@ -40,7 +40,7 @@ Message: This `|| undefined` fallback normalizes falsy primitive values and is l
 
 [TestNoUselessCoalescingRule/invalid-12 - 1]
 Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy primitive values and is likely unnecessary noise.
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
    2 | declare const x: number | undefined;
    3 | x || undefined;
      | ~~~~~~~~~~~~~~
@@ -49,7 +49,7 @@ Message: This `|| undefined` fallback normalizes falsy primitive values and is l
 
 [TestNoUselessCoalescingRule/invalid-13 - 1]
 Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy primitive values and is likely unnecessary noise.
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
    2 | declare const x: boolean | undefined;
    3 | x || undefined;
      | ~~~~~~~~~~~~~~
@@ -58,7 +58,7 @@ Message: This `|| undefined` fallback normalizes falsy primitive values and is l
 
 [TestNoUselessCoalescingRule/invalid-14 - 1]
 Diagnostic 1: falsyUndefinedNormalization (7:1 - 7:23)
-Message: This `|| undefined` fallback normalizes falsy primitive values and is likely unnecessary noise.
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
    6 | declare const user: User | undefined;
    7 | user?.name || undefined;
      | ~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,7 +67,7 @@ Message: This `|| undefined` fallback normalizes falsy primitive values and is l
 
 [TestNoUselessCoalescingRule/invalid-15 - 1]
 Diagnostic 1: falsyUndefinedNormalization (3:1 - 3:14)
-Message: This `|| undefined` fallback normalizes falsy primitive values and is likely unnecessary noise.
+Message: This `|| undefined` fallback normalizes falsy values and is likely unnecessary.
    2 | declare const x: string | null | undefined;
    3 | x || undefined;
      | ~~~~~~~~~~~~~~

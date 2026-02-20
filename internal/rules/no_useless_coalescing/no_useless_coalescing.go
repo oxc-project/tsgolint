@@ -35,7 +35,7 @@ func buildRedundantUndefinedFallbackMessage() rule.RuleMessage {
 func buildFalsyUndefinedNormalizationMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "falsyUndefinedNormalization",
-		Description: "This `|| undefined` fallback normalizes falsy primitive values and is likely unnecessary noise.",
+		Description: "This `|| undefined` fallback normalizes falsy values and is likely unnecessary.",
 	}
 }
 

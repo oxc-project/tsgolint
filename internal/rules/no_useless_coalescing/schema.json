@@ -6,7 +6,7 @@
       "properties": {
         "detectFalsyValues": {
           "type": "boolean",
-          "description": "Whether to also report technically-correct `|| undefined` normalizations for nullish-capable primitive types.",
+          "description": "Whether to also report `|| undefined` fallbacks that normalize falsy values on nullish-capable primitive types.",
           "default": false
         }
       }
