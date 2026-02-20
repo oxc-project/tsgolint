@@ -1,7 +1,7 @@
-From ba1ee831d4ba332e12627a1918b26a19e7e7cf55 Mon Sep 17 00:00:00 2001
+From 7983defbc7e01acc34998bafb44f4685324d54d3 Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 18 Jun 2025 15:24:34 +0300
-Subject: [PATCH 1/5] Parallel readDirectory visitor
+Subject: [PATCH 1/7] Parallel readDirectory visitor
 
 ---
  internal/vfs/utilities.go | 104 ++++++++++++++++++++++++++++----------

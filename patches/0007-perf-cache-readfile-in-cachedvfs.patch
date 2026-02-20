@@ -1,14 +1,14 @@
-From dd34811011bcd9a0f034f82111cb7dfffa92bb7a Mon Sep 17 00:00:00 2001
+From 9e66e57ab35a2aa9a0d4ad28b006a9df61b7931a Mon Sep 17 00:00:00 2001
 From: Codex <codex@example.com>
 Date: Thu, 12 Feb 2026 13:55:47 +0900
-Subject: [PATCH] perf(vfs): cache ReadFile results in cachedvfs
+Subject: [PATCH 7/7] perf(vfs): cache ReadFile results in cachedvfs
 
 ---
  internal/vfs/cachedvfs/cachedvfs.go | 24 +++++++++++++++++++++++-
  1 file changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/internal/vfs/cachedvfs/cachedvfs.go b/internal/vfs/cachedvfs/cachedvfs.go
-index 13ec842f7..c880479ef 100644
+index 13ec842f72..c880479ef6 100644
 --- a/internal/vfs/cachedvfs/cachedvfs.go
 +++ b/internal/vfs/cachedvfs/cachedvfs.go
 @@ -15,10 +15,16 @@ type FS struct {
@@ -61,4 +61,5 @@ index 13ec842f7..c880479ef 100644
  
  func (fsys *FS) Realpath(path string) string {
 -- 
-git version 2.52.0
+2.50.1 (Apple Git-155)
+
