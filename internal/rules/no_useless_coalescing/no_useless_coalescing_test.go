@@ -162,6 +162,21 @@ x;
 		},
 		{
 			Code: `
+declare const maybeArray: string[] | undefined;
+const sample10 = maybeArray || undefined || undefined || undefined;
+      `,
+			Output: []string{`
+declare const maybeArray: string[] | undefined;
+const sample10 = maybeArray;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "redundantUndefinedFallback"},
+				{MessageId: "redundantUndefinedFallback"},
+				{MessageId: "redundantUndefinedFallback"},
+			},
+		},
+		{
+			Code: `
 declare const x: string[] | undefined;
 (x || undefined);
       `,
