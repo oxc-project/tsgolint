@@ -107,10 +107,10 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 59/61.
+Implemented 60/61.
 
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
-- [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
+- [x] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
