@@ -154,20 +154,17 @@ func parseSnapshotFile(data string) map[string]string {
 			continue
 		}
 
-		newline := strings.IndexByte(block, '\n')
-		if newline == -1 {
+		before, after, ok := strings.Cut(block, "\n")
+		if !ok {
 			continue
 		}
 
-		key := block[:newline]
+		key := before
 		if !strings.HasPrefix(key, "[") || !strings.HasSuffix(key, "]") {
 			continue
 		}
 
-		content := block[newline+1:]
-		content = strings.TrimRight(content, "\n")
-
-		entries[key] = content
+		entries[key] = strings.TrimRight(after, "\n")
 	}
 
 	return entries
