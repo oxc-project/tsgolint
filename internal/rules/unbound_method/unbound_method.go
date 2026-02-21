@@ -25,6 +25,25 @@ func buildUnboundWithoutThisAnnotationMessage() rule.RuleMessage {
 	}
 }
 
+func buildUnboundDiagnostic(sourceFile *ast.SourceFile, node *ast.Node, dangerousReference *ast.Node, message rule.RuleMessage) rule.RuleDiagnostic {
+	diagnosticRange := utils.TrimNodeTextRange(sourceFile, node)
+	dangerousRange := utils.TrimNodeTextRange(sourceFile, dangerousReference)
+	labeledRanges := []rule.RuleLabeledRange{}
+
+	if diagnosticRange.Pos() != dangerousRange.Pos() || diagnosticRange.End() != dangerousRange.End() {
+		labeledRanges = append(labeledRanges, rule.RuleLabeledRange{
+			Label: "This reference may be unbound and lose `this` context",
+			Range: dangerousRange,
+		})
+	}
+
+	return rule.RuleDiagnostic{
+		Range:         diagnosticRange,
+		Message:       message,
+		LabeledRanges: labeledRanges,
+	}
+}
+
 func isNodeInsideTypeDeclaration(node *ast.Node) bool {
 	for parent := node.Parent; parent != nil; parent = parent.Parent {
 		switch parent.Kind {
@@ -208,7 +227,7 @@ var UnboundMethodRule = rule.Rule{
 			return utils.IsBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(object), supportedGlobalTypes...) && utils.IsAnyBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(property))
 		}
 
-		checkIfMethodAndReport := func(node *ast.Node, symbol *ast.Symbol) bool {
+		checkIfMethodAndReport := func(node *ast.Node, dangerousReference *ast.Node, symbol *ast.Symbol) bool {
 			if symbol == nil {
 				return false
 			}
@@ -220,9 +239,9 @@ var UnboundMethodRule = rule.Rule{
 			}
 
 			if firstParamIsThis {
-				ctx.ReportNode(node, buildUnboundMessage())
+				ctx.ReportDiagnostic(buildUnboundDiagnostic(ctx.SourceFile, node, dangerousReference, buildUnboundMessage()))
 			} else {
-				ctx.ReportNode(node, buildUnboundWithoutThisAnnotationMessage())
+				ctx.ReportDiagnostic(buildUnboundDiagnostic(ctx.SourceFile, node, dangerousReference, buildUnboundWithoutThisAnnotationMessage()))
 			}
 			return true
 		}
@@ -235,7 +254,7 @@ var UnboundMethodRule = rule.Rule{
 
 			if initNode != nil {
 				if !isNativelyBound(initNode, propertyName) {
-					reported := checkIfMethodAndReport(propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(initNode), propertyName.Text()))
+					reported := checkIfMethodAndReport(propertyName, propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(initNode), propertyName.Text()))
 					if reported {
 						return
 					}
@@ -249,7 +268,7 @@ var UnboundMethodRule = rule.Rule{
 			}
 
 			utils.TypeRecurser(ctx.TypeChecker.GetTypeAtLocation(patternNode), func(t *checker.Type) bool {
-				return checkIfMethodAndReport(propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName.Text()))
+				return checkIfMethodAndReport(propertyName, propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName.Text()))
 			})
 		}
 
@@ -259,7 +278,7 @@ var UnboundMethodRule = rule.Rule{
 					return
 				}
 
-				checkIfMethodAndReport(node, ctx.TypeChecker.GetSymbolAtLocation(node))
+				checkIfMethodAndReport(node, node.Name(), ctx.TypeChecker.GetSymbolAtLocation(node))
 			},
 
 			rule.ListenerOnAllowPattern(ast.KindObjectLiteralExpression): func(node *ast.Node) {

@@ -3528,6 +3528,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 336,
+          "pos": 333,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3542,6 +3551,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 453,
+          "pos": 445,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3556,6 +3574,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 565,
+          "pos": 562,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
