@@ -23,11 +23,11 @@ init:
 
 [unix]
 build:
-  GOEXPERIMENT=greenteagc go build -o tsgolint ./cmd/tsgolint
+  go build -o tsgolint ./cmd/tsgolint
 
 [windows]
 build:
-  $env:GOEXPERIMENT="greenteagc"; $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o tsgolint.exe ./cmd/tsgolint
+  $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o tsgolint.exe ./cmd/tsgolint
 
 test: build
   cd e2e && pnpm run test --run && cd ..
