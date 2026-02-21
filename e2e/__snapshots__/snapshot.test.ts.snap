@@ -3485,6 +3485,24 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 180,
     },
     "rule": "switch-exhaustiveness-check",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 300,
+              "pos": 300,
+            },
+            "text": "
+    case "rejected": { throw new Error('Not implemented yet: "rejected" case') }",
+          },
+        ],
+        "message": {
+          "description": "Switch is not exhaustive. Cases not matched: "rejected"",
+          "id": "switchIsNotExhaustive",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",

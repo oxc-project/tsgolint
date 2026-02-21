@@ -6,6 +6,7 @@ Message: Switch is not exhaustive. Cases not matched: "literal"
    3 | switch (value) {
      |         ~~~~~
    4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-1 - 1]
@@ -15,6 +16,7 @@ Message: Switch is not exhaustive. Cases not matched: "literal"
    3 | switch (value) {
      |         ~~~~~
    4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-10 - 1]
@@ -24,6 +26,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    4 | switch (value) {
      |         ~~~~~
    5 |   case a:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-11 - 1]
@@ -33,6 +36,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof a | typeof b
    5 | switch (value) {
      |         ~~~~~
    6 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-12 - 1]
@@ -42,6 +46,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    4 | switch (value) {
      |         ~~~~~
    5 |   case a:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-13 - 1]
@@ -51,6 +56,7 @@ Message: Switch is not exhaustive. Cases not matched: false | true
    3 | switch (value) {
      |         ~~~~~
    4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-14 - 1]
@@ -60,6 +66,7 @@ Message: Switch is not exhaustive. Cases not matched: 1 | true
    3 | switch (value) {
      |         ~~~~~
    4 |   case false:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-15 - 1]
@@ -69,6 +76,7 @@ Message: Switch is not exhaustive. Cases not matched: false | true
    3 | switch (value) {
      |         ~~~~~
    4 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 
 Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
 Message: Switch is not exhaustive. Cases not matched: default
@@ -76,6 +84,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-16 - 1]
@@ -85,6 +94,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-17 - 1]
@@ -94,6 +104,7 @@ Message: Switch is not exhaustive. Cases not matched: Aaa.Bar
    7 | switch (value) {
      |         ~~~~~
    8 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 
 Diagnostic 2: switchIsNotExhaustive (7:9 - 7:13)
 Message: Switch is not exhaustive. Cases not matched: default
@@ -101,6 +112,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    7 | switch (value) {
      |         ~~~~~
    8 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-18 - 1]
@@ -110,6 +122,7 @@ Message: Switch is not exhaustive. Cases not matched: "Friday" | "Saturday" | "S
   14 | switch (day) {
      |         ~~~
   15 |   case 'Monday': {
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-19 - 1]
@@ -119,6 +132,7 @@ Message: Switch is not exhaustive. Cases not matched: Enum.B
    8 |   switch (value) {
      |           ~~~~~
    9 |     case Enum.A:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-2 - 1]
@@ -128,6 +142,7 @@ Message: Switch is not exhaustive. Cases not matched: 1
    3 | switch (value) {
      |         ~~~~~
    4 |   case 'literal':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-20 - 1]
@@ -137,6 +152,7 @@ Message: Switch is not exhaustive. Cases not matched: "b" | "c"
    8 |   switch (value) {
      |           ~~~~~
    9 |     case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-21 - 1]
@@ -146,6 +162,7 @@ Message: Switch is not exhaustive. Cases not matched: 1 | true
    9 |   switch (value) {
      |           ~~~~~
   10 |     case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-22 - 1]
@@ -155,6 +172,7 @@ Message: Switch is not exhaustive. Cases not matched: "B"
    5 |   switch (value.type) {
      |           ~~~~~~~~~~
    6 |     case 'A':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-23 - 1]
@@ -164,6 +182,7 @@ Message: Switch is not exhaustive. Cases not matched: "Friday" | "Monday" | "Sat
   13 | switch (day) {
      |         ~~~
   14 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-24 - 1]
@@ -173,6 +192,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof b | typeof c
    9 |   switch (value) {
      |           ~~~~~
   10 |     case a:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-25 - 1]
@@ -182,6 +202,7 @@ Message: Switch is not exhaustive. Cases not matched: 2
    5 |   switch (value) {
      |           ~~~~~
    6 |     case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-26 - 1]
@@ -191,6 +212,7 @@ Message: Switch is not exhaustive. Cases not matched: 1 | 2
    5 |   switch (value) {
      |           ~~~~~
    6 |   }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-27 - 1]
@@ -200,6 +222,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof Enum["test-test"] |
    8 |   switch (arg) {
      |           ~~~
    9 |   }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-28 - 1]
@@ -209,6 +232,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof Enum[""] | Enum.tes
    8 |   switch (arg) {
      |           ~~~
    9 |   }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-29 - 1]
@@ -218,6 +242,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof Enum["9test"] | Enu
    8 |   switch (arg) {
      |           ~~~
    9 |   }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-3 - 1]
@@ -227,6 +252,7 @@ Message: Switch is not exhaustive. Cases not matched: "2"
    3 | switch (value) {
      |         ~~~~~
    4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-30 - 1]
@@ -236,6 +262,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case 0:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-31 - 1]
@@ -245,6 +272,7 @@ Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["key-
   11 |         switch (a) {
      |                 ~
   12 |         }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-32 - 1]
@@ -254,6 +282,7 @@ Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["'a' 
    9 |         switch (a) {}
      |                 ~
   10 |       
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-33 - 1]
@@ -354,6 +383,7 @@ Message: Switch is not exhaustive. Cases not matched: "2"
    3 | switch (value) {
      |         ~~~~~
    4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 
 Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
 Message: Switch is not exhaustive. Cases not matched: default
@@ -361,6 +391,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-40 - 1]
@@ -370,6 +401,7 @@ Message: Switch is not exhaustive. Cases not matched: "b"
    4 | switch (literal) {
      |         ~~~~~~~
    5 |   case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-41 - 1]
@@ -379,6 +411,7 @@ Message: Switch is not exhaustive. Cases not matched: "b"
    4 | switch (literal) {
      |         ~~~~~~~
    5 |   case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-42 - 1]
@@ -388,6 +421,7 @@ Message: Switch is not exhaustive. Cases not matched: "b"
    4 | switch (literal) {
      |         ~~~~~~~
    5 |   default:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-43 - 1]
@@ -397,6 +431,7 @@ Message: Switch is not exhaustive. Cases not matched: "b" | "c"
    4 | switch (literal) {
      |         ~~~~~~~
    5 |   case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-44 - 1]
@@ -406,6 +441,7 @@ Message: Switch is not exhaustive. Cases not matched: MyEnum.Bar | MyEnum.Baz
   10 | switch (myEnum) {
      |         ~~~~~~
   11 |   case MyEnum.Foo:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-45 - 1]
@@ -415,6 +451,7 @@ Message: Switch is not exhaustive. Cases not matched: false | true
    3 | switch (value) {
      |         ~~~~~
    4 |   default: {
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-46 - 1]
@@ -424,6 +461,7 @@ Message: Switch is not exhaustive. Cases not matched: undefined
    3 |   switch (x[0]) {
      |           ~~~~
    4 |     case 'hi':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-5 - 1]
@@ -433,6 +471,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-50 - 1]
@@ -442,6 +481,7 @@ Message: Switch is not exhaustive. Cases not matched: B.D
    9 |         switch (foo) {
      |                 ~~~
   10 |           case A.B.C: {
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-51 - 1]
@@ -451,6 +491,7 @@ Message: Switch is not exhaustive. Cases not matched: B.D
    4 |         switch (foo) {
      |                 ~~~
    5 |           case A.B.C: {
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-6 - 1]
@@ -460,6 +501,7 @@ Message: Switch is not exhaustive. Cases not matched: undefined | null | "1" | 1
    3 | switch (value) {
      |         ~~~~~
    4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 
 Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
 Message: Switch is not exhaustive. Cases not matched: default
@@ -467,6 +509,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-7 - 1]
@@ -476,6 +519,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-8 - 1]
@@ -485,6 +529,7 @@ Message: Switch is not exhaustive. Cases not matched: default
    4 | switch (value) {
      |         ~~~~~
    5 |   case a:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
 [TestSwitchExhaustivenessCheckRule/invalid-9 - 1]
@@ -494,4 +539,5 @@ Message: Switch is not exhaustive. Cases not matched: default
    3 | switch (value) {
      |         ~~~~~
    4 |   case 10n:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
