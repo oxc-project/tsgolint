@@ -233,6 +233,12 @@ var NoDeprecatedRule = rule.Rule{
 				if isDeprecated {
 					return true, reason
 				}
+				if signatureDecl == nil {
+					isDeprecated, reason = getJsDocDeprecation(aliasedSymbol)
+					if isDeprecated {
+						return true, reason
+					}
+				}
 			}
 
 			return false, ""
