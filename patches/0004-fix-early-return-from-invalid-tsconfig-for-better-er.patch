@@ -1,7 +1,7 @@
-From b4a3333c49bff230bbef83a5b3f40a0055280afa Mon Sep 17 00:00:00 2001
+From 54c5d5e60ee069172f001d27f889edb4b78a6b10 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Mon, 3 Nov 2025 12:44:32 +0000
-Subject: [PATCH 4/5] fix: early return from invalid tsconfig for better errors
+Subject: [PATCH 4/7] fix: early return from invalid tsconfig for better errors
 
 ---
  internal/tsoptions/tsconfigparsing.go | 11 +++++++++++

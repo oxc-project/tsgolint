@@ -1,6 +1,7 @@
 package no_deprecated
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -729,11 +730,8 @@ var NoDeprecatedRule = rule.Rule{
 						if tags == nil {
 							continue
 						}
-						for _, tag := range tags.Nodes {
-							if ast.IsJSDocDeprecatedTag(tag) {
-								hasDeprecatedTag = true
-								break
-							}
+						if slices.ContainsFunc(tags.Nodes, ast.IsJSDocDeprecatedTag) {
+							hasDeprecatedTag = true
 						}
 						if hasDeprecatedTag {
 							break

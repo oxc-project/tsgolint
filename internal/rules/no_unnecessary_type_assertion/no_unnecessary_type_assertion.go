@@ -38,6 +38,26 @@ func buildUnnecessaryAssertionDiagnostic(assertion core.TextRange, expression co
 	}
 }
 
+func buildUnnecessaryTypeAssertionDiagnostic(assertion core.TextRange, expression core.TextRange, expressionType string, assertedType string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: assertion,
+		Message: rule.RuleMessage{
+			Id:          "unnecessaryAssertion",
+			Description: "This assertion is unnecessary since it does not change the type of the expression.",
+		},
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("This expression already has the type '%s'", expressionType),
+				Range: expression,
+			},
+			{
+				Label: fmt.Sprintf("Casting it to '%s' is unnecessary", assertedType),
+				Range: assertion,
+			},
+		},
+	}
+}
+
 var NoUnnecessaryTypeAssertionRule = rule.Rule{
 	Name: "no-unnecessary-type-assertion",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -285,10 +305,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				assertionRange := asKeywordRange.WithEnd(typeNodeRange.End())
 
 				ctx.ReportDiagnosticWithFixes(
-					buildUnnecessaryAssertionDiagnostic(
+					buildUnnecessaryTypeAssertionDiagnostic(
 						assertionRange,
-						expressionForType.Loc,
+						utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
 						ctx.TypeChecker.TypeToString(uncastType),
+						ctx.TypeChecker.TypeToString(castType),
 					), func() []rule.RuleFix {
 						// Extend the `as` keyword range backwards to include any leading whitespace.
 						// Input:
@@ -344,10 +365,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				closingAngleBracket := s.TokenRange()
 				assertionRange := openingAngleBracket.WithEnd(closingAngleBracket.End())
 				ctx.ReportDiagnosticWithFixes(
-					buildUnnecessaryAssertionDiagnostic(
+					buildUnnecessaryTypeAssertionDiagnostic(
 						assertionRange,
-						expressionForType.Loc,
+						utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
 						ctx.TypeChecker.TypeToString(uncastType),
+						ctx.TypeChecker.TypeToString(castType),
 					),
 					func() []rule.RuleFix {
 						return []rule.RuleFix{rule.RuleFixRemoveRange(assertionRange)}

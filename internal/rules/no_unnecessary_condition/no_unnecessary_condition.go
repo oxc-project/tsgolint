@@ -17,6 +17,7 @@ package no_unnecessary_condition
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -138,6 +139,35 @@ func isIndeterminateType(t *checker.Type) bool {
 	// indexed access types like T[K] to concrete types (e.g., number, string)
 	// TypeFlagsIndex is for the index type operator (keyof T), which is indeterminate
 	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndex) != 0
+}
+
+// hasIndeterminateConstituent reports whether a type itself (or any union member)
+// is indeterminate at analysis time, including constrained generic substitutions.
+func hasIndeterminateConstituent(t *checker.Type) bool {
+	if isIndeterminateType(t) {
+		return true
+	}
+
+	flags := checker.Type_flags(t)
+	if flags&(checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+		return true
+	}
+
+	if !utils.IsUnionType(t) {
+		return false
+	}
+
+	for _, part := range t.Types() {
+		if isIndeterminateType(part) {
+			return true
+		}
+		partFlags := checker.Type_flags(part)
+		if partFlags&(checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+			return true
+		}
+	}
+
+	return false
 }
 
 // isAlwaysNullishType checks if a type is always null, undefined, or void.
@@ -921,12 +951,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check for union type - if any constituent is an array/tuple, return true
 				if utils.IsUnionType(t) {
-					for _, part := range t.Types() {
-						if isArrayOrTupleType(part) {
-							return true
-						}
-					}
-					return false
+					return slices.ContainsFunc(t.Types(), isArrayOrTupleType)
 				}
 
 				// Check for array type by number index type
@@ -1215,10 +1240,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			// Also allow if it's a union that includes an indeterminate type
 			if utils.IsUnionType(exprType) {
-				for _, part := range exprType.Types() {
-					if isIndeterminateType(part) {
-						return
-					}
+				if slices.ContainsFunc(exprType.Types(), isIndeterminateType) {
+					return
 				}
 			}
 
@@ -1888,12 +1911,7 @@ func checkTypeCondition(t *checker.Type) (isTruthy bool, isFalsy bool) {
 // optional chaining (?.) might be necessary.
 func isNullishType(t *checker.Type) bool {
 	if utils.IsUnionType(t) {
-		for _, part := range t.Types() {
-			if isNullishType(part) {
-				return true
-			}
-		}
-		return false
+		return slices.ContainsFunc(t.Types(), isNullishType)
 	}
 
 	flags := checker.Type_flags(t)
@@ -1981,10 +1999,9 @@ func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) b
 		return true
 	}
 
-	// Handle type parameters and indexed access types - we can't determine overlap at compile time
-	// This includes T, T[K], keyof T, etc.
-	genericFlags := checker.TypeFlagsTypeParameter | checker.TypeFlagsIndexedAccess | checker.TypeFlagsIndex
-	if leftFlags&genericFlags != 0 || rightFlags&genericFlags != 0 {
+	// Handle generic/indeterminate types conservatively.
+	// This includes unions with constrained type variables (e.g., T | undefined).
+	if hasIndeterminateConstituent(left) || hasIndeterminateConstituent(right) {
 		return true
 	}
 

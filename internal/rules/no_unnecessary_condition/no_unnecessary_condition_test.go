@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoUnnecessaryConditionRule(t *testing.T) {
@@ -367,6 +366,12 @@ function repro3(queryFlag: string[] | FlagPresent) {
 }
     `},
 		{Code: "type PersonalizationId = `${string}_6_main` | `${string}_7_main`;\nfunction repro4(a: PersonalizationId, b: string) {\n  return a === b;\n}\n"},
+		// Issue #699 regression
+		{Code: `
+function test699<T extends 'a' | 'b'>(x: T | undefined, y: T) {
+  return x === y;
+}
+    `},
 
 		// Predicate functions
 		{Code: `
@@ -552,19 +557,19 @@ const x = b1 && b2;
 			Code: `
 while (true) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(true)},
 		},
 		{
 			Code: `
 for (; true; ) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(true)},
 		},
 		{
 			Code: `
 do {} while (true);
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(true)},
 		},
 		{
 			Code: `
@@ -1843,7 +1848,7 @@ declare const test: true;
 
 while (test) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(false)},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -1852,7 +1857,7 @@ declare const test: true;
 
 for (; test; ) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(false)},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -1861,7 +1866,7 @@ declare const test: true;
 
 do {} while (test);
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(false)},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{

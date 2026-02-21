@@ -1,7 +1,8 @@
-From cdb4430eea6aad96c4d16f531b9ca837d495fdb3 Mon Sep 17 00:00:00 2001
+From ceebe335234552e03bb49de5d3abe38765711f40 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 13 Feb 2026 18:37:25 +0000
-Subject: [PATCH] fix(collections): avoid internal json import in ordered_map
+Subject: [PATCH 6/7] fix(collections): avoid internal json import in
+ ordered_map
 
 ---
  internal/collections/ordered_map.go | 17 +++++++++--------

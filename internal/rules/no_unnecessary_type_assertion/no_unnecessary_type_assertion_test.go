@@ -526,6 +526,23 @@ const alsoRedundant = num;
 		},
 		{
 			Code: `
+const str: string = 'hello';
+const redundant =  str as string;
+	      `,
+			Output: []string{`
+const str: string = 'hello';
+const redundant =  str;
+	      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+				},
+			},
+		},
+		{
+			Code: `
         type Foo = 3;
         const foo = <Foo>3;
       `,

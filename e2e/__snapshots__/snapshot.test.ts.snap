@@ -1294,7 +1294,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "label": "This expression already has the type 'string'",
         "range": {
           "end": 120,
-          "pos": 116,
+          "pos": 117,
+        },
+      },
+      {
+        "label": "Casting it to 'string' is unnecessary",
+        "range": {
+          "end": 130,
+          "pos": 121,
         },
       },
     ],
@@ -1325,7 +1332,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "label": "This expression already has the type 'string'",
         "range": {
           "end": 248,
-          "pos": 236,
+          "pos": 237,
+        },
+      },
+      {
+        "label": "Casting it to 'string' is unnecessary",
+        "range": {
+          "end": 258,
+          "pos": 249,
         },
       },
     ],
@@ -1356,7 +1370,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "label": "This expression already has the type '42'",
         "range": {
           "end": 353,
-          "pos": 349,
+          "pos": 350,
+        },
+      },
+      {
+        "label": "Casting it to '42' is unnecessary",
+        "range": {
+          "end": 359,
+          "pos": 354,
         },
       },
     ],
@@ -1762,7 +1783,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "label": "This expression already has the type 'any'",
         "range": {
           "end": 228,
-          "pos": 219,
+          "pos": 220,
+        },
+      },
+      {
+        "label": "Casting it to 'any' is unnecessary",
+        "range": {
+          "end": 235,
+          "pos": 229,
         },
       },
     ],
@@ -2849,7 +2877,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "label": "This expression already has the type 'number'",
         "range": {
           "end": 173,
-          "pos": 130,
+          "pos": 131,
+        },
+      },
+      {
+        "label": "Casting it to 'number' is unnecessary",
+        "range": {
+          "end": 183,
+          "pos": 174,
         },
       },
     ],

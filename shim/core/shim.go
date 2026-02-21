@@ -129,7 +129,6 @@ const ScriptTargetES2022 = core.ScriptTargetES2022
 const ScriptTargetES2023 = core.ScriptTargetES2023
 const ScriptTargetES2024 = core.ScriptTargetES2024
 const ScriptTargetES2025 = core.ScriptTargetES2025
-const ScriptTargetES3 = core.ScriptTargetES3
 const ScriptTargetES5 = core.ScriptTargetES5
 const ScriptTargetESNext = core.ScriptTargetESNext
 const ScriptTargetJSON = core.ScriptTargetJSON
@@ -138,7 +137,6 @@ const ScriptTargetLatestStandard = core.ScriptTargetLatestStandard
 const ScriptTargetNone = core.ScriptTargetNone
 //go:linkname ShouldRewriteModuleSpecifier github.com/microsoft/typescript-go/internal/core.ShouldRewriteModuleSpecifier
 func ShouldRewriteModuleSpecifier(specifier string, compilerOptions *core.CompilerOptions) bool
-type SourceFileAffectingCompilerOptions = core.SourceFileAffectingCompilerOptions
 type Stack[T any] = core.Stack[T]
 //go:linkname StringifyJson github.com/microsoft/typescript-go/internal/core.StringifyJson
 func StringifyJson(input any, prefix string, indent string) (string, error)
