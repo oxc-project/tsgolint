@@ -56,7 +56,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 63,
+      "end": 60,
       "pos": 55,
     },
     "rule": "await-thenable",
@@ -86,7 +86,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 123,
+      "end": 111,
       "pos": 106,
     },
     "rule": "await-thenable",
@@ -116,7 +116,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 278,
+      "end": 267,
       "pos": 262,
     },
     "rule": "await-thenable",
