@@ -1,6 +1,7 @@
 package consistent_type_exports
 
 import (
+	"slices"
 	"strings"
 	"unicode"
 
@@ -46,10 +47,8 @@ func isSymbolTypeBased(typeChecker *checker.Checker, symbol *ast.Symbol) (bool, 
 	for symbol != nil && !visited[symbol] {
 		visited[symbol] = true
 
-		for _, declaration := range symbol.Declarations {
-			if ast.IsTypeOnlyImportOrExportDeclaration(declaration) {
-				return true, true
-			}
+		if slices.ContainsFunc(symbol.Declarations, ast.IsTypeOnlyImportOrExportDeclaration) {
+			return true, true
 		}
 
 		if symbol.Flags&ast.SymbolFlagsValue != 0 {

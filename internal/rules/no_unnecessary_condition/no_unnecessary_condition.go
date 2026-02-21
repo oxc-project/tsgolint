@@ -17,6 +17,7 @@ package no_unnecessary_condition
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -950,12 +951,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check for union type - if any constituent is an array/tuple, return true
 				if utils.IsUnionType(t) {
-					for _, part := range t.Types() {
-						if isArrayOrTupleType(part) {
-							return true
-						}
-					}
-					return false
+					return slices.ContainsFunc(t.Types(), isArrayOrTupleType)
 				}
 
 				// Check for array type by number index type
@@ -1244,10 +1240,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			// Also allow if it's a union that includes an indeterminate type
 			if utils.IsUnionType(exprType) {
-				for _, part := range exprType.Types() {
-					if isIndeterminateType(part) {
-						return
-					}
+				if slices.ContainsFunc(exprType.Types(), isIndeterminateType) {
+					return
 				}
 			}
 
@@ -1917,12 +1911,7 @@ func checkTypeCondition(t *checker.Type) (isTruthy bool, isFalsy bool) {
 // optional chaining (?.) might be necessary.
 func isNullishType(t *checker.Type) bool {
 	if utils.IsUnionType(t) {
-		for _, part := range t.Types() {
-			if isNullishType(part) {
-				return true
-			}
-		}
-		return false
+		return slices.ContainsFunc(t.Types(), isNullishType)
 	}
 
 	flags := checker.Type_flags(t)
