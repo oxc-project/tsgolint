@@ -2,6 +2,7 @@ package switch_exhaustiveness_check
 
 import (
 	"slices"
+	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -22,10 +23,10 @@ func buildDangerousDefaultCaseMessage() rule.RuleMessage {
 		Description: "The switch statement is exhaustive, so the default case is unnecessary.",
 	}
 }
-func buildSwitchIsNotExhaustiveMessage(_missingBranches string) rule.RuleMessage {
+func buildSwitchIsNotExhaustiveMessage(missingBranches string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "switchIsNotExhaustive",
-		Description: "Switch is not exhaustive",
+		Description: "Switch is not exhaustive. Cases not matched: " + missingBranches,
 	}
 }
 
@@ -130,16 +131,17 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 			}
 
 			if len(switchMetadata.MissingLiteralBranchTypes) > 0 {
-				// TODO(port): more verbose message
-				//   missingBranches: missingLiteralBranchTypes
-				// .map(missingType =>
-				//   tsutils.isTypeFlagSet(missingType, ts.TypeFlags.ESSymbolLike)
-				//     ? `typeof ${missingType.getSymbol()?.escapedName as string}`
-				//     : typeToString(missingType),
-				// )
-				// .join(' | '),
+				missingBranches := make([]string, 0, len(switchMetadata.MissingLiteralBranchTypes))
+				for _, missingType := range switchMetadata.MissingLiteralBranchTypes {
+					if utils.IsTypeFlagSet(missingType, checker.TypeFlagsESSymbolLike) && missingType.Symbol() != nil {
+						missingBranches = append(missingBranches, "typeof "+missingType.Symbol().Name)
+						continue
+					}
 
-				ctx.ReportNode(node.Expression, buildSwitchIsNotExhaustiveMessage("TODO"))
+					missingBranches = append(missingBranches, ctx.TypeChecker.TypeToString(missingType))
+				}
+
+				ctx.ReportNode(node.Expression, buildSwitchIsNotExhaustiveMessage(strings.Join(missingBranches, " | ")))
 			}
 		}
 

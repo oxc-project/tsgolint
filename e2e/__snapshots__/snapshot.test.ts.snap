@@ -3468,8 +3468,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingReturnValue",
     },
     "range": {
-      "end": 327,
-      "pos": 120,
+      "end": 337,
+      "pos": 125,
     },
     "rule": "consistent-return",
   },
@@ -3477,38 +3477,12 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
     "kind": 0,
     "message": {
-      "description": "The case statement does not have a shared enum type with the switch predicate.",
-      "id": "mismatchedCase",
-    },
-    "range": {
-      "end": 236,
-      "pos": 184,
-    },
-    "rule": "no-unsafe-enum-comparison",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "The case statement does not have a shared enum type with the switch predicate.",
-      "id": "mismatchedCase",
-    },
-    "range": {
-      "end": 290,
-      "pos": 241,
-    },
-    "rule": "no-unsafe-enum-comparison",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Switch is not exhaustive",
+      "description": "Switch is not exhaustive. Cases not matched: "rejected"",
       "id": "switchIsNotExhaustive",
     },
     "range": {
-      "end": 176,
-      "pos": 170,
+      "end": 186,
+      "pos": 180,
     },
     "rule": "switch-exhaustiveness-check",
   },

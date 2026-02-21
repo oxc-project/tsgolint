@@ -1,7 +1,7 @@
 
 [TestSwitchExhaustivenessCheckRule/invalid-0 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "literal"
    2 | declare const value: 'literal';
    3 | switch (value) {
      |         ~~~~~
@@ -10,7 +10,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-1 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "literal"
    2 | declare const value: 'literal' & { _brand: true };
    3 | switch (value) {
      |         ~~~~~
@@ -19,7 +19,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-10 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    3 | const a = Symbol('a');
    4 | switch (value) {
      |         ~~~~~
@@ -28,7 +28,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-11 - 1]
 Diagnostic 1: switchIsNotExhaustive (5:9 - 5:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: typeof a | typeof b
    4 | declare const value: typeof a | typeof b | 1;
    5 | switch (value) {
      |         ~~~~~
@@ -37,7 +37,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-12 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    3 | declare const value: typeof a | string;
    4 | switch (value) {
      |         ~~~~~
@@ -46,7 +46,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-13 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: false | true
    2 | declare const value: boolean;
    3 | switch (value) {
      |         ~~~~~
@@ -55,7 +55,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-14 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: 1 | true
    2 | declare const value: boolean | 1;
    3 | switch (value) {
      |         ~~~~~
@@ -64,14 +64,14 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-15 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: false | true
    2 | declare const value: boolean | number;
    3 | switch (value) {
      |         ~~~~~
    4 |   case 1:
 
 Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: boolean | number;
    3 | switch (value) {
      |         ~~~~~
@@ -80,7 +80,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-16 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: object;
    3 | switch (value) {
      |         ~~~~~
@@ -89,14 +89,14 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-17 - 1]
 Diagnostic 1: switchIsNotExhaustive (7:9 - 7:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: Aaa.Bar
    6 | declare const value: Aaa | 1 | string;
    7 | switch (value) {
      |         ~~~~~
    8 |   case 1:
 
 Diagnostic 2: switchIsNotExhaustive (7:9 - 7:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    6 | declare const value: Aaa | 1 | string;
    7 | switch (value) {
      |         ~~~~~
@@ -105,7 +105,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-18 - 1]
 Diagnostic 1: switchIsNotExhaustive (14:9 - 14:11)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "Friday" | "Saturday" | "Sunday" | "Thursday" | "Tuesday" | "Wednesday"
   13 | 
   14 | switch (day) {
      |         ~~~
@@ -114,7 +114,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-19 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: Enum.B
    7 | function test(value: Enum): number {
    8 |   switch (value) {
      |           ~~~~~
@@ -123,7 +123,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-2 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: 1
    2 | declare const value: ('literal' & { _brand: true }) | 1;
    3 | switch (value) {
      |         ~~~~~
@@ -132,7 +132,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-20 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "b" | "c"
    7 | function test(value: Union): number {
    8 |   switch (value) {
      |           ~~~~~
@@ -141,7 +141,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-21 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:11 - 9:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: 1 | true
    8 | function test(value: Union): number {
    9 |   switch (value) {
      |           ~~~~~
@@ -150,7 +150,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-22 - 1]
 Diagnostic 1: switchIsNotExhaustive (5:11 - 5:20)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "B"
    4 | function test(value: DiscriminatedUnion): number {
    5 |   switch (value.type) {
      |           ~~~~~~~~~~
@@ -159,7 +159,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-23 - 1]
 Diagnostic 1: switchIsNotExhaustive (13:9 - 13:11)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "Friday" | "Monday" | "Saturday" | "Sunday" | "Thursday" | "Tuesday" | "Wednesday"
   12 | 
   13 | switch (day) {
      |         ~~~
@@ -168,7 +168,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-24 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:11 - 9:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: typeof b | typeof c
    8 | function test(value: T): number {
    9 |   switch (value) {
      |           ~~~~~
@@ -177,7 +177,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-25 - 1]
 Diagnostic 1: switchIsNotExhaustive (5:11 - 5:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: 2
    4 | function test(value: T): number {
    5 |   switch (value) {
      |           ~~~~~
@@ -186,7 +186,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-26 - 1]
 Diagnostic 1: switchIsNotExhaustive (5:11 - 5:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: 1 | 2
    4 | function test(value: T): number {
    5 |   switch (value) {
      |           ~~~~~
@@ -195,7 +195,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-27 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: typeof Enum["test-test"] | Enum.test
    7 | function test(arg: Enum): string {
    8 |   switch (arg) {
      |           ~~~
@@ -204,7 +204,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-28 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: typeof Enum[""] | Enum.test
    7 | function test(arg: Enum): string {
    8 |   switch (arg) {
      |           ~~~
@@ -213,7 +213,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-29 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: typeof Enum["9test"] | Enum.test
    7 | function test(arg: Enum): string {
    8 |   switch (arg) {
      |           ~~~
@@ -222,7 +222,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-3 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "2"
    2 | declare const value: '1' | '2' | number;
    3 | switch (value) {
      |         ~~~~~
@@ -231,7 +231,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-30 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | const value: number = Math.floor(Math.random() * 3);
    3 | switch (value) {
      |         ~~~~~
@@ -240,7 +240,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-31 - 1]
 Diagnostic 1: switchIsNotExhaustive (11:17 - 11:17)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["key-with\n\n          new-line"]
   10 | 
   11 |         switch (a) {
      |                 ~
@@ -249,7 +249,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-32 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:17 - 9:17)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["'a' `b` \"c\""]
    8 | 
    9 |         switch (a) {}
      |                 ~
@@ -349,14 +349,14 @@ Message: The switch statement is exhaustive, so the default case is unnecessary.
 
 [TestSwitchExhaustivenessCheckRule/invalid-4 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "2"
    2 | declare const value: '1' | '2' | number;
    3 | switch (value) {
      |         ~~~~~
    4 |   case '1':
 
 Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: '1' | '2' | number;
    3 | switch (value) {
      |         ~~~~~
@@ -365,7 +365,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-40 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "b"
    3 | 
    4 | switch (literal) {
      |         ~~~~~~~
@@ -374,7 +374,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-41 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "b"
    3 | 
    4 | switch (literal) {
      |         ~~~~~~~
@@ -383,7 +383,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-42 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "b"
    3 | 
    4 | switch (literal) {
      |         ~~~~~~~
@@ -392,7 +392,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-43 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: "b" | "c"
    3 | 
    4 | switch (literal) {
      |         ~~~~~~~
@@ -401,7 +401,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-44 - 1]
 Diagnostic 1: switchIsNotExhaustive (10:9 - 10:14)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: MyEnum.Bar | MyEnum.Baz
    9 | 
   10 | switch (myEnum) {
      |         ~~~~~~
@@ -410,7 +410,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-45 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: false | true
    2 | declare const value: boolean;
    3 | switch (value) {
      |         ~~~~~
@@ -419,7 +419,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-46 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:11 - 3:14)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: undefined
    2 | function foo(x: string[]) {
    3 |   switch (x[0]) {
      |           ~~~~
@@ -428,7 +428,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-5 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: (string & { foo: 'bar' }) | '1';
    3 | switch (value) {
      |         ~~~~~
@@ -437,7 +437,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-50 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:17 - 9:19)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: B.D
    8 |         declare const foo: A.B;
    9 |         switch (foo) {
      |                 ~~~
@@ -446,7 +446,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-51 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:17 - 4:19)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: B.D
    3 |         declare const foo: A.B;
    4 |         switch (foo) {
      |                 ~~~
@@ -455,14 +455,14 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-6 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: undefined | null | "1" | 1
    2 | declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
    3 | switch (value) {
      |         ~~~~~
    4 | }
 
 Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
    3 | switch (value) {
      |         ~~~~~
@@ -471,7 +471,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-7 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: string | number;
    3 | switch (value) {
      |         ~~~~~
@@ -480,7 +480,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-8 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    3 | declare const a: number;
    4 | switch (value) {
      |         ~~~~~
@@ -489,7 +489,7 @@ Message: Switch is not exhaustive
 
 [TestSwitchExhaustivenessCheckRule/invalid-9 - 1]
 Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive
+Message: Switch is not exhaustive. Cases not matched: default
    2 | declare const value: bigint;
    3 | switch (value) {
      |         ~~~~~
