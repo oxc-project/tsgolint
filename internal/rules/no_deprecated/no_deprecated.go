@@ -232,6 +232,17 @@ var NoDeprecatedRule = rule.Rule{
 				if isDeprecated {
 					return true, reason
 				}
+				// Fallback: if the signature had no declaration (typescript-go limitation for
+				// inherited methods), check the symbol's own declarations directly.
+				// Guarded by signatureDecl == nil so this never fires for overloaded functions
+				// (which always produce a resolved signatureDecl), preventing false positives on
+				// non-deprecated overloads.
+				if signatureDecl == nil {
+					isDeprecated, reason = getJsDocDeprecation(aliasedSymbol)
+					if isDeprecated {
+						return true, reason
+					}
+				}
 			}
 
 			return false, ""
