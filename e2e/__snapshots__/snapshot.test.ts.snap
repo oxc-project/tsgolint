@@ -4814,31 +4814,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
 exports[`TSGoLint E2E Snapshot Tests > should handle circular project references (issue #297) 1`] = `
 [
   {
-    "file_path": "fixtures/circular-project-references/project2/src/demo/index.ts",
-    "kind": 0,
+    "file_path": "fixtures/circular-project-references/project1/src/demo/index.ts",
+    "kind": 1,
     "message": {
-      "description": "'demo()' will use Object's default stringification format ('[object Object]') when stringified.",
-      "help": "Consider picking a property (e.g. \`user.name\`), using a formatter (or \`JSON.stringify\`), or implementing a custom \`toString()\`/\`toLocaleString()\` on the type.",
-      "id": "baseToString",
+      "description": "File was not found in program 'fixtures/circular-project-references/project1/tsconfig.json'. This is likely caused by circular project references, which are not supported by TypeScript (TS6202).",
+      "id": "circular-project-references",
     },
     "range": {
-      "end": 66,
-      "pos": 60,
+      "end": 0,
+      "pos": 0,
     },
-    "rule": "no-base-to-string",
   },
   {
     "file_path": "fixtures/circular-project-references/project2/src/demo/index.ts",
-    "kind": 0,
+    "kind": 1,
     "message": {
-      "description": "Invalid type "{ x: number; }" of template literal expression.",
-      "id": "invalidType",
+      "description": "File was not found in program 'fixtures/circular-project-references/project2/tsconfig.json'. This is likely caused by circular project references, which are not supported by TypeScript (TS6202).",
+      "id": "circular-project-references",
     },
     "range": {
-      "end": 66,
-      "pos": 60,
+      "end": 0,
+      "pos": 0,
     },
-    "rule": "restrict-template-expressions",
   },
 ]
 `;
