@@ -146,9 +146,9 @@ func (sf *snapshotFile) write(t *testing.T) {
 func parseSnapshotFile(data string) map[string]string {
 	entries := make(map[string]string)
 
-	blocks := strings.Split(data, "---\n")
+	blocks := strings.SplitSeq(data, "---\n")
 
-	for _, block := range blocks {
+	for block := range blocks {
 		block = strings.TrimLeft(block, "\n")
 		if block == "" {
 			continue
