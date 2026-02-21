@@ -7,9 +7,11 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/stats"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -52,6 +54,7 @@ func RunLinter(
 	onInternalDiagnostic func(d diagnostic.Internal),
 	fixState Fixes,
 	typeErrors TypeErrors,
+	lintStats *stats.Report,
 ) error {
 
 	idx := 0
@@ -59,6 +62,8 @@ func RunLinter(
 		if logLevel == utils.LogLevelDebug {
 			log.Printf("[%d/%d] Running linter on program: %s", idx+1, len(workload.Programs), configFileName)
 		}
+
+		programStart := time.Now()
 
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
@@ -111,7 +116,9 @@ func RunLinter(
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
+		lintStats.AddProgram(configFileName, time.Since(programStart), len(sourceFiles))
+
+		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors, lintStats)
 		if err != nil {
 			return err
 		}
@@ -119,7 +126,9 @@ func RunLinter(
 		idx++
 	}
 
-	{
+	if len(workload.UnmatchedFiles) > 0 {
+		inferredStart := time.Now()
+
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
 
@@ -142,7 +151,9 @@ func RunLinter(
 			files = append(files, sf)
 		}
 
-		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
+		lintStats.AddProgram("inferred program", time.Since(inferredStart), len(files))
+
+		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors, lintStats)
 		if err != nil {
 			return err
 		}
@@ -152,7 +163,12 @@ func RunLinter(
 
 }
 
-func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors) error {
+func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors, lintStats *stats.Report) error {
+	lintStart := time.Now()
+	var ruleTimesMu sync.Mutex
+	ruleTimes := make(map[string]time.Duration)
+	var lintCPUMu sync.Mutex
+	var lintCPUTime time.Duration
 	type checkerWorkload struct {
 		checker *checker.Checker
 		program *compiler.Program
@@ -219,7 +235,13 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	wg := core.NewWorkGroup(workers == 1)
 	for range workers {
 		wg.Queue(func() {
-			registeredListeners := make(map[ast.Kind][](func(node *ast.Node)), 20)
+			type ruleHandler struct {
+				ruleName string
+				fn       func(node *ast.Node)
+			}
+			registeredListeners := make(map[ast.Kind][]ruleHandler, 20)
+			localRuleTimes := make(map[string]time.Duration)
+			workerStart := time.Now()
 
 			for w := range workloadQueue {
 				for file := range w.queue {
@@ -330,16 +352,24 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						for kind, listener := range r.Run(ctx) {
 							listeners, ok := registeredListeners[kind]
 							if !ok {
-								listeners = make([](func(node *ast.Node)), 0, len(rules))
+								listeners = make([]ruleHandler, 0, len(rules))
 							}
-							registeredListeners[kind] = append(listeners, listener)
+							registeredListeners[kind] = append(listeners, ruleHandler{ruleName: r.Name, fn: listener})
 						}
 					}
 
 					runListeners := func(kind ast.Kind, node *ast.Node) {
 						if listeners, ok := registeredListeners[kind]; ok {
-							for _, listener := range listeners {
-								listener(node)
+							if lintStats != nil {
+								for _, listener := range listeners {
+									start := time.Now()
+									listener.fn(node)
+									localRuleTimes[listener.ruleName] += time.Since(start)
+								}
+							} else {
+								for _, listener := range listeners {
+									listener.fn(node)
+								}
 							}
 						}
 					}
@@ -413,9 +443,27 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 					clear(registeredListeners)
 				}
 			}
+
+			if len(localRuleTimes) > 0 {
+				ruleTimesMu.Lock()
+				for ruleName, duration := range localRuleTimes {
+					ruleTimes[ruleName] += duration
+				}
+				ruleTimesMu.Unlock()
+			}
+			localWorkerCPU := time.Since(workerStart)
+			lintCPUMu.Lock()
+			lintCPUTime += localWorkerCPU
+			lintCPUMu.Unlock()
 		})
 	}
 	wg.RunAndWait()
+
+	for ruleName, duration := range ruleTimes {
+		lintStats.AddRule(ruleName, duration)
+	}
+	lintStats.AddLintCPU(lintCPUTime)
+	lintStats.AddLintWall(time.Since(lintStart))
 
 	return nil
 }
