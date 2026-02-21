@@ -200,20 +200,14 @@ func renderSourceAnnotation(code string, sourceFile *ast.SourceFile, textRange c
 	el, ec := scanner.GetECMALineAndCharacterOfPosition(sourceFile, endPos)
 
 	// Display range with 1 line of context
-	startLine := sl - 1
-	if startLine < 0 {
-		startLine = 0
-	}
+	startLine := max(sl-1, 0)
 	endLine := el + 1
 	if endLine >= len(lines) {
 		endLine = len(lines) - 1
 	}
 
 	// Calculate gutter width based on line numbers
-	gutterWidth := len(strconv.Itoa(endLine + 1))
-	if gutterWidth < 2 {
-		gutterWidth = 2
-	}
+	gutterWidth := max(len(strconv.Itoa(endLine+1)), 2)
 
 	var sb strings.Builder
 	for lineIdx := startLine; lineIdx <= endLine; lineIdx++ {
