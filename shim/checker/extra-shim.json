@@ -31,6 +31,7 @@
       "getBaseTypeOfLiteralType",
       "getWidenedType",
       "isTypeAssignableTo",
+      "isTypeIdenticalTo",
       "isTypeStrictSubtypeOf",
       "IsDeprecatedDeclaration",
       "GetShorthandAssignmentValueSymbol",
