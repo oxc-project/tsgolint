@@ -3298,8 +3298,24 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: bigint",
+        "range": {
+          "end": 12,
+          "pos": 10,
+        },
+      },
+      {
+        "label": "Type: number",
+        "range": {
+          "end": 16,
+          "pos": 15,
+        },
+      },
+    ],
     "message": {
-      "description": "Numeric '+' operations must either be both bigints or both numbers. Got \`bigint\` + \`number\`.",
+      "description": "Numeric '+' operations must either be both bigints or both numbers.",
       "id": "bigintAndNumber",
     },
     "range": {
@@ -3312,7 +3328,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
     "message": {
-      "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`. Got \`never\`.",
+      "description": "Invalid operand of type 'never' for a '+' operation.",
+      "help": "Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`.",
       "id": "invalid",
     },
     "range": {
