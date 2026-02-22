@@ -2,6 +2,7 @@
 [TestUnboundMethod/invalid-1 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | import { console } from './class';
    3 | const x = console.log;
      |           ~~~~~~~~~~~
@@ -16,6 +17,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-10 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:1 - 18:29)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | ContainsMethods.unboundStatic as any;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,6 +30,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-11 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:1 - 18:16)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | instance.unbound || 0;
      | ~~~~~~~~~~~~~~~~
@@ -40,6 +43,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-12 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:1 - 18:29)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | ContainsMethods.unboundStatic || 0;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -52,6 +56,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-13 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:20 - 18:35)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | instance.unbound ? instance.unbound : null
      |                    ~~~~~~~~~~~~~~~~
@@ -64,6 +69,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-14 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (8:1 - 8:29)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    7 | 
    8 | new ContainsMethods().unbound;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,6 +84,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-15 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (5:11 - 5:42)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    4 | }
    5 | const x = CommunicationError.prototype.foo;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,6 +99,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-16 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (1:11 - 1:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    1 | const x = Promise.all;
      |           ~~~~~~~~~~~
   Label: This reference may be unbound and lose `this` context (1:19 - 1:21)
@@ -102,6 +110,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-17 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (9:5 - 9:20)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    8 | 
    9 | x = instance.unbound; // THIS SHOULD ERROR
      |     ~~~~~~~~~~~~~~~~
@@ -130,6 +139,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-19 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | declare const foo: Number;
    3 | const x = foo.toFixed;
      |           ~~~~~~~~~~~
@@ -144,6 +154,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-2 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (20:19 - 20:30)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   19 | function foo(arg: ContainsMethods | null) {
   20 |   const unbound = arg?.unbound;
      |                   ~~~~~~~~~~~~
@@ -156,6 +167,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 
 Diagnostic 2: unboundWithoutThisAnnotation (21:3 - 21:13)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   20 |   const unbound = arg?.unbound;
   21 |   arg.unbound += 1;
      |   ~~~~~~~~~~~
@@ -168,6 +180,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 
 Diagnostic 3: unboundWithoutThisAnnotation (22:3 - 22:14)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   21 |   arg.unbound += 1;
   22 |   arg?.unbound as any;
      |   ~~~~~~~~~~~~
@@ -182,6 +195,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-20 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:28)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | declare const foo: Object;
    3 | const x = foo.hasOwnProperty;
      |           ~~~~~~~~~~~~~~~~~~
@@ -196,6 +210,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-21 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:19)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | declare const foo: String;
    3 | const x = foo.slice;
      |           ~~~~~~~~~
@@ -210,6 +225,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-22 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | declare const foo: Date;
    3 | const x = foo.getTime;
      |           ~~~~~~~~~~~
@@ -224,6 +240,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-23 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:22)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | class Foo extends Number {}
    3 | const x = Foo.parseInt;
      |           ~~~~~~~~~~~~
@@ -238,6 +255,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-24 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:26)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | class Foo extends String {}
    3 | const x = Foo.fromCharCode;
      |           ~~~~~~~~~~~~~~~~
@@ -252,6 +270,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-25 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:28)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | class Foo extends Object {}
    3 | const x = Foo.defineProperty;
      |           ~~~~~~~~~~~~~~~~~~
@@ -266,6 +285,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-26 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:19)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | class Foo extends Date {}
    3 | const x = Foo.parse;
      |           ~~~~~~~~~
@@ -294,6 +314,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-28 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (5:9 - 5:15)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    4 | }
    5 | const { unbound } = new Foo();
      |         ~~~~~~~
@@ -312,6 +333,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-3 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:17 - 18:32)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | const unbound = instance.unbound;
      |                 ~~~~~~~~~~~~~~~~
@@ -324,6 +346,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-30 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (6:4 - 6:10)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    5 | let unbound;
    6 | ({ unbound } = new Foo());
      |    ~~~~~~~
@@ -369,6 +392,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-35 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (6:16 - 6:22)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    5 | declare const bar: Foo;
    6 | function foo({ unbound }: Foo = { unbound: function () {} }) {}
      |                ~~~~~~~
@@ -414,6 +438,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-4 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:23 - 18:51)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | const unboundStatic = ContainsMethods.unboundStatic;
      |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -498,6 +523,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-48 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (1:9 - 1:15)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    1 | const { unbound } = { unbound: function () {} };
      |         ~~~~~~~
 ---
@@ -505,6 +531,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-49 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:5 - 3:11)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | function foo(
    3 |   { unbound }: { unbound: () => void } = { unbound: function () {} },
      |     ~~~~~~~
@@ -514,6 +541,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-5 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:9 - 18:15)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | const { unbound } = instance;
      |         ~~~~~~~
@@ -531,6 +559,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-51 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (5:9 - 5:11)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    4 | }
    5 | const { foo } = CommunicationError.prototype;
      |         ~~~
@@ -540,6 +569,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-52 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (6:4 - 6:6)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    5 | let foo;
    6 | ({ foo } = CommunicationError.prototype);
      |    ~~~
@@ -549,6 +579,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-53 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (3:9 - 3:11)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    2 | import { console } from './class';
    3 | const { log } = console;
      |         ~~~
@@ -558,6 +589,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-54 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (1:9 - 1:11)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    1 | const { all } = Promise;
      |         ~~~
 ---
@@ -565,6 +597,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-55 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (8:15 - 8:27)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    7 |     super();
    8 |     const x = super.logThis;
      |               ~~~~~~~~~~~~~
@@ -579,6 +612,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-56 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (9:9 - 9:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    8 |     let x;
    9 |     x = super.logThis;
      |         ~~~~~~~~~~~~~
@@ -593,6 +627,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-57 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (7:9 - 7:9)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    6 | 
    7 | const { a, b } = values;
      |         ~
@@ -602,6 +637,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-58 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (7:9 - 7:9)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    6 | 
    7 | const { a: c } = values;
      |         ~
@@ -611,6 +647,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-59 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (7:12 - 7:12)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    6 | 
    7 | const { b, a } = values;
      |            ~
@@ -620,6 +657,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-6 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:9 - 18:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | const { unboundStatic } = ContainsMethods;
      |         ~~~~~~~~~~~~~
@@ -628,6 +666,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-60 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (5:11 - 5:25)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    4 | };
    5 | const f = objectLiteral.f;
      |           ~~~~~~~~~~~~~~~
@@ -642,6 +681,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-7 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:6 - 18:21)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | <any>instance.unbound;
      |      ~~~~~~~~~~~~~~~~
@@ -654,6 +694,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-8 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:1 - 18:16)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | instance.unbound as any;
      | ~~~~~~~~~~~~~~~~
@@ -666,6 +707,7 @@ Message: Avoid referencing unbound methods which may cause unintentional scoping
 [TestUnboundMethod/invalid-9 - 1]
 Diagnostic 1: unboundWithoutThisAnnotation (18:6 - 18:34)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
   17 | 
   18 | <any>ContainsMethods.unboundStatic;
      |      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

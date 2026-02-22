@@ -364,6 +364,7 @@ Message: Unsafe assignment of an any value.
 Diagnostic 1: anyAssignmentThis (3:9 - 3:18)
 Message: Unsafe assignment of an any value. `this` is typed as `any`.
 
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    2 | function foo() {
    3 |   const bar = this;
      |         ~~~~~~~~~~

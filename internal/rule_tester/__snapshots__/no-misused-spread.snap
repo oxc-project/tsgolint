@@ -2,6 +2,7 @@
 [TestNoMisusedSpreadRule/invalid-0 - 1]
 Diagnostic 1: noStringSpread (1:12 - 1:20)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    1 | const a = [...'test'];
      |            ~~~~~~~~~
 ---
@@ -9,6 +10,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-1 - 1]
 Diagnostic 1: noStringSpread (3:19 - 3:25)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         function withText<Text extends string>(text: Text) {
    3 |           return [...text];
      |                   ~~~~~~~
@@ -18,6 +20,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-10 - 1]
 Diagnostic 1: noStringSpread (6:22 - 6:28)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    5 | 
    6 |         textIdentity(...text, 'and', ...text);
      |                      ~~~~~~~
@@ -25,6 +28,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 
 Diagnostic 2: noStringSpread (6:38 - 6:44)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    5 | 
    6 |         textIdentity(...text, 'and', ...text);
      |                                      ~~~~~~~
@@ -34,6 +38,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-11 - 1]
 Diagnostic 1: noStringSpread (5:24 - 5:30)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    4 |         function withText<Text extends string>(text: Text) {
    5 |           textIdentity(...text);
      |                        ~~~~~~~
@@ -43,6 +48,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-12 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:33)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare function getString<T extends string>(): T;
    3 |         const a = [...getString()];
      |                    ~~~~~~~~~~~~~~
@@ -52,6 +58,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-13 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:33)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare function getString(): string & { __brand: 'test' };
    3 |         const a = [...getString()];
      |                    ~~~~~~~~~~~~~~
@@ -113,6 +120,7 @@ Message: Using the spread operator on an array in an object will result in a lis
 [TestNoMisusedSpreadRule/invalid-2 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:26)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         const test = 'hello';
    3 |         const a = [...test];
      |                    ~~~~~~~
@@ -210,6 +218,7 @@ Message: Using the spread operator on an Iterable in an object can cause unexpec
 [TestNoMisusedSpreadRule/invalid-3 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:26)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         const test = `he${'ll'}o`;
    3 |         const a = [...test];
      |                    ~~~~~~~
@@ -219,6 +228,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-30 - 1]
 Diagnostic 1: noMapSpreadInObject (3:11 - 6:12)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         const o = {
    3 |           ...new Map([
      |           ~~~~~~~~~~~~
@@ -235,6 +245,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-31 - 1]
 Diagnostic 1: noMapSpreadInObject (7:21 - 7:26)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    6 | 
    7 |         const o = { ...map };
      |                     ~~~~~~
@@ -245,6 +256,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-32 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: Map<string, number>;
    3 |         const o = { ...map };
      |                     ~~~~~~
@@ -255,6 +267,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-33 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:28)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: Map<string, number>;
    3 |         const o = { ...(map) };
      |                     ~~~~~~~~
@@ -265,6 +278,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-34 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:33)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: Map<string, number>;
    3 |         const o = { ...(map, map) };
      |                     ~~~~~~~~~~~~~
@@ -275,6 +289,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-35 - 1]
 Diagnostic 1: noMapSpreadInObject (4:21 - 4:26)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    3 |         const others = { a: 1 };
    4 |         const o = { ...map, ...others };
      |                     ~~~~~~
@@ -285,6 +300,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-36 - 1]
 Diagnostic 1: noMapSpreadInObject (3:31 - 3:36)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: Map<string, number>;
    3 |         const o = { other: 1, ...map };
      |                               ~~~~~~
@@ -295,6 +311,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-37 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: ReadonlyMap<string, number>;
    3 |         const o = { ...map };
      |                     ~~~~~~
@@ -305,6 +322,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-38 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: WeakMap<{ a: number }, string>;
    3 |         const o = { ...map };
      |                     ~~~~~~
@@ -315,6 +333,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-39 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:26)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const map: Map<string, number> | { a: number };
    3 |         const o = { ...map };
      |                     ~~~~~~
@@ -324,6 +343,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-4 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:26)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare const test: string;
    3 |         const a = [...test];
      |                    ~~~~~~~
@@ -333,6 +353,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-40 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:31)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare function getMap(): Map<string, number>;
    3 |         const o = { ...getMap() };
      |                     ~~~~~~~~~~~
@@ -343,6 +364,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-41 - 1]
 Diagnostic 1: noMapSpreadInObject (3:21 - 3:24)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    2 |         declare const a: Map<boolean, string> & Set<number>;
    3 |         const o = { ...a };
      |                     ~~~~
@@ -362,6 +384,7 @@ Message: Using the spread operator on class instances will lose their class prot
 [TestNoMisusedSpreadRule/invalid-43 - 1]
 Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:30)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    2 |         const promise = new Promise(() => {});
    3 |         const o = { ...promise };
      |                     ~~~~~~~~~~
@@ -372,6 +395,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-44 - 1]
 Diagnostic 1: noPromiseSpreadInObject (4:20 - 4:37)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    3 |         async function foo() {
    4 |           return { ...(promise || {}) };
      |                    ~~~~~~~~~~~~~~~~~~
@@ -382,6 +406,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-45 - 1]
 Diagnostic 1: noPromiseSpreadInObject (4:20 - 4:58)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    3 |         async function foo() {
    4 |           return { ...(Math.random() < 0.5 ? promise : {}) };
      |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -392,6 +417,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-46 - 1]
 Diagnostic 1: noPromiseSpreadInObject (3:20 - 3:29)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    2 |         function withPromise<P extends Promise<void>>(promise: P) {
    3 |           return { ...promise };
      |                    ~~~~~~~~~~
@@ -402,6 +428,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-47 - 1]
 Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:35)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    2 |         declare const maybePromise: Promise<number> | { a: number };
    3 |         const o = { ...maybePromise };
      |                     ~~~~~~~~~~~~~~~
@@ -412,6 +439,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-48 - 1]
 Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:30)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    2 |         declare const promise: Promise<number> & { a: number };
    3 |         const o = { ...promise };
      |                     ~~~~~~~~~~
@@ -422,6 +450,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-49 - 1]
 Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:35)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    2 |         declare function getPromise(): Promise<number>;
    3 |         const o = { ...getPromise() };
      |                     ~~~~~~~~~~~~~~~
@@ -432,6 +461,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-5 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:26)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare const test: string | number[];
    3 |         const a = [...test];
      |                    ~~~~~~~
@@ -441,6 +471,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-50 - 1]
 Diagnostic 1: noPromiseSpreadInObject (3:21 - 3:35)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    2 |         declare function getPromise<T extends Promise<number>>(arg: T): T;
    3 |         const o = { ...getPromise() };
      |                     ~~~~~~~~~~~~~~~
@@ -451,6 +482,7 @@ Message: Using the spread operator on Promise in an object can cause unexpected 
 [TestNoMisusedSpreadRule/invalid-51 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...f };
      |                     ~~~~
@@ -460,6 +492,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-52 - 1]
 Diagnostic 1: noFunctionSpreadInObject (11:21 - 11:26)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
   10 | 
   11 |         const o = { ...obj };
      |                     ~~~~~~
@@ -469,6 +502,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-53 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...f };
      |                     ~~~~
@@ -478,6 +512,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-54 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...f };
      |                     ~~~~
@@ -487,6 +522,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-55 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:36)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...getFunction() };
      |                     ~~~~~~~~~~~~~~~~
@@ -496,6 +532,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-56 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...f };
      |                     ~~~~
@@ -505,6 +542,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-57 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:24)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...f };
      |                     ~~~~
@@ -514,6 +552,7 @@ Message: Using the spread operator on a function without additional properties c
 [TestNoMisusedSpreadRule/invalid-58 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:21 - 4:32)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = { ...generator };
      |                     ~~~~~~~~~~~~
@@ -532,6 +571,7 @@ Message: Using the spread operator on an Iterable in an object can cause unexpec
 [TestNoMisusedSpreadRule/invalid-6 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:26)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare const test: string & { __brand: 'test' };
    3 |         const a = [...test];
      |                    ~~~~~~~
@@ -622,6 +662,7 @@ Message: Using the spread operator on class instances will lose their class prot
 [TestNoMisusedSpreadRule/invalid-7 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:26)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare const test: number | (boolean | (string & { __brand: true }));
    3 |         const a = [...test];
      |                    ~~~~~~~
@@ -721,6 +762,7 @@ Message: Using the spread operator on class declarations will spread only their 
 [TestNoMisusedSpreadRule/invalid-8 - 1]
 Diagnostic 1: noStringSpread (3:20 - 3:33)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    2 |         declare function getString(): string;
    3 |         const a = [...getString()];
      |                    ~~~~~~~~~~~~~~
@@ -799,6 +841,7 @@ Message: Using the spread operator on class instances will lose their class prot
 [TestNoMisusedSpreadRule/invalid-87 - 1]
 Diagnostic 1: noFunctionSpreadInObject (4:24 - 4:29)
 Message: Using the spread operator on a function without additional properties can cause unexpected behavior.
+Help: Did you forget to call the function?
    3 | 
    4 |         const o = <div {...f} />;
      |                        ~~~~~~
@@ -817,6 +860,7 @@ Message: Using the spread operator on an Iterable in an object can cause unexpec
 [TestNoMisusedSpreadRule/invalid-89 - 1]
 Diagnostic 1: noMapSpreadInObject (4:24 - 4:31)
 Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
    3 | 
    4 |         const o = <div {...map} />;
      |                        ~~~~~~~~
@@ -827,6 +871,7 @@ Message: Using the spread operator on a Map in an object will result in an empty
 [TestNoMisusedSpreadRule/invalid-9 - 1]
 Diagnostic 1: noStringSpread (6:22 - 6:28)
 Message: Using the spread operator on a string can mishandle special characters, because it produces Unicode code points, which will break complex characters (like emojis) into multiple parts.
+Help: Consider using `Intl.Segmenter` for locale-aware string decomposition. Otherwise, if you don't need to preserve emojis or other non-ASCII characters, disable this lint rule on this line or configure the 'allow' rule option.
    5 | 
    6 |         textIdentity(...text);
      |                      ~~~~~~~
@@ -836,6 +881,7 @@ Message: Using the spread operator on a string can mishandle special characters,
 [TestNoMisusedSpreadRule/invalid-90 - 1]
 Diagnostic 1: noPromiseSpreadInObject (4:24 - 4:35)
 Message: Using the spread operator on Promise in an object can cause unexpected behavior.
+Help: Did you forget to await the promise before spreading it?
    3 | 
    4 |         const o = <div {...promise} />;
      |                        ~~~~~~~~~~~~

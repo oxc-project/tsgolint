@@ -30,6 +30,7 @@ Message: Unsafe use of a(n) `any` typed template tag.
 Diagnostic 1: unsafeCallThis (4:12 - 4:23)
 Message: Unsafe call of a(n) `any` typed value. `this` is typed as `any`.
 
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    3 |   methodA() {
    4 |     return this.methodB()
      |            ~~~~~~~~~~~~
@@ -38,6 +39,7 @@ Message: Unsafe call of a(n) `any` typed value. `this` is typed as `any`.
 Diagnostic 2: unsafeCallThis (10:12 - 10:15)
 Message: Unsafe call of a(n) `any` typed value. `this` is typed as `any`.
 
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    9 |   methodC() {
   10 |     return this()
      |            ~~~~

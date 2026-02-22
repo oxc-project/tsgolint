@@ -315,6 +315,9 @@ func formatDiagnosticsSnapshot(code string, diagnostics []rule.RuleDiagnostic) s
 
 			fmt.Fprintf(&sb, "Diagnostic %d: %s (%d:%d - %d:%d)\n", i+1, d.Message.Id, line, column, endLine, endColumn)
 			fmt.Fprintf(&sb, "Message: %s\n", d.Message.Description)
+			if d.Message.Help != "" {
+				fmt.Fprintf(&sb, "Help: %s\n", d.Message.Help)
+			}
 
 			// Render primary diagnostic range
 			annotated := renderSourceAnnotation(code, d.SourceFile, d.Range, '~', "")
