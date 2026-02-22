@@ -297,6 +297,7 @@ Message: Functions that return promises must be async.
 [TestPromiseFunctionAsyncRule/invalid-20 - 1]
 Diagnostic 1: missingAsyncHybridReturn (2:1 - 4:1)
 Message: Functions that return promises must be async.
+Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
    1 | 
    2 | function promiseInUnionWithoutExplicitReturnType(p: boolean) {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -311,6 +312,7 @@ Message: Functions that return promises must be async.
 [TestPromiseFunctionAsyncRule/invalid-21 - 1]
 Diagnostic 1: missingAsyncHybridReturn (4:1 - 10:1)
 Message: Functions that return promises must be async.
+Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
    3 | function test1(a: number): Promise<number>;
    4 | function test1(a?: number) {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -332,6 +334,7 @@ Message: Functions that return promises must be async.
 [TestPromiseFunctionAsyncRule/invalid-22 - 1]
 Diagnostic 1: missingAsyncHybridReturn (6:1 - 8:1)
 Message: Functions that return promises must be async.
+Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
    5 | 
    6 | function promiseInUnionWithoutExplicitReturnType(p: boolean) {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

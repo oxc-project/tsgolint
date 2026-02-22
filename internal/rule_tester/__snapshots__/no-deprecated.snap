@@ -377,6 +377,28 @@ Message: `bar` is deprecated.
    3 |       
 ---
 
+[TestNoDeprecatedRule/invalid-143 - 1]
+Diagnostic 1: deprecated (8:15 - 8:25)
+Message: `searchPaths` is deprecated.
+   7 |         const child = new Child();
+   8 |         child.searchPaths();
+     |               ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoDeprecatedRule/invalid-144 - 1]
+Diagnostic 1: deprecatedWithReason (8:15 - 8:25)
+Message: `searchPaths` is deprecated. use newMethod() instead
+   7 |         const child = new Child();
+   8 |         child.searchPaths();
+     |               ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoDeprecatedRule/invalid-145 - 1]
+No diagnostics
+---
+
 [TestNoDeprecatedRule/invalid-15 - 1]
 Diagnostic 1: deprecated (3:9 - 3:9)
 Message: `a` is deprecated.

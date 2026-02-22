@@ -47,6 +47,7 @@ Message: Computed name [y] resolves to an `error` typed value.
 [TestNoUnsafeMemberAccessRule/invalid-13 - 1]
 Diagnostic 1: unsafeThisMemberExpression (4:17 - 4:23)
 Message: Unsafe member access .methodB on an `any` value. `this` is typed as `any`.
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    3 |   methodA() {
    4 |     return this.methodB()
      |                 ~~~~~~~
@@ -54,6 +55,7 @@ Message: Unsafe member access .methodB on an `any` value. `this` is typed as `an
 
 Diagnostic 2: unsafeThisMemberExpression (8:17 - 8:29)
 Message: Unsafe member access [getProperty()] on an `any` value. `this` is typed as `any`.
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    7 |     const getProperty = () => Math.random() > 0.5 ? 'methodB' : 'methodC'
    8 |     return this[getProperty()]()
      |                 ~~~~~~~~~~~~~
@@ -61,6 +63,7 @@ Message: Unsafe member access [getProperty()] on an `any` value. `this` is typed
 
 Diagnostic 3: unsafeThisMemberExpression (14:19 - 14:25)
 Message: Unsafe member access .methodA on an `any` value. `this` is typed as `any`.
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
   13 |   methodD() {
   14 |     return (this?.methodA)?.()
      |                   ~~~~~~~

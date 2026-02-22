@@ -2508,5 +2508,38 @@ exists('/foo');
 				},
 			},
 		},
+		// Case 1: inherited method call (no override in Child)
+		{
+			Code: `
+        class Base {
+          /** @deprecated */
+          searchPaths(): string[] { return []; }
+        }
+        class Child extends Base {}
+        const child = new Child();
+        child.searchPaths();
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecated",
+				},
+			},
+		},
+		{
+			Code: `
+        class Base {
+          /** @deprecated use newMethod() instead */
+          searchPaths(): string[] { return []; }
+        }
+        class Child extends Base {}
+        const child = new Child();
+        child.searchPaths();
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecatedWithReason",
+				},
+			},
+		},
 	})
 }

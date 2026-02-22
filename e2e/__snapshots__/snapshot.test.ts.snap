@@ -56,7 +56,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 63,
+      "end": 60,
       "pos": 55,
     },
     "rule": "await-thenable",
@@ -86,7 +86,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 123,
+      "end": 111,
       "pos": 106,
     },
     "rule": "await-thenable",
@@ -116,7 +116,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 278,
+      "end": 267,
       "pos": 262,
     },
     "rule": "await-thenable",
@@ -3298,8 +3298,24 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: bigint",
+        "range": {
+          "end": 12,
+          "pos": 10,
+        },
+      },
+      {
+        "label": "Type: number",
+        "range": {
+          "end": 16,
+          "pos": 15,
+        },
+      },
+    ],
     "message": {
-      "description": "Numeric '+' operations must either be both bigints or both numbers. Got \`bigint\` + \`number\`.",
+      "description": "Numeric '+' operations must either be both bigints or both numbers.",
       "id": "bigintAndNumber",
     },
     "range": {
@@ -3312,7 +3328,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
     "message": {
-      "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`. Got \`never\`.",
+      "description": "Invalid operand of type 'never' for a '+' operation.",
+      "help": "Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`.",
       "id": "invalid",
     },
     "range": {
@@ -3338,8 +3355,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: { prop: any; }",
+        "range": {
+          "end": 247,
+          "pos": 244,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "{ prop: any; }" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3351,8 +3377,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: symbol",
+        "range": {
+          "end": 319,
+          "pos": 316,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "symbol" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3364,8 +3399,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: Function",
+        "range": {
+          "end": 400,
+          "pos": 398,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "Function" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3377,8 +3421,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: number[]",
+        "range": {
+          "end": 468,
+          "pos": 465,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "number[]" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3468,8 +3521,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingReturnValue",
     },
     "range": {
-      "end": 327,
-      "pos": 120,
+      "end": 337,
+      "pos": 125,
     },
     "rule": "consistent-return",
   },
@@ -3477,40 +3530,32 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
     "kind": 0,
     "message": {
-      "description": "The case statement does not have a shared enum type with the switch predicate.",
-      "id": "mismatchedCase",
-    },
-    "range": {
-      "end": 236,
-      "pos": 184,
-    },
-    "rule": "no-unsafe-enum-comparison",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "The case statement does not have a shared enum type with the switch predicate.",
-      "id": "mismatchedCase",
-    },
-    "range": {
-      "end": 290,
-      "pos": 241,
-    },
-    "rule": "no-unsafe-enum-comparison",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Switch is not exhaustive",
+      "description": "Switch is not exhaustive. Cases not matched: "rejected"",
       "id": "switchIsNotExhaustive",
     },
     "range": {
-      "end": 176,
-      "pos": 170,
+      "end": 186,
+      "pos": 180,
     },
     "rule": "switch-exhaustiveness-check",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 300,
+              "pos": 300,
+            },
+            "text": "
+    case "rejected": { throw new Error('Not implemented yet: "rejected" case') }",
+          },
+        ],
+        "message": {
+          "description": "Switch is not exhaustive. Cases not matched: "rejected"",
+          "id": "switchIsNotExhaustive",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
@@ -3528,6 +3573,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 336,
+          "pos": 333,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3542,6 +3596,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 453,
+          "pos": 445,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3556,6 +3619,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 565,
+          "pos": 562,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -4811,8 +4883,17 @@ exports[`TSGoLint E2E Snapshot Tests > should handle circular project references
   {
     "file_path": "fixtures/circular-project-references/project2/src/demo/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: { x: number; }",
+        "range": {
+          "end": 66,
+          "pos": 60,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "{ x: number; }" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {

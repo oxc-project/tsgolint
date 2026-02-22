@@ -1,8 +1,8 @@
 // Examples of incorrect code for switch-exhaustiveness-check rule
 
-type Status = 'pending' | 'approved' | 'rejected';
+type OrderStatus = 'pending' | 'approved' | 'rejected';
 
-function handleStatus(status: Status) {
+function handleStatus(status: OrderStatus) {
   switch (status) {
     case 'pending':
       return 'Waiting for approval';

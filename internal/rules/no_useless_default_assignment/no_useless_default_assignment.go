@@ -2,6 +2,7 @@ package no_useless_default_assignment
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -57,12 +58,7 @@ func canBeUndefined(t *checker.Type) bool {
 	if utils.IsTypeAnyType(t) || utils.IsTypeUnknownType(t) {
 		return true
 	}
-	for _, typePart := range utils.UnionTypeParts(t) {
-		if utils.IsTypeUndefinedType(typePart) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(utils.UnionTypeParts(t), utils.IsTypeUndefinedType)
 }
 
 func getPropertyName(node *ast.Node) (string, bool) {

@@ -146,28 +146,25 @@ func (sf *snapshotFile) write(t *testing.T) {
 func parseSnapshotFile(data string) map[string]string {
 	entries := make(map[string]string)
 
-	blocks := strings.Split(data, "---\n")
+	blocks := strings.SplitSeq(data, "---\n")
 
-	for _, block := range blocks {
+	for block := range blocks {
 		block = strings.TrimLeft(block, "\n")
 		if block == "" {
 			continue
 		}
 
-		newline := strings.IndexByte(block, '\n')
-		if newline == -1 {
+		before, after, ok := strings.Cut(block, "\n")
+		if !ok {
 			continue
 		}
 
-		key := block[:newline]
+		key := before
 		if !strings.HasPrefix(key, "[") || !strings.HasSuffix(key, "]") {
 			continue
 		}
 
-		content := block[newline+1:]
-		content = strings.TrimRight(content, "\n")
-
-		entries[key] = content
+		entries[key] = strings.TrimRight(after, "\n")
 	}
 
 	return entries
@@ -200,20 +197,14 @@ func renderSourceAnnotation(code string, sourceFile *ast.SourceFile, textRange c
 	el, ec := scanner.GetECMALineAndCharacterOfPosition(sourceFile, endPos)
 
 	// Display range with 1 line of context
-	startLine := sl - 1
-	if startLine < 0 {
-		startLine = 0
-	}
+	startLine := max(sl-1, 0)
 	endLine := el + 1
 	if endLine >= len(lines) {
 		endLine = len(lines) - 1
 	}
 
 	// Calculate gutter width based on line numbers
-	gutterWidth := len(strconv.Itoa(endLine + 1))
-	if gutterWidth < 2 {
-		gutterWidth = 2
-	}
+	gutterWidth := max(len(strconv.Itoa(endLine+1)), 2)
 
 	var sb strings.Builder
 	for lineIdx := startLine; lineIdx <= endLine; lineIdx++ {
@@ -324,6 +315,9 @@ func formatDiagnosticsSnapshot(code string, diagnostics []rule.RuleDiagnostic) s
 
 			fmt.Fprintf(&sb, "Diagnostic %d: %s (%d:%d - %d:%d)\n", i+1, d.Message.Id, line, column, endLine, endColumn)
 			fmt.Fprintf(&sb, "Message: %s\n", d.Message.Description)
+			if d.Message.Help != "" {
+				fmt.Fprintf(&sb, "Help: %s\n", d.Message.Help)
+			}
 
 			// Render primary diagnostic range
 			annotated := renderSourceAnnotation(code, d.SourceFile, d.Range, '~', "")
