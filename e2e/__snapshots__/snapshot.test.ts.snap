@@ -3338,8 +3338,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: { prop: any; }",
+        "range": {
+          "end": 247,
+          "pos": 244,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "{ prop: any; }" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3351,8 +3360,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: symbol",
+        "range": {
+          "end": 319,
+          "pos": 316,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "symbol" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3364,8 +3382,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: Function",
+        "range": {
+          "end": 400,
+          "pos": 398,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "Function" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3377,8 +3404,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: number[]",
+        "range": {
+          "end": 468,
+          "pos": 465,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "number[]" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -4830,8 +4866,17 @@ exports[`TSGoLint E2E Snapshot Tests > should handle circular project references
   {
     "file_path": "fixtures/circular-project-references/project2/src/demo/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: { x: number; }",
+        "range": {
+          "end": 66,
+          "pos": 60,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "{ x: number; }" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
