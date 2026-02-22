@@ -219,17 +219,23 @@ Help: Remove the default assignment
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-22 - 1]
-Diagnostic 1: uselessDefaultAssignment (2:21 - 2:23)
-Message: Default value is useless because the property is not nullish. This default assignment will never be used.
-   1 | 
-   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
-     |                     ~~~
-   3 |       
-  Label: Default value (2:21 - 2:23)
-   1 | 
-   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
-     |                     ^^^ Default value
-   3 |       
+Diagnostic 1: uselessDefaultAssignment (4:25 - 4:26)
+Message: Default value is useless because the property has type `{}` (not nullish). This default assignment will never be used.
+Help: Remove the default assignment
+   3 |         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   4 |         const { rules = {} } = config
+     |                         ~~
+   5 |       
+  Label: Default value (4:25 - 4:26)
+   3 |         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   4 |         const { rules = {} } = config
+     |                         ^^ Default value
+   5 |       
+  Label: property type `{}` is not nullish (4:17 - 4:21)
+   3 |         // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   4 |         const { rules = {} } = config
+     |                 ^^^^^ property type `{}` is not nullish
+   5 |       
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-3 - 1]

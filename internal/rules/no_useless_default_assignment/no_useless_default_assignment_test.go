@@ -506,5 +506,19 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 				},
 			},
 		},
+		{
+			Code: "\n        const config = { rules: {} }\n        // eslint-disable-next-line @typescript-eslint/no-unused-vars\n        const { rules = {} } = config\n      ",
+			Output: []string{
+				"\n        const config = { rules: {} }\n        // eslint-disable-next-line @typescript-eslint/no-unused-vars\n        const { rules } = config\n      ",
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "uselessDefaultAssignment",
+					Line:      4,
+					Column:    25,
+					EndColumn: 27,
+				},
+			},
+		},
 	})
 }
