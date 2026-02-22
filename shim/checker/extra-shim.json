@@ -32,7 +32,6 @@
       "getWidenedType",
       "isTypeAssignableTo",
       "isTypeIdenticalTo",
-      "isTypeStrictSubtypeOf",
       "IsDeprecatedDeclaration",
       "GetShorthandAssignmentValueSymbol",
       "getImmediateAliasedSymbol",
