@@ -19,106 +19,6 @@ Help: Use a more robust iteration method such as for-of or array.forEach instead
    4 |   console.log(x);
 ---
 
-[TestNoForInArray/invalid-10 - 1]
-Diagnostic 1: forInViolation (4:1 - 4:24)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   3 | 
-   4 | for (const key in array) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   console.log(key);
----
-
-[TestNoForInArray/invalid-11 - 1]
-Diagnostic 1: forInViolation (4:1 - 4:24)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   3 | 
-   4 | for (const key in array) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   console.log(key);
----
-
-[TestNoForInArray/invalid-12 - 1]
-Diagnostic 1: forInViolation (4:1 - 4:24)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   3 | 
-   4 | for (const key in array) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   console.log(key);
----
-
-[TestNoForInArray/invalid-13 - 1]
-Diagnostic 1: forInViolation (4:1 - 4:26)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   3 | 
-   4 | for (const x in arrayLike) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   console.log(x);
----
-
-[TestNoForInArray/invalid-14 - 1]
-Diagnostic 1: forInViolation (4:1 - 4:26)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   3 | 
-   4 | for (const x in arrayLike) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   console.log(x);
----
-
-[TestNoForInArray/invalid-15 - 1]
-Diagnostic 1: forInViolation (4:1 - 4:26)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   3 | 
-   4 | for (const x in arrayLike) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   console.log(x);
----
-
-[TestNoForInArray/invalid-16 - 1]
-Diagnostic 1: forInViolation (3:3 - 3:28)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   2 | function foo() {
-   3 |   for (const a in arguments) {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |     console.log(a);
----
-
-[TestNoForInArray/invalid-17 - 1]
-Diagnostic 1: forInViolation (6:1 - 6:24)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   5 | 
-   6 | for (const key in array) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   7 |   console.log(key);
----
-
-[TestNoForInArray/invalid-18 - 1]
-Diagnostic 1: forInViolation (6:1 - 6:24)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   5 | 
-   6 | for (const key in array) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   7 |   console.log(k);
----
-
-[TestNoForInArray/invalid-19 - 1]
-Diagnostic 1: forInViolation (7:1 - 7:22)
-Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
-Help: Use a more robust iteration method such as for-of or array.forEach instead.
-   6 | 
-   7 | for (const key in obj) {
-     | ~~~~~~~~~~~~~~~~~~~~~~
-   8 |   console.log(key);
----
-
 [TestNoForInArray/invalid-2 - 1]
 Diagnostic 1: forInViolation (3:3 - 3:22)
 Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
@@ -233,4 +133,104 @@ Help: Use a more robust iteration method such as for-of or array.forEach instead
    4 | for (const key in array) {
      | ~~~~~~~~~~~~~~~~~~~~~~~~
    5 |   console.log(key);
+---
+
+[TestNoForInArray/invalid-10 - 1]
+Diagnostic 1: forInViolation (4:1 - 4:24)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   3 | 
+   4 | for (const key in array) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   console.log(key);
+---
+
+[TestNoForInArray/invalid-11 - 1]
+Diagnostic 1: forInViolation (4:1 - 4:24)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   3 | 
+   4 | for (const key in array) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   console.log(key);
+---
+
+[TestNoForInArray/invalid-12 - 1]
+Diagnostic 1: forInViolation (4:1 - 4:24)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   3 | 
+   4 | for (const key in array) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   console.log(key);
+---
+
+[TestNoForInArray/invalid-13 - 1]
+Diagnostic 1: forInViolation (4:1 - 4:26)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   3 | 
+   4 | for (const x in arrayLike) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   console.log(x);
+---
+
+[TestNoForInArray/invalid-14 - 1]
+Diagnostic 1: forInViolation (4:1 - 4:26)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   3 | 
+   4 | for (const x in arrayLike) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   console.log(x);
+---
+
+[TestNoForInArray/invalid-15 - 1]
+Diagnostic 1: forInViolation (4:1 - 4:26)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   3 | 
+   4 | for (const x in arrayLike) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   console.log(x);
+---
+
+[TestNoForInArray/invalid-16 - 1]
+Diagnostic 1: forInViolation (3:3 - 3:28)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   2 | function foo() {
+   3 |   for (const a in arguments) {
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |     console.log(a);
+---
+
+[TestNoForInArray/invalid-17 - 1]
+Diagnostic 1: forInViolation (6:1 - 6:24)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   5 | 
+   6 | for (const key in array) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   console.log(key);
+---
+
+[TestNoForInArray/invalid-18 - 1]
+Diagnostic 1: forInViolation (6:1 - 6:24)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   5 | 
+   6 | for (const key in array) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |   console.log(k);
+---
+
+[TestNoForInArray/invalid-19 - 1]
+Diagnostic 1: forInViolation (7:1 - 7:22)
+Message: For-in loops over arrays skips holes, returns indices as strings, and may visit the prototype chain or other enumerable properties.
+Help: Use a more robust iteration method such as for-of or array.forEach instead.
+   6 | 
+   7 | for (const key in obj) {
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   8 |   console.log(key);
 ---

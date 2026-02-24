@@ -19,6 +19,80 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    4 |       
 ---
 
+[TestNoBaseToStringRule/invalid-2 - 1]
+Diagnostic 1: baseToString (3:1 - 3:1)
+Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   2 | declare const x: unknown;
+   3 | x.toLocaleString();
+     | ~
+   4 |       
+---
+
+[TestNoBaseToStringRule/invalid-3 - 1]
+Diagnostic 1: baseToString (3:6 - 3:6)
+Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   2 | declare const x: unknown;
+   3 | '' + x;
+     |      ~
+   4 |       
+---
+
+[TestNoBaseToStringRule/invalid-4 - 1]
+Diagnostic 1: baseToString (3:8 - 3:8)
+Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   2 | declare const x: unknown;
+   3 | String(x);
+     |        ~
+   4 |       
+---
+
+[TestNoBaseToStringRule/invalid-5 - 1]
+Diagnostic 1: baseToString (3:7 - 3:7)
+Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   2 | declare const x: unknown;
+   3 | '' += x;
+     |       ~
+   4 |       
+---
+
+[TestNoBaseToStringRule/invalid-6 - 1]
+Diagnostic 1: baseToString (3:10 - 3:10)
+Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   2 | function foo<T>(x: T) {
+   3 |   String(x);
+     |          ~
+   4 | }
+---
+
+[TestNoBaseToStringRule/invalid-7 - 1]
+Diagnostic 1: baseToString (1:4 - 1:5)
+Message: '{}' will use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   1 | `${{}})`;
+     |    ~~
+---
+
+[TestNoBaseToStringRule/invalid-8 - 1]
+Diagnostic 1: baseToString (1:1 - 1:4)
+Message: '({})' will use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   1 | ({}).toString();
+     | ~~~~
+---
+
+[TestNoBaseToStringRule/invalid-9 - 1]
+Diagnostic 1: baseToString (1:1 - 1:4)
+Message: '({})' will use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   1 | ({}).toLocaleString();
+     | ~~~~
+---
+
 [TestNoBaseToStringRule/invalid-10 - 1]
 Diagnostic 1: baseToString (1:6 - 1:7)
 Message: '{}' will use Object's default stringification format ('[object Object]') when stringified.
@@ -111,16 +185,6 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    5 |           return `${intersection}`;
      |                     ~~~~~~~~~~~~
    6 |         }
----
-
-[TestNoBaseToStringRule/invalid-2 - 1]
-Diagnostic 1: baseToString (3:1 - 3:1)
-Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   2 | declare const x: unknown;
-   3 | x.toLocaleString();
-     | ~
-   4 |       
 ---
 
 [TestNoBaseToStringRule/invalid-20 - 1]
@@ -223,16 +287,6 @@ Help: Consider mapping the values to a meaningful string (e.g. pick a property o
    7 |       
 ---
 
-[TestNoBaseToStringRule/invalid-3 - 1]
-Diagnostic 1: baseToString (3:6 - 3:6)
-Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   2 | declare const x: unknown;
-   3 | '' + x;
-     |      ~
-   4 |       
----
-
 [TestNoBaseToStringRule/invalid-30 - 1]
 Diagnostic 1: baseArrayJoin (6:9 - 6:13)
 Message: Using `join()` for tuple will use Object's default stringification format ('[object Object]') when stringified.
@@ -333,16 +387,6 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    6 |       
 ---
 
-[TestNoBaseToStringRule/invalid-4 - 1]
-Diagnostic 1: baseToString (3:8 - 3:8)
-Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   2 | declare const x: unknown;
-   3 | String(x);
-     |        ~
-   4 |       
----
-
 [TestNoBaseToStringRule/invalid-40 - 1]
 Diagnostic 1: baseToString (6:16 - 6:20)
 Message: 'array' may use Object's default stringification format ('[object Object]') when stringified.
@@ -440,16 +484,6 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    2 |         const array = ['string', { foo: 'bar' }];
    3 |         String(array);
      |                ~~~~~
-   4 |       
----
-
-[TestNoBaseToStringRule/invalid-5 - 1]
-Diagnostic 1: baseToString (3:7 - 3:7)
-Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   2 | declare const x: unknown;
-   3 | '' += x;
-     |       ~
    4 |       
 ---
 
@@ -553,16 +587,6 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    7 |       
 ---
 
-[TestNoBaseToStringRule/invalid-6 - 1]
-Diagnostic 1: baseToString (3:10 - 3:10)
-Message: 'x' may use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   2 | function foo<T>(x: T) {
-   3 |   String(x);
-     |          ~
-   4 | }
----
-
 [TestNoBaseToStringRule/invalid-60 - 1]
 Diagnostic 1: baseToString (6:9 - 6:13)
 Message: 'tuple' may use Object's default stringification format ('[object Object]') when stringified.
@@ -661,14 +685,6 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    6 |         `${array}`;
      |            ~~~~~
    7 |       
----
-
-[TestNoBaseToStringRule/invalid-7 - 1]
-Diagnostic 1: baseToString (1:4 - 1:5)
-Message: '{}' will use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   1 | `${{}})`;
-     |    ~~
 ---
 
 [TestNoBaseToStringRule/invalid-70 - 1]
@@ -771,14 +787,6 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
    5 |         }
 ---
 
-[TestNoBaseToStringRule/invalid-8 - 1]
-Diagnostic 1: baseToString (1:1 - 1:4)
-Message: '({})' will use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   1 | ({}).toString();
-     | ~~~~
----
-
 [TestNoBaseToStringRule/invalid-80 - 1]
 Diagnostic 1: baseToString (4:11 - 4:15)
 Message: 'value' may use Object's default stringification format ('[object Object]') when stringified.
@@ -857,12 +865,4 @@ Help: Consider mapping the values to a meaningful string (e.g. pick a property o
    3 | v.join();
      | ~
    4 |       
----
-
-[TestNoBaseToStringRule/invalid-9 - 1]
-Diagnostic 1: baseToString (1:1 - 1:4)
-Message: '({})' will use Object's default stringification format ('[object Object]') when stringified.
-Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
-   1 | ({}).toLocaleString();
-     | ~~~~
 ---

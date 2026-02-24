@@ -19,6 +19,86 @@ Help: Move it to its own statement instead.
    3 |       
 ---
 
+[TestNoConfusingVoidExpression/invalid-2 - 1]
+Diagnostic 1: invalidVoidExpr (2:23 - 2:40)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         console.error(console.log('foo'));
+     |                       ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-3 - 1]
+Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         [console.log('foo')];
+     |          ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-4 - 1]
+Diagnostic 1: invalidVoidExpr (2:15 - 2:32)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         ({ x: console.log('foo') });
+     |               ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-5 - 1]
+Diagnostic 1: invalidVoidExpr (2:14 - 2:31)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         void console.log('foo');
+     |              ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-6 - 1]
+Diagnostic 1: invalidVoidExpr (2:9 - 2:26)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         console.log('foo') ? true : false;
+     |         ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-7 - 1]
+Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         (console.log('foo') && true) || false;
+     |          ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-8 - 1]
+Diagnostic 1: invalidVoidExpr (2:18 - 2:34)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         (cond && console.log('ok')) || console.log('error');
+     |                  ~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoConfusingVoidExpression/invalid-9 - 1]
+Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
+Message: Placing a void expression inside another expression is forbidden.
+Help: Move it to its own statement instead.
+   1 | 
+   2 |         !console.log('foo');
+     |          ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
 [TestNoConfusingVoidExpression/invalid-10 - 1]
 Diagnostic 1: invalidVoidExpr (3:17 - 3:34)
 Message: Placing a void expression inside another expression is forbidden.
@@ -107,16 +187,6 @@ Message: Returning a void expression from a function is forbidden. Please move i
    4 |           return ['bar', 'baz'].forEach(console.log)
      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    5 |           console.log('quux')
----
-
-[TestNoConfusingVoidExpression/invalid-2 - 1]
-Diagnostic 1: invalidVoidExpr (2:23 - 2:40)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         console.error(console.log('foo'));
-     |                       ~~~~~~~~~~~~~~~~~~
-   3 |       
 ---
 
 [TestNoConfusingVoidExpression/invalid-20 - 1]
@@ -211,16 +281,6 @@ Help: Add braces to the arrow function.
    4 |       
 ---
 
-[TestNoConfusingVoidExpression/invalid-3 - 1]
-Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         [console.log('foo')];
-     |          ~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
 [TestNoConfusingVoidExpression/invalid-30 - 1]
 Diagnostic 1: invalidVoidExprReturnWrapVoid (1:8 - 1:25)
 Message: Void expressions returned from a function must be marked explicitly with the `void` operator.
@@ -300,16 +360,6 @@ Message: Returning a void expression from a function is forbidden. Please remove
    4 |     return console.log();
      |            ~~~~~~~~~~~~~
    5 |   };
----
-
-[TestNoConfusingVoidExpression/invalid-4 - 1]
-Diagnostic 1: invalidVoidExpr (2:15 - 2:32)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         ({ x: console.log('foo') });
-     |               ~~~~~~~~~~~~~~~~~~
-   3 |       
 ---
 
 [TestNoConfusingVoidExpression/invalid-40 - 1]
@@ -410,16 +460,6 @@ Help: Add braces to the arrow function.
    4 |       
 ---
 
-[TestNoConfusingVoidExpression/invalid-5 - 1]
-Diagnostic 1: invalidVoidExpr (2:14 - 2:31)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         void console.log('foo');
-     |              ~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
 [TestNoConfusingVoidExpression/invalid-50 - 1]
 Diagnostic 1: invalidVoidExprArrow (3:25 - 3:37)
 Message: Returning a void expression from an arrow function shorthand is forbidden.
@@ -483,44 +523,4 @@ Message: Returning a void expression from a function is forbidden. Please remove
    8 |   return console.log();
      |          ~~~~~~~~~~~~~
    9 | }
----
-
-[TestNoConfusingVoidExpression/invalid-6 - 1]
-Diagnostic 1: invalidVoidExpr (2:9 - 2:26)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         console.log('foo') ? true : false;
-     |         ~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
-[TestNoConfusingVoidExpression/invalid-7 - 1]
-Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         (console.log('foo') && true) || false;
-     |          ~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
-[TestNoConfusingVoidExpression/invalid-8 - 1]
-Diagnostic 1: invalidVoidExpr (2:18 - 2:34)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         (cond && console.log('ok')) || console.log('error');
-     |                  ~~~~~~~~~~~~~~~~~
-   3 |       
----
-
-[TestNoConfusingVoidExpression/invalid-9 - 1]
-Diagnostic 1: invalidVoidExpr (2:10 - 2:27)
-Message: Placing a void expression inside another expression is forbidden.
-Help: Move it to its own statement instead.
-   1 | 
-   2 |         !console.log('foo');
-     |          ~~~~~~~~~~~~~~~~~~
-   3 |       
 ---

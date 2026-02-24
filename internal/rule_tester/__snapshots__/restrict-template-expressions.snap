@@ -27,6 +27,110 @@ Message: Invalid type used in template literal expression.
    3 |       
 ---
 
+[TestRestrictTemplateExpressionsRule/invalid-2 - 1]
+Diagnostic 1: invalidType (2:30 - 2:33)
+Message: Invalid type used in template literal expression.
+   1 | 
+   2 |         const msg = `arg = ${null}`;
+     |                              ~~~~
+   3 |       
+  Label: Type: null (2:30 - 2:33)
+   1 | 
+   2 |         const msg = `arg = ${null}`;
+     |                              ^^^^ Type: null
+   3 |       
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-3 - 1]
+Diagnostic 1: invalidType (3:30 - 3:32)
+Message: Invalid type used in template literal expression.
+   2 |         declare const arg: number[];
+   3 |         const msg = `arg = ${arg}`;
+     |                              ~~~
+   4 |       
+  Label: Type: number[] (3:30 - 3:32)
+   2 |         declare const arg: number[];
+   3 |         const msg = `arg = ${arg}`;
+     |                              ^^^ Type: number[]
+   4 |       
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-4 - 1]
+Diagnostic 1: invalidType (2:30 - 2:34)
+Message: Invalid type used in template literal expression.
+   1 | 
+   2 |         const msg = `arg = ${[, 2]}`;
+     |                              ~~~~~
+   3 |       
+  Label: Type: (number | undefined)[] (2:30 - 2:34)
+   1 | 
+   2 |         const msg = `arg = ${[, 2]}`;
+     |                              ^^^^^ Type: (number | undefined)[]
+   3 |       
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-5 - 1]
+Diagnostic 1: invalidType (1:22 - 1:38)
+Message: Invalid type used in template literal expression.
+   1 | const msg = `arg = ${Promise.resolve()}`;
+     |                      ~~~~~~~~~~~~~~~~~
+  Label: Type: Promise<void> (1:22 - 1:38)
+   1 | const msg = `arg = ${Promise.resolve()}`;
+     |                      ^^^^^^^^^^^^^^^^^ Type: Promise<void>
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-6 - 1]
+Diagnostic 1: invalidType (1:22 - 1:32)
+Message: Invalid type used in template literal expression.
+   1 | const msg = `arg = ${new Error()}`;
+     |                      ~~~~~~~~~~~
+  Label: Type: Error (1:22 - 1:32)
+   1 | const msg = `arg = ${new Error()}`;
+     |                      ^^^^^^^^^^^ Type: Error
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-7 - 1]
+Diagnostic 1: invalidType (3:30 - 3:32)
+Message: Invalid type used in template literal expression.
+   2 |         declare const arg: [number | undefined, string];
+   3 |         const msg = `arg = ${arg}`;
+     |                              ~~~
+   4 |       
+  Label: Type: [number | undefined, string] (3:30 - 3:32)
+   2 |         declare const arg: [number | undefined, string];
+   3 |         const msg = `arg = ${arg}`;
+     |                              ^^^ Type: [number | undefined, string]
+   4 |       
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-8 - 1]
+Diagnostic 1: invalidType (3:30 - 3:32)
+Message: Invalid type used in template literal expression.
+   2 |         declare const arg: number;
+   3 |         const msg = `arg = ${arg}`;
+     |                              ~~~
+   4 |       
+  Label: Type: number (3:30 - 3:32)
+   2 |         declare const arg: number;
+   3 |         const msg = `arg = ${arg}`;
+     |                              ^^^ Type: number
+   4 |       
+---
+
+[TestRestrictTemplateExpressionsRule/invalid-9 - 1]
+Diagnostic 1: invalidType (3:30 - 3:32)
+Message: Invalid type used in template literal expression.
+   2 |         declare const arg: boolean;
+   3 |         const msg = `arg = ${arg}`;
+     |                              ~~~
+   4 |       
+  Label: Type: boolean (3:30 - 3:32)
+   2 |         declare const arg: boolean;
+   3 |         const msg = `arg = ${arg}`;
+     |                              ^^^ Type: boolean
+   4 |       
+---
+
 [TestRestrictTemplateExpressionsRule/invalid-10 - 1]
 Diagnostic 1: invalidType (3:30 - 3:32)
 Message: Invalid type used in template literal expression.
@@ -151,108 +255,4 @@ Message: Invalid type used in template literal expression.
    3 |           return `arg = ${arg}`;
      |                           ^^^ Type: unknown
    4 |         }
----
-
-[TestRestrictTemplateExpressionsRule/invalid-2 - 1]
-Diagnostic 1: invalidType (2:30 - 2:33)
-Message: Invalid type used in template literal expression.
-   1 | 
-   2 |         const msg = `arg = ${null}`;
-     |                              ~~~~
-   3 |       
-  Label: Type: null (2:30 - 2:33)
-   1 | 
-   2 |         const msg = `arg = ${null}`;
-     |                              ^^^^ Type: null
-   3 |       
----
-
-[TestRestrictTemplateExpressionsRule/invalid-3 - 1]
-Diagnostic 1: invalidType (3:30 - 3:32)
-Message: Invalid type used in template literal expression.
-   2 |         declare const arg: number[];
-   3 |         const msg = `arg = ${arg}`;
-     |                              ~~~
-   4 |       
-  Label: Type: number[] (3:30 - 3:32)
-   2 |         declare const arg: number[];
-   3 |         const msg = `arg = ${arg}`;
-     |                              ^^^ Type: number[]
-   4 |       
----
-
-[TestRestrictTemplateExpressionsRule/invalid-4 - 1]
-Diagnostic 1: invalidType (2:30 - 2:34)
-Message: Invalid type used in template literal expression.
-   1 | 
-   2 |         const msg = `arg = ${[, 2]}`;
-     |                              ~~~~~
-   3 |       
-  Label: Type: (number | undefined)[] (2:30 - 2:34)
-   1 | 
-   2 |         const msg = `arg = ${[, 2]}`;
-     |                              ^^^^^ Type: (number | undefined)[]
-   3 |       
----
-
-[TestRestrictTemplateExpressionsRule/invalid-5 - 1]
-Diagnostic 1: invalidType (1:22 - 1:38)
-Message: Invalid type used in template literal expression.
-   1 | const msg = `arg = ${Promise.resolve()}`;
-     |                      ~~~~~~~~~~~~~~~~~
-  Label: Type: Promise<void> (1:22 - 1:38)
-   1 | const msg = `arg = ${Promise.resolve()}`;
-     |                      ^^^^^^^^^^^^^^^^^ Type: Promise<void>
----
-
-[TestRestrictTemplateExpressionsRule/invalid-6 - 1]
-Diagnostic 1: invalidType (1:22 - 1:32)
-Message: Invalid type used in template literal expression.
-   1 | const msg = `arg = ${new Error()}`;
-     |                      ~~~~~~~~~~~
-  Label: Type: Error (1:22 - 1:32)
-   1 | const msg = `arg = ${new Error()}`;
-     |                      ^^^^^^^^^^^ Type: Error
----
-
-[TestRestrictTemplateExpressionsRule/invalid-7 - 1]
-Diagnostic 1: invalidType (3:30 - 3:32)
-Message: Invalid type used in template literal expression.
-   2 |         declare const arg: [number | undefined, string];
-   3 |         const msg = `arg = ${arg}`;
-     |                              ~~~
-   4 |       
-  Label: Type: [number | undefined, string] (3:30 - 3:32)
-   2 |         declare const arg: [number | undefined, string];
-   3 |         const msg = `arg = ${arg}`;
-     |                              ^^^ Type: [number | undefined, string]
-   4 |       
----
-
-[TestRestrictTemplateExpressionsRule/invalid-8 - 1]
-Diagnostic 1: invalidType (3:30 - 3:32)
-Message: Invalid type used in template literal expression.
-   2 |         declare const arg: number;
-   3 |         const msg = `arg = ${arg}`;
-     |                              ~~~
-   4 |       
-  Label: Type: number (3:30 - 3:32)
-   2 |         declare const arg: number;
-   3 |         const msg = `arg = ${arg}`;
-     |                              ^^^ Type: number
-   4 |       
----
-
-[TestRestrictTemplateExpressionsRule/invalid-9 - 1]
-Diagnostic 1: invalidType (3:30 - 3:32)
-Message: Invalid type used in template literal expression.
-   2 |         declare const arg: boolean;
-   3 |         const msg = `arg = ${arg}`;
-     |                              ~~~
-   4 |       
-  Label: Type: boolean (3:30 - 3:32)
-   2 |         declare const arg: boolean;
-   3 |         const msg = `arg = ${arg}`;
-     |                              ^^^ Type: boolean
-   4 |       
 ---

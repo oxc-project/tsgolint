@@ -13,6 +13,62 @@ Message: Expected the Promise rejection reason to be an Error.
      | ~~~~~~~~~~~~~~~~~~~~~
 ---
 
+[TestPreferPromiseRejectErrors/invalid-2 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:21)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(`foo`);
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-3 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:36)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject('foo', somethingElse);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-4 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:21)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(false);
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-5 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:26)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(void `foo`);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-6 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:16)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject();
+     | ~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-7 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:25)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-8 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:25)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(undefined);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferPromiseRejectErrors/invalid-9 - 1]
+Diagnostic 1: rejectAnError (1:1 - 1:20)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | Promise.reject(null);
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
 [TestPreferPromiseRejectErrors/invalid-10 - 1]
 Diagnostic 1: rejectAnError (1:1 - 1:26)
 Message: Expected the Promise rejection reason to be an Error.
@@ -91,13 +147,6 @@ Message: Expected the Promise rejection reason to be an Error.
      | ~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferPromiseRejectErrors/invalid-2 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:21)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject(`foo`);
-     | ~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferPromiseRejectErrors/invalid-20 - 1]
 Diagnostic 1: rejectAnError (1:1 - 1:22)
 Message: Expected the Promise rejection reason to be an Error.
@@ -170,13 +219,6 @@ Message: Expected the Promise rejection reason to be an Error.
    3 | Promise.reject(foo);
      | ~~~~~~~~~~~~~~~~~~~
    4 |       
----
-
-[TestPreferPromiseRejectErrors/invalid-3 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:36)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject('foo', somethingElse);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferPromiseRejectErrors/invalid-30 - 1]
@@ -269,13 +311,6 @@ Message: Expected the Promise rejection reason to be an Error.
    5 |       
 ---
 
-[TestPreferPromiseRejectErrors/invalid-4 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:21)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject(false);
-     | ~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferPromiseRejectErrors/invalid-40 - 1]
 Diagnostic 1: rejectAnError (3:1 - 3:19)
 Message: Expected the Promise rejection reason to be an Error.
@@ -360,13 +395,6 @@ Message: Expected the Promise rejection reason to be an Error.
      |                                            ~~~~~~~~~
 ---
 
-[TestPreferPromiseRejectErrors/invalid-5 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:26)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject(void `foo`);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferPromiseRejectErrors/invalid-51 - 1]
 Diagnostic 1: rejectAnError (3:3 - 3:14)
 Message: Expected the Promise rejection reason to be an Error.
@@ -440,13 +468,6 @@ Message: Expected the Promise rejection reason to be an Error.
    3 | new Promise((resolve, reject) => reject(foo));
      |                                  ~~~~~~~~~~~
    4 |       
----
-
-[TestPreferPromiseRejectErrors/invalid-6 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:16)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject();
-     | ~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferPromiseRejectErrors/invalid-60 - 1]
@@ -539,13 +560,6 @@ Message: Expected the Promise rejection reason to be an Error.
    4 |       
 ---
 
-[TestPreferPromiseRejectErrors/invalid-7 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:25)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject(undefined);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferPromiseRejectErrors/invalid-70 - 1]
 Diagnostic 1: rejectAnError (4:34 - 4:44)
 Message: Expected the Promise rejection reason to be an Error.
@@ -636,13 +650,6 @@ Message: Expected the Promise rejection reason to be an Error.
    4 |       
 ---
 
-[TestPreferPromiseRejectErrors/invalid-8 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:25)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject(undefined);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferPromiseRejectErrors/invalid-80 - 1]
 Diagnostic 1: rejectAnError (3:9 - 3:40)
 Message: Expected the Promise rejection reason to be an Error.
@@ -659,11 +666,4 @@ Message: Expected the Promise rejection reason to be an Error.
    3 |         Promise.reject(someAnyValue);
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
----
-
-[TestPreferPromiseRejectErrors/invalid-9 - 1]
-Diagnostic 1: rejectAnError (1:1 - 1:20)
-Message: Expected the Promise rejection reason to be an Error.
-   1 | Promise.reject(null);
-     | ~~~~~~~~~~~~~~~~~~~~
 ---
