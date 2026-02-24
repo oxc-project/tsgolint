@@ -398,6 +398,9 @@ func runHeadless(args []string) int {
 			diagnosticsChan <- ruleToAny(d)
 		},
 		func(d diagnostic.Internal) {
+			if d.Id == "tsconfig-error" && os.Getenv("TSGOLINT_REPORT_TSCONFIG_ERRORS") == "false" {
+				return
+			}
 			diagnosticsChan <- internalToAny(d)
 		},
 		linter.Fixes{

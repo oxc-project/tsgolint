@@ -532,6 +532,24 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
+  it('should suppress tsconfig-error diagnostics when TSGOLINT_REPORT_TSCONFIG_ERRORS env var is false', async () => {
+    const testFiles = await getTestFiles('with-invalid-tsconfig-option');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-floating-promises']);
+
+    const env = { ...process.env, GOMAXPROCS: '1', TSGOLINT_REPORT_TSCONFIG_ERRORS: 'false' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    const diagnostics = parseHeadlessOutput(output);
+
+    expect(diagnostics.length).toBe(0);
+  });
+
   it('should work correctly with nested module namespaces and parent module searches (`ValueMatchesSomeSpecifier`) (issue #135)', async () => {
     const testFiles = await getTestFiles('issue-135');
     expect(testFiles.length).toBeGreaterThan(0);
