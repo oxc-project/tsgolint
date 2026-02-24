@@ -171,20 +171,6 @@ func getAssignmentTargetNode(node *ast.Node) *ast.Node {
 	return nil
 }
 
-func hasConditionalInitializer(node *ast.Node) bool {
-	if node == nil || node.Parent == nil {
-		return false
-	}
-
-	parent := node.Parent
-	if ast.IsVariableDeclaration(parent) && parent.Initializer() != nil {
-		initializer := ast.SkipParentheses(parent.Initializer())
-		return ast.IsConditionalExpression(initializer) || ast.IsLogicalExpression(initializer)
-	}
-
-	return hasConditionalInitializer(parent)
-}
-
 func hasPropertyInAllBranches(expression *ast.Node, propertyName string) bool {
 	expression = ast.SkipParentheses(expression)
 	if ast.IsObjectLiteralExpression(expression) {
@@ -256,10 +242,12 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 				}
 
 				if utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsOptional) {
-					if parent := parentPattern.Parent; ast.IsVariableDeclaration(parent) && parent.Initializer() != nil && hasConditionalInitializer(parentPattern) {
+					if parent := parentPattern.Parent; ast.IsVariableDeclaration(parent) && parent.Initializer() != nil {
 						if !hasPropertyInAllBranches(parent.Initializer(), propertyName) {
 							return nil
 						}
+					} else {
+						return nil
 					}
 				}
 
