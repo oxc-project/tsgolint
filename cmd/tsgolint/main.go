@@ -460,7 +460,7 @@ func runMain() int {
 		UseCaseSensitiveFileNames: host.FS().UseCaseSensitiveFileNames(),
 	}
 
-	program, _, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host)
+	program, _, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host, false)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating TS program: %v", err)
 		return 1

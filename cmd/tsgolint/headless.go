@@ -400,9 +400,6 @@ func runHeadless(args []string) int {
 			diagnosticsChan <- ruleToAny(d)
 		},
 		func(d diagnostic.Internal) {
-			if d.Id == "tsconfig-error" && suppressProgramDiagnostics {
-				return
-			}
 			diagnosticsChan <- internalToAny(d)
 		},
 		linter.Fixes{
@@ -413,6 +410,7 @@ func runHeadless(args []string) int {
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
+		suppressProgramDiagnostics,
 	)
 
 	close(diagnosticsChan)
