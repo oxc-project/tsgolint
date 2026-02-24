@@ -365,6 +365,8 @@ func runHeadless(args []string) int {
 		}
 	})
 
+	suppressProgramDiagnostics := os.Getenv("OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true"
+
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
 	}
@@ -398,7 +400,7 @@ func runHeadless(args []string) int {
 			diagnosticsChan <- ruleToAny(d)
 		},
 		func(d diagnostic.Internal) {
-			if d.Id == "tsconfig-error" && os.Getenv("OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true" {
+			if d.Id == "tsconfig-error" && suppressProgramDiagnostics {
 				return
 			}
 			diagnosticsChan <- internalToAny(d)
