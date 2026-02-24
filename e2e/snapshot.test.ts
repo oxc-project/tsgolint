@@ -532,13 +532,13 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
-  it('should suppress tsconfig-error diagnostics when TSGOLINT_REPORT_TSCONFIG_ERRORS env var is false', async () => {
+  it('should suppress tsconfig-error diagnostics when OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
     const testFiles = await getTestFiles('with-invalid-tsconfig-option');
     expect(testFiles.length).toBeGreaterThan(0);
 
     const config = generateConfig(testFiles, ['no-floating-promises']);
 
-    const env = { ...process.env, GOMAXPROCS: '1', TSGOLINT_REPORT_TSCONFIG_ERRORS: 'false' };
+    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,

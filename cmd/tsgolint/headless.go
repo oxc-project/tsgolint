@@ -398,7 +398,7 @@ func runHeadless(args []string) int {
 			diagnosticsChan <- ruleToAny(d)
 		},
 		func(d diagnostic.Internal) {
-			if d.Id == "tsconfig-error" && os.Getenv("TSGOLINT_REPORT_TSCONFIG_ERRORS") == "false" {
+			if d.Id == "tsconfig-error" && os.Getenv("OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true" {
 				return
 			}
 			diagnosticsChan <- internalToAny(d)
