@@ -21,6 +21,144 @@ Message: Type parameter T is used only once in the function signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
 
+[TestNoUnnecessaryTypeParameters/invalid-2 - 1]
+Diagnostic 1: sole (1:15 - 1:15)
+Message: Type parameter T is used only once in the function signature.
+   1 | const func = <T,>(param: T[]) => null;
+     |               ~
+  Label: This is the only usage of type parameter T in the signature. (1:26 - 1:26)
+   1 | const func = <T,>(param: T[]) => null;
+     |                          ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-3 - 1]
+Diagnostic 1: sole (1:13 - 1:13)
+Message: Type parameter T is used only once in the function signature.
+   1 | const f1 = <T,>(): T => {};
+     |             ~
+  Label: This is the only usage of type parameter T in the signature. (1:20 - 1:20)
+   1 | const f1 = <T,>(): T => {};
+     |                    ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-4 - 1]
+Diagnostic 1: sole (3:12 - 3:12)
+Message: Type parameter T is used only once in the function signature.
+   2 |         interface I {
+   3 |           <T>(value: T): void;
+     |            ~
+   4 |         }
+  Label: This is the only usage of type parameter T in the signature. (3:22 - 3:22)
+   2 |         interface I {
+   3 |           <T>(value: T): void;
+     |                      ^ This is the only usage of type parameter T in the signature.
+   4 |         }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-5 - 1]
+Diagnostic 1: sole (3:13 - 3:13)
+Message: Type parameter T is used only once in the function signature.
+   2 |         interface I {
+   3 |           m<T>(x: T): void;
+     |             ~
+   4 |         }
+  Label: This is the only usage of type parameter T in the signature. (3:19 - 3:19)
+   2 |         interface I {
+   3 |           m<T>(x: T): void;
+     |                   ^ This is the only usage of type parameter T in the signature.
+   4 |         }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-6 - 1]
+Diagnostic 1: sole (2:22 - 2:46)
+Message: Type parameter T is used only once in the class signature.
+   1 | 
+   2 |         class Joiner<T extends string | number> {
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           join(el: T, other: string) {
+  Label: This is the only usage of type parameter T in the signature. (3:20 - 3:20)
+   2 |         class Joiner<T extends string | number> {
+   3 |           join(el: T, other: string) {
+     |                    ^ This is the only usage of type parameter T in the signature.
+   4 |             return [el, other].join(',');
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-7 - 1]
+Diagnostic 1: sole (2:25 - 2:25)
+Message: Type parameter V is never used in the class signature.
+   1 | 
+   2 |         declare class C<V> {}
+     |                         ~
+   3 |       
+  Label: This is the only usage of type parameter V in the signature. (2:25 - 2:25)
+   1 | 
+   2 |         declare class C<V> {}
+     |                         ^ This is the only usage of type parameter V in the signature.
+   3 |       
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-8 - 1]
+Diagnostic 1: sole (2:25 - 2:25)
+Message: Type parameter T is used only once in the class signature.
+   1 | 
+   2 |         declare class C<T, U> {
+     |                         ~
+   3 |           method(param: T): U;
+  Label: This is the only usage of type parameter T in the signature. (3:25 - 3:25)
+   2 |         declare class C<T, U> {
+   3 |           method(param: T): U;
+     |                         ^ This is the only usage of type parameter T in the signature.
+   4 |         }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+
+Diagnostic 2: sole (2:28 - 2:28)
+Message: Type parameter U is used only once in the class signature.
+   1 | 
+   2 |         declare class C<T, U> {
+     |                            ~
+   3 |           method(param: T): U;
+  Label: This is the only usage of type parameter U in the signature. (3:29 - 3:29)
+   2 |         declare class C<T, U> {
+   3 |           method(param: T): U;
+     |                             ^ This is the only usage of type parameter U in the signature.
+   4 |         }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-9 - 1]
+Diagnostic 1: sole (3:18 - 3:18)
+Message: Type parameter T is used only once in the function signature.
+   2 |         declare class C {
+   3 |           method<T, U>(param: T): U;
+     |                  ~
+   4 |         }
+  Label: This is the only usage of type parameter T in the signature. (3:31 - 3:31)
+   2 |         declare class C {
+   3 |           method<T, U>(param: T): U;
+     |                               ^ This is the only usage of type parameter T in the signature.
+   4 |         }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+
+Diagnostic 2: sole (3:21 - 3:21)
+Message: Type parameter U is used only once in the function signature.
+   2 |         declare class C {
+   3 |           method<T, U>(param: T): U;
+     |                     ~
+   4 |         }
+  Label: This is the only usage of type parameter U in the signature. (3:35 - 3:35)
+   2 |         declare class C {
+   3 |           method<T, U>(param: T): U;
+     |                                   ^ This is the only usage of type parameter U in the signature.
+   4 |         }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
 [TestNoUnnecessaryTypeParameters/invalid-10 - 1]
 Diagnostic 1: sole (3:18 - 3:18)
 Message: Type parameter P is used only once in the function signature.
@@ -184,17 +322,6 @@ Message: Type parameter T is used only once in the function signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
 
-[TestNoUnnecessaryTypeParameters/invalid-2 - 1]
-Diagnostic 1: sole (1:15 - 1:15)
-Message: Type parameter T is used only once in the function signature.
-   1 | const func = <T,>(param: T[]) => null;
-     |               ~
-  Label: This is the only usage of type parameter T in the signature. (1:26 - 1:26)
-   1 | const func = <T,>(param: T[]) => null;
-     |                          ^ This is the only usage of type parameter T in the signature.
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
 [TestNoUnnecessaryTypeParameters/invalid-20 - 1]
 Diagnostic 1: sole (4:11 - 4:45)
 Message: Type parameter CB1 is used only once in the function signature.
@@ -327,17 +454,6 @@ Message: Type parameter U is used only once in the function signature.
   Label: This is the only usage of type parameter U in the signature. (1:50 - 1:50)
    1 | declare function take<T, U extends T>(param: T): U;
      |                                                  ^ This is the only usage of type parameter U in the signature.
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
-[TestNoUnnecessaryTypeParameters/invalid-3 - 1]
-Diagnostic 1: sole (1:13 - 1:13)
-Message: Type parameter T is used only once in the function signature.
-   1 | const f1 = <T,>(): T => {};
-     |             ~
-  Label: This is the only usage of type parameter T in the signature. (1:20 - 1:20)
-   1 | const f1 = <T,>(): T => {};
-     |                    ^ This is the only usage of type parameter T in the signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
 
@@ -487,21 +603,6 @@ Message: Type parameter T is used only once in the function signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
 
-[TestNoUnnecessaryTypeParameters/invalid-4 - 1]
-Diagnostic 1: sole (3:12 - 3:12)
-Message: Type parameter T is used only once in the function signature.
-   2 |         interface I {
-   3 |           <T>(value: T): void;
-     |            ~
-   4 |         }
-  Label: This is the only usage of type parameter T in the signature. (3:22 - 3:22)
-   2 |         interface I {
-   3 |           <T>(value: T): void;
-     |                      ^ This is the only usage of type parameter T in the signature.
-   4 |         }
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
 [TestNoUnnecessaryTypeParameters/invalid-40 - 1]
 Diagnostic 1: sole (1:35 - 1:35)
 Message: Type parameter T is used only once in the function signature.
@@ -621,21 +722,6 @@ Message: Type parameter T is used only once in the function signature.
   Label: This is the only usage of type parameter T in the signature. (1:25 - 1:25)
    1 | type Ctr = new <T>() => T;
      |                         ^ This is the only usage of type parameter T in the signature.
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
-[TestNoUnnecessaryTypeParameters/invalid-5 - 1]
-Diagnostic 1: sole (3:13 - 3:13)
-Message: Type parameter T is used only once in the function signature.
-   2 |         interface I {
-   3 |           m<T>(x: T): void;
-     |             ~
-   4 |         }
-  Label: This is the only usage of type parameter T in the signature. (3:19 - 3:19)
-   2 |         interface I {
-   3 |           m<T>(x: T): void;
-     |                   ^ This is the only usage of type parameter T in the signature.
-   4 |         }
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
 
@@ -782,21 +868,6 @@ Message: Type parameter T is used only once in the function signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
 
-[TestNoUnnecessaryTypeParameters/invalid-6 - 1]
-Diagnostic 1: sole (2:22 - 2:46)
-Message: Type parameter T is used only once in the class signature.
-   1 | 
-   2 |         class Joiner<T extends string | number> {
-     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |           join(el: T, other: string) {
-  Label: This is the only usage of type parameter T in the signature. (3:20 - 3:20)
-   2 |         class Joiner<T extends string | number> {
-   3 |           join(el: T, other: string) {
-     |                    ^ This is the only usage of type parameter T in the signature.
-   4 |             return [el, other].join(',');
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
 [TestNoUnnecessaryTypeParameters/invalid-60 - 1]
 Diagnostic 1: sole (3:8 - 3:23)
 Message: Type parameter T is used only once in the function signature.
@@ -914,76 +985,5 @@ Message: Type parameter T is used only once in the function signature.
    6 | declare function f<T extends A extends B ? C : D>(): T | null;
      |                                                      ^ This is the only usage of type parameter T in the signature.
    7 |       
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
-[TestNoUnnecessaryTypeParameters/invalid-7 - 1]
-Diagnostic 1: sole (2:25 - 2:25)
-Message: Type parameter V is never used in the class signature.
-   1 | 
-   2 |         declare class C<V> {}
-     |                         ~
-   3 |       
-  Label: This is the only usage of type parameter V in the signature. (2:25 - 2:25)
-   1 | 
-   2 |         declare class C<V> {}
-     |                         ^ This is the only usage of type parameter V in the signature.
-   3 |       
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
-[TestNoUnnecessaryTypeParameters/invalid-8 - 1]
-Diagnostic 1: sole (2:25 - 2:25)
-Message: Type parameter T is used only once in the class signature.
-   1 | 
-   2 |         declare class C<T, U> {
-     |                         ~
-   3 |           method(param: T): U;
-  Label: This is the only usage of type parameter T in the signature. (3:25 - 3:25)
-   2 |         declare class C<T, U> {
-   3 |           method(param: T): U;
-     |                         ^ This is the only usage of type parameter T in the signature.
-   4 |         }
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
-
-Diagnostic 2: sole (2:28 - 2:28)
-Message: Type parameter U is used only once in the class signature.
-   1 | 
-   2 |         declare class C<T, U> {
-     |                            ~
-   3 |           method(param: T): U;
-  Label: This is the only usage of type parameter U in the signature. (3:29 - 3:29)
-   2 |         declare class C<T, U> {
-   3 |           method(param: T): U;
-     |                             ^ This is the only usage of type parameter U in the signature.
-   4 |         }
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
----
-
-[TestNoUnnecessaryTypeParameters/invalid-9 - 1]
-Diagnostic 1: sole (3:18 - 3:18)
-Message: Type parameter T is used only once in the function signature.
-   2 |         declare class C {
-   3 |           method<T, U>(param: T): U;
-     |                  ~
-   4 |         }
-  Label: This is the only usage of type parameter T in the signature. (3:31 - 3:31)
-   2 |         declare class C {
-   3 |           method<T, U>(param: T): U;
-     |                               ^ This is the only usage of type parameter T in the signature.
-   4 |         }
-  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
-
-Diagnostic 2: sole (3:21 - 3:21)
-Message: Type parameter U is used only once in the function signature.
-   2 |         declare class C {
-   3 |           method<T, U>(param: T): U;
-     |                     ~
-   4 |         }
-  Label: This is the only usage of type parameter U in the signature. (3:35 - 3:35)
-   2 |         declare class C {
-   3 |           method<T, U>(param: T): U;
-     |                                   ^ This is the only usage of type parameter U in the signature.
-   4 |         }
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---

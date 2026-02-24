@@ -11,6 +11,78 @@ Diagnostic 1: noStrictNullCheck
 Message: This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.
 ---
 
+[TestPreferNullishCoalescingRule/invalid-2 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: string | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-3 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: number | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-4 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: boolean | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-5 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: bigint | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-6 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: string | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-7 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: number | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-8 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: boolean | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-9 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: bigint | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
 [TestPreferNullishCoalescingRule/invalid-10 - 1]
 Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
 Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
@@ -18,6 +90,827 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-11 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: `` | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-12 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 0 | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-13 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 0n | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-14 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: false | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-15 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: '' | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-16 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: `` | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-17 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0 | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-18 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0n | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-19 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: false | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-20 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 'a' | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-21 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: `hello${'string'}` | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-22 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 1 | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-23 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 1n | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-24 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: true | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-25 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 'a' | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-26 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 'a' | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-27 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: `hello${'string'}` | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-28 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: `hello${'string'}` | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-29 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1 | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-30 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1 | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-31 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1n | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-32 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1n | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-33 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: true | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-34 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: true | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-35 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 'a' | 'b' | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-36 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 'a' | `b` | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-37 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 0 | 1 | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-38 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 1 | 2 | 3 | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-39 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 0n | 1n | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-40 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 1n | 2n | 3n | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-41 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: true | false | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-42 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 'a' | 'b' | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-43 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 'a' | 'b' | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-44 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 'a' | `b` | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-45 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 'a' | `b` | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-46 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0 | 1 | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-47 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0 | 1 | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-48 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1 | 2 | 3 | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-49 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1 | 2 | 3 | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-50 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0n | 1n | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-51 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0n | 1n | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-52 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1n | 2n | 3n | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-53 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 1n | 2n | 3n | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-54 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: true | false | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-55 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: true | false | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-56 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: 0 | 1 | 0n | 1n | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-57 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: true | false | null | undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-58 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0 | 1 | 0n | 1n | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-59 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: 0 | 1 | 0n | 1n | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-60 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: true | false | null | undefined;
+   3 | x ? x : y;
+     | ~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-61 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: true | false | null | undefined;
+   3 | !x ? y : x;
+     | ~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-62 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | declare let x: null;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-63 - 1]
+Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   2 | const x = undefined;
+   3 | x || y;
+     |   ~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-64 - 1]
+Diagnostic 1: preferNullishOverOr (2:6 - 2:7)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   1 | 
+   2 | null || y;
+     |      ~~
+   3 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-65 - 1]
+Diagnostic 1: preferNullishOverOr (2:11 - 2:12)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   1 | 
+   2 | undefined || y;
+     |           ~~
+   3 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-66 - 1]
+Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   7 | declare let x: Enum | undefined;
+   8 | x || y;
+     |   ~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-67 - 1]
+Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   7 | declare let x: Enum.A | Enum.B | undefined;
+   8 | x || y;
+     |   ~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-68 - 1]
+Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   7 | declare let x: Enum | undefined;
+   8 | x || y;
+     |   ~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-69 - 1]
+Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   7 | declare let x: Enum.A | Enum.B | undefined;
+   8 | x || y;
+     |   ~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-70 - 1]
+Diagnostic 1: preferNullishOverOr (6:21 - 6:22)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   5 | 
+   6 | const x = Boolean(a || b);
+     |                     ~~
+   7 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-71 - 1]
+Diagnostic 1: preferNullishOverOr (5:20 - 5:21)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | 
+   5 | const x = String(a || b);
+     |                    ~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-72 - 1]
+Diagnostic 1: preferNullishOverOr (5:27 - 5:28)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | 
+   5 | const x = Boolean(() => a || b);
+     |                           ~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-73 - 1]
+Diagnostic 1: preferNullishOverOr (6:12 - 6:13)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   5 | const x = Boolean(function weird() {
+   6 |   return a || b;
+     |            ~~
+   7 | });
+---
+
+[TestPreferNullishCoalescingRule/invalid-74 - 1]
+Diagnostic 1: preferNullishOverOr (7:23 - 7:24)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   6 | 
+   7 | const x = Boolean(f(a || b));
+     |                       ~~
+   8 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-75 - 1]
+Diagnostic 1: preferNullishOverOr (5:26 - 5:27)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | 
+   5 | const x = Boolean(1 + (a || b));
+     |                          ~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-76 - 1]
+Diagnostic 1: preferNullishOverTernary (5:19 - 5:27)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   4 | 
+   5 | const x = Boolean(a ? a : b);
+     |                   ~~~~~~~~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-77 - 1]
+Diagnostic 1: preferNullishOverTernary (5:22 - 5:31)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   4 | 
+   5 | const test = Boolean(!a ? b : a);
+     |                      ~~~~~~~~~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-78 - 1]
+Diagnostic 1: preferNullishOverOr (7:9 - 7:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   6 | 
+   7 | if (f(a || b)) {
+     |         ~~
+   8 | }
+---
+
+[TestPreferNullishCoalescingRule/invalid-79 - 1]
+Diagnostic 1: preferNullishOverOr (5:9 - 5:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | 
+   5 | if (+(a || b)) {
+     |         ~~
+   6 | }
+---
+
+[TestPreferNullishCoalescingRule/invalid-80 - 1]
+Diagnostic 1: preferNullishOverOr (8:12 - 8:13)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   7 | 
+   8 | defaultBox || getFallbackBox();
+     |            ~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-81 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 8:42)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBox ? defaultBox : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-82 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 8:76)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b != null ? defaultBoxOptional.a?.b : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-83 - 1]
+Diagnostic 1: preferNullishOverOr (4:3 - 4:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   3 | declare const y: any;
+   4 | x || y;
+     |   ~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-84 - 1]
+Diagnostic 1: preferNullishOverOr (4:3 - 4:4)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   3 | declare const y: any;
+   4 | x || y;
+     |   ~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-85 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 8:75)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b != null ? defaultBoxOptional.a.b : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-86 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 8:68)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b ? defaultBoxOptional.a?.b : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-87 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 8:67)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b ? defaultBoxOptional.a.b : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-88 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b !== undefined
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   ? defaultBoxOptional.a?.b
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |   : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-89 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b !== undefined
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   ? defaultBoxOptional.a.b
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |   : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-90 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b !== undefined && defaultBoxOptional.a?.b !== null
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   ? defaultBoxOptional.a?.b
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |   : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-91 - 1]
+Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   7 | 
+   8 | defaultBoxOptional.a?.b !== undefined && defaultBoxOptional.a?.b !== null
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   ? defaultBoxOptional.a.b
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |   : getFallbackBox();
+     | ~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-92 - 1]
+Diagnostic 1: preferNullishOverTernary (4:1 - 4:10)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   3 | declare let y: number;
+   4 | !x ? y : x;
+     | ~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-93 - 1]
+Diagnostic 1: preferNullishOverTernary (4:1 - 4:9)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   3 | declare let y: number;
+   4 | x ? x : y;
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-94 - 1]
+Diagnostic 1: preferNullishOverTernary (3:1 - 3:14)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   2 | declare let x: { n: unknown };
+   3 | !x.n ? y : x.n;
+     | ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-95 - 1]
+Diagnostic 1: preferNullishOverTernary (4:1 - 4:33)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   3 | 
+   4 | x?.['a'] != null ? x['a'] : 'foo';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-96 - 1]
+Diagnostic 1: preferNullishOverTernary (4:1 - 4:30)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   3 | 
+   4 | x?.['a'] != null ? x.a : 'foo';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-97 - 1]
+Diagnostic 1: preferNullishOverTernary (4:1 - 4:29)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   3 | 
+   4 | x?.a != null ? x['a'] : 'foo';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-98 - 1]
+Diagnostic 1: preferNullishOverTernary (5:1 - 5:29)
+Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
+   4 | 
+   5 | x?.[a] != null ? x[a] : 'foo';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-99 - 1]
+Diagnostic 1: preferNullishOverAssignment (6:3 - 8:3)
+Message: Prefer using nullish coalescing operator (`??=`) instead of an assignment expression, as it is simpler to read.
+   5 | function lazyInitialize() {
+   6 |   if (!foo) {
+     |   ~~~~~~~~~~~
+   7 |     foo = makeFoo();
+     | ~~~~~~~~~~~~~~~~~~~~
+   8 |   }
+     | ~~~
+   9 | }
 ---
 
 [TestPreferNullishCoalescingRule/invalid-100 - 1]
@@ -152,15 +1045,6 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    9 | }
 ---
 
-[TestPreferNullishCoalescingRule/invalid-11 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: `` | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
 [TestPreferNullishCoalescingRule/invalid-110 - 1]
 Diagnostic 1: preferNullishOverAssignment (6:3 - 8:3)
 Message: Prefer using nullish coalescing operator (`??=`) instead of an assignment expression, as it is simpler to read.
@@ -245,15 +1129,6 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    6 |       
 ---
 
-[TestPreferNullishCoalescingRule/invalid-12 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 0 | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
 [TestPreferNullishCoalescingRule/invalid-120 - 1]
 Diagnostic 1: preferNullishOverOr (5:22 - 5:23)
 Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
@@ -270,879 +1145,4 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = a && b || c || 'd';
      |                  ~~
    6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-13 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 0n | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-14 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: false | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-15 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: '' | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-16 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: `` | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-17 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0 | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-18 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0n | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-19 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: false | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-2 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: string | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-20 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 'a' | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-21 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: `hello${'string'}` | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-22 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 1 | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-23 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 1n | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-24 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: true | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-25 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 'a' | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-26 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 'a' | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-27 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: `hello${'string'}` | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-28 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: `hello${'string'}` | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-29 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1 | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-3 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: number | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-30 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1 | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-31 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1n | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-32 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1n | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-33 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: true | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-34 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: true | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-35 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 'a' | 'b' | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-36 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 'a' | `b` | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-37 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 0 | 1 | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-38 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 1 | 2 | 3 | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-39 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 0n | 1n | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-4 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: boolean | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-40 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 1n | 2n | 3n | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-41 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: true | false | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-42 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 'a' | 'b' | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-43 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 'a' | 'b' | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-44 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 'a' | `b` | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-45 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 'a' | `b` | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-46 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0 | 1 | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-47 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0 | 1 | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-48 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1 | 2 | 3 | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-49 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1 | 2 | 3 | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-5 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: bigint | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-50 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0n | 1n | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-51 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0n | 1n | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-52 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1n | 2n | 3n | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-53 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 1n | 2n | 3n | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-54 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: true | false | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-55 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: true | false | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-56 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: 0 | 1 | 0n | 1n | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-57 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: true | false | null | undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-58 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0 | 1 | 0n | 1n | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-59 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: 0 | 1 | 0n | 1n | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-6 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: string | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-60 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: true | false | null | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-61 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: true | false | null | undefined;
-   3 | !x ? y : x;
-     | ~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-62 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | declare let x: null;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-63 - 1]
-Diagnostic 1: preferNullishOverOr (3:3 - 3:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   2 | const x = undefined;
-   3 | x || y;
-     |   ~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-64 - 1]
-Diagnostic 1: preferNullishOverOr (2:6 - 2:7)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   1 | 
-   2 | null || y;
-     |      ~~
-   3 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-65 - 1]
-Diagnostic 1: preferNullishOverOr (2:11 - 2:12)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   1 | 
-   2 | undefined || y;
-     |           ~~
-   3 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-66 - 1]
-Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   7 | declare let x: Enum | undefined;
-   8 | x || y;
-     |   ~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-67 - 1]
-Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   7 | declare let x: Enum.A | Enum.B | undefined;
-   8 | x || y;
-     |   ~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-68 - 1]
-Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   7 | declare let x: Enum | undefined;
-   8 | x || y;
-     |   ~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-69 - 1]
-Diagnostic 1: preferNullishOverOr (8:3 - 8:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   7 | declare let x: Enum.A | Enum.B | undefined;
-   8 | x || y;
-     |   ~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-7 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: number | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-70 - 1]
-Diagnostic 1: preferNullishOverOr (6:21 - 6:22)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   5 | 
-   6 | const x = Boolean(a || b);
-     |                     ~~
-   7 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-71 - 1]
-Diagnostic 1: preferNullishOverOr (5:20 - 5:21)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   4 | 
-   5 | const x = String(a || b);
-     |                    ~~
-   6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-72 - 1]
-Diagnostic 1: preferNullishOverOr (5:27 - 5:28)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   4 | 
-   5 | const x = Boolean(() => a || b);
-     |                           ~~
-   6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-73 - 1]
-Diagnostic 1: preferNullishOverOr (6:12 - 6:13)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   5 | const x = Boolean(function weird() {
-   6 |   return a || b;
-     |            ~~
-   7 | });
----
-
-[TestPreferNullishCoalescingRule/invalid-74 - 1]
-Diagnostic 1: preferNullishOverOr (7:23 - 7:24)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   6 | 
-   7 | const x = Boolean(f(a || b));
-     |                       ~~
-   8 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-75 - 1]
-Diagnostic 1: preferNullishOverOr (5:26 - 5:27)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   4 | 
-   5 | const x = Boolean(1 + (a || b));
-     |                          ~~
-   6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-76 - 1]
-Diagnostic 1: preferNullishOverTernary (5:19 - 5:27)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   4 | 
-   5 | const x = Boolean(a ? a : b);
-     |                   ~~~~~~~~~
-   6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-77 - 1]
-Diagnostic 1: preferNullishOverTernary (5:22 - 5:31)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   4 | 
-   5 | const test = Boolean(!a ? b : a);
-     |                      ~~~~~~~~~~
-   6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-78 - 1]
-Diagnostic 1: preferNullishOverOr (7:9 - 7:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   6 | 
-   7 | if (f(a || b)) {
-     |         ~~
-   8 | }
----
-
-[TestPreferNullishCoalescingRule/invalid-79 - 1]
-Diagnostic 1: preferNullishOverOr (5:9 - 5:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   4 | 
-   5 | if (+(a || b)) {
-     |         ~~
-   6 | }
----
-
-[TestPreferNullishCoalescingRule/invalid-8 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: boolean | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-80 - 1]
-Diagnostic 1: preferNullishOverOr (8:12 - 8:13)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   7 | 
-   8 | defaultBox || getFallbackBox();
-     |            ~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-81 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 8:42)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBox ? defaultBox : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-82 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 8:76)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b != null ? defaultBoxOptional.a?.b : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-83 - 1]
-Diagnostic 1: preferNullishOverOr (4:3 - 4:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   3 | declare const y: any;
-   4 | x || y;
-     |   ~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-84 - 1]
-Diagnostic 1: preferNullishOverOr (4:3 - 4:4)
-Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
-   3 | declare const y: any;
-   4 | x || y;
-     |   ~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-85 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 8:75)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b != null ? defaultBoxOptional.a.b : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-86 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 8:68)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b ? defaultBoxOptional.a?.b : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-87 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 8:67)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b ? defaultBoxOptional.a.b : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-88 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b !== undefined
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   ? defaultBoxOptional.a?.b
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  10 |   : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~
-  11 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-89 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b !== undefined
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   ? defaultBoxOptional.a.b
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-  10 |   : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~
-  11 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-9 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: bigint | undefined;
-   3 | x ? x : y;
-     | ~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-90 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b !== undefined && defaultBoxOptional.a?.b !== null
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   ? defaultBoxOptional.a?.b
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  10 |   : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~
-  11 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-91 - 1]
-Diagnostic 1: preferNullishOverTernary (8:1 - 10:20)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   7 | 
-   8 | defaultBoxOptional.a?.b !== undefined && defaultBoxOptional.a?.b !== null
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   ? defaultBoxOptional.a.b
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-  10 |   : getFallbackBox();
-     | ~~~~~~~~~~~~~~~~~~~~
-  11 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-92 - 1]
-Diagnostic 1: preferNullishOverTernary (4:1 - 4:10)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   3 | declare let y: number;
-   4 | !x ? y : x;
-     | ~~~~~~~~~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-93 - 1]
-Diagnostic 1: preferNullishOverTernary (4:1 - 4:9)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   3 | declare let y: number;
-   4 | x ? x : y;
-     | ~~~~~~~~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-94 - 1]
-Diagnostic 1: preferNullishOverTernary (3:1 - 3:14)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   2 | declare let x: { n: unknown };
-   3 | !x.n ? y : x.n;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-95 - 1]
-Diagnostic 1: preferNullishOverTernary (4:1 - 4:33)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   3 | 
-   4 | x?.['a'] != null ? x['a'] : 'foo';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-96 - 1]
-Diagnostic 1: preferNullishOverTernary (4:1 - 4:30)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   3 | 
-   4 | x?.['a'] != null ? x.a : 'foo';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-97 - 1]
-Diagnostic 1: preferNullishOverTernary (4:1 - 4:29)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   3 | 
-   4 | x?.a != null ? x['a'] : 'foo';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-98 - 1]
-Diagnostic 1: preferNullishOverTernary (5:1 - 5:29)
-Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
-   4 | 
-   5 | x?.[a] != null ? x[a] : 'foo';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestPreferNullishCoalescingRule/invalid-99 - 1]
-Diagnostic 1: preferNullishOverAssignment (6:3 - 8:3)
-Message: Prefer using nullish coalescing operator (`??=`) instead of an assignment expression, as it is simpler to read.
-   5 | function lazyInitialize() {
-   6 |   if (!foo) {
-     |   ~~~~~~~~~~~
-   7 |     foo = makeFoo();
-     | ~~~~~~~~~~~~~~~~~~~~
-   8 |   }
-     | ~~~
-   9 | }
 ---

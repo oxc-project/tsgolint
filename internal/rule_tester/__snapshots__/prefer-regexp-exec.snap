@@ -13,22 +13,6 @@ Message: Use the `RegExp#exec()` method instead.
      |             ~~~~~
 ---
 
-[TestPreferRegexpExecRule/invalid-10 - 1]
-Diagnostic 1: regExpExecOverStringMatch (3:8 - 3:12)
-Message: Use the `RegExp#exec()` method instead.
-   2 | function temp(text: string): void {
-   3 |   text.match(new RegExp(`${'hello'}`));
-     |        ~~~~~
-   4 |   text.match(new RegExp(`${'hello'.toString()}`));
-
-Diagnostic 2: regExpExecOverStringMatch (4:8 - 4:12)
-Message: Use the `RegExp#exec()` method instead.
-   3 |   text.match(new RegExp(`${'hello'}`));
-   4 |   text.match(new RegExp(`${'hello'.toString()}`));
-     |        ~~~~~
-   5 | }
----
-
 [TestPreferRegexpExecRule/invalid-2 - 1]
 Diagnostic 1: regExpExecOverStringMatch (4:6 - 4:10)
 Message: Use the `RegExp#exec()` method instead.
@@ -99,4 +83,20 @@ Message: Use the `RegExp#exec()` method instead.
    3 |   'check'.match(new RegExp(pattern, undefined));
      |           ~~~~~
    4 | }
+---
+
+[TestPreferRegexpExecRule/invalid-10 - 1]
+Diagnostic 1: regExpExecOverStringMatch (3:8 - 3:12)
+Message: Use the `RegExp#exec()` method instead.
+   2 | function temp(text: string): void {
+   3 |   text.match(new RegExp(`${'hello'}`));
+     |        ~~~~~
+   4 |   text.match(new RegExp(`${'hello'.toString()}`));
+
+Diagnostic 2: regExpExecOverStringMatch (4:8 - 4:12)
+Message: Use the `RegExp#exec()` method instead.
+   3 |   text.match(new RegExp(`${'hello'}`));
+   4 |   text.match(new RegExp(`${'hello'.toString()}`));
+     |        ~~~~~
+   5 | }
 ---

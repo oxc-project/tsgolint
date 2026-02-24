@@ -17,6 +17,78 @@ Message: Unsafe call of a(n) `any` typed value.
    4 | }
 ---
 
+[TestNoUnsafeCallRule/invalid-2 - 1]
+Diagnostic 1: unsafeCall (3:3 - 3:17)
+Message: Unsafe call of a(n) `any` typed value.
+   2 | function foo(x: any) {
+   3 |   x.a.b.c.d.e.f.g();
+     |   ~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-3 - 1]
+Diagnostic 1: unsafeCall (3:3 - 3:17)
+Message: Unsafe call of a(n) `any` typed value.
+   2 | function foo(x: any) {
+   3 |   x.a.b.c.d.e.f.g?.();
+     |   ~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-4 - 1]
+Diagnostic 1: unsafeCall (3:3 - 3:5)
+Message: Unsafe call of a(n) `any` typed value.
+   2 | function foo(x: { a: any }) {
+   3 |   x.a();
+     |   ~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-5 - 1]
+Diagnostic 1: unsafeCall (3:3 - 3:6)
+Message: Unsafe call of a(n) `any` typed value.
+   2 | function foo(x: { a: any }) {
+   3 |   x?.a();
+     |   ~~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-6 - 1]
+Diagnostic 1: unsafeCall (3:3 - 3:5)
+Message: Unsafe call of a(n) `any` typed value.
+   2 | function foo(x: { a: any }) {
+   3 |   x.a?.();
+     |   ~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-7 - 1]
+Diagnostic 1: unsafeNew (3:3 - 3:9)
+Message: Unsafe construction of a(n) `any` typed value.
+   2 | function foo(x: any) {
+   3 |   new x();
+     |   ~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-8 - 1]
+Diagnostic 1: unsafeNew (3:3 - 3:11)
+Message: Unsafe construction of a(n) `any` typed value.
+   2 | function foo(x: { a: any }) {
+   3 |   new x.a();
+     |   ~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeCallRule/invalid-9 - 1]
+Diagnostic 1: unsafeTemplateTag (3:3 - 3:3)
+Message: Unsafe use of a(n) `any` typed template tag.
+   2 | function foo(x: any) {
+   3 |   x`foo`;
+     |   ~
+   4 | }
+---
+
 [TestNoUnsafeCallRule/invalid-10 - 1]
 Diagnostic 1: unsafeTemplateTag (3:3 - 3:7)
 Message: Unsafe use of a(n) `any` typed template tag.
@@ -118,15 +190,6 @@ Message: Unsafe construction of a(n) `Function` typed value.
    7 |       
 ---
 
-[TestNoUnsafeCallRule/invalid-2 - 1]
-Diagnostic 1: unsafeCall (3:3 - 3:17)
-Message: Unsafe call of a(n) `any` typed value.
-   2 | function foo(x: any) {
-   3 |   x.a.b.c.d.e.f.g();
-     |   ~~~~~~~~~~~~~~~
-   4 | }
----
-
 [TestNoUnsafeCallRule/invalid-20 - 1]
 Diagnostic 1: unsafeCall (6:1 - 6:6)
 Message: Unsafe call of a(n) `Function` typed value.
@@ -134,67 +197,4 @@ Message: Unsafe call of a(n) `Function` typed value.
    6 | unsafe();
      | ~~~~~~
    7 |       
----
-
-[TestNoUnsafeCallRule/invalid-3 - 1]
-Diagnostic 1: unsafeCall (3:3 - 3:17)
-Message: Unsafe call of a(n) `any` typed value.
-   2 | function foo(x: any) {
-   3 |   x.a.b.c.d.e.f.g?.();
-     |   ~~~~~~~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeCallRule/invalid-4 - 1]
-Diagnostic 1: unsafeCall (3:3 - 3:5)
-Message: Unsafe call of a(n) `any` typed value.
-   2 | function foo(x: { a: any }) {
-   3 |   x.a();
-     |   ~~~
-   4 | }
----
-
-[TestNoUnsafeCallRule/invalid-5 - 1]
-Diagnostic 1: unsafeCall (3:3 - 3:6)
-Message: Unsafe call of a(n) `any` typed value.
-   2 | function foo(x: { a: any }) {
-   3 |   x?.a();
-     |   ~~~~
-   4 | }
----
-
-[TestNoUnsafeCallRule/invalid-6 - 1]
-Diagnostic 1: unsafeCall (3:3 - 3:5)
-Message: Unsafe call of a(n) `any` typed value.
-   2 | function foo(x: { a: any }) {
-   3 |   x.a?.();
-     |   ~~~
-   4 | }
----
-
-[TestNoUnsafeCallRule/invalid-7 - 1]
-Diagnostic 1: unsafeNew (3:3 - 3:9)
-Message: Unsafe construction of a(n) `any` typed value.
-   2 | function foo(x: any) {
-   3 |   new x();
-     |   ~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeCallRule/invalid-8 - 1]
-Diagnostic 1: unsafeNew (3:3 - 3:11)
-Message: Unsafe construction of a(n) `any` typed value.
-   2 | function foo(x: { a: any }) {
-   3 |   new x.a();
-     |   ~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeCallRule/invalid-9 - 1]
-Diagnostic 1: unsafeTemplateTag (3:3 - 3:3)
-Message: Unsafe use of a(n) `any` typed template tag.
-   2 | function foo(x: any) {
-   3 |   x`foo`;
-     |   ~
-   4 | }
 ---

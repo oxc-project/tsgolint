@@ -129,7 +129,7 @@ func (sf *snapshotFile) write(t *testing.T) {
 	for k := range sf.entries {
 		keys = append(keys, k)
 	}
-	sort.Strings(keys)
+	sortSnapshotKeys(keys)
 
 	var sb strings.Builder
 	for _, key := range keys {
@@ -139,6 +139,101 @@ func (sf *snapshotFile) write(t *testing.T) {
 	if err := os.WriteFile(sf.path, []byte(sb.String()), 0o644); err != nil {
 		t.Fatalf("could not write snapshot file: %v", err)
 	}
+}
+
+func sortSnapshotKeys(keys []string) {
+	sort.Slice(keys, func(i, j int) bool {
+		return compareSnapshotKeys(keys[i], keys[j]) < 0
+	})
+}
+
+func compareSnapshotKeys(a, b string) int {
+	i := 0
+	j := 0
+
+	for i < len(a) && j < len(b) {
+		ai := a[i]
+		bj := b[j]
+
+		if isASCIIDigit(ai) && isASCIIDigit(bj) {
+			aStart := i
+			bStart := j
+
+			for i < len(a) && isASCIIDigit(a[i]) {
+				i++
+			}
+			for j < len(b) && isASCIIDigit(b[j]) {
+				j++
+			}
+
+			aDigits := a[aStart:i]
+			bDigits := b[bStart:j]
+
+			if cmp := compareDigitRuns(aDigits, bDigits); cmp != 0 {
+				return cmp
+			}
+
+			continue
+		}
+
+		if ai != bj {
+			if ai < bj {
+				return -1
+			}
+			return 1
+		}
+
+		i++
+		j++
+	}
+
+	switch {
+	case len(a) < len(b):
+		return -1
+	case len(a) > len(b):
+		return 1
+	default:
+		return 0
+	}
+}
+
+func compareDigitRuns(a, b string) int {
+	aTrim := strings.TrimLeft(a, "0")
+	bTrim := strings.TrimLeft(b, "0")
+
+	if aTrim == "" {
+		aTrim = "0"
+	}
+	if bTrim == "" {
+		bTrim = "0"
+	}
+
+	if len(aTrim) != len(bTrim) {
+		if len(aTrim) < len(bTrim) {
+			return -1
+		}
+		return 1
+	}
+
+	if aTrim != bTrim {
+		if aTrim < bTrim {
+			return -1
+		}
+		return 1
+	}
+
+	if len(a) != len(b) {
+		if len(a) < len(b) {
+			return -1
+		}
+		return 1
+	}
+
+	return 0
+}
+
+func isASCIIDigit(b byte) bool {
+	return b >= '0' && b <= '9'
 }
 
 // parseSnapshotFile parses a .snap file into a map of key -> content.

@@ -17,6 +17,78 @@ Message: The two values in this comparison do not have a shared enum type.
    6 |       
 ---
 
+[TestNoUnsafeEnumComparisonRule/invalid-2 - 1]
+Diagnostic 1: mismatchedCondition (5:9 - 5:24)
+Message: The two values in this comparison do not have a shared enum type.
+   4 |         }
+   5 |         Fruit.Apple == 1;
+     |         ~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-3 - 1]
+Diagnostic 1: mismatchedCondition (5:9 - 5:25)
+Message: The two values in this comparison do not have a shared enum type.
+   4 |         }
+   5 |         Fruit.Apple === 1;
+     |         ~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-4 - 1]
+Diagnostic 1: mismatchedCondition (5:9 - 5:24)
+Message: The two values in this comparison do not have a shared enum type.
+   4 |         }
+   5 |         Fruit.Apple != 1;
+     |         ~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-5 - 1]
+Diagnostic 1: mismatchedCondition (5:9 - 5:25)
+Message: The two values in this comparison do not have a shared enum type.
+   4 |         }
+   5 |         Fruit.Apple !== 1;
+     |         ~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-6 - 1]
+Diagnostic 1: mismatchedCondition (6:9 - 6:25)
+Message: The two values in this comparison do not have a shared enum type.
+   5 |         }
+   6 |         Fruit.Apple === 0;
+     |         ~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-7 - 1]
+Diagnostic 1: mismatchedCondition (6:9 - 6:27)
+Message: The two values in this comparison do not have a shared enum type.
+   5 |         }
+   6 |         Fruit.Banana === '';
+     |         ~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-8 - 1]
+Diagnostic 1: mismatchedCondition (7:9 - 7:38)
+Message: The two values in this comparison do not have a shared enum type.
+   6 |         }
+   7 |         Vegetable.Asparagus === 'beet';
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-9 - 1]
+Diagnostic 1: mismatchedCondition (7:9 - 7:25)
+Message: The two values in this comparison do not have a shared enum type.
+   6 |         }
+   7 |         1 === Fruit.Apple;
+     |         ~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
 [TestNoUnsafeEnumComparisonRule/invalid-10 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:38)
 Message: The two values in this comparison do not have a shared enum type.
@@ -126,15 +198,6 @@ Message: The two values in this comparison do not have a shared enum type.
   21 |         mixed === 1;
      |         ~~~~~~~~~~~
   22 |       
----
-
-[TestNoUnsafeEnumComparisonRule/invalid-2 - 1]
-Diagnostic 1: mismatchedCondition (5:9 - 5:24)
-Message: The two values in this comparison do not have a shared enum type.
-   4 |         }
-   5 |         Fruit.Apple == 1;
-     |         ~~~~~~~~~~~~~~~~
-   6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-20 - 1]
@@ -247,15 +310,6 @@ Message: The two values in this comparison do not have a shared enum type.
    8 |       
 ---
 
-[TestNoUnsafeEnumComparisonRule/invalid-3 - 1]
-Diagnostic 1: mismatchedCondition (5:9 - 5:25)
-Message: The two values in this comparison do not have a shared enum type.
-   4 |         }
-   5 |         Fruit.Apple === 1;
-     |         ~~~~~~~~~~~~~~~~~
-   6 |       
----
-
 [TestNoUnsafeEnumComparisonRule/invalid-30 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:21)
 Message: The two values in this comparison do not have a shared enum type.
@@ -346,15 +400,6 @@ Message: The two values in this comparison do not have a shared enum type.
    8 |       
 ---
 
-[TestNoUnsafeEnumComparisonRule/invalid-4 - 1]
-Diagnostic 1: mismatchedCondition (5:9 - 5:24)
-Message: The two values in this comparison do not have a shared enum type.
-   4 |         }
-   5 |         Fruit.Apple != 1;
-     |         ~~~~~~~~~~~~~~~~
-   6 |       
----
-
 [TestNoUnsafeEnumComparisonRule/invalid-40 - 1]
 Diagnostic 1: mismatchedCondition (6:13 - 6:31)
 Message: The two values in this comparison do not have a shared enum type.
@@ -389,49 +434,4 @@ Message: The two values in this comparison do not have a shared enum type.
    6 |         if (foo === Vegetable.Asparagus) {
      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    7 |         }
----
-
-[TestNoUnsafeEnumComparisonRule/invalid-5 - 1]
-Diagnostic 1: mismatchedCondition (5:9 - 5:25)
-Message: The two values in this comparison do not have a shared enum type.
-   4 |         }
-   5 |         Fruit.Apple !== 1;
-     |         ~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestNoUnsafeEnumComparisonRule/invalid-6 - 1]
-Diagnostic 1: mismatchedCondition (6:9 - 6:25)
-Message: The two values in this comparison do not have a shared enum type.
-   5 |         }
-   6 |         Fruit.Apple === 0;
-     |         ~~~~~~~~~~~~~~~~~
-   7 |       
----
-
-[TestNoUnsafeEnumComparisonRule/invalid-7 - 1]
-Diagnostic 1: mismatchedCondition (6:9 - 6:27)
-Message: The two values in this comparison do not have a shared enum type.
-   5 |         }
-   6 |         Fruit.Banana === '';
-     |         ~~~~~~~~~~~~~~~~~~~
-   7 |       
----
-
-[TestNoUnsafeEnumComparisonRule/invalid-8 - 1]
-Diagnostic 1: mismatchedCondition (7:9 - 7:38)
-Message: The two values in this comparison do not have a shared enum type.
-   6 |         }
-   7 |         Vegetable.Asparagus === 'beet';
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   8 |       
----
-
-[TestNoUnsafeEnumComparisonRule/invalid-9 - 1]
-Diagnostic 1: mismatchedCondition (7:9 - 7:25)
-Message: The two values in this comparison do not have a shared enum type.
-   6 |         }
-   7 |         1 === Fruit.Apple;
-     |         ~~~~~~~~~~~~~~~~~
-   8 |       
 ---

@@ -15,6 +15,68 @@ Message: 'any' overrides all other types in this union type.
    4 |       
 ---
 
+[TestNoRedundantTypeConstituentsRule/invalid-2 - 1]
+Diagnostic 1: overrides (1:10 - 1:12)
+Message: 'any' overrides all other types in this union type.
+   1 | type T = any | number;
+     |          ~~~
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-3 - 1]
+Diagnostic 1: overrides (3:18 - 3:18)
+Message: 'any' overrides all other types in this union type.
+   2 |         type B = any;
+   3 |         type T = B | number;
+     |                  ~
+   4 |       
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-4 - 1]
+Diagnostic 1: overridden (1:19 - 1:23)
+Message: 'never' is overridden by other types in this union type.
+   1 | type T = number | never;
+     |                   ~~~~~
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-5 - 1]
+Diagnostic 1: overridden (3:22 - 3:26)
+Message: 'never' is overridden by other types in this union type.
+   2 |         type B = number;
+   3 |         type T = B | never;
+     |                      ~~~~~
+   4 |       
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-6 - 1]
+Diagnostic 1: overridden (3:18 - 3:18)
+Message: 'never' is overridden by other types in this union type.
+   2 |         type B = never;
+   3 |         type T = B | number;
+     |                  ~
+   4 |       
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-7 - 1]
+Diagnostic 1: overridden (1:10 - 1:14)
+Message: 'never' is overridden by other types in this union type.
+   1 | type T = never | number;
+     |          ~~~~~
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-8 - 1]
+Diagnostic 1: overrides (1:19 - 1:25)
+Message: 'unknown' overrides all other types in this union type.
+   1 | type T = number | unknown;
+     |                   ~~~~~~~
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-9 - 1]
+Diagnostic 1: overrides (1:10 - 1:16)
+Message: 'unknown' overrides all other types in this union type.
+   1 | type T = unknown | number;
+     |          ~~~~~~~
+---
+
 [TestNoRedundantTypeConstituentsRule/invalid-10 - 1]
 Diagnostic 1: errorTypeOverrides (1:19 - 1:26)
 Message: 'NotKnown' is an 'error' type that acts as 'any' and overrides all other types in this union type.
@@ -85,13 +147,6 @@ Diagnostic 1: literalOverridden (1:10 - 1:11)
 Message:  is overridden by string in this union type.
    1 | type T = '' | string;
      |          ~~
----
-
-[TestNoRedundantTypeConstituentsRule/invalid-2 - 1]
-Diagnostic 1: overrides (1:10 - 1:12)
-Message: 'any' overrides all other types in this union type.
-   1 | type T = any | number;
-     |          ~~~
 ---
 
 [TestNoRedundantTypeConstituentsRule/invalid-20 - 1]
@@ -170,15 +225,6 @@ Message: literal type is overridden by boolean in this union type.
      |          ~~~~
 ---
 
-[TestNoRedundantTypeConstituentsRule/invalid-3 - 1]
-Diagnostic 1: overrides (3:18 - 3:18)
-Message: 'any' overrides all other types in this union type.
-   2 |         type B = any;
-   3 |         type T = B | number;
-     |                  ~
-   4 |       
----
-
 [TestNoRedundantTypeConstituentsRule/invalid-30 - 1]
 Diagnostic 1: primitiveOverridden (1:18 - 1:24)
 Message: boolean is overridden by the literal type in this intersection type.
@@ -255,13 +301,6 @@ Message: 'never' overrides all other types in this intersection type.
      |          ~~~~~
 ---
 
-[TestNoRedundantTypeConstituentsRule/invalid-4 - 1]
-Diagnostic 1: overridden (1:19 - 1:23)
-Message: 'never' is overridden by other types in this union type.
-   1 | type T = number | never;
-     |                   ~~~~~
----
-
 [TestNoRedundantTypeConstituentsRule/invalid-40 - 1]
 Diagnostic 1: overridden (1:19 - 1:25)
 Message: 'unknown' is overridden by other types in this intersection type.
@@ -336,43 +375,4 @@ Message: 1 | 2 is overridden by the string in this intersection type.
    4 |         type U = S & T & string & number;
      |                      ~
    5 |       
----
-
-[TestNoRedundantTypeConstituentsRule/invalid-5 - 1]
-Diagnostic 1: overridden (3:22 - 3:26)
-Message: 'never' is overridden by other types in this union type.
-   2 |         type B = number;
-   3 |         type T = B | never;
-     |                      ~~~~~
-   4 |       
----
-
-[TestNoRedundantTypeConstituentsRule/invalid-6 - 1]
-Diagnostic 1: overridden (3:18 - 3:18)
-Message: 'never' is overridden by other types in this union type.
-   2 |         type B = never;
-   3 |         type T = B | number;
-     |                  ~
-   4 |       
----
-
-[TestNoRedundantTypeConstituentsRule/invalid-7 - 1]
-Diagnostic 1: overridden (1:10 - 1:14)
-Message: 'never' is overridden by other types in this union type.
-   1 | type T = never | number;
-     |          ~~~~~
----
-
-[TestNoRedundantTypeConstituentsRule/invalid-8 - 1]
-Diagnostic 1: overrides (1:19 - 1:25)
-Message: 'unknown' overrides all other types in this union type.
-   1 | type T = number | unknown;
-     |                   ~~~~~~~
----
-
-[TestNoRedundantTypeConstituentsRule/invalid-9 - 1]
-Diagnostic 1: overrides (1:10 - 1:16)
-Message: 'unknown' overrides all other types in this union type.
-   1 | type T = unknown | number;
-     |          ~~~~~~~
 ---

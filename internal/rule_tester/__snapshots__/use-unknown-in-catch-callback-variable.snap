@@ -9,6 +9,94 @@ Message: Prefer the safe `: unknown` for a `catch` callback variable.
   Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
 ---
 
+[TestUseUnknownInCatchCallbackVariable/invalid-2 - 1]
+Diagnostic 1: useUnknown (2:26 - 2:26)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   1 | 
+   2 | Promise.resolve().catch((e, ...rest: []) => {
+     |                          ~
+   3 |   throw err;
+  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-3 - 1]
+Diagnostic 1: useUnknown (3:4 - 3:57)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   2 | Promise.resolve().catch(
+   3 |   (err: string | ((number | unknown) & { b: () => void })) => {
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |     throw err;
+  Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-4 - 1]
+Diagnostic 1: useUnknown (4:5 - 8:5)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   3 |   (
+   4 |     ...err: [
+     |     ~~~~~~~~~
+   5 |       unknown[],
+     | ~~~~~~~~~~~~~~~~
+   6 |       string | ((number | unknown) & { b: () => void }),
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       string,
+     | ~~~~~~~~~~~~~
+   8 |     ]
+     | ~~~~~
+   9 |   ) => {
+  Suggestion 1: [wrongRestTypeAnnotationSuggestion] Change existing type annotation to `: [unknown]`.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-5 - 1]
+Diagnostic 1: useUnknown (2:35 - 2:45)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   1 | 
+   2 | Promise.resolve().catch(function (err: string) {
+     |                                   ~~~~~~~~~~~
+   3 |   throw err;
+  Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-6 - 1]
+Diagnostic 1: useUnknown (2:35 - 2:37)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   1 | 
+   2 | Promise.resolve().catch(function (err /* awkward spot for comment */) {
+     |                                   ~~~
+   3 |   throw err;
+  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-7 - 1]
+Diagnostic 1: useUnknown (2:48 - 2:58)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   1 | 
+   2 | Promise.resolve().catch(function namedCallback(err: string) {
+     |                                                ~~~~~~~~~~~
+   3 |   throw err;
+  Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-8 - 1]
+Diagnostic 1: useUnknown (2:25 - 2:27)
+Message: Prefer the safe `: unknown` for a `catch` callback variable.
+   1 | 
+   2 | Promise.resolve().catch(err => {
+     |                         ~~~
+   3 |   throw err;
+  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
+---
+
+[TestUseUnknownInCatchCallbackVariable/invalid-9 - 1]
+Diagnostic 1: useUnknown (4:3 - 4:7)
+Message: Prefer the safe `: unknown` for a `then` rejection callback variable.
+   3 |   () => {},
+   4 |   error => {},
+     |   ~~~~~
+   5 | );
+  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
+---
+
 [TestUseUnknownInCatchCallbackVariable/invalid-10 - 1]
 Diagnostic 1: useUnknown (2:26 - 2:29)
 Message: Prefer the safe `: unknown` for a `catch` callback variable.
@@ -106,16 +194,6 @@ Message: Prefer the safe `: unknown` for a `catch` callback variable. The thrown
    3 |   return null;
 ---
 
-[TestUseUnknownInCatchCallbackVariable/invalid-2 - 1]
-Diagnostic 1: useUnknown (2:26 - 2:26)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   1 | 
-   2 | Promise.resolve().catch((e, ...rest: []) => {
-     |                          ~
-   3 |   throw err;
-  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
----
-
 [TestUseUnknownInCatchCallbackVariable/invalid-20 - 1]
 Diagnostic 1: useUnknown (2:29 - 2:34)
 Message: Prefer the safe `: unknown` for a `catch` callback variable.
@@ -197,83 +275,5 @@ Message: Prefer the safe `: unknown` for a `catch` callback variable.
    7 |     : (condition && (err => {})) || (err => {}),
      |                                      ~~~
    8 | );
-  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-3 - 1]
-Diagnostic 1: useUnknown (3:4 - 3:57)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   2 | Promise.resolve().catch(
-   3 |   (err: string | ((number | unknown) & { b: () => void })) => {
-     |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |     throw err;
-  Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-4 - 1]
-Diagnostic 1: useUnknown (4:5 - 8:5)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   3 |   (
-   4 |     ...err: [
-     |     ~~~~~~~~~
-   5 |       unknown[],
-     | ~~~~~~~~~~~~~~~~
-   6 |       string | ((number | unknown) & { b: () => void }),
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   7 |       string,
-     | ~~~~~~~~~~~~~
-   8 |     ]
-     | ~~~~~
-   9 |   ) => {
-  Suggestion 1: [wrongRestTypeAnnotationSuggestion] Change existing type annotation to `: [unknown]`.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-5 - 1]
-Diagnostic 1: useUnknown (2:35 - 2:45)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   1 | 
-   2 | Promise.resolve().catch(function (err: string) {
-     |                                   ~~~~~~~~~~~
-   3 |   throw err;
-  Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-6 - 1]
-Diagnostic 1: useUnknown (2:35 - 2:37)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   1 | 
-   2 | Promise.resolve().catch(function (err /* awkward spot for comment */) {
-     |                                   ~~~
-   3 |   throw err;
-  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-7 - 1]
-Diagnostic 1: useUnknown (2:48 - 2:58)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   1 | 
-   2 | Promise.resolve().catch(function namedCallback(err: string) {
-     |                                                ~~~~~~~~~~~
-   3 |   throw err;
-  Suggestion 1: [wrongTypeAnnotationSuggestion] Change existing type annotation to `: unknown`.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-8 - 1]
-Diagnostic 1: useUnknown (2:25 - 2:27)
-Message: Prefer the safe `: unknown` for a `catch` callback variable.
-   1 | 
-   2 | Promise.resolve().catch(err => {
-     |                         ~~~
-   3 |   throw err;
-  Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
----
-
-[TestUseUnknownInCatchCallbackVariable/invalid-9 - 1]
-Diagnostic 1: useUnknown (4:3 - 4:7)
-Message: Prefer the safe `: unknown` for a `then` rejection callback variable.
-   3 |   () => {},
-   4 |   error => {},
-     |   ~~~~~
-   5 | );
   Suggestion 1: [addUnknownTypeAnnotationSuggestion] Add an explicit `: unknown` type annotation to the rejection callback variable.
 ---

@@ -19,6 +19,102 @@ Message: Switch is not exhaustive. Cases not matched: "literal"
   Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
+[TestSwitchExhaustivenessCheckRule/invalid-2 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: 1
+   2 | declare const value: ('literal' & { _brand: true }) | 1;
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case 'literal':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-3 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: "2"
+   2 | declare const value: '1' | '2' | number;
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-4 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: "2"
+   2 | declare const value: '1' | '2' | number;
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+
+Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: default
+   2 | declare const value: '1' | '2' | number;
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-5 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: default
+   2 | declare const value: (string & { foo: 'bar' }) | '1';
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case '1':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-6 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: undefined | null | "1" | 1
+   2 | declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
+   3 | switch (value) {
+     |         ~~~~~
+   4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+
+Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: default
+   2 | declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
+   3 | switch (value) {
+     |         ~~~~~
+   4 | }
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-7 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: default
+   2 | declare const value: string | number;
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case 1:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-8 - 1]
+Diagnostic 1: switchIsNotExhaustive (4:9 - 4:13)
+Message: Switch is not exhaustive. Cases not matched: default
+   3 | declare const a: number;
+   4 | switch (value) {
+     |         ~~~~~
+   5 |   case a:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-9 - 1]
+Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
+Message: Switch is not exhaustive. Cases not matched: default
+   2 | declare const value: bigint;
+   3 | switch (value) {
+     |         ~~~~~
+   4 |   case 10n:
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
 [TestSwitchExhaustivenessCheckRule/invalid-10 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:13)
 Message: Switch is not exhaustive. Cases not matched: default
@@ -135,16 +231,6 @@ Message: Switch is not exhaustive. Cases not matched: Enum.B
   Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
-[TestSwitchExhaustivenessCheckRule/invalid-2 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: 1
-   2 | declare const value: ('literal' & { _brand: true }) | 1;
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case 'literal':
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
 [TestSwitchExhaustivenessCheckRule/invalid-20 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:15)
 Message: Switch is not exhaustive. Cases not matched: "b" | "c"
@@ -242,16 +328,6 @@ Message: Switch is not exhaustive. Cases not matched: typeof Enum["9test"] | Enu
    8 |   switch (arg) {
      |           ~~~
    9 |   }
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
-[TestSwitchExhaustivenessCheckRule/invalid-3 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: "2"
-   2 | declare const value: '1' | '2' | number;
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case '1':
   Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
@@ -376,24 +452,6 @@ Message: The switch statement is exhaustive, so the default case is unnecessary.
   16 | }
 ---
 
-[TestSwitchExhaustivenessCheckRule/invalid-4 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: "2"
-   2 | declare const value: '1' | '2' | number;
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case '1':
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
-
-Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: default
-   2 | declare const value: '1' | '2' | number;
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case '1':
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
 [TestSwitchExhaustivenessCheckRule/invalid-40 - 1]
 Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
 Message: Switch is not exhaustive. Cases not matched: "b"
@@ -464,16 +522,6 @@ Message: Switch is not exhaustive. Cases not matched: undefined
   Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
-[TestSwitchExhaustivenessCheckRule/invalid-5 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: default
-   2 | declare const value: (string & { foo: 'bar' }) | '1';
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case '1':
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
 [TestSwitchExhaustivenessCheckRule/invalid-50 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:17 - 9:19)
 Message: Switch is not exhaustive. Cases not matched: B.D
@@ -491,53 +539,5 @@ Message: Switch is not exhaustive. Cases not matched: B.D
    4 |         switch (foo) {
      |                 ~~~
    5 |           case A.B.C: {
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
-[TestSwitchExhaustivenessCheckRule/invalid-6 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: undefined | null | "1" | 1
-   2 | declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
-   3 | switch (value) {
-     |         ~~~~~
-   4 | }
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
-
-Diagnostic 2: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: default
-   2 | declare const value: (string & { foo: 'bar' }) | '1' | 1 | null | undefined;
-   3 | switch (value) {
-     |         ~~~~~
-   4 | }
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
-[TestSwitchExhaustivenessCheckRule/invalid-7 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: default
-   2 | declare const value: string | number;
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case 1:
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
-[TestSwitchExhaustivenessCheckRule/invalid-8 - 1]
-Diagnostic 1: switchIsNotExhaustive (4:9 - 4:13)
-Message: Switch is not exhaustive. Cases not matched: default
-   3 | declare const a: number;
-   4 | switch (value) {
-     |         ~~~~~
-   5 |   case a:
-  Suggestion 1: [addMissingCases] Add branches for missing cases.
----
-
-[TestSwitchExhaustivenessCheckRule/invalid-9 - 1]
-Diagnostic 1: switchIsNotExhaustive (3:9 - 3:13)
-Message: Switch is not exhaustive. Cases not matched: default
-   2 | declare const value: bigint;
-   3 | switch (value) {
-     |         ~~~~~
-   4 |   case 10n:
   Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---

@@ -15,12 +15,748 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
+[TestPreferOptionalChainRule/invalid-2 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:21)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (await foo || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-3 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo1?.foo2 || {}).foo3;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-4 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:25)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo1?.foo2 || ({})).foo3;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-5 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((() => foo())() || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-6 - 1]
+Diagnostic 1: preferOptionalChain (1:13 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | const foo = (bar || {}).baz;
+     |             ~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-7 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo.bar || {})[baz];
+     | ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-8 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo1 || {}).foo2 || {}).foo3;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+
+Diagnostic 2: preferOptionalChain (1:2 - 1:18)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo1 || {}).foo2 || {}).foo3;
+     |  ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-9 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo || undefined || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
 [TestPreferOptionalChainRule/invalid-10 - 1]
 Diagnostic 1: preferOptionalChain (1:1 - 1:24)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | (foo() || bar || {}).baz;
      | ~~~~~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-11 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:33)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo1 ? foo2 : foo3) || {}).foo4;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-12 - 1]
+Diagnostic 1: preferOptionalChain (3:13 - 3:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           if (foo) {
+   3 |             (foo || {}).bar;
+     |             ~~~~~~~~~~~~~~~
+   4 |           }
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-13 - 1]
+Diagnostic 1: preferOptionalChain (2:15 - 2:29)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | 
+   2 |           if ((foo || {}).bar) {
+     |               ~~~~~~~~~~~~~~~
+   3 |             foo.bar;
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-14 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (undefined && foo || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-15 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:15)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo ?? {}).bar;
+     | ~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-16 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:17)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo ?? ({})).bar;
+     | ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-17 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:21)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (await foo ?? {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-18 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo1?.foo2 ?? {}).foo3;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-19 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((() => foo())() ?? {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-20 - 1]
+Diagnostic 1: preferOptionalChain (1:13 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | const foo = (bar ?? {}).baz;
+     |             ~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-21 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo.bar ?? {})[baz];
+     | ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-22 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo1 ?? {}).foo2 ?? {}).foo3;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+
+Diagnostic 2: preferOptionalChain (1:2 - 1:18)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo1 ?? {}).foo2 ?? {}).foo3;
+     |  ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-23 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo ?? undefined ?? {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-24 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo() ?? bar ?? {}).baz;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-25 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:33)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo1 ? foo2 : foo3) ?? {}).foo4;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-26 - 1]
+Diagnostic 1: preferOptionalChain (1:12 - 1:26)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | if (foo) { (foo ?? {}).bar; }
+     |            ~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-27 - 1]
+Diagnostic 1: preferOptionalChain (1:5 - 1:19)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | if ((foo ?? {}).bar) { foo.bar; }
+     |     ~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-28 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (undefined && foo ?? {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-29 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:17)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (a > b || {}).bar;
+     | ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-30 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:34)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (((typeof x) as string) || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-31 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:22)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (void foo() || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-32 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((a ? b : c) || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-33 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:32)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((a instanceof Error) || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-34 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((a << b) || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-35 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:22)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | ((foo ** 2) || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-36 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo ** 2 || {}).bar;
+     | ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-37 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:17)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (foo++ || {}).bar;
+     | ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-38 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:16)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (+foo || {}).bar;
+     | ~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-39 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:16)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | (this || {}).foo;
+     | ~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-40 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:19)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar == 0;
+     | ~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-41 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:19)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar == 1;
+     | ~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-42 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar == '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-43 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar == {};
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-44 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar == false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-45 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:22)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar == true;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-46 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === 0;
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-47 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === 1;
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-48 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-49 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:21)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === {};
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-50 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-51 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === true;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-52 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar === null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-53 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar !== undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-54 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar != undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-55 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:22)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo.bar != null;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-56 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar == 0;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-57 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar == 1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-58 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar == '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-59 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar == {};
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-60 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar == false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-61 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar == true;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-62 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === 0;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-63 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === 1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-64 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:32)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-65 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:29)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === {};
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-66 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:32)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-67 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === true;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-68 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar === null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-69 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:36)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar !== undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-70 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:35)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar != undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-71 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo != null && foo.bar != null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-72 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:32)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const foo: { bar: number };
+   3 |           foo && foo.bar != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~
+   4 |         
+---
+
+[TestPreferOptionalChainRule/invalid-73 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:40)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const foo: { bar: number };
+   3 |           foo != null && foo.bar != null;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         
+---
+
+[TestPreferOptionalChainRule/invalid-74 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar != 0;
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-75 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:20)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar != 1;
+     | ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-76 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar != '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-77 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:21)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar != {};
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-78 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar != false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-79 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar != true;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-80 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:29)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar === undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-81 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar == undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-82 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar == null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-83 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:21)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== 0;
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-84 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:21)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== 1;
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-85 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:25)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-86 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:22)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== {};
+     | ~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-87 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:25)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-88 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== true;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-89 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:24)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | !foo || foo.bar !== null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-90 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar != 0;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-91 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar != 1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-92 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar != '123';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-93 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar != {};
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-94 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar != false;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-95 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar != true;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-96 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:36)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar === undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-97 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:35)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar == undefined;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-98 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar == null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-99 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo == null || foo.bar !== 0;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-100 - 1]
@@ -99,14 +835,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 |           !foo || foo.bar !== 0;
      |           ~~~~~~~~~~~~~~~~~~~~~
    4 |         
----
-
-[TestPreferOptionalChainRule/invalid-11 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:33)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo1 ? foo2 : foo3) || {}).foo4;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-110 - 1]
@@ -199,16 +927,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 |         
 ---
 
-[TestPreferOptionalChainRule/invalid-12 - 1]
-Diagnostic 1: preferOptionalChain (3:13 - 3:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   2 |           if (foo) {
-   3 |             (foo || {}).bar;
-     |             ~~~~~~~~~~~~~~~
-   4 |           }
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-120 - 1]
 Diagnostic 1: preferOptionalChain (3:11 - 3:34)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -299,16 +1017,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 |         
 ---
 
-[TestPreferOptionalChainRule/invalid-13 - 1]
-Diagnostic 1: preferOptionalChain (2:15 - 2:29)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | 
-   2 |           if ((foo || {}).bar) {
-     |               ~~~~~~~~~~~~~~~
-   3 |             foo.bar;
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-130 - 1]
 Diagnostic 1: preferOptionalChain (3:11 - 3:41)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -396,14 +1104,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-14 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (undefined && foo || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-140 - 1]
 Diagnostic 1: preferOptionalChain (1:1 - 1:61)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -472,14 +1172,6 @@ Diagnostic 1: preferOptionalChain (1:1 - 1:49)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | foo && foo<string>() && foo<string, number>().bar;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-15 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:15)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo ?? {}).bar;
-     | ~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-150 - 1]
@@ -558,14 +1250,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-16 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:17)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo ?? ({})).bar;
-     | ~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-160 - 1]
 Diagnostic 1: preferOptionalChain (1:1 - 1:24)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -642,14 +1326,6 @@ Diagnostic 1: preferOptionalChain (1:1 - 1:26)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | !foo!.bar || !foo!.bar.baz;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-17 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:21)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (await foo ?? {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-170 - 1]
@@ -732,14 +1408,6 @@ Diagnostic 1: preferOptionalChain (1:1 - 1:48)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | foo?.bar.baz != null && foo.bar?.baz.bam != null;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-18 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo1?.foo2 ?? {}).foo3;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-180 - 1]
@@ -892,14 +1560,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    5 |             null != foo.bar.baz;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    6 |         
----
-
-[TestPreferOptionalChainRule/invalid-19 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((() => foo())() ?? {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-190 - 1]
@@ -1060,22 +1720,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 |         
 ---
 
-[TestPreferOptionalChainRule/invalid-2 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:21)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (await foo || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-20 - 1]
-Diagnostic 1: preferOptionalChain (1:13 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | const foo = (bar ?? {}).baz;
-     |             ~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-200 - 1]
 Diagnostic 1: preferOptionalChain (3:11 - 3:47)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -1172,14 +1816,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 |         
 ---
 
-[TestPreferOptionalChainRule/invalid-21 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo.bar ?? {})[baz];
-     | ~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-210 - 1]
 Diagnostic 1: preferOptionalChain (3:11 - 3:37)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -1258,20 +1894,6 @@ Diagnostic 1: preferOptionalChain (1:1 - 1:58)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | !foo || !foo.bar || ((((!foo.bar.baz || !foo.bar.baz()))));
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-22 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:30)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo1 ?? {}).foo2 ?? {}).foo3;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
-
-Diagnostic 2: preferOptionalChain (1:2 - 1:18)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo1 ?? {}).foo2 ?? {}).foo3;
-     |  ~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-220 - 1]
@@ -1381,14 +2003,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 |             
 ---
 
-[TestPreferOptionalChainRule/invalid-23 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo ?? undefined ?? {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-230 - 1]
 Diagnostic 1: preferOptionalChain (3:5 - 3:34)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -1471,14 +2085,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-24 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo() ?? bar ?? {}).baz;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-240 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:64)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -1557,14 +2163,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: {baz: {buzz: () => number}} | null | undefined};
    3 | foo.bar && foo.bar.baz.buzz();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-25 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:33)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo1 ? foo2 : foo3) ?? {}).foo4;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-250 - 1]
@@ -1647,14 +2245,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-26 - 1]
-Diagnostic 1: preferOptionalChain (1:12 - 1:26)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | if (foo) { (foo ?? {}).bar; }
-     |            ~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-260 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:20)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -1733,14 +2323,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | declare const foo: {[k: string]: {baz: {buzz: number} | null | undefined} | null | undefined} | null | undefined;
    4 | foo && foo[bar].baz && foo[bar].baz.buzz && bing;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-27 - 1]
-Diagnostic 1: preferOptionalChain (1:5 - 1:19)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | if ((foo ?? {}).bar) { foo.bar; }
-     |     ~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-270 - 1]
@@ -1823,14 +2405,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-28 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (undefined && foo ?? {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-280 - 1]
 Diagnostic 1: preferOptionalChain (4:1 - 4:85)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -1909,14 +2483,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: {baz: {buzz: number} | null | undefined} | null | undefined};
    3 | foo.bar && foo.bar.baz && foo.bar.baz.buzz && bing.bong;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-29 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:17)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (a > b || {}).bar;
-     | ~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-290 - 1]
@@ -1999,22 +2565,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-3 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo1?.foo2 || {}).foo3;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-30 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:34)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (((typeof x) as string) || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-300 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:49)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -2093,14 +2643,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: () => ({baz: number} | null | undefined)};
    3 | foo.bar && foo.bar?.() && foo.bar?.().baz && bing.bong;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-31 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:22)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (void foo() || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
 [TestPreferOptionalChainRule/invalid-310 - 1]
@@ -2190,14 +2732,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: {baz: {buzz: number} | null } | null } | null ;
    3 | foo.bar !== null && foo.bar.baz !== null && foo.bar.baz !== null && foo.bar.baz.buzz;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-32 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((a ? b : c) || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
@@ -2291,14 +2825,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
-[TestPreferOptionalChainRule/invalid-33 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:32)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((a instanceof Error) || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-330 - 1]
 Diagnostic 1: preferOptionalChain (4:1 - 4:79)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -2386,14 +2912,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: (() => number) | null | undefined};
    3 | foo.bar != null && foo.bar();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-34 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((a << b) || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
@@ -2487,14 +3005,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
-[TestPreferOptionalChainRule/invalid-35 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:22)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo ** 2) || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-350 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:103)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -2582,14 +3092,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | declare const foo: {bar: {baz: {[k: string]: number} | null | undefined}} | null | undefined;
    4 | foo != null && foo?.bar.baz != null && foo?.bar.baz[buzz];
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-36 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo ** 2 || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
@@ -2683,14 +3185,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
-[TestPreferOptionalChainRule/invalid-37 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:17)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo++ || {}).bar;
-     | ~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-370 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:120)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -2778,14 +3272,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: {baz: {buzz: () => number}}  | undefined};
    3 | foo.bar !== undefined && foo.bar.baz.buzz();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-38 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:16)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (+foo || {}).bar;
-     | ~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
@@ -2887,14 +3373,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 | 
 ---
 
-[TestPreferOptionalChainRule/invalid-39 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:16)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (this || {}).foo;
-     | ~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
 [TestPreferOptionalChainRule/invalid-390 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:27)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -2983,21 +3461,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | foo.bar != undefined && foo.bar.baz != undefined && foo.bar.baz != undefined && foo.bar.baz.buzz;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-4 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:25)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo1?.foo2 || ({})).foo3;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-40 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:19)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar == 0;
-     | ~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-400 - 1]
@@ -3090,13 +3553,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
-[TestPreferOptionalChainRule/invalid-41 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:19)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar == 1;
-     | ~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-410 - 1]
 Diagnostic 1: preferOptionalChain (4:1 - 4:91)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -3183,13 +3639,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-42 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar == '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-420 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:56)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -3270,13 +3719,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-43 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar == {};
-     | ~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-430 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:80)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -3355,13 +3797,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | declare const foo: {bar: {baz: {[k: string]: number} | null | undefined}} | null | undefined;
    4 | !foo || ! foo?.bar.baz || ! foo?.bar.baz[buzz];
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-44 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar == false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-440 - 1]
@@ -3450,13 +3885,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | foo.bar === null || foo.bar.baz.buzz === null;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-45 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:22)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar == true;
-     | ~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-450 - 1]
@@ -3549,13 +3977,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
-[TestPreferOptionalChainRule/invalid-46 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === 0;
-     | ~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-460 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:92)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -3644,13 +4065,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-47 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === 1;
-     | ~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-470 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:28)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -3729,13 +4143,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | declare const foo: {[k: string]: {baz: {buzz: number} | null | undefined} | null | undefined} | null | undefined;
    4 | foo == null || foo[bar].baz == null || foo[bar].baz.buzz == null;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-48 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-480 - 1]
@@ -3818,13 +4225,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-49 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:21)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === {};
-     | ~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-490 - 1]
 Diagnostic 1: preferOptionalChain (4:1 - 4:117)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -3903,21 +4303,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: {baz: {buzz: number}  | undefined}  | undefined};
    3 | foo.bar === undefined || foo.bar.baz === undefined || foo.bar.baz.buzz === undefined;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-5 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((() => foo())() || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-50 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-500 - 1]
@@ -4000,13 +4385,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-51 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === true;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-510 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:78)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -4085,13 +4463,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: () => ({baz: number}  | undefined)};
    3 | foo.bar === undefined || foo.bar?.() === undefined || foo.bar?.().baz === undefined;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-52 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar === null;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-520 - 1]
@@ -4184,13 +4555,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-53 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar !== undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-530 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:129)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -4269,13 +4633,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | declare const foo: {bar: {baz: {buzz: () => number}} | null | undefined};
    3 | foo.bar == undefined || foo.bar.baz.buzz() == undefined;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-54 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar != undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-540 - 1]
@@ -4358,13 +4715,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-55 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:22)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo && foo.bar != null;
-     | ~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-550 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 3:12)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -4445,13 +4795,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-56 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar == 0;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-560 - 1]
 Diagnostic 1: preferOptionalChain (4:1 - 4:58)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -4530,13 +4873,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    3 | declare const foo: {bar: {baz: {[k: string]: (() => number) | null | undefined} | null | undefined} | null | undefined} | null | undefined;
    4 | foo && foo.      bar && foo.      bar.      baz && foo.      bar.      baz[buzz] && foo.      bar.      baz[buzz]();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-57 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar == 1;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-570 - 1]
@@ -4661,13 +4997,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~
    7 | buzz;
      | ~~~~
----
-
-[TestPreferOptionalChainRule/invalid-58 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:31)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar == '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestPreferOptionalChainRule/invalid-580 - 1]
@@ -4864,13 +5193,6 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-59 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar == {};
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferOptionalChainRule/invalid-590 - 1]
 Diagnostic 1: preferOptionalChain (3:1 - 7:6)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
@@ -5047,326 +5369,4 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~
    9 | baz;
      | ~~~
----
-
-[TestPreferOptionalChainRule/invalid-6 - 1]
-Diagnostic 1: preferOptionalChain (1:13 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | const foo = (bar || {}).baz;
-     |             ~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-60 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:31)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar == false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-61 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:30)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar == true;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-62 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === 0;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-63 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === 1;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-64 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:32)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-65 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:29)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === {};
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-66 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:32)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-67 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:31)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === true;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-68 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:31)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar === null;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-69 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:36)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar !== undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-7 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo.bar || {})[baz];
-     | ~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-70 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:35)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar != undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-71 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:30)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo != null && foo.bar != null;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-72 - 1]
-Diagnostic 1: preferOptionalChain (3:11 - 3:32)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   2 |           declare const foo: { bar: number };
-   3 |           foo && foo.bar != null;
-     |           ~~~~~~~~~~~~~~~~~~~~~~
-   4 |         
----
-
-[TestPreferOptionalChainRule/invalid-73 - 1]
-Diagnostic 1: preferOptionalChain (3:11 - 3:40)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   2 |           declare const foo: { bar: number };
-   3 |           foo != null && foo.bar != null;
-     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |         
----
-
-[TestPreferOptionalChainRule/invalid-74 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar != 0;
-     | ~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-75 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:20)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar != 1;
-     | ~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-76 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar != '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-77 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:21)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar != {};
-     | ~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-78 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar != false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-79 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar != true;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-8 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:30)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo1 || {}).foo2 || {}).foo3;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
-
-Diagnostic 2: preferOptionalChain (1:2 - 1:18)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | ((foo1 || {}).foo2 || {}).foo3;
-     |  ~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-80 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:29)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar === undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-81 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar == undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-82 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:23)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar == null;
-     | ~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-83 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:21)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== 0;
-     | ~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-84 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:21)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== 1;
-     | ~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-85 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:25)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-86 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:22)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== {};
-     | ~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-87 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:25)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-88 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== true;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-89 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:24)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | !foo || foo.bar !== null;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-9 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | (foo || undefined || {}).bar;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
----
-
-[TestPreferOptionalChainRule/invalid-90 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar != 0;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-91 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:27)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar != 1;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-92 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:31)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar != '123';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-93 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar != {};
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-94 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:31)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar != false;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-95 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:30)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar != true;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-96 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:36)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar === undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-97 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:35)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar == undefined;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-98 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:30)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar == null;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
-[TestPreferOptionalChainRule/invalid-99 - 1]
-Diagnostic 1: preferOptionalChain (1:1 - 1:28)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   1 | foo == null || foo.bar !== 0;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---

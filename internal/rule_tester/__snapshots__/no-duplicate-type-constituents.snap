@@ -13,6 +13,50 @@ Message: Intersection type constituent is duplicated with  true.
      |                 ~~~~
 ---
 
+[TestNoDuplicateTypeConstituentsRule/invalid-2 - 1]
+Diagnostic 1: duplicate (1:17 - 1:20)
+Message: Union type constituent is duplicated with  null.
+   1 | type T = null | null;
+     |                 ~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-3 - 1]
+Diagnostic 1: duplicate (1:16 - 1:18)
+Message: Union type constituent is duplicated with  any.
+   1 | type T = any | any;
+     |                ~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-4 - 1]
+Diagnostic 1: duplicate (1:24 - 1:29)
+Message: Union type constituent is duplicated with  string.
+   1 | type T = { a: string | string };
+     |                        ~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-7 - 1]
+Diagnostic 1: duplicate (1:24 - 1:34)
+Message: Union type constituent is duplicated with  Set<string>.
+   1 | type T = Set<string> | Set<string>;
+     |                        ~~~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-8 - 1]
+Diagnostic 1: duplicate (3:45 - 3:59)
+Message: Union type constituent is duplicated with  IsArray<number>.
+   2 | type IsArray<T> = T extends any[] ? true : false;
+   3 | type ActuallyDuplicated = IsArray<number> | IsArray<string>;
+     |                                             ~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-9 - 1]
+Diagnostic 1: duplicate (1:21 - 1:28)
+Message: Union type constituent is duplicated with  string[].
+   1 | type T = string[] | string[];
+     |                     ~~~~~~~~
+---
+
 [TestNoDuplicateTypeConstituentsRule/invalid-10 - 1]
 Diagnostic 1: duplicate (1:23 - 1:32)
 Message: Union type constituent is duplicated with  string[][].
@@ -96,13 +140,6 @@ Message: Union type constituent is duplicated with  A1.
    5 | type T = A1 | A2 | A3;
      |                    ~~
    6 |       
----
-
-[TestNoDuplicateTypeConstituentsRule/invalid-2 - 1]
-Diagnostic 1: duplicate (1:17 - 1:20)
-Message: Union type constituent is duplicated with  null.
-   1 | type T = null | null;
-     |                 ~~~~
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-20 - 1]
@@ -231,13 +268,6 @@ Message: Union type constituent is duplicated with  (number | (string | null)).
      |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoDuplicateTypeConstituentsRule/invalid-3 - 1]
-Diagnostic 1: duplicate (1:16 - 1:18)
-Message: Union type constituent is duplicated with  any.
-   1 | type T = any | any;
-     |                ~~~
----
-
 [TestNoDuplicateTypeConstituentsRule/invalid-30 - 1]
 Diagnostic 1: duplicate (1:30 - 1:35)
 Message: Intersection type constituent is duplicated with number.
@@ -324,13 +354,6 @@ Message: Explicit undefined is unnecessary on an optional parameter.
      |                            ~~~~~~~~~
 ---
 
-[TestNoDuplicateTypeConstituentsRule/invalid-4 - 1]
-Diagnostic 1: duplicate (1:24 - 1:29)
-Message: Union type constituent is duplicated with  string.
-   1 | type T = { a: string | string };
-     |                        ~~~~~~
----
-
 [TestNoDuplicateTypeConstituentsRule/invalid-40 - 1]
 Diagnostic 1: unnecessary (1:33 - 1:41)
 Message: Explicit undefined is unnecessary on an optional parameter.
@@ -393,27 +416,4 @@ Message: Explicit undefined is unnecessary on an optional parameter.
    3 |           abstract f(a?: string | undefined): void;
      |                                   ~~~~~~~~~
    4 |         }
----
-
-[TestNoDuplicateTypeConstituentsRule/invalid-7 - 1]
-Diagnostic 1: duplicate (1:24 - 1:34)
-Message: Union type constituent is duplicated with  Set<string>.
-   1 | type T = Set<string> | Set<string>;
-     |                        ~~~~~~~~~~~
----
-
-[TestNoDuplicateTypeConstituentsRule/invalid-8 - 1]
-Diagnostic 1: duplicate (3:45 - 3:59)
-Message: Union type constituent is duplicated with  IsArray<number>.
-   2 | type IsArray<T> = T extends any[] ? true : false;
-   3 | type ActuallyDuplicated = IsArray<number> | IsArray<string>;
-     |                                             ~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoDuplicateTypeConstituentsRule/invalid-9 - 1]
-Diagnostic 1: duplicate (1:21 - 1:28)
-Message: Union type constituent is duplicated with  string[].
-   1 | type T = string[] | string[];
-     |                     ~~~~~~~~
 ---

@@ -15,6 +15,151 @@ Message: Unexpected string value in conditional. A string can be falsy (empty st
      |                 ~~~~~~~~~
 ---
 
+[TestStrictBooleanExpressionsRule/invalid-2 - 1]
+Diagnostic 1: conditionErrorObject (1:34 - 1:34)
+Message: Unexpected object value in conditional. An object is always truthy.
+   1 | (x: object) => (true || false || x ? true : false);
+     |                                  ~
+---
+
+[TestStrictBooleanExpressionsRule/invalid-3 - 1]
+Diagnostic 1: conditionErrorString (1:6 - 1:7)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | if (('' && {}) || (0 && void 0)) { }
+     |      ~~
+
+Diagnostic 2: conditionErrorObject (1:12 - 1:13)
+Message: Unexpected object value in conditional. An object is always truthy.
+   1 | if (('' && {}) || (0 && void 0)) { }
+     |            ~~
+
+Diagnostic 3: conditionErrorNumber (1:20 - 1:20)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | if (('' && {}) || (0 && void 0)) { }
+     |                    ~
+
+Diagnostic 4: conditionErrorNullish (1:25 - 1:30)
+Message: Unexpected nullish value in conditional. The expression is always falsy.
+   1 | if (('' && {}) || (0 && void 0)) { }
+     |                         ~~~~~~
+---
+
+[TestStrictBooleanExpressionsRule/invalid-4 - 1]
+Diagnostic 1: conditionErrorString (3:9 - 3:26)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   2 |         declare const array: string[];
+   3 |         array.some(x => x);
+     |         ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-5 - 1]
+Diagnostic 1: conditionErrorString (3:6 - 3:7)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   2 | declare const foo: true & { __BRAND: 'Foo' };
+   3 | if (('' && foo) || (0 && void 0)) { }
+     |      ~~
+   4 |       
+
+Diagnostic 2: conditionErrorNumber (3:21 - 3:21)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   2 | declare const foo: true & { __BRAND: 'Foo' };
+   3 | if (('' && foo) || (0 && void 0)) { }
+     |                     ~
+   4 |       
+
+Diagnostic 3: conditionErrorNullish (3:26 - 3:31)
+Message: Unexpected nullish value in conditional. The expression is always falsy.
+   2 | declare const foo: true & { __BRAND: 'Foo' };
+   3 | if (('' && foo) || (0 && void 0)) { }
+     |                          ~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-6 - 1]
+Diagnostic 1: conditionErrorString (3:6 - 3:7)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   2 | declare const foo: false & { __BRAND: 'Foo' };
+   3 | if (('' && {}) || (foo && void 0)) { }
+     |      ~~
+   4 |       
+
+Diagnostic 2: conditionErrorObject (3:12 - 3:13)
+Message: Unexpected object value in conditional. An object is always truthy.
+   2 | declare const foo: false & { __BRAND: 'Foo' };
+   3 | if (('' && {}) || (foo && void 0)) { }
+     |            ~~
+   4 |       
+
+Diagnostic 3: conditionErrorNullish (3:27 - 3:32)
+Message: Unexpected nullish value in conditional. The expression is always falsy.
+   2 | declare const foo: false & { __BRAND: 'Foo' };
+   3 | if (('' && {}) || (foo && void 0)) { }
+     |                           ~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-7 - 1]
+Diagnostic 1: conditionErrorString (1:1 - 1:5)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | 'asd' && 123 && [] && null;
+     | ~~~~~
+
+Diagnostic 2: conditionErrorNumber (1:10 - 1:12)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | 'asd' && 123 && [] && null;
+     |          ~~~
+
+Diagnostic 3: conditionErrorObject (1:17 - 1:18)
+Message: Unexpected object value in conditional. An object is always truthy.
+   1 | 'asd' && 123 && [] && null;
+     |                 ~~
+---
+
+[TestStrictBooleanExpressionsRule/invalid-8 - 1]
+Diagnostic 1: conditionErrorString (1:1 - 1:5)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | 'asd' || 123 || [] || null;
+     | ~~~~~
+
+Diagnostic 2: conditionErrorNumber (1:10 - 1:12)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | 'asd' || 123 || [] || null;
+     |          ~~~
+
+Diagnostic 3: conditionErrorObject (1:17 - 1:18)
+Message: Unexpected object value in conditional. An object is always truthy.
+   1 | 'asd' || 123 || [] || null;
+     |                 ~~
+---
+
+[TestStrictBooleanExpressionsRule/invalid-9 - 1]
+Diagnostic 1: conditionErrorNumber (1:10 - 1:10)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | let x = (1 && 'a' && null) || 0 || '' || {};
+     |          ~
+
+Diagnostic 2: conditionErrorString (1:15 - 1:17)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | let x = (1 && 'a' && null) || 0 || '' || {};
+     |               ~~~
+
+Diagnostic 3: conditionErrorNullish (1:22 - 1:25)
+Message: Unexpected nullish value in conditional. The expression is always falsy.
+   1 | let x = (1 && 'a' && null) || 0 || '' || {};
+     |                      ~~~~
+
+Diagnostic 4: conditionErrorNumber (1:31 - 1:31)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | let x = (1 && 'a' && null) || 0 || '' || {};
+     |                               ~
+
+Diagnostic 5: conditionErrorString (1:36 - 1:37)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | let x = (1 && 'a' && null) || 0 || '' || {};
+     |                                    ~~
+---
+
 [TestStrictBooleanExpressionsRule/invalid-10 - 1]
 Diagnostic 1: conditionErrorNumber (1:9 - 1:9)
 Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
@@ -42,96 +187,6 @@ Message: Unexpected string value in conditional. A string can be falsy (empty st
      |                                   ~~
 ---
 
-[TestStrictBooleanExpressionsRule/invalid-100 - 1]
-Diagnostic 1: conditionErrorNullish (2:1 - 2:32)
-Message: Unexpected nullish value in conditional. The expression is always falsy.
-   1 | 
-   2 | [() => {}, null].every(() => {});
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-101 - 1]
-Diagnostic 1: conditionErrorOther (5:1 - 5:14)
-Message: Unexpected value in conditional. A union of different types has inconsistent truthiness.
-   4 | 
-   5 | [35].filter(f);
-     | ~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-102 - 1]
-Diagnostic 1: conditionErrorOther (6:1 - 6:14)
-Message: Unexpected value in conditional. A union of different types has inconsistent truthiness.
-   5 | 
-   6 | [35].filter(f);
-     | ~~~~~~~~~~~~~~
-   7 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-103 - 1]
-Diagnostic 1: conditionErrorAny (3:1 - 3:20)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
-   2 | declare function foo<T>(x: number): T;
-   3 | [1, null].every(foo);
-     | ~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-104 - 1]
-Diagnostic 1: conditionErrorNumber (3:1 - 3:20)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   2 | function foo<T extends number>(x: number): T {}
-   3 | [1, null].every(foo);
-     | ~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-105 - 1]
-Diagnostic 1: conditionErrorNullableString (3:1 - 3:39)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
-   2 | declare const nullOrString: string | null;
-   3 | ['one', null].filter(x => nullOrString);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-106 - 1]
-Diagnostic 1: conditionErrorNullableString (3:28 - 3:39)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
-   2 | declare const nullOrString: string | null;
-   3 | ['one', null].filter(x => !nullOrString);
-     |                            ~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-107 - 1]
-Diagnostic 1: conditionErrorAny (3:1 - 3:35)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
-   2 | declare const anyValue: any;
-   3 | ['one', null].filter(x => anyValue);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-108 - 1]
-Diagnostic 1: conditionErrorNullableBoolean (3:1 - 3:39)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
-   2 | declare const nullOrBoolean: boolean | null;
-   3 | [true, null].filter(x => nullOrBoolean);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-109 - 1]
-Diagnostic 1: conditionErrorNullableEnum (7:1 - 7:27)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
-   6 | const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
-   7 | [0, 1].filter(x => theEnum);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   8 |       
----
-
 [TestStrictBooleanExpressionsRule/invalid-11 - 1]
 Diagnostic 1: conditionErrorNumber (1:14 - 1:14)
 Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
@@ -147,73 +202,6 @@ Diagnostic 3: conditionErrorString (1:27 - 1:29)
 Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
    1 | console.log((1 && []) || ('a' && {}));
      |                           ~~~
----
-
-[TestStrictBooleanExpressionsRule/invalid-110 - 1]
-Diagnostic 1: conditionErrorNullableNumber (3:1 - 3:35)
-Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
-   2 | declare const nullOrNumber: number | null;
-   3 | [0, null].filter(x => nullOrNumber);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-111 - 1]
-Diagnostic 1: conditionErrorObject (3:1 - 3:39)
-Message: Unexpected object value in conditional. An object is always truthy.
-   2 | const objectValue: object = {};
-   3 | [{ a: 0 }, {}].filter(x => objectValue);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-112 - 1]
-Diagnostic 1: conditionErrorObject (3:1 - 5:2)
-Message: Unexpected object value in conditional. An object is always truthy.
-   2 | const objectValue: object = {};
-   3 | [{ a: 0 }, {}].filter(x => {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |   return objectValue;
-     | ~~~~~~~~~~~~~~~~~~~~~
-   5 | });
-     | ~~
-   6 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-113 - 1]
-Diagnostic 1: conditionErrorNullableObject (3:1 - 3:42)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
-   2 | declare const nullOrObject: object | null;
-   3 | [{ a: 0 }, null].filter(x => nullOrObject);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-114 - 1]
-Diagnostic 1: conditionErrorNumber (3:1 - 3:34)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   2 | const numbers: number[] = [1];
-   3 | [1, 2].filter(x => numbers.length);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-115 - 1]
-Diagnostic 1: conditionErrorNumber (3:1 - 3:31)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   2 | const numberValue: number = 1;
-   3 | [1, 2].filter(x => numberValue);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-116 - 1]
-Diagnostic 1: conditionErrorString (3:1 - 3:40)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   2 | const stringValue: string = 'hoge';
-   3 | ['hoge', 'foo'].filter(x => stringValue);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-12 - 1]
@@ -319,13 +307,6 @@ Message: Unexpected nullish value in conditional. The expression is always falsy
      |                                        ~
 ---
 
-[TestStrictBooleanExpressionsRule/invalid-2 - 1]
-Diagnostic 1: conditionErrorObject (1:34 - 1:34)
-Message: Unexpected object value in conditional. An object is always truthy.
-   1 | (x: object) => (true || false || x ? true : false);
-     |                                  ~
----
-
 [TestStrictBooleanExpressionsRule/invalid-20 - 1]
 Diagnostic 1: conditionErrorNullish (1:28 - 1:28)
 Message: Unexpected nullish value in conditional. The expression is always falsy.
@@ -396,28 +377,6 @@ Diagnostic 1: conditionErrorObject (1:34 - 1:34)
 Message: Unexpected object value in conditional. An object is always truthy.
    1 | <T extends () => void>(x: T) => (x ? 1 : 0);
      |                                  ~
----
-
-[TestStrictBooleanExpressionsRule/invalid-3 - 1]
-Diagnostic 1: conditionErrorString (1:6 - 1:7)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   1 | if (('' && {}) || (0 && void 0)) { }
-     |      ~~
-
-Diagnostic 2: conditionErrorObject (1:12 - 1:13)
-Message: Unexpected object value in conditional. An object is always truthy.
-   1 | if (('' && {}) || (0 && void 0)) { }
-     |            ~~
-
-Diagnostic 3: conditionErrorNumber (1:20 - 1:20)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   1 | if (('' && {}) || (0 && void 0)) { }
-     |                    ~
-
-Diagnostic 4: conditionErrorNullish (1:25 - 1:30)
-Message: Unexpected nullish value in conditional. The expression is always falsy.
-   1 | if (('' && {}) || (0 && void 0)) { }
-     |                         ~~~~~~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-30 - 1]
@@ -492,15 +451,6 @@ Diagnostic 1: conditionErrorNumber (1:30 - 1:30)
 Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
    1 | <T extends number>(x: T) => (x ? 1 : 0);
      |                              ~
----
-
-[TestStrictBooleanExpressionsRule/invalid-4 - 1]
-Diagnostic 1: conditionErrorString (3:9 - 3:26)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   2 |         declare const array: string[];
-   3 |         array.some(x => x);
-     |         ~~~~~~~~~~~~~~~~~~
-   4 |       
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-40 - 1]
@@ -585,29 +535,6 @@ Message: Unexpected nullable boolean value in conditional. Please handle the nul
      |                   ~
 ---
 
-[TestStrictBooleanExpressionsRule/invalid-5 - 1]
-Diagnostic 1: conditionErrorString (3:6 - 3:7)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   2 | declare const foo: true & { __BRAND: 'Foo' };
-   3 | if (('' && foo) || (0 && void 0)) { }
-     |      ~~
-   4 |       
-
-Diagnostic 2: conditionErrorNumber (3:21 - 3:21)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   2 | declare const foo: true & { __BRAND: 'Foo' };
-   3 | if (('' && foo) || (0 && void 0)) { }
-     |                     ~
-   4 |       
-
-Diagnostic 3: conditionErrorNullish (3:26 - 3:31)
-Message: Unexpected nullish value in conditional. The expression is always falsy.
-   2 | declare const foo: true & { __BRAND: 'Foo' };
-   3 | if (('' && foo) || (0 && void 0)) { }
-     |                          ~~~~~~
-   4 |       
----
-
 [TestStrictBooleanExpressionsRule/invalid-50 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (1:50 - 1:50)
 Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
@@ -684,29 +611,6 @@ Diagnostic 1: conditionErrorNullableNumber (1:18 - 1:18)
 Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
    1 | (x?: number) => !x;
      |                  ~
----
-
-[TestStrictBooleanExpressionsRule/invalid-6 - 1]
-Diagnostic 1: conditionErrorString (3:6 - 3:7)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   2 | declare const foo: false & { __BRAND: 'Foo' };
-   3 | if (('' && {}) || (foo && void 0)) { }
-     |      ~~
-   4 |       
-
-Diagnostic 2: conditionErrorObject (3:12 - 3:13)
-Message: Unexpected object value in conditional. An object is always truthy.
-   2 | declare const foo: false & { __BRAND: 'Foo' };
-   3 | if (('' && {}) || (foo && void 0)) { }
-     |            ~~
-   4 |       
-
-Diagnostic 3: conditionErrorNullish (3:27 - 3:32)
-Message: Unexpected nullish value in conditional. The expression is always falsy.
-   2 | declare const foo: false & { __BRAND: 'Foo' };
-   3 | if (('' && {}) || (foo && void 0)) { }
-     |                           ~~~~~~
-   4 |       
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-60 - 1]
@@ -795,23 +699,6 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
    6 |         (value?: ExampleEnum) => (value ? 1 : 0);
      |                                   ~~~~~
    7 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-7 - 1]
-Diagnostic 1: conditionErrorString (1:1 - 1:5)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   1 | 'asd' && 123 && [] && null;
-     | ~~~~~
-
-Diagnostic 2: conditionErrorNumber (1:10 - 1:12)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   1 | 'asd' && 123 && [] && null;
-     |          ~~~
-
-Diagnostic 3: conditionErrorObject (1:17 - 1:18)
-Message: Unexpected object value in conditional. An object is always truthy.
-   1 | 'asd' && 123 && [] && null;
-     |                 ~~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-70 - 1]
@@ -922,23 +809,6 @@ Message: Unexpected nullable string value in conditional. Please handle the null
    5 |       
 ---
 
-[TestStrictBooleanExpressionsRule/invalid-8 - 1]
-Diagnostic 1: conditionErrorString (1:1 - 1:5)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   1 | 'asd' || 123 || [] || null;
-     | ~~~~~
-
-Diagnostic 2: conditionErrorNumber (1:10 - 1:12)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   1 | 'asd' || 123 || [] || null;
-     |          ~~~
-
-Diagnostic 3: conditionErrorObject (1:17 - 1:18)
-Message: Unexpected object value in conditional. An object is always truthy.
-   1 | 'asd' || 123 || [] || null;
-     |                 ~~
----
-
 [TestStrictBooleanExpressionsRule/invalid-80 - 1]
 Diagnostic 1: conditionErrorNullableString (4:13 - 4:26)
 Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
@@ -1035,33 +905,6 @@ Message: Unexpected nullish value in conditional. The expression is always falsy
    4 | });
      | ~~
    5 |       
----
-
-[TestStrictBooleanExpressionsRule/invalid-9 - 1]
-Diagnostic 1: conditionErrorNumber (1:10 - 1:10)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   1 | let x = (1 && 'a' && null) || 0 || '' || {};
-     |          ~
-
-Diagnostic 2: conditionErrorString (1:15 - 1:17)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   1 | let x = (1 && 'a' && null) || 0 || '' || {};
-     |               ~~~
-
-Diagnostic 3: conditionErrorNullish (1:22 - 1:25)
-Message: Unexpected nullish value in conditional. The expression is always falsy.
-   1 | let x = (1 && 'a' && null) || 0 || '' || {};
-     |                      ~~~~
-
-Diagnostic 4: conditionErrorNumber (1:31 - 1:31)
-Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
-   1 | let x = (1 && 'a' && null) || 0 || '' || {};
-     |                               ~
-
-Diagnostic 5: conditionErrorString (1:36 - 1:37)
-Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
-   1 | let x = (1 && 'a' && null) || 0 || '' || {};
-     |                                    ~~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-90 - 1]
@@ -1176,4 +1019,161 @@ Message: Unexpected nullish value in conditional. The expression is always falsy
    2 | [() => {}, null].every(function (x: () => void) {});
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    3 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-100 - 1]
+Diagnostic 1: conditionErrorNullish (2:1 - 2:32)
+Message: Unexpected nullish value in conditional. The expression is always falsy.
+   1 | 
+   2 | [() => {}, null].every(() => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-101 - 1]
+Diagnostic 1: conditionErrorOther (5:1 - 5:14)
+Message: Unexpected value in conditional. A union of different types has inconsistent truthiness.
+   4 | 
+   5 | [35].filter(f);
+     | ~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-102 - 1]
+Diagnostic 1: conditionErrorOther (6:1 - 6:14)
+Message: Unexpected value in conditional. A union of different types has inconsistent truthiness.
+   5 | 
+   6 | [35].filter(f);
+     | ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-103 - 1]
+Diagnostic 1: conditionErrorAny (3:1 - 3:20)
+Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+   2 | declare function foo<T>(x: number): T;
+   3 | [1, null].every(foo);
+     | ~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-104 - 1]
+Diagnostic 1: conditionErrorNumber (3:1 - 3:20)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   2 | function foo<T extends number>(x: number): T {}
+   3 | [1, null].every(foo);
+     | ~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-105 - 1]
+Diagnostic 1: conditionErrorNullableString (3:1 - 3:39)
+Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+   2 | declare const nullOrString: string | null;
+   3 | ['one', null].filter(x => nullOrString);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-106 - 1]
+Diagnostic 1: conditionErrorNullableString (3:28 - 3:39)
+Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+   2 | declare const nullOrString: string | null;
+   3 | ['one', null].filter(x => !nullOrString);
+     |                            ~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-107 - 1]
+Diagnostic 1: conditionErrorAny (3:1 - 3:35)
+Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+   2 | declare const anyValue: any;
+   3 | ['one', null].filter(x => anyValue);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-108 - 1]
+Diagnostic 1: conditionErrorNullableBoolean (3:1 - 3:39)
+Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+   2 | declare const nullOrBoolean: boolean | null;
+   3 | [true, null].filter(x => nullOrBoolean);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-109 - 1]
+Diagnostic 1: conditionErrorNullableEnum (7:1 - 7:27)
+Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+   6 | const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
+   7 | [0, 1].filter(x => theEnum);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-110 - 1]
+Diagnostic 1: conditionErrorNullableNumber (3:1 - 3:35)
+Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
+   2 | declare const nullOrNumber: number | null;
+   3 | [0, null].filter(x => nullOrNumber);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-111 - 1]
+Diagnostic 1: conditionErrorObject (3:1 - 3:39)
+Message: Unexpected object value in conditional. An object is always truthy.
+   2 | const objectValue: object = {};
+   3 | [{ a: 0 }, {}].filter(x => objectValue);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-112 - 1]
+Diagnostic 1: conditionErrorObject (3:1 - 5:2)
+Message: Unexpected object value in conditional. An object is always truthy.
+   2 | const objectValue: object = {};
+   3 | [{ a: 0 }, {}].filter(x => {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   return objectValue;
+     | ~~~~~~~~~~~~~~~~~~~~~
+   5 | });
+     | ~~
+   6 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-113 - 1]
+Diagnostic 1: conditionErrorNullableObject (3:1 - 3:42)
+Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+   2 | declare const nullOrObject: object | null;
+   3 | [{ a: 0 }, null].filter(x => nullOrObject);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-114 - 1]
+Diagnostic 1: conditionErrorNumber (3:1 - 3:34)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   2 | const numbers: number[] = [1];
+   3 | [1, 2].filter(x => numbers.length);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-115 - 1]
+Diagnostic 1: conditionErrorNumber (3:1 - 3:31)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   2 | const numberValue: number = 1;
+   3 | [1, 2].filter(x => numberValue);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestStrictBooleanExpressionsRule/invalid-116 - 1]
+Diagnostic 1: conditionErrorString (3:1 - 3:40)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   2 | const stringValue: string = 'hoge';
+   3 | ['hoge', 'foo'].filter(x => stringValue);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
 ---
