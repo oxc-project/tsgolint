@@ -54,13 +54,13 @@ func TestConsistentReturnRule(t *testing.T) {
       };
     `},
 		{Code: `
-	      function foo(flag?: boolean): number | void {
-	        if (flag) {
-	          return 42;
-	        }
-	        return;
-	      }
-	    `},
+      function foo(flag?: boolean): number | void {
+        if (flag) {
+          return 42;
+        }
+        return;
+      }
+    `},
 		{Code: `
 	      function solveLinearSystem(a: number): number | undefined {
 	        if (Math.abs(a) < 1e-10) {
@@ -141,14 +141,14 @@ func TestConsistentReturnRule(t *testing.T) {
       }
     `},
 		{Code: `
-	      type PromiseVoidNumber = Promise<void | number>;
-	      async function foo(flag?: boolean): PromiseVoidNumber {
-	        if (flag) {
-	          return 42;
-	        }
-	        return;
-	      }
-	    `},
+      type PromiseVoidNumber = Promise<void | number>;
+      async function foo(flag?: boolean): PromiseVoidNumber {
+        if (flag) {
+          return 42;
+        }
+        return;
+      }
+    `},
 		{Code: `
 	      async function foo(flag?: boolean): Promise<number | undefined> {
 	        if (flag) {

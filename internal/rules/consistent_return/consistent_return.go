@@ -71,6 +71,10 @@ func hasExplicitReturnTypeAnnotation(node *ast.Node) bool {
 		return node.AsArrowFunction().Type != nil
 	case ast.KindMethodDeclaration:
 		return node.AsMethodDeclaration().Type != nil
+	case ast.KindGetAccessor:
+		return node.AsGetAccessorDeclaration().Type != nil
+	case ast.KindSetAccessor:
+		return node.AsSetAccessorDeclaration().Type != nil
 	default:
 		return false
 	}
