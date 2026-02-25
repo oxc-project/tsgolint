@@ -1,0 +1,60 @@
+From 6f8ecf3d15fb9b828f6b85509bf163de29e59bae Mon Sep 17 00:00:00 2001
+From: Cam McHenry <camchenry@users.noreply.github.com>
+Date: Wed, 25 Feb 2026 00:06:23 -0500
+Subject: [PATCH] perf(tspath): add fast-paths for NormalizeSlashes and
+ CombinePaths
+
+NormalizeSlashes: skip strings.ReplaceAll when the path contains no
+backslashes (the common case on POSIX).
+
+CombinePaths: for the single trailing-path case (the vast majority of
+call sites in module resolution), avoid allocating a strings.Builder and
+closures; use simple string concatenation instead.
+---
+ internal/tspath/path.go | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
+
+diff --git a/internal/tspath/path.go b/internal/tspath/path.go
+index 96e7dc66e1..e1c4437cc7 100644
+--- a/internal/tspath/path.go
++++ b/internal/tspath/path.go
+@@ -88,10 +88,24 @@ func HasTrailingDirectorySeparator(path string) bool {
+ //	CombinePaths("file:///path", "file:///to", "file.ext") === "file:///to/file.ext"
+ //	```
+ func CombinePaths(firstPath string, paths ...string) string {
+-	// TODO (drosen): There is potential for a fast path here.
+-	// In the case where we find the last absolute path and just path.Join from there.
+ 	firstPath = NormalizeSlashes(firstPath)
+ 
++	// Fast path: single trailing path (most common case in module resolution).
++	if len(paths) == 1 {
++		p := paths[0]
++		if p == "" {
++			return firstPath
++		}
++		p = NormalizeSlashes(p)
++		if firstPath == "" || GetRootLength(p) != 0 {
++			return p
++		}
++		if HasTrailingDirectorySeparator(firstPath) {
++			return firstPath + p
++		}
++		return firstPath + "/" + p
++	}
++
+ 	var b strings.Builder
+ 	size := len(firstPath) + len(paths)
+ 	for _, p := range paths {
+@@ -280,6 +294,9 @@ func GetPathFromPathComponents(pathComponents []string) string {
+ }
+ 
+ func NormalizeSlashes(path string) string {
++	if !strings.Contains(path, "\\") {
++		return path
++	}
+ 	return strings.ReplaceAll(path, "\\", "/")
+ }
+ 
+-- 
+2.39.5 (Apple Git-154)
+
