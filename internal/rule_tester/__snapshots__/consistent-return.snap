@@ -69,15 +69,6 @@ Message: Async function 'foo' expected no return value.
 ---
 
 [TestConsistentReturnRule/invalid-6 - 1]
-Diagnostic 1: missingReturnValue (4:16 - 4:22)
-Message: Async function 'foo' expected a return value.
-   3 |           if (flag) return 'value';
-   4 |           else return;
-     |                ~~~~~~~
-   5 |         }
----
-
-[TestConsistentReturnRule/invalid-7 - 1]
 Diagnostic 1: unexpectedReturnValue (4:11 - 4:19)
 Message: Async function 'foo' expected no return value.
    3 |           if (flag) return;
@@ -86,7 +77,7 @@ Message: Async function 'foo' expected no return value.
    5 |         }
 ---
 
-[TestConsistentReturnRule/invalid-8 - 1]
+[TestConsistentReturnRule/invalid-7 - 1]
 Diagnostic 1: unexpectedReturnValue (4:16 - 4:30)
 Message: Function 'foo' expected no return value.
    3 |           if (flag) return;
@@ -95,7 +86,7 @@ Message: Function 'foo' expected no return value.
    5 |         }
 ---
 
-[TestConsistentReturnRule/invalid-9 - 1]
+[TestConsistentReturnRule/invalid-8 - 1]
 Diagnostic 1: missingReturnValue (7:11 - 7:17)
 Message: Function 'foo' expected a return value.
    6 |           }
@@ -104,13 +95,22 @@ Message: Function 'foo' expected a return value.
    8 |         }
 ---
 
-[TestConsistentReturnRule/invalid-10 - 1]
+[TestConsistentReturnRule/invalid-9 - 1]
 Diagnostic 1: unexpectedReturnValue (6:11 - 6:22)
 Message: Function 'foo' expected no return value.
    5 |           }
    6 |           return true;
      |           ~~~~~~~~~~~~
    7 |         }
+---
+
+[TestConsistentReturnRule/invalid-10 - 1]
+Diagnostic 1: unexpectedReturnValue (7:11 - 7:28)
+Message: Function 'foo' expected no return value.
+   6 |           }
+   7 |           return undefOrNum;
+     |           ~~~~~~~~~~~~~~~~~~
+   8 |         }
 ---
 
 [TestConsistentReturnRule/invalid-11 - 1]

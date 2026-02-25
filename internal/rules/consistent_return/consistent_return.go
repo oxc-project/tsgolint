@@ -61,6 +61,42 @@ func getFunctionNameWithKind(sourceFile *ast.SourceFile, node *ast.Node) string 
 	return fmt.Sprintf("%s '%s'", kindPrefix, nameText)
 }
 
+func hasExplicitReturnTypeAnnotation(node *ast.Node) bool {
+	switch node.Kind {
+	case ast.KindFunctionDeclaration:
+		return node.AsFunctionDeclaration().Type != nil
+	case ast.KindFunctionExpression:
+		return node.AsFunctionExpression().Type != nil
+	case ast.KindArrowFunction:
+		return node.AsArrowFunction().Type != nil
+	case ast.KindMethodDeclaration:
+		return node.AsMethodDeclaration().Type != nil
+	default:
+		return false
+	}
+}
+
+func hasUndefinedAndSpecifiedValueType(t *checker.Type) bool {
+	parts := utils.UnionTypeParts(t)
+	hasUndefined := false
+	hasSpecifiedValue := false
+
+	for _, part := range parts {
+		if utils.IsTypeUndefinedType(part) {
+			hasUndefined = true
+			continue
+		}
+
+		if utils.IsIntrinsicVoidType(part) || utils.IsTypeFlagSet(part, checker.TypeFlagsNever) {
+			continue
+		}
+
+		hasSpecifiedValue = true
+	}
+
+	return hasUndefined && hasSpecifiedValue
+}
+
 func isThenableTypeWithVoidValue(typeChecker *checker.Checker, node *ast.Node, t *checker.Type, visited map[*checker.Type]struct{}) bool {
 	if t == nil {
 		return false
@@ -92,6 +128,37 @@ func isThenableTypeWithVoidValue(typeChecker *checker.Checker, node *ast.Node, t
 	return isThenableTypeWithVoidValue(typeChecker, node, awaitedType, visited)
 }
 
+func isThenableTypeWithUndefinedAndSpecifiedValue(typeChecker *checker.Checker, node *ast.Node, t *checker.Type, visited map[*checker.Type]struct{}) bool {
+	if t == nil {
+		return false
+	}
+	if _, ok := visited[t]; ok {
+		return false
+	}
+	visited[t] = struct{}{}
+
+	if hasUndefinedAndSpecifiedValueType(t) {
+		return true
+	}
+
+	if utils.IsUnionType(t) || utils.IsIntersectionType(t) {
+		return utils.Some(t.Types(), func(part *checker.Type) bool {
+			return isThenableTypeWithUndefinedAndSpecifiedValue(typeChecker, node, part, visited)
+		})
+	}
+
+	if !utils.IsThenableType(typeChecker, node, t) {
+		return false
+	}
+
+	awaitedType := checker.Checker_getAwaitedType(typeChecker, t)
+	if awaitedType == nil || awaitedType == t {
+		return false
+	}
+
+	return isThenableTypeWithUndefinedAndSpecifiedValue(typeChecker, node, awaitedType, visited)
+}
+
 func isReturnVoidOrThenableVoid(ctx rule.RuleContext, functionNode *ast.Node) bool {
 	functionType := ctx.TypeChecker.GetTypeAtLocation(functionNode)
 	callSignatures := utils.GetCallSignatures(ctx.TypeChecker, functionType)
@@ -101,14 +168,24 @@ func isReturnVoidOrThenableVoid(ctx rule.RuleContext, functionNode *ast.Node) bo
 
 	functionFlags := checker.GetFunctionFlags(functionNode)
 	isAsyncFunction := functionFlags&checker.FunctionFlagsAsync != 0
+	hasExplicitReturnType := hasExplicitReturnTypeAnnotation(functionNode)
 
 	return utils.Some(callSignatures, func(signature *checker.Signature) bool {
 		returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature)
 		if isAsyncFunction {
-			return isThenableTypeWithVoidValue(ctx.TypeChecker, functionNode, returnType, map[*checker.Type]struct{}{})
+			if isThenableTypeWithVoidValue(ctx.TypeChecker, functionNode, returnType, map[*checker.Type]struct{}{}) {
+				return true
+			}
+
+			return hasExplicitReturnType &&
+				isThenableTypeWithUndefinedAndSpecifiedValue(ctx.TypeChecker, functionNode, returnType, map[*checker.Type]struct{}{})
 		}
 
-		return utils.Some(utils.UnionTypeParts(returnType), utils.IsIntrinsicVoidType)
+		if utils.Some(utils.UnionTypeParts(returnType), utils.IsIntrinsicVoidType) {
+			return true
+		}
+
+		return hasExplicitReturnType && hasUndefinedAndSpecifiedValueType(returnType)
 	})
 }
 

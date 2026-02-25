@@ -54,13 +54,21 @@ func TestConsistentReturnRule(t *testing.T) {
       };
     `},
 		{Code: `
-      function foo(flag?: boolean): number | void {
-        if (flag) {
-          return 42;
-        }
-        return;
-      }
-    `},
+	      function foo(flag?: boolean): number | void {
+	        if (flag) {
+	          return 42;
+	        }
+	        return;
+	      }
+	    `},
+		{Code: `
+	      function solveLinearSystem(a: number): number | undefined {
+	        if (Math.abs(a) < 1e-10) {
+	          return;
+	        }
+	        return 42;
+	      }
+	    `},
 		{Code: `
       function foo(): boolean;
       function foo(flag: boolean): void;
@@ -133,14 +141,22 @@ func TestConsistentReturnRule(t *testing.T) {
       }
     `},
 		{Code: `
-      type PromiseVoidNumber = Promise<void | number>;
-      async function foo(flag?: boolean): PromiseVoidNumber {
-        if (flag) {
-          return 42;
-        }
-        return;
-      }
-    `},
+	      type PromiseVoidNumber = Promise<void | number>;
+	      async function foo(flag?: boolean): PromiseVoidNumber {
+	        if (flag) {
+	          return 42;
+	        }
+	        return;
+	      }
+	    `},
+		{Code: `
+	      async function foo(flag?: boolean): Promise<number | undefined> {
+	        if (flag) {
+	          return;
+	        }
+	        return 42;
+	      }
+	    `},
 		{Code: `
       class Foo {
         baz(): void {}
@@ -290,23 +306,6 @@ func TestConsistentReturnRule(t *testing.T) {
 					Column:    16,
 					EndLine:   4,
 					EndColumn: 31,
-				},
-			},
-		},
-		{
-			Code: `
-        async function foo(flag: boolean): Promise<string | undefined> {
-          if (flag) return 'value';
-          else return;
-        }
-      `,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "missingReturnValue",
-					Line:      4,
-					Column:    16,
-					EndLine:   4,
-					EndColumn: 23,
 				},
 			},
 		},
