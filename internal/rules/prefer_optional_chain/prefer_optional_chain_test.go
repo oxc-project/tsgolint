@@ -989,6 +989,10 @@ func TestPreferOptionalChainRule(t *testing.T) {
 		{Code: `declare const foo: [string, unknown[]][] | undefined; typeof foo === 'undefined' || foo.length === 0;`},
 		{Code: `declare const foo: boolean; declare const bar: { value: string | null }; foo || bar.value === 'Invalid DateTime' || bar.value === null;`},
 		{Code: `declare const foo: { bar: string } | undefined; typeof foo === 'undefined' || foo.bar;`},
+		{Code: `
+			declare const foo: any;
+			foo === undefined || !foo.isTruthy();
+		`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{

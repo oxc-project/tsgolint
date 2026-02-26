@@ -2498,6 +2498,43 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 	return chain
 }
 
+func (processor *chainProcessor) hasUnsafeStrictNullishGuardWithNegatedAccess(chain []Operand) bool {
+	if len(chain) < 2 {
+		return false
+	}
+
+	for i := range len(chain) - 1 {
+		guardOp := chain[i]
+		if guardOp.comparedExpr == nil || !guardOp.typ.IsStrictNullishCheck() {
+			continue
+		}
+
+		guardType := processor.getTypeInfo(guardOp.comparedExpr)
+		if !guardType.IsAnyOrUnknown() && !guardType.HasBothNullAndUndefined() {
+			continue
+		}
+
+		for j := i + 1; j < len(chain); j++ {
+			candidate := chain[j]
+			if candidate.typ != OperandTypeNot || candidate.comparedExpr == nil {
+				continue
+			}
+
+			cmp := processor.compareNodes(guardOp.comparedExpr, candidate.comparedExpr)
+			if cmp != NodeEqual && cmp != NodeSubset {
+				continue
+			}
+
+			unwrapped := ast.SkipParentheses(candidate.comparedExpr)
+			if ast.IsCallExpression(unwrapped) || ast.IsPropertyAccessExpression(unwrapped) || ast.IsElementAccessExpression(unwrapped) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []Operand {
 	// Note: chain length >= 2, hasSameBaseIdentifier, and hasPropertyAccessInChain are already
 	// validated by validateChain() which is called before this function.
@@ -2681,6 +2718,12 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	chain = processor.validateOrChainNullishChecks(chain)
 	if len(chain) < 2 {
 		return nil
+	}
+
+	if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+		if processor.hasUnsafeStrictNullishGuardWithNegatedAccess(chain) {
+			return nil
+		}
 	}
 
 	for _, op := range chain {
