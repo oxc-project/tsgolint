@@ -2503,7 +2503,7 @@ func (processor *chainProcessor) hasUnsafeStrictNullishGuardWithNegatedAccess(ch
 		return false
 	}
 
-	for i := 0; i < len(chain)-1; i++ {
+	for i := range len(chain) - 1 {
 		guardOp := chain[i]
 		if guardOp.comparedExpr == nil || !guardOp.typ.IsStrictNullishCheck() {
 			continue
