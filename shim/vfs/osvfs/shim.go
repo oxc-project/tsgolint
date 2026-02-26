@@ -9,3 +9,5 @@ import _ "unsafe"
 
 //go:linkname FS github.com/microsoft/typescript-go/internal/vfs/osvfs.FS
 func FS() vfs.FS
+//go:linkname GetGlobalTypingsCacheLocation github.com/microsoft/typescript-go/internal/vfs/osvfs.GetGlobalTypingsCacheLocation
+func GetGlobalTypingsCacheLocation() string

@@ -64,8 +64,8 @@ func (vfs *OverlayVFS) GetAccessibleEntries(path string) (result vfs.Entries) {
 			continue
 		}
 
-		if slashIndex := strings.IndexByte(withoutPrefix, '/'); slashIndex >= 0 {
-			result.Directories = append(result.Directories, withoutPrefix[:slashIndex])
+		if before, _, ok := strings.Cut(withoutPrefix, "/"); ok {
+			result.Directories = append(result.Directories, before)
 		} else {
 			result.Files = append(result.Files, withoutPrefix)
 		}

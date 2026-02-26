@@ -56,7 +56,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 63,
+      "end": 60,
       "pos": 55,
     },
     "rule": "await-thenable",
@@ -72,8 +72,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
-          "id": "await",
+          "description": "Remove unnecessary \`await\`.",
+          "id": "removeAwait",
         },
       },
     ],
@@ -86,7 +86,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 123,
+      "end": 111,
       "pos": 106,
     },
     "rule": "await-thenable",
@@ -102,8 +102,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
-          "id": "await",
+          "description": "Remove unnecessary \`await\`.",
+          "id": "removeAwait",
         },
       },
     ],
@@ -116,7 +116,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
-      "end": 278,
+      "end": 267,
       "pos": 262,
     },
     "rule": "await-thenable",
@@ -132,8 +132,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
-          "id": "await",
+          "description": "Remove unnecessary \`await\`.",
+          "id": "removeAwait",
         },
       },
     ],
@@ -244,8 +244,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the \`delete\` operator with an array expression is unsafe.",
-          "id": "noArrayDelete",
+          "description": "Use \`array.splice()\` instead.",
+          "id": "useSplice",
         },
       },
     ],
@@ -555,9 +555,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -571,9 +570,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -603,9 +601,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -619,9 +616,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -651,9 +647,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -667,9 +662,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -699,9 +693,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -715,9 +708,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -1003,9 +995,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the spread operator on Promise in an object can cause unexpected behavior.",
-          "help": "Did you forget to await the promise before spreading it?",
-          "id": "noPromiseSpreadInObject",
+          "description": "Add await operator.",
+          "id": "addAwait",
         },
       },
     ],
@@ -1070,9 +1061,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Using the spread operator on a Map in an object will result in an empty object.",
-          "help": "Did you mean to use \`Object.fromEntries(map)\` instead?",
-          "id": "noMapSpreadInObject",
+          "description": "Replace map spread in object with \`Object.fromEntries()\`",
+          "id": "replaceMapSpreadInObject",
         },
       },
     ],
@@ -1289,13 +1279,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'string'",
+        "range": {
+          "end": 120,
+          "pos": 117,
+        },
+      },
+      {
+        "label": "Casting it to 'string' is unnecessary",
+        "range": {
+          "end": 130,
+          "pos": 121,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 130,
-      "pos": 117,
+      "pos": 121,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -1311,13 +1317,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'string'",
+        "range": {
+          "end": 248,
+          "pos": 237,
+        },
+      },
+      {
+        "label": "Casting it to 'string' is unnecessary",
+        "range": {
+          "end": 258,
+          "pos": 249,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 258,
-      "pos": 237,
+      "pos": 249,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -1333,13 +1355,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type '42'",
+        "range": {
+          "end": 353,
+          "pos": 350,
+        },
+      },
+      {
+        "label": "Casting it to '42' is unnecessary",
+        "range": {
+          "end": 359,
+          "pos": 354,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 359,
-      "pos": 350,
+      "pos": 354,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -1376,8 +1414,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Remove the type conversion.",
+          "id": "suggestRemove",
         },
       },
       {
@@ -1391,8 +1429,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Instead, assert that the value satisfies the primitive type.",
+          "id": "suggestSatisfies",
         },
       },
     ],
@@ -1430,8 +1468,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Remove the type conversion.",
+          "id": "suggestRemove",
         },
       },
       {
@@ -1445,8 +1483,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Instead, assert that the value satisfies the primitive type.",
+          "id": "suggestSatisfies",
         },
       },
     ],
@@ -1484,8 +1522,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Remove the type conversion.",
+          "id": "suggestRemove",
         },
       },
       {
@@ -1499,8 +1537,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Instead, assert that the value satisfies the primitive type.",
+          "id": "suggestSatisfies",
         },
       },
     ],
@@ -1538,8 +1576,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Remove the type conversion.",
+          "id": "suggestRemove",
         },
       },
       {
@@ -1553,8 +1591,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Instead, assert that the value satisfies the primitive type.",
+          "id": "suggestSatisfies",
         },
       },
     ],
@@ -1592,8 +1630,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Remove the type conversion.",
+          "id": "suggestRemove",
         },
       },
       {
@@ -1607,8 +1645,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "This type conversion does not change the type or value of the expression.",
-          "id": "unnecessaryTypeConversion",
+          "description": "Instead, assert that the value satisfies the primitive type.",
+          "id": "suggestSatisfies",
         },
       },
     ],
@@ -1616,6 +1654,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This is the only usage of type parameter T in the signature.",
+        "range": {
+          "end": 110,
+          "pos": 109,
+        },
+      },
+    ],
     "message": {
       "description": "Type parameter T is used only once in the function signature.",
       "id": "sole",
@@ -1651,8 +1698,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Type parameter T is used only once in the function signature.",
-          "id": "sole",
+          "description": "Replace all usages of type parameter with its constraint.",
+          "id": "replaceUsagesWithConstraint",
         },
       },
     ],
@@ -1721,13 +1768,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'any'",
+        "range": {
+          "end": 228,
+          "pos": 220,
+        },
+      },
+      {
+        "label": "Casting it to 'any' is unnecessary",
+        "range": {
+          "end": 235,
+          "pos": 229,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 235,
-      "pos": 220,
+      "pos": 229,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -2434,8 +2497,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Prefer .find(...) instead of .filter(...)[0].",
-          "id": "preferFind",
+          "description": "Use .find(...) instead of .filter(...)[0].",
+          "id": "preferFindSuggestion",
         },
       },
     ],
@@ -2465,9 +2528,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -2481,9 +2543,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -2513,9 +2574,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -2529,9 +2589,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -2561,9 +2620,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -2577,9 +2635,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -2609,9 +2666,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -2625,9 +2681,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -2657,9 +2712,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -2673,9 +2727,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -2799,13 +2852,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression already has the type 'number'",
+        "range": {
+          "end": 173,
+          "pos": 131,
+        },
+      },
+      {
+        "label": "Casting it to 'number' is unnecessary",
+        "range": {
+          "end": 183,
+          "pos": 174,
+        },
+      },
+    ],
     "message": {
       "description": "This assertion is unnecessary since it does not change the type of the expression.",
       "id": "unnecessaryAssertion",
     },
     "range": {
       "end": 183,
-      "pos": 131,
+      "pos": 174,
     },
     "rule": "no-unnecessary-type-assertion",
   },
@@ -3209,8 +3278,24 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: bigint",
+        "range": {
+          "end": 12,
+          "pos": 10,
+        },
+      },
+      {
+        "label": "Type: number",
+        "range": {
+          "end": 16,
+          "pos": 15,
+        },
+      },
+    ],
     "message": {
-      "description": "Numeric '+' operations must either be both bigints or both numbers. Got \`bigint\` + \`number\`.",
+      "description": "Numeric '+' operations must either be both bigints or both numbers.",
       "id": "bigintAndNumber",
     },
     "range": {
@@ -3223,7 +3308,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
     "message": {
-      "description": "Invalid operand for a '+' operation. Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`. Got \`never\`.",
+      "description": "Invalid operand of type 'never' for a '+' operation.",
+      "help": "Operands must each be a number or string, allowing a string + any of: \`any\`, \`boolean\`, \`null\`, \`RegExp\`, \`undefined\`.",
       "id": "invalid",
     },
     "range": {
@@ -3249,8 +3335,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: { prop: any; }",
+        "range": {
+          "end": 247,
+          "pos": 244,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "{ prop: any; }" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3262,8 +3357,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: symbol",
+        "range": {
+          "end": 319,
+          "pos": 316,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "symbol" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3275,8 +3379,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: Function",
+        "range": {
+          "end": 400,
+          "pos": 398,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "Function" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3288,8 +3401,17 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-template-expressions/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: number[]",
+        "range": {
+          "end": 468,
+          "pos": 465,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "number[]" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {
@@ -3322,8 +3444,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Returning an awaited promise is required in this context.",
-          "id": "requiredPromiseAwait",
+          "description": "Add \`await\` before the expression. Use caution as this may impact control flow.",
+          "id": "requiredPromiseAwaitSuggestion",
         },
       },
     ],
@@ -3352,8 +3474,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Returning an awaited promise is required in this context.",
-          "id": "requiredPromiseAwait",
+          "description": "Add \`await\` before the expression. Use caution as this may impact control flow.",
+          "id": "requiredPromiseAwaitSuggestion",
         },
       },
     ],
@@ -3379,8 +3501,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingReturnValue",
     },
     "range": {
-      "end": 327,
-      "pos": 120,
+      "end": 337,
+      "pos": 125,
     },
     "rule": "consistent-return",
   },
@@ -3388,40 +3510,32 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
     "kind": 0,
     "message": {
-      "description": "The case statement does not have a shared enum type with the switch predicate.",
-      "id": "mismatchedCase",
-    },
-    "range": {
-      "end": 236,
-      "pos": 184,
-    },
-    "rule": "no-unsafe-enum-comparison",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "The case statement does not have a shared enum type with the switch predicate.",
-      "id": "mismatchedCase",
-    },
-    "range": {
-      "end": 290,
-      "pos": 241,
-    },
-    "rule": "no-unsafe-enum-comparison",
-  },
-  {
-    "file_path": "fixtures/basic/rules/switch-exhaustiveness-check/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Switch is not exhaustive",
+      "description": "Switch is not exhaustive. Cases not matched: "rejected"",
       "id": "switchIsNotExhaustive",
     },
     "range": {
-      "end": 176,
-      "pos": 170,
+      "end": 186,
+      "pos": 180,
     },
     "rule": "switch-exhaustiveness-check",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 300,
+              "pos": 300,
+            },
+            "text": "
+    case "rejected": { throw new Error('Not implemented yet: "rejected" case') }",
+          },
+        ],
+        "message": {
+          "description": "Add branches for missing cases.",
+          "id": "addMissingCases",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
@@ -3439,6 +3553,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 336,
+          "pos": 333,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3453,6 +3576,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 453,
+          "pos": 445,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3467,6 +3599,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This reference may be unbound and lose \`this\` context",
+        "range": {
+          "end": 565,
+          "pos": 562,
+        },
+      },
+    ],
     "message": {
       "description": "Avoid referencing unbound methods which may cause unintentional scoping of \`this\`.",
       "help": "If your function does not access \`this\`, you can annotate it with \`this: void\`, or consider using an arrow function instead.",
@@ -3542,8 +3683,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Prefer the safe \`: unknown\` for a \`catch\` callback variable.",
-          "id": "useUnknown",
+          "description": "Change existing type annotation to \`: unknown\`.",
+          "id": "wrongTypeAnnotationSuggestion",
         },
       },
     ],
@@ -3603,9 +3744,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -3619,9 +3759,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -3651,9 +3790,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -3667,9 +3805,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -3699,9 +3836,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -3715,9 +3851,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -3747,9 +3882,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -3763,9 +3897,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -3891,9 +4024,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -3907,9 +4039,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -3939,9 +4070,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -3955,9 +4085,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -3987,9 +4116,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4003,9 +4131,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4035,9 +4162,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4051,9 +4177,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4179,9 +4304,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4195,9 +4319,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4227,9 +4350,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4243,9 +4365,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4275,9 +4396,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4291,9 +4411,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4323,9 +4442,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4339,9 +4457,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4467,9 +4584,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4483,9 +4599,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4515,9 +4630,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4531,9 +4645,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4563,9 +4676,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4579,9 +4691,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4611,9 +4722,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add void operator to ignore.",
+          "id": "floatingFixVoid",
         },
       },
       {
@@ -4627,9 +4737,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Promises must be awaited, add void operator to ignore.",
-          "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
-          "id": "floatingVoid",
+          "description": "Add await operator.",
+          "id": "floatingFixAwait",
         },
       },
     ],
@@ -4722,8 +4831,17 @@ exports[`TSGoLint E2E Snapshot Tests > should handle circular project references
   {
     "file_path": "fixtures/circular-project-references/project2/src/demo/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: { x: number; }",
+        "range": {
+          "end": 66,
+          "pos": 60,
+        },
+      },
+    ],
     "message": {
-      "description": "Invalid type "{ x: number; }" of template literal expression.",
+      "description": "Invalid type used in template literal expression.",
       "id": "invalidType",
     },
     "range": {

@@ -5,14 +5,24 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildInvalidTypeMessage(t string) rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "invalidType",
-		Description: fmt.Sprintf("Invalid type \"%v\" of template literal expression.", t),
+func buildInvalidTypeDiagnostic(diagnosticRange core.TextRange, t string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: diagnosticRange,
+		Message: rule.RuleMessage{
+			Id:          "invalidType",
+			Description: "Invalid type used in template literal expression.",
+		},
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Type: %v", t),
+				Range: diagnosticRange,
+			},
+		},
 	}
 }
 
@@ -66,7 +76,11 @@ var RestrictTemplateExpressionsRule = rule.Rule{
 						expression,
 					)
 					if !isTypeAllowed(expressionType) {
-						ctx.ReportNode(expression, buildInvalidTypeMessage(ctx.TypeChecker.TypeToString(expressionType)))
+						diagnosticRange := utils.TrimNodeTextRange(ctx.SourceFile, expression)
+						ctx.ReportDiagnostic(buildInvalidTypeDiagnostic(
+							diagnosticRange,
+							ctx.TypeChecker.TypeToString(expressionType),
+						))
 					}
 				}
 			},

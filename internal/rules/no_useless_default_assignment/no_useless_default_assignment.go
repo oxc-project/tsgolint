@@ -2,6 +2,7 @@ package no_useless_default_assignment
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -57,12 +58,7 @@ func canBeUndefined(t *checker.Type) bool {
 	if utils.IsTypeAnyType(t) || utils.IsTypeUnknownType(t) {
 		return true
 	}
-	for _, typePart := range utils.UnionTypeParts(t) {
-		if utils.IsTypeUndefinedType(typePart) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(utils.UnionTypeParts(t), utils.IsTypeUndefinedType)
 }
 
 func getPropertyName(node *ast.Node) (string, bool) {
@@ -175,20 +171,6 @@ func getAssignmentTargetNode(node *ast.Node) *ast.Node {
 	return nil
 }
 
-func hasConditionalInitializer(node *ast.Node) bool {
-	if node == nil || node.Parent == nil {
-		return false
-	}
-
-	parent := node.Parent
-	if ast.IsVariableDeclaration(parent) && parent.Initializer() != nil {
-		initializer := ast.SkipParentheses(parent.Initializer())
-		return ast.IsConditionalExpression(initializer) || ast.IsLogicalExpression(initializer)
-	}
-
-	return hasConditionalInitializer(parent)
-}
-
 func hasPropertyInAllBranches(expression *ast.Node, propertyName string) bool {
 	expression = ast.SkipParentheses(expression)
 	if ast.IsObjectLiteralExpression(expression) {
@@ -214,15 +196,13 @@ func hasPropertyInAllBranches(expression *ast.Node, propertyName string) bool {
 var NoUselessDefaultAssignmentRule = rule.Rule{
 	Name: noUselessDefaultAssignmentRuleName,
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		opts := utils.UnmarshalOptions[NoUselessDefaultAssignmentOptions](options, "no-useless-default-assignment")
-
 		compilerOptions := ctx.Program.Options()
 		isStrictNullChecks := utils.IsStrictCompilerOptionEnabled(
 			compilerOptions,
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
@@ -262,10 +242,12 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 				}
 
 				if utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsOptional) {
-					if parent := parentPattern.Parent; ast.IsVariableDeclaration(parent) && parent.Initializer() != nil && hasConditionalInitializer(parentPattern) {
+					if parent := parentPattern.Parent; ast.IsVariableDeclaration(parent) && parent.Initializer() != nil {
 						if !hasPropertyInAllBranches(parent.Initializer(), propertyName) {
 							return nil
 						}
+					} else {
+						return nil
 					}
 				}
 

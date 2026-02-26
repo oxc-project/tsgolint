@@ -669,7 +669,7 @@ async function wrapper<T extends number>(value: T) {
 					Line:      3,
 					Column:    10,
 					EndLine:   3,
-					EndColumn: 21,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "removeAwait",
@@ -697,7 +697,7 @@ class C<T> {
 					Line:      4,
 					Column:    12,
 					EndLine:   4,
-					EndColumn: 23,
+					EndColumn: 17,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "removeAwait",
@@ -727,7 +727,7 @@ class C<R extends number> {
 					Line:      4,
 					Column:    12,
 					EndLine:   4,
-					EndColumn: 23,
+					EndColumn: 17,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "removeAwait",

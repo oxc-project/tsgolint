@@ -17,67 +17,6 @@ Message: Require 'compare' argument.
    4 |         }
 ---
 
-[TestRequireArraySortCompare/invalid-10 - 1]
-Diagnostic 1: requireCompare (5:9 - 5:41)
-Message: Require 'compare' argument.
-   4 |         }
-   5 |         [getNumber(), getNumber()].sort();
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestRequireArraySortCompare/invalid-11 - 1]
-Diagnostic 1: requireCompare (5:9 - 5:30)
-Message: Require 'compare' argument.
-   4 |         const baz = 3;
-   5 |         [foo, bar, baz].sort();
-     |         ~~~~~~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestRequireArraySortCompare/invalid-12 - 1]
-Diagnostic 1: requireCompare (2:9 - 2:32)
-Message: Require 'compare' argument.
-   1 | 
-   2 |         [2, 'bar', 'baz'].sort();
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
-[TestRequireArraySortCompare/invalid-13 - 1]
-Diagnostic 1: requireCompare (5:9 - 5:21)
-Message: Require 'compare' argument.
-   4 |         }
-   5 |         [2, 3].sort();
-     |         ~~~~~~~~~~~~~
-   6 |       
----
-
-[TestRequireArraySortCompare/invalid-14 - 1]
-Diagnostic 1: requireCompare (5:9 - 5:32)
-Message: Require 'compare' argument.
-   4 |         const three = 3;
-   5 |         [one, two, three].sort();
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestRequireArraySortCompare/invalid-15 - 1]
-Diagnostic 1: requireCompare (3:11 - 3:22)
-Message: Require 'compare' argument.
-   2 |         function f(a: number[]) {
-   3 |           a.toSorted();
-     |           ~~~~~~~~~~~~
-   4 |         }
----
-
-[TestRequireArraySortCompare/invalid-16 - 1]
-Diagnostic 1: requireCompare (1:43 - 1:56)
-Message: Require 'compare' argument.
-   1 | declare const myArray: ("A" | "B" | 3)[]; myArray.sort();
-     |                                           ~~~~~~~~~~~~~~
----
-
 [TestRequireArraySortCompare/invalid-2 - 1]
 Diagnostic 1: requireCompare (3:11 - 3:18)
 Message: Require 'compare' argument.
@@ -148,4 +87,65 @@ Message: Require 'compare' argument.
    2 |         [1, 2, 3].sort();
      |         ~~~~~~~~~~~~~~~~
    3 |       
+---
+
+[TestRequireArraySortCompare/invalid-10 - 1]
+Diagnostic 1: requireCompare (5:9 - 5:41)
+Message: Require 'compare' argument.
+   4 |         }
+   5 |         [getNumber(), getNumber()].sort();
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestRequireArraySortCompare/invalid-11 - 1]
+Diagnostic 1: requireCompare (5:9 - 5:30)
+Message: Require 'compare' argument.
+   4 |         const baz = 3;
+   5 |         [foo, bar, baz].sort();
+     |         ~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestRequireArraySortCompare/invalid-12 - 1]
+Diagnostic 1: requireCompare (2:9 - 2:32)
+Message: Require 'compare' argument.
+   1 | 
+   2 |         [2, 'bar', 'baz'].sort();
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestRequireArraySortCompare/invalid-13 - 1]
+Diagnostic 1: requireCompare (5:9 - 5:21)
+Message: Require 'compare' argument.
+   4 |         }
+   5 |         [2, 3].sort();
+     |         ~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestRequireArraySortCompare/invalid-14 - 1]
+Diagnostic 1: requireCompare (5:9 - 5:32)
+Message: Require 'compare' argument.
+   4 |         const three = 3;
+   5 |         [one, two, three].sort();
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestRequireArraySortCompare/invalid-15 - 1]
+Diagnostic 1: requireCompare (3:11 - 3:22)
+Message: Require 'compare' argument.
+   2 |         function f(a: number[]) {
+   3 |           a.toSorted();
+     |           ~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestRequireArraySortCompare/invalid-16 - 1]
+Diagnostic 1: requireCompare (1:43 - 1:56)
+Message: Require 'compare' argument.
+   1 | declare const myArray: ("A" | "B" | 3)[]; myArray.sort();
+     |                                           ~~~~~~~~~~~~~~
 ---

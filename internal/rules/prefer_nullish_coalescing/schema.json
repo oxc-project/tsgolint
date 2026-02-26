@@ -29,11 +29,6 @@
     "prefer_nullish_coalescing_options": {
       "type": "object",
       "properties": {
-        "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": {
-          "type": "boolean",
-          "default": false,
-          "description": "Unless this is set to `true`, the rule will error on every file whose `tsconfig.json` does _not_ have the `strictNullChecks` compiler option (or `strict`) set to `true`."
-        },
         "ignoreBooleanCoercion": {
           "type": "boolean",
           "default": false,

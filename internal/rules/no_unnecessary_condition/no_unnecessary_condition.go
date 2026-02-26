@@ -17,6 +17,7 @@ package no_unnecessary_condition
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -140,6 +141,35 @@ func isIndeterminateType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndex) != 0
 }
 
+// hasIndeterminateConstituent reports whether a type itself (or any union member)
+// is indeterminate at analysis time, including constrained generic substitutions.
+func hasIndeterminateConstituent(t *checker.Type) bool {
+	if isIndeterminateType(t) {
+		return true
+	}
+
+	flags := checker.Type_flags(t)
+	if flags&(checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+		return true
+	}
+
+	if !utils.IsUnionType(t) {
+		return false
+	}
+
+	for _, part := range t.Types() {
+		if isIndeterminateType(part) {
+			return true
+		}
+		partFlags := checker.Type_flags(part)
+		if partFlags&(checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+			return true
+		}
+	}
+
+	return false
+}
+
 // isAlwaysNullishType checks if a type is always null, undefined, or void.
 //
 // Returns true for types that can only be nullish values:
@@ -243,7 +273,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
@@ -556,20 +586,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 					}
-				}
-			}
-
-			// Without strict null checks, null/undefined are valid values for all types
-			// This means we can't reliably check conditions because:
-			// - `string | null` becomes just `string` (null is already a valid string value)
-			// - Objects can be null even if not explicitly typed as nullable
-			// Skip checking in this case unless the user explicitly allows it
-			// When AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing is true,
-			// skip checking Object types in non-strict mode as they might be nullable
-			if !isStrictNullChecks && opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
-				flags := checker.Type_flags(nodeType)
-				if flags&(checker.TypeFlagsObject|checker.TypeFlagsNonPrimitive) != 0 {
-					return
 				}
 			}
 
@@ -935,12 +951,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check for union type - if any constituent is an array/tuple, return true
 				if utils.IsUnionType(t) {
-					for _, part := range t.Types() {
-						if isArrayOrTupleType(part) {
-							return true
-						}
-					}
-					return false
+					return slices.ContainsFunc(t.Types(), isArrayOrTupleType)
 				}
 
 				// Check for array type by number index type
@@ -1229,10 +1240,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			// Also allow if it's a union that includes an indeterminate type
 			if utils.IsUnionType(exprType) {
-				for _, part := range exprType.Types() {
-					if isIndeterminateType(part) {
-						return
-					}
+				if slices.ContainsFunc(exprType.Types(), isIndeterminateType) {
+					return
 				}
 			}
 
@@ -1363,6 +1372,19 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 							if hasOptionalChain(binExpr.Left) && containsElementAccess(binExpr.Left) {
 								// Case 2: Optional chain with element access - skip check
+								return
+							}
+						}
+
+						// With noUncheckedIndexedAccess enabled, element accesses through index
+						// signatures can still be absent at runtime (e.g. Record<string, T>[key]).
+						// Treat these as potentially nullish for ??=.
+						if ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() && isElementAccess(leftSkip) {
+							elemAccess := leftSkip.AsElementAccessExpression()
+							baseType := getResolvedType(elemAccess.Expression)
+							if baseType != nil &&
+								(ctx.TypeChecker.GetStringIndexType(baseType) != nil ||
+									ctx.TypeChecker.GetNumberIndexType(baseType) != nil) {
 								return
 							}
 						}
@@ -1514,7 +1536,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					if isEqualityOp {
 						// For equality operators, check if types can ever be equal
 						// Only skip if BOTH sides are nullish OR one side is a union that includes nullish
-						hasOverlap := typesHaveOverlap(leftType, rightType)
+						hasOverlap := typesHaveOverlap(ctx.TypeChecker, leftType, rightType)
 
 						if !hasOverlap {
 							// Check if this is a valid nullish check (e.g., `a: string | null` with `a === null`)
@@ -1889,12 +1911,7 @@ func checkTypeCondition(t *checker.Type) (isTruthy bool, isFalsy bool) {
 // optional chaining (?.) might be necessary.
 func isNullishType(t *checker.Type) bool {
 	if utils.IsUnionType(t) {
-		for _, part := range t.Types() {
-			if isNullishType(part) {
-				return true
-			}
-		}
-		return false
+		return slices.ContainsFunc(t.Types(), isNullishType)
 	}
 
 	flags := checker.Type_flags(t)
@@ -1972,7 +1989,7 @@ func isAllowedConstantLiteral(node *ast.Node) bool {
 // - Nullish types: null/undefined/void overlap with each other (treated as interchangeable in some contexts)
 // - Literals and base types: overlap (e.g., "hello" overlaps with string)
 // - Union types: checked part by part (e.g., string | number overlaps with "hello")
-func typesHaveOverlap(left, right *checker.Type) bool {
+func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) bool {
 	// Handle any/unknown types - they overlap with everything
 	leftFlags := checker.Type_flags(left)
 	rightFlags := checker.Type_flags(right)
@@ -1982,10 +1999,9 @@ func typesHaveOverlap(left, right *checker.Type) bool {
 		return true
 	}
 
-	// Handle type parameters and indexed access types - we can't determine overlap at compile time
-	// This includes T, T[K], keyof T, etc.
-	genericFlags := checker.TypeFlagsTypeParameter | checker.TypeFlagsIndexedAccess | checker.TypeFlagsIndex
-	if leftFlags&genericFlags != 0 || rightFlags&genericFlags != 0 {
+	// Handle generic/indeterminate types conservatively.
+	// This includes unions with constrained type variables (e.g., T | undefined).
+	if hasIndeterminateConstituent(left) || hasIndeterminateConstituent(right) {
 		return true
 	}
 
@@ -1999,6 +2015,14 @@ func typesHaveOverlap(left, right *checker.Type) bool {
 
 		for _, rightPart := range rightParts {
 			rightPartFlags := checker.Type_flags(rightPart)
+
+			// Use TypeScript assignability first. This catches subtype/alias
+			// relationships (e.g. Window extends EventTarget, template literals,
+			// branded intersections, unique symbols) that raw TypeFlags miss.
+			if checker.Checker_isTypeAssignableTo(typeChecker, leftPart, rightPart) ||
+				checker.Checker_isTypeAssignableTo(typeChecker, rightPart, leftPart) {
+				return true
+			}
 
 			// Check if both are the same primitive type
 			primitiveFlags := checker.TypeFlagsString | checker.TypeFlagsNumber |

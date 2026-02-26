@@ -17,6 +17,78 @@ Message: `a` is deprecated.
    4 |       
 ---
 
+[TestNoDeprecatedRule/invalid-2 - 1]
+Diagnostic 1: deprecated (3:9 - 3:9)
+Message: `a` is deprecated.
+   2 |         /** @deprecated */ export var a = undefined;
+   3 |         a;
+     |         ~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-3 - 1]
+Diagnostic 1: deprecated (3:9 - 3:9)
+Message: `a` is deprecated.
+   2 |         /** @deprecated */ let a = undefined;
+   3 |         a;
+     |         ~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-4 - 1]
+Diagnostic 1: deprecated (3:9 - 3:9)
+Message: `a` is deprecated.
+   2 |         /** @deprecated */ export let a = undefined;
+   3 |         a;
+     |         ~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-5 - 1]
+Diagnostic 1: deprecated (3:9 - 3:17)
+Message: `aLongName` is deprecated.
+   2 |         /** @deprecated */ let aLongName = undefined;
+   3 |         aLongName;
+     |         ~~~~~~~~~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-6 - 1]
+Diagnostic 1: deprecated (3:19 - 3:19)
+Message: `a` is deprecated.
+   2 |         /** @deprecated */ const a = { b: 1 };
+   3 |         const c = a;
+     |                   ~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-7 - 1]
+Diagnostic 1: deprecated (3:19 - 3:19)
+Message: `a` is deprecated.
+   2 |         /** @deprecated Reason. */ const a = { b: 1 };
+   3 |         const c = a;
+     |                   ~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-8 - 1]
+Diagnostic 1: deprecated (3:21 - 3:21)
+Message: `a` is deprecated.
+   2 |         /** @deprecated */ const a = { b: 1 };
+   3 |         const { c = a } = {};
+     |                     ~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-9 - 1]
+Diagnostic 1: deprecated (3:20 - 3:20)
+Message: `a` is deprecated.
+   2 |         /** @deprecated */ const a = { b: 1 };
+   3 |         const [c = a] = [];
+     |                    ~
+   4 |       
+---
+
 [TestNoDeprecatedRule/invalid-10 - 1]
 Diagnostic 1: deprecated (3:21 - 3:21)
 Message: `a` is deprecated.
@@ -24,69 +96,6 @@ Message: `a` is deprecated.
    3 |         console.log(a);
      |                     ~
    4 |       
----
-
-[TestNoDeprecatedRule/invalid-103 - 1]
-Diagnostic 1: deprecated (4:25 - 4:54)
-Message: `ClassWithDeprecatedConstructor` is deprecated.
-   3 | 
-   4 |         const foo = new ClassWithDeprecatedConstructor('a');
-     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-104 - 1]
-Diagnostic 1: deprecated (4:34 - 4:63)
-Message: `ClassWithDeprecatedConstructor` is deprecated.
-   3 | 
-   4 |         const foo = new imported.ClassWithDeprecatedConstructor('a');
-     |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-105 - 1]
-Diagnostic 1: deprecatedWithReason (4:21 - 4:60)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const foo = ReexportedClassWithDeprecatedConstructor;
-     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-106 - 1]
-Diagnostic 1: deprecatedWithReason (4:30 - 4:69)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const foo = imported.ReexportedClassWithDeprecatedConstructor;
-     |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-107 - 1]
-Diagnostic 1: deprecatedWithReason (4:17 - 4:56)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const { ReexportedClassWithDeprecatedConstructor } = imported;
-     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-108 - 1]
-Diagnostic 1: deprecatedWithReason (4:21 - 4:60)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const foo = ReexportedClassWithDeprecatedConstructor();
-     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-109 - 1]
-Diagnostic 1: deprecatedWithReason (4:30 - 4:69)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const foo = imported.ReexportedClassWithDeprecatedConstructor();
-     |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
 ---
 
 [TestNoDeprecatedRule/invalid-11 - 1]
@@ -98,87 +107,6 @@ Message: `a` is deprecated.
    4 |       
 ---
 
-[TestNoDeprecatedRule/invalid-110 - 1]
-Diagnostic 1: deprecatedWithReason (4:21 - 4:60)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const foo = ReexportedClassWithDeprecatedConstructor('a');
-     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-111 - 1]
-Diagnostic 1: deprecatedWithReason (4:30 - 4:69)
-Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
-   3 | 
-   4 |         const foo = imported.ReexportedClassWithDeprecatedConstructor('a');
-     |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-113 - 1]
-Diagnostic 1: deprecated (4:13 - 4:19)
-Message: `default` is deprecated.
-   3 |           const d = await import('./deprecated.js');
-   4 |           d.default.default;
-     |             ~~~~~~~
-   5 |         }
----
-
-[TestNoDeprecatedRule/invalid-114 - 1]
-Diagnostic 1: deprecated (5:30 - 5:32)
-Message: `Foo` is deprecated.
-   4 | 
-   5 |         class Bar implements Foo {}
-     |                              ~~~
-   6 |       
----
-
-[TestNoDeprecatedRule/invalid-115 - 1]
-Diagnostic 1: deprecated (5:37 - 5:39)
-Message: `Foo` is deprecated.
-   4 | 
-   5 |         export class Bar implements Foo {}
-     |                                     ~~~
-   6 |       
----
-
-[TestNoDeprecatedRule/invalid-116 - 1]
-Diagnostic 1: deprecated (7:42 - 7:44)
-Message: `Foo` is deprecated.
-   6 | 
-   7 |         export class Bar implements Baz, Foo {}
-     |                                          ~~~
-   8 |       
----
-
-[TestNoDeprecatedRule/invalid-117 - 1]
-Diagnostic 1: deprecated (5:34 - 5:36)
-Message: `Foo` is deprecated.
-   4 | 
-   5 |         export class Bar extends Foo {}
-     |                                  ~~~
-   6 |       
----
-
-[TestNoDeprecatedRule/invalid-118 - 1]
-Diagnostic 1: deprecated (5:10 - 5:18)
-Message: `decorator` is deprecated.
-   4 | 
-   5 |         @decorator
-     |          ~~~~~~~~~
-   6 |         export class Foo {}
----
-
-[TestNoDeprecatedRule/invalid-119 - 1]
-Diagnostic 1: deprecated (7:24 - 7:24)
-Message: `a` is deprecated.
-   6 | 
-   7 |         export default a();
-     |                        ~
-   8 |       
----
-
 [TestNoDeprecatedRule/invalid-12 - 1]
 Diagnostic 1: deprecated (6:13 - 6:13)
 Message: `a` is deprecated.
@@ -186,69 +114,6 @@ Message: `a` is deprecated.
    6 |         log(a);
      |             ~
    7 |       
----
-
-[TestNoDeprecatedRule/invalid-120 - 1]
-Diagnostic 1: deprecated (10:5 - 10:9)
-Message: `super` is deprecated.
-   9 |     /** should report but does not */
-  10 |     super();
-     |     ~~~~~
-  11 |   }
----
-
-[TestNoDeprecatedRule/invalid-121 - 1]
-Diagnostic 1: deprecatedWithReason (10:5 - 10:9)
-Message: `super` is deprecated. test reason
-   9 |     /** should report but does not */
-  10 |     super();
-     |     ~~~~~
-  11 |   }
----
-
-[TestNoDeprecatedRule/invalid-125 - 1]
-Diagnostic 1: deprecatedWithReason (3:1 - 3:6)
-Message: `exists` is deprecated. Since v1.0.0 - Use  or  instead.
-   2 | import { exists } from 'fs';
-   3 | exists('/foo');
-     | ~~~~~~
-   4 |       
----
-
-[TestNoDeprecatedRule/invalid-126 - 1]
-Diagnostic 1: deprecated (9:11 - 9:11)
-Message: `b` is deprecated.
-   8 | 
-   9 |         a.b;
-     |           ~
-  10 |       
----
-
-[TestNoDeprecatedRule/invalid-127 - 1]
-Diagnostic 1: deprecated (9:11 - 9:11)
-Message: `b` is deprecated.
-   8 | 
-   9 |         a.b();
-     |           ~
-  10 |       
----
-
-[TestNoDeprecatedRule/invalid-128 - 1]
-Diagnostic 1: deprecated (11:11 - 11:11)
-Message: `b` is deprecated.
-  10 | 
-  11 |         a.b();
-     |           ~
-  12 |       
----
-
-[TestNoDeprecatedRule/invalid-129 - 1]
-Diagnostic 1: deprecated (7:11 - 7:11)
-Message: `b` is deprecated.
-   6 | 
-   7 |         A.b();
-     |           ~
-   8 |       
 ---
 
 [TestNoDeprecatedRule/invalid-13 - 1]
@@ -260,96 +125,6 @@ Message: `a` is deprecated.
    4 |       
 ---
 
-[TestNoDeprecatedRule/invalid-130 - 1]
-Diagnostic 1: deprecated (7:18 - 7:19)
-Message: `##b` is deprecated.
-   6 |           c() {
-   7 |             this.#b();
-     |                  ~~
-   8 |           }
----
-
-[TestNoDeprecatedRule/invalid-131 - 1]
-Diagnostic 1: deprecated (7:21 - 7:23)
-Message: `b` is deprecated.
-   6 | 
-   7 |         const c = a['b'];
-     |                     ~~~
-   8 |       
----
-
-[TestNoDeprecatedRule/invalid-132 - 1]
-Diagnostic 1: deprecated (7:21 - 7:21)
-Message: `b` is deprecated.
-   6 |         const x = 'b';
-   7 |         const c = a[x];
-     |                     ~
-   8 |       
----
-
-[TestNoDeprecatedRule/invalid-133 - 1]
-Diagnostic 1: deprecated (7:21 - 7:21)
-Message: `2` is deprecated.
-   6 |         const x = 'b';
-   7 |         const c = a[2];
-     |                     ~
-   8 |       
----
-
-[TestNoDeprecatedRule/invalid-134 - 1]
-Diagnostic 1: deprecatedWithReason (9:21 - 9:29)
-Message: `b` is deprecated. reason for deprecation
-   8 |         const stringKey = key as const;
-   9 |         const c = a[stringKey];
-     |                     ~~~~~~~~~
-  10 |       
----
-
-[TestNoDeprecatedRule/invalid-135 - 1]
-Diagnostic 1: deprecatedWithReason (12:21 - 12:23)
-Message: `b` is deprecated. reason for deprecation
-  11 |         const key = Keys.B;
-  12 |         const c = a[key];
-     |                     ~~~
-  13 |       
----
-
-[TestNoDeprecatedRule/invalid-136 - 1]
-Diagnostic 1: deprecated (8:21 - 8:23)
-Message: `b` is deprecated.
-   7 |         const key = `b`;
-   8 |         const c = a[key];
-     |                     ~~~
-   9 |       
----
-
-[TestNoDeprecatedRule/invalid-137 - 1]
-Diagnostic 1: deprecated (7:21 - 7:29)
-Message: `b` is deprecated.
-   6 |         };
-   7 |         const c = a[stringObj];
-     |                     ~~~~~~~~~
-   8 |       
----
-
-[TestNoDeprecatedRule/invalid-138 - 1]
-Diagnostic 1: deprecated (4:18 - 4:35)
-Message: `deprecatedFunction` is deprecated.
-   3 | 
-   4 |         export { deprecatedFunction };
-     |                  ~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoDeprecatedRule/invalid-139 - 1]
-Diagnostic 1: deprecated (2:18 - 2:35)
-Message: `deprecatedFunction` is deprecated.
-   1 | 
-   2 |         export { deprecatedFunction } from './deprecated';
-     |                  ~~~~~~~~~~~~~~~~~~
-   3 |       
----
-
 [TestNoDeprecatedRule/invalid-14 - 1]
 Diagnostic 1: deprecated (3:21 - 3:21)
 Message: `a` is deprecated.
@@ -357,24 +132,6 @@ Message: `a` is deprecated.
    3 |         console.log(a?.b);
      |                     ~
    4 |       
----
-
-[TestNoDeprecatedRule/invalid-140 - 1]
-Diagnostic 1: deprecatedWithReason (2:23 - 2:23)
-Message: `T` is deprecated. Reason
-   1 | 
-   2 |         export type { T, U } from './deprecated';
-     |                       ~
-   3 |       
----
-
-[TestNoDeprecatedRule/invalid-142 - 1]
-Diagnostic 1: deprecated (2:40 - 2:42)
-Message: `bar` is deprecated.
-   1 | 
-   2 |         export { deprecatedFunction as bar } from './deprecated';
-     |                                        ~~~
-   3 |       
 ---
 
 [TestNoDeprecatedRule/invalid-15 - 1]
@@ -420,15 +177,6 @@ Message: `b` is deprecated.
    5 |         a.b.c;
      |           ~
    6 |       
----
-
-[TestNoDeprecatedRule/invalid-2 - 1]
-Diagnostic 1: deprecated (3:9 - 3:9)
-Message: `a` is deprecated.
-   2 |         /** @deprecated */ export var a = undefined;
-   3 |         a;
-     |         ~
-   4 |       
 ---
 
 [TestNoDeprecatedRule/invalid-20 - 1]
@@ -528,15 +276,6 @@ Message: `A` is deprecated.
    6 |       
 ---
 
-[TestNoDeprecatedRule/invalid-3 - 1]
-Diagnostic 1: deprecated (3:9 - 3:9)
-Message: `a` is deprecated.
-   2 |         /** @deprecated */ let a = undefined;
-   3 |         a;
-     |         ~
-   4 |       
----
-
 [TestNoDeprecatedRule/invalid-30 - 1]
 Diagnostic 1: deprecated (5:13 - 5:13)
 Message: `A` is deprecated.
@@ -625,15 +364,6 @@ Message: `b` is deprecated.
    9 |         a.b();
      |           ~
   10 |       
----
-
-[TestNoDeprecatedRule/invalid-4 - 1]
-Diagnostic 1: deprecated (3:9 - 3:9)
-Message: `a` is deprecated.
-   2 |         /** @deprecated */ export let a = undefined;
-   3 |         a;
-     |         ~
-   4 |       
 ---
 
 [TestNoDeprecatedRule/invalid-40 - 1]
@@ -726,15 +456,6 @@ Message: `b` is deprecated.
   10 |       
 ---
 
-[TestNoDeprecatedRule/invalid-5 - 1]
-Diagnostic 1: deprecated (3:9 - 3:17)
-Message: `aLongName` is deprecated.
-   2 |         /** @deprecated */ let aLongName = undefined;
-   3 |         aLongName;
-     |         ~~~~~~~~~
-   4 |       
----
-
 [TestNoDeprecatedRule/invalid-50 - 1]
 Diagnostic 1: deprecated (9:17 - 9:17)
 Message: `b` is deprecated.
@@ -825,15 +546,6 @@ Message: `a` is deprecated.
    6 |       
 ---
 
-[TestNoDeprecatedRule/invalid-6 - 1]
-Diagnostic 1: deprecated (3:19 - 3:19)
-Message: `a` is deprecated.
-   2 |         /** @deprecated */ const a = { b: 1 };
-   3 |         const c = a;
-     |                   ~
-   4 |       
----
-
 [TestNoDeprecatedRule/invalid-60 - 1]
 Diagnostic 1: deprecated (6:9 - 6:9)
 Message: `a` is deprecated.
@@ -922,15 +634,6 @@ Message: `A` is deprecated.
    7 |         const a = <A></A>;
      |                    ~
    8 |       
----
-
-[TestNoDeprecatedRule/invalid-7 - 1]
-Diagnostic 1: deprecated (3:19 - 3:19)
-Message: `a` is deprecated.
-   2 |         /** @deprecated Reason. */ const a = { b: 1 };
-   3 |         const c = a;
-     |                   ~
-   4 |       
 ---
 
 [TestNoDeprecatedRule/invalid-70 - 1]
@@ -1030,15 +733,6 @@ Message: `foo` is deprecated.
    7 |       
 ---
 
-[TestNoDeprecatedRule/invalid-8 - 1]
-Diagnostic 1: deprecated (3:21 - 3:21)
-Message: `a` is deprecated.
-   2 |         /** @deprecated */ const a = { b: 1 };
-   3 |         const { c = a } = {};
-     |                     ~
-   4 |       
----
-
 [TestNoDeprecatedRule/invalid-80 - 1]
 Diagnostic 1: deprecated (4:9 - 4:26)
 Message: `deprecatedFunction` is deprecated.
@@ -1129,15 +823,6 @@ Message: `normalFunction` is deprecated.
    5 |       
 ---
 
-[TestNoDeprecatedRule/invalid-9 - 1]
-Diagnostic 1: deprecated (3:20 - 3:20)
-Message: `a` is deprecated.
-   2 |         /** @deprecated */ const a = { b: 1 };
-   3 |         const [c = a] = [];
-     |                    ~
-   4 |       
----
-
 [TestNoDeprecatedRule/invalid-90 - 1]
 Diagnostic 1: deprecated (4:30 - 4:43)
 Message: `normalFunction` is deprecated.
@@ -1190,4 +875,341 @@ Message: `deprecatedFunctionWithOverloads` is deprecated.
    4 |         const foo = imported.deprecatedFunctionWithOverloads('a');
      |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    5 |       
+---
+
+[TestNoDeprecatedRule/invalid-103 - 1]
+Diagnostic 1: deprecated (4:25 - 4:54)
+Message: `ClassWithDeprecatedConstructor` is deprecated.
+   3 | 
+   4 |         const foo = new ClassWithDeprecatedConstructor('a');
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-104 - 1]
+Diagnostic 1: deprecated (4:34 - 4:63)
+Message: `ClassWithDeprecatedConstructor` is deprecated.
+   3 | 
+   4 |         const foo = new imported.ClassWithDeprecatedConstructor('a');
+     |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-105 - 1]
+Diagnostic 1: deprecatedWithReason (4:21 - 4:60)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const foo = ReexportedClassWithDeprecatedConstructor;
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-106 - 1]
+Diagnostic 1: deprecatedWithReason (4:30 - 4:69)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const foo = imported.ReexportedClassWithDeprecatedConstructor;
+     |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-107 - 1]
+Diagnostic 1: deprecatedWithReason (4:17 - 4:56)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const { ReexportedClassWithDeprecatedConstructor } = imported;
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-108 - 1]
+Diagnostic 1: deprecatedWithReason (4:21 - 4:60)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const foo = ReexportedClassWithDeprecatedConstructor();
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-109 - 1]
+Diagnostic 1: deprecatedWithReason (4:30 - 4:69)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const foo = imported.ReexportedClassWithDeprecatedConstructor();
+     |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-110 - 1]
+Diagnostic 1: deprecatedWithReason (4:21 - 4:60)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const foo = ReexportedClassWithDeprecatedConstructor('a');
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-111 - 1]
+Diagnostic 1: deprecatedWithReason (4:30 - 4:69)
+Message: `ReexportedClassWithDeprecatedConstructor` is deprecated. Reason
+   3 | 
+   4 |         const foo = imported.ReexportedClassWithDeprecatedConstructor('a');
+     |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-113 - 1]
+Diagnostic 1: deprecated (4:13 - 4:19)
+Message: `default` is deprecated.
+   3 |           const d = await import('./deprecated.js');
+   4 |           d.default.default;
+     |             ~~~~~~~
+   5 |         }
+---
+
+[TestNoDeprecatedRule/invalid-114 - 1]
+Diagnostic 1: deprecated (5:30 - 5:32)
+Message: `Foo` is deprecated.
+   4 | 
+   5 |         class Bar implements Foo {}
+     |                              ~~~
+   6 |       
+---
+
+[TestNoDeprecatedRule/invalid-115 - 1]
+Diagnostic 1: deprecated (5:37 - 5:39)
+Message: `Foo` is deprecated.
+   4 | 
+   5 |         export class Bar implements Foo {}
+     |                                     ~~~
+   6 |       
+---
+
+[TestNoDeprecatedRule/invalid-116 - 1]
+Diagnostic 1: deprecated (7:42 - 7:44)
+Message: `Foo` is deprecated.
+   6 | 
+   7 |         export class Bar implements Baz, Foo {}
+     |                                          ~~~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-117 - 1]
+Diagnostic 1: deprecated (5:34 - 5:36)
+Message: `Foo` is deprecated.
+   4 | 
+   5 |         export class Bar extends Foo {}
+     |                                  ~~~
+   6 |       
+---
+
+[TestNoDeprecatedRule/invalid-118 - 1]
+Diagnostic 1: deprecated (5:10 - 5:18)
+Message: `decorator` is deprecated.
+   4 | 
+   5 |         @decorator
+     |          ~~~~~~~~~
+   6 |         export class Foo {}
+---
+
+[TestNoDeprecatedRule/invalid-119 - 1]
+Diagnostic 1: deprecated (7:24 - 7:24)
+Message: `a` is deprecated.
+   6 | 
+   7 |         export default a();
+     |                        ~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-120 - 1]
+Diagnostic 1: deprecated (10:5 - 10:9)
+Message: `super` is deprecated.
+   9 |     /** should report but does not */
+  10 |     super();
+     |     ~~~~~
+  11 |   }
+---
+
+[TestNoDeprecatedRule/invalid-121 - 1]
+Diagnostic 1: deprecatedWithReason (10:5 - 10:9)
+Message: `super` is deprecated. test reason
+   9 |     /** should report but does not */
+  10 |     super();
+     |     ~~~~~
+  11 |   }
+---
+
+[TestNoDeprecatedRule/invalid-125 - 1]
+Diagnostic 1: deprecatedWithReason (3:1 - 3:6)
+Message: `exists` is deprecated. Since v1.0.0 - Use  or  instead.
+   2 | import { exists } from 'fs';
+   3 | exists('/foo');
+     | ~~~~~~
+   4 |       
+---
+
+[TestNoDeprecatedRule/invalid-126 - 1]
+Diagnostic 1: deprecated (9:11 - 9:11)
+Message: `b` is deprecated.
+   8 | 
+   9 |         a.b;
+     |           ~
+  10 |       
+---
+
+[TestNoDeprecatedRule/invalid-127 - 1]
+Diagnostic 1: deprecated (9:11 - 9:11)
+Message: `b` is deprecated.
+   8 | 
+   9 |         a.b();
+     |           ~
+  10 |       
+---
+
+[TestNoDeprecatedRule/invalid-128 - 1]
+Diagnostic 1: deprecated (11:11 - 11:11)
+Message: `b` is deprecated.
+  10 | 
+  11 |         a.b();
+     |           ~
+  12 |       
+---
+
+[TestNoDeprecatedRule/invalid-129 - 1]
+Diagnostic 1: deprecated (7:11 - 7:11)
+Message: `b` is deprecated.
+   6 | 
+   7 |         A.b();
+     |           ~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-130 - 1]
+Diagnostic 1: deprecated (7:18 - 7:19)
+Message: `##b` is deprecated.
+   6 |           c() {
+   7 |             this.#b();
+     |                  ~~
+   8 |           }
+---
+
+[TestNoDeprecatedRule/invalid-131 - 1]
+Diagnostic 1: deprecated (7:21 - 7:23)
+Message: `b` is deprecated.
+   6 | 
+   7 |         const c = a['b'];
+     |                     ~~~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-132 - 1]
+Diagnostic 1: deprecated (7:21 - 7:21)
+Message: `b` is deprecated.
+   6 |         const x = 'b';
+   7 |         const c = a[x];
+     |                     ~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-133 - 1]
+Diagnostic 1: deprecated (7:21 - 7:21)
+Message: `2` is deprecated.
+   6 |         const x = 'b';
+   7 |         const c = a[2];
+     |                     ~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-134 - 1]
+Diagnostic 1: deprecatedWithReason (9:21 - 9:29)
+Message: `b` is deprecated. reason for deprecation
+   8 |         const stringKey = key as const;
+   9 |         const c = a[stringKey];
+     |                     ~~~~~~~~~
+  10 |       
+---
+
+[TestNoDeprecatedRule/invalid-135 - 1]
+Diagnostic 1: deprecatedWithReason (12:21 - 12:23)
+Message: `b` is deprecated. reason for deprecation
+  11 |         const key = Keys.B;
+  12 |         const c = a[key];
+     |                     ~~~
+  13 |       
+---
+
+[TestNoDeprecatedRule/invalid-136 - 1]
+Diagnostic 1: deprecated (8:21 - 8:23)
+Message: `b` is deprecated.
+   7 |         const key = `b`;
+   8 |         const c = a[key];
+     |                     ~~~
+   9 |       
+---
+
+[TestNoDeprecatedRule/invalid-137 - 1]
+Diagnostic 1: deprecated (7:21 - 7:29)
+Message: `b` is deprecated.
+   6 |         };
+   7 |         const c = a[stringObj];
+     |                     ~~~~~~~~~
+   8 |       
+---
+
+[TestNoDeprecatedRule/invalid-138 - 1]
+Diagnostic 1: deprecated (4:18 - 4:35)
+Message: `deprecatedFunction` is deprecated.
+   3 | 
+   4 |         export { deprecatedFunction };
+     |                  ~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoDeprecatedRule/invalid-139 - 1]
+Diagnostic 1: deprecated (2:18 - 2:35)
+Message: `deprecatedFunction` is deprecated.
+   1 | 
+   2 |         export { deprecatedFunction } from './deprecated';
+     |                  ~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoDeprecatedRule/invalid-140 - 1]
+Diagnostic 1: deprecatedWithReason (2:23 - 2:23)
+Message: `T` is deprecated. Reason
+   1 | 
+   2 |         export type { T, U } from './deprecated';
+     |                       ~
+   3 |       
+---
+
+[TestNoDeprecatedRule/invalid-142 - 1]
+Diagnostic 1: deprecated (2:40 - 2:42)
+Message: `bar` is deprecated.
+   1 | 
+   2 |         export { deprecatedFunction as bar } from './deprecated';
+     |                                        ~~~
+   3 |       
+---
+
+[TestNoDeprecatedRule/invalid-143 - 1]
+Diagnostic 1: deprecated (8:15 - 8:25)
+Message: `searchPaths` is deprecated.
+   7 |         const child = new Child();
+   8 |         child.searchPaths();
+     |               ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoDeprecatedRule/invalid-144 - 1]
+Diagnostic 1: deprecatedWithReason (8:15 - 8:25)
+Message: `searchPaths` is deprecated. use newMethod() instead
+   7 |         const child = new Child();
+   8 |         child.searchPaths();
+     |               ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoDeprecatedRule/invalid-145 - 1]
+No diagnostics
 ---

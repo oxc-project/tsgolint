@@ -13,6 +13,64 @@ Message: Expected an error object to be thrown.
      |       ~~~~~~~~~~~~~~
 ---
 
+[TestOnlyThrowErrorRule/invalid-2 - 1]
+Diagnostic 1: object (1:7 - 1:13)
+Message: Expected an error object to be thrown.
+   1 | throw 'error';
+     |       ~~~~~~~
+---
+
+[TestOnlyThrowErrorRule/invalid-3 - 1]
+Diagnostic 1: object (1:7 - 1:7)
+Message: Expected an error object to be thrown.
+   1 | throw 0;
+     |       ~
+---
+
+[TestOnlyThrowErrorRule/invalid-4 - 1]
+Diagnostic 1: object (1:7 - 1:11)
+Message: Expected an error object to be thrown.
+   1 | throw false;
+     |       ~~~~~
+---
+
+[TestOnlyThrowErrorRule/invalid-5 - 1]
+Diagnostic 1: object (1:7 - 1:10)
+Message: Expected an error object to be thrown.
+   1 | throw null;
+     |       ~~~~
+---
+
+[TestOnlyThrowErrorRule/invalid-6 - 1]
+Diagnostic 1: object (1:7 - 1:8)
+Message: Expected an error object to be thrown.
+   1 | throw {};
+     |       ~~
+---
+
+[TestOnlyThrowErrorRule/invalid-7 - 1]
+Diagnostic 1: object (1:7 - 1:15)
+Message: Expected an error object to be thrown.
+   1 | throw 'a' + 'b';
+     |       ~~~~~~~~~
+---
+
+[TestOnlyThrowErrorRule/invalid-8 - 1]
+Diagnostic 1: object (3:7 - 3:13)
+Message: Expected an error object to be thrown.
+   2 | const a = '';
+   3 | throw a + 'b';
+     |       ~~~~~~~
+   4 |       
+---
+
+[TestOnlyThrowErrorRule/invalid-9 - 1]
+Diagnostic 1: object (1:7 - 1:21)
+Message: Expected an error object to be thrown.
+   1 | throw (foo = 'error');
+     |       ~~~~~~~~~~~~~~~
+---
+
 [TestOnlyThrowErrorRule/invalid-10 - 1]
 Diagnostic 1: object (1:7 - 1:28)
 Message: Expected an error object to be thrown.
@@ -83,13 +141,6 @@ Message: Expected an error object to be thrown.
    3 | throw err;
      |       ~~~
    4 |       
----
-
-[TestOnlyThrowErrorRule/invalid-2 - 1]
-Diagnostic 1: object (1:7 - 1:13)
-Message: Expected an error object to be thrown.
-   1 | throw 'error';
-     |       ~~~~~~~
 ---
 
 [TestOnlyThrowErrorRule/invalid-20 - 1]
@@ -182,13 +233,6 @@ Message: Expected an error object to be thrown.
    6 | }
 ---
 
-[TestOnlyThrowErrorRule/invalid-3 - 1]
-Diagnostic 1: object (1:7 - 1:7)
-Message: Expected an error object to be thrown.
-   1 | throw 0;
-     |       ~
----
-
 [TestOnlyThrowErrorRule/invalid-30 - 1]
 Diagnostic 1: object (3:9 - 3:53)
 Message: Expected an error object to be thrown.
@@ -279,13 +323,6 @@ Message: Expected an error object to be thrown.
    4 | }
 ---
 
-[TestOnlyThrowErrorRule/invalid-4 - 1]
-Diagnostic 1: object (1:7 - 1:11)
-Message: Expected an error object to be thrown.
-   1 | throw false;
-     |       ~~~~~
----
-
 [TestOnlyThrowErrorRule/invalid-40 - 1]
 Diagnostic 1: object (4:9 - 4:9)
 Message: Expected an error object to be thrown.
@@ -349,39 +386,11 @@ Message: Expected an error object to be thrown.
    4 | });
 ---
 
-[TestOnlyThrowErrorRule/invalid-5 - 1]
-Diagnostic 1: object (1:7 - 1:10)
+[TestOnlyThrowErrorRule/invalid-47 - 1]
+Diagnostic 1: object (3:7 - 3:19)
 Message: Expected an error object to be thrown.
-   1 | throw null;
-     |       ~~~~
----
-
-[TestOnlyThrowErrorRule/invalid-6 - 1]
-Diagnostic 1: object (1:7 - 1:8)
-Message: Expected an error object to be thrown.
-   1 | throw {};
-     |       ~~
----
-
-[TestOnlyThrowErrorRule/invalid-7 - 1]
-Diagnostic 1: object (1:7 - 1:15)
-Message: Expected an error object to be thrown.
-   1 | throw 'a' + 'b';
-     |       ~~~~~~~~~
----
-
-[TestOnlyThrowErrorRule/invalid-8 - 1]
-Diagnostic 1: object (3:7 - 3:13)
-Message: Expected an error object to be thrown.
-   2 | const a = '';
-   3 | throw a + 'b';
-     |       ~~~~~~~
+   2 | import { createError } from 'errors-like';
+   3 | throw createError();
+     |       ~~~~~~~~~~~~~
    4 |       
----
-
-[TestOnlyThrowErrorRule/invalid-9 - 1]
-Diagnostic 1: object (1:7 - 1:21)
-Message: Expected an error object to be thrown.
-   1 | throw (foo = 'error');
-     |       ~~~~~~~~~~~~~~~
 ---

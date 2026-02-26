@@ -27,6 +27,10 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 			Code: "\n      const obj: { a?: string } = {};\n      const { a = 'default' } = obj;\n    ",
 		},
 		{
+			Code:     "\n      function test(options?: { offset?: number }) {\n        const { offset = 5 } = { ...options };\n        offset.toString();\n      }\n    ",
+			TSConfig: "tsconfig.exactOptionalPropertyTypes.json",
+		},
+		{
 			Code: "\n      function test(a: string | undefined = 'default') {\n        return a;\n      }\n    ",
 		},
 		{
@@ -433,22 +437,6 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 					Line:      2,
 					Column:    26,
 					EndColumn: 35,
-				},
-			},
-		},
-		{
-			Code:     "\n        function Bar({ foo = '' }: { foo: string }) {\n          return foo;\n        }\n      ",
-			TSConfig: "tsconfig.unstrict.json",
-			Options:  rule_tester.OptionsFromJSON[NoUselessDefaultAssignmentOptions]("{\"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing\":true}"),
-			Output: []string{
-				"\n        function Bar({ foo }: { foo: string }) {\n          return foo;\n        }\n      ",
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "uselessDefaultAssignment",
-					Line:      2,
-					Column:    30,
-					EndColumn: 32,
 				},
 			},
 		},

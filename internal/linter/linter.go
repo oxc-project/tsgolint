@@ -265,6 +265,20 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 									LabeledRanges: diagnostic.LabeledRanges,
 								})
 							},
+							ReportDiagnosticWithFixes: func(diagnostic rule.RuleDiagnostic, fixesFn func() []rule.RuleFix) {
+								var fixes []rule.RuleFix = nil
+								if fixState.Fix {
+									fixes = fixesFn()
+								}
+								onDiagnostic(rule.RuleDiagnostic{
+									RuleName:      r.Name,
+									Range:         diagnostic.Range,
+									Message:       diagnostic.Message,
+									FixesPtr:      &fixes,
+									SourceFile:    file,
+									LabeledRanges: diagnostic.LabeledRanges,
+								})
+							},
 							ReportDiagnosticWithSuggestions: func(diagnostic rule.RuleDiagnostic, suggestionsFn func() []rule.RuleSuggestion) {
 								var suggestions []rule.RuleSuggestion = nil
 								if fixState.FixSuggestions {

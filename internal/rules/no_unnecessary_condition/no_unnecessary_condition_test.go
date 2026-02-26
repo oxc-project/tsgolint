@@ -5,7 +5,6 @@ import (
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
-	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
 func TestNoUnnecessaryConditionRule(t *testing.T) {
@@ -349,6 +348,30 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] == null;
 }
     `},
+		// Issue #695 regressions
+		{Code: `function repro1(e: FocusEvent) { if (e.target !== window) return; }`},
+		{Code: `
+function repro2(flag: string & {}, arg: string) {
+  if (arg === flag) return true;
+  return false;
+}
+    `},
+		{Code: `
+const flagPresent = Symbol();
+type FlagPresent = typeof flagPresent;
+function repro3(queryFlag: string[] | FlagPresent) {
+  if (Array.isArray(queryFlag) && queryFlag.length === 0) return true;
+  if (queryFlag === flagPresent) return true;
+  return false;
+}
+    `},
+		{Code: "type PersonalizationId = `${string}_6_main` | `${string}_7_main`;\nfunction repro4(a: PersonalizationId, b: string) {\n  return a === b;\n}\n"},
+		// Issue #699 regression
+		{Code: `
+function test699<T extends 'a' | 'b'>(x: T | undefined, y: T) {
+  return x === y;
+}
+    `},
 
 		// Predicate functions
 		{Code: `
@@ -534,19 +557,19 @@ const x = b1 && b2;
 			Code: `
 while (true) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(true)},
 		},
 		{
 			Code: `
 for (; true; ) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(true)},
 		},
 		{
 			Code: `
 do {} while (true);
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(true)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(true)},
 		},
 		{
 			Code: `
@@ -913,18 +936,6 @@ if (!(booleanTyped || unknownTyped)) {
 }
     `},
 
-		// Unstrict mode with option
-		{
-			Code: `
-declare const x: string[] | null;
-// eslint-disable-next-line
-if (x) {
-}
-      `,
-			Options:  NoUnnecessaryConditionOptions{AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: true},
-			TSConfig: "tsconfig.unstrict.json",
-		},
-
 		// Index signatures with tuple types
 		{Code: `
 interface Foo {
@@ -1005,6 +1016,23 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ??= 'default';
 }
     `},
+		{Code: `
+function repro5() {
+  const obj: Record<string, { name: string }> = {};
+  const key: string = 'foo';
+  obj[key] ??= { name: key };
+}
+    `},
+		{
+			Code: `
+function repro5WithNoUncheckedIndexedAccess() {
+  const obj: Record<string, { name: string }> = {};
+  const key: string = 'foo';
+  obj[key] ??= { name: key };
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 
 		// Generic indexed access
 		{Code: `
@@ -1820,7 +1848,7 @@ declare const test: true;
 
 while (test) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(false)},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -1829,7 +1857,7 @@ declare const test: true;
 
 for (; test; ) {}
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(false)},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{
@@ -1838,7 +1866,7 @@ declare const test: true;
 
 do {} while (test);
       `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: utils.Ref(false)},
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: new(false)},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 		{

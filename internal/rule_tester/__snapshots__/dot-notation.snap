@@ -17,6 +17,62 @@ Message: ["pub_prop"] is better written in dot notation.
    8 |       
 ---
 
+[TestDotNotation/invalid-2 - 1]
+Diagnostic 1: useDot (1:3 - 1:8)
+Message: ["true"] is better written in dot notation.
+   1 | a['true'];
+     |   ~~~~~~
+---
+
+[TestDotNotation/invalid-3 - 1]
+Diagnostic 1: useDot (1:3 - 1:8)
+Message: ["time"] is better written in dot notation.
+   1 | a['time'];
+     |   ~~~~~~
+---
+
+[TestDotNotation/invalid-4 - 1]
+Diagnostic 1: useDot (1:3 - 1:6)
+Message: [null] is better written in dot notation.
+   1 | a[null];
+     |   ~~~~
+---
+
+[TestDotNotation/invalid-5 - 1]
+Diagnostic 1: useDot (1:3 - 1:6)
+Message: [true] is better written in dot notation.
+   1 | a[true];
+     |   ~~~~
+---
+
+[TestDotNotation/invalid-6 - 1]
+Diagnostic 1: useDot (1:3 - 1:7)
+Message: [false] is better written in dot notation.
+   1 | a[false];
+     |   ~~~~~
+---
+
+[TestDotNotation/invalid-7 - 1]
+Diagnostic 1: useDot (1:3 - 1:5)
+Message: ["b"] is better written in dot notation.
+   1 | a['b'];
+     |   ~~~
+---
+
+[TestDotNotation/invalid-8 - 1]
+Diagnostic 1: useDot (1:3 - 1:5)
+Message: ["π"] is better written in dot notation.
+   1 | a['π'];
+     |   ~~~
+---
+
+[TestDotNotation/invalid-9 - 1]
+Diagnostic 1: useDot (1:5 - 1:7)
+Message: ["c"] is better written in dot notation.
+   1 | a.b['c'];
+     |     ~~~
+---
+
 [TestDotNotation/invalid-10 - 1]
 Diagnostic 1: useDot (1:3 - 1:11)
 Message: ["_dangle"] is better written in dot notation.
@@ -99,13 +155,6 @@ Message: [null] is better written in dot notation.
      |     ~~~~
 ---
 
-[TestDotNotation/invalid-2 - 1]
-Diagnostic 1: useDot (1:3 - 1:8)
-Message: ["true"] is better written in dot notation.
-   1 | a['true'];
-     |   ~~~~~~
----
-
 [TestDotNotation/invalid-20 - 1]
 Diagnostic 1: useDot (1:5 - 1:9)
 Message: ["bar"] is better written in dot notation.
@@ -163,53 +212,4 @@ Message: [`prop`] is better written in dot notation.
    7 | foo[`prop`];
      |     ~~~~~~
    8 |       
----
-
-[TestDotNotation/invalid-3 - 1]
-Diagnostic 1: useDot (1:3 - 1:8)
-Message: ["time"] is better written in dot notation.
-   1 | a['time'];
-     |   ~~~~~~
----
-
-[TestDotNotation/invalid-4 - 1]
-Diagnostic 1: useDot (1:3 - 1:6)
-Message: [null] is better written in dot notation.
-   1 | a[null];
-     |   ~~~~
----
-
-[TestDotNotation/invalid-5 - 1]
-Diagnostic 1: useDot (1:3 - 1:6)
-Message: [true] is better written in dot notation.
-   1 | a[true];
-     |   ~~~~
----
-
-[TestDotNotation/invalid-6 - 1]
-Diagnostic 1: useDot (1:3 - 1:7)
-Message: [false] is better written in dot notation.
-   1 | a[false];
-     |   ~~~~~
----
-
-[TestDotNotation/invalid-7 - 1]
-Diagnostic 1: useDot (1:3 - 1:5)
-Message: ["b"] is better written in dot notation.
-   1 | a['b'];
-     |   ~~~
----
-
-[TestDotNotation/invalid-8 - 1]
-Diagnostic 1: useDot (1:3 - 1:5)
-Message: ["π"] is better written in dot notation.
-   1 | a['π'];
-     |   ~~~
----
-
-[TestDotNotation/invalid-9 - 1]
-Diagnostic 1: useDot (1:5 - 1:7)
-Message: ["c"] is better written in dot notation.
-   1 | a.b['c'];
-     |     ~~~
 ---

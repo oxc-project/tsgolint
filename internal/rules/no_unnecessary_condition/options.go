@@ -9,9 +9,6 @@ type NoUnnecessaryConditionOptions struct {
 	// as "never".
 	AllowConstantLoopConditions interface{} `json:"allowConstantLoopConditions,omitempty"`
 
-	// DEPRECATED: Allow this rule to run without strictNullChecks enabled.
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing bool `json:"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing,omitempty"`
-
 	// Whether to check type predicate functions.
 	CheckTypePredicates bool `json:"checkTypePredicates,omitempty"`
 }
@@ -29,9 +26,6 @@ func (j *NoUnnecessaryConditionOptions) UnmarshalJSON(value []byte) error {
 	}
 	if v, ok := raw["allowConstantLoopConditions"]; !ok || v == nil {
 		plain.AllowConstantLoopConditions = "never"
-	}
-	if v, ok := raw["allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing"]; !ok || v == nil {
-		plain.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = false
 	}
 	if v, ok := raw["checkTypePredicates"]; !ok || v == nil {
 		plain.CheckTypePredicates = false

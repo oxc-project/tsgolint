@@ -94,6 +94,17 @@ type headlessSuggestion struct {
 	Fixes   []headlessFix       `json:"fixes"`
 }
 
+func headlessFixesFromRuleFixes(fixes []rule.RuleFix) []headlessFix {
+	headlessFixes := make([]headlessFix, len(fixes))
+	for i, fix := range fixes {
+		headlessFixes[i] = headlessFix{
+			Text:  fix.Text,
+			Range: *headlessRangeFromRange(fix.Range),
+		}
+	}
+	return headlessFixes
+}
+
 // Diagnostic kind discriminator
 type headlessDiagnosticKind uint8
 
@@ -321,26 +332,15 @@ func runHeadless(args []string) int {
 				}
 
 				if opts.fix {
-					hd.Fixes = make([]headlessFix, len(rd.Fixes()))
-					for i, fix := range rd.Fixes() {
-						hd.Fixes[i] = headlessFix{
-							Text:  fix.Text,
-							Range: *headlessRangeFromRange(fix.Range),
-						}
-					}
+					hd.Fixes = headlessFixesFromRuleFixes(rd.Fixes())
 				}
 				if opts.fixSuggestions {
-					hd.Suggestions = make([]headlessSuggestion, len(rd.GetSuggestions()))
-					for i, suggestion := range rd.GetSuggestions() {
+					suggestions := rd.GetSuggestions()
+					hd.Suggestions = make([]headlessSuggestion, len(suggestions))
+					for i, suggestion := range suggestions {
 						hd.Suggestions[i] = headlessSuggestion{
-							Message: headlessRuleMessageFromRuleMessage(rd.Message),
-							Fixes:   make([]headlessFix, len(suggestion.Fixes())),
-						}
-						for j, fix := range suggestion.Fixes() {
-							hd.Suggestions[i].Fixes[j] = headlessFix{
-								Text:  fix.Text,
-								Range: *headlessRangeFromRange(fix.Range),
-							}
+							Message: headlessRuleMessageFromRuleMessage(suggestion.Message),
+							Fixes:   headlessFixesFromRuleFixes(suggestion.Fixes()),
 						}
 					}
 				}

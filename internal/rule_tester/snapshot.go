@@ -129,7 +129,7 @@ func (sf *snapshotFile) write(t *testing.T) {
 	for k := range sf.entries {
 		keys = append(keys, k)
 	}
-	sort.Strings(keys)
+	sortSnapshotKeys(keys)
 
 	var sb strings.Builder
 	for _, key := range keys {
@@ -141,33 +141,125 @@ func (sf *snapshotFile) write(t *testing.T) {
 	}
 }
 
+func sortSnapshotKeys(keys []string) {
+	sort.Slice(keys, func(i, j int) bool {
+		return compareSnapshotKeys(keys[i], keys[j]) < 0
+	})
+}
+
+func compareSnapshotKeys(a, b string) int {
+	i := 0
+	j := 0
+
+	for i < len(a) && j < len(b) {
+		ai := a[i]
+		bj := b[j]
+
+		if isASCIIDigit(ai) && isASCIIDigit(bj) {
+			aStart := i
+			bStart := j
+
+			for i < len(a) && isASCIIDigit(a[i]) {
+				i++
+			}
+			for j < len(b) && isASCIIDigit(b[j]) {
+				j++
+			}
+
+			aDigits := a[aStart:i]
+			bDigits := b[bStart:j]
+
+			if cmp := compareDigitRuns(aDigits, bDigits); cmp != 0 {
+				return cmp
+			}
+
+			continue
+		}
+
+		if ai != bj {
+			if ai < bj {
+				return -1
+			}
+			return 1
+		}
+
+		i++
+		j++
+	}
+
+	switch {
+	case len(a) < len(b):
+		return -1
+	case len(a) > len(b):
+		return 1
+	default:
+		return 0
+	}
+}
+
+func compareDigitRuns(a, b string) int {
+	aTrim := strings.TrimLeft(a, "0")
+	bTrim := strings.TrimLeft(b, "0")
+
+	if aTrim == "" {
+		aTrim = "0"
+	}
+	if bTrim == "" {
+		bTrim = "0"
+	}
+
+	if len(aTrim) != len(bTrim) {
+		if len(aTrim) < len(bTrim) {
+			return -1
+		}
+		return 1
+	}
+
+	if aTrim != bTrim {
+		if aTrim < bTrim {
+			return -1
+		}
+		return 1
+	}
+
+	if len(a) != len(b) {
+		if len(a) < len(b) {
+			return -1
+		}
+		return 1
+	}
+
+	return 0
+}
+
+func isASCIIDigit(b byte) bool {
+	return b >= '0' && b <= '9'
+}
+
 // parseSnapshotFile parses a .snap file into a map of key -> content.
 // Format: each entry is "\n[TestName - N]\ncontent\n---\n".
 func parseSnapshotFile(data string) map[string]string {
 	entries := make(map[string]string)
 
-	blocks := strings.Split(data, "---\n")
+	blocks := strings.SplitSeq(data, "---\n")
 
-	for _, block := range blocks {
+	for block := range blocks {
 		block = strings.TrimLeft(block, "\n")
 		if block == "" {
 			continue
 		}
 
-		newline := strings.IndexByte(block, '\n')
-		if newline == -1 {
+		before, after, ok := strings.Cut(block, "\n")
+		if !ok {
 			continue
 		}
 
-		key := block[:newline]
+		key := before
 		if !strings.HasPrefix(key, "[") || !strings.HasSuffix(key, "]") {
 			continue
 		}
 
-		content := block[newline+1:]
-		content = strings.TrimRight(content, "\n")
-
-		entries[key] = content
+		entries[key] = strings.TrimRight(after, "\n")
 	}
 
 	return entries
@@ -200,20 +292,14 @@ func renderSourceAnnotation(code string, sourceFile *ast.SourceFile, textRange c
 	el, ec := scanner.GetECMALineAndCharacterOfPosition(sourceFile, endPos)
 
 	// Display range with 1 line of context
-	startLine := sl - 1
-	if startLine < 0 {
-		startLine = 0
-	}
+	startLine := max(sl-1, 0)
 	endLine := el + 1
 	if endLine >= len(lines) {
 		endLine = len(lines) - 1
 	}
 
 	// Calculate gutter width based on line numbers
-	gutterWidth := len(strconv.Itoa(endLine + 1))
-	if gutterWidth < 2 {
-		gutterWidth = 2
-	}
+	gutterWidth := max(len(strconv.Itoa(endLine+1)), 2)
 
 	var sb strings.Builder
 	for lineIdx := startLine; lineIdx <= endLine; lineIdx++ {
@@ -324,6 +410,9 @@ func formatDiagnosticsSnapshot(code string, diagnostics []rule.RuleDiagnostic) s
 
 			fmt.Fprintf(&sb, "Diagnostic %d: %s (%d:%d - %d:%d)\n", i+1, d.Message.Id, line, column, endLine, endColumn)
 			fmt.Fprintf(&sb, "Message: %s\n", d.Message.Description)
+			if d.Message.Help != "" {
+				fmt.Fprintf(&sb, "Help: %s\n", d.Message.Help)
+			}
 
 			// Render primary diagnostic range
 			annotated := renderSourceAnnotation(code, d.SourceFile, d.Range, '~', "")

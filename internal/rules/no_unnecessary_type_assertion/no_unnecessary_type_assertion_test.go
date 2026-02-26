@@ -503,7 +503,7 @@ function processValue<T extends NumberValuePairType | NumberValueType>(
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
-					Column:    13,
+					Column:    15,
 				},
 			},
 		},
@@ -516,6 +516,23 @@ const alsoRedundant = num as 42;
 const num = 42;
 const alsoRedundant = num;
       `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+				},
+			},
+		},
+		{
+			Code: `
+const str: string = 'hello';
+const redundant =  str as string;
+	      `,
+			Output: []string{`
+const str: string = 'hello';
+const redundant =  str;
+	      `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
@@ -556,7 +573,7 @@ const alsoRedundant = num;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    21,
+					Column:    23,
 				},
 			},
 		},
@@ -574,7 +591,7 @@ const bar = foo;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    13,
+					Column:    16,
 				},
 			},
 		},
@@ -590,7 +607,7 @@ const foo = (3 + 5);
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    21,
 				},
 			},
 		},
@@ -624,7 +641,7 @@ const foo = (3 + 5);
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    13,
+					Column:    21,
 				},
 			},
 		},
@@ -966,7 +983,7 @@ const bar: number | void = foo();
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      3,
-					Column:    28,
+					Column:    33,
 					EndColumn: 34,
 				},
 			},
@@ -985,7 +1002,7 @@ const a = foo();
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    11,
+					Column:    16,
 					EndColumn: 17,
 				},
 			},
@@ -1017,7 +1034,7 @@ const b = (1 + 1);
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    11,
+					Column:    18,
 					EndColumn: 19,
 				},
 			},
@@ -1036,7 +1053,7 @@ const a = foo();
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    11,
+					Column:    17,
 				},
 			},
 		},
@@ -1103,7 +1120,7 @@ const foo = (  3 + 5  );
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    25,
 				},
 			},
 		},
@@ -1119,7 +1136,7 @@ const foo = (  3 + 5  ) /*as*/;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    32,
 				},
 			},
 		},
@@ -1140,8 +1157,8 @@ const foo = (  3 + 5
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
-					Line:      2,
-					Column:    13,
+					Line:      3,
+					Column:    12,
 				},
 			},
 		},
@@ -1157,7 +1174,7 @@ const foo = (3 + (5 as number) );
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    34,
 				},
 			},
 		},
@@ -1173,7 +1190,7 @@ const foo = 3 + 5/*as*/;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    25,
 				},
 			},
 		},
@@ -1189,7 +1206,7 @@ const foo = 3 + 5/*a*/ /*b*/;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    30,
 				},
 			},
 		},
@@ -1279,7 +1296,7 @@ function bar(items: string[]) {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
-					Column:    9,
+					Column:    17,
 				},
 			},
 		},
@@ -1302,7 +1319,7 @@ const bar = foo.a;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
-					Column:    13,
+					Column:    19,
 				},
 			},
 		},
@@ -1325,7 +1342,7 @@ const bar = foo.a;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
-					Column:    13,
+					Column:    19,
 				},
 			},
 		},

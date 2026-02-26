@@ -983,6 +983,12 @@ func TestPreferOptionalChainRule(t *testing.T) {
 				return obj && obj?.flag === false;
 			}
 		`},
+		{Code: `declare const foo: { bar: string | null }; foo.bar === null || foo.bar.trim() === '';`},
+		{Code: `declare const foo: [Record<string, unknown>]; 'bar' in foo[0] && foo[0].bar === 'err';`},
+		{Code: `declare const foo: Set<string> | undefined; typeof foo === 'undefined' || foo.size === 0;`},
+		{Code: `declare const foo: [string, unknown[]][] | undefined; typeof foo === 'undefined' || foo.length === 0;`},
+		{Code: `declare const foo: boolean; declare const bar: { value: string | null }; foo || bar.value === 'Invalid DateTime' || bar.value === null;`},
+		{Code: `declare const foo: { bar: string } | undefined; typeof foo === 'undefined' || foo.bar;`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{

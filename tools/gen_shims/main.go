@@ -22,8 +22,8 @@ const tsgoInternalPrefix = "github.com/microsoft/typescript-go/internal/"
 
 func signatureHasUnexportedType(t types.Signature) bool {
 	if params := t.Params(); params != nil {
-		for i := range params.Len() {
-			ty := params.At(i).Type()
+		for v := range params.Variables() {
+			ty := v.Type()
 
 			if ptrType, ok := ty.(*types.Pointer); ok {
 				ty = ptrType.Elem()

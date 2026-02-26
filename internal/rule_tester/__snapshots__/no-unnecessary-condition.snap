@@ -80,6 +80,78 @@ Message: Unnecessary conditional, value is always truthy.
    5 | 
 ---
 
+[TestNoUnnecessaryConditionRule/invalid-2 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-3 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-4 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-5 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-6 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-7 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-8 - 1]
+Diagnostic 1: never (4:12 - 4:13)
+Message: Unnecessary conditional, value is `never`.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-9 - 1]
+Diagnostic 1: never (4:12 - 4:13)
+Message: Unnecessary conditional, value is `never`.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
 [TestNoUnnecessaryConditionRule/invalid-10 - 1]
 Diagnostic 1: alwaysFalsy (3:5 - 3:16)
 Message: Unnecessary conditional, value is always falsy.
@@ -87,103 +159,6 @@ Message: Unnecessary conditional, value is always falsy.
    3 | if (falseyBigInt) {
      |     ~~~~~~~~~~~~
    4 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-100 - 1]
-Diagnostic 1: neverNullish (3:1 - 3:3)
-Message: Unnecessary optional chain on a non-nullish value.
-   2 | declare let foo: {};
-   3 | foo ??= 1;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-101 - 1]
-Diagnostic 1: neverNullish (3:1 - 3:3)
-Message: Unnecessary optional chain on a non-nullish value.
-   2 | declare let foo: number;
-   3 | foo ??= 1;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-102 - 1]
-Diagnostic 1: alwaysNullish (3:1 - 3:3)
-Message: Unnecessary conditional, value is always nullish.
-   2 | declare let foo: null;
-   3 | foo ??= null;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-103 - 1]
-Diagnostic 1: alwaysTruthy (3:1 - 3:3)
-Message: Unnecessary conditional, value is always truthy.
-   2 | declare let foo: {};
-   3 | foo ||= 1;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-104 - 1]
-Diagnostic 1: alwaysFalsy (3:1 - 3:3)
-Message: Unnecessary conditional, value is always falsy.
-   2 | declare let foo: null;
-   3 | foo ||= null;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-105 - 1]
-Diagnostic 1: alwaysTruthy (3:1 - 3:3)
-Message: Unnecessary conditional, value is always truthy.
-   2 | declare let foo: {};
-   3 | foo &&= 1;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-106 - 1]
-Diagnostic 1: alwaysFalsy (3:1 - 3:3)
-Message: Unnecessary conditional, value is always falsy.
-   2 | declare let foo: null;
-   3 | foo &&= null;
-     | ~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-107 - 1]
-Diagnostic 1: neverNullish (3:1 - 3:7)
-Message: Unnecessary optional chain on a non-nullish value.
-   2 | declare const foo: { bar: number };
-   3 | foo.bar ??= 1;
-     | ~~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-108 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:25)
-Message: Unnecessary optional chain on a non-nullish value.
-   3 | declare const foo: Foo;
-   4 | foo?.bar()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-109 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:35)
-Message: Unnecessary optional chain on a non-nullish value.
-   3 | declare const foo: Foo;
-   4 | foo?.bar?.baz()?.qux?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
-
-Diagnostic 2: neverOptionalChain (4:1 - 4:20)
-Message: Unnecessary optional chain on a non-nullish value.
-   3 | declare const foo: Foo;
-   4 | foo?.bar?.baz()?.qux?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~
-   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-11 - 1]
@@ -195,96 +170,6 @@ Message: Unnecessary conditional, value is always truthy.
    4 | }
 ---
 
-[TestNoUnnecessaryConditionRule/invalid-110 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:22)
-Message: Unnecessary optional chain on a non-nullish value.
-   3 | declare const foo: Foo;
-   4 | foo?.()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-111 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:29)
-Message: Unnecessary optional chain on a non-nullish value.
-   3 | declare const foo: Foo;
-   4 | foo?.['bar']()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-112 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:31)
-Message: Unnecessary optional chain on a non-nullish value.
-   3 | declare const foo: Foo;
-   4 | foo?.['bar']?.()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-113 - 1]
-Diagnostic 1: alwaysTruthy (3:13 - 3:15)
-Message: Unnecessary conditional, value is always truthy.
-   2 |         const a = true;
-   3 |         if (!!a) {
-     |             ~~~
-   4 |         }
----
-
-[TestNoUnnecessaryConditionRule/invalid-114 - 1]
-Diagnostic 1: alwaysTruthy (3:8 - 3:11)
-Message: Unnecessary conditional, value is always truthy.
-   2 | declare function assert(x: unknown): asserts x;
-   3 | assert(true);
-     |        ~~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-115 - 1]
-Diagnostic 1: alwaysFalsy (3:8 - 3:12)
-Message: Unnecessary conditional, value is always falsy.
-   2 | declare function assert(x: unknown): asserts x;
-   3 | assert(false);
-     |        ~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-116 - 1]
-Diagnostic 1: alwaysTruthy (4:8 - 4:11)
-Message: Unnecessary conditional, value is always truthy.
-   3 | 
-   4 | assert(true, Math.random() > 0.5);
-     |        ~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-117 - 1]
-Diagnostic 1: alwaysTruthy (3:8 - 3:9)
-Message: Unnecessary conditional, value is always truthy.
-   2 | declare function assert(x: unknown): asserts x;
-   3 | assert({});
-     |        ~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-118 - 1]
-Diagnostic 1: typeGuardAlreadyIsType (4:1 - 4:16)
-Message: Type predicate is unnecessary as the parameter type already satisfies the predicate.
-   3 | declare const a: string;
-   4 | assertsString(a);
-     | ~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-119 - 1]
-Diagnostic 1: typeGuardAlreadyIsType (4:1 - 4:11)
-Message: Type predicate is unnecessary as the parameter type already satisfies the predicate.
-   3 | declare const a: string;
-   4 | isString(a);
-     | ~~~~~~~~~~~
-   5 |       
----
-
 [TestNoUnnecessaryConditionRule/invalid-12 - 1]
 Diagnostic 1: alwaysTruthy (3:5 - 3:13)
 Message: Unnecessary conditional, value is always truthy.
@@ -292,96 +177,6 @@ Message: Unnecessary conditional, value is always truthy.
    3 | if (negBigInt) {
      |     ~~~~~~~~~
    4 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-120 - 1]
-Diagnostic 1: typeGuardAlreadyIsType (4:1 - 4:24)
-Message: Type predicate is unnecessary as the parameter type already satisfies the predicate.
-   3 | declare const a: string;
-   4 | isString('fa' + 'lafel');
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-121 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-122 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-123 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-124 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-125 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-126 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-127 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-128 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
-[TestNoUnnecessaryConditionRule/invalid-129 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-13 - 1]
@@ -405,81 +200,6 @@ Message: Unnecessary conditional, value is always truthy.
    8 | if (b1 || b2 || true) {
      |                 ~~~~
    9 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-130 - 1]
-Diagnostic 1: neverOptionalChain (12:1 - 12:9)
-Message: Unnecessary optional chain on a non-nullish value.
-  11 | 
-  12 | a.a?.a?.a;
-     | ~~~~~~~~~
-  13 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-131 - 1]
-Diagnostic 1: neverOptionalChain (21:1 - 21:16)
-Message: Unnecessary optional chain on a non-nullish value.
-  20 | 
-  21 | t.a?.a?.a?.value;
-     | ~~~~~~~~~~~~~~~~
-  22 |       
-
-Diagnostic 2: neverOptionalChain (21:1 - 21:9)
-Message: Unnecessary optional chain on a non-nullish value.
-  20 | 
-  21 | t.a?.a?.a?.value;
-     | ~~~~~~~~~
-  22 |       
-
-Diagnostic 3: neverOptionalChain (21:1 - 21:6)
-Message: Unnecessary optional chain on a non-nullish value.
-  20 | 
-  21 | t.a?.a?.a?.value;
-     | ~~~~~~
-  22 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-132 - 1]
-Diagnostic 1: neverOptionalChain (5:3 - 5:12)
-Message: Unnecessary optional chain on a non-nullish value.
-   4 | if (test[0]?.a) {
-   5 |   test[0]?.a;
-     |   ~~~~~~~~~~
-   6 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-133 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:17)
-Message: Unnecessary optional chain on a non-nullish value.
-   2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
-   3 | arr2[42]?.x?.y?.z;
-     | ~~~~~~~~~~~~~~~~~
-   4 |       
-
-Diagnostic 2: neverOptionalChain (3:1 - 3:14)
-Message: Unnecessary optional chain on a non-nullish value.
-   2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
-   3 | arr2[42]?.x?.y?.z;
-     | ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-134 - 1]
-Diagnostic 1: neverNullish (5:3 - 5:8)
-Message: Unnecessary optional chain on a non-nullish value.
-   4 | if (arr[0]) {
-   5 |   arr[0] ?? 'foo';
-     |   ~~~~~~
-   6 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-135 - 1]
-Diagnostic 1: alwaysTruthy (4:16 - 4:22)
-Message: Unnecessary conditional, value is always truthy.
-   3 | 
-   4 | if (arr[42] && arr[42]) {
-     |                ~~~~~~~
-   5 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-14 - 1]
@@ -534,15 +254,6 @@ Message: Unnecessary comparison between literal values.
    3 | if (y === 0) {
      |     ~~~~~~~
    4 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-2 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-20 - 1]
@@ -633,15 +344,6 @@ Message: Unnecessary comparison between literal values.
    8 | if (x === 1) {
      |     ~~~~~~~
    9 | }
----
-
-[TestNoUnnecessaryConditionRule/invalid-3 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-30 - 1]
@@ -919,15 +621,6 @@ Message: This condition will always return the same value since the types have n
    6 |   const t4 = undefined !== a;
      |                            ^ Type: string | null
    7 |   const t5 = a === null;
----
-
-[TestNoUnnecessaryConditionRule/invalid-4 - 1]
-Diagnostic 1: alwaysTruthy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always truthy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-40 - 1]
@@ -1221,15 +914,6 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | }
 ---
 
-[TestNoUnnecessaryConditionRule/invalid-5 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
 [TestNoUnnecessaryConditionRule/invalid-50 - 1]
 Diagnostic 1: alwaysTruthy (2:18 - 2:27)
 Message: Unnecessary conditional, value is always truthy.
@@ -1373,15 +1057,6 @@ Message: Unnecessary conditional, value is always truthy.
    5 |       
 ---
 
-[TestNoUnnecessaryConditionRule/invalid-6 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
 [TestNoUnnecessaryConditionRule/invalid-60 - 1]
 Diagnostic 1: alwaysTruthy (4:8 - 4:11)
 Message: Unnecessary conditional, value is always truthy.
@@ -1470,15 +1145,6 @@ Message: Unnecessary conditional, value is always truthy.
    4 | while ((shouldRun = true)) {}
      |        ~~~~~~~~~~~~~~~~~~
    5 |       
----
-
-[TestNoUnnecessaryConditionRule/invalid-7 - 1]
-Diagnostic 1: alwaysFalsy (4:12 - 4:13)
-Message: Unnecessary conditional, value is always falsy.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-70 - 1]
@@ -1644,15 +1310,6 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 |       
 ---
 
-[TestNoUnnecessaryConditionRule/invalid-8 - 1]
-Diagnostic 1: never (4:12 - 4:13)
-Message: Unnecessary conditional, value is `never`.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
 [TestNoUnnecessaryConditionRule/invalid-80 - 1]
 Diagnostic 1: neverOptionalChain (3:1 - 3:18)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1792,15 +1449,6 @@ Message: Unnecessary optional chain on a non-nullish value.
    6 |       
 ---
 
-[TestNoUnnecessaryConditionRule/invalid-9 - 1]
-Diagnostic 1: never (4:12 - 4:13)
-Message: Unnecessary conditional, value is `never`.
-   3 | declare const b2: boolean;
-   4 | const t1 = b1 && b2;
-     |            ~~
-   5 | 
----
-
 [TestNoUnnecessaryConditionRule/invalid-90 - 1]
 Diagnostic 1: neverOptionalChain (11:10 - 11:39)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1892,4 +1540,356 @@ Message: Unnecessary conditional, value is always truthy.
    3 |   if (dict[key]) {
      |       ~~~~~~~~~
    4 |     return dict[key].foo;
+---
+
+[TestNoUnnecessaryConditionRule/invalid-100 - 1]
+Diagnostic 1: neverNullish (3:1 - 3:3)
+Message: Unnecessary optional chain on a non-nullish value.
+   2 | declare let foo: {};
+   3 | foo ??= 1;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-101 - 1]
+Diagnostic 1: neverNullish (3:1 - 3:3)
+Message: Unnecessary optional chain on a non-nullish value.
+   2 | declare let foo: number;
+   3 | foo ??= 1;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-102 - 1]
+Diagnostic 1: alwaysNullish (3:1 - 3:3)
+Message: Unnecessary conditional, value is always nullish.
+   2 | declare let foo: null;
+   3 | foo ??= null;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-103 - 1]
+Diagnostic 1: alwaysTruthy (3:1 - 3:3)
+Message: Unnecessary conditional, value is always truthy.
+   2 | declare let foo: {};
+   3 | foo ||= 1;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-104 - 1]
+Diagnostic 1: alwaysFalsy (3:1 - 3:3)
+Message: Unnecessary conditional, value is always falsy.
+   2 | declare let foo: null;
+   3 | foo ||= null;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-105 - 1]
+Diagnostic 1: alwaysTruthy (3:1 - 3:3)
+Message: Unnecessary conditional, value is always truthy.
+   2 | declare let foo: {};
+   3 | foo &&= 1;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-106 - 1]
+Diagnostic 1: alwaysFalsy (3:1 - 3:3)
+Message: Unnecessary conditional, value is always falsy.
+   2 | declare let foo: null;
+   3 | foo &&= null;
+     | ~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-107 - 1]
+Diagnostic 1: neverNullish (3:1 - 3:7)
+Message: Unnecessary optional chain on a non-nullish value.
+   2 | declare const foo: { bar: number };
+   3 | foo.bar ??= 1;
+     | ~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-108 - 1]
+Diagnostic 1: neverOptionalChain (4:1 - 4:25)
+Message: Unnecessary optional chain on a non-nullish value.
+   3 | declare const foo: Foo;
+   4 | foo?.bar()?.toExponential();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-109 - 1]
+Diagnostic 1: neverOptionalChain (4:1 - 4:35)
+Message: Unnecessary optional chain on a non-nullish value.
+   3 | declare const foo: Foo;
+   4 | foo?.bar?.baz()?.qux?.toExponential();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+
+Diagnostic 2: neverOptionalChain (4:1 - 4:20)
+Message: Unnecessary optional chain on a non-nullish value.
+   3 | declare const foo: Foo;
+   4 | foo?.bar?.baz()?.qux?.toExponential();
+     | ~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-110 - 1]
+Diagnostic 1: neverOptionalChain (4:1 - 4:22)
+Message: Unnecessary optional chain on a non-nullish value.
+   3 | declare const foo: Foo;
+   4 | foo?.()?.toExponential();
+     | ~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-111 - 1]
+Diagnostic 1: neverOptionalChain (4:1 - 4:29)
+Message: Unnecessary optional chain on a non-nullish value.
+   3 | declare const foo: Foo;
+   4 | foo?.['bar']()?.toExponential();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-112 - 1]
+Diagnostic 1: neverOptionalChain (4:1 - 4:31)
+Message: Unnecessary optional chain on a non-nullish value.
+   3 | declare const foo: Foo;
+   4 | foo?.['bar']?.()?.toExponential();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-113 - 1]
+Diagnostic 1: alwaysTruthy (3:13 - 3:15)
+Message: Unnecessary conditional, value is always truthy.
+   2 |         const a = true;
+   3 |         if (!!a) {
+     |             ~~~
+   4 |         }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-114 - 1]
+Diagnostic 1: alwaysTruthy (3:8 - 3:11)
+Message: Unnecessary conditional, value is always truthy.
+   2 | declare function assert(x: unknown): asserts x;
+   3 | assert(true);
+     |        ~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-115 - 1]
+Diagnostic 1: alwaysFalsy (3:8 - 3:12)
+Message: Unnecessary conditional, value is always falsy.
+   2 | declare function assert(x: unknown): asserts x;
+   3 | assert(false);
+     |        ~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-116 - 1]
+Diagnostic 1: alwaysTruthy (4:8 - 4:11)
+Message: Unnecessary conditional, value is always truthy.
+   3 | 
+   4 | assert(true, Math.random() > 0.5);
+     |        ~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-117 - 1]
+Diagnostic 1: alwaysTruthy (3:8 - 3:9)
+Message: Unnecessary conditional, value is always truthy.
+   2 | declare function assert(x: unknown): asserts x;
+   3 | assert({});
+     |        ~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-118 - 1]
+Diagnostic 1: typeGuardAlreadyIsType (4:1 - 4:16)
+Message: Type predicate is unnecessary as the parameter type already satisfies the predicate.
+   3 | declare const a: string;
+   4 | assertsString(a);
+     | ~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-119 - 1]
+Diagnostic 1: typeGuardAlreadyIsType (4:1 - 4:11)
+Message: Type predicate is unnecessary as the parameter type already satisfies the predicate.
+   3 | declare const a: string;
+   4 | isString(a);
+     | ~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-120 - 1]
+Diagnostic 1: typeGuardAlreadyIsType (4:1 - 4:24)
+Message: Type predicate is unnecessary as the parameter type already satisfies the predicate.
+   3 | declare const a: string;
+   4 | isString('fa' + 'lafel');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-121 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-122 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-123 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-124 - 1]
+Diagnostic 1: alwaysFalsy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always falsy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-125 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-126 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-127 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-128 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-129 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:13)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ~~
+   5 | 
+---
+
+[TestNoUnnecessaryConditionRule/invalid-130 - 1]
+Diagnostic 1: neverOptionalChain (12:1 - 12:9)
+Message: Unnecessary optional chain on a non-nullish value.
+  11 | 
+  12 | a.a?.a?.a;
+     | ~~~~~~~~~
+  13 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-131 - 1]
+Diagnostic 1: neverOptionalChain (21:1 - 21:16)
+Message: Unnecessary optional chain on a non-nullish value.
+  20 | 
+  21 | t.a?.a?.a?.value;
+     | ~~~~~~~~~~~~~~~~
+  22 |       
+
+Diagnostic 2: neverOptionalChain (21:1 - 21:9)
+Message: Unnecessary optional chain on a non-nullish value.
+  20 | 
+  21 | t.a?.a?.a?.value;
+     | ~~~~~~~~~
+  22 |       
+
+Diagnostic 3: neverOptionalChain (21:1 - 21:6)
+Message: Unnecessary optional chain on a non-nullish value.
+  20 | 
+  21 | t.a?.a?.a?.value;
+     | ~~~~~~
+  22 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-132 - 1]
+Diagnostic 1: neverOptionalChain (5:3 - 5:12)
+Message: Unnecessary optional chain on a non-nullish value.
+   4 | if (test[0]?.a) {
+   5 |   test[0]?.a;
+     |   ~~~~~~~~~~
+   6 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-133 - 1]
+Diagnostic 1: neverOptionalChain (3:1 - 3:17)
+Message: Unnecessary optional chain on a non-nullish value.
+   2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
+   3 | arr2[42]?.x?.y?.z;
+     | ~~~~~~~~~~~~~~~~~
+   4 |       
+
+Diagnostic 2: neverOptionalChain (3:1 - 3:14)
+Message: Unnecessary optional chain on a non-nullish value.
+   2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
+   3 | arr2[42]?.x?.y?.z;
+     | ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-134 - 1]
+Diagnostic 1: neverNullish (5:3 - 5:8)
+Message: Unnecessary optional chain on a non-nullish value.
+   4 | if (arr[0]) {
+   5 |   arr[0] ?? 'foo';
+     |   ~~~~~~
+   6 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-135 - 1]
+Diagnostic 1: alwaysTruthy (4:16 - 4:22)
+Message: Unnecessary conditional, value is always truthy.
+   3 | 
+   4 | if (arr[42] && arr[42]) {
+     |                ~~~~~~~
+   5 | }
 ---

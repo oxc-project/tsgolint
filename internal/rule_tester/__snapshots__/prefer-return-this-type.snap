@@ -17,33 +17,6 @@ Message: Use `this` type instead.
    4 |     return this;
 ---
 
-[TestPreferReturnThisTypeRule/invalid-10 - 1]
-Diagnostic 1: useThisType (3:20 - 3:22)
-Message: Use `this` type instead.
-   2 | class Foo {
-   3 |   bar(num: 1 | 2): Foo {
-     |                    ~~~
-   4 |     switch (num) {
----
-
-[TestPreferReturnThisTypeRule/invalid-11 - 1]
-Diagnostic 1: useThisType (3:10 - 3:18)
-Message: Use `this` type instead.
-   2 | class Animal<T> {
-   3 |   eat(): Animal<T> {
-     |          ~~~~~~~~~
-   4 |     console.log("I'm moving!");
----
-
-[TestPreferReturnThisTypeRule/invalid-12 - 1]
-Diagnostic 1: useThisType (3:8 - 3:15)
-Message: Use `this` type instead.
-   2 | const Foo = class FooClass {
-   3 |   f(): FooClass {
-     |        ~~~~~~~~
-   4 |     return this;
----
-
 [TestPreferReturnThisTypeRule/invalid-2 - 1]
 Diagnostic 1: useThisType (3:8 - 3:10)
 Message: Use `this` type instead.
@@ -114,4 +87,31 @@ Message: Use `this` type instead.
    3 |   bar(): Foo | undefined {
      |          ~~~
    4 |     if (Math.random() > 0.5) {
+---
+
+[TestPreferReturnThisTypeRule/invalid-10 - 1]
+Diagnostic 1: useThisType (3:20 - 3:22)
+Message: Use `this` type instead.
+   2 | class Foo {
+   3 |   bar(num: 1 | 2): Foo {
+     |                    ~~~
+   4 |     switch (num) {
+---
+
+[TestPreferReturnThisTypeRule/invalid-11 - 1]
+Diagnostic 1: useThisType (3:10 - 3:18)
+Message: Use `this` type instead.
+   2 | class Animal<T> {
+   3 |   eat(): Animal<T> {
+     |          ~~~~~~~~~
+   4 |     console.log("I'm moving!");
+---
+
+[TestPreferReturnThisTypeRule/invalid-12 - 1]
+Diagnostic 1: useThisType (3:8 - 3:15)
+Message: Use `this` type instead.
+   2 | const Foo = class FooClass {
+   3 |   f(): FooClass {
+     |        ~~~~~~~~
+   4 |     return this;
 ---

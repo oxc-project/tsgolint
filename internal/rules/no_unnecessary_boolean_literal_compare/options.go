@@ -12,10 +12,6 @@ type NoUnnecessaryBooleanLiteralCompareOptions struct {
 	// AllowComparingNullableBooleansToTrue corresponds to the JSON schema field
 	// "allowComparingNullableBooleansToTrue".
 	AllowComparingNullableBooleansToTrue bool `json:"allowComparingNullableBooleansToTrue,omitempty"`
-
-	// AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing corresponds to the JSON
-	// schema field "allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing".
-	AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing bool `json:"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing,omitempty"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -34,9 +30,6 @@ func (j *NoUnnecessaryBooleanLiteralCompareOptions) UnmarshalJSON(value []byte) 
 	}
 	if v, ok := raw["allowComparingNullableBooleansToTrue"]; !ok || v == nil {
 		plain.AllowComparingNullableBooleansToTrue = true
-	}
-	if v, ok := raw["allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing"]; !ok || v == nil {
-		plain.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing = false
 	}
 	*j = NoUnnecessaryBooleanLiteralCompareOptions(plain)
 	return nil

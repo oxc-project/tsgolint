@@ -6,26 +6,48 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildBigintAndNumberMessage(left, right string) rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "bigintAndNumber",
-		Description: fmt.Sprintf("Numeric '+' operations must either be both bigints or both numbers. Got `%v` + `%v`.", left, right),
+func buildBigintAndNumberDiagnostic(exprRange core.TextRange, leftRange core.TextRange, rightRange core.TextRange, leftType string, rightType string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: exprRange,
+		Message: rule.RuleMessage{
+			Id:          "bigintAndNumber",
+			Description: "Numeric '+' operations must either be both bigints or both numbers.",
+		},
+		LabeledRanges: []rule.RuleLabeledRange{
+			{Label: fmt.Sprintf("Type: %v", leftType), Range: leftRange},
+			{Label: fmt.Sprintf("Type: %v", rightType), Range: rightRange},
+		},
 	}
 }
-func buildInvalidMessage(stringLike, t string) rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "invalid",
-		Description: fmt.Sprintf("Invalid operand for a '+' operation. Operands must each be a number or %v. Got `%v`.", stringLike, t),
+
+func buildInvalidDiagnostic(exprRange core.TextRange, invalidType string, stringLike string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: exprRange,
+		Message: rule.RuleMessage{
+			Id:          "invalid",
+			Description: fmt.Sprintf("Invalid operand of type '%v' for a '+' operation.", invalidType),
+			Help:        fmt.Sprintf("Operands must each be a number or %v.", stringLike),
+		},
 	}
 }
-func buildMismatchedMessage(stringLike, left, right string) rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "mismatched",
-		Description: fmt.Sprintf("Operands of '+' operations must be a number or %v. Got `%v` + `%v`.", stringLike, left, right),
+
+func buildMismatchedDiagnostic(exprRange core.TextRange, leftRange core.TextRange, rightRange core.TextRange, stringLike string, leftType string, rightType string) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range: exprRange,
+		Message: rule.RuleMessage{
+			Id:          "mismatched",
+			Description: "Operands of '+' operations must be of the same type.",
+			Help:        fmt.Sprintf("Operands must both be a number or both be %v.", stringLike),
+		},
+		LabeledRanges: []rule.RuleLabeledRange{
+			{Label: fmt.Sprintf("Type: %v", leftType), Range: leftRange},
+			{Label: fmt.Sprintf("Type: %v", rightType), Range: rightRange},
+		},
 	}
 }
 
@@ -79,21 +101,16 @@ var RestrictPlusOperandsRule = rule.Rule{
 			invalidFlags |= checker.TypeFlagsNullable
 		}
 
-		checkInvalidPlusOperand := func(baseNode *ast.Node, baseType, otherType *checker.Type) (checker.TypeFlags, bool) {
+		checkInvalidPlusOperand := func(baseType, otherType *checker.Type) (checker.TypeFlags, string, bool) {
 			foundRegexp := false
 
 			var flags checker.TypeFlags
+			baseTypeString := ctx.TypeChecker.TypeToString(baseType)
 
-			reported := false
 			for _, part := range utils.UnionTypeParts(baseType) {
 				flags |= checker.Type_flags(part)
-				if reported {
-					continue
-				}
 				if utils.IsTypeFlagSet(part, invalidFlags) {
-					ctx.ReportNode(baseNode, buildInvalidMessage(stringLike, ctx.TypeChecker.TypeToString(baseType)))
-					reported = true
-					continue
+					return flags, baseTypeString, true
 				}
 
 				// RegExps also contain checker.TypeFlagsAny & checker.TypeFlagsObject
@@ -107,12 +124,11 @@ var RestrictPlusOperandsRule = rule.Rule{
 				foundRegexp = true
 			}
 
-			if !reported && foundRegexp {
-				ctx.ReportNode(baseNode, buildInvalidMessage(stringLike, ctx.TypeChecker.TypeToString(globalRegexpType)))
-				return flags, true
+			if foundRegexp {
+				return flags, ctx.TypeChecker.TypeToString(globalRegexpType), true
 			}
 
-			return flags, reported
+			return flags, "", false
 		}
 
 		checkPlusOperands := func(
@@ -120,6 +136,10 @@ var RestrictPlusOperandsRule = rule.Rule{
 		) {
 			leftType := getTypeConstrained(node.Left)
 			rightType := getTypeConstrained(node.Right)
+			leftTypeString := ctx.TypeChecker.TypeToString(leftType)
+			rightTypeString := ctx.TypeChecker.TypeToString(rightType)
+			leftRange := utils.TrimNodeTextRange(ctx.SourceFile, node.Left)
+			rightRange := utils.TrimNodeTextRange(ctx.SourceFile, node.Right)
 
 			if leftType == rightType &&
 				utils.IsTypeFlagSet(
@@ -131,8 +151,15 @@ var RestrictPlusOperandsRule = rule.Rule{
 				return
 			}
 
-			leftTypeFlags, leftInvalid := checkInvalidPlusOperand(node.Left, leftType, rightType)
-			rightTypeFlags, rightInvalid := checkInvalidPlusOperand(node.Right, rightType, leftType)
+			leftTypeFlags, leftInvalidType, leftInvalid := checkInvalidPlusOperand(leftType, rightType)
+			rightTypeFlags, rightInvalidType, rightInvalid := checkInvalidPlusOperand(rightType, leftType)
+
+			if leftInvalid {
+				ctx.ReportDiagnostic(buildInvalidDiagnostic(leftRange, leftInvalidType, stringLike))
+			}
+			if rightInvalid {
+				ctx.ReportDiagnostic(buildInvalidDiagnostic(rightRange, rightInvalidType, stringLike))
+			}
 			if leftInvalid || rightInvalid {
 				return
 			}
@@ -141,12 +168,12 @@ var RestrictPlusOperandsRule = rule.Rule{
 				if !opts.AllowNumberAndString &&
 					baseTypeFlags&checker.TypeFlagsStringLike != 0 &&
 					otherTypeFlags&(checker.TypeFlagsNumberLike|checker.TypeFlagsBigIntLike) != 0 {
-					ctx.ReportNode(&node.Node, buildMismatchedMessage(stringLike, ctx.TypeChecker.TypeToString(leftType), ctx.TypeChecker.TypeToString(rightType)))
+					ctx.ReportDiagnostic(buildMismatchedDiagnostic(utils.TrimNodeTextRange(ctx.SourceFile, &node.Node), leftRange, rightRange, stringLike, leftTypeString, rightTypeString))
 					return true
 				}
 
 				if baseTypeFlags&checker.TypeFlagsNumberLike != 0 && otherTypeFlags&checker.TypeFlagsBigIntLike != 0 {
-					ctx.ReportNode(&node.Node, buildBigintAndNumberMessage(ctx.TypeChecker.TypeToString(leftType), ctx.TypeChecker.TypeToString(rightType)))
+					ctx.ReportDiagnostic(buildBigintAndNumberDiagnostic(utils.TrimNodeTextRange(ctx.SourceFile, &node.Node), leftRange, rightRange, leftTypeString, rightTypeString))
 					return true
 				}
 

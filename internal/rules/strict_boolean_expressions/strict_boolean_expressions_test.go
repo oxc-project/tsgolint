@@ -353,13 +353,6 @@ if (x) {
       `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableEnum": true}`)},
 			{
 				Code: `
-declare const x: string[] | null;
-// eslint-disable-next-line
-if (x) {
-}
-      `, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing": true}`)},
-			{
-				Code: `
 function f(arg: 'a' | null) {
   if (arg) console.log(arg);
 }

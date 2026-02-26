@@ -318,6 +318,8 @@ func GetImportAttributes(node *ast.Node) *ast.Node
 func GetInitializerOfBinaryExpression(expr *ast.BinaryExpression) *ast.Expression
 //go:linkname GetInvokedExpression github.com/microsoft/typescript-go/internal/ast.GetInvokedExpression
 func GetInvokedExpression(node *ast.Node) *ast.Node
+//go:linkname GetJSDocDeprecatedTag github.com/microsoft/typescript-go/internal/ast.GetJSDocDeprecatedTag
+func GetJSDocDeprecatedTag(node *ast.Node) *ast.Node
 //go:linkname GetJSXImplicitImportBase github.com/microsoft/typescript-go/internal/ast.GetJSXImplicitImportBase
 func GetJSXImplicitImportBase(compilerOptions *core.CompilerOptions, file *ast.SourceFile) string
 //go:linkname GetJSXRuntimeImport github.com/microsoft/typescript-go/internal/ast.GetJSXRuntimeImport
@@ -368,8 +370,6 @@ func GetRightMostAssignedExpression(node *ast.Node) *ast.Node
 func GetRootDeclaration(node *ast.Node) *ast.Node
 //go:linkname GetSemanticJsxChildren github.com/microsoft/typescript-go/internal/ast.GetSemanticJsxChildren
 func GetSemanticJsxChildren(children []*ast.JsxChild) []*ast.JsxChild
-//go:linkname GetSourceFileAffectingCompilerOptions github.com/microsoft/typescript-go/internal/ast.GetSourceFileAffectingCompilerOptions
-func GetSourceFileAffectingCompilerOptions(fileName string, options *core.CompilerOptions) core.SourceFileAffectingCompilerOptions
 //go:linkname GetSourceFileOfModule github.com/microsoft/typescript-go/internal/ast.GetSourceFileOfModule
 func GetSourceFileOfModule(module *ast.Symbol) *ast.SourceFile
 //go:linkname GetSourceFileOfNode github.com/microsoft/typescript-go/internal/ast.GetSourceFileOfNode
@@ -635,6 +635,10 @@ func IsDefaultClause(node *ast.Node) bool
 func IsDefaultImport(node *ast.Node) bool
 //go:linkname IsDeleteExpression github.com/microsoft/typescript-go/internal/ast.IsDeleteExpression
 func IsDeleteExpression(node *ast.Node) bool
+//go:linkname IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/ast.IsDeprecatedDeclaration
+func IsDeprecatedDeclaration(declaration *ast.Node) bool
+//go:linkname IsDeprecatedDeclarationWithCachedFlags github.com/microsoft/typescript-go/internal/ast.IsDeprecatedDeclarationWithCachedFlags
+func IsDeprecatedDeclarationWithCachedFlags(declaration *ast.Node, combinedFlags ast.NodeFlags) bool
 //go:linkname IsDestructuringAssignment github.com/microsoft/typescript-go/internal/ast.IsDestructuringAssignment
 func IsDestructuringAssignment(node *ast.Node) bool
 //go:linkname IsDoStatement github.com/microsoft/typescript-go/internal/ast.IsDoStatement
@@ -767,6 +771,8 @@ func IsImportDeclarationOrJSImportDeclaration(node *ast.Node) bool
 func IsImportEqualsDeclaration(node *ast.Node) bool
 //go:linkname IsImportMeta github.com/microsoft/typescript-go/internal/ast.IsImportMeta
 func IsImportMeta(node *ast.Node) bool
+//go:linkname IsImportNode github.com/microsoft/typescript-go/internal/ast.IsImportNode
+func IsImportNode(node *ast.Node) bool
 //go:linkname IsImportOrExportSpecifier github.com/microsoft/typescript-go/internal/ast.IsImportOrExportSpecifier
 func IsImportOrExportSpecifier(node *ast.Node) bool
 //go:linkname IsImportOrImportEqualsDeclaration github.com/microsoft/typescript-go/internal/ast.IsImportOrImportEqualsDeclaration
@@ -1348,11 +1354,6 @@ type JSDocOverloadTag = ast.JSDocOverloadTag
 type JSDocOverrideTag = ast.JSDocOverrideTag
 type JSDocParameterOrPropertyTag = ast.JSDocParameterOrPropertyTag
 type JSDocParameterTag = ast.JSDocParameterTag
-type JSDocParsingMode = ast.JSDocParsingMode
-const JSDocParsingModeParseAll = ast.JSDocParsingModeParseAll
-const JSDocParsingModeParseForTypeErrors = ast.JSDocParsingModeParseForTypeErrors
-const JSDocParsingModeParseForTypeInfo = ast.JSDocParsingModeParseForTypeInfo
-const JSDocParsingModeParseNone = ast.JSDocParsingModeParseNone
 type JSDocPrivateTag = ast.JSDocPrivateTag
 type JSDocPropertyTag = ast.JSDocPropertyTag
 type JSDocProtectedTag = ast.JSDocProtectedTag
@@ -1919,7 +1920,6 @@ const NodeFlagsConstant = ast.NodeFlagsConstant
 const NodeFlagsContainsThis = ast.NodeFlagsContainsThis
 const NodeFlagsContextFlags = ast.NodeFlagsContextFlags
 const NodeFlagsDecoratorContext = ast.NodeFlagsDecoratorContext
-const NodeFlagsDeprecated = ast.NodeFlagsDeprecated
 const NodeFlagsDisallowConditionalTypesContext = ast.NodeFlagsDisallowConditionalTypesContext
 const NodeFlagsDisallowInContext = ast.NodeFlagsDisallowInContext
 const NodeFlagsExportContext = ast.NodeFlagsExportContext
@@ -1936,6 +1936,7 @@ const NodeFlagsLet = ast.NodeFlagsLet
 const NodeFlagsNone = ast.NodeFlagsNone
 const NodeFlagsOptionalChain = ast.NodeFlagsOptionalChain
 const NodeFlagsPermanentlySetIncrementalFlags = ast.NodeFlagsPermanentlySetIncrementalFlags
+const NodeFlagsPossiblyContainsDeprecatedTag = ast.NodeFlagsPossiblyContainsDeprecatedTag
 const NodeFlagsPossiblyContainsDynamicImport = ast.NodeFlagsPossiblyContainsDynamicImport
 const NodeFlagsPossiblyContainsImportMeta = ast.NodeFlagsPossiblyContainsImportMeta
 const NodeFlagsReachabilityCheckFlags = ast.NodeFlagsReachabilityCheckFlags
@@ -2075,6 +2076,8 @@ func SetExternalModuleIndicator(file *ast.SourceFile, opts ast.ExternalModuleInd
 func SetImportsOfSourceFile(node *ast.SourceFile, imports []*ast.LiteralLikeNode)
 //go:linkname SetParentInChildren github.com/microsoft/typescript-go/internal/ast.SetParentInChildren
 func SetParentInChildren(node *ast.Node)
+//go:linkname SetParseJSDocForNode github.com/microsoft/typescript-go/internal/ast.SetParseJSDocForNode
+func SetParseJSDocForNode(fn func(*ast.SourceFile, *ast.Node) []*ast.Node)
 type ShorthandPropertyAssignment = ast.ShorthandPropertyAssignment
 //go:linkname ShouldTransformImportCall github.com/microsoft/typescript-go/internal/ast.ShouldTransformImportCall
 func ShouldTransformImportCall(fileName string, options *core.CompilerOptions, impliedNodeFormatForEmit core.ModuleKind) bool
@@ -2261,6 +2264,7 @@ type ThrowStatement = ast.ThrowStatement
 //go:linkname ToFindAncestorResult github.com/microsoft/typescript-go/internal/ast.ToFindAncestorResult
 func ToFindAncestorResult(b bool) ast.FindAncestorResult
 type Token = ast.Token
+type TokenCacheKey = ast.TokenCacheKey
 type TokenFlags = ast.TokenFlags
 const TokenFlagsBinaryOrOctalSpecifier = ast.TokenFlagsBinaryOrOctalSpecifier
 const TokenFlagsBinarySpecifier = ast.TokenFlagsBinarySpecifier
@@ -2278,6 +2282,8 @@ const TokenFlagsOctal = ast.TokenFlagsOctal
 const TokenFlagsOctalSpecifier = ast.TokenFlagsOctalSpecifier
 const TokenFlagsPrecedingJSDocComment = ast.TokenFlagsPrecedingJSDocComment
 const TokenFlagsPrecedingJSDocLeadingAsterisks = ast.TokenFlagsPrecedingJSDocLeadingAsterisks
+const TokenFlagsPrecedingJSDocWithDeprecated = ast.TokenFlagsPrecedingJSDocWithDeprecated
+const TokenFlagsPrecedingJSDocWithSeeOrLink = ast.TokenFlagsPrecedingJSDocWithSeeOrLink
 const TokenFlagsPrecedingLineBreak = ast.TokenFlagsPrecedingLineBreak
 const TokenFlagsRegularExpressionLiteralFlags = ast.TokenFlagsRegularExpressionLiteralFlags
 const TokenFlagsScientific = ast.TokenFlagsScientific

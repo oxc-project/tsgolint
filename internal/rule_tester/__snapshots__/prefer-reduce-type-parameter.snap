@@ -15,42 +15,6 @@ Message: Unnecessary assertion: Array#reduce accepts a type parameter for the de
      |                                             ~~~~~~~~~~~~~~
 ---
 
-[TestPreferReduceTypeParameterRule/invalid-10 - 1]
-Diagnostic 1: preferTypeParameter (3:48 - 3:61)
-Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
-   2 | declare const tupleOrArray: [number, number, number] | number[];
-   3 | tupleOrArray.reduce((a, s) => a.concat(s * 2), [] as number[]);
-     |                                                ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestPreferReduceTypeParameterRule/invalid-11 - 1]
-Diagnostic 1: preferTypeParameter (3:41 - 3:54)
-Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
-   2 | declare const tuple: [number, number, number] & number[];
-   3 | tuple.reduce((a, s) => a.concat(s * 2), [] as number[]);
-     |                                         ~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestPreferReduceTypeParameterRule/invalid-12 - 1]
-Diagnostic 1: preferTypeParameter (7:3 - 7:31)
-Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
-   6 |   }),
-   7 |   {} as Record<string, boolean>,
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   8 | );
----
-
-[TestPreferReduceTypeParameterRule/invalid-13 - 1]
-Diagnostic 1: preferTypeParameter (8:5 - 8:41)
-Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
-   7 |     }),
-   8 |     t as Record<string, boolean | number>,
-     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   );
----
-
 [TestPreferReduceTypeParameterRule/invalid-2 - 1]
 Diagnostic 1: preferTypeParameter (1:45 - 1:56)
 Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
@@ -115,4 +79,40 @@ Message: Unnecessary assertion: Array#reduce accepts a type parameter for the de
    3 | tuple.reduce((a, s) => a.concat(s * 2), [] as number[]);
      |                                         ~~~~~~~~~~~~~~
    4 |       
+---
+
+[TestPreferReduceTypeParameterRule/invalid-10 - 1]
+Diagnostic 1: preferTypeParameter (3:48 - 3:61)
+Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
+   2 | declare const tupleOrArray: [number, number, number] | number[];
+   3 | tupleOrArray.reduce((a, s) => a.concat(s * 2), [] as number[]);
+     |                                                ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferReduceTypeParameterRule/invalid-11 - 1]
+Diagnostic 1: preferTypeParameter (3:41 - 3:54)
+Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
+   2 | declare const tuple: [number, number, number] & number[];
+   3 | tuple.reduce((a, s) => a.concat(s * 2), [] as number[]);
+     |                                         ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferReduceTypeParameterRule/invalid-12 - 1]
+Diagnostic 1: preferTypeParameter (7:3 - 7:31)
+Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
+   6 |   }),
+   7 |   {} as Record<string, boolean>,
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | );
+---
+
+[TestPreferReduceTypeParameterRule/invalid-13 - 1]
+Diagnostic 1: preferTypeParameter (8:5 - 8:41)
+Message: Unnecessary assertion: Array#reduce accepts a type parameter for the default value.
+   7 |     }),
+   8 |     t as Record<string, boolean | number>,
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   );
 ---

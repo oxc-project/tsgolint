@@ -19,6 +19,84 @@ Message: Using the `delete` operator with an array expression is unsafe.
   Suggestion 1: [useSplice] Use `array.splice()` instead.
 ---
 
+[TestNoArrayDelete/invalid-2 - 1]
+Diagnostic 1: noArrayDelete (9:9 - 9:26)
+Message: Using the `delete` operator with an array expression is unsafe.
+   8 | 
+   9 |         delete arr[Keys.A];
+     |         ~~~~~~~~~~~~~~~~~~
+  10 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-3 - 1]
+Diagnostic 1: noArrayDelete (4:9 - 4:33)
+Message: Using the `delete` operator with an array expression is unsafe.
+   3 |         declare function doWork(): void;
+   4 |         delete arr[(doWork(), 1)];
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-4 - 1]
+Diagnostic 1: noArrayDelete (3:9 - 3:21)
+Message: Using the `delete` operator with an array expression is unsafe.
+   2 |         declare const arr: Array<number>;
+   3 |         delete arr[0];
+     |         ~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-5 - 1]
+Diagnostic 1: noArrayDelete (1:1 - 1:19)
+Message: Using the `delete` operator with an array expression is unsafe.
+   1 | delete [1, 2, 3][0];
+     | ~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-6 - 1]
+Diagnostic 1: noArrayDelete (3:9 - 3:41)
+Message: Using the `delete` operator with an array expression is unsafe.
+   2 |         declare const arr: unknown[];
+   3 |         delete arr[Math.random() ? 0 : 1];
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-7 - 1]
+Diagnostic 1: noArrayDelete (3:9 - 3:21)
+Message: Using the `delete` operator with an array expression is unsafe.
+   2 |         declare const arr: number[] | string[] | boolean[];
+   3 |         delete arr[0];
+     |         ~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-8 - 1]
+Diagnostic 1: noArrayDelete (3:9 - 3:21)
+Message: Using the `delete` operator with an array expression is unsafe.
+   2 |         declare const arr: number[] & unknown;
+   3 |         delete arr[0];
+     |         ~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
+[TestNoArrayDelete/invalid-9 - 1]
+Diagnostic 1: noArrayDelete (3:9 - 3:21)
+Message: Using the `delete` operator with an array expression is unsafe.
+   2 |         declare const arr: (number | string)[];
+   3 |         delete arr[0];
+     |         ~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [useSplice] Use `array.splice()` instead.
+---
+
 [TestNoArrayDelete/invalid-10 - 1]
 Diagnostic 1: noArrayDelete (3:9 - 3:27)
 Message: Using the `delete` operator with an array expression is unsafe.
@@ -127,16 +205,6 @@ Message: Using the `delete` operator with an array expression is unsafe.
   Suggestion 1: [useSplice] Use `array.splice()` instead.
 ---
 
-[TestNoArrayDelete/invalid-2 - 1]
-Diagnostic 1: noArrayDelete (9:9 - 9:26)
-Message: Using the `delete` operator with an array expression is unsafe.
-   8 | 
-   9 |         delete arr[Keys.A];
-     |         ~~~~~~~~~~~~~~~~~~
-  10 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
 [TestNoArrayDelete/invalid-20 - 1]
 Diagnostic 1: noArrayDelete (5:9 - 5:35)
 Message: Using the `delete` operator with an array expression is unsafe.
@@ -151,74 +219,6 @@ Message: Using the `delete` operator with an array expression is unsafe.
 Diagnostic 1: noArrayDelete (3:9 - 3:21)
 Message: Using the `delete` operator with an array expression is unsafe.
    2 |         declare const arr: string & Array<number>;
-   3 |         delete arr[0];
-     |         ~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-3 - 1]
-Diagnostic 1: noArrayDelete (4:9 - 4:33)
-Message: Using the `delete` operator with an array expression is unsafe.
-   3 |         declare function doWork(): void;
-   4 |         delete arr[(doWork(), 1)];
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-4 - 1]
-Diagnostic 1: noArrayDelete (3:9 - 3:21)
-Message: Using the `delete` operator with an array expression is unsafe.
-   2 |         declare const arr: Array<number>;
-   3 |         delete arr[0];
-     |         ~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-5 - 1]
-Diagnostic 1: noArrayDelete (1:1 - 1:19)
-Message: Using the `delete` operator with an array expression is unsafe.
-   1 | delete [1, 2, 3][0];
-     | ~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-6 - 1]
-Diagnostic 1: noArrayDelete (3:9 - 3:41)
-Message: Using the `delete` operator with an array expression is unsafe.
-   2 |         declare const arr: unknown[];
-   3 |         delete arr[Math.random() ? 0 : 1];
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-7 - 1]
-Diagnostic 1: noArrayDelete (3:9 - 3:21)
-Message: Using the `delete` operator with an array expression is unsafe.
-   2 |         declare const arr: number[] | string[] | boolean[];
-   3 |         delete arr[0];
-     |         ~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-8 - 1]
-Diagnostic 1: noArrayDelete (3:9 - 3:21)
-Message: Using the `delete` operator with an array expression is unsafe.
-   2 |         declare const arr: number[] & unknown;
-   3 |         delete arr[0];
-     |         ~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [useSplice] Use `array.splice()` instead.
----
-
-[TestNoArrayDelete/invalid-9 - 1]
-Diagnostic 1: noArrayDelete (3:9 - 3:21)
-Message: Using the `delete` operator with an array expression is unsafe.
-   2 |         declare const arr: (number | string)[];
    3 |         delete arr[0];
      |         ~~~~~~~~~~~~~
    4 |       

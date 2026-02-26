@@ -67,7 +67,7 @@ var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 			compilerOptions.StrictNullChecks,
 		)
 
-		if !isStrictNullChecks && !opts.AllowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing {
+		if !isStrictNullChecks {
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 

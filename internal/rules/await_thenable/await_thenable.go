@@ -52,11 +52,12 @@ var AwaitThenableRule = rule.Rule{
 				certainty := utils.NeedsToBeAwaited(ctx.TypeChecker, awaitArgument, awaitArgumentType)
 
 				if certainty == utils.TypeAwaitableNever {
-					ctx.ReportNodeWithSuggestions(node, buildAwaitMessage(), func() []rule.RuleSuggestion {
+					awaitTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())
+					ctx.ReportRangeWithSuggestions(awaitTokenRange, buildAwaitMessage(), func() []rule.RuleSuggestion {
 						return []rule.RuleSuggestion{{
 							Message: buildRemoveAwaitMessage(),
 							FixesArr: []rule.RuleFix{
-								rule.RuleFixRemoveRange(scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())),
+								rule.RuleFixRemoveRange(awaitTokenRange),
 							},
 						}}
 					})

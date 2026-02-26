@@ -17,6 +17,78 @@ Message: Use 'includes()' method instead.
    4 |         }
 ---
 
+[TestPreferIncludesRule/invalid-2 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:27)
+Message: Use 'includes()' method instead.
+   2 |         function f(a: string): void {
+   3 |           a.indexOf(b) > -1;
+     |           ~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-3 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:27)
+Message: Use 'includes()' method instead.
+   2 |         function f(a: string): void {
+   3 |           a.indexOf(b) >= 0;
+     |           ~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-4 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:29)
+Message: Use 'includes()' method instead.
+   2 |         function f(a: string): void {
+   3 |           a.indexOf(b) === -1;
+     |           ~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-5 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:28)
+Message: Use 'includes()' method instead.
+   2 |         function f(a: string): void {
+   3 |           a.indexOf(b) == -1;
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-6 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:28)
+Message: Use 'includes()' method instead.
+   2 |         function f(a: string): void {
+   3 |           a.indexOf(b) <= -1;
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-7 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:26)
+Message: Use 'includes()' method instead.
+   2 |         function f(a: string): void {
+   3 |           a.indexOf(b) < 0;
+     |           ~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-8 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:30)
+Message: Use 'includes()' method instead.
+   2 |         function f(a?: string): void {
+   3 |           a?.indexOf(b) === -1;
+     |           ~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-9 - 1]
+Diagnostic 1: preferIncludes (3:11 - 3:30)
+Message: Use 'includes()' method instead.
+   2 |         function f(a?: string): void {
+   3 |           a?.indexOf(b) !== -1;
+     |           ~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
 [TestPreferIncludesRule/invalid-10 - 1]
 Diagnostic 1: preferStringIncludes (3:11 - 3:23)
 Message: Use `String#includes()` method with a string instead.
@@ -104,15 +176,6 @@ Message: Use 'includes()' method instead.
    2 |         function f(a: Int32Array): void {
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestPreferIncludesRule/invalid-2 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:27)
-Message: Use 'includes()' method instead.
-   2 |         function f(a: string): void {
-   3 |           a.indexOf(b) > -1;
-     |           ~~~~~~~~~~~~~~~~~
    4 |         }
 ---
 
@@ -206,15 +269,6 @@ Message: Use 'includes()' method instead.
    5 |         }
 ---
 
-[TestPreferIncludesRule/invalid-3 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:27)
-Message: Use 'includes()' method instead.
-   2 |         function f(a: string): void {
-   3 |           a.indexOf(b) >= 0;
-     |           ~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
 [TestPreferIncludesRule/invalid-30 - 1]
 Diagnostic 1: preferIncludes (4:11 - 4:29)
 Message: Use 'includes()' method instead.
@@ -305,15 +359,6 @@ Message: Use `String#includes()` method with a string instead.
    5 |         }
 ---
 
-[TestPreferIncludesRule/invalid-4 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:29)
-Message: Use 'includes()' method instead.
-   2 |         function f(a: string): void {
-   3 |           a.indexOf(b) === -1;
-     |           ~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
 [TestPreferIncludesRule/invalid-40 - 1]
 Diagnostic 1: preferStringIncludes (4:11 - 4:29)
 Message: Use `String#includes()` method with a string instead.
@@ -383,50 +428,5 @@ Message: Use `String#includes()` method with a string instead.
    2 |         function f(arr: string[]): void {
    3 |           /word/.test(arr[0]);
      |           ~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestPreferIncludesRule/invalid-5 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:28)
-Message: Use 'includes()' method instead.
-   2 |         function f(a: string): void {
-   3 |           a.indexOf(b) == -1;
-     |           ~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestPreferIncludesRule/invalid-6 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:28)
-Message: Use 'includes()' method instead.
-   2 |         function f(a: string): void {
-   3 |           a.indexOf(b) <= -1;
-     |           ~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestPreferIncludesRule/invalid-7 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:26)
-Message: Use 'includes()' method instead.
-   2 |         function f(a: string): void {
-   3 |           a.indexOf(b) < 0;
-     |           ~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestPreferIncludesRule/invalid-8 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:30)
-Message: Use 'includes()' method instead.
-   2 |         function f(a?: string): void {
-   3 |           a?.indexOf(b) === -1;
-     |           ~~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestPreferIncludesRule/invalid-9 - 1]
-Diagnostic 1: preferIncludes (3:11 - 3:30)
-Message: Use 'includes()' method instead.
-   2 |         function f(a?: string): void {
-   3 |           a?.indexOf(b) !== -1;
-     |           ~~~~~~~~~~~~~~~~~~~~
    4 |         }
 ---
