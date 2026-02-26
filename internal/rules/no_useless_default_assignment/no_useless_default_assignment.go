@@ -367,10 +367,8 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 
 			ctx.ReportDiagnostic(rule.RuleDiagnostic{
 				Range:         diagnosticRange,
-				RuleName:      noUselessDefaultAssignmentRuleName,
 				Message:       message,
 				FixesPtr:      &fixes,
-				SourceFile:    ctx.SourceFile,
 				LabeledRanges: labeledRanges,
 			})
 		}

@@ -229,6 +229,18 @@ async function test(unknownParam: unknown) {
 			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
 		},
 		{
+			Code:    "const f = (): Promise<number> => Promise.resolve(1);",
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
+		},
+		{
+			Code:    "const f = (): Promise<number> => Promise.resolve(1);",
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"in-try-catch"`),
+		},
+		{
+			Code:    "const f = (): Promise<number> => Promise.resolve(1);",
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"error-handling-correctness-only"`),
+		},
+		{
 			Code: `
         async function test() {
           try {

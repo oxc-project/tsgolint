@@ -281,7 +281,7 @@ var ReturnAwaitRule = rule.Rule{
 
 			rule.ListenerOnExit(ast.KindArrowFunction): func(node *ast.Node) {
 				body := node.Body()
-				if !ast.IsBlock(body) {
+				if !ast.IsBlock(body) && scope != nil && scope.hasAsync {
 					testEachPossiblyReturnedNode(body)
 				}
 
