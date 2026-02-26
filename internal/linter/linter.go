@@ -152,6 +152,92 @@ func RunLinter(
 
 }
 
+// ruleContextBuilder is a per-worker struct that provides the RuleContext
+// reporting methods. Instead of allocating 8 new closures per file, per rule, a
+// single builder is created per worker goroutine and its mutable fields
+// are updated before each rule invocation to match the current rule and file.
+type ruleContextBuilder struct {
+	file         *ast.SourceFile
+	ruleName     string
+	program      *compiler.Program
+	checker      *checker.Checker
+	fixState     Fixes
+	onDiagnostic func(rule.RuleDiagnostic)
+}
+
+// Calls `onDiagnostic` with the given diagnostic's information, but sets the
+// rule name and source file to match the file and rule currently being run.
+func (b *ruleContextBuilder) emitDiagnostic(d rule.RuleDiagnostic) {
+	d.RuleName = b.ruleName
+	d.SourceFile = b.file
+	b.onDiagnostic(d)
+}
+
+func (b *ruleContextBuilder) reportDiagnosticWithFixes(d rule.RuleDiagnostic, fixesFn func() []rule.RuleFix) {
+	var fixes []rule.RuleFix
+	if b.fixState.Fix {
+		fixes = fixesFn()
+	}
+	d.FixesPtr = &fixes
+	b.emitDiagnostic(d)
+}
+
+func (b *ruleContextBuilder) reportDiagnosticWithSuggestions(d rule.RuleDiagnostic, suggestionsFn func() []rule.RuleSuggestion) {
+	var suggestions []rule.RuleSuggestion
+	if b.fixState.FixSuggestions {
+		suggestions = suggestionsFn()
+	}
+	d.Suggestions = &suggestions
+	b.emitDiagnostic(d)
+}
+
+func (b *ruleContextBuilder) reportRange(textRange core.TextRange, msg rule.RuleMessage) {
+	b.emitDiagnostic(rule.RuleDiagnostic{
+		Range:   textRange,
+		Message: msg,
+	})
+}
+
+func (b *ruleContextBuilder) reportRangeWithSuggestions(textRange core.TextRange, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
+	var suggestions []rule.RuleSuggestion
+	if b.fixState.FixSuggestions {
+		suggestions = suggestionsFn()
+	}
+	b.emitDiagnostic(rule.RuleDiagnostic{
+		Range:       textRange,
+		Message:     msg,
+		Suggestions: &suggestions,
+	})
+}
+
+func (b *ruleContextBuilder) reportNode(node *ast.Node, msg rule.RuleMessage) {
+	b.emitDiagnostic(rule.RuleDiagnostic{
+		Range:   utils.TrimNodeTextRange(b.file, node),
+		Message: msg,
+	})
+}
+
+func (b *ruleContextBuilder) reportNodeWithFixes(node *ast.Node, msg rule.RuleMessage, fixesFn func() []rule.RuleFix) {
+	var fixes []rule.RuleFix
+	if b.fixState.Fix {
+		fixes = fixesFn()
+	}
+	b.emitDiagnostic(rule.RuleDiagnostic{
+		Range:    utils.TrimNodeTextRange(b.file, node),
+		Message:  msg,
+		FixesPtr: &fixes,
+	})
+}
+
+func (b *ruleContextBuilder) reportNodeWithSuggestions(node *ast.Node, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
+	suggestions := suggestionsFn()
+	b.emitDiagnostic(rule.RuleDiagnostic{
+		Range:       utils.TrimNodeTextRange(b.file, node),
+		Message:     msg,
+		Suggestions: &suggestions,
+	})
+}
+
 func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors) error {
 	type checkerWorkload struct {
 		checker *checker.Checker
@@ -219,127 +305,62 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 	wg := core.NewWorkGroup(workers == 1)
 	for range workers {
 		wg.Queue(func() {
-			registeredListeners := make(map[ast.Kind][](func(node *ast.Node)), 20)
+			// Listeners are tagged with the rule that is associated with, so that when a diagnostic
+			// is emitted we know what rule it is coming from.
+			type taggedListener struct {
+				ruleName string
+				fn       func(node *ast.Node)
+			}
+			registeredListeners := make(map[ast.Kind][]taggedListener, 20)
+
+			ctxBuilder := &ruleContextBuilder{
+				fixState:     fixState,
+				onDiagnostic: onDiagnostic,
+			}
+
+			// These closures remain valid for the length of linting, as we mutate the fields
+			// of `ctxBuilder`, but `ctxBuilder` itself will not change.
+			ctx := rule.RuleContext{
+				ReportDiagnostic:                ctxBuilder.emitDiagnostic,
+				ReportDiagnosticWithFixes:       ctxBuilder.reportDiagnosticWithFixes,
+				ReportDiagnosticWithSuggestions: ctxBuilder.reportDiagnosticWithSuggestions,
+				ReportRange:                     ctxBuilder.reportRange,
+				ReportRangeWithSuggestions:      ctxBuilder.reportRangeWithSuggestions,
+				ReportNode:                      ctxBuilder.reportNode,
+				ReportNodeWithFixes:             ctxBuilder.reportNodeWithFixes,
+				ReportNodeWithSuggestions:       ctxBuilder.reportNodeWithSuggestions,
+			}
 
 			for w := range workloadQueue {
+				ctxBuilder.program = w.program
+				ctxBuilder.checker = w.checker
+				ctx.Program = w.program
+				ctx.TypeChecker = w.checker
+
 				for file := range w.queue {
 					if logLevel == utils.LogLevelDebug {
 						log.Print(file.FileName())
 					}
+					ctxBuilder.file = file
+					ctx.SourceFile = file
+
 					rules := getRulesForFile(file)
 					for _, r := range rules {
-						ctx := rule.RuleContext{
-							SourceFile:  file,
-							Program:     w.program,
-							TypeChecker: w.checker,
-							ReportDiagnostic: func(diagnostic rule.RuleDiagnostic) {
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:      r.Name,
-									Range:         diagnostic.Range,
-									Message:       diagnostic.Message,
-									FixesPtr:      diagnostic.FixesPtr,
-									Suggestions:   diagnostic.Suggestions,
-									SourceFile:    file,
-									LabeledRanges: diagnostic.LabeledRanges,
-								})
-							},
-							ReportDiagnosticWithFixes: func(diagnostic rule.RuleDiagnostic, fixesFn func() []rule.RuleFix) {
-								var fixes []rule.RuleFix = nil
-								if fixState.Fix {
-									fixes = fixesFn()
-								}
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:      r.Name,
-									Range:         diagnostic.Range,
-									Message:       diagnostic.Message,
-									FixesPtr:      &fixes,
-									SourceFile:    file,
-									LabeledRanges: diagnostic.LabeledRanges,
-								})
-							},
-							ReportDiagnosticWithSuggestions: func(diagnostic rule.RuleDiagnostic, suggestionsFn func() []rule.RuleSuggestion) {
-								var suggestions []rule.RuleSuggestion = nil
-								if fixState.FixSuggestions {
-									suggestions = suggestionsFn()
-								}
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:      r.Name,
-									Range:         diagnostic.Range,
-									Message:       diagnostic.Message,
-									FixesPtr:      diagnostic.FixesPtr,
-									Suggestions:   &suggestions,
-									SourceFile:    file,
-									LabeledRanges: diagnostic.LabeledRanges,
-								})
-							},
-							ReportRange: func(textRange core.TextRange, msg rule.RuleMessage) {
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:   r.Name,
-									Range:      textRange,
-									Message:    msg,
-									SourceFile: file,
-								})
-							},
-							ReportRangeWithSuggestions: func(textRange core.TextRange, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
-								var suggestions []rule.RuleSuggestion = nil
-								if fixState.FixSuggestions {
-									suggestions = suggestionsFn()
-								}
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:    r.Name,
-									Range:       textRange,
-									Message:     msg,
-									Suggestions: &suggestions,
-									SourceFile:  file,
-								})
-							},
-							ReportNode: func(node *ast.Node, msg rule.RuleMessage) {
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:   r.Name,
-									Range:      utils.TrimNodeTextRange(file, node),
-									Message:    msg,
-									SourceFile: file,
-								})
-							},
-							ReportNodeWithFixes: func(node *ast.Node, msg rule.RuleMessage, fixesFn func() []rule.RuleFix) {
-								var fixes []rule.RuleFix = nil
-								if fixState.Fix {
-									fixes = fixesFn()
-								}
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:   r.Name,
-									Range:      utils.TrimNodeTextRange(file, node),
-									Message:    msg,
-									FixesPtr:   &fixes,
-									SourceFile: file,
-								})
-							},
-
-							ReportNodeWithSuggestions: func(node *ast.Node, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
-								suggestions := suggestionsFn()
-								onDiagnostic(rule.RuleDiagnostic{
-									RuleName:    r.Name,
-									Range:       utils.TrimNodeTextRange(file, node),
-									Message:     msg,
-									Suggestions: &suggestions,
-									SourceFile:  file,
-								})
-							},
-						}
-
+						ctxBuilder.ruleName = r.Name
 						for kind, listener := range r.Run(ctx) {
 							listeners, ok := registeredListeners[kind]
 							if !ok {
-								listeners = make([](func(node *ast.Node)), 0, len(rules))
+								listeners = make([]taggedListener, 0, len(rules))
 							}
-							registeredListeners[kind] = append(listeners, listener)
+							registeredListeners[kind] = append(listeners, taggedListener{ruleName: r.Name, fn: listener})
 						}
 					}
 
 					runListeners := func(kind ast.Kind, node *ast.Node) {
 						if listeners, ok := registeredListeners[kind]; ok {
 							for _, listener := range listeners {
-								listener(node)
+								ctxBuilder.ruleName = listener.ruleName
+								listener.fn(node)
 							}
 						}
 					}
@@ -410,7 +431,10 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						return false
 					}
 					file.Node.ForEachChild(childVisitor)
-					clear(registeredListeners)
+					// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
+					for k := range registeredListeners {
+						registeredListeners[k] = registeredListeners[k][:0]
+					}
 				}
 			}
 		})
