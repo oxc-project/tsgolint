@@ -5397,16 +5397,3 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    5 |             
 ---
-
-[TestPreferOptionalChainRule/invalid-602 - 1]
-Diagnostic 1: preferOptionalChain (4:7 - 4:41)
-Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
-   3 |                 declare const FooClass: new (...args: unknown[]) => unknown;
-   4 |                 !(foo && foo.name instanceof FooClass);
-     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |             
----
-
-[TestPreferOptionalChainRule/invalid-603 - 1]
-No diagnostics
----
