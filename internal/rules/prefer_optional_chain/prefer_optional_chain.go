@@ -218,6 +218,21 @@ func isAndOperator(op ast.Kind) bool {
 	return op == ast.KindAmpersandAmpersandToken
 }
 
+func invertEqualityOperator(op ast.Kind) (string, bool) {
+	switch op {
+	case ast.KindEqualsEqualsToken:
+		return "!=", true
+	case ast.KindExclamationEqualsToken:
+		return "==", true
+	case ast.KindEqualsEqualsEqualsToken:
+		return "!==", true
+	case ast.KindExclamationEqualsEqualsToken:
+		return "===", true
+	default:
+		return "", false
+	}
+}
+
 // binaryParts holds the components of a binary expression after unwrapping parentheses.
 type binaryParts struct {
 	expr     *ast.BinaryExpression
@@ -1332,6 +1347,91 @@ func (processor *chainProcessor) allSubsequentHaveOptionalChaining(chain []Opera
 		}
 	}
 	return true
+}
+
+func (processor *chainProcessor) getNegationWrapperNode(node *ast.Node) *ast.Node {
+	if node == nil || node.Parent == nil {
+		return nil
+	}
+
+	if ast.IsPrefixUnaryExpression(node.Parent) {
+		prefix := node.Parent.AsPrefixUnaryExpression()
+		if prefix.Operator == ast.KindExclamationToken && prefix.Operand == node {
+			return node.Parent
+		}
+	}
+
+	if ast.IsParenthesizedExpression(node.Parent) && node.Parent.Parent != nil && ast.IsPrefixUnaryExpression(node.Parent.Parent) {
+		prefix := node.Parent.Parent.AsPrefixUnaryExpression()
+		if prefix.Operator == ast.KindExclamationToken && prefix.Operand == node.Parent {
+			return node.Parent.Parent
+		}
+	}
+
+	return nil
+}
+
+func (processor *chainProcessor) isUnderOuterNegation(node *ast.Node) bool {
+	if node == nil || node.Parent == nil {
+		return false
+	}
+
+	if ast.IsPrefixUnaryExpression(node.Parent) {
+		prefix := node.Parent.AsPrefixUnaryExpression()
+		if prefix.Operator == ast.KindExclamationToken && prefix.Operand == node {
+			return true
+		}
+	}
+
+	if ast.IsParenthesizedExpression(node.Parent) && node.Parent.Parent != nil && ast.IsPrefixUnaryExpression(node.Parent.Parent) {
+		prefix := node.Parent.Parent.AsPrefixUnaryExpression()
+		if prefix.Operator == ast.KindExclamationToken && prefix.Operand == node.Parent {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (processor *chainProcessor) getParenthesizedAndInOrContext(node *ast.Node) *ast.Node {
+	if node == nil || node.Parent == nil || !ast.IsParenthesizedExpression(node.Parent) {
+		return nil
+	}
+
+	parens := node.Parent
+	if parens.Parent == nil || !ast.IsBinaryExpression(parens.Parent) {
+		return nil
+	}
+
+	parentBin := parens.Parent.AsBinaryExpression()
+	if parentBin.OperatorToken.Kind != ast.KindBarBarToken {
+		return nil
+	}
+
+	if parentBin.Left != parens && parentBin.Right != parens {
+		return nil
+	}
+
+	return parens
+}
+
+func (processor *chainProcessor) buildNegatedComparisonCode(optionalChainCode string, binExpr *ast.BinaryExpression, comparedExpr *ast.Node) (string, bool) {
+	invertedOp, ok := invertEqualityOperator(binExpr.OperatorToken.Kind)
+	if !ok {
+		return "", false
+	}
+
+	leftRange := processor.getNodeRange(binExpr.Left)
+	comparedRange := processor.getNodeRange(comparedExpr)
+	isYoda := comparedRange.Pos() > leftRange.Pos()
+
+	if isYoda {
+		leftText := processor.getNodeText(binExpr.Left)
+		return leftText + " " + invertedOp + " " + optionalChainCode, true
+	}
+
+	rightText := processor.getNodeText(binExpr.Right)
+	return optionalChainCode + " " + invertedOp + " " + rightText, true
 }
 
 func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.Kind) Operand {
@@ -3188,6 +3288,8 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 		}
 	}
 
+	baseChainCode := newCode
+
 	if hasTrailingComparison {
 		var operandForComparison Operand
 		if hasComplementaryNullCheck || hasLooseStrictWithTrailingPlain {
@@ -3240,6 +3342,18 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 		}
 	}
 
+	negationWrapper := processor.getNegationWrapperNode(node)
+	collapseNegatedComparison := false
+	if negationWrapper != nil && !processor.isUnderOuterNegation(negationWrapper) && hasTrailingComparison && !hasComplementaryNullCheck && !hasLooseStrictWithTrailingPlain && !hasTrailingTypeofCheck {
+		lastOp := chain[len(chain)-1]
+		if lastOp.comparedExpr != nil && ast.IsBinaryExpression(lastOp.node) {
+			if negatedCode, ok := processor.buildNegatedComparisonCode(baseChainCode, lastOp.node.AsBinaryExpression(), lastOp.comparedExpr); ok {
+				newCode = negatedCode
+				collapseNegatedComparison = true
+			}
+		}
+	}
+
 	var replaceStart, replaceEnd int
 
 	// Preserve typeof check on undeclared variables to avoid ReferenceError.
@@ -3270,6 +3384,18 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	} else {
 		replaceStart = processor.getNodeRange(chain[effectiveChainStart].node).Pos()
 		replaceEnd = processor.getNodeRange(chain[len(chain)-1].node).End()
+	}
+
+	if collapseNegatedComparison {
+		r := processor.getNodeRange(negationWrapper)
+		replaceStart = r.Pos()
+		replaceEnd = r.End()
+	} else if effectiveChainStart == 0 {
+		if parens := processor.getParenthesizedAndInOrContext(node); parens != nil {
+			r := processor.getNodeRange(parens)
+			replaceStart = r.Pos()
+			replaceEnd = r.End()
+		}
 	}
 
 	fixes := []rule.RuleFix{
