@@ -45,10 +45,10 @@ func (s *TypeOrValueSpecifier) UnmarshalJSON(data []byte) error {
 
 	// Otherwise, unmarshal as an object
 	var raw struct {
-		From    string      `json:"from"`
-		Name    interface{} `json:"name"` // Can be string or []string
-		Path    *string     `json:"path,omitempty"`
-		Package *string     `json:"package,omitempty"`
+		From    string  `json:"from"`
+		Name    any     `json:"name"` // Can be string or []string
+		Path    *string `json:"path,omitempty"`
+		Package *string `json:"package,omitempty"`
 	}
 
 	if err := json.Unmarshal(data, &raw); err != nil {
@@ -76,7 +76,7 @@ func (s *TypeOrValueSpecifier) UnmarshalJSON(data []byte) error {
 		names = []string{}
 	case string:
 		names = []string{nameVal}
-	case []interface{}:
+	case []any:
 		names = make([]string, 0, len(nameVal))
 		for _, n := range nameVal {
 			if str, ok := n.(string); ok {
@@ -122,7 +122,7 @@ func (s TypeOrValueSpecifier) MarshalJSON() ([]byte, error) {
 	}
 
 	// Build the output object
-	output := map[string]interface{}{
+	output := map[string]any{
 		"from": fromStr,
 		"name": s.Name,
 	}
@@ -403,7 +403,7 @@ func typeMatchesSpecifier(
 // The input can be:
 // - A string (universal string specifier - matches all names)
 // - A map with "from" field indicating file/lib/package specifier
-func ConvertTypeOrValueSpecifier(spec interface{}) (TypeOrValueSpecifier, bool) {
+func ConvertTypeOrValueSpecifier(spec any) (TypeOrValueSpecifier, bool) {
 	// Handle string specifier
 	if str, ok := spec.(string); ok {
 		return TypeOrValueSpecifier{
@@ -413,7 +413,7 @@ func ConvertTypeOrValueSpecifier(spec interface{}) (TypeOrValueSpecifier, bool) 
 	}
 
 	// Handle object specifier
-	specMap, ok := spec.(map[string]interface{})
+	specMap, ok := spec.(map[string]any)
 	if !ok {
 		return TypeOrValueSpecifier{}, false
 	}
@@ -440,7 +440,7 @@ func ConvertTypeOrValueSpecifier(spec interface{}) (TypeOrValueSpecifier, bool) 
 	switch nameVal := specMap["name"].(type) {
 	case string:
 		names = []string{nameVal}
-	case []interface{}:
+	case []any:
 		names = make([]string, 0, len(nameVal))
 		for _, n := range nameVal {
 			if str, ok := n.(string); ok {

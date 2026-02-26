@@ -27,6 +27,10 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 			Code: "\n      const obj: { a?: string } = {};\n      const { a = 'default' } = obj;\n    ",
 		},
 		{
+			Code:     "\n      function test(options?: { offset?: number }) {\n        const { offset = 5 } = { ...options };\n        offset.toString();\n      }\n    ",
+			TSConfig: "tsconfig.exactOptionalPropertyTypes.json",
+		},
+		{
 			Code: "\n      function test(a: string | undefined = 'default') {\n        return a;\n      }\n    ",
 		},
 		{

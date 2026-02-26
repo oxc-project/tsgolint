@@ -95,7 +95,7 @@ var NoMisusedPromisesRule = rule.Rule{
 					// If true, use default nested options
 					checksVoidReturnOpts = defaultChecksVoidReturnOpts()
 				}
-			case map[string]interface{}:
+			case map[string]any:
 				// It's an object, unmarshal it as ChecksVoidReturnOptions
 				checksVoidReturn = true
 				jsonBytes, err := json.Marshal(v)

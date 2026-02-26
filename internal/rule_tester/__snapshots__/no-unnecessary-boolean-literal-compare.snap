@@ -13,6 +13,78 @@ Message: This expression unnecessarily compares a boolean value to a boolean ins
      | ~~~~~~~~~~~~~~
 ---
 
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-2 - 1]
+Diagnostic 1: negated (3:13 - 3:32)
+Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
+   2 |         declare const varBoolean: boolean;
+   3 |         if (varBoolean !== false) {
+     |             ~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-3 - 1]
+Diagnostic 1: negated (3:13 - 3:28)
+Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
+   2 |         declare const varTrue: true;
+   3 |         if (varTrue !== true) {
+     |             ~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-4 - 1]
+Diagnostic 1: comparingNullableToTrueDirect (3:13 - 3:39)
+Message: This expression unnecessarily compares a nullable boolean value to true instead of using it directly.
+   2 |         declare const varTrueOrUndefined: true | undefined;
+   3 |         if (varTrueOrUndefined === true) {
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-5 - 1]
+Diagnostic 1: comparingNullableToTrueNegated (3:13 - 3:35)
+Message: This expression unnecessarily compares a nullable boolean value to true instead of negating it.
+   2 |         declare const varFalseOrNull: false | null;
+   3 |         if (varFalseOrNull !== true) {
+     |             ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-6 - 1]
+Diagnostic 1: comparingNullableToFalse (4:13 - 4:38)
+Message: This expression unnecessarily compares a nullable boolean value to false instead of using the ?? operator to provide a default.
+   3 |         declare const otherBoolean: boolean;
+   4 |         if (varBooleanOrNull === false && otherBoolean) {
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-7 - 1]
+Diagnostic 1: comparingNullableToFalse (4:15 - 4:40)
+Message: This expression unnecessarily compares a nullable boolean value to false instead of using the ?? operator to provide a default.
+   3 |         declare const otherBoolean: boolean;
+   4 |         if (!(varBooleanOrNull === false) || otherBoolean) {
+     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-8 - 1]
+Diagnostic 1: comparingNullableToFalse (4:13 - 4:47)
+Message: This expression unnecessarily compares a nullable boolean value to false instead of using the ?? operator to provide a default.
+   3 |         declare const otherBoolean: boolean;
+   4 |         if (varTrueOrFalseOrUndefined !== false && !otherBoolean) {
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-9 - 1]
+Diagnostic 1: negated (3:13 - 3:32)
+Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
+   2 |         declare const varBoolean: boolean;
+   3 |         if (false !== varBoolean) {
+     |             ~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
 [TestNoUnnecessaryBooleanLiteralCompareRule/invalid-10 - 1]
 Diagnostic 1: negated (3:13 - 3:31)
 Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
@@ -103,15 +175,6 @@ Message: This expression unnecessarily compares a boolean value to a boolean ins
    4 |         }
 ---
 
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-2 - 1]
-Diagnostic 1: negated (3:13 - 3:32)
-Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
-   2 |         declare const varBoolean: boolean;
-   3 |         if (varBoolean !== false) {
-     |             ~~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
 [TestNoUnnecessaryBooleanLiteralCompareRule/invalid-20 - 1]
 Diagnostic 1: direct (3:13 - 3:48)
 Message: This expression unnecessarily compares a boolean value to a boolean instead of using it directly.
@@ -178,67 +241,4 @@ Message: This expression unnecessarily compares a boolean value to a boolean ins
 [TestNoUnnecessaryBooleanLiteralCompareRule/invalid-27 - 1]
 Diagnostic 1: noStrictNullCheck
 Message: This rule requires the `strictNullChecks` compiler option to be turned on to function correctly.
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-3 - 1]
-Diagnostic 1: negated (3:13 - 3:28)
-Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
-   2 |         declare const varTrue: true;
-   3 |         if (varTrue !== true) {
-     |             ~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-4 - 1]
-Diagnostic 1: comparingNullableToTrueDirect (3:13 - 3:39)
-Message: This expression unnecessarily compares a nullable boolean value to true instead of using it directly.
-   2 |         declare const varTrueOrUndefined: true | undefined;
-   3 |         if (varTrueOrUndefined === true) {
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-5 - 1]
-Diagnostic 1: comparingNullableToTrueNegated (3:13 - 3:35)
-Message: This expression unnecessarily compares a nullable boolean value to true instead of negating it.
-   2 |         declare const varFalseOrNull: false | null;
-   3 |         if (varFalseOrNull !== true) {
-     |             ~~~~~~~~~~~~~~~~~~~~~~~
-   4 |         }
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-6 - 1]
-Diagnostic 1: comparingNullableToFalse (4:13 - 4:38)
-Message: This expression unnecessarily compares a nullable boolean value to false instead of using the ?? operator to provide a default.
-   3 |         declare const otherBoolean: boolean;
-   4 |         if (varBooleanOrNull === false && otherBoolean) {
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |         }
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-7 - 1]
-Diagnostic 1: comparingNullableToFalse (4:15 - 4:40)
-Message: This expression unnecessarily compares a nullable boolean value to false instead of using the ?? operator to provide a default.
-   3 |         declare const otherBoolean: boolean;
-   4 |         if (!(varBooleanOrNull === false) || otherBoolean) {
-     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |         }
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-8 - 1]
-Diagnostic 1: comparingNullableToFalse (4:13 - 4:47)
-Message: This expression unnecessarily compares a nullable boolean value to false instead of using the ?? operator to provide a default.
-   3 |         declare const otherBoolean: boolean;
-   4 |         if (varTrueOrFalseOrUndefined !== false && !otherBoolean) {
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |         }
----
-
-[TestNoUnnecessaryBooleanLiteralCompareRule/invalid-9 - 1]
-Diagnostic 1: negated (3:13 - 3:32)
-Message: This expression unnecessarily compares a boolean value to a boolean instead of negating it.
-   2 |         declare const varBoolean: boolean;
-   3 |         if (false !== varBoolean) {
-     |             ~~~~~~~~~~~~~~~~~~~~
-   4 |         }
 ---

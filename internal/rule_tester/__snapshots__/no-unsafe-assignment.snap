@@ -15,6 +15,83 @@ Message: Unsafe assignment of an any value.
    3 |   y = 1;
 ---
 
+[TestNoUnsafeAssignmentRule/invalid-2 - 1]
+Diagnostic 1: anyAssignment (1:14 - 1:25)
+Message: Unsafe assignment of an any value.
+   1 | function foo(a = 1 as any) {}
+     |              ~~~~~~~~~~~~
+---
+
+[TestNoUnsafeAssignmentRule/invalid-3 - 1]
+Diagnostic 1: anyAssignment (3:15 - 3:34)
+Message: Unsafe assignment of an any value.
+   2 | class Foo {
+   3 |   constructor(private a = 1 as any) {}
+     |               ~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeAssignmentRule/invalid-4 - 1]
+Diagnostic 1: anyAssignment (3:3 - 3:23)
+Message: Unsafe assignment of an any value.
+   2 | class Foo {
+   3 |   private a = 1 as any;
+     |   ~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeAssignmentRule/invalid-5 - 1]
+Diagnostic 1: anyAssignment (3:3 - 3:24)
+Message: Unsafe assignment of an any value.
+   2 | class Foo {
+   3 |   accessor a = 1 as any;
+     |   ~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeAssignmentRule/invalid-6 - 1]
+Diagnostic 1: anyAssignment (2:7 - 2:18)
+Message: Unsafe assignment of an any value.
+   1 | 
+   2 | const [x] = spooky;
+     |       ~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoUnsafeAssignmentRule/invalid-7 - 1]
+Diagnostic 1: unsafeArrayPatternFromTuple (2:8 - 2:12)
+Message: Unsafe array destructuring of a tuple element with an any value.
+   1 | 
+   2 | const [[[x]]] = [spooky];
+     |        ~~~~~
+   3 |       
+---
+
+[TestNoUnsafeAssignmentRule/invalid-8 - 1]
+Diagnostic 1: unsafeArrayPatternFromTuple (3:6 - 3:13)
+Message: Unsafe array destructuring of a tuple element with an any value.
+   2 | const {
+   3 |   x: { y: z },
+     |      ~~~~~~~~
+   4 | } = { x: spooky };
+
+Diagnostic 2: anyAssignment (4:7 - 4:15)
+Message: Unsafe assignment of an any value.
+   3 |   x: { y: z },
+   4 | } = { x: spooky };
+     |       ~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnsafeAssignmentRule/invalid-9 - 1]
+Diagnostic 1: anyAssignment (4:1 - 4:14)
+Message: Unsafe assignment of an any value.
+   3 | 
+   4 | value = spooky;
+     | ~~~~~~~~~~~~~~
+   5 |       
+---
+
 [TestNoUnsafeAssignmentRule/invalid-10 - 1]
 Diagnostic 1: anyAssignment (2:7 - 2:20)
 Message: Unsafe assignment of an any value.
@@ -89,13 +166,6 @@ Message: Unsafe array destructuring of a tuple element with an any value.
      |           ~
 ---
 
-[TestNoUnsafeAssignmentRule/invalid-2 - 1]
-Diagnostic 1: anyAssignment (1:14 - 1:25)
-Message: Unsafe assignment of an any value.
-   1 | function foo(a = 1 as any) {}
-     |              ~~~~~~~~~~~~
----
-
 [TestNoUnsafeAssignmentRule/invalid-20 - 1]
 Diagnostic 1: unsafeArrayPatternFromTuple (1:18 - 1:18)
 Message: Unsafe array destructuring of a tuple element with an any value.
@@ -164,15 +234,6 @@ Diagnostic 1: unsafeArrayPatternFromTuple (1:11 - 1:11)
 Message: Unsafe array destructuring of a tuple element with an any value.
    1 | ([{['x']: x}] = [{['x']: 1}] as [{['x']: any}])
      |           ~
----
-
-[TestNoUnsafeAssignmentRule/invalid-3 - 1]
-Diagnostic 1: anyAssignment (3:15 - 3:34)
-Message: Unsafe assignment of an any value.
-   2 | class Foo {
-   3 |   constructor(private a = 1 as any) {}
-     |               ~~~~~~~~~~~~~~~~~~~~
-   4 | }
 ---
 
 [TestNoUnsafeAssignmentRule/invalid-30 - 1]
@@ -249,15 +310,6 @@ Message: Unsafe array destructuring of a tuple element with an any value.
      |           ~
 ---
 
-[TestNoUnsafeAssignmentRule/invalid-4 - 1]
-Diagnostic 1: anyAssignment (3:3 - 3:23)
-Message: Unsafe assignment of an any value.
-   2 | class Foo {
-   3 |   private a = 1 as any;
-     |   ~~~~~~~~~~~~~~~~~~~~~
-   4 | }
----
-
 [TestNoUnsafeAssignmentRule/invalid-40 - 1]
 Diagnostic 1: unsafeArrayPatternFromTuple (1:18 - 1:18)
 Message: Unsafe array destructuring of a tuple element with an any value.
@@ -328,15 +380,6 @@ Message: Unsafe assignment of an any value.
      |                  ~~~~~~~~~~~
 ---
 
-[TestNoUnsafeAssignmentRule/invalid-5 - 1]
-Diagnostic 1: anyAssignment (3:3 - 3:24)
-Message: Unsafe assignment of an any value.
-   2 | class Foo {
-   3 |   accessor a = 1 as any;
-     |   ~~~~~~~~~~~~~~~~~~~~~~
-   4 | }
----
-
 [TestNoUnsafeAssignmentRule/invalid-50 - 1]
 Diagnostic 1: unsafeAssignment (1:43 - 1:69)
 Message: Unsafe assignment of type Set<Set<Set<any>>> to a variable of type Set<Set<Set<string>>>.
@@ -364,6 +407,7 @@ Message: Unsafe assignment of an any value.
 Diagnostic 1: anyAssignmentThis (3:9 - 3:18)
 Message: Unsafe assignment of an any value. `this` is typed as `any`.
 
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    2 | function foo() {
    3 |   const bar = this;
      |         ~~~~~~~~~~
@@ -403,48 +447,5 @@ Message: Unsafe assignment of an any value.
    3 | 
    4 | foo = { bar: 2 } as any;
      | ~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnsafeAssignmentRule/invalid-6 - 1]
-Diagnostic 1: anyAssignment (2:7 - 2:18)
-Message: Unsafe assignment of an any value.
-   1 | 
-   2 | const [x] = spooky;
-     |       ~~~~~~~~~~~~
-   3 |       
----
-
-[TestNoUnsafeAssignmentRule/invalid-7 - 1]
-Diagnostic 1: unsafeArrayPatternFromTuple (2:8 - 2:12)
-Message: Unsafe array destructuring of a tuple element with an any value.
-   1 | 
-   2 | const [[[x]]] = [spooky];
-     |        ~~~~~
-   3 |       
----
-
-[TestNoUnsafeAssignmentRule/invalid-8 - 1]
-Diagnostic 1: unsafeArrayPatternFromTuple (3:6 - 3:13)
-Message: Unsafe array destructuring of a tuple element with an any value.
-   2 | const {
-   3 |   x: { y: z },
-     |      ~~~~~~~~
-   4 | } = { x: spooky };
-
-Diagnostic 2: anyAssignment (4:7 - 4:15)
-Message: Unsafe assignment of an any value.
-   3 |   x: { y: z },
-   4 | } = { x: spooky };
-     |       ~~~~~~~~~
-   5 |       
----
-
-[TestNoUnsafeAssignmentRule/invalid-9 - 1]
-Diagnostic 1: anyAssignment (4:1 - 4:14)
-Message: Unsafe assignment of an any value.
-   3 | 
-   4 | value = spooky;
-     | ~~~~~~~~~~~~~~
    5 |       
 ---

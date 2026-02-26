@@ -17,6 +17,78 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
+[TestNoUnnecessaryTypeArguments/invalid-2 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:3 - 3:8)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | function f<T = number>(templates: TemplateStringsArray, arg: T) {}
+   3 | f<number>`${1}`;
+     |   ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-3 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:17 - 3:22)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | class C<T = number> {}
+   3 | function h(c: C<number>) {}
+     |                 ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-4 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:7 - 3:12)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | class C<T = number> {}
+   3 | new C<number>();
+     |       ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-5 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:19 - 3:24)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | class C<T = number> {}
+   3 | class D extends C<number> {}
+     |                   ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-6 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:25 - 3:30)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | interface I<T = number> {}
+   3 | class Impl implements I<number> {}
+     |                         ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-7 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:21 - 3:26)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | class Foo<T = number> {}
+   3 | const foo = new Foo<number>();
+     |                     ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-8 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:38 - 3:43)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | interface Bar<T = string> {}
+   3 | class Foo<T = number> implements Bar<string> {}
+     |                                      ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-9 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:35 - 3:40)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | class Bar<T = string> {}
+   3 | class Foo<T = number> extends Bar<string> {}
+     |                                   ~~~~~~
+   4 |       
+---
+
 [TestNoUnnecessaryTypeArguments/invalid-11 - 1]
 Diagnostic 1: unnecessaryTypeParameter (4:12 - 4:19)
 Message: This is the default value for this type parameter, so it can be omitted.
@@ -98,15 +170,6 @@ Message: This is the default value for this type parameter, so it can be omitted
    5 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-2 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:3 - 3:8)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | function f<T = number>(templates: TemplateStringsArray, arg: T) {}
-   3 | f<number>`${1}`;
-     |   ~~~~~~
-   4 |       
----
-
 [TestNoUnnecessaryTypeArguments/invalid-20 - 1]
 Diagnostic 1: unnecessaryTypeParameter (6:23 - 6:28)
 Message: This is the default value for this type parameter, so it can be omitted.
@@ -159,67 +222,4 @@ Message: This is the default value for this type parameter, so it can be omitted
    2 | declare type MessageEventHandler = ((ev: MessageEvent<any>) => any) | null;
      |                                                       ~~~
    3 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-3 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:17 - 3:22)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | class C<T = number> {}
-   3 | function h(c: C<number>) {}
-     |                 ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-4 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:7 - 3:12)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | class C<T = number> {}
-   3 | new C<number>();
-     |       ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-5 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:19 - 3:24)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | class C<T = number> {}
-   3 | class D extends C<number> {}
-     |                   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-6 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:25 - 3:30)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | interface I<T = number> {}
-   3 | class Impl implements I<number> {}
-     |                         ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-7 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:21 - 3:26)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | class Foo<T = number> {}
-   3 | const foo = new Foo<number>();
-     |                     ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-8 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:38 - 3:43)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | interface Bar<T = string> {}
-   3 | class Foo<T = number> implements Bar<string> {}
-     |                                      ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-9 - 1]
-Diagnostic 1: unnecessaryTypeParameter (3:35 - 3:40)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | class Bar<T = string> {}
-   3 | class Foo<T = number> extends Bar<string> {}
-     |                                   ~~~~~~
-   4 |       
 ---

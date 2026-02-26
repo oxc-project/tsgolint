@@ -240,69 +240,6 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
    6 | }
 ---
 
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-10 - 1]
-Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (6:3 - 6:8)
-Message: Unsafe type assertion: the original type is assignable to the constraint of type 'V', but 'V' could be instantiated with a different subtype of its constraint.
-   5 | ) {
-   6 |   x as V; // banned; assignable to constraint
-     |   ~~~~~~
-   7 | }
----
-
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-11 - 1]
-Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
-Message: Unsafe type assertion: 'V' could be instantiated with an arbitrary type which could be unrelated to the original type.
-   2 | function parameterExtendsUnconstrainedParameter<T, V extends T>(x: T, y: V) {
-   3 |   x as V; // banned; unconstrained arbitrary type
-     |   ~~~~~~
-   4 | }
----
-
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-12 - 1]
-Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
-Message: Unsafe type assertion: 'T' could be instantiated with an arbitrary type which could be unrelated to the original type.
-   2 | function twoUnconstrained<T, V>(x: T, y: V) {
-   3 |   y as T;
-     |   ~~~~~~
-   4 | }
----
-
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-13 - 1]
-Diagnostic 1: unsafeTypeAssertion (3:3 - 3:13)
-Message: Unsafe type assertion: type 'string' is more narrow than the original type.
-   2 | function toNarrower<T>(x: T, y: string) {
-   3 |   x as string; // banned; ordinary 'string' narrower than 'T'.
-     |   ~~~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-14 - 1]
-Diagnostic 1: unsafeToAnyTypeAssertion (3:3 - 3:10)
-Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
-   2 | function unconstrainedToAny<T>(x: T) {
-   3 |   x as any;
-     |   ~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-15 - 1]
-Diagnostic 1: unsafeToAnyTypeAssertion (3:3 - 3:10)
-Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
-   2 | function stringToAny<T extends string>(x: T) {
-   3 |   x as any;
-     |   ~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-16 - 1]
-Diagnostic 1: unsafeTypeAssertion (3:3 - 3:16)
-Message: Unsafe type assertion: type '"a" | "b"' is more narrow than the original type.
-   2 | function stringToNarrower<T extends string>(x: T) {
-   3 |   x as 'a' | 'b';
-     |   ~~~~~~~~~~~~~~
-   4 | }
----
-
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeTypeAssertion (5:27 - 5:48)
 Message: Unsafe type assertion: type 'CustomObjectT' is more narrow than the original type.
@@ -372,6 +309,69 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
    2 | function assertFromAny<T extends string | number>(x: T, y: any) {
    3 |   y as T; // banned; just an `any` complaint. Not a generic subtype.
      |   ~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-10 - 1]
+Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (6:3 - 6:8)
+Message: Unsafe type assertion: the original type is assignable to the constraint of type 'V', but 'V' could be instantiated with a different subtype of its constraint.
+   5 | ) {
+   6 |   x as V; // banned; assignable to constraint
+     |   ~~~~~~
+   7 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-11 - 1]
+Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
+Message: Unsafe type assertion: 'V' could be instantiated with an arbitrary type which could be unrelated to the original type.
+   2 | function parameterExtendsUnconstrainedParameter<T, V extends T>(x: T, y: V) {
+   3 |   x as V; // banned; unconstrained arbitrary type
+     |   ~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-12 - 1]
+Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
+Message: Unsafe type assertion: 'T' could be instantiated with an arbitrary type which could be unrelated to the original type.
+   2 | function twoUnconstrained<T, V>(x: T, y: V) {
+   3 |   y as T;
+     |   ~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-13 - 1]
+Diagnostic 1: unsafeTypeAssertion (3:3 - 3:13)
+Message: Unsafe type assertion: type 'string' is more narrow than the original type.
+   2 | function toNarrower<T>(x: T, y: string) {
+   3 |   x as string; // banned; ordinary 'string' narrower than 'T'.
+     |   ~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-14 - 1]
+Diagnostic 1: unsafeToAnyTypeAssertion (3:3 - 3:10)
+Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+   2 | function unconstrainedToAny<T>(x: T) {
+   3 |   x as any;
+     |   ~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-15 - 1]
+Diagnostic 1: unsafeToAnyTypeAssertion (3:3 - 3:10)
+Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+   2 | function stringToAny<T extends string>(x: T) {
+   3 |   x as any;
+     |   ~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-16 - 1]
+Diagnostic 1: unsafeTypeAssertion (3:3 - 3:16)
+Message: Unsafe type assertion: type '"a" | "b"' is more narrow than the original type.
+   2 | function stringToNarrower<T extends string>(x: T) {
+   3 |   x as 'a' | 'b';
+     |   ~~~~~~~~~~~~~~
    4 | }
 ---
 

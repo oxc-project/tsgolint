@@ -1,6 +1,8 @@
 package strict_void_return
 
 import (
+	"slices"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
@@ -271,11 +273,9 @@ var StrictVoidReturnRule = rule.Rule{
 			if methodNode.AsMethodDeclaration().Body == nil {
 				return
 			}
-			for _, baseMemberType := range getBaseMemberTypes(methodNode) {
-				if isVoidReturningFunctionType(baseMemberType) {
-					reportIfNonVoidFunction(methodNode)
-					return
-				}
+			if slices.ContainsFunc(getBaseMemberTypes(methodNode), isVoidReturningFunctionType) {
+				reportIfNonVoidFunction(methodNode)
+				return
 			}
 		}
 

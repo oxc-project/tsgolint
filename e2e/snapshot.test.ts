@@ -562,6 +562,40 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
+  it('should keep no-floating-promises suggestion messages distinct (issue #534)', async () => {
+    const testFiles = await getTestFiles('issue-534');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, [
+      {
+        name: 'no-floating-promises',
+        options: { ignoreVoid: true },
+      },
+    ]);
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless', '-fix-suggestions'], {
+      input: config,
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].suggestions).toStrictEqual(
+      [
+        {
+          fixes: [{ range: expect.any(Object), text: 'void ' }],
+          message: { description: 'Add void operator to ignore.', id: 'floatingFixVoid' },
+        },
+        {
+          fixes: [{ range: expect.any(Object), text: 'await ' }],
+          message: { description: 'Add await operator.', id: 'floatingFixAwait' },
+        },
+      ],
+    );
+  });
+
   it('should report type errors', async () => {
     const testFiles = await getTestFiles('report-type-errors');
     expect(testFiles.length).toBeGreaterThan(0);

@@ -1477,12 +1477,13 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 		op := binExpr.OperatorToken.Kind
 
-		// Relational operators (<, >, <=, >=) should not participate in optional chaining.
+		// Relational operators (<, >, <=, >=, in) should not participate in optional chaining.
 		switch op {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
-			ast.KindGreaterThanEqualsToken:
+			ast.KindGreaterThanEqualsToken,
+			ast.KindInKeyword:
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
@@ -1520,12 +1521,13 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 		op := binExpr.OperatorToken.Kind
 
-		// Relational operators (<, >, <=, >=) should not participate in optional chaining.
+		// Relational operators (<, >, <=, >=, in) should not participate in optional chaining.
 		switch op {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
-			ast.KindGreaterThanEqualsToken:
+			ast.KindGreaterThanEqualsToken,
+			ast.KindInKeyword:
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
@@ -2453,8 +2455,44 @@ func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) [
 		return nil
 	}
 
+	// When the first operand is a nullish guard (typeof check, === null, === undefined, == null),
+	// validate that all subsequent operands have safe comparisons for optional chaining.
+	// For example, `typeof foo === 'undefined' || foo.size === 0` should NOT
+	// suggest optional chaining because `.size === 0` is not safe (comparing against 0).
+	// Similarly, `typeof foo[bar] === 'undefined' || foo[bar] === null` should NOT suggest
+	// optional chaining because `=== null` is not safe per isOrChainComparisonSafe.
+	isNullishGuardStart := chain[0].typ == OperandTypeTypeofCheck ||
+		chain[0].typ == OperandTypeStrictEqualNull ||
+		chain[0].typ == OperandTypeStrictEqualUndef ||
+		chain[0].typ == OperandTypeEqualNull
+	if isNullishGuardStart && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+		for i := 1; i < len(chain); i++ {
+			op := chain[i]
+			if op.typ == OperandTypeComparison && !processor.isOrChainComparisonSafe(op) {
+				return nil
+			}
+			if op.typ == OperandTypePlain || op.typ == OperandTypeNot {
+				return nil
+			}
+		}
+	}
+
 	if analysis.HasNullCheck && !analysis.HasUndefinedCheck && !analysis.HasBothCheck && !strictCheckIsComplete {
 		return nil
+	}
+
+	// When the first operand is a comparison-type nullish check (property access === null/undefined),
+	// validate that subsequent comparisons are not non-nullish, non-safe comparisons.
+	// For example, `contract.bidFiles === null || contract.bidFiles.trim() === ''` should NOT suggest
+	// optional chaining because `.trim() === ''` is not a safe comparison (comparing against empty string).
+	// But `foo.bar === null || foo.bar.baz === null` IS valid because each subsequent operand
+	// is also a nullish check at increasing depth.
+	if chain[0].typ == OperandTypeComparison && isNullishComparison(chain[0]) && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+		for i := 1; i < len(chain); i++ {
+			if chain[i].typ == OperandTypeComparison && !processor.isOrChainComparisonSafe(chain[i]) && !isNullishComparison(chain[i]) {
+				return nil
+			}
+		}
 	}
 
 	return chain
@@ -2476,6 +2514,13 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	}
 
 	if processor.shouldSkipOrChainOptimalChecks(chain) {
+		return nil
+	}
+
+	// When all operands check the same expression at the same depth (e.g.,
+	// foo.value === 'Invalid DateTime' || foo.value === null),
+	// there's no deeper property access that optional chaining would help with.
+	if processor.allOperandsCheckSameExpression(chain) {
 		return nil
 	}
 

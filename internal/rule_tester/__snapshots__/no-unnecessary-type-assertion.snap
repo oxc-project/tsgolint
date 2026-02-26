@@ -25,6 +25,153 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |               ^^^^ Casting it to '3' is unnecessary
 ---
 
+[TestNoUnnecessaryTypeAssertion/invalid-2 - 1]
+Diagnostic 1: unnecessaryAssertion (3:27 - 3:31)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const num = 42;
+   3 | const alsoRedundant = num as 42;
+     |                           ~~~~~
+   4 |       
+  Label: This expression already has the type '42' (3:23 - 3:25)
+   2 | const num = 42;
+   3 | const alsoRedundant = num as 42;
+     |                       ^^^ This expression already has the type '42'
+   4 |       
+  Label: Casting it to '42' is unnecessary (3:27 - 3:31)
+   2 | const num = 42;
+   3 | const alsoRedundant = num as 42;
+     |                           ^^^^^ Casting it to '42' is unnecessary
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-3 - 1]
+Diagnostic 1: unnecessaryAssertion (3:24 - 3:32)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const str: string = 'hello';
+   3 | const redundant =  str as string;
+     |                        ~~~~~~~~~
+   4 |           
+  Label: This expression already has the type 'string' (3:20 - 3:22)
+   2 | const str: string = 'hello';
+   3 | const redundant =  str as string;
+     |                    ^^^ This expression already has the type 'string'
+   4 |           
+  Label: Casting it to 'string' is unnecessary (3:24 - 3:32)
+   2 | const str: string = 'hello';
+   3 | const redundant =  str as string;
+     |                        ^^^^^^^^^ Casting it to 'string' is unnecessary
+   4 |           
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-4 - 1]
+Diagnostic 1: unnecessaryAssertion (3:21 - 3:25)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 |         type Foo = 3;
+   3 |         const foo = <Foo>3;
+     |                     ~~~~~
+   4 |       
+  Label: This expression already has the type '3' (3:26 - 3:26)
+   2 |         type Foo = 3;
+   3 |         const foo = <Foo>3;
+     |                          ^ This expression already has the type '3'
+   4 |       
+  Label: Casting it to '3' is unnecessary (3:21 - 3:25)
+   2 |         type Foo = 3;
+   3 |         const foo = <Foo>3;
+     |                     ^^^^^ Casting it to '3' is unnecessary
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-5 - 1]
+Diagnostic 1: unnecessaryAssertion (3:23 - 3:28)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 |         type Foo = 3;
+   3 |         const foo = 3 as Foo;
+     |                       ~~~~~~
+   4 |       
+  Label: This expression already has the type '3' (3:21 - 3:21)
+   2 |         type Foo = 3;
+   3 |         const foo = 3 as Foo;
+     |                     ^ This expression already has the type '3'
+   4 |       
+  Label: Casting it to '3' is unnecessary (3:23 - 3:28)
+   2 |         type Foo = 3;
+   3 |         const foo = 3 as Foo;
+     |                       ^^^^^^ Casting it to '3' is unnecessary
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-6 - 1]
+Diagnostic 1: unnecessaryAssertion (3:16 - 3:16)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const foo = 3;
+   3 | const bar = foo!;
+     |                ~
+   4 |       
+  Label: This expression already has the type '3' (3:13 - 3:15)
+   2 | const foo = 3;
+   3 | const bar = foo!;
+     |             ^^^ This expression already has the type '3'
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-7 - 1]
+Diagnostic 1: unnecessaryAssertion (2:21 - 2:29)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | 
+   2 | const foo = (3 + 5) as number;
+     |                     ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:14 - 2:18)
+   1 | 
+   2 | const foo = (3 + 5) as number;
+     |              ^^^^^ This expression already has the type 'number'
+   3 |       
+  Label: Casting it to 'number' is unnecessary (2:21 - 2:29)
+   1 | 
+   2 | const foo = (3 + 5) as number;
+     |                     ^^^^^^^^^ Casting it to 'number' is unnecessary
+   3 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-8 - 1]
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:20)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | 
+   2 | const foo = <number>(3 + 5);
+     |             ~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:22 - 2:26)
+   1 | 
+   2 | const foo = <number>(3 + 5);
+     |                      ^^^^^ This expression already has the type 'number'
+   3 |       
+  Label: Casting it to 'number' is unnecessary (2:13 - 2:20)
+   1 | 
+   2 | const foo = <number>(3 + 5);
+     |             ^^^^^^^^ Casting it to 'number' is unnecessary
+   3 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-9 - 1]
+Diagnostic 1: unnecessaryAssertion (3:21 - 3:26)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | type Foo = number;
+   3 | const foo = (3 + 5) as Foo;
+     |                     ~~~~~~
+   4 |       
+  Label: This expression already has the type 'number' (3:14 - 3:18)
+   2 | type Foo = number;
+   3 | const foo = (3 + 5) as Foo;
+     |              ^^^^^ This expression already has the type 'number'
+   4 |       
+  Label: Casting it to 'number' is unnecessary (3:21 - 3:26)
+   2 | type Foo = number;
+   3 | const foo = (3 + 5) as Foo;
+     |                     ^^^^^^ Casting it to 'number' is unnecessary
+   4 |       
+---
+
 [TestNoUnnecessaryTypeAssertion/invalid-10 - 1]
 Diagnostic 1: unnecessaryAssertion (3:13 - 3:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
@@ -181,25 +328,6 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |   return { ...mod, extra: true };
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-2 - 1]
-Diagnostic 1: unnecessaryAssertion (3:27 - 3:31)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   2 | const num = 42;
-   3 | const alsoRedundant = num as 42;
-     |                           ~~~~~
-   4 |       
-  Label: This expression already has the type '42' (3:23 - 3:25)
-   2 | const num = 42;
-   3 | const alsoRedundant = num as 42;
-     |                       ^^^ This expression already has the type '42'
-   4 |       
-  Label: Casting it to '42' is unnecessary (3:27 - 3:31)
-   2 | const num = 42;
-   3 | const alsoRedundant = num as 42;
-     |                           ^^^^^ Casting it to '42' is unnecessary
-   4 |       
----
-
 [TestNoUnnecessaryTypeAssertion/invalid-20 - 1]
 Diagnostic 1: unnecessaryAssertion (3:65 - 3:73)
 Message: This assertion is unnecessary since it does not change the type of the expression.
@@ -313,25 +441,6 @@ Message: This assertion is unnecessary since it does not change the type of the 
    2 | const b = new Date()!;
      |           ^^^^^^^^^^ This expression already has the type 'Date'
    3 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-3 - 1]
-Diagnostic 1: unnecessaryAssertion (3:24 - 3:32)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   2 | const str: string = 'hello';
-   3 | const redundant =  str as string;
-     |                        ~~~~~~~~~
-   4 |           
-  Label: This expression already has the type 'string' (3:20 - 3:22)
-   2 | const str: string = 'hello';
-   3 | const redundant =  str as string;
-     |                    ^^^ This expression already has the type 'string'
-   4 |           
-  Label: Casting it to 'string' is unnecessary (3:24 - 3:32)
-   2 | const str: string = 'hello';
-   3 | const redundant =  str as string;
-     |                        ^^^^^^^^^ Casting it to 'string' is unnecessary
-   4 |           
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-30 - 1]
@@ -526,25 +635,6 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-4 - 1]
-Diagnostic 1: unnecessaryAssertion (3:21 - 3:25)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   2 |         type Foo = 3;
-   3 |         const foo = <Foo>3;
-     |                     ~~~~~
-   4 |       
-  Label: This expression already has the type '3' (3:26 - 3:26)
-   2 |         type Foo = 3;
-   3 |         const foo = <Foo>3;
-     |                          ^ This expression already has the type '3'
-   4 |       
-  Label: Casting it to '3' is unnecessary (3:21 - 3:25)
-   2 |         type Foo = 3;
-   3 |         const foo = <Foo>3;
-     |                     ^^^^^ Casting it to '3' is unnecessary
-   4 |       
----
-
 [TestNoUnnecessaryTypeAssertion/invalid-40 - 1]
 Diagnostic 1: unnecessaryAssertion (2:30 - 2:38)
 Message: This assertion is unnecessary since it does not change the type of the expression.
@@ -720,25 +810,6 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-5 - 1]
-Diagnostic 1: unnecessaryAssertion (3:23 - 3:28)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   2 |         type Foo = 3;
-   3 |         const foo = 3 as Foo;
-     |                       ~~~~~~
-   4 |       
-  Label: This expression already has the type '3' (3:21 - 3:21)
-   2 |         type Foo = 3;
-   3 |         const foo = 3 as Foo;
-     |                     ^ This expression already has the type '3'
-   4 |       
-  Label: Casting it to '3' is unnecessary (3:23 - 3:28)
-   2 |         type Foo = 3;
-   3 |         const foo = 3 as Foo;
-     |                       ^^^^^^ Casting it to '3' is unnecessary
-   4 |       
----
-
 [TestNoUnnecessaryTypeAssertion/invalid-50 - 1]
 Diagnostic 1: unnecessaryAssertion (4:4 - 4:4)
 Message: This assertion is unnecessary since it does not change the type of the expression.
@@ -894,20 +965,6 @@ Message: This assertion is unnecessary since it does not change the type of the 
    5 |             
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-6 - 1]
-Diagnostic 1: unnecessaryAssertion (3:16 - 3:16)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   2 | const foo = 3;
-   3 | const bar = foo!;
-     |                ~
-   4 |       
-  Label: This expression already has the type '3' (3:13 - 3:15)
-   2 | const foo = 3;
-   3 | const bar = foo!;
-     |             ^^^ This expression already has the type '3'
-   4 |       
----
-
 [TestNoUnnecessaryTypeAssertion/invalid-60 - 1]
 Diagnostic 1: unnecessaryAssertion (1:16 - 1:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
@@ -1044,25 +1101,6 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-7 - 1]
-Diagnostic 1: unnecessaryAssertion (2:21 - 2:29)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   1 | 
-   2 | const foo = (3 + 5) as number;
-     |                     ~~~~~~~~~
-   3 |       
-  Label: This expression already has the type 'number' (2:14 - 2:18)
-   1 | 
-   2 | const foo = (3 + 5) as number;
-     |              ^^^^^ This expression already has the type 'number'
-   3 |       
-  Label: Casting it to 'number' is unnecessary (2:21 - 2:29)
-   1 | 
-   2 | const foo = (3 + 5) as number;
-     |                     ^^^^^^^^^ Casting it to 'number' is unnecessary
-   3 |       
----
-
 [TestNoUnnecessaryTypeAssertion/invalid-70 - 1]
 Diagnostic 1: unnecessaryAssertion (8:13 - 8:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
@@ -1080,42 +1118,4 @@ Message: This assertion is unnecessary since it does not change the type of the 
    8 | const b = a as const;
      |             ^^^^^^^^ Casting it to 'T.Value1' is unnecessary
    9 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-8 - 1]
-Diagnostic 1: unnecessaryAssertion (2:13 - 2:20)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   1 | 
-   2 | const foo = <number>(3 + 5);
-     |             ~~~~~~~~
-   3 |       
-  Label: This expression already has the type 'number' (2:22 - 2:26)
-   1 | 
-   2 | const foo = <number>(3 + 5);
-     |                      ^^^^^ This expression already has the type 'number'
-   3 |       
-  Label: Casting it to 'number' is unnecessary (2:13 - 2:20)
-   1 | 
-   2 | const foo = <number>(3 + 5);
-     |             ^^^^^^^^ Casting it to 'number' is unnecessary
-   3 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-9 - 1]
-Diagnostic 1: unnecessaryAssertion (3:21 - 3:26)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   2 | type Foo = number;
-   3 | const foo = (3 + 5) as Foo;
-     |                     ~~~~~~
-   4 |       
-  Label: This expression already has the type 'number' (3:14 - 3:18)
-   2 | type Foo = number;
-   3 | const foo = (3 + 5) as Foo;
-     |              ^^^^^ This expression already has the type 'number'
-   4 |       
-  Label: Casting it to 'number' is unnecessary (3:21 - 3:26)
-   2 | type Foo = number;
-   3 | const foo = (3 + 5) as Foo;
-     |                     ^^^^^^ Casting it to 'number' is unnecessary
-   4 |       
 ---

@@ -19,6 +19,82 @@ Message: Prefer .find(...) instead of .filter(...)[0].
   Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
 ---
 
+[TestPreferFindRule/invalid-2 - 1]
+Diagnostic 1: preferFind (4:1 - 4:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = 0n;
+   4 | arr.filter(item => item === 'aha')[zero];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-3 - 1]
+Diagnostic 1: preferFind (4:1 - 4:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = -0n;
+   4 | arr.filter(item => item === 'aha')[zero];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-4 - 1]
+Diagnostic 1: preferFind (3:1 - 3:40)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: readonly string[];
+   3 | arr.filter(item => item === 'aha').at(0);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-5 - 1]
+Diagnostic 1: preferFind (3:1 - 3:53)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: ReadonlyArray<string>;
+   3 | (undefined, arr.filter(item => item === 'aha')).at(0);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-6 - 1]
+Diagnostic 1: preferFind (4:1 - 4:43)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   3 | const zero = 0;
+   4 | arr.filter(item => item === 'aha').at(zero);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-7 - 1]
+Diagnostic 1: preferFind (3:1 - 3:39)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   2 | declare const arr: string[];
+   3 | arr.filter(item => item === 'aha')['0'];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-8 - 1]
+Diagnostic 1: preferFind (1:13 - 1:51)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | const two = [1, 2, 3].filter(item => item === 2)[0];
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
+[TestPreferFindRule/invalid-9 - 1]
+Diagnostic 1: preferFind (1:24 - 1:91)
+Message: Prefer .find(...) instead of .filter(...)[0].
+   1 | const fltr = "filter"; (([] as unknown[]))[fltr] ((item) => { return item === 2 }  ) [ 0  ] ;
+     |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
+---
+
 [TestPreferFindRule/invalid-10 - 1]
 Diagnostic 1: preferFind (1:1 - 1:74)
 Message: Prefer .find(...) instead of .filter(...)[0].
@@ -126,16 +202,6 @@ Message: Prefer .find(...) instead of .filter(...)[0].
    5 |   ];
      | ~~~
    6 | }
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-2 - 1]
-Diagnostic 1: preferFind (4:1 - 4:40)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   3 | const zero = 0n;
-   4 | arr.filter(item => item === 'aha')[zero];
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
   Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
 ---
 
@@ -252,71 +318,5 @@ Message: Prefer .find(...) instead of .filter(...)[0].
    3 | [1, 2, 3].filter(...spreadArgs).at(0);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-3 - 1]
-Diagnostic 1: preferFind (4:1 - 4:40)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   3 | const zero = -0n;
-   4 | arr.filter(item => item === 'aha')[zero];
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-4 - 1]
-Diagnostic 1: preferFind (3:1 - 3:40)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   2 | declare const arr: readonly string[];
-   3 | arr.filter(item => item === 'aha').at(0);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-5 - 1]
-Diagnostic 1: preferFind (3:1 - 3:53)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   2 | declare const arr: ReadonlyArray<string>;
-   3 | (undefined, arr.filter(item => item === 'aha')).at(0);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-6 - 1]
-Diagnostic 1: preferFind (4:1 - 4:43)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   3 | const zero = 0;
-   4 | arr.filter(item => item === 'aha').at(zero);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |       
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-7 - 1]
-Diagnostic 1: preferFind (3:1 - 3:39)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   2 | declare const arr: string[];
-   3 | arr.filter(item => item === 'aha')['0'];
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |       
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-8 - 1]
-Diagnostic 1: preferFind (1:13 - 1:51)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   1 | const two = [1, 2, 3].filter(item => item === 2)[0];
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
----
-
-[TestPreferFindRule/invalid-9 - 1]
-Diagnostic 1: preferFind (1:24 - 1:91)
-Message: Prefer .find(...) instead of .filter(...)[0].
-   1 | const fltr = "filter"; (([] as unknown[]))[fltr] ((item) => { return item === 2 }  ) [ 0  ] ;
-     |                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   Suggestion 1: [preferFindSuggestion] Use .find(...) instead of .filter(...)[0].
 ---

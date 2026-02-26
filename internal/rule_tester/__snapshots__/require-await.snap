@@ -25,101 +25,6 @@ Message: Function has no 'await' expression.
    5 |       
 ---
 
-[TestRequireAwaitRule/invalid-10 - 1]
-Diagnostic 1: missingAwait (5:1 - 9:1)
-Message: Function has no 'await' expression.
-   4 | }
-   5 | async function* asyncGenerator(source: Iterable<any> | AsyncIterable<any>) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |   if (!isAsyncIterable(source)) {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   7 |     yield* source;
-     | ~~~~~~~~~~~~~~~~~~
-   8 |   }
-     | ~~~
-   9 | }
-     | ~
-  10 |       
----
-
-[TestRequireAwaitRule/invalid-11 - 1]
-Diagnostic 1: missingAwait (5:1 - 7:1)
-Message: Function has no 'await' expression.
-   4 | }
-   5 | async function* asyncGenerator() {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |   yield* syncGenerator();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
-   7 | }
-     | ~
-   8 |       
----
-
-[TestRequireAwaitRule/invalid-12 - 1]
-Diagnostic 1: missingAwait (2:1 - 4:1)
-Message: Function has no 'await' expression.
-   1 | 
-   2 | async function* asyncGenerator() {
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |   yield* anotherAsyncGenerator(); // Unknown function.
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 | }
-     | ~
-   5 |       
----
-
-[TestRequireAwaitRule/invalid-13 - 1]
-Diagnostic 1: missingAwait (2:20 - 4:9)
-Message: Function has no 'await' expression.
-   1 | 
-   2 |         const fn = async () => {
-     |                    ~~~~~~~~~~~~~
-   3 |           using foo = new Bar();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |         };
-     | ~~~~~~~~~
-   5 |       
----
-
-[TestRequireAwaitRule/invalid-14 - 1]
-Diagnostic 1: missingAwait (3:9 - 5:9)
-Message: Function has no 'await' expression.
-   2 |         // intentional TS error
-   3 |         async function* foo(): Promise<number> {
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |           yield 1;
-     | ~~~~~~~~~~~~~~~~~~
-   5 |         }
-     | ~~~~~~~~~
-   6 |       
----
-
-[TestRequireAwaitRule/invalid-15 - 1]
-Diagnostic 1: missingAwait (2:9 - 4:9)
-Message: Function has no 'await' expression.
-   1 | 
-   2 |         async function* foo(): AsyncGenerator {
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |           yield 1;
-     | ~~~~~~~~~~~~~~~~~~
-   4 |         }
-     | ~~~~~~~~~
-   5 |       
----
-
-[TestRequireAwaitRule/invalid-16 - 1]
-Diagnostic 1: missingAwait (2:9 - 4:9)
-Message: Function has no 'await' expression.
-   1 | 
-   2 |         async function* foo(): AsyncGenerator<number> {
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |           yield 1;
-     | ~~~~~~~~~~~~~~~~~~
-   4 |         }
-     | ~~~~~~~~~
-   5 |       
----
-
 [TestRequireAwaitRule/invalid-2 - 1]
 Diagnostic 1: missingAwait (1:19 - 1:48)
 Message: Function has no 'await' expression.
@@ -222,6 +127,101 @@ Message: Function has no 'await' expression.
    5 |       
 ---
 
+[TestRequireAwaitRule/invalid-10 - 1]
+Diagnostic 1: missingAwait (5:1 - 9:1)
+Message: Function has no 'await' expression.
+   4 | }
+   5 | async function* asyncGenerator(source: Iterable<any> | AsyncIterable<any>) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   if (!isAsyncIterable(source)) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |     yield* source;
+     | ~~~~~~~~~~~~~~~~~~
+   8 |   }
+     | ~~~
+   9 | }
+     | ~
+  10 |       
+---
+
+[TestRequireAwaitRule/invalid-11 - 1]
+Diagnostic 1: missingAwait (5:1 - 7:1)
+Message: Function has no 'await' expression.
+   4 | }
+   5 | async function* asyncGenerator() {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   yield* syncGenerator();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 | }
+     | ~
+   8 |       
+---
+
+[TestRequireAwaitRule/invalid-12 - 1]
+Diagnostic 1: missingAwait (2:1 - 4:1)
+Message: Function has no 'await' expression.
+   1 | 
+   2 | async function* asyncGenerator() {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   yield* anotherAsyncGenerator(); // Unknown function.
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestRequireAwaitRule/invalid-13 - 1]
+Diagnostic 1: missingAwait (2:20 - 4:9)
+Message: Function has no 'await' expression.
+   1 | 
+   2 |         const fn = async () => {
+     |                    ~~~~~~~~~~~~~
+   3 |           using foo = new Bar();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         };
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestRequireAwaitRule/invalid-14 - 1]
+Diagnostic 1: missingAwait (3:9 - 5:9)
+Message: Function has no 'await' expression.
+   2 |         // intentional TS error
+   3 |         async function* foo(): Promise<number> {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           yield 1;
+     | ~~~~~~~~~~~~~~~~~~
+   5 |         }
+     | ~~~~~~~~~
+   6 |       
+---
+
+[TestRequireAwaitRule/invalid-15 - 1]
+Diagnostic 1: missingAwait (2:9 - 4:9)
+Message: Function has no 'await' expression.
+   1 | 
+   2 |         async function* foo(): AsyncGenerator {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           yield 1;
+     | ~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestRequireAwaitRule/invalid-16 - 1]
+Diagnostic 1: missingAwait (2:9 - 4:9)
+Message: Function has no 'await' expression.
+   1 | 
+   2 |         async function* foo(): AsyncGenerator<number> {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           yield 1;
+     | ~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
+
 [TestRequireAwaitRuleEslintBase/invalid-0 - 1]
 Diagnostic 1: missingAwait (2:9 - 4:9)
 Message: Function has no 'await' expression.
@@ -246,84 +246,6 @@ Message: Function has no 'await' expression.
    4 |         });
      | ~~~~~~~~~
    5 |       
----
-
-[TestRequireAwaitRuleEslintBase/invalid-10 - 1]
-Diagnostic 1: missingAwait (3:18 - 5:11)
-Message: Function has no 'await' expression.
-   2 |         async function foo() {
-   3 |           await (async () => {
-     |                  ~~~~~~~~~~~~~
-   4 |             doSomething();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 |           });
-     | ~~~~~~~~~~~
-   6 |         }
----
-
-[TestRequireAwaitRuleEslintBase/invalid-11 - 1]
-Diagnostic 1: missingAwait (3:18 - 5:11)
-Message: Function has no 'await' expression.
-   2 |         const obj = {
-   3 |           async: async function foo() {
-     |                  ~~~~~~~~~~~~~~~~~~~~~~
-   4 |             bar();
-     | ~~~~~~~~~~~~~~~~~~
-   5 |           },
-     | ~~~~~~~~~~~
-   6 |         };
----
-
-[TestRequireAwaitRuleEslintBase/invalid-12 - 1]
-Diagnostic 1: missingAwait (2:9 - 4:9)
-Message: Function has no 'await' expression.
-   1 | 
-   2 |         async    /* test */ function foo() {
-     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   3 |           doSomething();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |         }
-     | ~~~~~~~~~
-   5 |       
----
-
-[TestRequireAwaitRuleEslintBase/invalid-13 - 1]
-Diagnostic 1: missingAwait (4:11 - 6:11)
-Message: Function has no 'await' expression.
-   3 |           a = 0
-   4 |           async [b]() {
-     |           ~~~~~~~~~~~~~
-   5 |             return 0;
-     | ~~~~~~~~~~~~~~~~~~~~~
-   6 |           }
-     | ~~~~~~~~~~~
-   7 |         }
----
-
-[TestRequireAwaitRuleEslintBase/invalid-14 - 1]
-Diagnostic 1: missingAwait (3:9 - 5:9)
-Message: Function has no 'await' expression.
-   2 |         foo
-   3 |         async () => {
-     |         ~~~~~~~~~~~~~
-   4 |           return 0;
-     | ~~~~~~~~~~~~~~~~~~~
-   5 |         }
-     | ~~~~~~~~~
-   6 |       
----
-
-[TestRequireAwaitRuleEslintBase/invalid-15 - 1]
-Diagnostic 1: missingAwait (4:11 - 6:11)
-Message: Function has no 'await' expression.
-   3 |           foo() {}
-   4 |           async [bar]() {
-     |           ~~~~~~~~~~~~~~~
-   5 |             baz;
-     | ~~~~~~~~~~~~~~~~
-   6 |           }
-     | ~~~~~~~~~~~
-   7 |         }
 ---
 
 [TestRequireAwaitRuleEslintBase/invalid-2 - 1]
@@ -426,4 +348,82 @@ Message: Function has no 'await' expression.
    6 |         }
      | ~~~~~~~~~
    7 |       
+---
+
+[TestRequireAwaitRuleEslintBase/invalid-10 - 1]
+Diagnostic 1: missingAwait (3:18 - 5:11)
+Message: Function has no 'await' expression.
+   2 |         async function foo() {
+   3 |           await (async () => {
+     |                  ~~~~~~~~~~~~~
+   4 |             doSomething();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           });
+     | ~~~~~~~~~~~
+   6 |         }
+---
+
+[TestRequireAwaitRuleEslintBase/invalid-11 - 1]
+Diagnostic 1: missingAwait (3:18 - 5:11)
+Message: Function has no 'await' expression.
+   2 |         const obj = {
+   3 |           async: async function foo() {
+     |                  ~~~~~~~~~~~~~~~~~~~~~~
+   4 |             bar();
+     | ~~~~~~~~~~~~~~~~~~
+   5 |           },
+     | ~~~~~~~~~~~
+   6 |         };
+---
+
+[TestRequireAwaitRuleEslintBase/invalid-12 - 1]
+Diagnostic 1: missingAwait (2:9 - 4:9)
+Message: Function has no 'await' expression.
+   1 | 
+   2 |         async    /* test */ function foo() {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           doSomething();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestRequireAwaitRuleEslintBase/invalid-13 - 1]
+Diagnostic 1: missingAwait (4:11 - 6:11)
+Message: Function has no 'await' expression.
+   3 |           a = 0
+   4 |           async [b]() {
+     |           ~~~~~~~~~~~~~
+   5 |             return 0;
+     | ~~~~~~~~~~~~~~~~~~~~~
+   6 |           }
+     | ~~~~~~~~~~~
+   7 |         }
+---
+
+[TestRequireAwaitRuleEslintBase/invalid-14 - 1]
+Diagnostic 1: missingAwait (3:9 - 5:9)
+Message: Function has no 'await' expression.
+   2 |         foo
+   3 |         async () => {
+     |         ~~~~~~~~~~~~~
+   4 |           return 0;
+     | ~~~~~~~~~~~~~~~~~~~
+   5 |         }
+     | ~~~~~~~~~
+   6 |       
+---
+
+[TestRequireAwaitRuleEslintBase/invalid-15 - 1]
+Diagnostic 1: missingAwait (4:11 - 6:11)
+Message: Function has no 'await' expression.
+   3 |           foo() {}
+   4 |           async [bar]() {
+     |           ~~~~~~~~~~~~~~~
+   5 |             baz;
+     | ~~~~~~~~~~~~~~~~
+   6 |           }
+     | ~~~~~~~~~~~
+   7 |         }
 ---

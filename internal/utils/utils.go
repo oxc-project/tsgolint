@@ -60,11 +60,6 @@ func TypeRecurser(t *checker.Type, predicate func(t *checker.Type) /* should sto
 	}
 }
 
-// SUPER DIRTY HACK FOR OPTIONAL FIELDS :(
-func Ref[T any](a T) *T {
-	return &a
-}
-
 func GetNumberIndexType(typeChecker *checker.Checker, t *checker.Type) *checker.Type {
 	return checker.Checker_getIndexTypeOfType(typeChecker, t, checker.Checker_numberType(typeChecker))
 }

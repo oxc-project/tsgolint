@@ -17,6 +17,74 @@ Message: Unsafe return of a value of type `any`.
    4 | }
 ---
 
+[TestNoUnsafeReturnRule/invalid-2 - 1]
+Diagnostic 1: unsafeReturn (3:3 - 3:18)
+Message: Unsafe return of a value of type `any`.
+   2 | const foo = () => {
+   3 |   return 1 as any;
+     |   ~~~~~~~~~~~~~~~~
+   4 | };
+---
+
+[TestNoUnsafeReturnRule/invalid-3 - 1]
+Diagnostic 1: unsafeReturn (1:19 - 1:37)
+Message: Unsafe return of a value of type `any`.
+   1 | const foo = () => Object.create(null);
+     |                   ~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnsafeReturnRule/invalid-4 - 1]
+Diagnostic 1: unsafeReturn (3:3 - 3:21)
+Message: Unsafe return of a value of type `any[]`.
+   2 | function foo() {
+   3 |   return [] as any[];
+     |   ~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeReturnRule/invalid-5 - 1]
+Diagnostic 1: unsafeReturn (3:3 - 3:26)
+Message: Unsafe return of a value of type `any[]`.
+   2 | function foo() {
+   3 |   return [] as Array<any>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeReturnRule/invalid-6 - 1]
+Diagnostic 1: unsafeReturn (3:3 - 3:30)
+Message: Unsafe return of a value of type `any[]`.
+   2 | function foo() {
+   3 |   return [] as readonly any[];
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeReturnRule/invalid-7 - 1]
+Diagnostic 1: unsafeReturn (3:3 - 3:31)
+Message: Unsafe return of a value of type `any[]`.
+   2 | function foo() {
+   3 |   return [] as Readonly<any[]>;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnsafeReturnRule/invalid-8 - 1]
+Diagnostic 1: unsafeReturn (3:3 - 3:21)
+Message: Unsafe return of a value of type `any[]`.
+   2 | const foo = () => {
+   3 |   return [] as any[];
+     |   ~~~~~~~~~~~~~~~~~~~
+   4 | };
+---
+
+[TestNoUnsafeReturnRule/invalid-9 - 1]
+Diagnostic 1: unsafeReturn (1:19 - 1:29)
+Message: Unsafe return of a value of type `any[]`.
+   1 | const foo = () => [] as any[];
+     |                   ~~~~~~~~~~~
+---
+
 [TestNoUnsafeReturnRule/invalid-10 - 1]
 Diagnostic 1: unsafeReturnAssignment (3:3 - 3:24)
 Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
@@ -88,6 +156,7 @@ Message: Unsafe return of type `Set<any>` from function with return type `Set<st
 [TestNoUnsafeReturnRule/invalid-16 - 1]
 Diagnostic 1: unsafeReturnThis (3:3 - 3:14)
 Message: Unsafe return of a value of type ``any``. `this` is typed as `any`.
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    2 | function foo() {
    3 |   return this;
      |   ~~~~~~~~~~~~
@@ -95,6 +164,7 @@ Message: Unsafe return of a value of type ``any``. `this` is typed as `any`.
 
 Diagnostic 2: unsafeReturnThis (7:16 - 7:19)
 Message: Unsafe return of a value of type ``any``. `this` is typed as `any`.
+Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    6 | function bar() {
    7 |   return () => this;
      |                ~~~~
@@ -126,15 +196,6 @@ Message: Unsafe return of a value of type `any`.
    4 |   return value;
      |   ~~~~~~~~~~~~~
    5 | }
----
-
-[TestNoUnsafeReturnRule/invalid-2 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:18)
-Message: Unsafe return of a value of type `any`.
-   2 | const foo = () => {
-   3 |   return 1 as any;
-     |   ~~~~~~~~~~~~~~~~
-   4 | };
 ---
 
 [TestNoUnsafeReturnRule/invalid-20 - 1]
@@ -227,13 +288,6 @@ Message: Unsafe return of a value of type `Promise<any>`.
    4 | }
 ---
 
-[TestNoUnsafeReturnRule/invalid-3 - 1]
-Diagnostic 1: unsafeReturn (1:19 - 1:37)
-Message: Unsafe return of a value of type `any`.
-   1 | const foo = () => Object.create(null);
-     |                   ~~~~~~~~~~~~~~~~~~~
----
-
 [TestNoUnsafeReturnRule/invalid-30 - 1]
 Diagnostic 1: unsafeReturn (3:3 - 3:49)
 Message: Unsafe return of a value of type `Promise<any>`.
@@ -250,56 +304,4 @@ Message: Unsafe return of a value of type `Promise<any>`.
    8 |   return value;
      |   ~~~~~~~~~~~~~
    9 | }
----
-
-[TestNoUnsafeReturnRule/invalid-4 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:21)
-Message: Unsafe return of a value of type `any[]`.
-   2 | function foo() {
-   3 |   return [] as any[];
-     |   ~~~~~~~~~~~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeReturnRule/invalid-5 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:26)
-Message: Unsafe return of a value of type `any[]`.
-   2 | function foo() {
-   3 |   return [] as Array<any>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeReturnRule/invalid-6 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:30)
-Message: Unsafe return of a value of type `any[]`.
-   2 | function foo() {
-   3 |   return [] as readonly any[];
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeReturnRule/invalid-7 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:31)
-Message: Unsafe return of a value of type `any[]`.
-   2 | function foo() {
-   3 |   return [] as Readonly<any[]>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 | }
----
-
-[TestNoUnsafeReturnRule/invalid-8 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:21)
-Message: Unsafe return of a value of type `any[]`.
-   2 | const foo = () => {
-   3 |   return [] as any[];
-     |   ~~~~~~~~~~~~~~~~~~~
-   4 | };
----
-
-[TestNoUnsafeReturnRule/invalid-9 - 1]
-Diagnostic 1: unsafeReturn (1:19 - 1:29)
-Message: Unsafe return of a value of type `any[]`.
-   1 | const foo = () => [] as any[];
-     |                   ~~~~~~~~~~~
 ---
