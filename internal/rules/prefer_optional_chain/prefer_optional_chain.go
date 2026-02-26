@@ -3391,10 +3391,17 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 		replaceStart = r.Pos()
 		replaceEnd = r.End()
 	} else if effectiveChainStart == 0 {
-		if parens := processor.getParenthesizedAndInOrContext(node); parens != nil {
-			r := processor.getNodeRange(parens)
-			replaceStart = r.Pos()
-			replaceEnd = r.End()
+		canUnwrapParensInOrContext := !hasTrailingComparison
+		if hasTrailingComparison && len(chain) > 0 && ast.IsBinaryExpression(chain[len(chain)-1].node) {
+			_, canUnwrapParensInOrContext = invertEqualityOperator(chain[len(chain)-1].node.AsBinaryExpression().OperatorToken.Kind)
+		}
+
+		if canUnwrapParensInOrContext {
+			if parens := processor.getParenthesizedAndInOrContext(node); parens != nil {
+				r := processor.getNodeRange(parens)
+				replaceStart = r.Pos()
+				replaceEnd = r.End()
+			}
 		}
 	}
 
