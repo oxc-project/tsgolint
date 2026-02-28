@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/go-json-experiment/json"
 
@@ -23,6 +24,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/stats"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
@@ -33,6 +35,7 @@ type headlessOptions struct {
 	allocsOut      string
 	fix            bool
 	fixSuggestions bool
+	stats          bool
 }
 
 func parseHeadlessOptions(args []string) (*headlessOptions, error) {
@@ -44,6 +47,7 @@ func parseHeadlessOptions(args []string) (*headlessOptions, error) {
 	flag.StringVar(&opts.allocsOut, "allocs", "", "file to put allocs profiling to")
 	flag.BoolVar(&opts.fix, "fix", false, "generate fixes for code problems")
 	flag.BoolVar(&opts.fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
+	flag.BoolVar(&opts.stats, "stats", false, "output performance stats")
 
 	if err := flag.CommandLine.Parse(args); err != nil {
 		return nil, err
@@ -179,6 +183,7 @@ func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 	log.SetOutput(os.Stderr)
 	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
+	start := time.Now()
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Starting tsgolint")
@@ -369,6 +374,11 @@ func runHeadless(args []string) int {
 		log.Printf("Running Linter")
 	}
 
+	var report *stats.Report
+	if opts.stats {
+		report = stats.NewReport()
+	}
+
 	err = linter.RunLinter(
 		logLevel,
 		cwd,
@@ -408,6 +418,7 @@ func runHeadless(args []string) int {
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
+		report,
 	)
 
 	close(diagnosticsChan)
@@ -418,6 +429,9 @@ func runHeadless(args []string) int {
 	}
 
 	wg.Wait()
+
+	report.SetTotal(time.Since(start))
+	stats.PrintReport(os.Stderr, report, cwd)
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")

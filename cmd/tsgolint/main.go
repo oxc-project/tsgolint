@@ -544,6 +544,7 @@ func runMain() int {
 			ReportSyntactic: false,
 			ReportSemantic:  false,
 		},
+		nil,
 	)
 
 	close(diagnosticsChan)

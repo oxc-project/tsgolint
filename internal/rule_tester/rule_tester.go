@@ -121,6 +121,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 				ReportSyntactic: false,
 				ReportSemantic:  false,
 			},
+			nil, // stats
 		)
 
 		assert.NilError(t, err, "error running linter. code:\n", code)

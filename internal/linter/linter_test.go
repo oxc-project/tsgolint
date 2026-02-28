@@ -84,6 +84,7 @@ function greet(name: string): string {
 		func(d diagnostic.Internal) {},
 		Fixes{Fix: false, FixSuggestions: false},
 		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+		nil,
 	)
 	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
 
@@ -174,6 +175,7 @@ function add(a: number, b: number): number {
 		func(d diagnostic.Internal) {},
 		Fixes{Fix: false, FixSuggestions: false},
 		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+		nil,
 	)
 	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
 
@@ -263,6 +265,7 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 		func(d diagnostic.Internal) {},
 		Fixes{Fix: false, FixSuggestions: false},
 		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+		nil,
 	)
 	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
 
