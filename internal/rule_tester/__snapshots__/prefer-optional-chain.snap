@@ -5370,3 +5370,30 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    9 | baz;
      | ~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-599 - 1]
+Diagnostic 1: preferOptionalChain (3:7 - 3:31)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |                 declare const foo: { name: string } | null | undefined;
+   3 |                 !(foo && foo.name === 'baz');
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |             
+---
+
+[TestPreferOptionalChainRule/invalid-600 - 1]
+Diagnostic 1: preferOptionalChain (4:14 - 4:28)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   3 |                 declare const foo: { name: string } | null | undefined;
+   4 |                 test || (foo && foo.name);
+     |                          ~~~~~~~~~~~~~~~
+   5 |             
+---
+
+[TestPreferOptionalChainRule/invalid-601 - 1]
+Diagnostic 1: preferOptionalChain (4:7 - 4:41)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   3 |                 declare const FooClass: new (...args: unknown[]) => unknown;
+   4 |                 !(foo && foo.name instanceof FooClass);
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |             
+---
