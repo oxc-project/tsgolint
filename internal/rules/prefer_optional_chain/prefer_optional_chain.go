@@ -1477,13 +1477,14 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 		op := binExpr.OperatorToken.Kind
 
-		// Relational operators (<, >, <=, >=, in) should not participate in optional chaining.
+		// Relational operators (<, >, <=, >=, in, instanceof) should not participate in optional chaining.
 		switch op {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
 			ast.KindGreaterThanEqualsToken,
-			ast.KindInKeyword:
+			ast.KindInKeyword,
+			ast.KindInstanceOfKeyword:
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
@@ -1521,13 +1522,14 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 		op := binExpr.OperatorToken.Kind
 
-		// Relational operators (<, >, <=, >=, in) should not participate in optional chaining.
+		// Relational operators (<, >, <=, >=, in, instanceof) should not participate in optional chaining.
 		switch op {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
 			ast.KindGreaterThanEqualsToken,
-			ast.KindInKeyword:
+			ast.KindInKeyword,
+			ast.KindInstanceOfKeyword:
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
@@ -2547,6 +2549,12 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 		}
 	}
 	if !hasExplicitCheck {
+		return nil
+	}
+
+	// When every operand checks the exact same expression (e.g., a.b === null || a.b === undefined),
+	// there is no member access to convert — skip flagging, mirroring the AND-chain guard.
+	if processor.allOperandsCheckSameExpression(chain) {
 		return nil
 	}
 
