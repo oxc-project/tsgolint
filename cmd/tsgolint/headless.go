@@ -11,6 +11,7 @@ import (
 	"runtime"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/go-json-experiment/json"
 
@@ -136,7 +137,12 @@ type headlessMessageType uint8
 const (
 	headlessMessageTypeError headlessMessageType = iota
 	headlessMessageTypeDiagnostic
+	headlessMessageTypeTiming
 )
+
+type headlessTimingPayload struct {
+	Timings map[string]float64 `json:"timings"`
+}
 
 type headlessMessagePayloadError struct {
 	Error string `json:"error"`
@@ -290,6 +296,10 @@ func runHeadless(args []string) int {
 		log.Printf("Workload distribution: %d programs", len(workload.Programs))
 	}
 
+	// Per-rule timing accumulators (nanoseconds).
+	var timingMu sync.Mutex
+	ruleTimingsNs := make(map[string]int64)
+
 	var wg sync.WaitGroup
 
 	diagnosticsChan := make(chan anyDiagnostic, 4096)
@@ -384,10 +394,25 @@ func runHeadless(args []string) int {
 				if !ok {
 					panic(fmt.Sprintf("unknown rule: %v", headlessRule.Name))
 				}
+				ruleName := r.Name
+				options := headlessRule.Options
 				rules[i] = linter.ConfiguredRule{
-					Name: r.Name,
+					Name: ruleName,
 					Run: func(ctx rule.RuleContext) rule.RuleListeners {
-						return r.Run(ctx, headlessRule.Options)
+						listeners := r.Run(ctx, options)
+						timed := make(rule.RuleListeners, len(listeners))
+						for kind, listener := range listeners {
+							kind, listener := kind, listener
+							timed[kind] = func(node *ast.Node) {
+								start := time.Now()
+								listener(node)
+								ns := time.Since(start).Nanoseconds()
+								timingMu.Lock()
+								ruleTimingsNs[ruleName] += ns
+								timingMu.Unlock()
+							}
+						}
+						return timed
 					},
 				}
 			}
@@ -418,6 +443,19 @@ func runHeadless(args []string) int {
 	}
 
 	wg.Wait()
+
+	// Send per-rule timing data.
+	if len(ruleTimingsNs) > 0 {
+		timingsMs := make(map[string]float64, len(ruleTimingsNs))
+		for name, ns := range ruleTimingsNs {
+			timingsMs[name] = float64(ns) / 1e6
+		}
+		w := bufio.NewWriter(os.Stdout)
+		if writeErr := writeMessage(w, headlessMessageTypeTiming, headlessTimingPayload{Timings: timingsMs}); writeErr != nil {
+			log.Printf("WARN: Failed to write timing message: %v", writeErr)
+		}
+		w.Flush()
+	}
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")
