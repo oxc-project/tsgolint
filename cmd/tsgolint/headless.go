@@ -365,6 +365,8 @@ func runHeadless(args []string) int {
 		}
 	})
 
+	suppressProgramDiagnostics := os.Getenv("OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true"
+
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
 	}
@@ -408,6 +410,7 @@ func runHeadless(args []string) int {
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
+		suppressProgramDiagnostics,
 	)
 
 	close(diagnosticsChan)
