@@ -71,10 +71,8 @@ func RunLinter(
 		}
 
 		if program == nil {
-			if len(diagnostics) > 0 {
-				for _, d := range diagnostics {
-					onInternalDiagnostic(d)
-				}
+			for _, d := range diagnostics {
+				onInternalDiagnostic(d)
 			}
 			idx++
 			continue
