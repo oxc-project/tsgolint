@@ -107,6 +107,7 @@ func runAllRulesBenchmark(b *testing.B, singleThreaded bool) {
 		func(_ diagnostic.Internal) {},
 		linter.Fixes{},
 		linter.TypeErrors{},
+		nil, // stats
 	)
 	if err != nil {
 		b.Fatal("warmup linter failed:", err)
@@ -127,6 +128,7 @@ func runAllRulesBenchmark(b *testing.B, singleThreaded bool) {
 			func(_ diagnostic.Internal) {},
 			linter.Fixes{},
 			linter.TypeErrors{},
+			nil,
 		)
 		if err != nil {
 			b.Fatal("linter failed:", err)
@@ -226,6 +228,7 @@ func BenchmarkE2ESingleFile(b *testing.B) {
 			func(_ diagnostic.Internal) {},
 			linter.Fixes{},
 			linter.TypeErrors{},
+			nil,
 		)
 		if err != nil {
 			b.Fatal("warmup linter failed:", err)
@@ -258,6 +261,7 @@ func BenchmarkE2ESingleFile(b *testing.B) {
 			func(_ diagnostic.Internal) {},
 			linter.Fixes{},
 			linter.TypeErrors{},
+			nil,
 		)
 		if err != nil {
 			b.Fatal("linter failed:", err)
