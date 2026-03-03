@@ -36,10 +36,6 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, &core.CompilerOptions{}, nil, host, nil)
 
 	if len(diagnostics) > 0 {
-		// configParseResult is nil here — the file couldn't be read at all
-		if suppressProgramDiagnostics {
-			return nil, nil, nil
-		}
 		internalDiags := make([]diagnostic.Internal, len(diagnostics))
 		for i, d := range diagnostics {
 			loc := d.Loc()
