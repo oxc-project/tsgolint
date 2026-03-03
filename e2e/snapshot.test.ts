@@ -566,11 +566,11 @@ console.log(x);
     const diagnostics = parseHeadlessOutput(output);
 
     // tsconfig-error diagnostics should be suppressed, but lint rules should still fire
-    const tsconfigErrors = diagnostics.filter((d: any) => d.kind === 1);
-    const ruleDiagnostics = diagnostics.filter((d: any) => d.kind === 0);
+    const tsconfigErrors = diagnostics.filter((d: any) => d.kind === DiagnosticKind.Internal);
+    const ruleDiagnostics = diagnostics.filter((d: any) => d.kind === DiagnosticKind.Rule);
 
     expect(tsconfigErrors.length).toBe(0);
-    expect(ruleDiagnostics.length).toBeGreaterThan(0);
+    expect(ruleDiagnostics).toMatchSnapshot();
   });
 
   it('should work correctly with nested module namespaces and parent module searches (`ValueMatchesSomeSpecifier`) (issue #135)', async () => {
