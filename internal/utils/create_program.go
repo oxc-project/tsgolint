@@ -27,7 +27,7 @@ func enhanceHelpDiagnosticMessage(msg string) string {
 	return msg
 }
 
-func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost) (*compiler.Program, []diagnostic.Internal, error) {
+func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost, suppressProgramDiagnostics bool) (*compiler.Program, []diagnostic.Internal, error) {
 	resolvedConfigPath := tspath.ResolvePath(cwd, tsconfigPath)
 	if !fs.FileExists(resolvedConfigPath) {
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
@@ -54,7 +54,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, internalDiags, nil
 	}
 
-	if len(configParseResult.Errors) > 0 {
+	if len(configParseResult.Errors) > 0 && !suppressProgramDiagnostics {
 		internalDiags := make([]diagnostic.Internal, len(configParseResult.Errors))
 		for i, e := range configParseResult.Errors {
 			loc := e.Loc()
@@ -90,7 +90,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	}
 
 	program_diagnostics := program.GetProgramDiagnostics()
-	if len(program_diagnostics) > 0 {
+	if len(program_diagnostics) > 0 && !suppressProgramDiagnostics {
 		// Convert ast.Diagnostic to diagnostic.Internal
 		internalDiags := make([]diagnostic.Internal, len(program_diagnostics))
 		for i, d := range program_diagnostics {

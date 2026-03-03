@@ -4907,6 +4907,25 @@ exports[`TSGoLint E2E Snapshot Tests > should report type errors 1`] = `
 ]
 `;
 
+exports[`TSGoLint E2E Snapshot Tests > should still report lint rule diagnostics when OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true 1`] = `
+[
+  {
+    "file_path": "fixtures/with-invalid-tsconfig-option-and-lint-errors/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Promises must be awaited, add void operator to ignore.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
+      "id": "floatingVoid",
+    },
+    "range": {
+      "end": 51,
+      "pos": 26,
+    },
+    "rule": "no-floating-promises",
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should work correctly with nested module namespaces and parent module searches (\`ValueMatchesSomeSpecifier\`) (issue #135) 1`] = `[]`;
 
 exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `

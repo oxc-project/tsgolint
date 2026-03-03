@@ -36,7 +36,7 @@ function greet(name: string): string {
 	)
 	host := utils.CreateCompilerHost(rootDir, fs)
 
-	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host)
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
 	assert.NilError(t, err, "couldn't create program")
 
 	sourceFiles := []*ast.SourceFile{program.GetSourceFile(filePath)}
@@ -118,7 +118,7 @@ function add(a: number, b: number): number {
 	)
 	host := utils.CreateCompilerHost(rootDir, fs)
 
-	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host)
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
 	assert.NilError(t, err, "couldn't create program")
 
 	sourceFiles := []*ast.SourceFile{program.GetSourceFile(filePath)}
@@ -207,7 +207,7 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 	)
 	host := utils.CreateCompilerHost(rootDir, fs)
 
-	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host)
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
 	assert.NilError(t, err, "couldn't create program")
 
 	sourceFiles := []*ast.SourceFile{program.GetSourceFile(filePath)}

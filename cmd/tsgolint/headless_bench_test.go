@@ -45,7 +45,7 @@ func setupBenchmarkEnv(b *testing.B, singleThreaded bool) benchmarkEnv {
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 	host := utils.CreateCompilerHost(dir, fs)
 
-	program, diags, err := utils.CreateProgram(singleThreaded, fs, dir, tsconfigPath, host)
+	program, diags, err := utils.CreateProgram(singleThreaded, fs, dir, tsconfigPath, host, false)
 	if err != nil {
 		b.Fatal("failed to create program:", err)
 	}
@@ -202,7 +202,7 @@ func BenchmarkE2ESingleFile(b *testing.B) {
 	{
 		fs := bundled.WrapFS(cachedvfs.From(baseFS))
 		host := utils.CreateCompilerHost(dir, fs)
-		program, diags, err := utils.CreateProgram(true, fs, dir, tsconfigPath, host)
+		program, diags, err := utils.CreateProgram(true, fs, dir, tsconfigPath, host, false)
 		if err != nil {
 			b.Fatal("warmup program creation failed:", err)
 		}
@@ -238,7 +238,7 @@ func BenchmarkE2ESingleFile(b *testing.B) {
 		// Full end-to-end: fresh FS, host, program, lint.
 		fs := bundled.WrapFS(cachedvfs.From(baseFS))
 		host := utils.CreateCompilerHost(dir, fs)
-		program, _, err := utils.CreateProgram(true, fs, dir, tsconfigPath, host)
+		program, _, err := utils.CreateProgram(true, fs, dir, tsconfigPath, host, false)
 		if err != nil {
 			b.Fatal("program creation failed:", err)
 		}

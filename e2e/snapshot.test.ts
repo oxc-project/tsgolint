@@ -532,6 +532,47 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
+  it('should suppress tsconfig-error diagnostics when OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
+    const testFiles = await getTestFiles('with-invalid-tsconfig-option');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-floating-promises']);
+
+    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    const diagnostics = parseHeadlessOutput(output);
+
+    expect(diagnostics.length).toBe(0);
+  });
+
+  it('should still report lint rule diagnostics when OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
+    const testFiles = await getTestFiles('with-invalid-tsconfig-option-and-lint-errors');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-floating-promises']);
+
+    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    const diagnostics = parseHeadlessOutput(output);
+
+    // tsconfig-error diagnostics should be suppressed, but lint rules should still fire
+    const tsconfigErrors = diagnostics.filter((d: any) => d.kind === DiagnosticKind.Internal);
+    const ruleDiagnostics = diagnostics.filter((d: any) => d.kind === DiagnosticKind.Rule);
+
+    expect(tsconfigErrors.length).toBe(0);
+    expect(ruleDiagnostics).toMatchSnapshot();
+  });
+
   it('should work correctly with nested module namespaces and parent module searches (`ValueMatchesSomeSpecifier`) (issue #135)', async () => {
     const testFiles = await getTestFiles('issue-135');
     expect(testFiles.length).toBeGreaterThan(0);

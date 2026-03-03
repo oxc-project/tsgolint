@@ -52,6 +52,7 @@ func RunLinter(
 	onInternalDiagnostic func(d diagnostic.Internal),
 	fixState Fixes,
 	typeErrors TypeErrors,
+	suppressProgramDiagnostics bool,
 ) error {
 
 	idx := 0
@@ -63,13 +64,13 @@ func RunLinter(
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
-		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host)
+		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics)
 
 		if err != nil {
 			return err
 		}
 
-		if len(diagnostics) > 0 {
+		if program == nil {
 			for _, d := range diagnostics {
 				onInternalDiagnostic(d)
 			}
