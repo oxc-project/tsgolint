@@ -203,15 +203,7 @@ func IsStrictCompilerOptionEnabled(
 	options *core.CompilerOptions,
 	option core.Tristate,
 ) bool {
-	if options.Strict.IsTrue() {
-		return option.IsTrueOrUnknown()
-	}
-	return option.IsTrue()
-	// return (
-	// 	(options.strict ? options[option] !== false : options[option] === true) &&
-	// 	(option !== "strictPropertyInitialization" ||
-	// 		isStrictCompilerOptionEnabled(options, "strictNullChecks"))
-	// );
+	return options.GetStrictOptionValue(option)
 }
 
 // AST Node Helpers

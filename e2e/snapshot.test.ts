@@ -637,6 +637,23 @@ console.log(x);
     );
   });
 
+  it('should use strict defaults when strict is omitted (issue #762)', async () => {
+    const testFiles = await getTestFiles('issue-762');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-unnecessary-boolean-literal-compare']);
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toHaveLength(0);
+  });
+
   it('should report type errors', async () => {
     const testFiles = await getTestFiles('report-type-errors');
     expect(testFiles.length).toBeGreaterThan(0);
