@@ -1,0 +1,203 @@
+From 7eb7016049c4fcbfada86ac4c5a1383847ee9844 Mon Sep 17 00:00:00 2001
+From: Cam McHenry <camchenry@users.noreply.github.com>
+Date: Mon, 2 Mar 2026 21:38:25 -0500
+Subject: [PATCH] perf: add per-directory module resolution cache
+
+Add a per-directory cache to ResolveModuleName and
+ResolveTypeReferenceDirective. Files in the same directory resolving the
+same module name with the same resolution mode and project reference
+redirect will always produce the same result, so we can cache and reuse
+the resolution result.
+---
+ internal/module/cache.go    | 72 ++++++++++++++++++++++++++++++++++++-
+ internal/module/resolver.go | 45 ++++++++++++++++++++---
+ 2 files changed, 112 insertions(+), 5 deletions(-)
+
+diff --git a/internal/module/cache.go b/internal/module/cache.go
+index bddce784ef..5dbe032bd5 100644
+--- a/internal/module/cache.go
++++ b/internal/module/cache.go
+@@ -3,15 +3,74 @@ package module
+ import (
+ 	"sync"
+ 
++	"github.com/microsoft/typescript-go/internal/collections"
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
+ )
+ 
+ type ModeAwareCache[T any] map[ModeAwareCacheKey]T
+ 
++type moduleResolutionCacheKey struct {
++	containingDirectory string
++	moduleName          string
++	resolutionMode      core.ResolutionMode
++	redirectConfigName  string
++}
++
++type moduleResolutionCache struct {
++	cache collections.SyncMap[moduleResolutionCacheKey, *ResolvedModule]
++}
++
++func newModuleResolutionCache() *moduleResolutionCache {
++	return &moduleResolutionCache{
++		cache: collections.SyncMap[moduleResolutionCacheKey, *ResolvedModule]{},
++	}
++}
++
++func (c *moduleResolutionCache) Get(key moduleResolutionCacheKey) (*ResolvedModule, bool) {
++	return c.cache.Load(key)
++}
++
++func (c *moduleResolutionCache) Set(key moduleResolutionCacheKey, value *ResolvedModule) {
++	c.cache.Store(key, value)
++}
++
++type typeRefDirectiveResolutionCacheKey struct {
++	containingDirectory             string
++	typeReferenceName               string
++	resolutionMode                  core.ResolutionMode
++	redirectConfigName              string
++	fromInferredTypesContainingFile bool
++}
++
++type typeRefDirectiveResolutionCache struct {
++	cache collections.SyncMap[typeRefDirectiveResolutionCacheKey, *ResolvedTypeReferenceDirective]
++}
++
++func newTypeRefDirectiveResolutionCache() *typeRefDirectiveResolutionCache {
++	return &typeRefDirectiveResolutionCache{
++		cache: collections.SyncMap[typeRefDirectiveResolutionCacheKey, *ResolvedTypeReferenceDirective]{},
++	}
++}
++
++func (c *typeRefDirectiveResolutionCache) Get(key typeRefDirectiveResolutionCacheKey) (*ResolvedTypeReferenceDirective, bool) {
++	return c.cache.Load(key)
++}
++
++func (c *typeRefDirectiveResolutionCache) Set(key typeRefDirectiveResolutionCacheKey, value *ResolvedTypeReferenceDirective) {
++	c.cache.Store(key, value)
++}
++
+ type caches struct {
+ 	packageJsonInfoCache *packagejson.InfoCache
+ 
++	// Per-directory module resolution cache.
++	// Avoids re-resolving the same module name from the same directory.
++	moduleResolutionCache *moduleResolutionCache
++
++	// Per-directory type reference directive resolution cache.
++	typeRefDirectiveResolutionCache *typeRefDirectiveResolutionCache
++
+ 	// Cached representation for `core.CompilerOptions.paths`.
+ 	// Doesn't handle other path patterns like in `typesVersions`.
+ 	parsedPatternsForPathsOnce sync.Once
+@@ -24,6 +83,17 @@ func newCaches(
+ 	options *core.CompilerOptions,
+ ) caches {
+ 	return caches{
+-		packageJsonInfoCache: packagejson.NewInfoCache(currentDirectory, useCaseSensitiveFileNames),
++		packageJsonInfoCache:            packagejson.NewInfoCache(currentDirectory, useCaseSensitiveFileNames),
++		moduleResolutionCache:           newModuleResolutionCache(),
++		typeRefDirectiveResolutionCache: newTypeRefDirectiveResolutionCache(),
++	}
++}
++
++// getRedirectConfigName returns a stable string key for a ResolvedProjectReference.
++// Returns "" for nil redirects.
++func getRedirectConfigName(redirect ResolvedProjectReference) string {
++	if redirect == nil {
++		return ""
+ 	}
++	return redirect.ConfigName()
+ }
+diff --git a/internal/module/resolver.go b/internal/module/resolver.go
+index d22fa0a97b..d9034cca5b 100644
+--- a/internal/module/resolver.go
++++ b/internal/module/resolver.go
+@@ -196,10 +196,27 @@ func (r *Resolver) ResolveTypeReferenceDirective(
+ 	resolutionMode core.ResolutionMode,
+ 	redirectedReference ResolvedProjectReference,
+ ) (*ResolvedTypeReferenceDirective, []DiagAndArgs) {
++	containingDirectory := tspath.GetDirectoryPath(containingFile)
+ 	traceBuilder := r.newTraceBuilder()
+ 
++	fromInferredTypesContainingFile := strings.HasSuffix(containingFile, InferredTypesContainingFile)
++
++	cacheKey := typeRefDirectiveResolutionCacheKey{
++		containingDirectory:             containingDirectory,
++		typeReferenceName:               typeReferenceDirectiveName,
++		resolutionMode:                  resolutionMode,
++		redirectConfigName:              getRedirectConfigName(redirectedReference),
++		fromInferredTypesContainingFile: fromInferredTypesContainingFile,
++	}
++
++	// Only use type reference directive resolution cache when trace resolution is disabled
++	if traceBuilder == nil {
++		if cached, ok := r.typeRefDirectiveResolutionCache.Get(cacheKey); ok {
++			return cached, nil
++		}
++	}
++
+ 	compilerOptions := GetCompilerOptionsWithRedirect(r.compilerOptions, redirectedReference)
+-	containingDirectory := tspath.GetDirectoryPath(containingFile)
+ 
+ 	typeRoots, fromConfig := compilerOptions.GetEffectiveTypeRoots(r.host.GetCurrentDirectory())
+ 	if traceBuilder != nil {
+@@ -208,22 +225,39 @@ func (r *Resolver) ResolveTypeReferenceDirective(
+ 	}
+ 
+ 	state := newResolutionState(typeReferenceDirectiveName, containingDirectory, true /*isTypeReferenceDirective*/, resolutionMode, compilerOptions, redirectedReference, r, traceBuilder)
+-	result := state.resolveTypeReferenceDirective(typeRoots, fromConfig, strings.HasSuffix(containingFile, InferredTypesContainingFile))
++	result := state.resolveTypeReferenceDirective(typeRoots, fromConfig, fromInferredTypesContainingFile)
+ 
+ 	if traceBuilder != nil {
+ 		traceBuilder.traceTypeReferenceDirectiveResult(typeReferenceDirectiveName, result)
+ 	}
++
++	r.typeRefDirectiveResolutionCache.Set(cacheKey, result)
++
+ 	return result, traceBuilder.getTraces()
+ }
+ 
+ func (r *Resolver) ResolveModuleName(moduleName string, containingFile string, resolutionMode core.ResolutionMode, redirectedReference ResolvedProjectReference) (*ResolvedModule, []DiagAndArgs) {
++	containingDirectory := tspath.GetDirectoryPath(containingFile)
+ 	traceBuilder := r.newTraceBuilder()
++
++	cacheKey := moduleResolutionCacheKey{
++		containingDirectory: containingDirectory,
++		moduleName:          moduleName,
++		resolutionMode:      resolutionMode,
++		redirectConfigName:  getRedirectConfigName(redirectedReference),
++	}
++	// Only use module resolution cache when trace resolution is disabled
++	if traceBuilder == nil {
++		if cached, ok := r.moduleResolutionCache.Get(cacheKey); ok {
++			return cached, nil
++		}
++	}
++
+ 	compilerOptions := GetCompilerOptionsWithRedirect(r.compilerOptions, redirectedReference)
+ 	if traceBuilder != nil {
+ 		traceBuilder.write(diagnostics.Resolving_module_0_from_1, moduleName, containingFile)
+ 		traceBuilder.traceResolutionUsingProjectReference(redirectedReference)
+ 	}
+-	containingDirectory := tspath.GetDirectoryPath(containingFile)
+ 
+ 	moduleResolution := compilerOptions.GetModuleResolutionKind()
+ 	if compilerOptions.ModuleResolution != moduleResolution {
+@@ -257,7 +291,10 @@ func (r *Resolver) ResolveModuleName(moduleName string, containingFile string, r
+ 		}
+ 	}
+ 
+-	return r.tryResolveFromTypingsLocation(moduleName, containingDirectory, result, traceBuilder), traceBuilder.getTraces()
++	finalResult := r.tryResolveFromTypingsLocation(moduleName, containingDirectory, result, traceBuilder)
++	r.moduleResolutionCache.Set(cacheKey, finalResult)
++
++	return finalResult, traceBuilder.getTraces()
+ }
+ 
+ func (r *Resolver) ResolvePackageDirectory(moduleName string, containingFile string, resolutionMode core.ResolutionMode, redirectedReference ResolvedProjectReference) *ResolvedModule {
+-- 
+2.39.5 (Apple Git-154)
+
