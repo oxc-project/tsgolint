@@ -532,13 +532,13 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
-  it('should suppress tsconfig-error diagnostics when OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
+  it('should suppress tsconfig-error diagnostics when OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
     const testFiles = await getTestFiles('with-invalid-tsconfig-option');
     expect(testFiles.length).toBeGreaterThan(0);
 
     const config = generateConfig(testFiles, ['no-floating-promises']);
 
-    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
+    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,
@@ -550,13 +550,13 @@ console.log(x);
     expect(diagnostics.length).toBe(0);
   });
 
-  it('should still report lint rule diagnostics when OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
+  it('should still report lint rule diagnostics when OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS env var is true', async () => {
     const testFiles = await getTestFiles('with-invalid-tsconfig-option-and-lint-errors');
     expect(testFiles.length).toBeGreaterThan(0);
 
     const config = generateConfig(testFiles, ['no-floating-promises']);
 
-    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
+    const env = { ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS: 'true' };
 
     const output = execFileSync(TSGOLINT_BIN, ['headless'], {
       input: config,
