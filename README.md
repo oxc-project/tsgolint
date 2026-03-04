@@ -182,7 +182,7 @@ Implemented 59/61.
 <!-- Badge definitions -->
 
 [npm-badge]: https://img.shields.io/npm/v/oxlint-tsgolint.svg
-[npm-url]: https://www.npmjs.com/package/oxlint-tsgolint
+[npm-url]: https://www.npmx.dev/package/oxlint-tsgolint
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: LICENSE
 [ci-badge]: https://github.com/oxc-project/tsgolint/actions/workflows/ci.yml/badge.svg
