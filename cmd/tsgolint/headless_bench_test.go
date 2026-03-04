@@ -12,6 +12,7 @@ import (
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/compiler"
 	"github.com/microsoft/typescript-go/shim/tspath"
+	"github.com/microsoft/typescript-go/shim/vfs"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
@@ -146,43 +147,31 @@ func BenchmarkAllRulesHeadlessSingleThread(b *testing.B) {
 	runAllRulesBenchmark(b, true)
 }
 
-// BenchmarkE2ESingleFile benchmarks the true end-to-end path for a single file:
+// BenchmarkE2E benchmarks the true end-to-end path for all fixture files:
 // FS creation, tsconfig resolution, program creation, linting with all rules,
-// and diagnostic emission. This measures the full cost that a real oxlint
-// invocation would pay for one file.
-func BenchmarkE2ESingleFile(b *testing.B) {
+// and diagnostic serialization via RunLinter. This measures the full cost that
+// a real oxlint invocation would pay, including tsconfig discovery.
+// File collection is excluded from the timed section since oxlint handles that.
+func BenchmarkE2E(b *testing.B) {
 	b.Helper()
 	b.ReportAllocs()
 
 	dir := fixtureDir
-	// Pick the first fixture file we can find.
 	baseFS := osvfs.FS()
-	wrappedFS := bundled.WrapFS(cachedvfs.From(baseFS))
-	resolver := utils.NewTsConfigResolver(wrappedFS, dir)
 
-	// Find a single .ts file in the fixtures directory.
-	var targetFile string
+	// Collect all .ts files in the fixtures directory (simulates what oxlint sends us).
+	var allFiles []string
 	_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if err != nil || info.IsDir() {
 			return nil
 		}
 		if strings.HasSuffix(path, ".ts") && !strings.HasSuffix(path, ".d.ts") {
-			targetFile = path
-			return filepath.SkipAll
+			allFiles = append(allFiles, tspath.NormalizeSlashes(path))
 		}
 		return nil
 	})
-	if targetFile == "" {
-		b.Fatal("no .ts fixture file found")
-	}
-
-	normalizedFile := tspath.NormalizeSlashes(targetFile)
-
-	// Resolve tsconfig once to know the config path (this is amortized in real usage).
-	result := resolver.FindTsConfigParallel([]string{normalizedFile})
-	tsconfigPath := result[normalizedFile]
-	if tsconfigPath == "" {
-		b.Fatal("no tsconfig found for fixture file:", normalizedFile)
+	if len(allFiles) == 0 {
+		b.Fatal("no .ts fixture files found")
 	}
 
 	getRulesForFile := func(_ *ast.SourceFile) []linter.ConfiguredRule {
@@ -198,66 +187,75 @@ func BenchmarkE2ESingleFile(b *testing.B) {
 		return rules
 	}
 
+	// buildWorkload creates a fresh FS, resolves tsconfigs for all files, and
+	// returns the workload and FS needed by RunLinter.
+	buildWorkload := func() (linter.Workload, vfs.FS) {
+		fs := bundled.WrapFS(cachedvfs.From(baseFS))
+		resolver := utils.NewTsConfigResolver(fs, dir)
+		result := resolver.FindTsConfigParallel(allFiles)
+
+		workload := linter.Workload{
+			Programs:       make(map[string][]string),
+			UnmatchedFiles: []string{},
+		}
+		for file, tsconfig := range result {
+			if tsconfig == "" {
+				workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
+			} else {
+				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], file)
+			}
+		}
+		return workload, fs
+	}
+
+	workers := runtime.GOMAXPROCS(0)
+
 	// Warm up once to verify everything works.
 	{
-		fs := bundled.WrapFS(cachedvfs.From(baseFS))
-		host := utils.CreateCompilerHost(dir, fs)
-		program, diags, err := utils.CreateProgram(true, fs, dir, tsconfigPath, host, false)
-		if err != nil {
-			b.Fatal("warmup program creation failed:", err)
-		}
-		if len(diags) > 0 {
-			b.Fatal("tsconfig diagnostics:", diags[0].Description)
-		}
-
-		sf := program.GetSourceFile(normalizedFile)
-		if sf == nil {
-			b.Fatal("source file not found in program:", normalizedFile)
+		workload, fs := buildWorkload()
+		if len(workload.Programs) == 0 && len(workload.UnmatchedFiles) == 0 {
+			b.Fatal("no files resolved to any program")
 		}
 
 		var diagnosticCount int64
-		err = linter.RunLinterOnProgram(
+		err := linter.RunLinter(
 			utils.LogLevelNormal,
-			program,
-			[]*ast.SourceFile{sf},
-			1,
+			dir,
+			workload,
+			workers,
+			fs,
 			getRulesForFile,
 			func(_ rule.RuleDiagnostic) { atomic.AddInt64(&diagnosticCount, 1) },
 			func(_ diagnostic.Internal) {},
 			linter.Fixes{},
 			linter.TypeErrors{},
+			false,
 		)
 		if err != nil {
 			b.Fatal("warmup linter failed:", err)
 		}
-		b.Logf("file: %s, diagnostics: %d", normalizedFile, diagnosticCount)
+		b.Logf("files: %d, programs: %d, diagnostics: %d, workers: %d",
+			len(allFiles), len(workload.Programs), diagnosticCount, workers)
 	}
 
 	b.ResetTimer()
 	for b.Loop() {
-		// Full end-to-end: fresh FS, host, program, lint.
-		fs := bundled.WrapFS(cachedvfs.From(baseFS))
-		host := utils.CreateCompilerHost(dir, fs)
-		program, _, err := utils.CreateProgram(true, fs, dir, tsconfigPath, host, false)
-		if err != nil {
-			b.Fatal("program creation failed:", err)
-		}
+		// Full end-to-end: fresh FS, tsconfig resolution, program creation, lint,
+		// and diagnostic serialization to io.Discard.
+		workload, fs := buildWorkload()
 
-		sf := program.GetSourceFile(normalizedFile)
-		if sf == nil {
-			b.Fatal("source file not found in program:", normalizedFile)
-		}
-
-		err = linter.RunLinterOnProgram(
+		err := linter.RunLinter(
 			utils.LogLevelNormal,
-			program,
-			[]*ast.SourceFile{sf},
-			1,
+			dir,
+			workload,
+			workers,
+			fs,
 			getRulesForFile,
 			func(_ rule.RuleDiagnostic) {},
 			func(_ diagnostic.Internal) {},
 			linter.Fixes{},
 			linter.TypeErrors{},
+			false,
 		)
 		if err != nil {
 			b.Fatal("linter failed:", err)
