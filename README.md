@@ -13,13 +13,9 @@
 
 High-performance **type-aware linting** for Oxlint.
 
-`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using the TypeScript compiler through [typescript-go](https://github.com/microsoft/typescript-go) for full compatibility with the TypeScript type system.
-
-It targets **TypeScript 7** (codenamed **Project Corsa**) through `typescript-go`.
+`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using the TypeScript compiler through [typescript-go](https://github.com/microsoft/typescript-go) for full compatibility with the TypeScript type system, and targets **TypeScript 7** (codenamed **Project Corsa**).
 
 It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabling projects to run deeper semantic checks without sacrificing performance.
-
-This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint), with fork permission granted by [@auvred](https://github.com/auvred).
 
 Key highlights:
 
@@ -29,6 +25,8 @@ Key highlights:
 - **Compiler target**: TypeScript 7 ("Project Corsa")
 - **Parallel**: Multi-core rule execution for scalable analysis
 - **High impact**: catches production-grade bugs that syntax-only linting misses (for example `no-floating-promises`)
+
+This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint), with fork permission granted by [@auvred](https://github.com/auvred).
 
 ## Why Teams Upgrade to Type-Aware Linting
 
