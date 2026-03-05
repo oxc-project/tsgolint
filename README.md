@@ -7,7 +7,7 @@
 [![MIT licensed][license-badge]][license-url]
 [![Build Status][ci-badge]][ci-url]
 [![Discord chat][discord-badge]][discord-url]
-[![npm version][npm-badge]][npm-url]
+[![npm weekly downloads][npm-badge]][npm-url]
 
 </div>
 
@@ -181,7 +181,7 @@ Implemented 59/61.
 
 <!-- Badge definitions -->
 
-[npm-badge]: https://img.shields.io/npm/v/oxlint-tsgolint.svg
+[npm-badge]: https://img.shields.io/npm/dw/oxlint-tsgolint.svg
 [npm-url]: https://www.npmx.dev/package/oxlint-tsgolint
 [license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: LICENSE
