@@ -11,47 +11,80 @@
 
 </div>
 
-**tsgolint** is a high-performance TypeScript linter containing only type-aware rules, powered by [typescript-go](https://github.com/microsoft/typescript-go) and designed for integration with [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+High-performance **type-aware linting** for Oxlint.
+
+`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using [typescript-go](https://github.com/microsoft/typescript-go) for full compatibility with the TypeScript type system, and targets **TypeScript 7** (codenamed **Project Corsa**).
+
+It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabling projects to run deeper semantic checks without sacrificing performance.
 
 Key highlights:
 
-- **Performance**: 20-40x faster than ESLint + typescript-eslint
-- **Type-aware**: Comprehensive TypeScript type checking integration
-- **Parallel**: Utilizes all available CPU cores
-- **Compatible**: Implements typescript-eslint rules with consistent behavior
+- **Performance**: 20-40x faster than ESLint + typescript-eslint on large repositories
+- **Coverage**: 59/61 targeted `typescript-eslint` type-aware rules implemented
+- **Parallel**: Multi-core rule execution for scalable analysis
+- **High impact**: catches production-grade bugs that syntax-only linting misses (for example `no-floating-promises`)
 
-This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint). Fork permission is granted by @auvred.
+This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint), with fork permission granted by [@auvred](https://github.com/auvred).
 
-> [!IMPORTANT]
-> **tsgolint** is currently in alpha.
-> This is a community effort. Feel free to ask to be assigned to any of the [good first issues](https://github.com/oxc-project/tsgolint/contribute).
+## Why Teams Upgrade to Type-Aware Linting
+
+If you ship TypeScript, running `oxlint --type-aware` in CI is a high-leverage upgrade that catches bug classes syntax linting cannot.
+
+For example, `typescript/no-floating-promises` catches silently dropped async failures:
+
+```js
+async function saveUser(user) {
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    body: JSON.stringify(user),
+  });
+  if (!res.ok) throw new Error('save failed');
+}
+
+function onSubmit(user) {
+  saveUser(user); // no-floating-promises: Promise is created but never handled
+  showToast('Saved!'); // UI claims success even if the request rejects
+}
+```
+
+Without this rule, rejected promises can be missed and reach production as flaky, hard-to-debug failures.
 
 ## Installation & Usage
 
-**tsgolint** is integrated into Oxlint as the type-aware backend. Install and use via Oxlint:
+`tsgolint` is integrated into Oxlint as the type-aware backend. Install and use via Oxlint:
 
 ```shell
 # Install oxlint with type-aware support
 pnpm add -D oxlint-tsgolint@latest
 
 # Quick start
-pnpm dlx oxlint --type-aware
+pnpm dlx oxlint --type-aware --type-check
 
 # Or run on your project
-oxlint --type-aware
+oxlint --type-aware --type-check
 ```
+
+### What these flags do
+
+- `--type-aware`: enables `typescript/*` rules that require TypeScript semantic analysis via `tsgolint`
+- `--type-check`: includes type diagnostics from `typescript-go` in type-aware runs
 
 ### Configuration
 
 Configure type-aware rules in `.oxlintrc.json`:
 
-```json
+```jsonc
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // alternatively, configure via options field
+  "options": {
+    "typeAware": true,
+    "typeCheck": true,
+  },
   "rules": {
     "typescript/no-floating-promises": "error",
-    "typescript/no-misused-promises": "error"
-  }
+    "typescript/no-misused-promises": "error",
+  },
 }
 ```
 
@@ -60,39 +93,54 @@ Over 50 TypeScript-specific type-aware rules are available. For detailed setup a
 > [!NOTE]
 > Non-type-aware TypeScript rules can be found in [Oxlint's TypeScript rules](https://oxc.rs/docs/guide/usage/linter/rules.html) under the TypeScript source.
 
-## Performance
+## How it fits into Oxlint
 
-**tsgolint** is **20-40 times faster** than ESLint + typescript-eslint.
+Oxlint separates linting into two layers:
 
-### Real-World Performance Examples
+| Layer        | Purpose                      | Speed                  |
+| ------------ | ---------------------------- | ---------------------- |
+| **Oxlint**   | Syntax & structural analysis | Instant                |
+| **tsgolint** | Type-aware semantic rules    | Requires type analysis |
 
-- **napi-rs** (144 files): 1.0s
-- **preact** (245 files): 2.7s
-- **rolldown** (314 files): 1.5s
-- **bluesky** (1152 files): 7.0s
+This architecture keeps the common case extremely fast while enabling powerful type-aware checks when needed.
+Oxlint handles file discovery, configuration, and output formatting, while `tsgolint` executes type-aware rules and emits semantic diagnostics.
 
-### Speed Sources
+## Why tsgolint exists
 
-- **Native Speed**: Go implementation with direct TypeScript compiler integration
-- **Zero Conversion**: Direct TypeScript AST usage without ESTree conversion overhead
-- **Parallel Processing**: Multi-core execution utilizing all available CPU cores
-- **Efficient Memory**: Streaming diagnostics and optimized resource usage
+Traditional type-aware linting in the JavaScript ecosystem typically works by embedding TypeScript's type-analysis engine inside a JavaScript linter.
+
+This approach introduces several bottlenecks:
+
+- slow startup due to compiler initialization
+- AST conversion between toolchains
+- limited parallelism
+- high memory overhead on large repositories
+
+`tsgolint` takes a different approach: it runs directly on `typescript-go`, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
+
+Recent benchmark results (`eslint` + `typescript-eslint` vs `tsgolint`) show consistent large speedups:
+
+| Repository           | ESLint + typescript-eslint | tsgolint | Speedup |
+| -------------------- | -------------------------- | -------- | ------- |
+| microsoft/vscode     | 167.8s                     | 4.89s    | **34x** |
+| microsoft/typescript | 47.4s                      | 2.10s    | **23x** |
+| typeorm/typeorm      | 27.3s                      | 0.93s    | **29x** |
+| vuejs/core           | 20.7s                      | 0.95s    | **22x** |
 
 See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 
-## Current Status
+## Status
 
-### In Development 🚧
+`tsgolint` is under active development.
 
-- Additional typescript-eslint rules
+The core architecture is stable and already powers Oxlint's type-aware linting mode. Current development focuses on expanding rule coverage and ecosystem integration:
 
-## Architecture
+- additional `typescript-eslint` rule support
+- editor integration improvements
+- configuration and rule customization
+- performance improvements for large monorepos
 
-**tsgolint** follows a clean separation between frontend and backend:
-
-- **Oxlint CLI** handles file discovery, configuration, and output formatting
-- **tsgolint backend** provides type-aware rule execution and diagnostics
-- **TypeScript integration** via typescript-go for native performance
+Because `tsgolint` relies on `typescript-go`, its long-term stability evolves alongside TypeScript itself.
 
 For detailed technical documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
@@ -176,7 +224,7 @@ Implemented 59/61.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Development and contribution guidelines
 - [Benchmarks](./benchmarks/README.md) - Performance comparison data
-- [TypeScript Go](https://github.com/microsoft/typescript-go) - Underlying TypeScript compiler
+- [typescript-go](https://github.com/microsoft/typescript-go) - Underlying type-analysis backend
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) - Frontend linter integration
 
 <!-- Badge definitions -->
