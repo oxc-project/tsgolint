@@ -23,7 +23,7 @@ This project originated in [typescript-eslint/tsgolint](https://github.com/types
 
 Key highlights:
 
-- **Performance**: 22x-34x faster than ESLint + typescript-eslint on large repositories
+- **Performance**: 20-40x faster than ESLint + typescript-eslint on large repositories
 - **Coverage**: 59/61 targeted `typescript-eslint` type-aware rules implemented
 - **Type-aware**: Full TypeScript semantic analysis via `typescript-go`
 - **Compiler target**: TypeScript 7 ("Project Corsa")
@@ -53,22 +53,6 @@ function onSubmit(user) {
 
 Without this rule, rejected promises can be missed and reach production as flaky, hard-to-debug failures.
 
-## How it fits into Oxlint
-
-Oxlint separates linting into two layers:
-
-| Layer        | Purpose                      | Speed                  |
-| ------------ | ---------------------------- | ---------------------- |
-| **Oxlint**   | Syntax & structural analysis | Instant                |
-| **tsgolint** | Type-aware semantic rules    | Requires type analysis |
-
-This architecture keeps the common case extremely fast while enabling powerful type-aware checks when needed.
-
-- **Oxlint** handles file discovery, configuration, and output formatting.
-- **tsgolint** executes type-aware rules and produces semantic diagnostics.
-
-Most repositories can run Oxlint continuously in editors and CI for immediate feedback, while enabling type-aware rules where deeper analysis is required.
-
 ## Installation & Usage
 
 `tsgolint` is integrated into Oxlint as the type-aware backend. Install and use via Oxlint:
@@ -93,9 +77,14 @@ oxlint --type-aware --type-check
 
 Configure type-aware rules in `.oxlintrc.json`:
 
-```json
+```jsonc
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // alternatively, configure via options field
+  "options": {
+    "typeAware": true,
+    "typeCheck": true
+  },
   "rules": {
     "typescript/no-floating-promises": "error",
     "typescript/no-misused-promises": "error"
@@ -107,6 +96,22 @@ Over 50 TypeScript-specific type-aware rules are available. For detailed setup a
 
 > [!NOTE]
 > Non-type-aware TypeScript rules can be found in [Oxlint's TypeScript rules](https://oxc.rs/docs/guide/usage/linter/rules.html) under the TypeScript source.
+
+## How it fits into Oxlint
+
+Oxlint separates linting into two layers:
+
+| Layer        | Purpose                      | Speed                  |
+| ------------ | ---------------------------- | ---------------------- |
+| **Oxlint**   | Syntax & structural analysis | Instant                |
+| **tsgolint** | Type-aware semantic rules    | Requires type analysis |
+
+This architecture keeps the common case extremely fast while enabling powerful type-aware checks when needed.
+
+- **Oxlint** handles file discovery, configuration, and output formatting.
+- **tsgolint** executes type-aware rules and produces semantic diagnostics.
+
+Most repositories can run Oxlint continuously in editors and CI for immediate feedback, while enabling type-aware rules where deeper analysis is required.
 
 ## Why tsgolint exists
 
@@ -126,7 +131,7 @@ It runs directly on the TypeScript compiler via [typescript-go](https://github.c
 Benefits include:
 
 - native TypeScript compatibility
-- significantly faster execution than ESLint + typescript-eslint
+- 20-40x faster execution than ESLint + typescript-eslint
 - efficient parallel rule execution
 - scalable analysis for large repositories
 
