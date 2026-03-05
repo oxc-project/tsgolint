@@ -13,7 +13,7 @@
 
 High-performance **type-aware linting** for Oxlint.
 
-`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using the TypeScript compiler through [typescript-go](https://github.com/microsoft/typescript-go) for full compatibility with the TypeScript type system, and targets **TypeScript 7** (codenamed **Project Corsa**).
+`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using [typescript-go](https://github.com/microsoft/typescript-go) for full compatibility with the TypeScript type system, and targets **TypeScript 7** (codenamed **Project Corsa**).
 
 It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabling projects to run deeper semantic checks without sacrificing performance.
 
@@ -69,7 +69,7 @@ oxlint --type-aware --type-check
 ### What these flags do
 
 - `--type-aware`: enables `typescript/*` rules that require TypeScript semantic analysis via `tsgolint`
-- `--type-check`: includes TypeScript compiler diagnostics in type-aware runs
+- `--type-check`: includes type diagnostics from `typescript-go` in type-aware runs
 
 ### Configuration
 
@@ -113,7 +113,7 @@ Most repositories can run Oxlint continuously in editors and CI for immediate fe
 
 ## Why tsgolint exists
 
-Traditional type-aware linting in the JavaScript ecosystem typically works by embedding the TypeScript compiler inside a JavaScript linter.
+Traditional type-aware linting in the JavaScript ecosystem typically works by embedding TypeScript's type-analysis engine inside a JavaScript linter.
 
 This approach introduces several bottlenecks:
 
@@ -124,7 +124,7 @@ This approach introduces several bottlenecks:
 
 `tsgolint` takes a different approach.
 
-It runs directly on the TypeScript compiler backend, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
+It runs directly on `typescript-go`, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
 
 Benefits include:
 
@@ -158,7 +158,7 @@ Current development focuses on expanding rule coverage and ecosystem integration
 
 Current implemented rule coverage is **59/61** targeted `typescript-eslint` type-aware rules (full list below).
 
-Because `tsgolint` relies on the TypeScript compiler backend, its long-term stability evolves alongside the TypeScript compiler itself.
+Because `tsgolint` relies on `typescript-go`, its long-term stability evolves alongside TypeScript itself.
 
 ## Relationship to Oxlint
 
@@ -270,7 +270,7 @@ Implemented 59/61.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Development and contribution guidelines
 - [Benchmarks](./benchmarks/README.md) - Performance comparison data
-- [TypeScript Go](https://github.com/microsoft/typescript-go) - Underlying TypeScript compiler
+- [typescript-go](https://github.com/microsoft/typescript-go) - Underlying type-analysis backend
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) - Frontend linter integration
 
 <!-- Badge definitions -->
