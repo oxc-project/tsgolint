@@ -81,12 +81,12 @@ Configure type-aware rules in `.oxlintrc.json`:
   // alternatively, configure via options field
   "options": {
     "typeAware": true,
-    "typeCheck": true
+    "typeCheck": true,
   },
   "rules": {
     "typescript/no-floating-promises": "error",
-    "typescript/no-misused-promises": "error"
-  }
+    "typescript/no-misused-promises": "error",
+  },
 }
 ```
 
@@ -124,7 +124,7 @@ This approach introduces several bottlenecks:
 
 `tsgolint` takes a different approach.
 
-It runs directly on the TypeScript compiler via [typescript-go](https://github.com/microsoft/typescript-go), avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
+It runs directly on the TypeScript compiler backend, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
 
 Benefits include:
 
@@ -158,7 +158,7 @@ Current development focuses on expanding rule coverage and ecosystem integration
 
 Current implemented rule coverage is **59/61** targeted `typescript-eslint` type-aware rules (full list below).
 
-Because `tsgolint` relies on the TypeScript compiler through [typescript-go](https://github.com/microsoft/typescript-go), its long-term stability evolves alongside the TypeScript compiler itself.
+Because `tsgolint` relies on the TypeScript compiler backend, its long-term stability evolves alongside the TypeScript compiler itself.
 
 ## Relationship to Oxlint
 
