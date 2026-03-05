@@ -71,16 +71,16 @@ For example, `typescript/no-floating-promises` catches silently dropped async fa
 
 ```js
 async function saveUser(user) {
-  const res = await fetch("/api/users", {
-    method: "POST",
+  const res = await fetch('/api/users', {
+    method: 'POST',
     body: JSON.stringify(user),
   });
-  if (!res.ok) throw new Error("save failed");
+  if (!res.ok) throw new Error('save failed');
 }
 
 function onSubmit(user) {
   saveUser(user); // no-floating-promises: Promise is created but never handled
-  showToast("Saved!"); // UI claims success even if the request rejects
+  showToast('Saved!'); // UI claims success even if the request rejects
 }
 ```
 
