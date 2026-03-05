@@ -21,8 +21,6 @@ Key highlights:
 
 - **Performance**: 20-40x faster than ESLint + typescript-eslint on large repositories
 - **Coverage**: 59/61 targeted `typescript-eslint` type-aware rules implemented
-- **Type-aware**: Full TypeScript semantic analysis via `typescript-go`
-- **Compiler target**: TypeScript 7 ("Project Corsa")
 - **Parallel**: Multi-core rule execution for scalable analysis
 - **High impact**: catches production-grade bugs that syntax-only linting misses (for example `no-floating-promises`)
 
@@ -105,11 +103,7 @@ Oxlint separates linting into two layers:
 | **tsgolint** | Type-aware semantic rules    | Requires type analysis |
 
 This architecture keeps the common case extremely fast while enabling powerful type-aware checks when needed.
-
-- **Oxlint** handles file discovery, configuration, and output formatting.
-- **tsgolint** executes type-aware rules and produces semantic diagnostics.
-
-Most repositories can run Oxlint continuously in editors and CI for immediate feedback, while enabling type-aware rules where deeper analysis is required.
+Oxlint handles file discovery, configuration, and output formatting, while `tsgolint` executes type-aware rules and emits semantic diagnostics.
 
 ## Why tsgolint exists
 
@@ -122,16 +116,7 @@ This approach introduces several bottlenecks:
 - limited parallelism
 - high memory overhead on large repositories
 
-`tsgolint` takes a different approach.
-
-It runs directly on `typescript-go`, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
-
-Benefits include:
-
-- native TypeScript compatibility
-- 20-40x faster execution than ESLint + typescript-eslint
-- efficient parallel rule execution
-- scalable analysis for large repositories
+`tsgolint` takes a different approach: it runs directly on `typescript-go`, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
 
 Recent benchmark results (`eslint` + `typescript-eslint` vs `tsgolint`) show consistent large speedups:
 
@@ -148,45 +133,14 @@ See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 
 `tsgolint` is under active development.
 
-The core architecture is stable and already powers Oxlint's type-aware linting mode.
-Current development focuses on expanding rule coverage and ecosystem integration, including:
+The core architecture is stable and already powers Oxlint's type-aware linting mode. Current development focuses on expanding rule coverage and ecosystem integration:
 
 - additional `typescript-eslint` rule support
 - editor integration improvements
 - configuration and rule customization
 - performance improvements for large monorepos
 
-Current implemented rule coverage is **59/61** targeted `typescript-eslint` type-aware rules (full list below).
-
 Because `tsgolint` relies on `typescript-go`, its long-term stability evolves alongside TypeScript itself.
-
-## Relationship to Oxlint
-
-`tsgolint` focuses specifically on **rules that require type information**.
-
-Non-type-aware rules remain part of **Oxlint itself**, which allows Oxlint to remain extremely fast while semantic checks evolve independently.
-
-```text
-Oxc platform
- ├ parser
- ├ semantic analysis
- ├ oxlint (syntax rules)
- └ tsgolint (type-aware rules)
-```
-
-This layered design allows Oxlint to provide instant lint feedback while enabling deeper semantic analysis when required.
-
-## Conceptual model
-
-Think of `tsgolint` as the **semantic linting layer for TypeScript**, similar to how compiler-powered linting works in other ecosystems.
-You can also think of it as a Clippy-style layer for TypeScript semantic linting.
-
-```text
-syntax linting      -> oxlint
-semantic linting    -> tsgolint
-```
-
-This separation allows each layer to evolve independently while sharing the same compiler infrastructure.
 
 For detailed technical documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
