@@ -30,10 +30,10 @@ Key highlights:
 
 Oxlint separates linting into two layers:
 
-| Layer | Purpose | Speed |
-| --- | --- | --- |
-| **Oxlint** | Syntax & structural analysis | Instant |
-| **tsgolint** | Type-aware semantic rules | Requires type analysis |
+| Layer        | Purpose                      | Speed                  |
+| ------------ | ---------------------------- | ---------------------- |
+| **Oxlint**   | Syntax & structural analysis | Instant                |
+| **tsgolint** | Type-aware semantic rules    | Requires type analysis |
 
 This architecture keeps the common case extremely fast while enabling powerful type-aware checks when needed.
 
@@ -105,12 +105,12 @@ Benefits include:
 
 Recent benchmark results (`eslint` + `typescript-eslint` vs `tsgolint`) show consistent large speedups:
 
-| Repository | ESLint + typescript-eslint | tsgolint | Speedup |
-| --- | --- | --- | --- |
-| microsoft/vscode | 167.8s | 4.89s | **34x** |
-| microsoft/typescript | 47.4s | 2.10s | **23x** |
-| typeorm/typeorm | 27.3s | 0.93s | **29x** |
-| vuejs/core | 20.7s | 0.95s | **22x** |
+| Repository           | ESLint + typescript-eslint | tsgolint | Speedup |
+| -------------------- | -------------------------- | -------- | ------- |
+| microsoft/vscode     | 167.8s                     | 4.89s    | **34x** |
+| microsoft/typescript | 47.4s                      | 2.10s    | **23x** |
+| typeorm/typeorm      | 27.3s                      | 0.93s    | **29x** |
+| vuejs/core           | 20.7s                      | 0.95s    | **22x** |
 
 See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 
