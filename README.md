@@ -19,7 +19,7 @@ It targets **TypeScript 7** (codenamed **Project Corsa**) through `typescript-go
 
 It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabling projects to run deeper semantic checks without sacrificing performance.
 
-This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint), with fork permission granted by @auvred.
+This project originated in [typescript-eslint/tsgolint](https://github.com/typescript-eslint/tsgolint), with fork permission granted by [@auvred](https://github.com/auvred).
 
 Key highlights:
 
@@ -29,6 +29,29 @@ Key highlights:
 - **Compiler target**: TypeScript 7 ("Project Corsa")
 - **Parallel**: Multi-core rule execution for scalable analysis
 - **High impact**: catches production-grade bugs that syntax-only linting misses (for example `no-floating-promises`)
+
+## Why Teams Upgrade to Type-Aware Linting
+
+If you ship TypeScript, running `oxlint --type-aware` in CI is a high-leverage upgrade that catches bug classes syntax linting cannot.
+
+For example, `typescript/no-floating-promises` catches silently dropped async failures:
+
+```js
+async function saveUser(user) {
+  const res = await fetch('/api/users', {
+    method: 'POST',
+    body: JSON.stringify(user),
+  });
+  if (!res.ok) throw new Error('save failed');
+}
+
+function onSubmit(user) {
+  saveUser(user); // no-floating-promises: Promise is created but never handled
+  showToast('Saved!'); // UI claims success even if the request rejects
+}
+```
+
+Without this rule, rejected promises can be missed and reach production as flaky, hard-to-debug failures.
 
 ## How it fits into Oxlint
 
@@ -65,29 +88,6 @@ oxlint --type-aware --type-check
 
 - `--type-aware`: enables `typescript/*` rules that require TypeScript semantic analysis via `tsgolint`
 - `--type-check`: includes TypeScript compiler diagnostics in type-aware runs
-
-### Why this is a must-upgrade
-
-If you ship TypeScript, running `oxlint --type-aware` in CI is a high-leverage upgrade that catches bug classes syntax linting cannot.
-
-For example, `typescript/no-floating-promises` catches silently dropped async failures:
-
-```js
-async function saveUser(user) {
-  const res = await fetch('/api/users', {
-    method: 'POST',
-    body: JSON.stringify(user),
-  });
-  if (!res.ok) throw new Error('save failed');
-}
-
-function onSubmit(user) {
-  saveUser(user); // no-floating-promises: Promise is created but never handled
-  showToast('Saved!'); // UI claims success even if the request rejects
-}
-```
-
-Without this rule, rejected promises can be missed and reach production as flaky, hard-to-debug failures.
 
 ### Configuration
 
