@@ -2470,6 +2470,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/prefer-find/index.ts",
     "kind": 0,
     "message": {
+      "description": "Use array destructuring.",
+      "id": "preferDestructuring",
+    },
+    "range": {
+      "end": 51,
+      "pos": 6,
+    },
+    "rule": "prefer-destructuring",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-find/index.ts",
+    "kind": 0,
+    "message": {
       "description": "Prefer .find(...) instead of .filter(...)[0].",
       "id": "preferFind",
     },
@@ -3536,6 +3549,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
     ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/unbound-method/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 453,
+          "pos": 429,
+        },
+        "text": "{getValue} = calc",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use object destructuring.",
+      "id": "preferDestructuring",
+    },
+    "range": {
+      "end": 453,
+      "pos": 429,
+    },
+    "rule": "prefer-destructuring",
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",
