@@ -58,9 +58,12 @@ Without this rule, rejected promises can be missed and reach production as flaky
 pnpm add -D oxlint-tsgolint@latest
 
 # Quick start
-pnpm dlx oxlint --type-aware --type-check
+pnpm dlx oxlint --type-aware
 
 # Or run on your project
+oxlint --type-aware
+
+# Optionally also run typechecking at the same time
 oxlint --type-aware --type-check
 ```
 
