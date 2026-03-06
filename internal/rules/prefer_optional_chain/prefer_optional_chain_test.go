@@ -993,6 +993,10 @@ func TestPreferOptionalChainRule(t *testing.T) {
 			declare const foo: any;
 			foo === undefined || !foo.isTruthy();
 		`},
+		{Code: `
+			declare const foo: { name: string } | null | undefined;
+			!(foo && typeof foo.name === 'undefined');
+		`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{
@@ -4180,6 +4184,46 @@ foo.bar?.() === undefined || foo.bar?.().baz;
 			MutateOutput: AddNewlineInsideBrackets,
 		}),
 	)...)
+
+	invalidCases = append(invalidCases,
+		rule_tester.InvalidTestCase{
+			Code: `
+				declare const foo: { name: string } | null | undefined;
+				!(foo && foo.name === 'baz');
+			`,
+			Output: []string{`
+				declare const foo: { name: string } | null | undefined;
+				foo?.name !== 'baz';
+			`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+		rule_tester.InvalidTestCase{
+			Code: `
+				declare const test: boolean;
+				declare const foo: { name: string } | null | undefined;
+				test || (foo && foo.name);
+			`,
+			Output: []string{`
+				declare const test: boolean;
+				declare const foo: { name: string } | null | undefined;
+				test || foo?.name;
+			`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+		rule_tester.InvalidTestCase{
+			Code: `
+				declare const foo: { name: string } | null | undefined;
+				declare const FooClass: new (...args: unknown[]) => unknown;
+				!(foo && foo.name instanceof FooClass);
+			`,
+			Output: []string{`
+				declare const foo: { name: string } | null | undefined;
+				declare const FooClass: new (...args: unknown[]) => unknown;
+				!(foo?.name instanceof FooClass);
+			`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+	)
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
