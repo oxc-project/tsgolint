@@ -4166,6 +4166,32 @@ foo.bar?.() === undefined || foo.bar?.().baz;
 		MutateOutput: AddTrailingEqualUndefined(Identity),
 	})...)
 
+	// --- `in` / `instanceof` operator false positives ---
+	// `in` has no optional-chain equivalent (`key in obj?.prop` is not valid),
+	// so these patterns must never be reported.
+	validCases = append(validCases, rule_tester.ValidTestCase{
+		Code: `(!data.previous_values || key in data.previous_values)`,
+	}, rule_tester.ValidTestCase{
+		Code: `(data.previous_values && key in data.previous_values)`,
+	}, rule_tester.ValidTestCase{
+		Code: `(!a.b || key in a.b)`,
+	}, rule_tester.ValidTestCase{
+		Code: `(a.b && key in a.b)`,
+	}, rule_tester.ValidTestCase{
+		Code: `(!a.b || foo instanceof a.b)`,
+	}, rule_tester.ValidTestCase{
+		Code: `(a.b && foo instanceof a.b)`,
+	})
+
+	// --- Redundant null/undefined checks false positive ---
+	// `a.b === null || a.b === undefined` is just a nullish check — there is no
+	// member access to convert, so it must not be reported.
+	validCases = append(validCases, rule_tester.ValidTestCase{
+		Code: `request.payload === undefined || request.payload === null`,
+	}, rule_tester.ValidTestCase{
+		Code: `request.payload === null || request.payload === undefined`,
+	})
+
 	// --- Spacing sanity checks ---
 	// These test that extra spacing in the code is handled correctly
 	invalidCases = append(invalidCases, DedupeInvalidTestCases(

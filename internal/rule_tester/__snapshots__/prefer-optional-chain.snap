@@ -5370,3 +5370,24 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    9 | baz;
      | ~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-599 - 1]
+Diagnostic 1: preferOptionalChain (3:1 - 9:3)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 | declare const foo: {bar: () => ({baz: number} | null | undefined)};
+   3 | foo.
+     | ~~~~
+   4 | bar && foo.
+     | ~~~~~~~~~~~
+   5 | bar?.
+     | ~~~~~
+   6 | () && foo.
+     | ~~~~~~~~~~
+   7 | bar?.
+     | ~~~~~
+   8 | ().
+     | ~~~
+   9 | baz;
+     | ~~~
+---
+
