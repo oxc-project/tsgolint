@@ -15,9 +15,9 @@ jobs:
   cache:
     runs-on: ubuntu-latest
     steps:
-      - uses: taiki-e/checkout-action@3ab630d442e198ebb0ca30872832406ca01c46eb # v1.4.0
+      - uses: taiki-e/checkout-action@83ed61bfbe2b8abbb3c66e8b65b1335484c70009 # v1.4.1
 
-      - uses: taiki-e/install-action@68675c5a5f1a6950c3975d33f3ae0ef155e5bf3d # v2.68.15
+      - uses: taiki-e/install-action@b18b9d93a43496aeda12369e7563d9251abc2fe1 # v2.68.24
         with:
           tool: dprint
 
