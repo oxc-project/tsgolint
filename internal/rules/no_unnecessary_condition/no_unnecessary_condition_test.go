@@ -1227,6 +1227,24 @@ declare const t: T;
 t.a.a.a.value;
 t.A?.A?.A?.VALUE;
     `},
+		{Code: `
+type Result<T> = T extends null
+  ? string | null
+  : T extends string
+    ? string
+    : T extends boolean
+      ? boolean
+      : T extends number
+        ? number
+        : T;
+
+function processValue<T extends string | null>(value: Result<T>): string {
+  if (value == null) {
+    return 'default';
+  }
+  return String(value);
+}
+    `},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
