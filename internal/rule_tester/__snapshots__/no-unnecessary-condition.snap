@@ -1911,3 +1911,12 @@ Message: Unnecessary conditional, value is always nullish.
      |   ~~~
    4 | }
 ---
+
+[TestNoUnnecessaryConditionRule/invalid-138 - 1]
+Diagnostic 1: neverOptionalChain (25:22 - 25:54)
+Message: Unnecessary optional chain on a non-nullish value.
+  24 | 
+  25 | const readableName = MyEnum.valueOf('A')?.readableName;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  26 |       
+---
