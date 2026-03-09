@@ -965,6 +965,21 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			call := callExpr.AsCallExpression()
 			if !isCallExpressionNullableOriginFromCallee(call) {
+				if resolvedSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callExpr, nil, checker.CheckModeNormal); resolvedSignature != nil {
+					resolvedReturnType := ctx.TypeChecker.GetReturnTypeOfSignature(resolvedSignature)
+					// typescript-go can collapse optional-property reads during overload
+					// selection. Preserve the resolved signature fast path, but fall back
+					// to the overload matcher when it finds a nullable candidate.
+					if resolvedReturnType != nil {
+						if overloadReturnType := getBestApplicableOverloadReturnType(call); overloadReturnType != nil {
+							if isNullishType(overloadReturnType) && !isNullishType(resolvedReturnType) {
+								return overloadReturnType
+							}
+						}
+						return resolvedReturnType
+					}
+				}
+
 				if returnType := getBestApplicableOverloadReturnType(call); returnType != nil {
 					return returnType
 				}
