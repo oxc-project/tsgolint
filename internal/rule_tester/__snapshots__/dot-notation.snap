@@ -213,3 +213,10 @@ Message: [`prop`] is better written in dot notation.
      |     ~~~~~~
    8 |       
 ---
+
+[TestDotNotation/invalid-27 - 1]
+Diagnostic 1: useDot (1:7 - 1:11)
+Message: ["bar"] is better written in dot notation.
+   1 | foo?.['bar'];
+     |       ~~~~~
+---

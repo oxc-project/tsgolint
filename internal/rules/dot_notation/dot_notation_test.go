@@ -251,5 +251,12 @@ func TestDotNotation(t *testing.T) {
 			},
 			TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json",
 		},
+		{
+			Code:   "foo?.['bar'];",
+			Output: []string{"foo?.bar;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "useDot"},
+			},
+		},
 	})
 }

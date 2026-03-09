@@ -164,6 +164,7 @@ var DotNotationRule = rule.Rule{
 				leftBracketRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, objectRange.End())
 				rightBracketRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, propertyRange.End())
 
+				replaceStart := leftBracketRange.Pos()
 				fixes := make([]rule.RuleFix, 0, 3)
 				if elementAccess.QuestionDotToken == nil {
 					dotText := "."
@@ -171,9 +172,11 @@ var DotNotationRule = rule.Rule{
 						dotText = " ."
 					}
 					fixes = append(fixes, rule.RuleFixReplaceRange(core.NewTextRange(leftBracketRange.Pos(), leftBracketRange.Pos()), dotText))
+				} else {
+					replaceStart = elementAccess.QuestionDotToken.End()
 				}
 
-				fixes = append(fixes, rule.RuleFixReplaceRange(core.NewTextRange(leftBracketRange.Pos(), rightBracketRange.End()), value))
+				fixes = append(fixes, rule.RuleFixReplaceRange(core.NewTextRange(replaceStart, rightBracketRange.End()), value))
 
 				if needsSpaceAfterIdentifier(ctx.SourceFile.Text(), node.End()) {
 					fixes = append(fixes, rule.RuleFixInsertAfter(node, " "))
