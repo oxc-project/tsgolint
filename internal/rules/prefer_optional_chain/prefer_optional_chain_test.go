@@ -993,6 +993,13 @@ func TestPreferOptionalChainRule(t *testing.T) {
 			declare const foo: any;
 			foo === undefined || !foo.isTruthy();
 		`},
+		{Code: `
+			declare const left: string;
+			declare const right: { prop: string };
+			declare const shared: { name: string };
+
+			left !== shared.name && right.prop === shared.name;
+		`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{

@@ -134,6 +134,10 @@ func isNullishCheckOperand(op Operand) bool {
 	return false
 }
 
+func isNonNullishTrailingComparison(op Operand) bool {
+	return op.typ == OperandTypeComparison && !isNullishComparison(op)
+}
+
 // NullishCheckAnalysis tracks what kinds of null/undefined checks are present in a chain.
 // Optional chaining checks for BOTH null AND undefined, so incomplete checks are unsafe.
 type NullishCheckAnalysis struct {
@@ -1745,6 +1749,10 @@ func (processor *chainProcessor) buildAndChains(operands []Operand) [][]Operand 
 		}
 
 		if len(currentChain) == 0 {
+			if isNonNullishTrailingComparison(op) {
+				i++
+				continue
+			}
 			currentChain = append(currentChain, op)
 			lastExpr = op.comparedExpr
 			if op.typ != OperandTypePlain {
@@ -1818,6 +1826,9 @@ func (processor *chainProcessor) buildAndChains(operands []Operand) [][]Operand 
 			lastExpr = op.comparedExpr
 			if op.typ != OperandTypePlain && op.typ.IsNullishCheck() {
 				lastCheckType = op.typ
+			}
+			if isNonNullishTrailingComparison(op) {
+				chainComplete = true
 			}
 			i++
 			continue
