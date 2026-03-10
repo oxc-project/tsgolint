@@ -231,37 +231,41 @@ var NoBaseToStringRule = rule.Rule{
 				return collectArrayCertainty(t, append(visited, t))
 			}
 
-			toString := checker.Checker_getPropertyOfType(ctx.TypeChecker, t, "toString")
-			if toString == nil {
-				toString = checker.Checker_getPropertyOfType(ctx.TypeChecker, t, "toLocaleString")
-			}
-			if toString == nil {
-				// unknown
-				if opts.CheckUnknown && utils.IsTypeFlagSet(t, checker.TypeFlagsUnknown) {
-					return usefulnessSometimes
+			foundFallbackOnObject := false
+			for _, propertyName := range []string{"toString", "toLocaleString", "valueOf"} {
+				property := checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName)
+				if property == nil {
+					continue
 				}
-				// e.g. any
-				return usefulnessAlways
-			}
 
-			declarations := toString.Declarations
+				declarations := property.Declarations
+				if len(declarations) == 0 {
+					continue
+				}
 
-			if declarations == nil || len(declarations) != 1 {
-				// If there are multiple declarations, at least one of them must not be
-				// the default object toString.
-				//
-				// This may only matter for older versions of TS
+				// If any declaration is not from the Object interface, this is
+				// user-defined (e.g. overloaded toString/toLocaleString/valueOf).
 				// see https://github.com/typescript-eslint/typescript-eslint/issues/8585
-				return usefulnessAlways
+				// see https://github.com/typescript-eslint/typescript-eslint/issues/11945
+				if utils.Some(declarations, func(declaration *ast.Declaration) bool {
+					return !(ast.IsInterfaceDeclaration(declaration.Parent) &&
+						declaration.Parent.AsInterfaceDeclaration().Name().Text() == "Object")
+				}) {
+					return usefulnessAlways
+				}
+
+				foundFallbackOnObject = true
 			}
 
-			declaration := declarations[0]
-			isBaseToString := ast.IsInterfaceDeclaration(declaration.Parent) && declaration.Parent.AsInterfaceDeclaration().Name().Text() == "Object"
-
-			if isBaseToString {
+			if foundFallbackOnObject {
 				return usefulnessNever
 			}
 
+			// unknown
+			if opts.CheckUnknown && utils.IsTypeFlagSet(t, checker.TypeFlagsUnknown) {
+				return usefulnessSometimes
+			}
+			// e.g. any
 			return usefulnessAlways
 		}
 

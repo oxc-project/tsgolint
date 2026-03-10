@@ -107,6 +107,24 @@ class CustomToString {
 '' + new CustomToString();
     `},
 			{Code: `
+class Foo {
+  toString(): string;
+  toString(options: { verbose: boolean }): string;
+  toString(options?: { verbose: boolean }) {
+    return 'Hello, world!';
+  }
+}
+'' + new Foo();
+    `},
+			{Code: `
+class Foo {
+  valueOf() {
+    return 1;
+  }
+}
+'' + new Foo();
+    `},
+			{Code: `
 const literalWithToString = {
   toString: () => 'Hello, world!',
 };
@@ -183,6 +201,14 @@ String(myValue);
 			{Code: `
 import { String } from 'foo';
 String({});
+    `},
+			{Code: `
+declare module 'guid' {
+  export function toString(id: number): string;
+  export function toString(id: number, format: string): string;
+}
+import * as GUID from 'guid';
+GUID.toString(123);
     `},
 			{Code: `
 ['foo', 'bar'].join('');
@@ -1640,6 +1666,20 @@ type Value = [{ foo: string }, Value];
 declare const v: Value;
 
 String(v);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			// Covers the branch where a synthesized mapped-type property has no
+			// declarations, so we need to keep checking Object fallbacks.
+			Code: `
+type Mapped = { [K in 'toString']: () => string };
+declare const x: Mapped;
+'' + x;
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{

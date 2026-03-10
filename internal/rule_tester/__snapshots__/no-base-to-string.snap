@@ -858,6 +858,16 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
 ---
 
 [TestNoBaseToStringRule/invalid-87 - 1]
+Diagnostic 1: baseToString (4:6 - 4:6)
+Message: 'x' will use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   3 | declare const x: Mapped;
+   4 | '' + x;
+     |      ~
+   5 |       
+---
+
+[TestNoBaseToStringRule/invalid-88 - 1]
 Diagnostic 1: baseArrayJoin (3:1 - 3:1)
 Message: Using `join()` for v will use Object's default stringification format ('[object Object]') when stringified.
 Help: Consider mapping the values to a meaningful string (e.g. pick a property or call a formatter) before calling `join()`, or implementing a custom `toString()`/`toLocaleString()` on the element type.
