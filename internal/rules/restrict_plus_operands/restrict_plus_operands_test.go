@@ -1124,5 +1124,48 @@ const f = (a: any, b: unknown) => a + b;
 				},
 			},
 		},
+		// Date should be reported as 'Date', not 'RegExp'
+		{
+			Code: "'' + new Date();",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalid",
+					Line:      1,
+					Column:    6,
+				},
+			},
+		},
+		{
+			Code: `
+declare const d: Date;
+const x = d + '';
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalid",
+					Line:      3,
+					Column:    11,
+				},
+			},
+		},
+		{
+			Code: `
+const x = new Date() + new Date();
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalid",
+					Line:      2,
+					Column:    11,
+					EndColumn: 21,
+				},
+				{
+					MessageId: "invalid",
+					Line:      2,
+					Column:    24,
+					EndColumn: 34,
+				},
+			},
+		},
 	})
 }

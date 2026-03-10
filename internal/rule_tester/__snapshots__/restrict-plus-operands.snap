@@ -29,13 +29,13 @@ Help: Operands must both be a number or both be string.
 
 [TestRestrictPlusOperands/invalid-2 - 1]
 Diagnostic 1: invalid (1:11 - 1:12)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'never[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = [] + {};
      |           ~~
 
 Diagnostic 2: invalid (1:16 - 1:17)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{}' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = [] + {};
      |                ~~
@@ -57,7 +57,7 @@ Help: Operands must both be a number or both be string.
 
 [TestRestrictPlusOperands/invalid-4 - 1]
 Diagnostic 1: invalid (1:11 - 1:12)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'never[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = [] + 5;
      |           ~~
@@ -65,13 +65,13 @@ Help: Operands must each be a number or string, allowing a string + any of: `any
 
 [TestRestrictPlusOperands/invalid-5 - 1]
 Diagnostic 1: invalid (1:11 - 1:12)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'never[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = [] + [];
      |           ~~
 
 Diagnostic 2: invalid (1:16 - 1:17)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'never[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = [] + [];
      |                ~~
@@ -79,7 +79,7 @@ Help: Operands must each be a number or string, allowing a string + any of: `any
 
 [TestRestrictPlusOperands/invalid-6 - 1]
 Diagnostic 1: invalid (1:15 - 1:17)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'number[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = 5 + [3];
      |               ~~~
@@ -87,7 +87,7 @@ Help: Operands must each be a number or string, allowing a string + any of: `any
 
 [TestRestrictPlusOperands/invalid-7 - 1]
 Diagnostic 1: invalid (1:17 - 1:18)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{}' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | let foo = '5' + {};
      |                 ~~
@@ -163,7 +163,7 @@ Help: Operands must both be a number or both be string, allowing a string + any 
 
 [TestRestrictPlusOperands/invalid-12 - 1]
 Diagnostic 1: invalid (3:15 - 3:16)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{}' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    2 | let x = 5;
    3 | let foo = x + {};
@@ -173,7 +173,7 @@ Help: Operands must each be a number or string, allowing a string + any of: `any
 
 [TestRestrictPlusOperands/invalid-13 - 1]
 Diagnostic 1: invalid (3:11 - 3:12)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'never[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    2 | let y = '10';
    3 | let foo = [] + y;
@@ -183,7 +183,7 @@ Help: Operands must each be a number or string, allowing a string + any of: `any
 
 [TestRestrictPlusOperands/invalid-14 - 1]
 Diagnostic 1: invalid (3:11 - 3:14)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{ first: number; second: string; }' for a '+' operation.
 Help: Operands must each be a number or string.
    2 | let pair = { first: 5, second: '10' };
    3 | let foo = pair + pair;
@@ -191,7 +191,7 @@ Help: Operands must each be a number or string.
    4 |       
 
 Diagnostic 2: invalid (3:18 - 3:21)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{ first: number; second: string; }' for a '+' operation.
 Help: Operands must each be a number or string.
    2 | let pair = { first: 5, second: '10' };
    3 | let foo = pair + pair;
@@ -201,7 +201,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-15 - 1]
 Diagnostic 1: invalid (4:16 - 4:20)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'Valued' for a '+' operation.
 Help: Operands must each be a number or string.
    3 | let value: Valued = { value: 0 };
    4 | let combined = value + 0;
@@ -415,7 +415,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-29 - 1]
 Diagnostic 1: invalid (4:19 - 4:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{ a: 1; } & { b: 2; }' for a '+' operation.
 Help: Operands must each be a number or string.
    3 |         declare const b: string;
    4 |         const x = a + b;
@@ -425,7 +425,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-30 - 1]
 Diagnostic 1: invalid (7:19 - 7:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'A' for a '+' operation.
 Help: Operands must each be a number or string.
    6 |         declare const b: string;
    7 |         const x = a + b;
@@ -435,7 +435,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-31 - 1]
 Diagnostic 1: invalid (10:19 - 10:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'A2' for a '+' operation.
 Help: Operands must each be a number or string.
    9 |         declare const b: string;
   10 |         const x = a + b;
@@ -445,7 +445,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-32 - 1]
 Diagnostic 1: invalid (5:19 - 5:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'A' for a '+' operation.
 Help: Operands must each be a number or string.
    4 |         declare const b: string;
    5 |         const x = a + b;
@@ -455,7 +455,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-33 - 1]
 Diagnostic 1: invalid (4:19 - 4:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{ a: 1; } & { b: 2; }' for a '+' operation.
 Help: Operands must each be a number or string.
    3 |         declare const b: number;
    4 |         const x = a + b;
@@ -485,7 +485,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-36 - 1]
 Diagnostic 1: invalid (4:19 - 4:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '{ a: 1; } & { b: 2; }' for a '+' operation.
 Help: Operands must each be a number or string.
    3 |         declare const b: bigint;
    4 |         const x = a + b;
@@ -515,7 +515,7 @@ Help: Operands must each be a number or string.
 
 [TestRestrictPlusOperands/invalid-39 - 1]
 Diagnostic 1: invalid (4:19 - 4:19)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type 'Symbol' for a '+' operation.
 Help: Operands must each be a number or string.
    3 |         declare const b: string;
    4 |         const x = a + b;
@@ -625,7 +625,7 @@ Help: Operands must each be a number or string, allowing a string + any of: `any
 
 [TestRestrictPlusOperands/invalid-48 - 1]
 Diagnostic 1: invalid (2:34 - 2:34)
-Message: Invalid operand of type 'RegExp' for a '+' operation.
+Message: Invalid operand of type '[]' for a '+' operation.
 Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
    1 | 
    2 | const f = (a: any, b: []) => a + b;
@@ -761,4 +761,40 @@ Help: Operands must both be a number or both be string, allowing a string + any 
   Label: Type: bigint (1:17 - 1:18)
    1 | let foo = '1' + 1n;
      |                 ^^ Type: bigint
+---
+
+[TestRestrictPlusOperands/invalid-60 - 1]
+Diagnostic 1: invalid (1:6 - 1:15)
+Message: Invalid operand of type 'Date' for a '+' operation.
+Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
+   1 | '' + new Date();
+     |      ~~~~~~~~~~
+---
+
+[TestRestrictPlusOperands/invalid-61 - 1]
+Diagnostic 1: invalid (3:11 - 3:11)
+Message: Invalid operand of type 'Date' for a '+' operation.
+Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
+   2 | declare const d: Date;
+   3 | const x = d + '';
+     |           ~
+   4 |       
+---
+
+[TestRestrictPlusOperands/invalid-62 - 1]
+Diagnostic 1: invalid (2:11 - 2:20)
+Message: Invalid operand of type 'Date' for a '+' operation.
+Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
+   1 | 
+   2 | const x = new Date() + new Date();
+     |           ~~~~~~~~~~
+   3 |       
+
+Diagnostic 2: invalid (2:24 - 2:33)
+Message: Invalid operand of type 'Date' for a '+' operation.
+Help: Operands must each be a number or string, allowing a string + any of: `any`, `boolean`, `null`, `RegExp`, `undefined`.
+   1 | 
+   2 | const x = new Date() + new Date();
+     |                        ~~~~~~~~~~
+   3 |       
 ---

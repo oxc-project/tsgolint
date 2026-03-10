@@ -102,7 +102,7 @@ var RestrictPlusOperandsRule = rule.Rule{
 		}
 
 		checkInvalidPlusOperand := func(baseType, otherType *checker.Type) (checker.TypeFlags, string, bool) {
-			foundRegexp := false
+			foundInvalid := false
 
 			var flags checker.TypeFlags
 			baseTypeString := ctx.TypeChecker.TypeToString(baseType)
@@ -121,11 +121,11 @@ var RestrictPlusOperandsRule = rule.Rule{
 				} else if (opts.AllowAny || !utils.IsTypeAnyType(part)) && !utils.Every(utils.IntersectionTypeParts(part), utils.IsObjectType) {
 					continue
 				}
-				foundRegexp = true
+				foundInvalid = true
 			}
 
-			if foundRegexp {
-				return flags, ctx.TypeChecker.TypeToString(globalRegexpType), true
+			if foundInvalid {
+				return flags, baseTypeString, true
 			}
 
 			return flags, "", false
