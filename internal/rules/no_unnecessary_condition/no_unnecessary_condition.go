@@ -461,22 +461,20 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return false
 		}
 
-		// checkIndexedAccessNullish resolves an indexed access type via its
-		// constraint and reports/skips accordingly.  Returns true when the
-		// caller should return (the indexed-access path was handled).
-		checkIndexedAccessNullish := func(t *checker.Type, reportNode *ast.Node) bool {
-			flags := checker.Type_flags(t)
-			if !isIndexedAccessFlags(flags) {
-				return false
+		// constrainIndexedAccessType resolves an indexed access type via its
+		// base constraint. Returns (resolvedType, shouldSkip).
+		//
+		// When the indexed access can't be resolved to a concrete constraint,
+		// callers should skip conservatively.
+		constrainIndexedAccessType := func(t *checker.Type) (*checker.Type, bool) {
+			if t == nil || !isIndexedAccessFlags(checker.Type_flags(t)) {
+				return t, false
 			}
 			constraintType := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t)
 			if constraintType == nil || isIndexedAccessFlags(checker.Type_flags(constraintType)) {
-				return true // unresolvable — skip conservatively
+				return nil, true
 			}
-			if !isNullishType(constraintType) {
-				ctx.ReportNode(reportNode, buildNeverNullishMessage())
-			}
-			return true
+			return constraintType, false
 		}
 
 		checkCondition := func(node *ast.Node) {
@@ -1324,6 +1322,16 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 
+						if constrainedType, shouldSkip := constrainIndexedAccessType(leftType); shouldSkip {
+							return
+						} else {
+							leftType = constrainedType
+						}
+
+						if isIndeterminateType(leftType) {
+							return
+						}
+
 						// Check for never type first (never is a special case)
 						flags := checker.Type_flags(leftType)
 						if isNeverType(flags) {
@@ -1334,13 +1342,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						// Check if the value is always nullish
 						if isAlwaysNullishType(leftType) {
 							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
-							return
-						}
-
-						// Indexed access types (e.g., Partial<Record<R, T[]>>[R] where R is generic)
-						// may not be fully resolved. Try to resolve via constraint; if the
-						// constraint is still unresolved or includes nullish, skip the report.
-						if checkIndexedAccessNullish(leftType, binExpr.Left) {
 							return
 						}
 
@@ -1378,16 +1379,25 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 
-						// Check for always nullish first (before skipping for element access)
-						if isAlwaysNullishType(leftType) {
-							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
+						if constrainedType, shouldSkip := constrainIndexedAccessType(leftType); shouldSkip {
+							return
+						} else {
+							leftType = constrainedType
+						}
+
+						if isIndeterminateType(leftType) {
 							return
 						}
 
-						// Indexed access types (e.g., Partial<Record<R, T[]>>[R] where R is generic)
-						// may not be fully resolved. Try to resolve via constraint; if the
-						// constraint is still unresolved or includes nullish, skip the report.
-						if checkIndexedAccessNullish(leftType, binExpr.Left) {
+						flags := checker.Type_flags(leftType)
+						if isNeverType(flags) {
+							ctx.ReportNode(binExpr.Left, buildNeverMessage())
+							return
+						}
+
+						// Check for always nullish first (before skipping for element access)
+						if isAlwaysNullishType(leftType) {
+							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
 							return
 						}
 
@@ -1447,19 +1457,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 									}
 								}
 							}
-						}
-
-						// Check if the value is always nullish
-						flags := checker.Type_flags(leftType)
-						if isNeverType(flags) {
-							// Special case for never type
-							ctx.ReportNode(binExpr.Left, buildNeverMessage())
-							return
-						}
-
-						if isAlwaysNullishType(leftType) {
-							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
-							return
 						}
 
 						// Check if the value is never nullish

@@ -460,6 +460,11 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ?? 'default';
 }
     `},
+		{Code: `
+function test<T extends [string], I extends number>(arr: T, i: I) {
+  return arr[i] ?? 'default';
+}
+    `},
 
 		// Indexing cases
 		{Code: `
@@ -1041,6 +1046,11 @@ foo &&= 1;
 		{Code: `
 function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ??= 'default';
+}
+    `},
+		{Code: `
+function test<T extends string[], I extends number>(arr: T, i: I) {
+  arr[i] ??= 'default';
 }
     `},
 		{Code: `
@@ -2675,6 +2685,22 @@ if (arr[42] && arr[42]) {
       `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+  num ?? 'default';
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
+		},
+		{
+			Code: `
+function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+  num ??= null;
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
 		},
 	})
 }
