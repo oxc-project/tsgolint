@@ -27,6 +27,7 @@ type ValidTestCase struct {
 	Code     string
 	Only     bool
 	Skip     bool
+	FileName string
 	Options  any
 	TSConfig string
 	Tsx      bool
@@ -51,6 +52,7 @@ type InvalidTestCase struct {
 	Code     string
 	Only     bool
 	Skip     bool
+	FileName string
 	Output   []string
 	Errors   []InvalidTestCaseError
 	TSConfig string
@@ -63,16 +65,19 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 	onlyMode := slices.ContainsFunc(validTestCases, func(c ValidTestCase) bool { return c.Only }) ||
 		slices.ContainsFunc(invalidTestCases, func(c InvalidTestCase) bool { return c.Only })
 
-	runLinter := func(t *testing.T, code string, options any, tsconfigPathOverride string, tsx bool, extraFiles map[string]string) []rule.RuleDiagnostic {
+	runLinter := func(t *testing.T, code string, fileName string, options any, tsconfigPathOverride string, tsx bool, extraFiles map[string]string) []rule.RuleDiagnostic {
 		var diagnosticsMu sync.Mutex
 		diagnostics := make([]rule.RuleDiagnostic, 0, 3)
 
-		fileName := "file.ts"
-		if tsx {
-			fileName = "react.tsx"
+		if fileName == "" {
+			fileName = "file.ts"
+			if tsx {
+				fileName = "react.tsx"
+			}
 		}
 
-		virtualFiles := map[string]string{tspath.ResolvePath(rootDir, fileName): code}
+		resolvedFileName := tspath.ResolvePath(rootDir, fileName)
+		virtualFiles := map[string]string{resolvedFileName: code}
 		for relativePath, source := range extraFiles {
 			virtualFiles[tspath.ResolvePath(rootDir, relativePath)] = source
 		}
@@ -84,10 +89,20 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			tsconfigPath = tsconfigPathOverride
 		}
 
-		program, _, err := utils.CreateProgram(true, fs, rootDir, tsconfigPath, host, false)
+		program, internalDiagnostics, err := utils.CreateProgram(true, fs, rootDir, tsconfigPath, host, false)
 		assert.NilError(t, err, "couldn't create program. code: "+code)
+		if len(internalDiagnostics) > 0 {
+			t.Fatalf("couldn't create program due to internal diagnostics: %+v", internalDiagnostics)
+		}
+		assert.Assert(t, program != nil, "couldn't create program")
 
-		files := []*ast.SourceFile{program.GetSourceFile(fileName)}
+		sourceFile := program.GetSourceFile(fileName)
+		if sourceFile == nil {
+			sourceFile = program.GetSourceFile(resolvedFileName)
+		}
+		assert.Assert(t, sourceFile != nil, "couldn't get source file: "+fileName)
+
+		files := []*ast.SourceFile{sourceFile}
 
 		err = linter.RunLinterOnProgram(
 			utils.LogLevelNormal,
@@ -135,7 +150,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 				t.SkipNow()
 			}
 
-			diagnostics := runLinter(t, testCase.Code, testCase.Options, testCase.TSConfig, testCase.Tsx, testCase.Files)
+			diagnostics := runLinter(t, testCase.Code, testCase.FileName, testCase.Options, testCase.TSConfig, testCase.Tsx, testCase.Files)
 			if len(diagnostics) != 0 {
 				// TODO: pretty errors
 				t.Errorf("Expected valid test case not to contain errors. Code:\n%v", testCase.Code)
@@ -159,7 +174,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			code := testCase.Code
 
 			for i := range 10 {
-				diagnostics := runLinter(t, code, testCase.Options, testCase.TSConfig, testCase.Tsx, testCase.Files)
+				diagnostics := runLinter(t, code, testCase.FileName, testCase.Options, testCase.TSConfig, testCase.Tsx, testCase.Files)
 				if i == 0 {
 					initialDiagnostics = diagnostics
 				}

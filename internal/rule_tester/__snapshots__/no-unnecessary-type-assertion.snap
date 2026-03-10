@@ -1119,3 +1119,22 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |             ^^^^^^^^ Casting it to 'T.Value1' is unnecessary
    9 |       
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-71 - 1]
+Diagnostic 1: unnecessaryAssertion (4:12 - 4:32)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   3 | 
+   4 | const s2 = /** @type {string} */ (s);
+     |            ~~~~~~~~~~~~~~~~~~~~~
+   5 | 
+  Label: This expression already has the type 'string' (4:35 - 4:35)
+   3 | 
+   4 | const s2 = /** @type {string} */ (s);
+     |                                   ^ This expression already has the type 'string'
+   5 | 
+  Label: Casting it to 'string' is unnecessary (4:12 - 4:32)
+   3 | 
+   4 | const s2 = /** @type {string} */ (s);
+     |            ^^^^^^^^^^^^^^^^^^^^^ Casting it to 'string' is unnecessary
+   5 | 
+---
