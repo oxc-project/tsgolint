@@ -2733,7 +2733,7 @@ function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
       `,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
 		},
-				{
+		{
 			Code: `
 class MyEnum {
   public readonly readableName: string;
