@@ -7,10 +7,10 @@ Message: All exports in the declaration are only used as types. Use `export type
 ---
 
 [TestConsistentTypeExportsRule/invalid-1 - 1]
-Diagnostic 1: typeOverValue (1:1 - 1:57)
+Diagnostic 1: typeOverValue (1:1 - 1:58)
 Message: All exports in the declaration are only used as types. Use `export type`.
    1 | export { Type1 as "🍎" } from './consistent-type-exports';
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestConsistentTypeExportsRule/invalid-2 - 1]

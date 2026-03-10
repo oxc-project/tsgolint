@@ -97,8 +97,8 @@ const PollingKindFixedInterval = core.PollingKindFixedInterval
 const PollingKindNone = core.PollingKindNone
 const PollingKindPriorityInterval = core.PollingKindPriorityInterval
 type Pool[T any] = core.Pool[T]
-//go:linkname PositionToLineAndCharacter github.com/microsoft/typescript-go/internal/core.PositionToLineAndCharacter
-func PositionToLineAndCharacter(position int, lineStarts []core.TextPos) (line int, character int)
+//go:linkname PositionToLineAndByteOffset github.com/microsoft/typescript-go/internal/core.PositionToLineAndByteOffset
+func PositionToLineAndByteOffset(position int, lineStarts []core.TextPos) (line int, byteOffset int)
 type ProjectReference = core.ProjectReference
 type ResolutionMode = core.ResolutionMode
 const ResolutionModeCommonJS = core.ResolutionModeCommonJS
@@ -151,6 +151,9 @@ type Tristate = core.Tristate
 //go:linkname TryParsePattern github.com/microsoft/typescript-go/internal/core.TryParsePattern
 func TryParsePattern(pattern string) core.Pattern
 type TypeAcquisition = core.TypeAcquisition
+//go:linkname UTF16Len github.com/microsoft/typescript-go/internal/core.UTF16Len
+func UTF16Len(s string) core.UTF16Offset
+type UTF16Offset = core.UTF16Offset
 //go:linkname UndefinedTextRange github.com/microsoft/typescript-go/internal/core.UndefinedTextRange
 func UndefinedTextRange() core.TextRange
 var UnprefixedNodeCoreModules = core.UnprefixedNodeCoreModules

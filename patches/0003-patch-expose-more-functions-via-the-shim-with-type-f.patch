@@ -1,7 +1,7 @@
-From 3fc3931955915411746c1d67a63944dbd08b32f5 Mon Sep 17 00:00:00 2001
+From 3f2b139b67d43ebd6083e54d5367662b55dd6062 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
-Subject: [PATCH 3/7] patch: expose more functions via the shim with type fixes
+Subject: [PATCH 3/6] patch: expose more functions via the shim with type fixes
 
 ---
  internal/project/autoimport.go                |  4 +-
@@ -354,7 +354,7 @@ index e968e9c441..28faeb11f4 100644
  			fileName: f.fileName,
  			content:  f.content,
 diff --git a/internal/project/projectcollectionbuilder.go b/internal/project/projectcollectionbuilder.go
-index e933f20cfe..1b26e21cd0 100644
+index 97b555f2a6..e38655634d 100644
 --- a/internal/project/projectcollectionbuilder.go
 +++ b/internal/project/projectcollectionbuilder.go
 @@ -16,13 +16,13 @@ import (
@@ -620,10 +620,10 @@ index e933f20cfe..1b26e21cd0 100644
  	project.Delete()
  }
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index f0f25a91da..63d3acd477 100644
+index ff41f617da..fc7293c5ea 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
-@@ -273,7 +273,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -277,7 +277,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  	}
  
  	start := time.Now()
@@ -632,8 +632,8 @@ index f0f25a91da..63d3acd477 100644
  	if change.fileChanges.HasExcessiveWatchEvents() {
  		invalidateStart := time.Now()
  		if change.fileChanges.InvalidateAll {
-@@ -356,7 +356,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
- 		if len(projectsWithNewProgramStructure) > 0 {
+@@ -366,7 +366,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 		if len(projectsWithNewProgramStructure) > 0 || change.cleanDiskCache {
  			cleanFilesStart := time.Now()
  			removedFiles := 0
 -			fs.diskFiles.Range(func(entry *dirty.SyncMapEntry[tspath.Path, *diskFile]) bool {
@@ -642,7 +642,7 @@ index f0f25a91da..63d3acd477 100644
  					if project.host != nil && project.host.sourceFS.Seen(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index a8629d0f76..a2fad571aa 100644
+index 14459da9d1..7705958962 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -23,7 +23,7 @@ type FileSource interface {

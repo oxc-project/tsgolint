@@ -134,11 +134,11 @@ func requiresQuoting(text string) bool {
 
 func getNodeIndent(sourceFile *ast.SourceFile, node *ast.Node) string {
 	trimmed := utils.TrimNodeTextRange(sourceFile, node)
-	_, column := scanner.GetECMALineAndCharacterOfPosition(sourceFile, trimmed.Pos())
+	_, column := scanner.GetECMALineAndUTF16CharacterOfPosition(sourceFile, trimmed.Pos())
 	if column <= 0 {
 		return ""
 	}
-	return strings.Repeat(" ", column)
+	return strings.Repeat(" ", int(column))
 }
 
 func buildCaseTest(typeChecker *checker.Checker, missingBranchType *checker.Type, symbolName string) string {

@@ -1,7 +1,6 @@
 {
   "ExtraFunctions": [
     "isNonDeferredTypeReference",
-    "getFunctionFlags",
     "getMappedTypeModifiers"
   ],
   "ExtraMethods": {

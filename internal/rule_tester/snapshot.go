@@ -288,8 +288,8 @@ func renderSourceAnnotation(code string, sourceFile *ast.SourceFile, textRange c
 		}
 	}
 
-	sl, sc := scanner.GetECMALineAndCharacterOfPosition(sourceFile, startPos)
-	el, ec := scanner.GetECMALineAndCharacterOfPosition(sourceFile, endPos)
+	sl, sc := scanner.GetECMALineAndUTF16CharacterOfPosition(sourceFile, startPos)
+	el, ec := scanner.GetECMALineAndUTF16CharacterOfPosition(sourceFile, endPos)
 
 	// Display range with 1 line of context
 	startLine := max(sl-1, 0)
@@ -317,11 +317,11 @@ func renderSourceAnnotation(code string, sourceFile *ast.SourceFile, textRange c
 		// Calculate annotation columns for this line
 		aStart := 0
 		if lineIdx == sl {
-			aStart = sc
+			aStart = int(sc)
 		}
 		aEnd := len(lineText)
 		if lineIdx == el {
-			aEnd = ec
+			aEnd = int(ec)
 		}
 
 		adjustedStart := adjustForTabs(lineText, aStart)
@@ -397,15 +397,15 @@ func formatDiagnosticsSnapshot(code string, diagnostics []rule.RuleDiagnostic) s
 						break
 					}
 				}
-				lineIdx, colIdx := scanner.GetECMALineAndCharacterOfPosition(d.SourceFile, startPos)
-				line, column = lineIdx+1, colIdx+1
+				lineIdx, colIdx := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, startPos)
+				line, column = lineIdx+1, int(colIdx)+1
 				// Use inclusive end (last character in range) for display
 				inclusiveEnd := d.Range.End()
 				if inclusiveEnd > startPos {
 					inclusiveEnd--
 				}
-				endLineIdx, endColIdx := scanner.GetECMALineAndCharacterOfPosition(d.SourceFile, inclusiveEnd)
-				endLine, endColumn = endLineIdx+1, endColIdx+1
+				endLineIdx, endColIdx := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, inclusiveEnd)
+				endLine, endColumn = endLineIdx+1, int(endColIdx)+1
 			}
 
 			fmt.Fprintf(&sb, "Diagnostic %d: %s (%d:%d - %d:%d)\n", i+1, d.Message.Id, line, column, endLine, endColumn)
@@ -439,15 +439,15 @@ func formatDiagnosticsSnapshot(code string, diagnostics []rule.RuleDiagnostic) s
 						break
 					}
 				}
-				lrLineIdx, lrColIdx := scanner.GetECMALineAndCharacterOfPosition(d.SourceFile, lrStartPos)
-				lrLine, lrCol = lrLineIdx+1, lrColIdx+1
+				lrLineIdx, lrColIdx := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, lrStartPos)
+				lrLine, lrCol = lrLineIdx+1, int(lrColIdx)+1
 				// Use inclusive end (last character in range) for display
 				lrInclusiveEnd := lr.Range.End()
 				if lrInclusiveEnd > lrStartPos {
 					lrInclusiveEnd--
 				}
-				lrEndLineIdx, lrEndColIdx := scanner.GetECMALineAndCharacterOfPosition(d.SourceFile, lrInclusiveEnd)
-				lrEndLine, lrEndCol = lrEndLineIdx+1, lrEndColIdx+1
+				lrEndLineIdx, lrEndColIdx := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, lrInclusiveEnd)
+				lrEndLine, lrEndCol = lrEndLineIdx+1, int(lrEndColIdx)+1
 			}
 			fmt.Fprintf(&sb, "  Label: %s (%d:%d - %d:%d)\n", lr.Label, lrLine, lrCol, lrEndLine, lrEndCol)
 			labelAnnotated := renderSourceAnnotation(code, d.SourceFile, lr.Range, '^', lr.Label)

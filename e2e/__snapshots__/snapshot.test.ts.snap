@@ -900,6 +900,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-implied-eval",
   },
   {
+    "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe call of a(n) \`any\` typed value.",
+      "id": "unsafeCall",
+    },
+    "range": {
+      "end": 139,
+      "pos": 127,
+    },
+    "rule": "no-unsafe-call",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
     "kind": 0,
     "message": {
@@ -3536,19 +3549,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
     ],
-  },
-  {
-    "file_path": "fixtures/basic/rules/unbound-method/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Value-returning function used in a context where a void function is expected.",
-      "id": "nonVoidFunc",
-    },
-    "range": {
-      "end": 565,
-      "pos": 557,
-    },
-    "rule": "strict-void-return",
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",

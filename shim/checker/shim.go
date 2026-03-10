@@ -169,7 +169,6 @@ type extra_Checker struct {
   isInferencePartiallyBlocked bool
   legacyDecorators bool
   emitStandardClassFields bool
-  allowSyntheticDefaultImports bool
   strictNullChecks bool
   strictFunctionTypes bool
   strictBindCallApply bool
@@ -440,6 +439,7 @@ type extra_Checker struct {
   couldContainTypeVariables func(*checker.Type) bool
   isStringIndexSignatureOnlyType func(*checker.Type) bool
   markNodeAssignments func(*ast.Node) bool
+  compareTypesAssignable checker.TypeComparer
   emitResolver *checker.EmitResolver
   emitResolverOnce sync.Once
   _jsxNamespace string
@@ -558,12 +558,6 @@ type FlowLoopInfo = checker.FlowLoopInfo
 type FlowLoopKey = checker.FlowLoopKey
 type FlowState = checker.FlowState
 type FlowType = checker.FlowType
-type FunctionFlags = checker.FunctionFlags
-const FunctionFlagsAsync = checker.FunctionFlagsAsync
-const FunctionFlagsAsyncGenerator = checker.FunctionFlagsAsyncGenerator
-const FunctionFlagsGenerator = checker.FunctionFlagsGenerator
-const FunctionFlagsInvalid = checker.FunctionFlagsInvalid
-const FunctionFlagsNormal = checker.FunctionFlagsNormal
 type FunctionTypeMapper = checker.FunctionTypeMapper
 //go:linkname GetDeclarationModifierFlagsFromSymbol github.com/microsoft/typescript-go/internal/checker.GetDeclarationModifierFlagsFromSymbol
 func GetDeclarationModifierFlagsFromSymbol(s *ast.Symbol) ast.ModifierFlags
@@ -777,30 +771,12 @@ type NodeBuilderLinks = checker.NodeBuilderLinks
 type NodeBuilderSymbolLinks = checker.NodeBuilderSymbolLinks
 type NodeCheckFlags = checker.NodeCheckFlags
 const NodeCheckFlagsAssignmentsMarked = checker.NodeCheckFlagsAssignmentsMarked
-const NodeCheckFlagsBlockScopedBindingInLoop = checker.NodeCheckFlagsBlockScopedBindingInLoop
-const NodeCheckFlagsCaptureArguments = checker.NodeCheckFlagsCaptureArguments
-const NodeCheckFlagsCaptureNewTarget = checker.NodeCheckFlagsCaptureNewTarget
-const NodeCheckFlagsCaptureThis = checker.NodeCheckFlagsCaptureThis
-const NodeCheckFlagsCapturedBlockScopedBinding = checker.NodeCheckFlagsCapturedBlockScopedBinding
-const NodeCheckFlagsConstructorReference = checker.NodeCheckFlagsConstructorReference
-const NodeCheckFlagsContainsCapturedBlockScopeBinding = checker.NodeCheckFlagsContainsCapturedBlockScopeBinding
-const NodeCheckFlagsContainsClassWithPrivateIdentifiers = checker.NodeCheckFlagsContainsClassWithPrivateIdentifiers
-const NodeCheckFlagsContainsConstructorReference = checker.NodeCheckFlagsContainsConstructorReference
-const NodeCheckFlagsContainsSuperPropertyInStaticInitializer = checker.NodeCheckFlagsContainsSuperPropertyInStaticInitializer
 const NodeCheckFlagsContextChecked = checker.NodeCheckFlagsContextChecked
 const NodeCheckFlagsEnumValuesComputed = checker.NodeCheckFlagsEnumValuesComputed
 const NodeCheckFlagsInCheckIdentifier = checker.NodeCheckFlagsInCheckIdentifier
 const NodeCheckFlagsInitializerIsUndefined = checker.NodeCheckFlagsInitializerIsUndefined
 const NodeCheckFlagsInitializerIsUndefinedComputed = checker.NodeCheckFlagsInitializerIsUndefinedComputed
-const NodeCheckFlagsLexicalThis = checker.NodeCheckFlagsLexicalThis
-const NodeCheckFlagsLoopWithCapturedBlockScopedBinding = checker.NodeCheckFlagsLoopWithCapturedBlockScopedBinding
-const NodeCheckFlagsMethodWithSuperPropertyAccessInAsync = checker.NodeCheckFlagsMethodWithSuperPropertyAccessInAsync
-const NodeCheckFlagsMethodWithSuperPropertyAssignmentInAsync = checker.NodeCheckFlagsMethodWithSuperPropertyAssignmentInAsync
-const NodeCheckFlagsNeedsLoopOutParameter = checker.NodeCheckFlagsNeedsLoopOutParameter
 const NodeCheckFlagsNone = checker.NodeCheckFlagsNone
-const NodeCheckFlagsPartiallyTypeChecked = checker.NodeCheckFlagsPartiallyTypeChecked
-const NodeCheckFlagsSuperInstance = checker.NodeCheckFlagsSuperInstance
-const NodeCheckFlagsSuperStatic = checker.NodeCheckFlagsSuperStatic
 const NodeCheckFlagsTypeChecked = checker.NodeCheckFlagsTypeChecked
 type NodeLinks = checker.NodeLinks
 type NonExistentPropertyKey = checker.NonExistentPropertyKey
@@ -948,7 +924,6 @@ const SignatureFlagsPropagatingFlags = checker.SignatureFlagsPropagatingFlags
 var SignatureKeyBase = checker.SignatureKeyBase
 var SignatureKeyCanonical = checker.SignatureKeyCanonical
 var SignatureKeyErased = checker.SignatureKeyErased
-var SignatureKeyImplementation = checker.SignatureKeyImplementation
 var SignatureKeyInner = checker.SignatureKeyInner
 var SignatureKeyOuter = checker.SignatureKeyOuter
 type SignatureKind = checker.SignatureKind
@@ -1287,8 +1262,6 @@ const WideningKindFunctionReturn = checker.WideningKindFunctionReturn
 const WideningKindGeneratorNext = checker.WideningKindGeneratorNext
 const WideningKindGeneratorYield = checker.WideningKindGeneratorYield
 const WideningKindNormal = checker.WideningKindNormal
-//go:linkname GetFunctionFlags github.com/microsoft/typescript-go/internal/checker.getFunctionFlags
-func GetFunctionFlags(node *ast.Node) checker.FunctionFlags
 //go:linkname GetMappedTypeModifiers github.com/microsoft/typescript-go/internal/checker.getMappedTypeModifiers
 func GetMappedTypeModifiers(t *checker.Type) checker.MappedTypeModifiers
 //go:linkname IsNonDeferredTypeReference github.com/microsoft/typescript-go/internal/checker.isNonDeferredTypeReference
