@@ -3,6 +3,8 @@
 set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set shell := ["bash", "-cu"]
 
+alias r := ready
+
 ready:
   just fmt
   just lint
