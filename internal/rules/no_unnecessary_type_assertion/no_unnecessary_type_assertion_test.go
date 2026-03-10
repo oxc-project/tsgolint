@@ -1725,5 +1725,26 @@ const b = a;
 				},
 			},
 		},
+		{
+			Code: `/** @type {string} */
+const s = "foo";
+
+const s2 = /** @type {string} */ (s);
+`,
+			FileName: "repro.js",
+			TSConfig: "./tsconfig.checkJs.json",
+			Output: []string{`/** @type {string} */
+const s = "foo";
+
+const s2 = (s);
+`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      4,
+					Column:    12,
+				},
+			},
+		},
 	})
 }

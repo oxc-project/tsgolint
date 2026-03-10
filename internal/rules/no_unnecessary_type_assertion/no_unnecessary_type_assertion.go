@@ -288,6 +288,39 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return
 			}
 
+			if typeNode.Pos() < expression.Pos() {
+				searchStart := node.Pos()
+				if ast.IsParenthesizedExpression(node.Parent) {
+					searchStart = node.Parent.Pos()
+				}
+
+				beforeExpression := ctx.SourceFile.Text()[searchStart:expression.Pos()]
+				commentStartOffset := strings.LastIndex(beforeExpression, "/**")
+				commentEndOffset := strings.LastIndex(beforeExpression, "*/")
+				if commentStartOffset != -1 && commentEndOffset != -1 && commentEndOffset >= commentStartOffset {
+					commentStart := searchStart + commentStartOffset
+					commentEnd := searchStart + commentEndOffset + len("*/")
+					fixEnd := commentEnd
+					for fixEnd < expression.Pos() && utils.IsStrWhiteSpace(rune(ctx.SourceFile.Text()[fixEnd])) {
+						fixEnd++
+					}
+
+					assertionRange := core.NewTextRange(commentStart, commentEnd)
+					ctx.ReportDiagnosticWithFixes(
+						buildUnnecessaryTypeAssertionDiagnostic(
+							assertionRange,
+							utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
+							ctx.TypeChecker.TypeToString(uncastType),
+							ctx.TypeChecker.TypeToString(castType),
+						),
+						func() []rule.RuleFix {
+							return []rule.RuleFix{rule.RuleFixRemoveRange(core.NewTextRange(commentStart, fixEnd))}
+						},
+					)
+					return
+				}
+			}
+
 			if node.Kind == ast.KindAsExpression {
 				s := scanner.GetScannerForSourceFile(ctx.SourceFile, expression.End())
 
