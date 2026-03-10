@@ -139,11 +139,11 @@ func (vfs *OverlayVFS) Realpath(path string) string {
 	return vfs.fs.Realpath(path)
 }
 
-func (vfs *OverlayVFS) WriteFile(path string, data string, writeByteOrderMark bool) error {
+func (vfs *OverlayVFS) WriteFile(path string, data string) error {
 	if _, ok := vfs.VirtualFiles[path]; ok {
 		panic("not implemented: cannot write to overlay file system")
 	}
-	return vfs.fs.WriteFile(path, data, writeByteOrderMark)
+	return vfs.fs.WriteFile(path, data)
 }
 
 func (vfs *OverlayVFS) Remove(path string) error {

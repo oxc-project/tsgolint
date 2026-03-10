@@ -74,12 +74,12 @@ var StrictVoidReturnRule = rule.Rule{
 				return
 			}
 
-			functionFlags := checker.GetFunctionFlags(funcNode)
-			if functionFlags&checker.FunctionFlagsGenerator != 0 {
+			functionFlags := ast.GetFunctionFlags(funcNode)
+			if functionFlags&ast.FunctionFlagsGenerator != 0 {
 				ctx.ReportNode(funcNode, buildNonVoidFuncMessage())
 				return
 			}
-			if functionFlags&checker.FunctionFlagsAsync != 0 {
+			if functionFlags&ast.FunctionFlagsAsync != 0 {
 				ctx.ReportNode(funcNode, buildAsyncFuncMessage())
 				return
 			}

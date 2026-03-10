@@ -1,14 +1,14 @@
-From f513e766e8642da10f651ecc32c47c23e71ee453 Mon Sep 17 00:00:00 2001
+From 34a6bded56e1de7f326d84445168a73628f0042f Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
-Subject: [PATCH 2/7] Adapt project service for single run mode
+Subject: [PATCH 2/6] Adapt project service for single run mode
 
 ---
  internal/project/project.go | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/internal/project/project.go b/internal/project/project.go
-index 2f91085cef..3ee73ca1de 100644
+index 4988f64d5a..6e89182035 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
 @@ -2,6 +2,7 @@ package project
@@ -19,7 +19,7 @@ index 2f91085cef..3ee73ca1de 100644
  	"strings"
  	"sync"
  
-@@ -341,7 +342,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
+@@ -340,7 +341,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
  				UseSourceOfProjectReference: true,
  				TypingsLocation:             typingsLocation,
  				CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {

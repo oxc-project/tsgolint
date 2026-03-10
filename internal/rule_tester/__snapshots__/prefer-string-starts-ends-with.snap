@@ -63,11 +63,11 @@ Message: Use 'String#startsWith' method instead.
 ---
 
 [TestPreferStringStartsEndsWithRule/invalid-7 - 1]
-Diagnostic 1: preferStartsWith (3:11 - 3:22)
+Diagnostic 1: preferStartsWith (3:11 - 3:23)
 Message: Use 'String#startsWith' method instead.
    2 |         function f(s: string) {
    3 |           s[0] === '👍'; // the length is 2.
-     |           ~~~~~~~~~~~~
+     |           ~~~~~~~~~~~~~
    4 |         }
 ---
 
@@ -144,11 +144,11 @@ Message: Use 'String#startsWith' method instead.
 ---
 
 [TestPreferStringStartsEndsWithRule/invalid-16 - 1]
-Diagnostic 1: preferStartsWith (3:11 - 3:29)
+Diagnostic 1: preferStartsWith (3:11 - 3:30)
 Message: Use 'String#startsWith' method instead.
    2 |         function f(s: string) {
    3 |           s.charAt(0) === '👍'; // the length is 2.
-     |           ~~~~~~~~~~~~~~~~~~~
+     |           ~~~~~~~~~~~~~~~~~~~~
    4 |         }
 ---
 

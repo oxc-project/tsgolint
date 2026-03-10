@@ -11,10 +11,10 @@ import _ "unsafe"
 
 //go:linkname ComputeLineOfPosition github.com/microsoft/typescript-go/internal/scanner.ComputeLineOfPosition
 func ComputeLineOfPosition(lineStarts []core.TextPos, pos int) int
-//go:linkname ComputePositionOfLineAndCharacter github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndCharacter
-func ComputePositionOfLineAndCharacter(lineStarts []core.TextPos, line int, character int) int
-//go:linkname ComputePositionOfLineAndCharacterEx github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndCharacterEx
-func ComputePositionOfLineAndCharacterEx(lineStarts []core.TextPos, line int, character int, text *string, allowEdits bool) int
+//go:linkname ComputePositionOfLineAndByteOffset github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndByteOffset
+func ComputePositionOfLineAndByteOffset(lineStarts []core.TextPos, line int, byteOffset int) int
+//go:linkname ComputePositionOfLineAndUTF16Character github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndUTF16Character
+func ComputePositionOfLineAndUTF16Character(lineStarts []core.TextPos, line int, character core.UTF16Offset, text string, allowEdits bool) int
 //go:linkname DeclarationNameToString github.com/microsoft/typescript-go/internal/scanner.DeclarationNameToString
 func DeclarationNameToString(name *ast.Node) string
 type ErrorCallback = scanner.ErrorCallback
@@ -29,14 +29,18 @@ const EscapeSequenceScanningFlagsReportInvalidEscapeErrors = scanner.EscapeSeque
 const EscapeSequenceScanningFlagsString = scanner.EscapeSequenceScanningFlagsString
 //go:linkname GetECMAEndLinePosition github.com/microsoft/typescript-go/internal/scanner.GetECMAEndLinePosition
 func GetECMAEndLinePosition(sourceFile *ast.SourceFile, line int) int
-//go:linkname GetECMALineAndCharacterOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndCharacterOfPosition
-func GetECMALineAndCharacterOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, character int)
+//go:linkname GetECMALineAndByteOffsetOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndByteOffsetOfPosition
+func GetECMALineAndByteOffsetOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, byteOffset int)
+//go:linkname GetECMALineAndUTF16CharacterOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndUTF16CharacterOfPosition
+func GetECMALineAndUTF16CharacterOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, character core.UTF16Offset)
 //go:linkname GetECMALineOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineOfPosition
 func GetECMALineOfPosition(sourceFile ast.SourceFileLike, pos int) int
 //go:linkname GetECMALineStarts github.com/microsoft/typescript-go/internal/scanner.GetECMALineStarts
 func GetECMALineStarts(sourceFile ast.SourceFileLike) []core.TextPos
-//go:linkname GetECMAPositionOfLineAndCharacter github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndCharacter
-func GetECMAPositionOfLineAndCharacter(sourceFile ast.SourceFileLike, line int, character int) int
+//go:linkname GetECMAPositionOfLineAndByteOffset github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndByteOffset
+func GetECMAPositionOfLineAndByteOffset(sourceFile ast.SourceFileLike, line int, byteOffset int) int
+//go:linkname GetECMAPositionOfLineAndUTF16Character github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndUTF16Character
+func GetECMAPositionOfLineAndUTF16Character(sourceFile ast.SourceFileLike, line int, character core.UTF16Offset) int
 //go:linkname GetErrorRangeForNode github.com/microsoft/typescript-go/internal/scanner.GetErrorRangeForNode
 func GetErrorRangeForNode(sourceFile *ast.SourceFile, node *ast.Node) core.TextRange
 //go:linkname GetIdentifierToken github.com/microsoft/typescript-go/internal/scanner.GetIdentifierToken

@@ -36,8 +36,8 @@ func (o *overlayFS) ReadFile(path string) (string, bool) {
 	return o.underlying.ReadFile(path)
 }
 
-func (o *overlayFS) WriteFile(path string, data string, writeByteOrderMark bool) error {
-	return o.underlying.WriteFile(path, data, writeByteOrderMark)
+func (o *overlayFS) WriteFile(path string, data string) error {
+	return o.underlying.WriteFile(path, data)
 }
 
 func (o *overlayFS) Remove(path string) error {

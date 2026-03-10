@@ -37,7 +37,7 @@ type functionState struct {
 
 func getFunctionNameWithKind(sourceFile *ast.SourceFile, node *ast.Node) string {
 	kindPrefix := "Function"
-	if checker.GetFunctionFlags(node)&checker.FunctionFlagsAsync != 0 {
+	if ast.GetFunctionFlags(node)&ast.FunctionFlagsAsync != 0 {
 		kindPrefix = "Async function"
 	}
 
@@ -99,8 +99,8 @@ func isReturnVoidOrThenableVoid(ctx rule.RuleContext, functionNode *ast.Node) bo
 		return false
 	}
 
-	functionFlags := checker.GetFunctionFlags(functionNode)
-	isAsyncFunction := functionFlags&checker.FunctionFlagsAsync != 0
+	functionFlags := ast.GetFunctionFlags(functionNode)
+	isAsyncFunction := functionFlags&ast.FunctionFlagsAsync != 0
 
 	return utils.Some(callSignatures, func(signature *checker.Signature) bool {
 		returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature)

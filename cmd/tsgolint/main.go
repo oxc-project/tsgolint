@@ -83,6 +83,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
@@ -235,8 +236,8 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	diagnosticStart := d.Range.Pos()
 	diagnosticEnd := d.Range.End()
 
-	diagnosticStartLine, diagnosticStartColumn := scanner.GetECMALineAndCharacterOfPosition(d.SourceFile, diagnosticStart)
-	diagnosticEndline, _ := scanner.GetECMALineAndCharacterOfPosition(d.SourceFile, diagnosticEnd)
+	diagnosticStartLine, diagnosticStartColumn := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, diagnosticStart)
+	diagnosticEndline, _ := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, diagnosticEnd)
 
 	lineMap := d.SourceFile.ECMALineMap()
 	text := d.SourceFile.Text()
@@ -244,14 +245,14 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	codeboxStartLine := max(diagnosticStartLine-1, 0)
 	codeboxEndLine := min(diagnosticEndline+1, len(lineMap)-1)
 
-	codeboxStart := scanner.GetECMAPositionOfLineAndCharacter(d.SourceFile, codeboxStartLine, 0)
+	codeboxStart := scanner.GetECMAPositionOfLineAndUTF16Character(d.SourceFile, codeboxStartLine, 0)
 	var codeboxEndColumn int
 	if codeboxEndLine == len(lineMap)-1 {
 		codeboxEndColumn = len(text) - int(lineMap[len(lineMap)-1])
 	} else {
 		codeboxEndColumn = int(lineMap[codeboxEndLine+1]-lineMap[codeboxEndLine]) - 1
 	}
-	codeboxEnd := scanner.GetECMAPositionOfLineAndCharacter(d.SourceFile, codeboxEndLine, codeboxEndColumn)
+	codeboxEnd := scanner.GetECMAPositionOfLineAndUTF16Character(d.SourceFile, codeboxEndLine, core.UTF16Offset(codeboxEndColumn))
 
 	w.Write([]byte{' ', 0x1b, '[', '7', 'm', 0x1b, '[', '1', 'm', 0x1b, '[', '3', '8', ';', '5', ';', '3', '7', 'm', ' '})
 	w.WriteString(d.RuleName)
@@ -273,7 +274,7 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	w.WriteByte(':')
 	w.WriteString(strconv.Itoa(diagnosticStartLine + 1))
 	w.WriteByte(':')
-	w.WriteString(strconv.Itoa(diagnosticStartColumn + 1))
+	w.WriteString(strconv.Itoa(int(diagnosticStartColumn) + 1))
 	w.WriteString("\x1b[0m \x1b[2m)─────\x1b[0m\n")
 
 	indentSize := math.MaxInt

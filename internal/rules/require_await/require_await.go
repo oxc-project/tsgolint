@@ -24,7 +24,7 @@ func buildMissingAwaitMessage() rule.RuleMessage {
 type scopeInfo struct {
 	hasAwait      bool
 	isAsyncYield  bool
-	functionFlags checker.FunctionFlags
+	functionFlags ast.FunctionFlags
 	upper         *scopeInfo
 }
 
@@ -37,18 +37,18 @@ var RequireAwaitRule = rule.Rule{
 			currentScope = &scopeInfo{
 				hasAwait:      false,
 				isAsyncYield:  false,
-				functionFlags: checker.FunctionFlagsNormal,
+				functionFlags: ast.FunctionFlagsNormal,
 				upper:         currentScope,
 			}
 
 			body := node.Body()
 			if body != nil && (!ast.IsBlock(body) || len(body.AsBlock().Statements.Nodes) > 0) {
-				currentScope.functionFlags = checker.GetFunctionFlags(node)
+				currentScope.functionFlags = ast.GetFunctionFlags(node)
 			}
 		}
 
 		exitFunction := func(node *ast.Node) {
-			if currentScope.functionFlags&checker.FunctionFlagsAsync != 0 && !currentScope.hasAwait && !(currentScope.functionFlags&checker.FunctionFlagsGenerator != 0 && currentScope.isAsyncYield) {
+			if currentScope.functionFlags&ast.FunctionFlagsAsync != 0 && !currentScope.hasAwait && !(currentScope.functionFlags&ast.FunctionFlagsGenerator != 0 && currentScope.isAsyncYield) {
 				// TODO(port): implement suggestions
 				// // If the function belongs to a method definition or
 				// // property, then the function's range may not include the
@@ -204,7 +204,7 @@ var RequireAwaitRule = rule.Rule{
 				enterFunction(node)
 				// check body-less async arrow function.
 				// ignore `async () => await foo` because it's obviously correct
-				if currentScope.functionFlags&checker.FunctionFlagsAsync == 0 {
+				if currentScope.functionFlags&ast.FunctionFlagsAsync == 0 {
 					return
 				}
 
@@ -241,7 +241,7 @@ var RequireAwaitRule = rule.Rule{
 					return
 				}
 				argument := node.Expression()
-				if currentScope.functionFlags&checker.FunctionFlagsGenerator == 0 || argument == nil {
+				if currentScope.functionFlags&ast.FunctionFlagsGenerator == 0 || argument == nil {
 					return
 				}
 
@@ -267,7 +267,7 @@ var RequireAwaitRule = rule.Rule{
 				}
 			},
 			ast.KindReturnStatement: func(node *ast.Node) {
-				if currentScope == nil || currentScope.hasAwait || currentScope.functionFlags&checker.FunctionFlagsAsync == 0 {
+				if currentScope == nil || currentScope.hasAwait || currentScope.functionFlags&ast.FunctionFlagsAsync == 0 {
 					return
 				}
 
