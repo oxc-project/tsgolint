@@ -1128,7 +1128,6 @@ type fn = () => void;
 declare function foo(): void | fn;
 const bar = foo()?.();
     `},
-
 		// Private fields with exact optional property types
 		{
 			Code: `
@@ -1280,6 +1279,38 @@ function processValue<T extends string | null>(value: Result<T>): string {
     return 'default';
   }
   return String(value);
+}
+    `},
+		{Code: `
+class MyEnum {
+  public readonly readableName: string;
+
+  private constructor(readableName: string) {
+    this.readableName = readableName;
+  }
+
+  public static readonly A = new MyEnum('Type A');
+  public static readonly B = new MyEnum('Type B');
+
+  public static valueOf(entry: string): MyEnum;
+  public static valueOf(entry: string | undefined): MyEnum | undefined;
+  public static valueOf(entry: string | undefined): MyEnum | undefined {
+    if (entry === 'A') {
+      return MyEnum.A;
+    }
+    if (entry === 'B') {
+      return MyEnum.B;
+    }
+    return undefined;
+  }
+}
+
+type Event = {
+  type?: string;
+};
+
+function getReadableName(event: Event): string {
+  return MyEnum.valueOf(event.type)?.readableName ?? 'unknown';
 }
     `},
 	}, []rule_tester.InvalidTestCase{
@@ -2701,6 +2732,35 @@ function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
 }
       `,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
+		},
+		{
+			Code: `
+class MyEnum {
+  public readonly readableName: string;
+
+  private constructor(readableName: string) {
+    this.readableName = readableName;
+  }
+
+  public static readonly A = new MyEnum('Type A');
+  public static readonly B = new MyEnum('Type B');
+
+  public static valueOf(entry: string): MyEnum;
+  public static valueOf(entry: string | undefined): MyEnum | undefined;
+  public static valueOf(entry: string | undefined): MyEnum | undefined {
+    if (entry === 'A') {
+      return MyEnum.A;
+    }
+    if (entry === 'B') {
+      return MyEnum.B;
+    }
+    return undefined;
+  }
+}
+
+const readableName = MyEnum.valueOf('A')?.readableName;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain"}},
 		},
 	})
 }

@@ -18,6 +18,7 @@ package no_unnecessary_condition
 import (
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -620,14 +621,371 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
-		// Helper: Get the return type of a call expression's function
-		// Returns the function's return type, or the full expression type for union of functions
-		getCallReturnType := func(callExpr *ast.Node) *checker.Type {
+		// Helper: Check whether a call expression is only nullable because an earlier
+		// optional chain step short-circuits the callee.
+		isCallExpressionNullableOriginFromCallee := func(callExpr *ast.CallExpression) bool {
+			if callExpr == nil {
+				return false
+			}
+
+			prevType := getResolvedType(callExpr.Expression)
+			if prevType == nil || !utils.IsUnionType(prevType) {
+				return false
+			}
+
+			isOwnNullable := slices.ContainsFunc(prevType.Types(), func(part *checker.Type) bool {
+				signatures := ctx.TypeChecker.GetCallSignatures(part)
+				return slices.ContainsFunc(signatures, func(sig *checker.Signature) bool {
+					returnType := ctx.TypeChecker.GetReturnTypeOfSignature(sig)
+					return returnType != nil && isNullishType(returnType)
+				})
+			})
+
+			return !isOwnNullable && isNullishType(prevType)
+		}
+
+		argumentMayBeUndefined := func(arg *ast.Node) bool {
+			if arg == nil {
+				return false
+			}
+
+			arg = ast.SkipParentheses(arg)
+			if !isPropertyAccess(arg) {
+				return false
+			}
+
+			propAccess := arg.AsPropertyAccessExpression()
+			baseType := getResolvedType(propAccess.Expression)
+			nameNode := propAccess.Name()
+			if baseType == nil || nameNode == nil {
+				return false
+			}
+
+			propName := ast.GetTextOfPropertyName(nameNode)
+			if propName == "" {
+				return false
+			}
+
+			for _, part := range utils.UnionTypeParts(baseType) {
+				nonNullishPart := removeNullishFromType(part)
+				if nonNullishPart == nil {
+					continue
+				}
+				prop := checker.Checker_getPropertyOfType(ctx.TypeChecker, nonNullishPart, propName)
+				if prop == nil {
+					continue
+				}
+				if prop.Flags&ast.SymbolFlagsOptional != 0 {
+					return true
+				}
+				for _, decl := range prop.Declarations {
+					if ast.HasQuestionToken(decl) {
+						return true
+					}
+					if decl.Pos() >= 0 && decl.End() <= len(ctx.SourceFile.Text()) {
+						declText := ctx.SourceFile.Text()[decl.Pos():decl.End()]
+						questionIndex := strings.IndexByte(declText, '?')
+						colonIndex := strings.IndexByte(declText, ':')
+						if questionIndex >= 0 && (colonIndex == -1 || questionIndex < colonIndex) {
+							return true
+						}
+					}
+				}
+			}
+
+			return false
+		}
+
+		parameterAcceptsUndefined := func(paramType *checker.Type) bool {
+			if paramType == nil {
+				return false
+			}
+
+			if isNullishType(paramType) {
+				return true
+			}
+
+			flags := checker.Type_flags(paramType)
+			return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsTypeVariable) != 0
+		}
+
+		getSignatureParameterType := func(
+			signature *checker.Signature,
+			callExpr *ast.CallExpression,
+			argIndex int,
+		) *checker.Type {
+			if signature == nil || callExpr == nil {
+				return nil
+			}
+
+			parameters := checker.Signature_parameters(signature)
+			if len(parameters) == 0 {
+				return nil
+			}
+
+			paramIndex := argIndex
+			if paramIndex >= len(parameters) {
+				paramIndex = len(parameters) - 1
+			}
+
+			param := parameters[paramIndex]
+			paramType := ctx.TypeChecker.GetTypeOfSymbolAtLocation(param, &callExpr.Node)
+			if paramType == nil {
+				return nil
+			}
+
+			if param.ValueDeclaration == nil || !ast.IsParameter(param.ValueDeclaration) {
+				return paramType
+			}
+
+			paramDecl := param.ValueDeclaration.AsParameterDeclaration()
+			if paramDecl.DotDotDotToken == nil {
+				return paramType
+			}
+
+			if checker.Checker_isArrayType(ctx.TypeChecker, paramType) {
+				typeArguments := checker.Checker_getTypeArguments(ctx.TypeChecker, paramType)
+				if len(typeArguments) > 0 {
+					return typeArguments[0]
+				}
+				return paramType
+			}
+
+			if checker.IsTupleType(paramType) {
+				typeArguments := checker.Checker_getTypeArguments(ctx.TypeChecker, paramType)
+				if len(typeArguments) == 0 {
+					return nil
+				}
+
+				tupleIndex := argIndex - paramIndex
+				if tupleIndex >= len(typeArguments) {
+					tupleIndex = len(typeArguments) - 1
+				}
+				return typeArguments[tupleIndex]
+			}
+
+			return paramType
+		}
+
+		isSignatureApplicable := func(signature *checker.Signature, callExpr *ast.CallExpression) bool {
+			if signature == nil || callExpr == nil {
+				return false
+			}
+
+			parameters := checker.Signature_parameters(signature)
+			arguments := callExpr.Arguments.Nodes
+			requiredParams := 0
+			hasRestParameter := false
+
+			for _, param := range parameters {
+				if param == nil || param.ValueDeclaration == nil || !ast.IsParameter(param.ValueDeclaration) {
+					requiredParams++
+					continue
+				}
+
+				paramDecl := param.ValueDeclaration.AsParameterDeclaration()
+				if paramDecl.DotDotDotToken != nil {
+					hasRestParameter = true
+					break
+				}
+				if paramDecl.QuestionToken == nil && paramDecl.Initializer == nil {
+					requiredParams++
+				}
+			}
+
+			if len(arguments) < requiredParams {
+				return false
+			}
+			if !hasRestParameter && len(arguments) > len(parameters) {
+				return false
+			}
+
+			for argIndex, arg := range arguments {
+				argType := ctx.TypeChecker.GetTypeAtLocation(arg)
+				paramType := getSignatureParameterType(signature, callExpr, argIndex)
+				if argType == nil || paramType == nil {
+					return false
+				}
+				if argumentMayBeUndefined(arg) && !parameterAcceptsUndefined(paramType) {
+					return false
+				}
+				if !checker.Checker_isTypeAssignableTo(ctx.TypeChecker, argType, paramType) {
+					return false
+				}
+			}
+
+			return true
+		}
+
+		isSignatureMoreSpecific := func(
+			left *checker.Signature,
+			right *checker.Signature,
+			callExpr *ast.CallExpression,
+		) bool {
+			if left == nil || right == nil || callExpr == nil {
+				return false
+			}
+
+			arguments := callExpr.Arguments.Nodes
+			if len(arguments) == 0 {
+				return false
+			}
+
+			moreSpecific := false
+			for argIndex := range arguments {
+				leftType := getSignatureParameterType(left, callExpr, argIndex)
+				rightType := getSignatureParameterType(right, callExpr, argIndex)
+				if leftType == nil || rightType == nil {
+					continue
+				}
+
+				if !checker.Checker_isTypeAssignableTo(ctx.TypeChecker, leftType, rightType) {
+					return false
+				}
+				if !checker.Checker_isTypeAssignableTo(ctx.TypeChecker, rightType, leftType) {
+					moreSpecific = true
+				}
+			}
+
+			return moreSpecific
+		}
+
+		getBestApplicableOverloadReturnType := func(callExpr *ast.CallExpression) *checker.Type {
+			if callExpr == nil {
+				return nil
+			}
+
+			funcType := getResolvedType(callExpr.Expression)
+			if funcType == nil {
+				return nil
+			}
+
+			signatures := ctx.TypeChecker.GetCallSignatures(funcType)
+			if len(signatures) <= 1 {
+				return nil
+			}
+
+			applicable := make([]*checker.Signature, 0, len(signatures))
+			for _, signature := range signatures {
+				if isSignatureApplicable(signature, callExpr) {
+					applicable = append(applicable, signature)
+				}
+			}
+
+			if len(applicable) == 0 {
+				return nil
+			}
+
+			for argIndex, arg := range callExpr.Arguments.Nodes {
+				arg = ast.SkipParentheses(arg)
+				if !isPropertyAccess(arg) && !isElementAccess(arg) {
+					continue
+				}
+
+				undefinedAccepting := make([]*checker.Signature, 0, len(applicable))
+				hasDefinedOnly := false
+				for _, signature := range applicable {
+					paramType := getSignatureParameterType(signature, callExpr, argIndex)
+					if parameterAcceptsUndefined(paramType) {
+						undefinedAccepting = append(undefinedAccepting, signature)
+					} else {
+						hasDefinedOnly = true
+					}
+				}
+
+				if hasDefinedOnly && len(undefinedAccepting) > 0 {
+					applicable = undefinedAccepting
+				}
+			}
+
+			best := applicable[0]
+			for _, candidate := range applicable[1:] {
+				if isSignatureMoreSpecific(candidate, best, callExpr) {
+					best = candidate
+				}
+			}
+
+			return ctx.TypeChecker.GetReturnTypeOfSignature(best)
+		}
+
+		var getCallReturnType func(*ast.Node) *checker.Type
+
+		optionalChainCanShortCircuit := func(node *ast.Node) bool {
+			if node == nil {
+				return false
+			}
+
+			var expression *ast.Node
+			switch node.Kind {
+			case ast.KindPropertyAccessExpression:
+				propAccess := node.AsPropertyAccessExpression()
+				if propAccess.QuestionDotToken == nil {
+					return false
+				}
+				expression = propAccess.Expression
+			case ast.KindElementAccessExpression:
+				elemAccess := node.AsElementAccessExpression()
+				if elemAccess.QuestionDotToken == nil {
+					return false
+				}
+				expression = elemAccess.Expression
+			case ast.KindCallExpression:
+				callExpr := node.AsCallExpression()
+				if callExpr.QuestionDotToken == nil {
+					return false
+				}
+				expression = callExpr.Expression
+			default:
+				return false
+			}
+
+			if expression == nil {
+				return false
+			}
+
+			var expressionType *checker.Type
+			if isCallExpr(expression) {
+				expressionType = getCallReturnType(expression)
+			} else {
+				expressionType = getResolvedType(expression)
+			}
+
+			return expressionType != nil && isNullishType(expressionType)
+		}
+
+		// Helper: Get the return type of a call expression's function.
+		// When the call's nullability comes from the selected overload itself, prefer
+		// the call expression type so TypeScript's overload resolution is preserved.
+		// When the call is only nullable because an earlier optional chain could
+		// short-circuit, fall back to the callee signatures to strip that origin.
+		getCallReturnType = func(callExpr *ast.Node) *checker.Type {
 			if callExpr == nil || callExpr.Kind != ast.KindCallExpression {
 				return nil
 			}
 
 			call := callExpr.AsCallExpression()
+			if !isCallExpressionNullableOriginFromCallee(call) {
+				if resolvedSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callExpr, nil, checker.CheckModeNormal); resolvedSignature != nil {
+					resolvedReturnType := ctx.TypeChecker.GetReturnTypeOfSignature(resolvedSignature)
+					// typescript-go can collapse optional-property reads during overload
+					// selection. Preserve the resolved signature fast path, but fall back
+					// to the overload matcher when it finds a nullable candidate.
+					if resolvedReturnType != nil {
+						if overloadReturnType := getBestApplicableOverloadReturnType(call); overloadReturnType != nil {
+							if isNullishType(overloadReturnType) && !isNullishType(resolvedReturnType) {
+								return overloadReturnType
+							}
+						}
+						return resolvedReturnType
+					}
+				}
+
+				if returnType := getBestApplicableOverloadReturnType(call); returnType != nil {
+					return returnType
+				}
+				return getResolvedType(callExpr)
+			}
+
 			funcType := getResolvedType(call.Expression)
 			if funcType == nil {
 				return nil
@@ -1314,6 +1672,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					// Check if the left side contains an array element access without noUncheckedIndexedAccess
 					// In this case, the ?? is justified even if the type appears non-nullish
 					// EXCEPT when the element type itself is always nullish (e.g., null[])
+					if optionalChainCanShortCircuit(ast.SkipParentheses(binExpr.Left)) {
+						return
+					}
 
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
@@ -1372,6 +1733,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 				// Check nullish coalescing assignment operator (??=)
 				if opKind == ast.KindQuestionQuestionEqualsToken {
+					if optionalChainCanShortCircuit(ast.SkipParentheses(binExpr.Left)) {
+						return
+					}
+
 					leftType := getResolvedType(binExpr.Left)
 					if leftType != nil {
 						// Don't report on indeterminate types
