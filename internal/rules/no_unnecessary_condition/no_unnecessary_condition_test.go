@@ -460,6 +460,11 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ?? 'default';
 }
     `},
+		{Code: `
+function test<T extends [string], I extends number>(arr: T, i: I) {
+  return arr[i] ?? 'default';
+}
+    `},
 
 		// Indexing cases
 		{Code: `
@@ -543,6 +548,33 @@ arr[x] ?? [];
 		{Code: `
 declare const arr: { foo: number }[];
 const bar = arr[42]?.foo ?? 0;
+    `},
+
+		// Partial<Record<R, T[]>> with generic type parameters - indexed access type is unresolved
+		{
+			Code: `
+export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
+    return list.reduce(
+      (obj, item) => {
+        const existingItems = obj[func(item)] ?? [];
+        return { ...obj, [func(item)]: [...existingItems, item] };
+      },
+      {} as Partial<Record<R, T[]>>
+    );
+}
+      `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{Code: `
+export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
+    return list.reduce(
+      (obj, item) => {
+        const existingItems = obj[func(item)] ?? [];
+        return { ...obj, [func(item)]: [...existingItems, item] };
+      },
+      {} as Partial<Record<R, T[]>>
+    );
+}
     `},
 
 		// Doesn't check the right-hand side of a logical expression in a non-conditional context
@@ -1014,6 +1046,11 @@ foo &&= 1;
 		{Code: `
 function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ??= 'default';
+}
+    `},
+		{Code: `
+function test<T extends string[], I extends number>(arr: T, i: I) {
+  arr[i] ??= 'default';
 }
     `},
 		{Code: `
@@ -2648,6 +2685,22 @@ if (arr[42] && arr[42]) {
       `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+  num ?? 'default';
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
+		},
+		{
+			Code: `
+function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+  num ??= null;
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
 		},
 	})
 }

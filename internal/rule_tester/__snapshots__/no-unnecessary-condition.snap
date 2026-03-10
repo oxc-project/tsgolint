@@ -1893,3 +1893,21 @@ Message: Unnecessary conditional, value is always truthy.
      |                ~~~~~~~
    5 | }
 ---
+
+[TestNoUnnecessaryConditionRule/invalid-136 - 1]
+Diagnostic 1: alwaysNullish (3:3 - 3:5)
+Message: Unnecessary conditional, value is always nullish.
+   2 | function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+   3 |   num ?? 'default';
+     |   ~~~
+   4 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-137 - 1]
+Diagnostic 1: alwaysNullish (3:3 - 3:5)
+Message: Unnecessary conditional, value is always nullish.
+   2 | function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+   3 |   num ??= null;
+     |   ~~~
+   4 | }
+---
