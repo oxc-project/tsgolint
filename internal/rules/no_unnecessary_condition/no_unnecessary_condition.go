@@ -461,6 +461,24 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return false
 		}
 
+		// checkIndexedAccessNullish resolves an indexed access type via its
+		// constraint and reports/skips accordingly.  Returns true when the
+		// caller should return (the indexed-access path was handled).
+		checkIndexedAccessNullish := func(t *checker.Type, reportNode *ast.Node) bool {
+			flags := checker.Type_flags(t)
+			if !isIndexedAccessFlags(flags) {
+				return false
+			}
+			constraintType := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t)
+			if constraintType == nil || isIndexedAccessFlags(checker.Type_flags(constraintType)) {
+				return true // unresolvable — skip conservatively
+			}
+			if !isNullishType(constraintType) {
+				ctx.ReportNode(reportNode, buildNeverNullishMessage())
+			}
+			return true
+		}
+
 		checkCondition := func(node *ast.Node) {
 			skipNode := ast.SkipParentheses(node)
 
@@ -1319,6 +1337,13 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 
+						// Indexed access types (e.g., Partial<Record<R, T[]>>[R] where R is generic)
+						// may not be fully resolved. Try to resolve via constraint; if the
+						// constraint is still unresolved or includes nullish, skip the report.
+						if checkIndexedAccessNullish(leftType, binExpr.Left) {
+							return
+						}
+
 						// Skip nullish coalescing checks for element access when noUncheckedIndexedAccess is disabled
 						// UNLESS the type is clearly always or never nullish (checked above)
 						// 1. Left side IS directly an element access (arr[0] ?? 'default')
@@ -1356,6 +1381,13 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						// Check for always nullish first (before skipping for element access)
 						if isAlwaysNullishType(leftType) {
 							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
+							return
+						}
+
+						// Indexed access types (e.g., Partial<Record<R, T[]>>[R] where R is generic)
+						// may not be fully resolved. Try to resolve via constraint; if the
+						// constraint is still unresolved or includes nullish, skip the report.
+						if checkIndexedAccessNullish(leftType, binExpr.Left) {
 							return
 						}
 

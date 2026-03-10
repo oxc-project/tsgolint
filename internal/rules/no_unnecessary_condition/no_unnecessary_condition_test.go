@@ -545,6 +545,33 @@ declare const arr: { foo: number }[];
 const bar = arr[42]?.foo ?? 0;
     `},
 
+		// Partial<Record<R, T[]>> with generic type parameters - indexed access type is unresolved
+		{
+			Code: `
+export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
+    return list.reduce(
+      (obj, item) => {
+        const existingItems = obj[func(item)] ?? [];
+        return { ...obj, [func(item)]: [...existingItems, item] };
+      },
+      {} as Partial<Record<R, T[]>>
+    );
+}
+      `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{Code: `
+export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
+    return list.reduce(
+      (obj, item) => {
+        const existingItems = obj[func(item)] ?? [];
+        return { ...obj, [func(item)]: [...existingItems, item] };
+      },
+      {} as Partial<Record<R, T[]>>
+    );
+}
+    `},
+
 		// Doesn't check the right-hand side of a logical expression in a non-conditional context
 		{Code: `
 declare const b1: boolean;
