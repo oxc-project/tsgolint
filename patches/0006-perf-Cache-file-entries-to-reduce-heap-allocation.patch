@@ -1,0 +1,325 @@
+From d4ca27e266826283df9a654450a4e256866a95f7 Mon Sep 17 00:00:00 2001
+From: no-yan <63000297+no-yan@users.noreply.github.com>
+Date: Wed, 31 Dec 2025 06:00:22 +0900
+Subject: [PATCH] perf: Cache file entries to reduce heap allocation
+
+---
+ internal/module/resolver.go | 267 +++++++++++++++++++++++++++++++++++-
+ internal/module/types.go    |   2 +-
+ 2 files changed, 267 insertions(+), 2 deletions(-)
+
+diff --git a/internal/module/resolver.go b/internal/module/resolver.go
+index f5ae94746..c65d8cf28 100644
+--- a/internal/module/resolver.go
++++ b/internal/module/resolver.go
+@@ -2,6 +2,8 @@ package module
+ 
+ import (
+ 	"fmt"
++	"os"
++	"path"
+ 	"slices"
+ 	"strings"
+ 	"sync"
+@@ -1326,7 +1328,7 @@ func (r *resolutionState) loadModuleFromFile(extensions extensions, candidate st
+ 
+ 	// ./foo -> ./foo.ts
+ 	if !r.esmMode {
+-		return r.tryAddingExtensions(candidate, extensions, "", onlyRecordFailures)
++		return r.tryAddingExtensionsBits(candidate, extensions, "", onlyRecordFailures)
+ 	}
+ 
+ 	return continueSearching()
+@@ -1350,6 +1352,129 @@ func (r *resolutionState) loadModuleFromFileNoImplicitExtensions(extensions exte
+ 	return r.tryAddingExtensions(extensionless, extensions, extension, onlyRecordFailures)
+ }
+ 
++func (r *resolutionState) tryAddingExtensionsBits(extensionless string, extensions extensions, originalExtension string, onlyRecordFailures bool) *resolved {
++	if !onlyRecordFailures {
++		directory := tspath.GetDirectoryPath(extensionless)
++		onlyRecordFailures = directory != "" && !r.resolver.host.FS().DirectoryExists(directory)
++
++		if directory != "" {
++			if _, ok := scannedDir.Load(directory); !ok {
++				r.Scan(directory)
++			}
++		}
++	}
++
++	switch originalExtension {
++	case tspath.ExtensionMjs, tspath.ExtensionMts, tspath.ExtensionDmts:
++		if extensions&extensionsTypeScript != 0 {
++			if resolved := r.tryExtensionBits(ExtMts, extensionless, originalExtension == tspath.ExtensionMts || originalExtension == tspath.ExtensionDmts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsDeclaration != 0 {
++			if resolved := r.tryExtensionBits(ExtDmts, extensionless, originalExtension == tspath.ExtensionMts || originalExtension == tspath.ExtensionDmts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsJavaScript != 0 {
++			if resolved := r.tryExtensionBits(ExtMjs, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		return continueSearching()
++	case tspath.ExtensionCjs, tspath.ExtensionCts, tspath.ExtensionDcts:
++		if extensions&extensionsTypeScript != 0 {
++			if resolved := r.tryExtensionBits(ExtCts, extensionless, originalExtension == tspath.ExtensionCts || originalExtension == tspath.ExtensionDcts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsDeclaration != 0 {
++			if resolved := r.tryExtensionBits(ExtDcts, extensionless, originalExtension == tspath.ExtensionCts || originalExtension == tspath.ExtensionDcts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsJavaScript != 0 {
++			if resolved := r.tryExtensionBits(ExtCjs, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		return continueSearching()
++	case tspath.ExtensionJson:
++		if extensions&extensionsDeclaration != 0 {
++			if resolved := r.tryExtension(".d.json.ts", extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsJson != 0 {
++			if resolved := r.tryExtension(tspath.ExtensionJson, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		return continueSearching()
++	case tspath.ExtensionTsx, tspath.ExtensionJsx:
++		// basically idendical to the ts/js case below, but prefers matching tsx and jsx files exactly before falling back to the ts or js file path
++		// (historically, we disallow having both a a.ts and a.tsx file in the same compilation, since their outputs clash)
++		// TODO: We should probably error if `"./a.tsx"` resolved to `"./a.ts"`, right?
++		if extensions&extensionsTypeScript != 0 {
++			if resolved := r.tryExtensionBits(ExtTsx, extensionless, originalExtension == tspath.ExtensionTsx, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++			if resolved := r.tryExtensionBits(ExtTs, extensionless, originalExtension == tspath.ExtensionTsx, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsDeclaration != 0 {
++			if resolved := r.tryExtensionBits(ExtDts, extensionless, originalExtension == tspath.ExtensionTsx, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsJavaScript != 0 {
++			if resolved := r.tryExtensionBits(ExtJsx, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++			if resolved := r.tryExtensionBits(ExtJs, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		return continueSearching()
++	case tspath.ExtensionTs, tspath.ExtensionDts, tspath.ExtensionJs, "":
++		if extensions&extensionsTypeScript != 0 {
++			if resolved := r.tryExtensionBits(ExtTs, extensionless, originalExtension == tspath.ExtensionTs || originalExtension == tspath.ExtensionDts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++			if resolved := r.tryExtensionBits(ExtTsx, extensionless, originalExtension == tspath.ExtensionTs || originalExtension == tspath.ExtensionDts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsDeclaration != 0 {
++			if resolved := r.tryExtensionBits(ExtDts, extensionless, originalExtension == tspath.ExtensionTs || originalExtension == tspath.ExtensionDts, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if extensions&extensionsJavaScript != 0 {
++			if resolved := r.tryExtensionBits(ExtJs, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++			if resolved := r.tryExtensionBits(ExtJsx, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		if r.isConfigLookup {
++			if resolved := r.tryExtension(tspath.ExtensionJson, extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		return continueSearching()
++	default:
++		if extensions&extensionsDeclaration != 0 && !tspath.IsDeclarationFileName(extensionless+originalExtension) {
++			if resolved := r.tryExtension(".d"+originalExtension+".ts", extensionless, false, onlyRecordFailures); !resolved.shouldContinueSearching() {
++				return resolved
++			}
++		}
++		return continueSearching()
++	}
++}
++
+ func (r *resolutionState) tryAddingExtensions(extensionless string, extensions extensions, originalExtension string, onlyRecordFailures bool) *resolved {
+ 	if !onlyRecordFailures {
+ 		directory := tspath.GetDirectoryPath(extensionless)
+@@ -1467,6 +1592,146 @@ func (r *resolutionState) tryAddingExtensions(extensionless string, extensions e
+ 	}
+ }
+ 
++type extensionBits uint16
++
++const (
++	ExtTs extensionBits = 1 << iota
++	ExtJs
++	ExtDts
++	ExtTsx
++	ExtJsx
++	ExtCts
++	ExtCjs
++	ExtDcts
++	ExtMts
++	ExtMjs
++	ExtDmts
++	ExtLess
++)
++
++var pathCache collections.SyncMap[string, extensionBits]
++var scannedDir collections.SyncMap[string, bool]
++
++func classify(name string) (base string, bit extensionBits, ok bool) {
++	switch {
++	// Some extensions like `d.ts` should be handled earlier;
++	// otherwise they would be incorrectly classified as non-declaration files
++	// such as `.ts`.
++	case strings.HasSuffix(name, ".d.ts"):
++		return strings.TrimSuffix(name, ".d.ts"), ExtTs, true
++	case strings.HasSuffix(name, ".d.cts"):
++		return strings.TrimSuffix(name, ".d.cts"), ExtDcts, true
++	case strings.HasSuffix(name, ".d.mts"):
++		return strings.TrimSuffix(name, ".d.mts"), ExtDmts, true
++
++	case strings.HasSuffix(name, ".ts"):
++		return strings.TrimSuffix(name, ".ts"), ExtTs, true
++	case strings.HasSuffix(name, ".js"):
++		return strings.TrimSuffix(name, ".js"), ExtJs, true
++	case strings.HasSuffix(name, ".tsx"):
++		return strings.TrimSuffix(name, ".tsx"), ExtTsx, true
++	case strings.HasSuffix(name, ".jsx"):
++		return strings.TrimSuffix(name, ".jsx"), ExtJsx, true
++	case strings.HasSuffix(name, ".cts"):
++		return strings.TrimSuffix(name, ".cts"), ExtCts, true
++	case strings.HasSuffix(name, ".cjs"):
++		return strings.TrimSuffix(name, ".cjs"), ExtCjs, true
++	case strings.HasSuffix(name, ".mts"):
++		return strings.TrimSuffix(name, ".mts"), ExtMts, true
++	case strings.HasSuffix(name, ".mjs"):
++		return strings.TrimSuffix(name, ".mjs"), ExtMjs, true
++	default:
++		return "", 0, false
++	}
++}
++
++func (r *resolutionState) Scan(dir string) {
++	files, err := os.ReadDir(dir)
++	if err != nil {
++		return
++	}
++
++	for _, f := range files {
++		name := f.Name()
++		base, bit, ok := classify(name)
++
++		if !ok {
++			continue
++		}
++
++		fullPath := path.Join(dir, base)
++		bits, _ := pathCache.Load(fullPath)
++		pathCache.Store(fullPath, bits|bit) // It's safe to ignore cache miss: 0 | bit == bit
++	}
++
++	scannedDir.Store(dir, true)
++}
++
++// tryExtensionBits checks whether `extensionless + <extension>` exists, using pre-scanned cache.
++// If the file exists, it constructs and returns `resolved`; otherwise it returns continueSearching().
++//
++// Why this exists:
++// Module resolution is a hot path. A straightforward implementation tries multiple extensions by
++// concatenating strings (`extensionless + ext`) and then hitting the filesystem.
++// In Go, each concatenation allocates a new string, so doing this for *missing* candidates increases GC pressure.
++//
++// Optimization strategy:
++//   - During a directory scan, we record "which extensions exist" for each extensionless path:
++//     pathCache[extensionless] = bitset of possible extensions
++//   - At lookup time, we first test the bitset; we only build the final path string when the extension is possible.
++//
++// Result:
++// Avoids allocations for non-existing extension candidates; we allocate only for candidates that may exist.
++//
++// See: https://www.typescriptlang.org/docs/handbook/modules/reference.html#the-moduleresolution-compiler-option
++func (r *resolutionState) tryExtensionBits(extension extensionBits, extensionless string, resolvedUsingTsExtension bool, _onlyrecordFailure bool) *resolved {
++	bits, ok := pathCache.Load(extensionless)
++	if !ok {
++		return continueSearching()
++	}
++	if bits&extension == 0 {
++		return continueSearching()
++	}
++
++	var extensionStr string
++	switch extension {
++	case ExtTs:
++		extensionStr = ".ts"
++	case ExtJs:
++		extensionStr = ".js"
++	case ExtDts:
++		extensionStr = ".d.ts"
++	case ExtTsx:
++		extensionStr = ".tsx"
++	case ExtJsx:
++		extensionStr = ".jsx"
++	case ExtCts:
++		extensionStr = ".cts"
++	case ExtCjs:
++		extensionStr = ".cjs"
++	case ExtDcts:
++		extensionStr = ".d.cts"
++	case ExtMts:
++		extensionStr = ".mts"
++	case ExtMjs:
++		extensionStr = ".mjs"
++	case ExtDmts:
++		extensionStr = ".d.mts"
++	case ExtLess:
++		extensionStr = ""
++	default:
++		return continueSearching()
++	}
++
++	path := extensionless + extensionStr
++
++	return &resolved{
++		path:                     path,
++		extension:                extensionStr,
++		resolvedUsingTsExtension: !r.candidateIsFromPackageJsonField && resolvedUsingTsExtension,
++	}
++}
++
+ func (r *resolutionState) tryExtension(extension string, extensionless string, resolvedUsingTsExtension bool, onlyRecordFailures bool) *resolved {
+ 	fileName := extensionless + extension
+ 	if path, ok := r.tryFile(fileName, onlyRecordFailures); ok {
+diff --git a/internal/module/types.go b/internal/module/types.go
+index 59b79950f..b6dfa4f18 100644
+--- a/internal/module/types.go
++++ b/internal/module/types.go
+@@ -104,7 +104,7 @@ func (r *ResolvedTypeReferenceDirective) GetLookupLocations() *LookupLocations {
+ 	return &r.LookupLocations
+ }
+ 
+-type extensions int32
++type extensions uint8
+ 
+ const (
+ 	extensionsTypeScript extensions = 1 << iota
+-- 
+2.52.0
+
