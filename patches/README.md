@@ -12,4 +12,4 @@ We should probably use something like [this](https://github.com/pulumi/ci-mgmt/b
 
 ## Patch notes
 
-- `0006-fix-collections-ordered-map-public-json.patch`: updates `internal/collections/ordered_map.go` to use `github.com/go-json-experiment/json` APIs instead of `github.com/microsoft/typescript-go/internal/json`, so copied collections files compile in the parent module.
+- `0005-fix-collections-avoid-internal-json-import-in-ordere.patch`: updates `internal/collections/ordered_map.go` to use `github.com/go-json-experiment/json` APIs instead of `github.com/microsoft/typescript-go/internal/json`, so copied collections files compile in the parent module.
