@@ -695,14 +695,30 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
-		// Helper: Get the return type of a call expression's function
-		// Returns the function's return type, or the full expression type for union of functions
+		// Helper: Get the effective type of a call expression.
+		// For plain calls, prefer the resolved call-site type so overloaded APIs like
+		// react-hook-form's getValues(path) use the selected overload.
+		// For calls that are themselves part of an optional chain, fall back to the
+		// callee's return type so we ignore undefined introduced only by short-circuiting
+		// earlier chain segments.
 		getCallReturnType := func(callExpr *ast.Node) *checker.Type {
 			if callExpr == nil || callExpr.Kind != ast.KindCallExpression {
 				return nil
 			}
 
 			call := callExpr.AsCallExpression()
+			if call.QuestionDotToken == nil && !hasOptionalChain(call.Expression) {
+				if callType := getResolvedType(callExpr); callType != nil {
+					return callType
+				}
+			}
+
+			if resolvedSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callExpr, nil, checker.CheckModeNormal); resolvedSignature != nil {
+				if returnType := ctx.TypeChecker.GetReturnTypeOfSignature(resolvedSignature); returnType != nil {
+					return returnType
+				}
+			}
+
 			funcType := getResolvedType(call.Expression)
 			if funcType == nil {
 				return nil
@@ -860,6 +876,34 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			// ElementAccessExpression
 			return ctx.TypeChecker.GetTypeAtLocation(accessExpr)
+		}
+
+		isCallExpressionNullableOriginFromCallee := func(callExpr *ast.CallExpression) bool {
+			if callExpr == nil {
+				return false
+			}
+
+			prevType := getResolvedType(callExpr.Expression)
+			if prevType == nil || !utils.IsUnionType(prevType) {
+				return false
+			}
+
+			isOwnNullable := false
+			for _, part := range prevType.Types() {
+				signatures := ctx.TypeChecker.GetCallSignatures(part)
+				for _, sig := range signatures {
+					returnType := ctx.TypeChecker.GetReturnTypeOfSignature(sig)
+					if returnType != nil && isNullishType(returnType) {
+						isOwnNullable = true
+						break
+					}
+				}
+				if isOwnNullable {
+					break
+				}
+			}
+
+			return !isOwnNullable && isNullishType(prevType)
 		}
 
 		// checkOptionalChain validates optional chaining (?.) to detect unnecessary usage.
@@ -1292,6 +1336,16 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			if exprType == nil {
 				return
+			}
+
+			if isCallExpr(expression) {
+				callExpr := expression.AsCallExpression()
+				if isCallExpressionNullableOriginFromCallee(callExpr) {
+					exprType = removeNullishFromType(exprType)
+					if exprType == nil {
+						return
+					}
+				}
 			}
 
 			// Special case: if expression is a call to a union of functions

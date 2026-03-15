@@ -1127,7 +1127,6 @@ type fn = () => void;
 declare function foo(): void | fn;
 const bar = foo()?.();
     `},
-
 		// Private fields with exact optional property types
 		{
 			Code: `
@@ -1303,6 +1302,28 @@ function reproBrandedRecordAssignmentWithNoUncheckedIndexedAccess(key: BrandedSt
     `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 		},
+		{Code: `
+type Item = { action: 'create'; value: number } | null | undefined;
+
+declare function getValues(): { data: Item[] };
+declare function getValues(name: ` + "`data.${number}`" + `): Item;
+
+const value = getValues(` + "`data.0`" + `)?.value;
+    `},
+		{Code: `
+type Item = { action: 'create'; value: number } | null | undefined;
+
+type Form =
+  | {
+      getValues(): { data: Item[] };
+      getValues(name: ` + "`data.${number}`" + `): Item;
+    }
+  | undefined;
+
+declare const form: Form;
+
+const value = form?.getValues(` + "`data.0`" + `)?.value;
+    `},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
