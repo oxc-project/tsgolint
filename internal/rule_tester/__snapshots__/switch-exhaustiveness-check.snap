@@ -303,7 +303,7 @@ Message: Switch is not exhaustive. Cases not matched: 1 | 2
 
 [TestSwitchExhaustivenessCheckRule/invalid-27 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:13)
-Message: Switch is not exhaustive. Cases not matched: typeof Enum["test-test"] | Enum.test
+Message: Switch is not exhaustive. Cases not matched: (typeof Enum)["test-test"] | Enum.test
    7 | function test(arg: Enum): string {
    8 |   switch (arg) {
      |           ~~~
@@ -313,7 +313,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof Enum["test-test"] |
 
 [TestSwitchExhaustivenessCheckRule/invalid-28 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:13)
-Message: Switch is not exhaustive. Cases not matched: typeof Enum[""] | Enum.test
+Message: Switch is not exhaustive. Cases not matched: (typeof Enum)[""] | Enum.test
    7 | function test(arg: Enum): string {
    8 |   switch (arg) {
      |           ~~~
@@ -323,7 +323,7 @@ Message: Switch is not exhaustive. Cases not matched: typeof Enum[""] | Enum.tes
 
 [TestSwitchExhaustivenessCheckRule/invalid-29 - 1]
 Diagnostic 1: switchIsNotExhaustive (8:11 - 8:13)
-Message: Switch is not exhaustive. Cases not matched: typeof Enum["9test"] | Enum.test
+Message: Switch is not exhaustive. Cases not matched: (typeof Enum)["9test"] | Enum.test
    7 | function test(arg: Enum): string {
    8 |   switch (arg) {
      |           ~~~
@@ -343,7 +343,7 @@ Message: Switch is not exhaustive. Cases not matched: default
 
 [TestSwitchExhaustivenessCheckRule/invalid-31 - 1]
 Diagnostic 1: switchIsNotExhaustive (11:17 - 11:17)
-Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["key-with\n\n          new-line"]
+Message: Switch is not exhaustive. Cases not matched: Enum.a | (typeof Enum)["key-with\n\n          new-line"]
   10 | 
   11 |         switch (a) {
      |                 ~
@@ -353,7 +353,7 @@ Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["key-
 
 [TestSwitchExhaustivenessCheckRule/invalid-32 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:17 - 9:17)
-Message: Switch is not exhaustive. Cases not matched: Enum.a | typeof Enum["'a' `b` \"c\""]
+Message: Switch is not exhaustive. Cases not matched: Enum.a | (typeof Enum)["'a' `b` \"c\""]
    8 | 
    9 |         switch (a) {}
      |                 ~

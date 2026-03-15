@@ -250,7 +250,6 @@ type extra_Checker struct {
   declaredTypeLinks core.LinkStore[*ast.Symbol, checker.DeclaredTypeLinks]
   spreadLinks core.LinkStore[*ast.Symbol, checker.SpreadLinks]
   varianceLinks core.LinkStore[*ast.Symbol, checker.VarianceLinks]
-  indexSymbolLinks core.LinkStore[*ast.Symbol, checker.IndexSymbolLinks]
   ReverseMappedSymbolLinks core.LinkStore[*ast.Symbol, checker.ReverseMappedSymbolLinks]
   markedAssignmentSymbolLinks core.LinkStore[*ast.Symbol, checker.MarkedAssignmentSymbolLinks]
   symbolContainerLinks core.LinkStore[*ast.Symbol, checker.ContainingSymbolLinks]
@@ -572,7 +571,6 @@ const IndexFlagsNoReducibleCheck = checker.IndexFlagsNoReducibleCheck
 const IndexFlagsNone = checker.IndexFlagsNone
 const IndexFlagsStringsOnly = checker.IndexFlagsStringsOnly
 type IndexInfo = checker.IndexInfo
-type IndexSymbolLinks = checker.IndexSymbolLinks
 type IndexType = checker.IndexType
 type IndexedAccessType = checker.IndexedAccessType
 type extra_IndexedAccessType struct {

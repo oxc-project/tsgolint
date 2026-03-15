@@ -1,15 +1,12 @@
-From bd01b4881bf9d2ae3a7539930d5d0a8bba3c0576 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 13 Feb 2026 18:37:25 +0000
 Subject: [PATCH 5/6] fix(collections): avoid internal json import in
  ordered_map
 
----
- internal/collections/ordered_map.go | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/internal/collections/ordered_map.go b/internal/collections/ordered_map.go
-index df66ec6401..02f0a56781 100644
+index df66ec6401af0fa69502c00ca0829ee50d900590..02f0a56781424b351b848bcb2bab34a7fe7921fe 100644
 --- a/internal/collections/ordered_map.go
 +++ b/internal/collections/ordered_map.go
 @@ -9,7 +9,8 @@ import (
@@ -69,6 +66,3 @@ index df66ec6401..02f0a56781 100644
  		var key K
  		var value V
  		if err := json.UnmarshalDecode(dec, &key); err != nil {
--- 
-2.50.1 (Apple Git-155)
-
