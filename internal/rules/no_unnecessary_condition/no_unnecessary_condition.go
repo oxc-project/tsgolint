@@ -477,6 +477,81 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return constraintType, false
 		}
 
+		getPropertyNameFromLiteralType := func(t *checker.Type) (string, bool) {
+			if t == nil {
+				return "", false
+			}
+
+			flags := checker.Type_flags(t)
+			if flags&checker.TypeFlagsStringLiteral != 0 && t.IsStringLiteral() {
+				literal := t.AsLiteralType()
+				if literal != nil {
+					if value, ok := literal.Value().(string); ok {
+						return value, true
+					}
+				}
+			}
+
+			if flags&checker.TypeFlagsNumberLiteral != 0 && t.IsNumberLiteral() {
+				literal := t.AsLiteralType()
+				if literal != nil {
+					return literal.String(), true
+				}
+			}
+
+			return "", false
+		}
+
+		var isNullablePropertyType func(objType *checker.Type, propertyType *checker.Type) bool
+		isNullablePropertyType = func(objType *checker.Type, propertyType *checker.Type) bool {
+			if objType == nil || propertyType == nil {
+				return false
+			}
+
+			if utils.IsUnionType(propertyType) {
+				for _, part := range propertyType.Types() {
+					if isNullablePropertyType(objType, part) {
+						return true
+					}
+				}
+				return false
+			}
+
+			if propertyName, ok := getPropertyNameFromLiteralType(propertyType); ok {
+				propType := checker.Checker_getTypeOfPropertyOfType(ctx.TypeChecker, objType, propertyName)
+				if propType != nil {
+					return isNullishType(propType)
+				}
+			}
+
+			propertyTypeName := utils.GetTypeName(ctx.TypeChecker, propertyType)
+			for _, info := range checker.Checker_getIndexInfosOfType(ctx.TypeChecker, objType) {
+				if utils.GetTypeName(ctx.TypeChecker, info.KeyType()) == propertyTypeName {
+					return true
+				}
+			}
+
+			return false
+		}
+
+		isNullableElementAccessExpression := func(elemAccess *ast.ElementAccessExpression) bool {
+			if elemAccess == nil || elemAccess.ArgumentExpression == nil {
+				return false
+			}
+
+			objectType := ctx.TypeChecker.GetTypeAtLocation(elemAccess.Expression)
+			if objectType == nil {
+				return false
+			}
+
+			propertyType := ctx.TypeChecker.GetTypeAtLocation(elemAccess.ArgumentExpression)
+			if propertyType == nil {
+				return false
+			}
+
+			return isNullablePropertyType(objectType, propertyType)
+		}
+
 		checkCondition := func(node *ast.Node) {
 			skipNode := ast.SkipParentheses(node)
 
@@ -1362,6 +1437,15 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 						}
 
+						// Upstream typescript-eslint treats computed member expressions as nullable
+						// when their key type matches an applicable index signature or mapped key.
+						if isElementAccess(ast.SkipParentheses(binExpr.Left)) {
+							elemAccess := ast.SkipParentheses(binExpr.Left).AsElementAccessExpression()
+							if isNullableElementAccessExpression(elemAccess) {
+								return
+							}
+						}
+
 						// Check if the value is never nullish
 						if !isNullishType(leftType) {
 							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
@@ -1419,15 +1503,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 						}
 
-						// With noUncheckedIndexedAccess enabled, element accesses through index
-						// signatures can still be absent at runtime (e.g. Record<string, T>[key]).
-						// Treat these as potentially nullish for ??=.
-						if ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() && isElementAccess(leftSkip) {
+						// Upstream typescript-eslint treats computed member expressions as nullable
+						// when their key type matches an applicable index signature or mapped key.
+						if isElementAccess(leftSkip) {
 							elemAccess := leftSkip.AsElementAccessExpression()
-							baseType := getResolvedType(elemAccess.Expression)
-							if baseType != nil &&
-								(ctx.TypeChecker.GetStringIndexType(baseType) != nil ||
-									ctx.TypeChecker.GetNumberIndexType(baseType) != nil) {
+							if isNullableElementAccessExpression(elemAccess) {
 								return
 							}
 						}

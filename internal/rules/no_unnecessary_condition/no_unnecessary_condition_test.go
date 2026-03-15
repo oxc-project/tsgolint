@@ -1070,7 +1070,6 @@ function repro5WithNoUncheckedIndexedAccess() {
     `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 		},
-
 		// Generic indexed access
 		{Code: `
 function get<Obj, Key extends keyof Obj>(obj: Obj, key: Key) {
@@ -1282,6 +1281,28 @@ function processValue<T extends string | null>(value: Result<T>): string {
   return String(value);
 }
     `},
+		{
+			Code: `
+type BrandedString = string & { __brand: 'brandedString' };
+
+function reproBrandedRecordWithNoUncheckedIndexedAccess(key: BrandedString) {
+  const lookup: Record<BrandedString, number> = {};
+  lookup[key] ?? 2;
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{
+			Code: `
+type BrandedString = string & { __brand: 'brandedString' };
+
+function reproBrandedRecordAssignmentWithNoUncheckedIndexedAccess(key: BrandedString) {
+  const lookup: Record<BrandedString, number> = {};
+  lookup[key] ??= 2;
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
