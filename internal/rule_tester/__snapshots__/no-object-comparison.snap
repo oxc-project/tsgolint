@@ -1,0 +1,36 @@
+
+[TestNoObjectComparisonRule/invalid-0 - 1]
+Diagnostic 1: objectComparison (6:13 - 6:18)
+Message: Do not compare objects - use one of eq, gt, gte, lt, lte functions instead.
+   5 | 
+   6 |         if (a <= b) {
+     |             ~~~~~~
+   7 |         }
+---
+
+[TestNoObjectComparisonRule/invalid-1 - 1]
+Diagnostic 1: objectComparison (5:13 - 5:59)
+Message: Do not compare objects - use one of eq, gt, gte, lt, lte functions instead.
+   4 | 
+   5 |         if (({} as BaseNumber) === ({} as NormalizedNumber)) {
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |         }
+---
+
+[TestNoObjectComparisonRule/invalid-2 - 1]
+Diagnostic 1: objectComparison (8:13 - 8:19)
+Message: Do not compare objects - use one of eq, gt, gte, lt, lte functions instead.
+   7 | 
+   8 |         if (a === b) {
+     |             ~~~~~~~
+   9 |         }
+---
+
+[TestNoObjectComparisonRule/invalid-3 - 1]
+Diagnostic 1: objectComparison (9:13 - 9:19)
+Message: Do not compare objects - use one of eq, gt, gte, lt, lte functions instead.
+   8 | 
+   9 |         if (a === b) {
+     |             ~~~~~~~
+  10 |         }
+---

@@ -37,6 +37,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_misused_promises"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_misused_spread"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_mixed_enums"
+	"github.com/typescript-eslint/tsgolint/internal/rules/no_object_comparison"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_redundant_type_constituents"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_boolean_literal_compare"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_condition"
@@ -72,6 +73,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/related_getter_setter_pairs"
 	"github.com/typescript-eslint/tsgolint/internal/rules/require_array_sort_compare"
 	"github.com/typescript-eslint/tsgolint/internal/rules/require_await"
+	"github.com/typescript-eslint/tsgolint/internal/rules/require_using_for_disposable"
 	"github.com/typescript-eslint/tsgolint/internal/rules/restrict_plus_operands"
 	"github.com/typescript-eslint/tsgolint/internal/rules/restrict_template_expressions"
 	"github.com/typescript-eslint/tsgolint/internal/rules/return_await"
@@ -177,6 +179,7 @@ var allRules = []rule.Rule{
 	no_misused_promises.NoMisusedPromisesRule,
 	no_misused_spread.NoMisusedSpreadRule,
 	no_mixed_enums.NoMixedEnumsRule,
+	no_object_comparison.NoObjectComparisonRule,
 	no_redundant_type_constituents.NoRedundantTypeConstituentsRule,
 	no_unnecessary_boolean_literal_compare.NoUnnecessaryBooleanLiteralCompareRule,
 	no_unnecessary_condition.NoUnnecessaryConditionRule,
@@ -212,6 +215,7 @@ var allRules = []rule.Rule{
 	related_getter_setter_pairs.RelatedGetterSetterPairsRule,
 	require_array_sort_compare.RequireArraySortCompareRule,
 	require_await.RequireAwaitRule,
+	require_using_for_disposable.RequireUsingForDisposableRule,
 	restrict_plus_operands.RestrictPlusOperandsRule,
 	restrict_template_expressions.RestrictTemplateExpressionsRule,
 	return_await.ReturnAwaitRule,

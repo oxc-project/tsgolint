@@ -1,0 +1,45 @@
+
+[TestRequireUsingForDisposableRule/invalid-0 - 1]
+Diagnostic 1: requireUsing (10:15 - 10:35)
+Message: Type "{ [Symbol.dispose]: () => void; }" is disposable and must be declared with "using" or "await using"
+   9 | 
+  10 |         const result = disposable();
+     |               ~~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestRequireUsingForDisposableRule/invalid-1 - 1]
+Diagnostic 1: requireUsing (10:15 - 10:35)
+Message: Type "{ [Symbol.asyncDispose]: () => Promise<void>; }" is disposable and must be declared with "using" or "await using"
+   9 | 
+  10 |         const result = disposable();
+     |               ~~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestRequireUsingForDisposableRule/invalid-2 - 1]
+Diagnostic 1: requireUsing (8:15 - 8:41)
+Message: Type "DisposableClass" is disposable and must be declared with "using" or "await using"
+   7 | 
+   8 |         const cls = new DisposableClass();
+     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestRequireUsingForDisposableRule/invalid-3 - 1]
+Diagnostic 1: requireUsing (8:15 - 8:41)
+Message: Type "DisposableClass" is disposable and must be declared with "using" or "await using"
+   7 | 
+   8 |         const cls = new DisposableClass();
+     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestRequireUsingForDisposableRule/invalid-4 - 1]
+Diagnostic 1: requireUsing (14:15 - 14:40)
+Message: Type "10 | { [Symbol.dispose]: () => void; }" is disposable and must be declared with "using" or "await using"
+  13 | 
+  14 |         const result = disposable(false);
+     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  15 |       
+---
