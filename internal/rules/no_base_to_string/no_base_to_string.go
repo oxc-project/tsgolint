@@ -47,31 +47,6 @@ const (
 	usefulnessSometimes
 )
 
-func matchesTypeOrBaseType(typeChecker *checker.Checker, t *checker.Type, predicate func(*checker.Type) bool) bool {
-	if predicate(t) {
-		return true
-	}
-
-	if !utils.IsObjectType(t) {
-		return false
-	}
-
-	target := t
-	if checker.Type_objectFlags(t)&checker.ObjectFlagsReference != 0 {
-		target = t.Target()
-	}
-
-	if checker.Type_objectFlags(target)&checker.ObjectFlagsClassOrInterface != 0 {
-		for _, baseType := range checker.Checker_getBaseTypes(typeChecker, target) {
-			if matchesTypeOrBaseType(typeChecker, baseType, predicate) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 var NoBaseToStringRule = rule.Rule{
 	Name: "no-base-to-string",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -232,7 +207,7 @@ var NoBaseToStringRule = rule.Rule{
 				return usefulnessAlways
 			}
 
-			if matchesTypeOrBaseType(ctx.TypeChecker, t, func(t *checker.Type) bool {
+			if utils.MatchesTypeOrBaseType(ctx.TypeChecker, t, func(t *checker.Type) bool {
 				return slices.Contains(opts.IgnoredTypeNames, utils.GetTypeName(ctx.TypeChecker, t))
 			}) {
 				return usefulnessAlways
