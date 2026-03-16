@@ -3159,7 +3159,7 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 
 	callShouldBeOptional := false
 	if len(parts) > 0 && parts[len(parts)-1].isCall {
-		partsWithoutCall := len(processor.flattenForFix(lastPropertyAccess.AsCallExpression().Expression))
+		partsWithoutCall := len(parts) - 1
 
 		for _, op := range chain[:len(chain)-1] {
 			if op.comparedExpr != nil {
