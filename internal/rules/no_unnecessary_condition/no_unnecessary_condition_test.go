@@ -1070,7 +1070,6 @@ function repro5WithNoUncheckedIndexedAccess() {
     `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 		},
-
 		// Generic indexed access
 		{Code: `
 function get<Obj, Key extends keyof Obj>(obj: Obj, key: Key) {
@@ -1128,7 +1127,6 @@ type fn = () => void;
 declare function foo(): void | fn;
 const bar = foo()?.();
     `},
-
 		// Private fields with exact optional property types
 		{
 			Code: `
@@ -1281,6 +1279,50 @@ function processValue<T extends string | null>(value: Result<T>): string {
   }
   return String(value);
 }
+    `},
+		{
+			Code: `
+type BrandedString = string & { __brand: 'brandedString' };
+
+function reproBrandedRecordWithNoUncheckedIndexedAccess(key: BrandedString) {
+  const lookup: Record<BrandedString, number> = {};
+  lookup[key] ?? 2;
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{
+			Code: `
+type BrandedString = string & { __brand: 'brandedString' };
+
+function reproBrandedRecordAssignmentWithNoUncheckedIndexedAccess(key: BrandedString) {
+  const lookup: Record<BrandedString, number> = {};
+  lookup[key] ??= 2;
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{Code: `
+type Item = { action: 'create'; value: number } | null | undefined;
+
+declare function getValues(): { data: Item[] };
+declare function getValues(name: ` + "`data.${number}`" + `): Item;
+
+const value = getValues(` + "`data.0`" + `)?.value;
+    `},
+		{Code: `
+type Item = { action: 'create'; value: number } | null | undefined;
+
+type Form =
+  | {
+      getValues(): { data: Item[] };
+      getValues(name: ` + "`data.${number}`" + `): Item;
+    }
+  | undefined;
+
+declare const form: Form;
+
+const value = form?.getValues(` + "`data.0`" + `)?.value;
     `},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases

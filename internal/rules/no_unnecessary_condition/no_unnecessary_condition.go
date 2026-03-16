@@ -477,6 +477,81 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return constraintType, false
 		}
 
+		getPropertyNameFromLiteralType := func(t *checker.Type) (string, bool) {
+			if t == nil {
+				return "", false
+			}
+
+			flags := checker.Type_flags(t)
+			if flags&checker.TypeFlagsStringLiteral != 0 && t.IsStringLiteral() {
+				literal := t.AsLiteralType()
+				if literal != nil {
+					if value, ok := literal.Value().(string); ok {
+						return value, true
+					}
+				}
+			}
+
+			if flags&checker.TypeFlagsNumberLiteral != 0 && t.IsNumberLiteral() {
+				literal := t.AsLiteralType()
+				if literal != nil {
+					return literal.String(), true
+				}
+			}
+
+			return "", false
+		}
+
+		var isNullablePropertyType func(objType *checker.Type, propertyType *checker.Type) bool
+		isNullablePropertyType = func(objType *checker.Type, propertyType *checker.Type) bool {
+			if objType == nil || propertyType == nil {
+				return false
+			}
+
+			if utils.IsUnionType(propertyType) {
+				for _, part := range propertyType.Types() {
+					if isNullablePropertyType(objType, part) {
+						return true
+					}
+				}
+				return false
+			}
+
+			if propertyName, ok := getPropertyNameFromLiteralType(propertyType); ok {
+				propType := checker.Checker_getTypeOfPropertyOfType(ctx.TypeChecker, objType, propertyName)
+				if propType != nil {
+					return isNullishType(propType)
+				}
+			}
+
+			propertyTypeName := utils.GetTypeName(ctx.TypeChecker, propertyType)
+			for _, info := range checker.Checker_getIndexInfosOfType(ctx.TypeChecker, objType) {
+				if utils.GetTypeName(ctx.TypeChecker, info.KeyType()) == propertyTypeName {
+					return true
+				}
+			}
+
+			return false
+		}
+
+		isNullableElementAccessExpression := func(elemAccess *ast.ElementAccessExpression) bool {
+			if elemAccess == nil || elemAccess.ArgumentExpression == nil {
+				return false
+			}
+
+			objectType := ctx.TypeChecker.GetTypeAtLocation(elemAccess.Expression)
+			if objectType == nil {
+				return false
+			}
+
+			propertyType := ctx.TypeChecker.GetTypeAtLocation(elemAccess.ArgumentExpression)
+			if propertyType == nil {
+				return false
+			}
+
+			return isNullablePropertyType(objectType, propertyType)
+		}
+
 		checkCondition := func(node *ast.Node) {
 			skipNode := ast.SkipParentheses(node)
 
@@ -620,14 +695,30 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
-		// Helper: Get the return type of a call expression's function
-		// Returns the function's return type, or the full expression type for union of functions
+		// Helper: Get the effective type of a call expression.
+		// For plain calls, prefer the resolved call-site type so overloaded APIs like
+		// react-hook-form's getValues(path) use the selected overload.
+		// For calls that are themselves part of an optional chain, fall back to the
+		// callee's return type so we ignore undefined introduced only by short-circuiting
+		// earlier chain segments.
 		getCallReturnType := func(callExpr *ast.Node) *checker.Type {
 			if callExpr == nil || callExpr.Kind != ast.KindCallExpression {
 				return nil
 			}
 
 			call := callExpr.AsCallExpression()
+			if call.QuestionDotToken == nil && !hasOptionalChain(call.Expression) {
+				if callType := getResolvedType(callExpr); callType != nil {
+					return callType
+				}
+			}
+
+			if resolvedSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callExpr, nil, checker.CheckModeNormal); resolvedSignature != nil {
+				if returnType := ctx.TypeChecker.GetReturnTypeOfSignature(resolvedSignature); returnType != nil {
+					return returnType
+				}
+			}
+
 			funcType := getResolvedType(call.Expression)
 			if funcType == nil {
 				return nil
@@ -785,6 +876,34 @@ var NoUnnecessaryConditionRule = rule.Rule{
 
 			// ElementAccessExpression
 			return ctx.TypeChecker.GetTypeAtLocation(accessExpr)
+		}
+
+		isCallExpressionNullableOriginFromCallee := func(callExpr *ast.CallExpression) bool {
+			if callExpr == nil {
+				return false
+			}
+
+			prevType := getResolvedType(callExpr.Expression)
+			if prevType == nil || !utils.IsUnionType(prevType) {
+				return false
+			}
+
+			isOwnNullable := false
+			for _, part := range prevType.Types() {
+				signatures := ctx.TypeChecker.GetCallSignatures(part)
+				for _, sig := range signatures {
+					returnType := ctx.TypeChecker.GetReturnTypeOfSignature(sig)
+					if returnType != nil && isNullishType(returnType) {
+						isOwnNullable = true
+						break
+					}
+				}
+				if isOwnNullable {
+					break
+				}
+			}
+
+			return !isOwnNullable && isNullishType(prevType)
 		}
 
 		// checkOptionalChain validates optional chaining (?.) to detect unnecessary usage.
@@ -1219,6 +1338,16 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
+			if isCallExpr(expression) {
+				callExpr := expression.AsCallExpression()
+				if isCallExpressionNullableOriginFromCallee(callExpr) {
+					exprType = removeNullishFromType(exprType)
+					if exprType == nil {
+						return
+					}
+				}
+			}
+
 			// Special case: if expression is a call to a union of functions
 			// and any function returns nullish, allow the optional chain
 			// e.g., type Foo = (() => undefined) | (() => number) | null
@@ -1362,6 +1491,15 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 						}
 
+						// Upstream typescript-eslint treats computed member expressions as nullable
+						// when their key type matches an applicable index signature or mapped key.
+						if isElementAccess(ast.SkipParentheses(binExpr.Left)) {
+							elemAccess := ast.SkipParentheses(binExpr.Left).AsElementAccessExpression()
+							if isNullableElementAccessExpression(elemAccess) {
+								return
+							}
+						}
+
 						// Check if the value is never nullish
 						if !isNullishType(leftType) {
 							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
@@ -1419,15 +1557,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							}
 						}
 
-						// With noUncheckedIndexedAccess enabled, element accesses through index
-						// signatures can still be absent at runtime (e.g. Record<string, T>[key]).
-						// Treat these as potentially nullish for ??=.
-						if ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() && isElementAccess(leftSkip) {
+						// Upstream typescript-eslint treats computed member expressions as nullable
+						// when their key type matches an applicable index signature or mapped key.
+						if isElementAccess(leftSkip) {
 							elemAccess := leftSkip.AsElementAccessExpression()
-							baseType := getResolvedType(elemAccess.Expression)
-							if baseType != nil &&
-								(ctx.TypeChecker.GetStringIndexType(baseType) != nil ||
-									ctx.TypeChecker.GetNumberIndexType(baseType) != nil) {
+							if isNullableElementAccessExpression(elemAccess) {
 								return
 							}
 						}

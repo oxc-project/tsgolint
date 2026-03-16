@@ -5370,3 +5370,12 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    9 | baz;
      | ~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-599 - 1]
+Diagnostic 1: preferOptionalChain (4:14 - 4:42)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   3 | declare const text: string | undefined;
+   4 | !pattern || (text && (text.match(pattern)));
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | 
+---

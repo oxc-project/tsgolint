@@ -4188,5 +4188,19 @@ foo.bar?.() === undefined || foo.bar?.().baz;
 		}),
 	)...)
 
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const pattern: RegExp | undefined;
+declare const text: string | undefined;
+!pattern || (text && (text.match(pattern)));
+`,
+		Output: []string{`
+declare const pattern: RegExp | undefined;
+declare const text: string | undefined;
+!pattern || (text?.match(pattern));
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }

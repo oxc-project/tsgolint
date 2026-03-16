@@ -4,6 +4,5 @@
     "allowJs": true,
     "checkJs": true,
     "noEmit": true
-  },
-  "include": ["repro.js"]
+  }
 }
