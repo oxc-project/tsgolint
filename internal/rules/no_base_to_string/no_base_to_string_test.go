@@ -557,6 +557,19 @@ String(v);
 			{Code: "declare const x: any;\n'' + x;\n"},
 			{Code: "declare const x: any;\nString(x);\n"},
 			{Code: "declare const x: any;\n'' += x;\n"},
+			// class extending a type in ignoredTypeNames(like Error) should be valid
+			{
+				Code: `
+class Foo extends Error {}
+let x = new Foo();
+x.toString();`,
+			},
+			{
+				Code: `
+class Foo<T> extends Error {}
+let x = new Foo();
+x.toString();`,
+			},
 		}), []rule_tester.InvalidTestCase{
 		// Tests with checkUnknown: true
 		{
