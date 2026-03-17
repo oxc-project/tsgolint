@@ -323,6 +323,38 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 			Code:    "const msg = `arg = ${Promise.resolve()}`;",
 			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allow": [{"from": "lib", "name": ["Promise"]}]}`),
 		},
+		{
+			Code: `
+        class Base {}
+        class Derived extends Base {}
+        const value = new Derived();
+        const msg = ` + "`" + `${value}` + "`" + `;
+      `,
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allow": [{"from": "file", "name": ["Base"]}]}`),
+		},
+		{
+			Code: `
+        class Base {}
+        class Derived extends Base {}
+        class DerivedTwice extends Derived {}
+        const value = new DerivedTwice();
+        const msg = ` + "`" + `${value}` + "`" + `;
+      `,
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allow": [{"from": "file", "name": ["Base"]}]}`),
+		},
+		{
+			Code: `
+        interface Base {
+          value: string;
+        }
+        interface Derived extends Base {
+          extra: number;
+        }
+        declare const value: Derived;
+        const msg = ` + "`" + `${value}` + "`" + `;
+      `,
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allow": [{"from": "file", "name": ["Base"]}]}`),
+		},
 		{Code: "const msg = `arg = ${new Error()}`;"},
 		{Code: "const msg = `arg = ${false}`;"},
 		{Code: "const msg = `arg = ${null}`;"},
