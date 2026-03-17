@@ -1481,13 +1481,14 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 		op := binExpr.OperatorToken.Kind
 
-		// Relational operators (<, >, <=, >=, in) should not participate in optional chaining.
+		// Relational operators (<, >, <=, >=, in, instanceof) should not participate in optional chaining.
 		switch op {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
 			ast.KindGreaterThanEqualsToken,
-			ast.KindInKeyword:
+			ast.KindInKeyword,
+			ast.KindInstanceOfKeyword:
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
@@ -1525,13 +1526,14 @@ outer3:
 		binExpr := unwrapped.AsBinaryExpression()
 		op := binExpr.OperatorToken.Kind
 
-		// Relational operators (<, >, <=, >=, in) should not participate in optional chaining.
+		// Relational operators (<, >, <=, >=, in, instanceof) should not participate in optional chaining.
 		switch op {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
 			ast.KindGreaterThanEqualsToken,
-			ast.KindInKeyword:
+			ast.KindInKeyword,
+			ast.KindInstanceOfKeyword:
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
