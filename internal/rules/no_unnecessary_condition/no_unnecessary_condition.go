@@ -141,10 +141,15 @@ func isIndeterminateType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndex) != 0
 }
 
-// hasIndeterminateConstituent reports whether a type itself (or any union member)
-// is indeterminate at analysis time, including unresolved conditional and
-// substitution types derived from constrained generics.
+// hasIndeterminateConstituent reports whether a type itself or any nested union
+// or intersection constituent is indeterminate at analysis time, including
+// unresolved conditional and substitution types derived from constrained
+// generics.
 func hasIndeterminateConstituent(t *checker.Type) bool {
+	if t == nil {
+		return false
+	}
+
 	if isIndeterminateType(t) {
 		return true
 	}
@@ -154,17 +159,11 @@ func hasIndeterminateConstituent(t *checker.Type) bool {
 		return true
 	}
 
-	if !utils.IsUnionType(t) {
-		return false
-	}
-
-	for _, part := range t.Types() {
-		if isIndeterminateType(part) {
-			return true
-		}
-		partFlags := checker.Type_flags(part)
-		if partFlags&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
-			return true
+	if utils.IsUnionType(t) || utils.IsIntersectionType(t) {
+		for _, part := range t.Types() {
+			if hasIndeterminateConstituent(part) {
+				return true
+			}
 		}
 	}
 

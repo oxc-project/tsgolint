@@ -1324,6 +1324,16 @@ declare const form: Form;
 
 const value = form?.getValues(` + "`data.0`" + `)?.value;
     `},
+		{Code: `
+function getValueOrDefault<T>(value: T | null | undefined, defaultValue: T): T {
+	if (value != null && value !== '') {
+		return value;
+	}
+	return defaultValue;
+}
+
+const _result = getValueOrDefault<string>('', 'fallback');
+    `},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
