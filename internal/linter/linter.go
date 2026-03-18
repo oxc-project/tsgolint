@@ -361,7 +361,25 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						if listeners, ok := registeredListeners[kind]; ok {
 							for _, listener := range listeners {
 								ctxBuilder.ruleName = listener.ruleName
-								listener.fn(node)
+								func() {
+									defer func() {
+										if r := recover(); r != nil {
+											// Report the panic as an internal diagnostic so the user
+											// knows a rule was skipped. This handles upstream panics
+											// (e.g., typescript-go nil dereferences) that we cannot
+											// prevent at the call site.
+											fileName := ctxBuilder.file.FileName()
+											onInternalDiagnostic(diagnostic.Internal{
+												Range:       node.Loc,
+												Id:          "rule-panic",
+												Description: fmt.Sprintf("Rule '%s' panicked: %v", listener.ruleName, r),
+												Help:        "This is likely an upstream bug. Please report it.",
+												FilePath:    &fileName,
+											})
+										}
+									}()
+									listener.fn(node)
+								}()
 							}
 						}
 					}

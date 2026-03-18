@@ -281,3 +281,95 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 	assert.Equal(t, diagnostics[1].RuleName, ruleB, "second diagnostic should come from ruleB")
 	assert.Equal(t, diagnostics[1].Message.Id, msgB.Id, "second diagnostic should have ruleB's message")
 }
+
+// TestRunLinterOnProgram_PanicRecovery verifies that a panicking rule listener
+// does not crash the linter and that other rules still produce diagnostics.
+// Regression test for https://github.com/oxc-project/tsgolint/issues/810.
+func TestRunLinterOnProgram_PanicRecovery(t *testing.T) {
+	rootDir := fixtures.GetRootDir()
+	fileName := "file.ts"
+	filePath := tspath.ResolvePath(rootDir, fileName)
+	code := `
+const x: number = 1;
+function add(a: number, b: number): number {
+	return a + b;
+}
+`
+
+	fs := utils.NewOverlayVFS(
+		cachedBaseFS,
+		map[string]string{filePath: code},
+	)
+	host := utils.CreateCompilerHost(rootDir, fs)
+
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
+	assert.NilError(t, err, "couldn't create program")
+
+	sourceFiles := []*ast.SourceFile{program.GetSourceFile(filePath)}
+
+	const panicRule = "panicking-rule"
+	const safeRule = "safe-rule"
+	safeMsg := rule.RuleMessage{
+		Id:          "foundFunction",
+		Description: "Found a function declaration",
+	}
+
+	var mu sync.Mutex
+	var diagnostics []rule.RuleDiagnostic
+	var internalDiagnostics []diagnostic.Internal
+
+	err = RunLinterOnProgram(
+		utils.LogLevelNormal,
+		program,
+		sourceFiles,
+		1,
+		func(sourceFile *ast.SourceFile) []ConfiguredRule {
+			return []ConfiguredRule{
+				{
+					Name: panicRule,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						return rule.RuleListeners{
+							ast.KindFunctionDeclaration: func(node *ast.Node) {
+								panic("simulated upstream nil pointer dereference")
+							},
+						}
+					},
+				},
+				{
+					Name: safeRule,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						return rule.RuleListeners{
+							ast.KindFunctionDeclaration: func(node *ast.Node) {
+								ctx.ReportNode(node, safeMsg)
+							},
+						}
+					},
+				},
+			}
+		},
+		func(d rule.RuleDiagnostic) {
+			mu.Lock()
+			defer mu.Unlock()
+			diagnostics = append(diagnostics, d)
+		},
+		func(d diagnostic.Internal) {
+			mu.Lock()
+			defer mu.Unlock()
+			internalDiagnostics = append(internalDiagnostics, d)
+		},
+		Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+	)
+	assert.NilError(t, err, "linter should not return an error even when a rule panics")
+
+	// The safe rule should still produce its diagnostic despite the panicking rule
+	assert.Equal(t, len(diagnostics), 1, "expected exactly one diagnostic from the safe rule")
+	assert.Equal(t, diagnostics[0].RuleName, safeRule, "diagnostic should come from the safe rule")
+	assert.Equal(t, diagnostics[0].Message.Id, safeMsg.Id, "diagnostic should have the safe rule's message id")
+
+	// The panic should be reported as an internal diagnostic
+	assert.Equal(t, len(internalDiagnostics), 1, "expected exactly one internal diagnostic from the panic")
+	assert.Equal(t, internalDiagnostics[0].Id, "rule-panic", "internal diagnostic should have 'rule-panic' id")
+	assert.Assert(t, internalDiagnostics[0].FilePath != nil, "internal diagnostic should have a file path")
+	assert.Equal(t, *internalDiagnostics[0].FilePath, filePath, "internal diagnostic should reference the correct file")
+}
