@@ -5,10 +5,6 @@ export default defineConfig({
     include: ['**/*.test.ts'],
     testTimeout: 60000,
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: true,
-      },
-    },
+    maxWorkers: 1,
   },
 });
