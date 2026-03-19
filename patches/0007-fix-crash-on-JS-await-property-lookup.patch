@@ -1,0 +1,28 @@
+From cbfcb4dddadb37c547b9c1f039625177716cf797 Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Thu, 19 Mar 2026 22:36:05 +0000
+Subject: [PATCH] fix crash on JS await property lookup
+
+---
+ internal/binder/nameresolver.go | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/internal/binder/nameresolver.go b/internal/binder/nameresolver.go
+index b300126d09..eaf0d7ac35 100644
+--- a/internal/binder/nameresolver.go
++++ b/internal/binder/nameresolver.go
+@@ -93,7 +93,11 @@ loop:
+ 			}
+ 			fallthrough
+ 		case ast.KindModuleDeclaration:
+-			moduleExports := r.getSymbolOfDeclaration(location).Exports
++			moduleSymbol := r.getSymbolOfDeclaration(location)
++			if moduleSymbol == nil {
++				break
++			}
++			moduleExports := moduleSymbol.Exports
+ 			if ast.IsSourceFile(location) || (ast.IsModuleDeclaration(location) && location.Flags&ast.NodeFlagsAmbient != 0 && !ast.IsGlobalScopeAugmentation(location)) {
+ 				// It's an external module. First see if the module has an export default and if the local
+ 				// name of that export default matches.
+-- 
+2.50.1 (Apple Git-155)
