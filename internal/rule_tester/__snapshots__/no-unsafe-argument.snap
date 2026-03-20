@@ -10,7 +10,7 @@ Message: Unsafe argument of type any assigned to a parameter of type number.
 
 [TestNoUnsafeArgumentRule/invalid-1 - 1]
 Diagnostic 1: unsafeArgument (3:5 - 3:9)
-Message: Unsafe argument of type any assigned to a parameter of type number.
+Message: Unsafe argument of type error typed assigned to a parameter of type number.
    2 | declare function foo(arg: number): void;
    3 | foo(error);
      |     ~~~~~
@@ -89,7 +89,7 @@ Message: Unsafe spread of a tuple type. The argument is of type any and is assig
 
 [TestNoUnsafeArgumentRule/invalid-9 - 1]
 Diagnostic 1: unsafeTupleSpread (5:5 - 5:8)
-Message: Unsafe spread of a tuple type. The argument is of type any and is assigned to a parameter of type number.
+Message: Unsafe spread of a tuple type. The argument is error typed and is assigned to a parameter of type number.
    4 | const x = ['a', error] as const;
    5 | foo(...x);
      |     ~~~~

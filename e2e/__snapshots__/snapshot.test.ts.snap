@@ -142,7 +142,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
     "message": {
-      "description": "Unsafe call of a(n) \`any\` typed value.",
+      "description": "Unsafe call of a(n) \`error\` type typed value.",
       "id": "unsafeCall",
     },
     "range": {
@@ -155,7 +155,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
     "message": {
-      "description": "Unsafe call of a(n) \`any\` typed value.",
+      "description": "Unsafe call of a(n) \`error\` type typed value.",
       "id": "unsafeCall",
     },
     "range": {
@@ -855,8 +855,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "noImpliedEvalError",
     },
     "range": {
-      "end": 154,
-      "pos": 140,
+      "end": 156,
+      "pos": 145,
     },
     "rule": "no-implied-eval",
   },
@@ -868,21 +868,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "noImpliedEvalError",
     },
     "range": {
-      "end": 187,
-      "pos": 176,
-    },
-    "rule": "no-implied-eval",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Implied eval. Consider passing a function.",
-      "id": "noImpliedEvalError",
-    },
-    "range": {
-      "end": 225,
-      "pos": 214,
+      "end": 194,
+      "pos": 183,
     },
     "rule": "no-implied-eval",
   },
@@ -894,23 +881,10 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "noFunctionConstructor",
     },
     "range": {
-      "end": 282,
-      "pos": 244,
+      "end": 251,
+      "pos": 213,
     },
     "rule": "no-implied-eval",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe call of a(n) \`any\` typed value.",
-      "id": "unsafeCall",
-    },
-    "range": {
-      "end": 139,
-      "pos": 127,
-    },
-    "rule": "no-unsafe-call",
   },
   {
     "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
@@ -3227,50 +3201,11 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/require-await/index.ts",
     "kind": 0,
     "message": {
-      "description": "Unsafe call of a(n) \`any\` typed value.",
-      "id": "unsafeCall",
-    },
-    "range": {
-      "end": 240,
-      "pos": 228,
-    },
-    "rule": "no-unsafe-call",
-  },
-  {
-    "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe member access .map on an \`any\` value.",
-      "id": "unsafeMemberExpression",
-    },
-    "range": {
-      "end": 240,
-      "pos": 237,
-    },
-    "rule": "no-unsafe-member-access",
-  },
-  {
-    "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe return of a value of type \`any\`.",
-      "id": "unsafeReturn",
-    },
-    "range": {
-      "end": 253,
-      "pos": 221,
-    },
-    "rule": "no-unsafe-return",
-  },
-  {
-    "file_path": "fixtures/basic/rules/require-await/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Function has no 'await' expression.",
       "id": "missingAwait",
     },
     "range": {
-      "end": 255,
+      "end": 285,
       "pos": 205,
     },
     "rule": "require-await",
@@ -3394,7 +3329,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "labeled_ranges": [
       {
-        "label": "Type: Function",
+        "label": "Type: (a: string, b: never) => string",
         "range": {
           "end": 400,
           "pos": 398,

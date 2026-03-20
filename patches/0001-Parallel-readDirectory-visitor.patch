@@ -1,11 +1,14 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 554b672968505659fef0cbbde22e54d1f693e3a9 Mon Sep 17 00:00:00 2001
 From: auvred <aauvred@gmail.com>
 Date: Wed, 18 Jun 2025 15:24:34 +0300
 Subject: [PATCH 1/6] Parallel readDirectory visitor
 
+---
+ internal/vfs/utilities.go | 104 ++++++++++++++++++++++++++++----------
+ 1 file changed, 76 insertions(+), 28 deletions(-)
 
 diff --git a/internal/vfs/utilities.go b/internal/vfs/utilities.go
-index d3c2d98b135984dd0535515331dfae1a3815b215..cae738e3e7d7374fc017230daf88f44c3c893b3b 100644
+index d3c2d98b13..cae738e3e7 100644
 --- a/internal/vfs/utilities.go
 +++ b/internal/vfs/utilities.go
 @@ -3,9 +3,11 @@ package vfs

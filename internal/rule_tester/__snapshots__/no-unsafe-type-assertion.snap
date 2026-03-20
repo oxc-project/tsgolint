@@ -46,7 +46,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-5 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (2:13 - 2:25)
-Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Message: Unsafe assertion from error typed detected: consider using type guards or a safer assertion.
    1 | 
    2 | const bar = foo as number;
      |             ~~~~~~~~~~~~~

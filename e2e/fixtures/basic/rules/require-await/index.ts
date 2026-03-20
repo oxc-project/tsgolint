@@ -7,5 +7,8 @@ async function fetchData() {
 
 // Async arrow function without await
 const processData = async () => {
+  const someData: any[] = [];
   return someData.map(x => x * 2);
 };
+
+export {}
