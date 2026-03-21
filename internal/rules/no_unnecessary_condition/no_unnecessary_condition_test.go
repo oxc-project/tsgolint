@@ -348,30 +348,6 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] == null;
 }
     `},
-		// Issue #695 regressions
-		{Code: `function repro1(e: FocusEvent) { if (e.target !== window) return; }`},
-		{Code: `
-function repro2(flag: string & {}, arg: string) {
-  if (arg === flag) return true;
-  return false;
-}
-    `},
-		{Code: `
-const flagPresent = Symbol();
-type FlagPresent = typeof flagPresent;
-function repro3(queryFlag: string[] | FlagPresent) {
-  if (Array.isArray(queryFlag) && queryFlag.length === 0) return true;
-  if (queryFlag === flagPresent) return true;
-  return false;
-}
-    `},
-		{Code: "type PersonalizationId = `${string}_6_main` | `${string}_7_main`;\nfunction repro4(a: PersonalizationId, b: string) {\n  return a === b;\n}\n"},
-		// Issue #699 regression
-		{Code: `
-function test699<T extends 'a' | 'b'>(x: T | undefined, y: T) {
-  return x === y;
-}
-    `},
 
 		// Predicate functions
 		{Code: `
@@ -459,10 +435,6 @@ function test<T extends string | null>(a: T) {
 function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ?? 'default';
 }
-    `},
-		{Code: `
-function test<T extends [string], I extends number>(arr: T, i: I) {
-  return arr[i] ?? 'default';
 }
     `},
 
@@ -550,33 +522,6 @@ declare const arr: { foo: number }[];
 const bar = arr[42]?.foo ?? 0;
     `},
 
-		// Partial<Record<R, T[]>> with generic type parameters - indexed access type is unresolved
-		{
-			Code: `
-export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
-    return list.reduce(
-      (obj, item) => {
-        const existingItems = obj[func(item)] ?? [];
-        return { ...obj, [func(item)]: [...existingItems, item] };
-      },
-      {} as Partial<Record<R, T[]>>
-    );
-}
-      `,
-			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
-		},
-		{Code: `
-export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
-    return list.reduce(
-      (obj, item) => {
-        const existingItems = obj[func(item)] ?? [];
-        return { ...obj, [func(item)]: [...existingItems, item] };
-      },
-      {} as Partial<Record<R, T[]>>
-    );
-}
-    `},
-
 		// Doesn't check the right-hand side of a logical expression in a non-conditional context
 		{Code: `
 declare const b1: boolean;
@@ -642,6 +587,24 @@ while (false) {}
 		{
 			Code: `
 while (0) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
+		},
+		{
+			Code: `
+for (; true; ) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
+		},
+		{
+			Code: `
+for (; 0; ) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
+		},
+		{
+			Code: `
+do {} while (0);
       `,
 			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
 		},
@@ -1048,28 +1011,6 @@ function foo<T extends object>(arg: T, key: keyof T): void {
   arg[key] ??= 'default';
 }
     `},
-		{Code: `
-function test<T extends string[], I extends number>(arr: T, i: I) {
-  arr[i] ??= 'default';
-}
-    `},
-		{Code: `
-function repro5() {
-  const obj: Record<string, { name: string }> = {};
-  const key: string = 'foo';
-  obj[key] ??= { name: key };
-}
-    `},
-		{
-			Code: `
-function repro5WithNoUncheckedIndexedAccess() {
-  const obj: Record<string, { name: string }> = {};
-  const key: string = 'foo';
-  obj[key] ??= { name: key };
-}
-    `,
-			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
-		},
 		// Generic indexed access
 		{Code: `
 function get<Obj, Key extends keyof Obj>(obj: Obj, key: Key) {
@@ -1232,7 +1173,6 @@ isString('falafel');
       `,
 			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
-
 		// Mapped types
 		{Code: `
 type A = { [name in Lowercase<string>]?: A };
@@ -1262,6 +1202,82 @@ declare const t: T;
 t.a.a.a.value;
 t.A?.A?.A?.VALUE;
     `},
+
+		// OXC specific
+		{Code: `function repro1(e: FocusEvent) { if (e.target !== window) return; }`},
+		{Code: `
+function repro2(flag: string & {}, arg: string) {
+  if (arg === flag) return true;
+  return false;
+}
+    `},
+		{Code: `
+const flagPresent = Symbol();
+type FlagPresent = typeof flagPresent;
+function repro3(queryFlag: string[] | FlagPresent) {
+  if (Array.isArray(queryFlag) && queryFlag.length === 0) return true;
+  if (queryFlag === flagPresent) return true;
+  return false;
+}
+    `},
+		{Code: "type PersonalizationId = `${string}_6_main` | `${string}_7_main`;\nfunction repro4(a: PersonalizationId, b: string) {\n  return a === b;\n}\n"},
+		{Code: `
+function test699<T extends 'a' | 'b'>(x: T | undefined, y: T) {
+  return x === y;
+}
+    `},
+		{Code: `
+function test<T extends [string], I extends number>(arr: T, i: I) {
+  return arr[i] ?? 'default';
+}
+    `},
+		{
+			Code: `
+export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
+    return list.reduce(
+      (obj, item) => {
+        const existingItems = obj[func(item)] ?? [];
+        return { ...obj, [func(item)]: [...existingItems, item] };
+      },
+      {} as Partial<Record<R, T[]>>
+    );
+}
+      `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{Code: `
+export function groupBy<T, R extends string | number>(list: T[], func: (item: T) => R) {
+    return list.reduce(
+      (obj, item) => {
+        const existingItems = obj[func(item)] ?? [];
+        return { ...obj, [func(item)]: [...existingItems, item] };
+      },
+      {} as Partial<Record<R, T[]>>
+    );
+}
+    `},
+		{Code: `
+function test<T extends string[], I extends number>(arr: T, i: I) {
+  arr[i] ??= 'default';
+}
+    `},
+		{Code: `
+function repro5() {
+  const obj: Record<string, { name: string }> = {};
+  const key: string = 'foo';
+  obj[key] ??= { name: key };
+}
+    `},
+		{
+			Code: `
+function repro5WithNoUncheckedIndexedAccess() {
+  const obj: Record<string, { name: string }> = {};
+  const key: string = 'foo';
+  obj[key] ??= { name: key };
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 		{Code: `
 type Result<T> = T extends null
   ? string | null
@@ -1334,6 +1350,42 @@ function getValueOrDefault<T>(value: T | null | undefined, defaultValue: T): T {
 
 const _result = getValueOrDefault<string>('', 'fallback');
     `},
+		{
+			Code: `
+declare const test: true;
+
+while (test) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "always"},
+		},
+		{Code: `
+type Foo = { bar: { baz: string } } | { bar: null };
+declare const foo: Foo | null;
+foo?.bar?.baz;
+    `},
+		{Code: `
+type Brand<T, B extends string> = T & { readonly $brand: { [K in B]: true } };
+type IsoDateString = Brand<string, "IsoDateString">;
+declare const date: IsoDateString;
+if (date === "2025-01-01") {}
+    `},
+		{
+			Code: `
+declare function isString(x: unknown): x is string;
+declare const a: 'falafel';
+
+if (isString(a)) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+		},
+		{
+			Code: `
+declare function assertSecond(x: unknown, y: unknown): asserts y;
+
+assertSecond(...[], true);
+      `,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+		},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
@@ -2041,27 +2093,6 @@ do {} while (test);
 		},
 		{
 			Code: `
-for (; true; ) {}
-      `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
-		},
-		{
-			Code: `
-for (; 0; ) {}
-      `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysFalsy"}},
-		},
-		{
-			Code: `
-do {} while (0);
-      `,
-			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
-			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysFalsy"}},
-		},
-		{
-			Code: `
 let shouldRun = true;
 
 while ((shouldRun = true)) {}
@@ -2738,6 +2769,29 @@ if (arr[42] && arr[42]) {
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
+
+		// OXC specific
+		{
+			Code: `
+for (; 2; ) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+for (; 'truthy'; ) {}
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+do {} while (2);
+      `,
+			Options: NoUnnecessaryConditionOptions{AllowConstantLoopConditions: "only-allowed-literals"},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
 		{
 			Code: `
 function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
@@ -2753,6 +2807,46 @@ function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
 }
       `,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
+		},
+		{
+			Code: `
+declare function assert(x: unknown): asserts x;
+declare const a: true;
+
+assert(!!a);
+      `,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+class Foo {
+  #value = 1;
+
+  method() {
+    this.#value ??= 2;
+  }
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+if (false && true) {}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "alwaysTruthy"},
+				{MessageId: "alwaysFalsy"},
+			},
+		},
+		{
+			Code: `
+if (true || false) {}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "alwaysFalsy"},
+				{MessageId: "alwaysTruthy"},
+			},
 		},
 	})
 }

@@ -141,35 +141,6 @@ func isIndeterminateType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeParameter|checker.TypeFlagsIndex) != 0
 }
 
-// hasIndeterminateConstituent reports whether a type itself or any nested union
-// or intersection constituent is indeterminate at analysis time, including
-// unresolved conditional and substitution types derived from constrained
-// generics.
-func hasIndeterminateConstituent(t *checker.Type) bool {
-	if t == nil {
-		return false
-	}
-
-	if isIndeterminateType(t) {
-		return true
-	}
-
-	flags := checker.Type_flags(t)
-	if flags&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
-		return true
-	}
-
-	if utils.IsUnionType(t) || utils.IsIntersectionType(t) {
-		for _, part := range t.Types() {
-			if hasIndeterminateConstituent(part) {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
 // isAlwaysNullishType checks if a type is always null, undefined, or void.
 //
 // Returns true for types that can only be nullish values:
@@ -188,78 +159,65 @@ func isAlwaysNullishType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
 }
 
-// isSameExpression checks if two AST nodes represent the same expression.
-//
-// This is used for control flow narrowing to detect when the same expression
-// is checked multiple times (e.g., `arr[42] && arr[42]`).
-//
-// Examples of same expressions:
-// - `foo` and `foo` (same identifier)
-// - `arr[42]` and `arr[42]` (same array access with same index)
-// - `obj.prop` and `obj.prop` (same property access)
-//
-// Note: This is a shallow comparison and doesn't handle all cases.
-// For complex expressions or expressions with side effects, it may return false negatives.
-func isSameExpression(a, b *ast.Node) bool {
-	if a == nil || b == nil {
-		return false
+func toStaticValue(t *checker.Type) (any, bool) {
+	if t == nil {
+		return nil, false
 	}
 
-	// Must be same kind
-	if a.Kind != b.Kind {
-		return false
+	flags := checker.Type_flags(t)
+	if flags&checker.TypeFlagsBooleanLiteral != 0 {
+		return isTrueLiteralTypeValue(t)
+	}
+	if flags&checker.TypeFlagsUndefined != 0 {
+		return "undefined", true
+	}
+	if flags&checker.TypeFlagsNull != 0 {
+		return nil, true
 	}
 
-	switch a.Kind {
-	case ast.KindIdentifier:
-		// Compare identifier names
-		aId := a.AsIdentifier()
-		bId := b.AsIdentifier()
-		return aId.Text == bId.Text
-
-	case ast.KindPropertyAccessExpression:
-		// Compare obj.prop
-		aProp := a.AsPropertyAccessExpression()
-		bProp := b.AsPropertyAccessExpression()
-		// Check if base expressions are the same and property names match
-		if !isSameExpression(aProp.Expression, bProp.Expression) {
-			return false
+	if flags&checker.TypeFlagsStringLiteral != 0 && t.IsStringLiteral() {
+		if literal := t.AsLiteralType(); literal != nil {
+			return literal.Value(), true
 		}
-		aName := aProp.Name()
-		bName := bProp.Name()
-		if aName == nil || bName == nil {
-			return false
-		}
-		return ast.GetTextOfPropertyName(aName) == ast.GetTextOfPropertyName(bName)
-
-	case ast.KindElementAccessExpression:
-		// Compare arr[index]
-		aElem := a.AsElementAccessExpression()
-		bElem := b.AsElementAccessExpression()
-		// Check if base expressions and argument expressions are the same
-		return isSameExpression(aElem.Expression, bElem.Expression) &&
-			isSameExpression(aElem.ArgumentExpression, bElem.ArgumentExpression)
-
-	case ast.KindNumericLiteral:
-		// Compare numeric literals
-		aLit := a.AsNumericLiteral()
-		bLit := b.AsNumericLiteral()
-		return aLit.Text == bLit.Text
-
-	case ast.KindStringLiteral:
-		// Compare string literals
-		aLit := a.AsStringLiteral()
-		bLit := b.AsStringLiteral()
-		return aLit.Text == bLit.Text
-
-	case ast.KindTrueKeyword, ast.KindFalseKeyword, ast.KindNullKeyword:
-		// Same keywords are always equal
-		return true
-
-	default:
-		// For other expression types, we conservatively return false
-		return false
 	}
+	if flags&checker.TypeFlagsNumberLiteral != 0 && t.IsNumberLiteral() {
+		if literal := t.AsLiteralType(); literal != nil {
+			return literal.String(), true
+		}
+	}
+	if flags&checker.TypeFlagsBigIntLiteral != 0 && t.IsBigIntLiteral() {
+		if literal := t.AsLiteralType(); literal != nil {
+			return literal.String(), true
+		}
+	}
+
+	return nil, false
+}
+
+func isTrueLiteralTypeValue(t *checker.Type) (bool, bool) {
+	if t == nil || checker.Type_flags(t)&checker.TypeFlagsBooleanLiteral == 0 {
+		return false, false
+	}
+
+	if utils.IsIntrinsicType(t) {
+		switch t.AsIntrinsicType().IntrinsicName() {
+		case "true":
+			return true, true
+		case "false":
+			return false, true
+		}
+	}
+
+	if literal := t.AsLiteralType(); literal != nil {
+		switch literal.String() {
+		case "true":
+			return true, true
+		case "false":
+			return false, true
+		}
+	}
+
+	return false, false
 }
 
 var NoUnnecessaryConditionRule = rule.Rule{
@@ -277,35 +235,65 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			ctx.ReportRange(core.NewTextRange(0, 0), buildNoStrictNullCheckMessage())
 		}
 
-		// Parse AllowConstantLoopConditions which can be string, *string, bool, or *bool
-		var loopConditionMode string
-		switch v := opts.AllowConstantLoopConditions.(type) {
-		case string:
-			loopConditionMode = v
-		case *string:
-			if v != nil {
-				loopConditionMode = *v
-			} else {
-				loopConditionMode = "never"
-			}
-		case bool:
-			if v {
-				loopConditionMode = "always"
-			} else {
-				loopConditionMode = "never"
-			}
-		case *bool:
-			if v != nil && *v {
-				loopConditionMode = "always"
-			} else {
-				loopConditionMode = "never"
-			}
-		default:
-			loopConditionMode = "never"
-		}
+		noUncheckedIndexedAccess := compilerOptions.NoUncheckedIndexedAccess.IsTrue()
+		loopConditionMode := normalizeAllowConstantLoopConditions(opts.AllowConstantLoopConditions)
 
-		isAlwaysConstantLoopCondition := loopConditionMode == "always"
-		isAllowedConstantLoopCondition := loopConditionMode == "only-allowed-literals"
+		resolveIndexedAccessType := func(t *checker.Type) *checker.Type {
+			if t == nil || checker.Type_flags(t)&checker.TypeFlagsIndexedAccess == 0 {
+				return t
+			}
+
+			indexedAccess := t.AsIndexedAccessType()
+			objectType := checker.IndexedAccessType_objectType(indexedAccess)
+			indexType := checker.IndexedAccessType_indexType(indexedAccess)
+			if objectType == nil || indexType == nil {
+				return t
+			}
+
+			if constrainedObject := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, objectType); constrainedObject != nil {
+				objectType = constrainedObject
+			}
+			if constrainedIndex := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, indexType); constrainedIndex != nil {
+				indexType = constrainedIndex
+			}
+
+			if checker.Type_flags(indexType)&checker.TypeFlagsStringLiteral != 0 && indexType.IsStringLiteral() {
+				if literal := indexType.AsLiteralType(); literal != nil {
+					if propertyName, ok := literal.Value().(string); ok {
+						if propType := checker.Checker_getTypeOfPropertyOfType(ctx.TypeChecker, objectType, propertyName); propType != nil {
+							return propType
+						}
+					}
+				}
+			}
+
+			if checker.Type_flags(indexType)&checker.TypeFlagsNumberLiteral != 0 && indexType.IsNumberLiteral() {
+				if literal := indexType.AsLiteralType(); literal != nil {
+					if propType := checker.Checker_getTypeOfPropertyOfType(ctx.TypeChecker, objectType, literal.String()); propType != nil {
+						return propType
+					}
+				}
+			}
+
+			indexParts := utils.UnionTypeParts(indexType)
+			if len(indexParts) != 0 && slices.ContainsFunc(indexParts, func(part *checker.Type) bool {
+				return checker.Type_flags(part)&checker.TypeFlagsStringLike != 0
+			}) {
+				if stringIndexType := ctx.TypeChecker.GetStringIndexType(objectType); stringIndexType != nil {
+					return stringIndexType
+				}
+			}
+
+			if len(indexParts) != 0 && slices.ContainsFunc(indexParts, func(part *checker.Type) bool {
+				return checker.Type_flags(part)&checker.TypeFlagsNumberLike != 0
+			}) {
+				if numberIndexType := ctx.TypeChecker.GetNumberIndexType(objectType); numberIndexType != nil {
+					return numberIndexType
+				}
+			}
+
+			return t
+		}
 
 		getResolvedType := func(node *ast.Node) *checker.Type {
 			nodeType := ctx.TypeChecker.GetTypeAtLocation(node)
@@ -318,79 +306,81 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return nil
 			}
 			if isTypeParameter {
-				return constraintType
+				return resolveIndexedAccessType(constraintType)
 			}
-			return nodeType
+			return resolveIndexedAccessType(nodeType)
 		}
 
-		// isInConditionalContext checks if a node is used in a boolean conditional context.
-		// Returns true if the node is used as a condition (if/while/for/ternary).
-		// Returns false if it's in a non-conditional context (variable assignment, function argument, etc.).
-		var isInConditionalContext func(*ast.Node) bool
-		isInConditionalContext = func(node *ast.Node) bool {
-			if node == nil || node.Parent == nil {
+		nodeIsArrayType := func(node *ast.Node) bool {
+			nodeType := getResolvedType(node)
+			if nodeType == nil {
 				return false
 			}
 
-			parent := node.Parent
-
-			switch parent.Kind {
-			case ast.KindIfStatement:
-				// Check if node is the condition
-				ifStmt := parent.AsIfStatement()
-				return ifStmt.Expression == node
-
-			case ast.KindWhileStatement:
-				whileStmt := parent.AsWhileStatement()
-				return whileStmt.Expression == node
-
-			case ast.KindDoStatement:
-				doStmt := parent.AsDoStatement()
-				return doStmt.Expression == node
-
-			case ast.KindForStatement:
-				forStmt := parent.AsForStatement()
-				return forStmt.Condition == node
-
-			case ast.KindConditionalExpression:
-				condExpr := parent.AsConditionalExpression()
-				return condExpr.Condition == node
-
-			case ast.KindPrefixUnaryExpression:
-				// ! operator - recursively check parent
-				unaryExpr := parent.AsPrefixUnaryExpression()
-				if unaryExpr.Operator == ast.KindExclamationToken {
-					return isInConditionalContext(parent)
+			for _, part := range utils.UnionTypeParts(nodeType) {
+				if checker.Checker_isArrayType(ctx.TypeChecker, part) {
+					return true
 				}
-				return false
-
-			case ast.KindBinaryExpression:
-				// Logical operators (&&, ||) - recursively check parent
-				binExpr := parent.AsBinaryExpression()
-				opKind := binExpr.OperatorToken.Kind
-				if opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindBarBarToken {
-					return isInConditionalContext(parent)
-				}
-				return false
-
-			case ast.KindParenthesizedExpression:
-				// Parentheses - recursively check parent
-				return isInConditionalContext(parent)
-
-			default:
-				return false
 			}
+
+			return false
 		}
 
-		isLiteralBoolean := func(node *ast.Node) bool {
-			skipNode := ast.SkipParentheses(node)
-			return skipNode.Kind == ast.KindTrueKeyword || skipNode.Kind == ast.KindFalseKeyword
+		nodeIsTupleType := func(node *ast.Node) bool {
+			nodeType := getResolvedType(node)
+			if nodeType == nil {
+				return false
+			}
+
+			for _, part := range utils.UnionTypeParts(nodeType) {
+				if checker.IsTupleType(part) {
+					return true
+				}
+			}
+
+			return false
+		}
+
+		isArrayIndexExpression := func(node *ast.Node) bool {
+			if node == nil {
+				return false
+			}
+
+			node = ast.SkipParentheses(node)
+			if !ast.IsElementAccessExpression(node) {
+				return false
+			}
+
+			elemAccess := node.AsElementAccessExpression()
+			if elemAccess.ArgumentExpression == nil {
+				return false
+			}
+
+			return nodeIsArrayType(elemAccess.Expression) ||
+				(nodeIsTupleType(elemAccess.Expression) &&
+					ast.SkipParentheses(elemAccess.ArgumentExpression).Kind != ast.KindNumericLiteral)
+		}
+
+		isConditionalAlwaysNecessary := func(t *checker.Type) bool {
+			for _, part := range utils.UnionTypeParts(t) {
+				flags := checker.Type_flags(part)
+				if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeVariable) != 0 {
+					return true
+				}
+			}
+
+			return false
 		}
 
 		// Type check predicates for declarative, readable code
 
 		isNeverType := func(flags checker.TypeFlags) bool {
 			return flags&checker.TypeFlagsNever != 0
+		}
+
+		isTrueLiteralType := func(t *checker.Type) bool {
+			value, ok := isTrueLiteralTypeValue(t)
+			return ok && value
 		}
 
 		isIndexedAccessFlags := func(flags checker.TypeFlags) bool {
@@ -439,27 +429,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return false
 		}
 
-		// Helper to check if an expression contains an element access
-		var containsElementAccess func(*ast.Node) bool
-		containsElementAccess = func(n *ast.Node) bool {
-			if n == nil {
-				return false
-			}
-			n = ast.SkipParentheses(n)
-			if isElementAccess(n) {
-				return true
-			}
-			// Check in property access chains
-			if isPropertyAccess(n) {
-				return containsElementAccess(n.AsPropertyAccessExpression().Expression)
-			}
-			// Check in call expressions
-			if isCallExpr(n) {
-				return containsElementAccess(n.AsCallExpression().Expression)
-			}
-			return false
-		}
-
 		// constrainIndexedAccessType resolves an indexed access type via its
 		// base constraint. Returns (resolvedType, shouldSkip).
 		//
@@ -469,7 +438,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			if t == nil || !isIndexedAccessFlags(checker.Type_flags(t)) {
 				return t, false
 			}
-			constraintType := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t)
+			constraintType := resolveIndexedAccessType(t)
 			if constraintType == nil || isIndexedAccessFlags(checker.Type_flags(constraintType)) {
 				return nil, true
 			}
@@ -549,149 +518,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 
 			return isNullablePropertyType(objectType, propertyType)
-		}
-
-		checkCondition := func(node *ast.Node) {
-			skipNode := ast.SkipParentheses(node)
-
-			// Handle negation operator (!)
-			if skipNode.Kind == ast.KindPrefixUnaryExpression {
-				unaryExpr := skipNode.AsPrefixUnaryExpression()
-				if unaryExpr.Operator == ast.KindExclamationToken {
-					operandSkipped := ast.SkipParentheses(unaryExpr.Operand)
-
-					// Skip element access - they can return undefined at runtime
-					if isElementAccess(operandSkipped) {
-						return
-					}
-
-					// Get operand type
-					operandType := getResolvedType(unaryExpr.Operand)
-					if operandType == nil {
-						return
-					}
-
-					// Special case: never type
-					flags := checker.Type_flags(operandType)
-					if isNeverType(flags) {
-						ctx.ReportNode(unaryExpr.Operand, buildNeverMessage())
-						return
-					}
-
-					// Check if operand is always truthy or falsy
-					isTruthy, isFalsy := checkTypeCondition(operandType)
-					if isTruthy {
-						// operand is always truthy, so !operand is always falsy
-						ctx.ReportNode(node, buildAlwaysFalsyMessage())
-					} else if isFalsy {
-						// operand is always falsy, so !operand is always truthy
-						ctx.ReportNode(node, buildAlwaysTruthyMessage())
-					}
-					return
-				}
-			}
-
-			// Skip logical operators - they're handled by KindBinaryExpression listener
-			if skipNode.Kind == ast.KindBinaryExpression {
-				binExpr := skipNode.AsBinaryExpression()
-				opKind := binExpr.OperatorToken.Kind
-				if opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindBarBarToken {
-					return
-				}
-			}
-
-			// Check literal boolean keywords first
-			if isLiteralBoolean(node) {
-				if skipNode.Kind == ast.KindTrueKeyword {
-					ctx.ReportNode(node, buildAlwaysTruthyMessage())
-				} else {
-					ctx.ReportNode(node, buildAlwaysFalsyMessage())
-				}
-				return
-			}
-
-			nodeType := getResolvedType(node)
-			if nodeType == nil {
-				return
-			}
-
-			// Handle indexed access types for element access expressions
-			// e.g., obj[key] where obj: Record<string, T> and key: keyof Obj
-			// In this case, nodeType might be an indexed access type (Obj[Key])
-			// We need to resolve it to the actual element type
-			if isElementAccess(skipNode) {
-				flags := checker.Type_flags(nodeType)
-				if isIndexedAccessFlags(flags) {
-					// This is an indexed access type (e.g., Obj[Key])
-					// Try to get the actual element type by checking the base type's index signature
-					elemAccess := skipNode.AsElementAccessExpression()
-					baseType := getResolvedType(elemAccess.Expression)
-					if baseType != nil {
-						// Try string index type first
-						stringIndexType := ctx.TypeChecker.GetStringIndexType(baseType)
-						if stringIndexType != nil {
-							// Use the string index type as the element type
-							nodeType = stringIndexType
-						}
-					}
-				}
-			}
-			// Skip array/tuple element access without noUncheckedIndexedAccess
-			//
-			// TypeScript's type system has a soundness hole with array element access:
-			// Without noUncheckedIndexedAccess, arr[i] has type T instead of T|undefined,
-			// even though accessing an out-of-bounds index returns undefined at runtime.
-			//
-			// Examples:
-			//   const arr: number[] = [1, 2, 3]
-			//   const x = arr[10]  // type: number, runtime value: undefined
-			//
-			//   With noUncheckedIndexedAccess:
-			//   const x = arr[10]  // type: number | undefined (correct)
-			//
-			// We only skip this check for actual array/tuple types. Object types with index
-			// signatures (like Record<string, T>) are still checked because they don't have
-			// this soundness issue.
-			if isElementAccess(skipNode) && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-				elemAccess := skipNode.AsElementAccessExpression()
-				baseType := getResolvedType(elemAccess.Expression)
-				if baseType != nil {
-					// Check if it's a tuple type with literal index (safe) or variable index (unsafe)
-					if checker.IsTupleType(baseType) {
-						// If accessing with literal numeric index, it's safe - don't skip
-						if elemAccess.ArgumentExpression != nil {
-							arg := ast.SkipParentheses(elemAccess.ArgumentExpression)
-							// Numeric literal or other literals are safe
-							if arg.Kind != ast.KindNumericLiteral && arg.Kind != ast.KindFirstLiteralToken {
-								// Variable or computed index - unsafe, skip check
-								return
-							}
-						}
-						// Literal index - safe, continue to check
-					}
-					// Check if it's an array type (e.g., number[], Array<string>)
-					if baseType.Symbol() != nil {
-						symbolName := baseType.Symbol().Name
-						// Array and ReadonlyArray are the built-in array type symbols
-						if symbolName == "Array" || symbolName == "ReadonlyArray" {
-							return
-						}
-					}
-				}
-			}
-
-			isTruthy, isFalsy := checkTypeCondition(nodeType)
-			if isTruthy {
-				ctx.ReportNode(node, buildAlwaysTruthyMessage())
-			} else if isFalsy {
-				// Check if it's specifically the never type
-				flags := checker.Type_flags(nodeType)
-				if isNeverType(flags) {
-					ctx.ReportNode(node, buildNeverMessage())
-				} else {
-					ctx.ReportNode(node, buildAlwaysFalsyMessage())
-				}
-			}
 		}
 
 		// Helper: Get the effective type of a call expression.
@@ -905,6 +731,114 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return !isOwnNullable && isNullishType(prevType)
 		}
 
+		isMemberExpressionNullableOriginFromObject := func(node *ast.Node) bool {
+			if node == nil {
+				return false
+			}
+
+			node = ast.SkipParentheses(node)
+
+			var objectExpr *ast.Node
+			var propertyType *checker.Type
+			var propertyName string
+			var isComputed bool
+
+			switch node.Kind {
+			case ast.KindPropertyAccessExpression:
+				propAccess := node.AsPropertyAccessExpression()
+				objectExpr = propAccess.Expression
+				nameNode := propAccess.Name()
+				if nameNode == nil {
+					return false
+				}
+				propertyName = ast.GetTextOfPropertyName(nameNode)
+			case ast.KindElementAccessExpression:
+				elemAccess := node.AsElementAccessExpression()
+				objectExpr = elemAccess.Expression
+				isComputed = true
+				if elemAccess.ArgumentExpression == nil {
+					return false
+				}
+				propertyType = getResolvedType(elemAccess.ArgumentExpression)
+			default:
+				return false
+			}
+
+			prevType := getResolvedType(objectExpr)
+			if prevType == nil || !utils.IsUnionType(prevType) {
+				return false
+			}
+
+			isOwnNullable := false
+			for _, part := range prevType.Types() {
+				if isNullishType(part) {
+					continue
+				}
+
+				if isComputed {
+					if propertyType != nil && isNullablePropertyType(part, propertyType) {
+						isOwnNullable = true
+						break
+					}
+					continue
+				}
+
+				if propertyName == "" {
+					continue
+				}
+
+				propType := checker.Checker_getTypeOfPropertyOfType(ctx.TypeChecker, part, propertyName)
+				if propType != nil {
+					if isNullishType(propType) {
+						isOwnNullable = true
+						break
+					}
+					continue
+				}
+
+				for _, info := range checker.Checker_getIndexInfosOfType(ctx.TypeChecker, part) {
+					if utils.GetTypeName(ctx.TypeChecker, info.KeyType()) != "string" {
+						continue
+					}
+					if noUncheckedIndexedAccess || isNullishType(info.ValueType()) {
+						isOwnNullable = true
+						break
+					}
+				}
+				if isOwnNullable {
+					break
+				}
+			}
+
+			return !isOwnNullable && isNullishType(prevType)
+		}
+
+		isOptionableExpression := func(node *ast.Node) bool {
+			if node == nil {
+				return false
+			}
+			node = ast.SkipParentheses(node)
+
+			nodeType := getResolvedType(node)
+			if nodeType == nil {
+				return false
+			}
+
+			if isConditionalAlwaysNecessary(nodeType) {
+				return true
+			}
+
+			isOwnNullable := true
+			switch node.Kind {
+			case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
+				isOwnNullable = !isMemberExpressionNullableOriginFromObject(node)
+			case ast.KindCallExpression:
+				isOwnNullable = !isCallExpressionNullableOriginFromCallee(node.AsCallExpression())
+			}
+
+			return isOwnNullable && isNullishType(nodeType)
+		}
+
 		// checkOptionalChain validates optional chaining (?.) to detect unnecessary usage.
 		//
 		// Optional chaining is unnecessary when the expression being accessed is never nullish.
@@ -1072,39 +1006,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 			}
 
-			// Helper function to check if a type is an array or tuple type
-			var isArrayOrTupleType func(*checker.Type) bool
-			isArrayOrTupleType = func(t *checker.Type) bool {
-				if t == nil {
-					return false
-				}
-
-				// Check for tuple type
-				if checker.IsTupleType(t) {
-					return true
-				}
-
-				// Check for union type - if any constituent is an array/tuple, return true
-				if utils.IsUnionType(t) {
-					return slices.ContainsFunc(t.Types(), isArrayOrTupleType)
-				}
-
-				// Check for array type by number index type
-				// Arrays have a number index type (arr[number] returns the element type)
-				numberIndexType := ctx.TypeChecker.GetNumberIndexType(t)
-				if numberIndexType != nil {
-					return true
-				}
-
-				// Check for array type by symbol name (fallback)
-				if t.Symbol() != nil {
-					symbolName := t.Symbol().Name
-					if symbolName == "Array" || symbolName == "ReadonlyArray" {
-						return true
-					}
-				}
-
-				return false
+			if isOptionableExpression(expression) {
+				return
 			}
 
 			// Check if the expression is itself an optional chain (chained access)
@@ -1395,513 +1298,410 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
+		isNullableMemberExpression := func(node *ast.Node) bool {
+			node = ast.SkipParentheses(node)
+
+			switch node.Kind {
+			case ast.KindPropertyAccessExpression:
+				propAccess := node.AsPropertyAccessExpression()
+				nameNode := propAccess.Name()
+				if nameNode == nil {
+					return false
+				}
+
+				baseType := ctx.TypeChecker.GetTypeAtLocation(propAccess.Expression)
+				if baseType == nil {
+					return false
+				}
+
+				propName := ast.GetTextOfPropertyName(nameNode)
+				if propName == "" {
+					return false
+				}
+
+				propSymbol := ctx.TypeChecker.GetSymbolAtLocation(nameNode)
+				if propSymbol == nil {
+					propSymbol = checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
+				}
+				if propSymbol == nil {
+					for _, prop := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, baseType) {
+						if prop.Name == propName {
+							propSymbol = prop
+							break
+						}
+					}
+				}
+				return propSymbol != nil && propSymbol.Flags&ast.SymbolFlagsOptional != 0
+
+			case ast.KindElementAccessExpression:
+				return isNullableElementAccessExpression(node.AsElementAccessExpression())
+			}
+
+			return false
+		}
+
+		var optionChainContainsOptionArrayIndex func(*ast.Node) bool
+		optionChainContainsOptionArrayIndex = func(node *ast.Node) bool {
+			if node == nil {
+				return false
+			}
+
+			node = ast.SkipParentheses(node)
+
+			var lhsNode *ast.Node
+			var isOptional bool
+
+			switch node.Kind {
+			case ast.KindCallExpression:
+				callExpr := node.AsCallExpression()
+				lhsNode = callExpr.Expression
+				isOptional = callExpr.QuestionDotToken != nil
+			case ast.KindPropertyAccessExpression:
+				propAccess := node.AsPropertyAccessExpression()
+				lhsNode = propAccess.Expression
+				isOptional = propAccess.QuestionDotToken != nil
+			case ast.KindElementAccessExpression:
+				elemAccess := node.AsElementAccessExpression()
+				lhsNode = elemAccess.Expression
+				isOptional = elemAccess.QuestionDotToken != nil
+			default:
+				return false
+			}
+
+			if isOptional && isArrayIndexExpression(lhsNode) {
+				return true
+			}
+
+			switch lhsNode.Kind {
+			case ast.KindCallExpression, ast.KindPropertyAccessExpression, ast.KindElementAccessExpression:
+				return optionChainContainsOptionArrayIndex(lhsNode)
+			default:
+				return false
+			}
+		}
+
+		var checkNode func(expression *ast.Node, isUnaryNotArgument bool, reportNode *ast.Node)
+		checkNode = func(expression *ast.Node, isUnaryNotArgument bool, reportNode *ast.Node) {
+			if expression == nil {
+				return
+			}
+			if reportNode == nil {
+				reportNode = expression
+			}
+
+			expression = ast.SkipParentheses(expression)
+
+			if expression.Kind == ast.KindPrefixUnaryExpression {
+				unaryExpr := expression.AsPrefixUnaryExpression()
+				if unaryExpr.Operator == ast.KindExclamationToken {
+					checkNode(unaryExpr.Operand, !isUnaryNotArgument, reportNode)
+					return
+				}
+			}
+
+			if !noUncheckedIndexedAccess && isArrayIndexExpression(expression) {
+				return
+			}
+
+			if expression.Kind == ast.KindBinaryExpression {
+				binExpr := expression.AsBinaryExpression()
+				if opKind := binExpr.OperatorToken.Kind; opKind != ast.KindQuestionQuestionToken &&
+					(opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindBarBarToken) {
+					checkNode(binExpr.Right, false, nil)
+					return
+				}
+			}
+
+			nodeType := getResolvedType(expression)
+			if nodeType == nil || isConditionalAlwaysNecessary(nodeType) {
+				return
+			}
+
+			if isElementAccess(expression) && isIndexedAccessFlags(checker.Type_flags(nodeType)) {
+				elemAccess := expression.AsElementAccessExpression()
+				baseType := getResolvedType(elemAccess.Expression)
+				if baseType != nil {
+					if stringIndexType := ctx.TypeChecker.GetStringIndexType(baseType); stringIndexType != nil {
+						nodeType = stringIndexType
+					}
+				}
+			}
+
+			flags := checker.Type_flags(nodeType)
+			if isNeverType(flags) {
+				ctx.ReportNode(reportNode, buildNeverMessage())
+				return
+			}
+
+			isTruthy, isFalsy := checkTypeCondition(nodeType)
+			if isFalsy {
+				if isUnaryNotArgument {
+					ctx.ReportNode(reportNode, buildAlwaysTruthyMessage())
+				} else {
+					ctx.ReportNode(reportNode, buildAlwaysFalsyMessage())
+				}
+				return
+			}
+			if isTruthy {
+				if isUnaryNotArgument {
+					ctx.ReportNode(reportNode, buildAlwaysFalsyMessage())
+				} else {
+					ctx.ReportNode(reportNode, buildAlwaysTruthyMessage())
+				}
+			}
+		}
+
+		checkNodeForNullish := func(node *ast.Node) {
+			if node == nil {
+				return
+			}
+
+			nodeType := getResolvedType(node)
+			if nodeType == nil || isConditionalAlwaysNecessary(nodeType) {
+				return
+			}
+
+			if constrainedType, shouldSkip := constrainIndexedAccessType(nodeType); shouldSkip {
+				return
+			} else if constrainedType != nil {
+				nodeType = constrainedType
+			}
+
+			flags := checker.Type_flags(nodeType)
+			switch {
+			case isNeverType(flags):
+				ctx.ReportNode(node, buildNeverMessage())
+				return
+			case isAlwaysNullishType(nodeType):
+				ctx.ReportNode(node, buildAlwaysNullishMessage())
+				return
+			}
+
+			if !isNullishType(nodeType) && !isNullableMemberExpression(node) {
+				node = ast.SkipParentheses(node)
+
+				if noUncheckedIndexedAccess ||
+					(!isArrayIndexExpression(node) &&
+						!(hasOptionalChain(node) && optionChainContainsOptionArrayIndex(node))) {
+					ctx.ReportNode(node, buildNeverNullishMessage())
+				}
+			}
+		}
+
+		checkIfBoolExpressionIsNecessaryConditional := func(node *ast.Node, left *ast.Node, right *ast.Node, opKind ast.Kind) {
+			leftType := getResolvedType(left)
+			rightType := getResolvedType(right)
+			if leftType == nil || rightType == nil {
+				return
+			}
+
+			if _, ok := toStaticValue(leftType); ok {
+				if _, ok := toStaticValue(rightType); ok {
+					ctx.ReportNode(node, buildLiteralBinaryExpressionMessage())
+					return
+				}
+			}
+
+			if !isStrictNullChecks {
+				return
+			}
+
+			leftFlags := checker.Type_flags(leftType)
+			rightFlags := checker.Type_flags(rightType)
+
+			isComparable := func(t *checker.Type, flags checker.TypeFlags) bool {
+				if t == nil {
+					return false
+				}
+
+				flags |= checker.TypeFlagsAny | checker.TypeFlagsUnknown | checker.TypeFlagsTypeParameter | checker.TypeFlagsTypeVariable
+				if opKind == ast.KindEqualsEqualsToken || opKind == ast.KindExclamationEqualsToken {
+					flags |= checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid
+				}
+
+				if checker.Type_flags(t)&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+					return true
+				}
+
+				for _, part := range utils.UnionTypeParts(t) {
+					partFlags := checker.Type_flags(part)
+					if partFlags&flags != 0 {
+						return true
+					}
+					if partFlags&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+						return true
+					}
+				}
+
+				return false
+			}
+
+			if (leftFlags == checker.TypeFlagsUndefined && !isComparable(rightType, checker.TypeFlagsUndefined|checker.TypeFlagsVoid)) ||
+				(rightFlags == checker.TypeFlagsUndefined && !isComparable(leftType, checker.TypeFlagsUndefined|checker.TypeFlagsVoid)) ||
+				(leftFlags == checker.TypeFlagsNull && !isComparable(rightType, checker.TypeFlagsNull)) ||
+				(rightFlags == checker.TypeFlagsNull && !isComparable(leftType, checker.TypeFlagsNull)) {
+				ctx.ReportDiagnostic(buildNoOverlapDiagnostic(
+					ctx.TypeChecker.TypeToString(leftType),
+					left.Loc,
+					ctx.TypeChecker.TypeToString(rightType),
+					right.Loc,
+				))
+			}
+		}
+
+		checkLogicalExpressionForUnnecessaryConditionals := func(node *ast.BinaryExpression) {
+			if node.OperatorToken.Kind == ast.KindQuestionQuestionToken {
+				checkNodeForNullish(node.Left)
+				return
+			}
+
+			checkNode(node.Left, false, nil)
+		}
+
+		checkIfLoopIsNecessaryConditional := func(test *ast.Node) {
+			if test == nil {
+				return
+			}
+
+			if loopConditionMode == "only-allowed-literals" && isAllowedConstantLiteral(test) {
+				return
+			}
+
+			if loopConditionMode == "always" {
+				if ast.SkipParentheses(test).Kind == ast.KindTrueKeyword {
+					return
+				}
+				if testType := getResolvedType(test); isTrueLiteralType(testType) {
+					return
+				}
+			}
+
+			checkNode(test, false, nil)
+		}
+
+		checkAssignmentExpression := func(node *ast.BinaryExpression) {
+			switch node.OperatorToken.Kind {
+			case ast.KindAmpersandAmpersandEqualsToken, ast.KindBarBarEqualsToken:
+				checkNode(node.Left, false, nil)
+			case ast.KindQuestionQuestionEqualsToken:
+				checkNodeForNullish(node.Left)
+			}
+		}
+
+		checkTypePredicateCallExpression := func(node *ast.Node, callExpr *ast.CallExpression) {
+			if !opts.CheckTypePredicates {
+				return
+			}
+
+			var checkableArguments []*ast.Node
+			if callExpr.Arguments != nil {
+				for _, arg := range callExpr.Arguments.Nodes {
+					if arg == nil {
+						continue
+					}
+					if arg.Kind == ast.KindSpreadElement {
+						break
+					}
+					checkableArguments = append(checkableArguments, arg)
+				}
+			}
+			if len(checkableArguments) == 0 {
+				return
+			}
+
+			callSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, node, nil, checker.CheckModeNormal)
+			if callSignature == nil {
+				return
+			}
+
+			typePredicate := ctx.TypeChecker.GetTypePredicateOfSignature(callSignature)
+			if typePredicate == nil {
+				return
+			}
+
+			paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
+			if paramIndex < 0 || paramIndex >= len(checkableArguments) {
+				return
+			}
+
+			arg := checkableArguments[paramIndex]
+			predicateType := checker.TypePredicate_t(typePredicate)
+
+			switch checker.TypePredicate_kind(typePredicate) {
+			case checker.TypePredicateKindAssertsIdentifier:
+				if predicateType == nil {
+					checkNode(arg, false, nil)
+					return
+				}
+				if argType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, arg); argType != nil && argType == predicateType {
+					ctx.ReportNode(arg, buildTypeGuardAlreadyIsTypeMessage())
+				}
+			case checker.TypePredicateKindIdentifier:
+				if argType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, arg); argType != nil && argType == predicateType {
+					ctx.ReportNode(arg, buildTypeGuardAlreadyIsTypeMessage())
+				}
+			}
+		}
+
+		checkCallExpression := func(node *ast.Node) {
+			checkOptionalChain(node)
+
+			callExpr := node.AsCallExpression()
+			if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) &&
+				callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
+				if arg := callExpr.Arguments.Nodes[0]; arg != nil {
+					checkPredicateFunction(ctx, arg, opts.CheckTypePredicates)
+				}
+			}
+
+			checkTypePredicateCallExpression(node, callExpr)
+		}
+
 		return rule.RuleListeners{
 			ast.KindIfStatement: func(node *ast.Node) {
-				checkCondition(node.AsIfStatement().Expression)
+				checkNode(node.AsIfStatement().Expression, false, nil)
 			},
 			ast.KindWhileStatement: func(node *ast.Node) {
-				if isAlwaysConstantLoopCondition {
-					return
-				}
-				whileStmt := node.AsWhileStatement()
-				if isAllowedConstantLoopCondition && isAllowedConstantLiteral(whileStmt.Expression) {
-					return
-				}
-				checkCondition(whileStmt.Expression)
+				checkIfLoopIsNecessaryConditional(node.AsWhileStatement().Expression)
 			},
 			ast.KindDoStatement: func(node *ast.Node) {
-				if isAlwaysConstantLoopCondition {
-					return
-				}
-				doStmt := node.AsDoStatement()
-				// Note: Unlike while statements, do-while does NOT allow constant literals
-				// even in "only-allowed-literals" mode
-				checkCondition(doStmt.Expression)
+				checkIfLoopIsNecessaryConditional(node.AsDoStatement().Expression)
 			},
 			ast.KindForStatement: func(node *ast.Node) {
-				forStmt := node.AsForStatement()
-				if forStmt.Condition == nil {
-					return
-				}
-				if isAlwaysConstantLoopCondition {
-					return
-				}
-				// Note: "only-allowed-literals" does NOT apply to for loops
-				// Only "always" mode skips checking for loops
-				checkCondition(forStmt.Condition)
+				checkIfLoopIsNecessaryConditional(node.AsForStatement().Condition)
 			},
 			ast.KindConditionalExpression: func(node *ast.Node) {
-				checkCondition(node.AsConditionalExpression().Condition)
+				checkNode(node.AsConditionalExpression().Condition, false, nil)
 			},
 			ast.KindBinaryExpression: func(node *ast.Node) {
 				binExpr := node.AsBinaryExpression()
-				opKind := binExpr.OperatorToken.Kind
 
-				// Check nullish coalescing operator (??)
-				if opKind == ast.KindQuestionQuestionToken {
-					// Check if the left side contains an array element access without noUncheckedIndexedAccess
-					// In this case, the ?? is justified even if the type appears non-nullish
-					// EXCEPT when the element type itself is always nullish (e.g., null[])
-
-					leftType := getResolvedType(binExpr.Left)
-					if leftType != nil {
-						// Don't report on indeterminate types
-						if isIndeterminateType(leftType) {
-							return
-						}
-
-						if constrainedType, shouldSkip := constrainIndexedAccessType(leftType); shouldSkip {
-							return
-						} else {
-							leftType = constrainedType
-						}
-
-						if isIndeterminateType(leftType) {
-							return
-						}
-
-						// Check for never type first (never is a special case)
-						flags := checker.Type_flags(leftType)
-						if isNeverType(flags) {
-							ctx.ReportNode(binExpr.Left, buildNeverMessage())
-							return
-						}
-
-						// Check if the value is always nullish
-						if isAlwaysNullishType(leftType) {
-							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
-							return
-						}
-
-						// Skip nullish coalescing checks for element access when noUncheckedIndexedAccess is disabled
-						// UNLESS the type is clearly always or never nullish (checked above)
-						// 1. Left side IS directly an element access (arr[0] ?? 'default')
-						// 2. Left side has optional chaining AND contains element access (arr[0]?.foo ?? 'default')
-						// But NOT: Left side has no optional chain but contains element access (arr[0].foo ?? 'default')
-						if !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-							leftSkip := ast.SkipParentheses(binExpr.Left)
-							if isElementAccess(leftSkip) {
-								// Case 1: Direct element access - skip check
-								return
-							}
-							if hasOptionalChain(binExpr.Left) && containsElementAccess(binExpr.Left) {
-								// Case 2: Optional chain with element access - skip check
-								return
-							}
-						}
-
-						// Upstream typescript-eslint treats computed member expressions as nullable
-						// when their key type matches an applicable index signature or mapped key.
-						if isElementAccess(ast.SkipParentheses(binExpr.Left)) {
-							elemAccess := ast.SkipParentheses(binExpr.Left).AsElementAccessExpression()
-							if isNullableElementAccessExpression(elemAccess) {
-								return
-							}
-						}
-
-						// Check if the value is never nullish
-						if !isNullishType(leftType) {
-							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
-						}
-					}
-					return
-				}
-
-				// Check nullish coalescing assignment operator (??=)
-				if opKind == ast.KindQuestionQuestionEqualsToken {
-					leftType := getResolvedType(binExpr.Left)
-					if leftType != nil {
-						// Don't report on indeterminate types
-						if isIndeterminateType(leftType) {
-							return
-						}
-
-						if constrainedType, shouldSkip := constrainIndexedAccessType(leftType); shouldSkip {
-							return
-						} else {
-							leftType = constrainedType
-						}
-
-						if isIndeterminateType(leftType) {
-							return
-						}
-
-						flags := checker.Type_flags(leftType)
-						if isNeverType(flags) {
-							ctx.ReportNode(binExpr.Left, buildNeverMessage())
-							return
-						}
-
-						// Check for always nullish first (before skipping for element access)
-						if isAlwaysNullishType(leftType) {
-							ctx.ReportNode(binExpr.Left, buildAlwaysNullishMessage())
-							return
-						}
-
-						leftSkip := ast.SkipParentheses(binExpr.Left)
-
-						// Skip nullish coalescing assignment checks for element access when noUncheckedIndexedAccess is disabled
-						// UNLESS the type is clearly always or never nullish (checked above/below)
-						// 1. Left side IS directly an element access (arr[0] ??= 'default')
-						// 2. Left side has optional chaining AND contains element access (arr[0]?.foo ??= 'default')
-						// But NOT: Left side has no optional chain but contains element access (arr[0].foo ??= 'default')
-						if !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-							if isElementAccess(leftSkip) {
-								// Case 1: Direct element access - skip check
-								return
-							}
-							if hasOptionalChain(binExpr.Left) && containsElementAccess(binExpr.Left) {
-								// Case 2: Optional chain with element access - skip check
-								return
-							}
-						}
-
-						// Upstream typescript-eslint treats computed member expressions as nullable
-						// when their key type matches an applicable index signature or mapped key.
-						if isElementAccess(leftSkip) {
-							elemAccess := leftSkip.AsElementAccessExpression()
-							if isNullableElementAccessExpression(elemAccess) {
-								return
-							}
-						}
-
-						// Skip optional property access - with exactOptionalPropertyTypes,
-						// the type doesn't include undefined but the property can still be absent
-						// Also skip private properties - they have complex semantics
-						if isPropertyAccess(binExpr.Left) {
-							propAccess := binExpr.Left.AsPropertyAccessExpression()
-							nameNode := propAccess.Name()
-							if nameNode != nil {
-								// Skip private identifiers (e.g., #rand)
-								// Private fields can be optional, and type checking is complex
-								if nameNode.Kind == ast.KindPrivateIdentifier {
-									return
-								}
-
-								// Regular property - check if optional
-								propName := ast.GetTextOfPropertyName(nameNode)
-								if propName != "" {
-									baseType := getResolvedType(propAccess.Expression)
-									if baseType != nil {
-										propSymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
-										if propSymbol != nil && propSymbol.Flags&ast.SymbolFlagsOptional != 0 {
-											return
-										}
-									}
-								}
-							}
-						}
-
-						// Check if the value is never nullish
-						if !isNullishType(leftType) {
-							ctx.ReportNode(binExpr.Left, buildNeverNullishMessage())
-						}
-					}
-					return
-				}
-
-				// Check logical operators (&&, ||) and logical assignment operators (&&=, ||=)
-				if opKind == ast.KindAmpersandAmpersandToken ||
-					opKind == ast.KindBarBarToken ||
-					opKind == ast.KindAmpersandAmpersandEqualsToken ||
-					opKind == ast.KindBarBarEqualsToken {
-
-					isAssignment := opKind == ast.KindAmpersandAmpersandEqualsToken || opKind == ast.KindBarBarEqualsToken
-					isAndOperator := opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindAmpersandAmpersandEqualsToken
-					isOrOperator := opKind == ast.KindBarBarToken || opKind == ast.KindBarBarEqualsToken
-
-					// Check if left is a literal boolean (true/false keyword)
-					leftSkipNode := ast.SkipParentheses(binExpr.Left)
-					leftIsLiteralTrue := leftSkipNode.Kind == ast.KindTrueKeyword
-					leftIsLiteralFalse := leftSkipNode.Kind == ast.KindFalseKeyword
-
-					// Determine if we should skip the right side based on short-circuit behavior
-					skipRight := false
-					if isAndOperator && leftIsLiteralFalse {
-						// Left is false, so right is never evaluated
-						skipRight = true
-					} else if isOrOperator && leftIsLiteralTrue {
-						// Left is true, so right is never evaluated
-						skipRight = true
-					} else {
-						// For non-literal cases, check the type
-						leftType := getResolvedType(binExpr.Left)
-						if leftType != nil {
-							leftTruthy, leftFalsy := checkTypeCondition(leftType)
-							if isAndOperator && leftFalsy {
-								skipRight = true
-							} else if isOrOperator && leftTruthy {
-								skipRight = true
-							}
-						}
-					}
-
-					// Always check the left side as it's used as a condition
-					// For both regular operators (&&, ||) and assignment operators (&&=, ||=)
-					checkCondition(binExpr.Left)
-
-					// Check right side only for regular operators (not assignment operators)
-					// in conditional context, and only if it would be evaluated (not short-circuited)
-					// For assignment operators (&&=, ||=), the right side is a value, not a condition
-					// For non-conditional context like `const x = b1 && b2`, only check left, not right
-					if !isAssignment && !skipRight && isInConditionalContext(node) {
-						// Control flow narrowing: if left and right are the same expression
-						// and this is an &&, then right is always truthy (since we already checked left)
-						if isAndOperator && isSameExpression(binExpr.Left, binExpr.Right) {
-							// Report that the right side is always truthy
-							ctx.ReportNode(binExpr.Right, buildAlwaysTruthyMessage())
-						} else {
-							checkCondition(binExpr.Right)
-						}
-					}
-					return
-				}
-
-				// Check equality and comparison operators
-				isLooseEqualityOp := opKind == ast.KindEqualsEqualsToken ||
-					opKind == ast.KindExclamationEqualsToken
-				isStrictEqualityOp := opKind == ast.KindEqualsEqualsEqualsToken ||
-					opKind == ast.KindExclamationEqualsEqualsToken
-				isEqualityOp := isLooseEqualityOp || isStrictEqualityOp
-
-				isComparisonOp := opKind == ast.KindLessThanToken ||
-					opKind == ast.KindGreaterThanToken ||
-					opKind == ast.KindLessThanEqualsToken ||
-					opKind == ast.KindGreaterThanEqualsToken
-
-				if isEqualityOp || isComparisonOp {
-					leftType := getResolvedType(binExpr.Left)
-					rightType := getResolvedType(binExpr.Right)
-
-					if leftType == nil || rightType == nil {
-						return
-					}
-
-					// Skip if either side is any/unknown
-					leftFlags := checker.Type_flags(leftType)
-					rightFlags := checker.Type_flags(rightType)
-					if leftFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 ||
-						rightFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
-						return
-					}
-
-					// Check for literal type comparisons
-					leftIsLiteral := isLiteralValue(leftType)
-					rightIsLiteral := isLiteralValue(rightType)
-
-					if leftIsLiteral && rightIsLiteral {
-						// Both sides are literal types
-						ctx.ReportNode(node, buildLiteralBinaryExpressionMessage())
-						return
-					}
-
-					// Check for type overlap in equality/inequality operations
-					if isEqualityOp {
-						// For equality operators, check if types can ever be equal
-						// Only skip if BOTH sides are nullish OR one side is a union that includes nullish
-						hasOverlap := typesHaveOverlap(ctx.TypeChecker, leftType, rightType)
-
-						if !hasOverlap {
-							// Check if this is a valid nullish check (e.g., `a: string | null` with `a === null`)
-							// We allow it if one side is exactly null/undefined and the other contains THE SAME nullish type
-							leftIsNullish := leftFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
-							rightIsNullish := rightFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
-
-							// If one side is nullish, check if the other side could contain a matching nullish type
-							// For loose equality (==, !=), null and undefined are interchangeable
-							if leftIsNullish {
-								// Get the specific nullish flags from left
-								leftNullishFlags := leftFlags & (checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid)
-								rightParts := utils.UnionTypeParts(rightType)
-								for _, part := range rightParts {
-									partFlags := checker.Type_flags(part)
-									// For loose equality, null matches undefined (and vice versa)
-									if isLooseEqualityOp {
-										// Check if this part has ANY nullish type
-										if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
-											return
-										}
-									} else {
-										// For strict equality, check if this part has THE SAME nullish type
-										if partFlags&leftNullishFlags != 0 {
-											return
-										}
-									}
-								}
-							} else if rightIsNullish {
-								// Get the specific nullish flags from right
-								rightNullishFlags := rightFlags & (checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid)
-								leftParts := utils.UnionTypeParts(leftType)
-								for _, part := range leftParts {
-									partFlags := checker.Type_flags(part)
-									// For loose equality, null matches undefined (and vice versa)
-									if isLooseEqualityOp {
-										// Check if this part has ANY nullish type
-										if partFlags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0 {
-											return
-										}
-									} else {
-										// For strict equality, check if this part has THE SAME nullish type
-										if partFlags&rightNullishFlags != 0 {
-											return
-										}
-									}
-								}
-							}
-
-							// Types don't overlap, report it
-							ctx.ReportDiagnostic(buildNoOverlapDiagnostic(
-								ctx.TypeChecker.TypeToString(leftType),
-								binExpr.Left.Loc,
-								ctx.TypeChecker.TypeToString(rightType),
-								binExpr.Right.Loc,
-							))
-						}
-					}
+				switch binExpr.OperatorToken.Kind {
+				case ast.KindAmpersandAmpersandToken, ast.KindBarBarToken, ast.KindQuestionQuestionToken:
+					checkLogicalExpressionForUnnecessaryConditionals(binExpr)
+				case ast.KindAmpersandAmpersandEqualsToken, ast.KindBarBarEqualsToken, ast.KindQuestionQuestionEqualsToken:
+					checkAssignmentExpression(binExpr)
+				case ast.KindLessThanToken,
+					ast.KindGreaterThanToken,
+					ast.KindLessThanEqualsToken,
+					ast.KindGreaterThanEqualsToken,
+					ast.KindEqualsEqualsToken,
+					ast.KindEqualsEqualsEqualsToken,
+					ast.KindExclamationEqualsToken,
+					ast.KindExclamationEqualsEqualsToken:
+					checkIfBoolExpressionIsNecessaryConditional(node, binExpr.Left, binExpr.Right, binExpr.OperatorToken.Kind)
 				}
 			},
-			// Note: Negation operator (!) is handled in checkCondition, not as a separate listener
-			// This prevents duplicate errors for patterns like !!a
 			ast.KindPropertyAccessExpression: checkOptionalChain,
 			ast.KindElementAccessExpression:  checkOptionalChain,
-			ast.KindCallExpression: func(node *ast.Node) {
-				checkOptionalChain(node)
-
-				callExpr := node.AsCallExpression()
-
-				// Check array method predicates (filter, find, etc.)
-				// This check is independent of CheckTypePredicates option
-				if utils.IsArrayMethodCallWithPredicate(ctx.TypeChecker, callExpr) {
-					if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-						if arg := callExpr.Arguments.Nodes[0]; arg != nil {
-							checkPredicateFunction(ctx, arg, opts.CheckTypePredicates)
-						}
-					}
-				}
-
-				// Check type guard or assertion function calls only if CheckTypePredicates is enabled
-				if !opts.CheckTypePredicates {
+			ast.KindCallExpression:           checkCallExpression,
+			ast.KindCaseClause: func(node *ast.Node) {
+				if node.Expression() == nil || node.Parent == nil || node.Parent.Parent == nil || node.Parent.Parent.Kind != ast.KindSwitchStatement {
 					return
 				}
 
-				// Check if this is a type guard or assertion function call
-				callSignature := checker.Checker_getResolvedSignature(ctx.TypeChecker, node, nil, 0)
-				if callSignature != nil {
-					typePredicate := ctx.TypeChecker.GetTypePredicateOfSignature(callSignature)
-					if typePredicate != nil {
-						// This is a type guard/assertion function call
-
-						// Skip checking if this is a standalone call with a type predicate and literal argument
-						// Example: assertString('falafel') or isString('falafel')
-						// These are valid because literal values might be used for runtime validation
-						// But still check non-literal arguments like variables: isString(a) where a: string
-						predicateType := checker.TypePredicate_t(typePredicate)
-						parent := node.Parent
-						if predicateType != nil && parent != nil && parent.Kind == ast.KindExpressionStatement {
-							// Check if the argument is a literal value
-							if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-								paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
-								if paramIndex >= 0 && paramIndex < len(callExpr.Arguments.Nodes) {
-									arg := callExpr.Arguments.Nodes[paramIndex]
-									if arg != nil {
-										argType := ctx.TypeChecker.GetTypeAtLocation(arg)
-										if argType != nil && isLiteralValue(argType) {
-											// Standalone call with literal argument - don't check
-											return
-										}
-									}
-								}
-							}
-						}
-
-						if callExpr.Arguments != nil && len(callExpr.Arguments.Nodes) > 0 {
-							paramIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
-
-							if paramIndex >= 0 && paramIndex < len(callExpr.Arguments.Nodes) {
-								arg := callExpr.Arguments.Nodes[paramIndex]
-								if arg != nil {
-									// Skip spread elements - their values are determined at runtime
-									if arg.Kind == ast.KindSpreadElement {
-										return
-									}
-
-									predicateKind := checker.TypePredicate_kind(typePredicate)
-									argType := ctx.TypeChecker.GetTypeAtLocation(arg)
-
-									if argType == nil {
-										return
-									}
-
-									// Handle different predicate kinds
-									switch predicateKind {
-									case checker.TypePredicateKindAssertsThis:
-										// For "asserts this", we don't check arguments
-										// because it asserts the this context, not a parameter
-										// Example: assertThis(this: unknown, arg2: unknown): asserts this
-										// The arg2 parameter is not being asserted
-										return
-									case checker.TypePredicateKindAssertsIdentifier:
-										// For "asserts x is Type", check if argument already satisfies the type
-										// For "asserts x" (no type specified), check if argument is always truthy/falsy
-										predicateType := checker.TypePredicate_t(typePredicate)
-										if predicateType != nil {
-											// "asserts x is Type" - check if argType is already assignable to predicateType
-											if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, argType, predicateType) {
-												ctx.ReportNode(node, buildTypeGuardAlreadyIsTypeMessage())
-											}
-										} else {
-											// "asserts x" - check if argument is always truthy/falsy
-											isTruthy, isFalsy := checkTypeCondition(argType)
-											if isTruthy {
-												ctx.ReportNode(arg, buildAlwaysTruthyMessage())
-											} else if isFalsy {
-												ctx.ReportNode(arg, buildAlwaysFalsyMessage())
-											}
-										}
-									case checker.TypePredicateKindIdentifier, checker.TypePredicateKindThis:
-										// For "x is Type" type guards, check if argument already satisfies the type
-										predicateType := checker.TypePredicate_t(typePredicate)
-										if predicateType != nil {
-											// Check if argType is assignable to predicateType
-											if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, argType, predicateType) {
-												ctx.ReportNode(node, buildTypeGuardAlreadyIsTypeMessage())
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			ast.KindSwitchStatement: func(node *ast.Node) {
-				// Don't check switch expressions as conditions
-				// Switch statements compare values, not boolean conditions
-				// e.g., switch (true) { case condition: } is valid
-			},
-			ast.KindCaseClause: func(node *ast.Node) {
-				if node.Expression() != nil {
-					// Check if the case expression is a literal being compared
-					// node.Parent is the CaseBlock, node.Parent.Parent is the SwitchStatement
-					switchNode := node.Parent
-					if switchNode != nil {
-						switchNode = switchNode.Parent
-					}
-					if switchNode != nil && switchNode.Kind == ast.KindSwitchStatement {
-						discriminant := switchNode.Expression()
-						discriminantType := getResolvedType(discriminant)
-						caseType := getResolvedType(node.Expression())
-
-						if discriminantType != nil && caseType != nil {
-							discriminantIsLiteral := isLiteralValue(discriminantType)
-							caseIsLiteral := isLiteralValue(caseType)
-
-							if discriminantIsLiteral && caseIsLiteral {
-								ctx.ReportNode(node.Expression(), buildLiteralBinaryExpressionMessage())
-							}
-						}
-					}
-				}
+				switchStmt := node.Parent.Parent.AsSwitchStatement()
+				checkIfBoolExpressionIsNecessaryConditional(node.Expression(), switchStmt.Expression, node.Expression(), ast.KindEqualsEqualsEqualsToken)
 			},
 		}
 	},
@@ -2132,122 +1932,25 @@ func isAllowedConstantLiteral(node *ast.Node) bool {
 	return false
 }
 
-// typesHaveOverlap determines if two types can have any overlapping values.
-//
-// This function is used to detect comparisons that will always return the same result,
-// such as comparing a string with a number (always false) or comparing two different
-// string literals (always false).
-//
-// Examples:
-//   - string and number: no overlap (string === number is always false)
-//   - string | null and null: overlap (null can match)
-//   - string and "hello": overlap ("hello" is a string)
-//   - "hello" and "world": no overlap (different literals)
-//   - 1 and "1": no overlap (different primitive types)
-//
-// Special handling:
-// - any/unknown: always overlap with everything (could be any value)
-// - Type parameters (T, K): conservatively treated as overlapping (we don't know T at compile time)
-// - Indexed access (T[K]): conservatively treated as overlapping
-// - Nullish types: null/undefined/void overlap with each other (treated as interchangeable in some contexts)
-// - Literals and base types: overlap (e.g., "hello" overlaps with string)
-// - Union types: checked part by part (e.g., string | number overlaps with "hello")
-func typesHaveOverlap(typeChecker *checker.Checker, left, right *checker.Type) bool {
-	// Handle any/unknown types - they overlap with everything
-	leftFlags := checker.Type_flags(left)
-	rightFlags := checker.Type_flags(right)
-
-	if leftFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 ||
-		rightFlags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown) != 0 {
-		return true
-	}
-
-	// Handle generic/indeterminate types conservatively.
-	// This includes unions with constrained type variables (e.g., T | undefined).
-	if hasIndeterminateConstituent(left) || hasIndeterminateConstituent(right) {
-		return true
-	}
-
-	// Get union parts
-	leftParts := utils.UnionTypeParts(left)
-	rightParts := utils.UnionTypeParts(right)
-
-	// Check for overlap between any parts
-	for _, leftPart := range leftParts {
-		leftPartFlags := checker.Type_flags(leftPart)
-
-		for _, rightPart := range rightParts {
-			rightPartFlags := checker.Type_flags(rightPart)
-
-			// Use TypeScript assignability first. This catches subtype/alias
-			// relationships (e.g. Window extends EventTarget, template literals,
-			// branded intersections, unique symbols) that raw TypeFlags miss.
-			if checker.Checker_isTypeAssignableTo(typeChecker, leftPart, rightPart) ||
-				checker.Checker_isTypeAssignableTo(typeChecker, rightPart, leftPart) {
-				return true
-			}
-
-			// Check if both are the same primitive type
-			primitiveFlags := checker.TypeFlagsString | checker.TypeFlagsNumber |
-				checker.TypeFlagsBoolean | checker.TypeFlagsBigInt |
-				checker.TypeFlagsESSymbol | checker.TypeFlagsObject
-
-			if leftPartFlags&primitiveFlags != 0 && rightPartFlags&primitiveFlags != 0 {
-				if leftPartFlags&rightPartFlags&primitiveFlags != 0 {
-					return true
-				}
-			}
-
-			// Null and undefined/void overlap
-			// void is treated as undefined at runtime
-			nullishFlags := checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid
-			if leftPartFlags&nullishFlags != 0 && rightPartFlags&nullishFlags != 0 {
-				// Check if both have the same nullish type
-				if leftPartFlags&rightPartFlags&nullishFlags != 0 {
-					return true
-				}
-				// void overlaps with undefined
-				if (leftPartFlags&checker.TypeFlagsVoid != 0 && rightPartFlags&checker.TypeFlagsUndefined != 0) ||
-					(leftPartFlags&checker.TypeFlagsUndefined != 0 && rightPartFlags&checker.TypeFlagsVoid != 0) {
-					return true
-				}
-			}
-
-			// If one is nullish and the other is not, no overlap
-			if (leftPartFlags&nullishFlags != 0) != (rightPartFlags&nullishFlags != 0) {
-				continue
-			}
-
-			// Objects overlap with other objects
-			if leftPartFlags&checker.TypeFlagsObject != 0 && rightPartFlags&checker.TypeFlagsObject != 0 {
-				return true
-			}
-
-			// Literals overlap with their base types and other literals of the same type
-			// String literal vs string (base type or literal)
-			if (leftPartFlags&checker.TypeFlagsStringLiteral != 0 && rightPartFlags&(checker.TypeFlagsString|checker.TypeFlagsStringLiteral) != 0) ||
-				(leftPartFlags&checker.TypeFlagsString != 0 && rightPartFlags&checker.TypeFlagsStringLiteral != 0) {
-				return true
-			}
-			// Number literal vs number (base type or literal)
-			if (leftPartFlags&checker.TypeFlagsNumberLiteral != 0 && rightPartFlags&(checker.TypeFlagsNumber|checker.TypeFlagsNumberLiteral) != 0) ||
-				(leftPartFlags&checker.TypeFlagsNumber != 0 && rightPartFlags&checker.TypeFlagsNumberLiteral != 0) {
-				return true
-			}
-			// BigInt literal vs bigint (base type or literal)
-			if (leftPartFlags&checker.TypeFlagsBigIntLiteral != 0 && rightPartFlags&(checker.TypeFlagsBigInt|checker.TypeFlagsBigIntLiteral) != 0) ||
-				(leftPartFlags&checker.TypeFlagsBigInt != 0 && rightPartFlags&checker.TypeFlagsBigIntLiteral != 0) {
-				return true
-			}
-			// Boolean literal vs boolean (base type or literal)
-			if (leftPartFlags&checker.TypeFlagsBooleanLiteral != 0 && rightPartFlags&(checker.TypeFlagsBoolean|checker.TypeFlagsBooleanLiteral) != 0) ||
-				(leftPartFlags&checker.TypeFlagsBoolean != 0 && rightPartFlags&checker.TypeFlagsBooleanLiteral != 0) {
-				return true
-			}
+func normalizeAllowConstantLoopConditions(value any) string {
+	switch v := value.(type) {
+	case string:
+		return v
+	case *string:
+		if v != nil {
+			return *v
+		}
+	case bool:
+		if v {
+			return "always"
+		}
+	case *bool:
+		if v != nil && *v {
+			return "always"
 		}
 	}
 
-	return false
+	return "never"
 }
 
 // checkPredicateFunction analyzes predicate functions used in array methods like filter/find.
