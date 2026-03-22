@@ -6,6 +6,6 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
-    "dprint": "^0.52.0"
+    "dprint": "^0.53.0"
   }
 }
