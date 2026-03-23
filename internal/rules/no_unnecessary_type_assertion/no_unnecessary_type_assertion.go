@@ -245,6 +245,15 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				}
 			}
 
+			// For call-like expressions, use the context-free expression type so
+			// contextual typing from the assertion itself doesn't leak into generic
+			// inference for the original expression.
+			if ast.IsCallExpression(expression) || ast.IsNewExpression(expression) || ast.IsTaggedTemplateExpression(expression) {
+				if t := checker.Checker_getContextFreeTypeOfExpression(ctx.TypeChecker, expression); t != nil {
+					return t
+				}
+			}
+
 			return ctx.TypeChecker.GetTypeAtLocation(expression)
 		}
 
