@@ -43,7 +43,6 @@ type TypeErrors struct {
 
 func RunLinter(
 	logLevel utils.LogLevel,
-	currentDirectory string,
 	workload Workload,
 	workers int,
 	fs vfs.FS,
