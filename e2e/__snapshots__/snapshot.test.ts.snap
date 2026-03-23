@@ -15,37 +15,6 @@ See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
 ]
 `;
 
-exports[`TSGoLint E2E Snapshot Tests > should correctly lint files not inside a project 1`] = `
-[
-  {
-    "file_path": "fixtures/with-unmatched-files/src/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe argument of type any assigned to a parameter of type string.",
-      "id": "unsafeArgument",
-    },
-    "range": {
-      "end": 45,
-      "pos": 36,
-    },
-    "rule": "no-unsafe-argument",
-  },
-  {
-    "file_path": "fixtures/with-unmatched-files/test.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe argument of type any assigned to a parameter of type string.",
-      "id": "unsafeArgument",
-    },
-    "range": {
-      "end": 45,
-      "pos": 36,
-    },
-    "rule": "no-unsafe-argument",
-  },
-]
-`;
-
 exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics snapshot 1`] = `
 [
   {
@@ -4803,6 +4772,24 @@ See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
       "end": 44,
       "pos": 35,
     },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should not run typecheck for files not included in any tsconfig 1`] = `
+[
+  {
+    "file_path": "fixtures/with-unmatched-files/src/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe argument of type any assigned to a parameter of type string.",
+      "id": "unsafeArgument",
+    },
+    "range": {
+      "end": 45,
+      "pos": 36,
+    },
+    "rule": "no-unsafe-argument",
   },
 ]
 `;

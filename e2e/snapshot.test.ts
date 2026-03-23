@@ -368,7 +368,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(diagnostics).toMatchSnapshot();
   });
 
-  it('should correctly lint files not inside a project', async () => {
+  it('should not run typecheck for files not included in any tsconfig', async () => {
     const testFiles = await getTestFiles('with-unmatched-files');
     expect(testFiles.length).toBeGreaterThan(0);
 
