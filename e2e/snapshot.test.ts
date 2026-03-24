@@ -623,7 +623,7 @@ console.log(x);
     diagnostics = sortDiagnostics(diagnostics);
 
     expect(diagnostics).toHaveLength(1);
-    expect(diagnostics[0].suggestions).toStrictEqual(
+    expect((diagnostics[0] as RuleDiagnostic).suggestions).toStrictEqual(
       [
         {
           fixes: [{ range: expect.any(Object), text: 'void ' }],
