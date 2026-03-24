@@ -223,7 +223,7 @@ func runHeadless(args []string) int {
 
 	workload := linter.Workload{
 		Programs:       make(map[string][]string),
-		UnmatchedFiles: []string{},
+		UnmatchedFiles: make(map[string][]string),
 	}
 
 	totalFileCount := 0
@@ -248,29 +248,31 @@ func runHeadless(args []string) int {
 	}
 
 	result := tsConfigResolver.FindTsConfigParallel(normalizedFiles)
-	for file, tsconfig := range result {
-		if tsconfig == "" {
-			workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
+	for file, res := range result {
+		if res.Config != "" {
+			workload.Programs[res.Config] = append(workload.Programs[res.Config], file)
 		} else {
-			workload.Programs[tsconfig] = append(workload.Programs[tsconfig], file)
+			workload.UnmatchedFiles[res.NearestConfig] = append(workload.UnmatchedFiles[res.NearestConfig], file)
 		}
 	}
 
 	if logLevel == utils.LogLevelDebug {
-		for file, tsconfig := range result {
+		for file, res := range result {
 			tsconfigStr := "<none>"
-			if tsconfig != "" {
-				tsconfigStr = tsconfig
+			if res.Config != "" {
+				tsconfigStr = res.Config
 			}
 			log.Printf("Got tsconfig for file %s: %s", file, tsconfigStr)
 		}
 
-		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched files: %d", len(workload.Programs), len(workload.UnmatchedFiles))
+		log.Printf("Done assigning files to programs. Total programs: %d. Unmatched groups: %d", len(workload.Programs), len(workload.UnmatchedFiles))
 		for program, files := range workload.Programs {
 			log.Printf("  Program %s: %d files", program, len(files))
 		}
-		for _, file := range workload.UnmatchedFiles {
-			log.Printf("  Unmatched file: %s", file)
+		for nearest, files := range workload.UnmatchedFiles {
+			for _, file := range files {
+				log.Printf("  Unmatched file: %s (nearest: %s)", file, nearest)
+			}
 		}
 	}
 

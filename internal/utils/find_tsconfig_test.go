@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 	"gotest.tools/v3/assert"
@@ -83,19 +84,19 @@ func TestFindTsConfigParallel(t *testing.T) {
 	tests := []struct {
 		name            string
 		files           []string
-		expectedResults map[string]string
+		expectedConfigs map[string]string
 	}{
 		{
 			name:  "single file",
 			files: []string{"file.ts"},
-			expectedResults: map[string]string{
+			expectedConfigs: map[string]string{
 				filepath.Join(rootDir, "file.ts"): expectedConfigPath,
 			},
 		},
 		{
 			name:  "multiple files",
 			files: []string{"file.ts", "foo.ts", "class.ts", "deprecated.ts"},
-			expectedResults: map[string]string{
+			expectedConfigs: map[string]string{
 				filepath.Join(rootDir, "file.ts"):       expectedConfigPath,
 				filepath.Join(rootDir, "foo.ts"):        expectedConfigPath,
 				filepath.Join(rootDir, "class.ts"):      expectedConfigPath,
@@ -105,19 +106,19 @@ func TestFindTsConfigParallel(t *testing.T) {
 		{
 			name:            "empty file list",
 			files:           []string{},
-			expectedResults: map[string]string{},
+			expectedConfigs: map[string]string{},
 		},
 		{
 			name:  "non-existent file",
 			files: []string{"nonexistent.ts"},
-			expectedResults: map[string]string{
+			expectedConfigs: map[string]string{
 				filepath.Join(rootDir, "nonexistent.ts"): "",
 			},
 		},
 		{
 			name:  "mixed existing and non-existing files",
 			files: []string{"file.ts", "nonexistent.ts", "foo.ts"},
-			expectedResults: map[string]string{
+			expectedConfigs: map[string]string{
 				filepath.Join(rootDir, "file.ts"):        expectedConfigPath,
 				filepath.Join(rootDir, "nonexistent.ts"): "",
 				filepath.Join(rootDir, "foo.ts"):         expectedConfigPath,
@@ -135,18 +136,18 @@ func TestFindTsConfigParallel(t *testing.T) {
 
 			results := resolver.FindTsConfigParallel(filePaths)
 
-			assert.Equal(t, len(tc.expectedResults), len(results),
+			assert.Equal(t, len(tc.expectedConfigs), len(results),
 				"Number of results should match expected")
 
-			for filePath, expectedConfig := range tc.expectedResults {
-				actualConfig, exists := results[filePath]
+			for filePath, expectedConfig := range tc.expectedConfigs {
+				res, exists := results[filePath]
 				assert.Assert(t, exists, "Result should exist for %s", filePath)
-				assert.Equal(t, expectedConfig, actualConfig,
+				assert.Equal(t, expectedConfig, res.Config,
 					"Config path should match for %s", filePath)
 
-				if actualConfig != "" {
-					_, err := os.Stat(actualConfig)
-					assert.NilError(t, err, "Config file should exist: %s", actualConfig)
+				if res.Config != "" {
+					_, err := os.Stat(res.Config)
+					assert.NilError(t, err, "Config file should exist: %s", res.Config)
 				}
 			}
 		})
@@ -154,7 +155,7 @@ func TestFindTsConfigParallel(t *testing.T) {
 }
 
 // TestFindTsConfigParallel_Consistency verifies that the parallel
-// implementation produces identical results to the sequential implementation
+// implementation produces identical Config results to the sequential implementation
 func TestFindTsConfigParallel_Consistency(t *testing.T) {
 	rootDir := fixtures.GetRootDir()
 	fs := osvfs.FS()
@@ -183,11 +184,73 @@ func TestFindTsConfigParallel_Consistency(t *testing.T) {
 		"Result count should match between sequential and parallel")
 
 	for file, expectedConfig := range sequentialResults {
-		actualConfig, exists := parallelResults[file]
+		res, exists := parallelResults[file]
 		assert.Assert(t, exists, "Parallel should have result for %s", file)
-		assert.Equal(t, expectedConfig, actualConfig,
+		assert.Equal(t, expectedConfig, res.Config,
 			"Parallel result should match sequential for %s", file)
 	}
+}
+
+func TestFindTsConfigParallel_NearestConfig(t *testing.T) {
+	dir := t.TempDir()
+
+	tsconfigContent := `{
+  "compilerOptions": { "lib": ["esnext"], "target": "esnext", "noEmit": true },
+  "include": ["src"]
+}`
+	if err := os.WriteFile(filepath.Join(dir, "tsconfig.json"), []byte(tsconfigContent), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(dir, "src"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "src", "main.ts"), []byte("export {};\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.MkdirAll(filepath.Join(dir, "tests"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "tests", "spec.ts"), []byte("export {};\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	tsconfigPath := tspath.NormalizeSlashes(filepath.Join(dir, "tsconfig.json"))
+	matchedFile := tspath.NormalizeSlashes(filepath.Join(dir, "src", "main.ts"))
+	unmatchedFile := tspath.NormalizeSlashes(filepath.Join(dir, "tests", "spec.ts"))
+
+	fs := osvfs.FS()
+	resolver := NewTsConfigResolver(fs, dir)
+	results := resolver.FindTsConfigParallel([]string{matchedFile, unmatchedFile})
+
+	matched, ok := results[matchedFile]
+	assert.Assert(t, ok)
+	assert.Equal(t, tsconfigPath, matched.Config)
+	assert.Equal(t, tsconfigPath, matched.NearestConfig)
+
+	// tests/spec.ts is outside include: Config empty, NearestConfig set.
+	unmatched, ok := results[unmatchedFile]
+	assert.Assert(t, ok)
+	assert.Equal(t, "", unmatched.Config)
+	assert.Equal(t, tsconfigPath, unmatched.NearestConfig)
+}
+
+func TestFindTsConfigParallel_NoNearestConfig(t *testing.T) {
+	dir := t.TempDir()
+
+	tsFile := filepath.Join(dir, "standalone.ts")
+	if err := os.WriteFile(tsFile, []byte("export {};\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	normalizedFile := tspath.NormalizeSlashes(tsFile)
+	fs := osvfs.FS()
+	resolver := NewTsConfigResolver(fs, dir)
+	results := resolver.FindTsConfigParallel([]string{normalizedFile})
+
+	res, ok := results[normalizedFile]
+	assert.Assert(t, ok)
+	assert.Equal(t, "", res.Config)
+	assert.Equal(t, "", res.NearestConfig)
 }
 
 // TestFindTsConfigParallel_Determinism ensures parallel execution
@@ -203,15 +266,23 @@ func TestFindTsConfigParallel_Determinism(t *testing.T) {
 		filepath.Join(rootDir, "class.ts"),
 	}
 
-	// Run 10 times
-	var firstRun map[string]string
+	// Run 10 times and verify both Config and NearestConfig are stable.
+	var firstConfigs, firstNearest map[string]string
 	for i := range 10 {
 		results := resolver.FindTsConfigParallel(testFiles)
+		configs := make(map[string]string, len(results))
+		nearest := make(map[string]string, len(results))
+		for file, res := range results {
+			configs[file] = res.Config
+			nearest[file] = res.NearestConfig
+		}
 
 		if i == 0 {
-			firstRun = results
+			firstConfigs = configs
+			firstNearest = nearest
 		} else {
-			assert.DeepEqual(t, firstRun, results)
+			assert.DeepEqual(t, firstConfigs, configs)
+			assert.DeepEqual(t, firstNearest, nearest)
 		}
 	}
 }

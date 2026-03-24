@@ -198,33 +198,36 @@ func (r *TsConfigResolver) findConfigWithReferences(
 }
 
 type ResolutionResult struct {
-	file   string
-	config string
+	file string
+	// Config is the tsconfig.json that includes this file (empty if none).
+	Config string
+	// NearestConfig is the closest tsconfig.json by directory traversal,
+	// even when the file is not in that tsconfig's include patterns.
+	NearestConfig string
 }
 
 func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
 	for file := range in {
-		config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
-		if config == "" {
-			out <- ResolutionResult{
-				file:   file,
-				config: config,
-			}
+		nearest := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
+		if nearest == "" {
+			out <- ResolutionResult{file: file}
 			continue
 		}
 
 		fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
 
-		// Search through the config and its references
-		result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
+		// Search through the config and its references to find one that actually
+		// includes the file.
+		result := r.findConfigWithReferences(file, fileNormalized, nearest, nil, nil)
 		out <- ResolutionResult{
-			config: result.configFileName,
-			file:   file,
+			file:          file,
+			Config:        result.configFileName,
+			NearestConfig: nearest,
 		}
 	}
 }
 
-func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]string {
+func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]ResolutionResult {
 	in := make(chan string, len(fileNames))
 	out := make(chan ResolutionResult, len(fileNames))
 
@@ -247,9 +250,9 @@ func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]s
 		close(out)
 	}()
 
-	res := make(map[string]string, len(fileNames))
+	res := make(map[string]ResolutionResult, len(fileNames))
 	for result := range out {
-		res[result.file] = result.config
+		res[result.file] = result
 	}
 
 	return res

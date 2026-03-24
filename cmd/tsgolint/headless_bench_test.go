@@ -196,13 +196,13 @@ func BenchmarkE2E(b *testing.B) {
 
 		workload := linter.Workload{
 			Programs:       make(map[string][]string),
-			UnmatchedFiles: []string{},
+			UnmatchedFiles: make(map[string][]string),
 		}
-		for file, tsconfig := range result {
-			if tsconfig == "" {
-				workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
+		for file, res := range result {
+			if res.Config != "" {
+				workload.Programs[res.Config] = append(workload.Programs[res.Config], file)
 			} else {
-				workload.Programs[tsconfig] = append(workload.Programs[tsconfig], file)
+				workload.UnmatchedFiles[res.NearestConfig] = append(workload.UnmatchedFiles[res.NearestConfig], file)
 			}
 		}
 		return workload, fs
