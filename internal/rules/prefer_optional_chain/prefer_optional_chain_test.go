@@ -4190,6 +4190,19 @@ foo.bar?.() === undefined || foo.bar?.().baz;
 		Code: `request.payload === undefined || request.payload === null`,
 	}, rule_tester.ValidTestCase{
 		Code: `request.payload === null || request.payload === undefined`,
+	}, rule_tester.ValidTestCase{
+		Code: `
+        type ProjectID = { toString(): string };
+        type Intervention = { projectId: ProjectID | null };
+        declare const intervention: Intervention;
+        declare const previousIntervention: Intervention | null;
+
+        const isSameProjectAsPreviousIntervention = Boolean(
+          intervention.projectId &&
+            previousIntervention?.projectId?.toString() ===
+              intervention.projectId.toString(),
+        );
+      `,
 	})
 
 	// --- Spacing sanity checks ---

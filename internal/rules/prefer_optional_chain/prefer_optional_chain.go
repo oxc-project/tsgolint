@@ -617,6 +617,42 @@ func (t *TypeInfo) HasNoNullableTypes() bool {
 	return !t.hasNull && !t.hasUndefined && !t.hasAny && !t.hasUnknown
 }
 
+func (t *TypeInfo) CanBeUndefinedLike() bool {
+	return len(t.parts) == 0 || t.hasUndefined || t.hasVoid || t.hasAny || t.hasUnknown
+}
+
+func (t *TypeInfo) CanBeNullishLike() bool {
+	return len(t.parts) == 0 || t.hasNull || t.hasUndefined || t.hasVoid || t.hasAny || t.hasUnknown
+}
+
+func (t *TypeInfo) IsAlwaysUndefinedLike() bool {
+	if len(t.parts) == 0 || t.IsAnyOrUnknown() {
+		return false
+	}
+
+	for _, part := range t.parts {
+		if !utils.IsTypeUndefinedType(part) && !utils.IsTypeVoidType(part) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (t *TypeInfo) IsAlwaysNullishLike() bool {
+	if len(t.parts) == 0 || t.IsAnyOrUnknown() {
+		return false
+	}
+
+	for _, part := range t.parts {
+		if !utils.IsTypeNullType(part) && !utils.IsTypeUndefinedType(part) && !utils.IsTypeVoidType(part) {
+			return false
+		}
+	}
+
+	return true
+}
+
 type chainProcessor struct {
 	ctx                rule.RuleContext
 	opts               PreferOptionalChainOptions
@@ -2302,61 +2338,56 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 		if ast.IsBinaryExpression(unwrappedNode) {
 			binExpr := unwrappedNode.AsBinaryExpression()
 			op := binExpr.OperatorToken.Kind
+			left := ast.SkipParentheses(binExpr.Left)
+			right := ast.SkipParentheses(binExpr.Right)
 
 			var value *ast.Node
-			if utils.IsAccessExpression(binExpr.Left) {
-				value = binExpr.Right
-			} else if utils.IsAccessExpression(binExpr.Right) {
-				value = binExpr.Left
+			switch {
+			case lastOp.comparedExpr != nil && areNodesStructurallyEqual(lastOp.comparedExpr, left):
+				value = right
+			case lastOp.comparedExpr != nil && areNodesStructurallyEqual(lastOp.comparedExpr, right):
+				value = left
+			case utils.IsAccessExpression(left):
+				value = right
+			case utils.IsAccessExpression(right):
+				value = left
 			}
 
-			if value != nil {
-				isNull := utils.IsNullLiteral(value)
-				isUndefined := utils.IsUndefinedLiteral(value)
-				isNullish := isNull || isUndefined
-				isLiteral := value.Kind == ast.KindNumericLiteral ||
-					value.Kind == ast.KindStringLiteral ||
-					value.Kind == ast.KindTrueKeyword ||
-					value.Kind == ast.KindFalseKeyword ||
-					value.Kind == ast.KindObjectLiteralExpression ||
-					value.Kind == ast.KindArrayLiteralExpression
-				isUndeclaredVar := ast.IsIdentifier(value) && !isUndefined && !isLiteral
-
-				unsafe := false
-				switch op {
-				case ast.KindEqualsEqualsToken:
-					if isNullish || isUndeclaredVar {
-						unsafe = true
-					}
-				case ast.KindEqualsEqualsEqualsToken:
-					if isUndefined || isUndeclaredVar {
-						unsafe = true
-					}
-				case ast.KindExclamationEqualsToken:
-					if !isNullish {
-						unsafe = true
-					}
-				case ast.KindExclamationEqualsEqualsToken:
-					if !isUndefined {
-						unsafe = true
-					}
-				// Relational operators are unsafe because undefined/null comparisons
-				// produce unexpected results
-				case ast.KindLessThanToken,
-					ast.KindGreaterThanToken,
-					ast.KindLessThanEqualsToken,
-					ast.KindGreaterThanEqualsToken:
-					unsafe = true
-				}
-
-				if unsafe && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-					return true
-				}
+			if value != nil &&
+				!processor.isSafeTrailingComparisonValue(op, value) &&
+				!processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+				return true
 			}
 		}
 	}
 
 	return false
+}
+
+func (processor *chainProcessor) isSafeTrailingComparisonValue(operator ast.Kind, value *ast.Node) bool {
+	if value == nil {
+		return false
+	}
+
+	info := processor.getTypeInfo(value)
+
+	switch operator {
+	case ast.KindEqualsEqualsToken:
+		return !info.CanBeNullishLike()
+	case ast.KindEqualsEqualsEqualsToken:
+		return !info.CanBeUndefinedLike()
+	case ast.KindExclamationEqualsToken:
+		return info.IsAlwaysNullishLike()
+	case ast.KindExclamationEqualsEqualsToken:
+		return info.IsAlwaysUndefinedLike()
+	case ast.KindLessThanToken,
+		ast.KindGreaterThanToken,
+		ast.KindLessThanEqualsToken,
+		ast.KindGreaterThanEqualsToken:
+		return false
+	default:
+		return true
+	}
 }
 
 func (processor *chainProcessor) validateOrChainNullishChecks(chain []Operand) []Operand {
