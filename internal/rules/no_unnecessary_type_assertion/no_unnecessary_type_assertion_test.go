@@ -507,6 +507,29 @@ declare const query: { <E extends Element = Element>(strings: TemplateStringsArr
 export const a = query` + "`" + `.foo` + "`" + ` as HTMLCanvasElement | null;
 		`},
 		{Code: `
+declare function load<T = unknown>(): Promise<T>;
+
+export async function main() {
+  const actual = (await load()) as Record<string, unknown>;
+  return { ...actual };
+}
+		`},
+		{Code: `
+declare function load<T = unknown>(): Promise<Promise<T>>;
+
+export async function main() {
+  const actual = (await await load()) as Record<string, unknown>;
+  return { ...actual };
+}
+		`},
+		{Code: `
+declare function load<T = unknown>(): Promise<T>;
+export async function main() {
+  const actual = <Record<string, unknown>>(await load());
+  return { ...actual };
+}
+		`},
+		{Code: `
 type NumberValueType = number | string;
 type NumberValuePairType = [NumberValueType, NumberValueType];
 
