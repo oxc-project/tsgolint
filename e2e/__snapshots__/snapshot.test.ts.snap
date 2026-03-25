@@ -1954,7 +1954,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
-      "description": "Unnecessary comparison between literal values.",
+      "description": "Unnecessary conditional, comparison is always false, since \`Status.Open === Color.Red\` is false.",
       "id": "comparisonBetweenLiteralTypes",
     },
     "range": {
