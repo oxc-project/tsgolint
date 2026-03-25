@@ -279,15 +279,7 @@ func staticValueToNumber(value any) (float64, bool) {
 		}
 		return 0, true
 	case string:
-		trimmed := strings.TrimSpace(value)
-		if trimmed == "" {
-			return 0, true
-		}
-		number, err := strconv.ParseFloat(trimmed, 64)
-		if err != nil {
-			return 0, false
-		}
-		return number, true
+		return parseJSNumberString(value)
 	case float64:
 		return value, true
 	case undefinedStaticValue:
@@ -354,70 +346,78 @@ func staticValuesLooseEqual(left any, right any) bool {
 	}
 
 	if leftKind == "bigint" && rightKind == "string" {
-		value, ok := new(big.Int).SetString(strings.TrimSpace(right.(string)), 10)
+		value, ok := parseJSBigIntString(right.(string))
 		return ok && left.(*big.Int).Cmp(value) == 0
 	}
 	if leftKind == "string" && rightKind == "bigint" {
-		value, ok := new(big.Int).SetString(strings.TrimSpace(left.(string)), 10)
+		value, ok := parseJSBigIntString(left.(string))
 		return ok && value.Cmp(right.(*big.Int)) == 0
 	}
 
 	if leftKind == "bigint" && rightKind == "number" {
 		number := right.(float64)
-		if math.IsNaN(number) || math.IsInf(number, 0) || math.Trunc(number) != number {
+		intValue, ok := float64ToBigIntIfIntegral(number)
+		if !ok {
 			return false
 		}
-		return left.(*big.Int).Cmp(big.NewInt(int64(number))) == 0
+		return left.(*big.Int).Cmp(intValue) == 0
 	}
 	if leftKind == "number" && rightKind == "bigint" {
 		number := left.(float64)
-		if math.IsNaN(number) || math.IsInf(number, 0) || math.Trunc(number) != number {
+		intValue, ok := float64ToBigIntIfIntegral(number)
+		if !ok {
 			return false
 		}
-		return big.NewInt(int64(number)).Cmp(right.(*big.Int)) == 0
+		return intValue.Cmp(right.(*big.Int)) == 0
 	}
 
 	return false
 }
 
-func staticValuesLessThan(left any, right any) bool {
+func staticValuesLessThan(left any, right any) (bool, bool) {
 	if staticValueKind(left) == "string" && staticValueKind(right) == "string" {
-		return left.(string) < right.(string)
+		return left.(string) < right.(string), true
 	}
 
 	if leftBigInt, ok := left.(*big.Int); ok {
 		switch right := right.(type) {
 		case *big.Int:
-			return leftBigInt.Cmp(right) < 0
+			return leftBigInt.Cmp(right) < 0, true
 		case float64:
 			if math.IsNaN(right) {
-				return false
+				return false, false
 			}
-			return new(big.Float).SetInt(leftBigInt).Cmp(big.NewFloat(right)) < 0
+			return new(big.Float).SetInt(leftBigInt).Cmp(big.NewFloat(right)) < 0, true
 		case string:
-			value, ok := new(big.Int).SetString(strings.TrimSpace(right), 10)
-			return ok && leftBigInt.Cmp(value) < 0
+			value, ok := parseJSBigIntString(right)
+			if !ok {
+				return false, false
+			}
+			return leftBigInt.Cmp(value) < 0, true
 		}
 	}
 	if rightBigInt, ok := right.(*big.Int); ok {
 		switch left := left.(type) {
 		case float64:
 			if math.IsNaN(left) {
-				return false
+				return false, false
 			}
-			return big.NewFloat(left).Cmp(new(big.Float).SetInt(rightBigInt)) < 0
+			return big.NewFloat(left).Cmp(new(big.Float).SetInt(rightBigInt)) < 0, true
 		case string:
-			value, ok := new(big.Int).SetString(strings.TrimSpace(left), 10)
-			return ok && value.Cmp(rightBigInt) < 0
+			value, ok := parseJSBigIntString(left)
+			if !ok {
+				return false, false
+			}
+			return value.Cmp(rightBigInt) < 0, true
 		}
 	}
 
 	leftNumber, leftOK := staticValueToNumber(left)
 	rightNumber, rightOK := staticValueToNumber(right)
 	if !leftOK || !rightOK || math.IsNaN(leftNumber) || math.IsNaN(rightNumber) {
-		return false
+		return false, false
 	}
-	return leftNumber < rightNumber
+	return leftNumber < rightNumber, true
 }
 
 func booleanComparison(left any, opKind ast.Kind, right any) bool {
@@ -427,20 +427,118 @@ func booleanComparison(left any, opKind ast.Kind, right any) bool {
 	case ast.KindExclamationEqualsEqualsToken:
 		return !staticValuesStrictEqual(left, right)
 	case ast.KindLessThanToken:
-		return staticValuesLessThan(left, right)
+		result, ok := staticValuesLessThan(left, right)
+		return ok && result
 	case ast.KindLessThanEqualsToken:
-		return staticValuesLessThan(left, right) || staticValuesLooseEqual(left, right)
+		result, ok := staticValuesLessThan(right, left)
+		return ok && !result
 	case ast.KindEqualsEqualsToken:
 		return staticValuesLooseEqual(left, right)
 	case ast.KindEqualsEqualsEqualsToken:
 		return staticValuesStrictEqual(left, right)
 	case ast.KindGreaterThanToken:
-		return staticValuesLessThan(right, left)
+		result, ok := staticValuesLessThan(right, left)
+		return ok && result
 	case ast.KindGreaterThanEqualsToken:
-		return staticValuesLessThan(right, left) || staticValuesLooseEqual(left, right)
+		result, ok := staticValuesLessThan(left, right)
+		return ok && !result
 	default:
 		return false
 	}
+}
+
+func parseJSNumberString(value string) (float64, bool) {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" {
+		return 0, true
+	}
+
+	switch trimmed {
+	case "Infinity", "+Infinity":
+		return math.Inf(1), true
+	case "-Infinity":
+		return math.Inf(-1), true
+	}
+
+	if len(trimmed) > 2 && trimmed[0] == '0' {
+		switch trimmed[1] {
+		case 'x', 'X':
+			value, err := strconv.ParseUint(trimmed[2:], 16, 64)
+			if err != nil {
+				return 0, false
+			}
+			return float64(value), true
+		case 'o', 'O':
+			value, err := strconv.ParseUint(trimmed[2:], 8, 64)
+			if err != nil {
+				return 0, false
+			}
+			return float64(value), true
+		case 'b', 'B':
+			value, err := strconv.ParseUint(trimmed[2:], 2, 64)
+			if err != nil {
+				return 0, false
+			}
+			return float64(value), true
+		}
+	}
+
+	number, err := strconv.ParseFloat(trimmed, 64)
+	if err != nil {
+		return 0, false
+	}
+	return number, true
+}
+
+func parseJSBigIntString(value string) (*big.Int, bool) {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" {
+		return nil, false
+	}
+
+	sign := 1
+	if trimmed[0] == '+' {
+		trimmed = trimmed[1:]
+	} else if trimmed[0] == '-' {
+		sign = -1
+		trimmed = trimmed[1:]
+	}
+	if trimmed == "" {
+		return nil, false
+	}
+
+	base := 10
+	if len(trimmed) > 2 && trimmed[0] == '0' {
+		switch trimmed[1] {
+		case 'x', 'X':
+			base = 16
+			trimmed = trimmed[2:]
+		case 'o', 'O':
+			base = 8
+			trimmed = trimmed[2:]
+		case 'b', 'B':
+			base = 2
+			trimmed = trimmed[2:]
+		}
+	}
+
+	valueInt, ok := new(big.Int).SetString(trimmed, base)
+	if !ok {
+		return nil, false
+	}
+	if sign < 0 {
+		valueInt.Neg(valueInt)
+	}
+	return valueInt, true
+}
+
+func float64ToBigIntIfIntegral(n float64) (*big.Int, bool) {
+	if math.IsNaN(n) || math.IsInf(n, 0) || math.Trunc(n) != n {
+		return nil, false
+	}
+	bf := new(big.Float).SetFloat64(n)
+	intValue, _ := bf.Int(nil)
+	return intValue, true
 }
 
 func isTrueLiteralTypeValue(t *checker.Type) (bool, bool) {

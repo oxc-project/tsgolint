@@ -1628,7 +1628,35 @@ if (1 == '1') {
 		},
 		{
 			Code: `
+null <= 0;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+		},
+		{
+			Code: `
+null <= undefined;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+		},
+		{
+			Code: `
 -2n !== 2n;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+		},
+		{
+			Code: `
+// @ts-expect-error
+if (9223372036854775808n == 9223372036854775808) {
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+		},
+		{
+			Code: `
+// @ts-expect-error
+if (16 == '0x10') {
+}
       `,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
 		},
