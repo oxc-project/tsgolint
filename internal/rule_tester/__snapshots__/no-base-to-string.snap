@@ -876,3 +876,13 @@ Help: Consider mapping the values to a meaningful string (e.g. pick a property o
      | ~
    4 |       
 ---
+
+[TestNoBaseToStringRule/invalid-89 - 1]
+Diagnostic 1: baseToString (31:26 - 31:29)
+Message: 'node' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+  30 | 
+  31 | throw new Error(`Fail: ${node}`);
+     |                          ~~~~
+  32 |       
+---

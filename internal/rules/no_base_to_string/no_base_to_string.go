@@ -47,10 +47,41 @@ const (
 	usefulnessSometimes
 )
 
+type certaintyMemo struct {
+	values    map[*checker.Type]usefulness
+	resolving map[*checker.Type]struct{}
+}
+
+func newCertaintyMemo() *certaintyMemo {
+	return &certaintyMemo{
+		values:    map[*checker.Type]usefulness{},
+		resolving: map[*checker.Type]struct{}{},
+	}
+}
+
+func (m *certaintyMemo) get(t *checker.Type, compute func() usefulness) usefulness {
+	if certainty, ok := m.values[t]; ok {
+		return certainty
+	}
+
+	if _, ok := m.resolving[t]; ok {
+		return usefulnessAlways
+	}
+
+	m.resolving[t] = struct{}{}
+	certainty := compute()
+	delete(m.resolving, t)
+	m.values[t] = certainty
+
+	return certainty
+}
+
 var NoBaseToStringRule = rule.Rule{
 	Name: "no-base-to-string",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[NoBaseToStringOptions](options, "no-base-to-string")
+		toStringMemo := newCertaintyMemo()
+		joinMemo := newCertaintyMemo()
 
 		var collectToStringCertainty func(
 			t *checker.Type,
@@ -158,27 +189,29 @@ var NoBaseToStringRule = rule.Rule{
 			t *checker.Type,
 			visited []*checker.Type,
 		) usefulness {
-			if utils.IsUnionType(t) {
-				return collectUnionTypeCertainty(t, func(t *checker.Type) usefulness {
-					return collectJoinCertainty(t, visited)
-				})
-			}
+			return joinMemo.get(t, func() usefulness {
+				if utils.IsUnionType(t) {
+					return collectUnionTypeCertainty(t, func(t *checker.Type) usefulness {
+						return collectJoinCertainty(t, visited)
+					})
+				}
 
-			if utils.IsIntersectionType(t) {
-				return collectIntersectionTypeCertainty(t, func(t *checker.Type) usefulness {
-					return collectJoinCertainty(t, visited)
-				})
-			}
+				if utils.IsIntersectionType(t) {
+					return collectIntersectionTypeCertainty(t, func(t *checker.Type) usefulness {
+						return collectJoinCertainty(t, visited)
+					})
+				}
 
-			if checker.IsTupleType(t) {
-				return collectTupleCertainty(t, visited)
-			}
+				if checker.IsTupleType(t) {
+					return collectTupleCertainty(t, visited)
+				}
 
-			if checker.Checker_isArrayType(ctx.TypeChecker, t) {
-				return collectArrayCertainty(t, visited)
-			}
+				if checker.Checker_isArrayType(ctx.TypeChecker, t) {
+					return collectArrayCertainty(t, visited)
+				}
 
-			return usefulnessAlways
+				return usefulnessAlways
+			})
 		}
 
 		collectToStringCertainty = func(
@@ -190,85 +223,87 @@ var NoBaseToStringRule = rule.Rule{
 				return usefulnessAlways
 			}
 
-			if utils.IsTypeParameter(t) {
-				constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t)
-				if constraint != nil {
-					return collectToStringCertainty(constraint, visited)
-				}
-				// unconstrained generic means `unknown`
-				if opts.CheckUnknown {
-					return usefulnessSometimes
-				}
-				return usefulnessAlways
-			}
-
-			// the Boolean type definition missing toString()
-			if utils.IsTypeFlagSet(t, checker.TypeFlagsBooleanLike) {
-				return usefulnessAlways
-			}
-
-			if utils.MatchesTypeOrBaseType(ctx.TypeChecker, t, func(t *checker.Type) bool {
-				return slices.Contains(opts.IgnoredTypeNames, utils.GetTypeName(ctx.TypeChecker, t))
-			}) {
-				return usefulnessAlways
-			}
-
-			if utils.IsIntersectionType(t) {
-				return collectIntersectionTypeCertainty(t, func(t *checker.Type) usefulness {
-					return collectToStringCertainty(t, visited)
-				})
-			}
-
-			if utils.IsUnionType(t) {
-				return collectUnionTypeCertainty(t, func(t *checker.Type) usefulness {
-					return collectToStringCertainty(t, visited)
-				})
-			}
-
-			if checker.IsTupleType(t) {
-				return collectTupleCertainty(t, append(visited, t))
-			}
-
-			if checker.Checker_isArrayType(ctx.TypeChecker, t) {
-				return collectArrayCertainty(t, append(visited, t))
-			}
-
-			foundFallbackOnObject := false
-			for _, propertyName := range []string{"toString", "toLocaleString", "valueOf"} {
-				property := checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName)
-				if property == nil {
-					continue
+			return toStringMemo.get(t, func() usefulness {
+				if utils.IsTypeParameter(t) {
+					constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t)
+					if constraint != nil {
+						return collectToStringCertainty(constraint, visited)
+					}
+					// unconstrained generic means `unknown`
+					if opts.CheckUnknown {
+						return usefulnessSometimes
+					}
+					return usefulnessAlways
 				}
 
-				declarations := property.Declarations
-				if len(declarations) == 0 {
-					continue
+				// the Boolean type definition missing toString()
+				if utils.IsTypeFlagSet(t, checker.TypeFlagsBooleanLike) {
+					return usefulnessAlways
 				}
 
-				// If any declaration is not from the Object interface, this is
-				// user-defined (e.g. overloaded toString/toLocaleString/valueOf).
-				// see https://github.com/typescript-eslint/typescript-eslint/issues/8585
-				// see https://github.com/typescript-eslint/typescript-eslint/issues/11945
-				if utils.Some(declarations, func(declaration *ast.Declaration) bool {
-					return !(ast.IsInterfaceDeclaration(declaration.Parent) &&
-						declaration.Parent.AsInterfaceDeclaration().Name().Text() == "Object")
+				if utils.MatchesTypeOrBaseType(ctx.TypeChecker, t, func(t *checker.Type) bool {
+					return slices.Contains(opts.IgnoredTypeNames, utils.GetTypeName(ctx.TypeChecker, t))
 				}) {
 					return usefulnessAlways
 				}
 
-				foundFallbackOnObject = true
-			}
+				if utils.IsIntersectionType(t) {
+					return collectIntersectionTypeCertainty(t, func(t *checker.Type) usefulness {
+						return collectToStringCertainty(t, visited)
+					})
+				}
 
-			if foundFallbackOnObject {
-				return usefulnessNever
-			}
+				if utils.IsUnionType(t) {
+					return collectUnionTypeCertainty(t, func(t *checker.Type) usefulness {
+						return collectToStringCertainty(t, visited)
+					})
+				}
 
-			// unknown
-			if opts.CheckUnknown && utils.IsTypeFlagSet(t, checker.TypeFlagsUnknown) {
-				return usefulnessSometimes
-			}
-			// e.g. any
-			return usefulnessAlways
+				if checker.IsTupleType(t) {
+					return collectTupleCertainty(t, append(visited, t))
+				}
+
+				if checker.Checker_isArrayType(ctx.TypeChecker, t) {
+					return collectArrayCertainty(t, append(visited, t))
+				}
+
+				foundFallbackOnObject := false
+				for _, propertyName := range []string{"toString", "toLocaleString", "valueOf"} {
+					property := checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName)
+					if property == nil {
+						continue
+					}
+
+					declarations := property.Declarations
+					if len(declarations) == 0 {
+						continue
+					}
+
+					// If any declaration is not from the Object interface, this is
+					// user-defined (e.g. overloaded toString/toLocaleString/valueOf).
+					// see https://github.com/typescript-eslint/typescript-eslint/issues/8585
+					// see https://github.com/typescript-eslint/typescript-eslint/issues/11945
+					if utils.Some(declarations, func(declaration *ast.Declaration) bool {
+						return !(ast.IsInterfaceDeclaration(declaration.Parent) &&
+							declaration.Parent.AsInterfaceDeclaration().Name().Text() == "Object")
+					}) {
+						return usefulnessAlways
+					}
+
+					foundFallbackOnObject = true
+				}
+
+				if foundFallbackOnObject {
+					return usefulnessNever
+				}
+
+				// unknown
+				if opts.CheckUnknown && utils.IsTypeFlagSet(t, checker.TypeFlagsUnknown) {
+					return usefulnessSometimes
+				}
+				// e.g. any
+				return usefulnessAlways
+			})
 		}
 
 		isBuiltInStringCall := func(node *ast.CallExpression) bool {

@@ -1711,5 +1711,46 @@ v.join();
 				},
 			},
 		},
+		// Covers the issue 20733 shape where a recursive tuple-union expression
+		// type inside a template literal used to trigger pathological recursion.
+		{
+			Code: `
+type Leaf = { kind: string };
+
+type BinaryExpression = [Leaf | Expression];
+type UnaryExpression = [Leaf | Expression];
+type UpdateExpression = [Leaf | Expression];
+type CallExpression = [Leaf | Expression];
+type MemberExpression = [Leaf | Expression];
+type OptionalMemberExpression = [Leaf | Expression];
+type OptionalCallExpression = [Leaf | Expression];
+type AssignmentExpression = [Leaf | Expression];
+type ConditionalExpression = [Leaf | Expression];
+type SequenceExpression = [Leaf | Expression];
+type TSAsExpression = [Leaf | Expression];
+
+type Expression =
+  | BinaryExpression
+  | UnaryExpression
+  | UpdateExpression
+  | CallExpression
+  | MemberExpression
+  | OptionalMemberExpression
+  | OptionalCallExpression
+  | AssignmentExpression
+  | ConditionalExpression
+  | SequenceExpression
+  | TSAsExpression;
+
+declare const node: Expression;
+
+throw new Error(` + "`" + `Fail: ${node}` + "`" + `);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
 	})
 }
