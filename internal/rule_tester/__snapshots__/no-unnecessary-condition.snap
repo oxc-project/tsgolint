@@ -64,7 +64,7 @@ Message: Unnecessary conditional, value is always truthy.
   17 | switch (b1) {
 
 Diagnostic 10: comparisonBetweenLiteralTypes (18:8 - 18:11)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `true === true` is true.
   17 | switch (b1) {
   18 |   case true:
      |        ~~~~
@@ -231,7 +231,7 @@ Message: Unnecessary conditional, value is always truthy.
 
 [TestNoUnnecessaryConditionRule/invalid-17 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (3:10 - 3:18)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `"a" === "a"` is true.
    2 | function test(a: 'a') {
    3 |   return a === 'a';
      |          ~~~~~~~~~
@@ -240,7 +240,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-18 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (4:1 - 4:5)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `"34" > "56"` is false.
    3 | declare const b: '56';
    4 | a > b;
      | ~~~~~
@@ -249,7 +249,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-19 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:11)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `1 === 0` is false.
    2 | const y = 1;
    3 | if (y === 0) {
      |     ~~~~~~~
@@ -258,7 +258,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-20 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:12)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `1 == "1"` is true.
    2 | // @ts-expect-error
    3 | if (1 == '1') {
      |     ~~~~~~~~
@@ -267,7 +267,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-21 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:9)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `2.3 > 2.3` is false.
    1 | 
    2 | 2.3 > 2.3;
      | ~~~~~~~~~
@@ -276,7 +276,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-22 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:10)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `2.3 >= 2.3` is true.
    1 | 
    2 | 2.3 >= 2.3;
      | ~~~~~~~~~~
@@ -285,7 +285,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-23 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:7)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `2n < 2n` is false.
    1 | 
    2 | 2n < 2n;
      | ~~~~~~~
@@ -294,7 +294,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-24 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:8)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `2n <= 2n` is true.
    1 | 
    2 | 2n <= 2n;
      | ~~~~~~~~
@@ -303,7 +303,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-25 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:10)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `-2n !== 2n` is true.
    1 | 
    2 | -2n !== 2n;
      | ~~~~~~~~~~
@@ -312,7 +312,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-26 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:12)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `1 == "2"` is false.
    2 | // @ts-expect-error
    3 | if (1 == '2') {
      |     ~~~~~~~~
@@ -321,7 +321,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-27 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:12)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `1 != "2"` is true.
    2 | // @ts-expect-error
    3 | if (1 != '2') {
      |     ~~~~~~~~
@@ -330,7 +330,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-28 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (8:5 - 8:15)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `Foo.a === Foo.a` is true.
    7 | const x = Foo.a;
    8 | if (x === Foo.a) {
      |     ~~~~~~~~~~~
@@ -339,7 +339,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-29 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (8:5 - 8:11)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `Foo.a === 1` is true.
    7 | const x = Foo.a;
    8 | if (x === 1) {
      |     ~~~~~~~
@@ -348,7 +348,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-30 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:27)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `null == undefined` is true.
    3 |   if (a) {
    4 |   } else if (a == undefined) {
      |              ~~~~~~~~~~~~~~
@@ -357,7 +357,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-31 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:28)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `null === undefined` is false.
    3 |   if (a) {
    4 |   } else if (a === undefined) {
      |              ~~~~~~~~~~~~~~~
@@ -366,7 +366,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-32 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:27)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `null != undefined` is false.
    3 |   if (a) {
    4 |   } else if (a != undefined) {
      |              ~~~~~~~~~~~~~~
@@ -375,7 +375,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-33 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:28)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `null !== undefined` is true.
    3 |   if (a) {
    4 |   } else if (a !== undefined) {
      |              ~~~~~~~~~~~~~~~
@@ -384,7 +384,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-34 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:14)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `true === false` is false.
    1 | 
    2 | true === false;
      | ~~~~~~~~~~~~~~
@@ -393,7 +393,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-35 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:13)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always true, since `true === true` is true.
    1 | 
    2 | true === true;
      | ~~~~~~~~~~~~~
@@ -402,7 +402,7 @@ Message: Unnecessary comparison between literal values.
 
 [TestNoUnnecessaryConditionRule/invalid-36 - 1]
 Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:18)
-Message: Unnecessary comparison between literal values.
+Message: Unnecessary conditional, comparison is always false, since `true === undefined` is false.
    1 | 
    2 | true === undefined;
      | ~~~~~~~~~~~~~~~~~~

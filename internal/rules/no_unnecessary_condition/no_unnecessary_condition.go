@@ -17,7 +17,11 @@ package no_unnecessary_condition
 
 import (
 	"fmt"
+	"math"
+	"math/big"
 	"slices"
+	"strconv"
+	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -25,6 +29,8 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
+
+type undefinedStaticValue struct{}
 
 func buildAlwaysTruthyMessage() rule.RuleMessage {
 	return rule.RuleMessage{
@@ -82,10 +88,22 @@ func buildNoStrictNullCheckMessage() rule.RuleMessage {
 	}
 }
 
-func buildLiteralBinaryExpressionMessage() rule.RuleMessage {
+func buildLiteralBinaryExpressionMessage(left string, operator string, right string, conditionIsTrue bool) rule.RuleMessage {
+	trueOrFalse := "false"
+	if conditionIsTrue {
+		trueOrFalse = "true"
+	}
+
 	return rule.RuleMessage{
-		Id:          "comparisonBetweenLiteralTypes",
-		Description: "Unnecessary comparison between literal values.",
+		Id: "comparisonBetweenLiteralTypes",
+		Description: fmt.Sprintf(
+			"Unnecessary conditional, comparison is always %s, since `%s %s %s` is %s.",
+			trueOrFalse,
+			left,
+			operator,
+			right,
+			trueOrFalse,
+		),
 	}
 }
 
@@ -169,7 +187,7 @@ func toStaticValue(t *checker.Type) (any, bool) {
 		return isTrueLiteralTypeValue(t)
 	}
 	if flags&checker.TypeFlagsUndefined != 0 {
-		return "undefined", true
+		return undefinedStaticValue{}, true
 	}
 	if flags&checker.TypeFlagsNull != 0 {
 		return nil, true
@@ -182,16 +200,247 @@ func toStaticValue(t *checker.Type) (any, bool) {
 	}
 	if flags&checker.TypeFlagsNumberLiteral != 0 && t.IsNumberLiteral() {
 		if literal := t.AsLiteralType(); literal != nil {
-			return literal.String(), true
+			switch text := literal.String(); text {
+			case "NaN":
+				return math.NaN(), true
+			default:
+				value, err := strconv.ParseFloat(text, 64)
+				if err != nil {
+					return nil, false
+				}
+				return value, true
+			}
 		}
 	}
 	if flags&checker.TypeFlagsBigIntLiteral != 0 && t.IsBigIntLiteral() {
 		if literal := t.AsLiteralType(); literal != nil {
-			return literal.String(), true
+			value, ok := new(big.Int).SetString(strings.TrimSuffix(literal.String(), "n"), 10)
+			if !ok {
+				return nil, false
+			}
+			return value, true
 		}
 	}
 
 	return nil, false
+}
+
+func boolOperatorString(opKind ast.Kind) (string, bool) {
+	switch opKind {
+	case ast.KindLessThanToken:
+		return "<", true
+	case ast.KindGreaterThanToken:
+		return ">", true
+	case ast.KindLessThanEqualsToken:
+		return "<=", true
+	case ast.KindGreaterThanEqualsToken:
+		return ">=", true
+	case ast.KindEqualsEqualsToken:
+		return "==", true
+	case ast.KindEqualsEqualsEqualsToken:
+		return "===", true
+	case ast.KindExclamationEqualsToken:
+		return "!=", true
+	case ast.KindExclamationEqualsEqualsToken:
+		return "!==", true
+	default:
+		return "", false
+	}
+}
+
+func staticValueKind(value any) string {
+	if value == nil {
+		return "null"
+	}
+
+	switch value.(type) {
+	case undefinedStaticValue:
+		return "undefined"
+	case bool:
+		return "boolean"
+	case string:
+		return "string"
+	case float64:
+		return "number"
+	case *big.Int:
+		return "bigint"
+	default:
+		return ""
+	}
+}
+
+func staticValueToNumber(value any) (float64, bool) {
+	switch value := value.(type) {
+	case nil:
+		return 0, true
+	case bool:
+		if value {
+			return 1, true
+		}
+		return 0, true
+	case string:
+		trimmed := strings.TrimSpace(value)
+		if trimmed == "" {
+			return 0, true
+		}
+		number, err := strconv.ParseFloat(trimmed, 64)
+		if err != nil {
+			return 0, false
+		}
+		return number, true
+	case float64:
+		return value, true
+	case undefinedStaticValue:
+		return 0, false
+	default:
+		return 0, false
+	}
+}
+
+func staticValuesStrictEqual(left any, right any) bool {
+	leftKind := staticValueKind(left)
+	rightKind := staticValueKind(right)
+	if leftKind == "" || rightKind == "" || leftKind != rightKind {
+		return false
+	}
+
+	switch left := left.(type) {
+	case nil:
+		return true
+	case undefinedStaticValue:
+		return true
+	case bool:
+		return left == right.(bool)
+	case string:
+		return left == right.(string)
+	case float64:
+		return !math.IsNaN(left) && !math.IsNaN(right.(float64)) && left == right.(float64)
+	case *big.Int:
+		return left.Cmp(right.(*big.Int)) == 0
+	default:
+		return false
+	}
+}
+
+func staticValuesLooseEqual(left any, right any) bool {
+	if staticValuesStrictEqual(left, right) {
+		return true
+	}
+
+	leftKind := staticValueKind(left)
+	rightKind := staticValueKind(right)
+
+	if (leftKind == "null" && rightKind == "undefined") || (leftKind == "undefined" && rightKind == "null") {
+		return true
+	}
+
+	if leftKind == "boolean" {
+		if number, ok := staticValueToNumber(left); ok {
+			return staticValuesLooseEqual(number, right)
+		}
+		return false
+	}
+	if rightKind == "boolean" {
+		if number, ok := staticValueToNumber(right); ok {
+			return staticValuesLooseEqual(left, number)
+		}
+		return false
+	}
+
+	if (leftKind == "string" && rightKind == "number") || (leftKind == "number" && rightKind == "string") {
+		leftNumber, leftOK := staticValueToNumber(left)
+		rightNumber, rightOK := staticValueToNumber(right)
+		return leftOK && rightOK && !math.IsNaN(leftNumber) && !math.IsNaN(rightNumber) && leftNumber == rightNumber
+	}
+
+	if leftKind == "bigint" && rightKind == "string" {
+		value, ok := new(big.Int).SetString(strings.TrimSpace(right.(string)), 10)
+		return ok && left.(*big.Int).Cmp(value) == 0
+	}
+	if leftKind == "string" && rightKind == "bigint" {
+		value, ok := new(big.Int).SetString(strings.TrimSpace(left.(string)), 10)
+		return ok && value.Cmp(right.(*big.Int)) == 0
+	}
+
+	if leftKind == "bigint" && rightKind == "number" {
+		number := right.(float64)
+		if math.IsNaN(number) || math.IsInf(number, 0) || math.Trunc(number) != number {
+			return false
+		}
+		return left.(*big.Int).Cmp(big.NewInt(int64(number))) == 0
+	}
+	if leftKind == "number" && rightKind == "bigint" {
+		number := left.(float64)
+		if math.IsNaN(number) || math.IsInf(number, 0) || math.Trunc(number) != number {
+			return false
+		}
+		return big.NewInt(int64(number)).Cmp(right.(*big.Int)) == 0
+	}
+
+	return false
+}
+
+func staticValuesLessThan(left any, right any) bool {
+	if staticValueKind(left) == "string" && staticValueKind(right) == "string" {
+		return left.(string) < right.(string)
+	}
+
+	if leftBigInt, ok := left.(*big.Int); ok {
+		switch right := right.(type) {
+		case *big.Int:
+			return leftBigInt.Cmp(right) < 0
+		case float64:
+			if math.IsNaN(right) {
+				return false
+			}
+			return new(big.Float).SetInt(leftBigInt).Cmp(big.NewFloat(right)) < 0
+		case string:
+			value, ok := new(big.Int).SetString(strings.TrimSpace(right), 10)
+			return ok && leftBigInt.Cmp(value) < 0
+		}
+	}
+	if rightBigInt, ok := right.(*big.Int); ok {
+		switch left := left.(type) {
+		case float64:
+			if math.IsNaN(left) {
+				return false
+			}
+			return big.NewFloat(left).Cmp(new(big.Float).SetInt(rightBigInt)) < 0
+		case string:
+			value, ok := new(big.Int).SetString(strings.TrimSpace(left), 10)
+			return ok && value.Cmp(rightBigInt) < 0
+		}
+	}
+
+	leftNumber, leftOK := staticValueToNumber(left)
+	rightNumber, rightOK := staticValueToNumber(right)
+	if !leftOK || !rightOK || math.IsNaN(leftNumber) || math.IsNaN(rightNumber) {
+		return false
+	}
+	return leftNumber < rightNumber
+}
+
+func booleanComparison(left any, opKind ast.Kind, right any) bool {
+	switch opKind {
+	case ast.KindExclamationEqualsToken:
+		return !staticValuesLooseEqual(left, right)
+	case ast.KindExclamationEqualsEqualsToken:
+		return !staticValuesStrictEqual(left, right)
+	case ast.KindLessThanToken:
+		return staticValuesLessThan(left, right)
+	case ast.KindLessThanEqualsToken:
+		return staticValuesLessThan(left, right) || staticValuesLooseEqual(left, right)
+	case ast.KindEqualsEqualsToken:
+		return staticValuesLooseEqual(left, right)
+	case ast.KindEqualsEqualsEqualsToken:
+		return staticValuesStrictEqual(left, right)
+	case ast.KindGreaterThanToken:
+		return staticValuesLessThan(right, left)
+	case ast.KindGreaterThanEqualsToken:
+		return staticValuesLessThan(right, left) || staticValuesLooseEqual(left, right)
+	default:
+		return false
+	}
 }
 
 func isTrueLiteralTypeValue(t *checker.Type) (bool, bool) {
@@ -1495,9 +1744,18 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
-			if _, ok := toStaticValue(leftType); ok {
-				if _, ok := toStaticValue(rightType); ok {
-					ctx.ReportNode(node, buildLiteralBinaryExpressionMessage())
+			leftStaticValue, leftOK := toStaticValue(leftType)
+			rightStaticValue, rightOK := toStaticValue(rightType)
+
+			if leftOK && rightOK {
+				if operator, ok := boolOperatorString(opKind); ok {
+					conditionIsTrue := booleanComparison(leftStaticValue, opKind, rightStaticValue)
+					ctx.ReportNode(node, buildLiteralBinaryExpressionMessage(
+						ctx.TypeChecker.TypeToString(leftType),
+						operator,
+						ctx.TypeChecker.TypeToString(rightType),
+						conditionIsTrue,
+					))
 					return
 				}
 			}
