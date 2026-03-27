@@ -159,7 +159,7 @@ func isAlwaysNullishType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
 }
 
-func toStaticValue(t *checker.Type) (any, bool) {
+func toStaticValue(t *checker.Type) (any, bool) { //nolint:unparam // the value return is reserved for follow-up checks; current callers only need the static-ness signal
 	if t == nil {
 		return nil, false
 	}
