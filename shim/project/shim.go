@@ -51,7 +51,7 @@ type Kind = project.Kind
 const KindConfigured = project.KindConfigured
 const KindInferred = project.KindInferred
 //go:linkname NewConfigFileRegistryBuilder github.com/microsoft/typescript-go/internal/project.NewConfigFileRegistryBuilder
-func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
+func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, customConfigFileName string, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
 //go:linkname NewConfiguredProject github.com/microsoft/typescript-go/internal/project.NewConfiguredProject
 func NewConfiguredProject(configFileName string, configFilePath tspath.Path, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
 //go:linkname NewExtendedConfigCache github.com/microsoft/typescript-go/internal/project.NewExtendedConfigCache

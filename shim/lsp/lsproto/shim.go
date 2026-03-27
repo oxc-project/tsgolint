@@ -225,6 +225,8 @@ type CustomClosingTagCompletionOrNull = lsproto.CustomClosingTagCompletionOrNull
 type CustomClosingTagCompletionResponse = lsproto.CustomClosingTagCompletionResponse
 var CustomInitializeAPISessionInfo = lsproto.CustomInitializeAPISessionInfo
 type CustomInitializeAPISessionResponse = lsproto.CustomInitializeAPISessionResponse
+var CustomProjectInfoInfo = lsproto.CustomProjectInfoInfo
+type CustomProjectInfoResponse = lsproto.CustomProjectInfoResponse
 var CustomRunGCInfo = lsproto.CustomRunGCInfo
 var CustomSaveAllocProfileInfo = lsproto.CustomSaveAllocProfileInfo
 var CustomSaveHeapProfileInfo = lsproto.CustomSaveHeapProfileInfo
@@ -585,6 +587,7 @@ const MethodCodeActionResolve = lsproto.MethodCodeActionResolve
 const MethodCodeLensResolve = lsproto.MethodCodeLensResolve
 const MethodCompletionItemResolve = lsproto.MethodCompletionItemResolve
 const MethodCustomInitializeAPISession = lsproto.MethodCustomInitializeAPISession
+const MethodCustomProjectInfo = lsproto.MethodCustomProjectInfo
 const MethodCustomRunGC = lsproto.MethodCustomRunGC
 const MethodCustomSaveAllocProfile = lsproto.MethodCustomSaveAllocProfile
 const MethodCustomSaveHeapProfile = lsproto.MethodCustomSaveHeapProfile
@@ -695,6 +698,7 @@ func NewBaseReader(r io.Reader) *lsproto.BaseReader
 func NewBaseWriter(w io.Writer) *lsproto.BaseWriter
 //go:linkname NewID github.com/microsoft/typescript-go/internal/lsp/lsproto.NewID
 func NewID(rawValue lsproto.IntegerOrString) *jsonrpc.ID
+type NoParams = lsproto.NoParams
 type NotebookCell = lsproto.NotebookCell
 type NotebookCellArrayChange = lsproto.NotebookCellArrayChange
 type NotebookCellKind = lsproto.NotebookCellKind
@@ -747,6 +751,8 @@ type ProfileParams = lsproto.ProfileParams
 type ProfileResult = lsproto.ProfileResult
 var ProgressInfo = lsproto.ProgressInfo
 type ProgressParams = lsproto.ProgressParams
+type ProjectInfoParams = lsproto.ProjectInfoParams
+type ProjectInfoResult = lsproto.ProjectInfoResult
 type PublishDiagnosticsClientCapabilities = lsproto.PublishDiagnosticsClientCapabilities
 type PublishDiagnosticsParams = lsproto.PublishDiagnosticsParams
 type Range = lsproto.Range
@@ -1165,6 +1171,7 @@ var WindowWorkDoneProgressCreateInfo = lsproto.WindowWorkDoneProgressCreateInfo
 //go:linkname WithClientCapabilities github.com/microsoft/typescript-go/internal/lsp/lsproto.WithClientCapabilities
 func WithClientCapabilities(ctx context.Context, caps *lsproto.ResolvedClientCapabilities) context.Context
 type WorkDoneProgressBegin = lsproto.WorkDoneProgressBegin
+type WorkDoneProgressBeginOrReportOrEnd = lsproto.WorkDoneProgressBeginOrReportOrEnd
 type WorkDoneProgressCancelParams = lsproto.WorkDoneProgressCancelParams
 type WorkDoneProgressCreateParams = lsproto.WorkDoneProgressCreateParams
 type WorkDoneProgressCreateResponse = lsproto.WorkDoneProgressCreateResponse

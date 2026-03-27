@@ -34,6 +34,8 @@ func GetNewLineKind(s string) core.NewLineKind
 func GetRequestID(ctx context.Context) string
 //go:linkname GetScriptKindFromFileName github.com/microsoft/typescript-go/internal/core.GetScriptKindFromFileName
 func GetScriptKindFromFileName(fileName string) core.ScriptKind
+//go:linkname GetSpellingSuggestionForStrings github.com/microsoft/typescript-go/internal/core.GetSpellingSuggestionForStrings
+func GetSpellingSuggestionForStrings(name string, candidates iter.Seq[string]) string
 //go:linkname IndexAfter github.com/microsoft/typescript-go/internal/core.IndexAfter
 func IndexAfter(s string, pattern string, startIndex int) int
 type JsxEmit = core.JsxEmit

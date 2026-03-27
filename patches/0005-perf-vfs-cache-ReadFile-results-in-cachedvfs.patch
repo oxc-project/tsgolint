@@ -1,7 +1,7 @@
-From 35a87c8cc25317387f74b3b52a24b633c2312fa6 Mon Sep 17 00:00:00 2001
+From 69ebc71f6c84e33f21b79987274de832d14fe054 Mon Sep 17 00:00:00 2001
 From: Codex <codex@example.com>
 Date: Thu, 12 Feb 2026 13:55:47 +0900
-Subject: [PATCH 6/6] perf(vfs): cache ReadFile results in cachedvfs
+Subject: [PATCH 5/5] perf(vfs): cache ReadFile results in cachedvfs
 
 ---
  internal/vfs/cachedvfs/cachedvfs.go | 24 +++++++++++++++++++++++-
