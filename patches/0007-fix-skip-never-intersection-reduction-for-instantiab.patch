@@ -1,0 +1,41 @@
+From 9c40f6d5aeb049c9ab85ed2ca3d7cf1cbf610f0d Mon Sep 17 00:00:00 2001
+From: Eugene Oldman <eugene.oldman@gmail.com>
+Date: Fri, 27 Mar 2026 11:54:42 +1100
+Subject: [PATCH] fix: skip never-intersection reduction for instantiable types
+
+When getReducedType is called on an intersection containing instantiable
+types (deferred conditional types, type parameters), skip the property
+check that determines if the intersection reduces to never. Resolving
+properties of instantiable types can trigger circular type resolution
+when mutually recursive type aliases reference each other through
+conditional types.
+---
+ internal/checker/checker.go | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/internal/checker/checker.go b/internal/checker/checker.go
+index 5bf47a104..49622be6c 100644
+--- a/internal/checker/checker.go
++++ b/internal/checker/checker.go
+@@ -21225,8 +21225,16 @@ func (c *Checker) getReducedType(t *Type) *Type {
+ 	case t.flags&TypeFlagsIntersection != 0:
+ 		if t.objectFlags&ObjectFlagsIsNeverIntersectionComputed == 0 {
+ 			t.objectFlags |= ObjectFlagsIsNeverIntersectionComputed
+-			if core.Some(c.getPropertiesOfUnionOrIntersectionType(t), c.isNeverReducedProperty) {
+-				t.objectFlags |= ObjectFlagsIsNeverIntersection
++			// Skip the never-intersection property check when the intersection contains
++			// instantiable types (e.g., deferred conditional types). Eagerly resolving
++			// properties of instantiable types can trigger circular type resolution when
++			// mutually recursive type aliases reference each other through conditional
++			// types. The never-reduction will be correctly applied when the types are
++			// fully instantiated with concrete type arguments.
++			if !c.maybeTypeOfKind(t, TypeFlagsInstantiable) {
++				if core.Some(c.getPropertiesOfUnionOrIntersectionType(t), c.isNeverReducedProperty) {
++					t.objectFlags |= ObjectFlagsIsNeverIntersection
++				}
+ 			}
+ 		}
+ 		if t.objectFlags&ObjectFlagsIsNeverIntersection != 0 {
+-- 
+2.53.0
+
