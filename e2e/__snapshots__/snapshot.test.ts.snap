@@ -4825,6 +4825,35 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
 ]
 `;
 
+exports[`TSGoLint E2E Snapshot Tests > should report syntactic issues 1`] = `
+[
+  {
+    "file_path": "fixtures/semantic-syntactic-diagnostics/src/a.ts",
+    "kind": 1,
+    "message": {
+      "description": "Unterminated string literal.",
+      "id": "TS1002",
+    },
+    "range": {
+      "end": 24,
+      "pos": 24,
+    },
+  },
+  {
+    "file_path": "fixtures/semantic-syntactic-diagnostics/src/b.mts",
+    "kind": 1,
+    "message": {
+      "description": "Type 'string' is not assignable to type 'number'.",
+      "id": "TS2322",
+    },
+    "range": {
+      "end": 7,
+      "pos": 6,
+    },
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should report type errors 1`] = `
 [
   {

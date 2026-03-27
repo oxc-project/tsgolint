@@ -256,38 +256,53 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
 
-	if typeErrors.ReportSyntactic || typeErrors.ReportSemantic {
+	if typeErrors.ReportSyntactic {
 		for _, file := range files {
 			fileName := file.FileName()
 
-			if typeErrors.ReportSyntactic {
-				syntacticDiagnostics := program.GetSyntacticDiagnostics(ctx, file)
-				for _, d := range syntacticDiagnostics {
-					if d.File() != nil && d.File().FileName() == fileName {
-						onInternalDiagnostic(diagnostic.Internal{
-							Range:       d.Loc(),
-							Id:          "TS" + strconv.Itoa(int(d.Code())),
-							Description: utils.GetDiagnosticMessage(d),
-							FilePath:    &fileName,
-						})
-					}
-				}
-			}
-
-			if typeErrors.ReportSemantic {
-				semanticDiagnostics := program.GetSemanticDiagnostics(ctx, file)
-				for _, d := range semanticDiagnostics {
-					if d.File() != nil && d.File().FileName() == fileName {
-						onInternalDiagnostic(diagnostic.Internal{
-							Range:       d.Loc(),
-							Id:          "TS" + strconv.Itoa(int(d.Code())),
-							Description: utils.GetDiagnosticMessage(d),
-							FilePath:    &fileName,
-						})
-					}
+			syntacticDiagnostics := program.GetSyntacticDiagnostics(ctx, file)
+			for _, d := range syntacticDiagnostics {
+				if d.File() != nil && d.File().FileName() == fileName {
+					onInternalDiagnostic(diagnostic.Internal{
+						Range:       d.Loc(),
+						Id:          "TS" + strconv.Itoa(int(d.Code())),
+						Description: utils.GetDiagnosticMessage(d),
+						FilePath:    &fileName,
+					})
 				}
 			}
 		}
+	}
+
+	if typeErrors.ReportSemantic {
+		semanticDiagnosticsByFile := program.GetSemanticDiagnosticsWithoutNoEmitFiltering(ctx, files)
+
+		programOption := program.Options()
+
+		for _, file := range files {
+			fileName := file.FileName()
+			finalDiagnostics := compiler.FilterNoEmitSemanticDiagnostics(semanticDiagnosticsByFile[file], programOption)
+			includeProcessorDiagnostics := program.GetIncludeProcessorDiagnostics(file)
+			if len(finalDiagnostics) == 0 && len(includeProcessorDiagnostics) == 0 {
+				continue
+			}
+			finalDiagnostics = append(append(make([]*ast.Diagnostic, 0, len(finalDiagnostics)+len(includeProcessorDiagnostics)), finalDiagnostics...), includeProcessorDiagnostics...)
+			if len(finalDiagnostics) > 1 {
+				finalDiagnostics = compiler.SortAndDeduplicateDiagnostics(finalDiagnostics)
+			}
+
+			for _, d := range finalDiagnostics {
+				if d.File() != nil && d.File().FileName() == fileName {
+					onInternalDiagnostic(diagnostic.Internal{
+						Range:       d.Loc(),
+						Id:          "TS" + strconv.Itoa(int(d.Code())),
+						Description: utils.GetDiagnosticMessage(d),
+						FilePath:    &fileName,
+					})
+				}
+			}
+		}
+
 	}
 
 	var flatQueueMu sync.Mutex

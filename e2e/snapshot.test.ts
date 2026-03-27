@@ -698,4 +698,26 @@ console.log(x);
 
     expect(diagnostics).toMatchSnapshot();
   });
+
+  it('should report syntactic issues', async () => {
+    const testFiles = await getTestFiles('semantic-syntactic-diagnostics');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ALL_RULES, {
+      reportSemantic: true,
+      reportSyntactic: true,
+    });
+
+    const env = { ...process.env, GOMAXPROCS: '1' };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env,
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
 });
