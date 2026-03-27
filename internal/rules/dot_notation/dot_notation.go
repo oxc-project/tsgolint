@@ -43,6 +43,28 @@ func isKeyword(name string) bool {
 	return ok
 }
 
+// https://github.com/eslint/eslint/blob/39a6424373d915fa9de0d7b0caba9a4dc3da9b53/lib/rules/dot-notation.js#L18
+func isDotNotationIdentifier(name string) bool {
+	if len(name) == 0 {
+		return false
+	}
+
+	first := name[0]
+	if !(first >= 'a' && first <= 'z' || first >= 'A' && first <= 'Z' || first == '_' || first == '$') {
+		return false
+	}
+
+	for i := 1; i < len(name); i++ {
+		ch := name[i]
+		if ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch >= '0' && ch <= '9' || ch == '_' || ch == '$' {
+			continue
+		}
+		return false
+	}
+
+	return true
+}
+
 func getComputedPropertyValue(node *ast.Node) (value string, formatted string, ok bool) {
 	switch node.Kind {
 	case ast.KindStringLiteral:
@@ -143,7 +165,7 @@ var DotNotationRule = rule.Rule{
 				return
 			}
 
-			if !scanner.IsIdentifierText(value, core.LanguageVariantStandard) {
+			if !isDotNotationIdentifier(value) {
 				return
 			}
 

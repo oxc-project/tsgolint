@@ -51,6 +51,8 @@ func TestDotNotation(t *testing.T) {
 		{Code: "\ntype Foo = {\n  [key: string]: number;\n};\ndeclare const foo: Foo;\nfoo[`key_baz`];\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
 		{Code: "a['X-Amzn-Trace-Id'];"},
 		{Code: "a['X-Amzn-Trace-Id'];", Tsx: true},
+		{Code: "a['Prénom'];"},
+		{Code: "a['π'];"},
 		{Code: "a['has space'];"},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -106,13 +108,6 @@ func TestDotNotation(t *testing.T) {
 		{
 			Code:   "a['b'];",
 			Output: []string{"a.b;"},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "useDot"},
-			},
-		},
-		{
-			Code:   "a['π'];",
-			Output: []string{"a.π;"},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "useDot"},
 			},
