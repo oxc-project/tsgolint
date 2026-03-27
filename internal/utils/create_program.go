@@ -117,7 +117,10 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 	return program, nil, nil
 }
 
-func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, host compiler.CompilerHost, fileNames []string) (*compiler.Program, []diagnostic.Internal, error) {
+// CreateInferredProjectProgram creates a TypeScript program for files not
+// covered by any tsconfig include pattern. When nearestTsconfigPath is
+// non-empty, its compiler options are inherited (crucially lib/target).
+func CreateInferredProjectProgram(singleThreaded bool, host compiler.CompilerHost, fileNames []string, nearestTsconfigPath string) (*compiler.Program, []diagnostic.Internal, error) {
 	opts := compiler.ProgramOptions{
 		Config: &tsoptions.ParsedCommandLine{
 			ParsedConfig: &core.ParsedOptions{
@@ -141,6 +144,15 @@ func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, ho
 		SingleThreaded: core.TSTrue,
 		Host:           host,
 	}
+
+	// Inherit compiler options from nearest tsconfig when available.
+	if nearestTsconfigPath != "" {
+		parsed, _ := tsoptions.GetParsedCommandLineOfConfigFile(nearestTsconfigPath, &core.CompilerOptions{}, nil, host, nil)
+		if parsed != nil && parsed.CompilerOptions() != nil {
+			opts.Config.ParsedConfig.CompilerOptions = parsed.CompilerOptions()
+		}
+	}
+
 	if !singleThreaded {
 		opts.SingleThreaded = core.TSFalse
 	}

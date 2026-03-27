@@ -27,8 +27,10 @@ type ConfiguredRule struct {
 }
 
 type Workload struct {
-	Programs       map[string][]string
-	UnmatchedFiles []string
+	Programs map[string][]string
+	// UnmatchedFiles groups files not covered by any tsconfig include pattern,
+	// keyed by nearest tsconfig path ("" when none found).
+	UnmatchedFiles map[string][]string
 }
 
 type Fixes struct {
@@ -120,29 +122,32 @@ func RunLinter(
 		idx++
 	}
 
-	{
-		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
-		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
-
+	for nearestTsconfig, unmatchedFiles := range workload.UnmatchedFiles {
+		if len(unmatchedFiles) == 0 {
+			continue
+		}
+		hostDir := currentDirectory
+		if nearestTsconfig != "" {
+			hostDir = tspath.GetDirectoryPath(nearestTsconfig)
+		}
+		host := utils.NewCachedFSCompilerHost(hostDir, fs, bundled.LibPath(), nil, nil)
+		program, diagnostics, err := utils.CreateInferredProjectProgram(false, host, unmatchedFiles, nearestTsconfig)
 		if err != nil {
 			return err
 		}
-
 		if len(diagnostics) > 0 {
 			for _, d := range diagnostics {
 				onInternalDiagnostic(d)
 			}
 		}
-
-		files := make([]*ast.SourceFile, 0, len(workload.UnmatchedFiles))
-		for _, f := range workload.UnmatchedFiles {
+		files := make([]*ast.SourceFile, 0, len(unmatchedFiles))
+		for _, f := range unmatchedFiles {
 			sf := program.GetSourceFile(f)
 			if sf == nil {
 				panic(fmt.Sprintf("Expected file '%s' to be in inferred program", f))
 			}
 			files = append(files, sf)
 		}
-
 		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
 		if err != nil {
 			return err

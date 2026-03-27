@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"strings"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -171,8 +173,21 @@ func IsThenableType(
 	return false
 }
 
+// GetWellKnownSymbolPropertyOfType finds a well-known symbol property by
+// prefix-matching the internal symbol name format (e.g. \xFE@asyncDispose or
+// \xFE@asyncDispose@<id>). This ports the upstream ts-api-utils iteration
+// approach: the symbol ID suffix varies across declaration sources, so
+// exact-name lookup via getPropertyNameForKnownSymbolName is insufficient.
+// The "@" boundary check after the name prevents cross-symbol collisions
+// (e.g. "match" vs "matchAll").
 func GetWellKnownSymbolPropertyOfType(t *checker.Type, name string, typeChecker *checker.Checker) *ast.Symbol {
-	return checker.Checker_getPropertyOfType(typeChecker, t, checker.Checker_getPropertyNameForKnownSymbolName(typeChecker, name))
+	prefix := ast.InternalSymbolNamePrefix + "@" + name
+	for _, prop := range checker.Checker_getPropertiesOfType(typeChecker, t) {
+		if prop.Name == prefix || strings.HasPrefix(prop.Name, prefix+"@") {
+			return prop
+		}
+	}
+	return nil
 }
 
 /**
