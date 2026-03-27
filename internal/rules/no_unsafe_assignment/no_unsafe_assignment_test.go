@@ -141,6 +141,99 @@ declare function Foo(props: { a: string }): never;
 		{Code: "const x: unknown[] = y as any[];"},
 		{Code: "const x: Set<unknown> = y as Set<any>;"},
 		{Code: "const x: Map<string, string> = new Map();"},
+		// conditional types from .d.ts in node_modules should resolve correctly
+		{
+			Code: `
+import type { SearchResult, ContentsOptions } from 'exa-js';
+
+type NC = ContentsOptions & {
+    text: { maxCharacters: number; includeHtmlTags: boolean }
+    highlights: { numSentences: number; highlightsPerUrl: number; query: string }
+    summary: { query: string }
+}
+
+type ExaSearchResult = SearchResult<NC>;
+
+declare const result: ExaSearchResult;
+
+const id: string = result.id;
+const title: string | null = result.title;
+const text: string = result.text;
+const highlights: string[] = result.highlights;
+const summary: string = result.summary;
+      `,
+			Files: map[string]string{
+				"node_modules/exa-js/package.json": `{
+          "name": "exa-js",
+          "version": "1.8.23",
+          "types": "dist/index.d.ts"
+        }`,
+				"node_modules/exa-js/dist/index.d.ts": `
+declare const isBeta = false;
+
+type TextContentsOptions = { maxCharacters?: number; includeHtmlTags?: boolean };
+type HighlightsContentsOptions = { query?: string; numSentences?: number; highlightsPerUrl?: number };
+type SummaryContentsOptions = { query?: string };
+type LivecrawlOptions = "never" | "fallback" | "always" | "auto" | "preferred";
+type ContextOptions = { maxCharacters?: number };
+type ExtrasOptions = { links?: number; imageLinks?: number };
+
+export type ContentsOptions = {
+    text?: TextContentsOptions | true;
+    highlights?: HighlightsContentsOptions | true;
+    summary?: SummaryContentsOptions | true;
+    livecrawl?: LivecrawlOptions;
+    context?: ContextOptions | true;
+    livecrawlTimeout?: number;
+    filterEmptyResults?: boolean;
+    subpages?: number;
+    subpageTarget?: string | string[];
+    extras?: ExtrasOptions;
+} & (typeof isBeta extends true ? {} : {});
+
+type Default<T extends {}, U> = [keyof T] extends [never] ? U : T;
+
+type TextResponse = { text: string };
+type HighlightsResponse = { highlights: string[]; highlightScores: number[] };
+type SummaryResponse = { summary: string };
+type ExtrasResponse = { extras: { links?: string[]; imageLinks?: string[] } };
+type SubpagesResponse<T extends ContentsOptions> = { subpages: ContentsResultComponent<T>[] };
+
+type ContentsResultComponent<T extends ContentsOptions> = Default<
+    (T["text"] extends object | true ? TextResponse : {}) &
+    (T["highlights"] extends object | true ? HighlightsResponse : {}) &
+    (T["summary"] extends object | true ? SummaryResponse : {}) &
+    (T["subpages"] extends number ? SubpagesResponse<T> : {}) &
+    (T["extras"] extends object ? ExtrasResponse : {}),
+    TextResponse
+>;
+
+export type SearchResult<T extends ContentsOptions> = {
+    title: string | null;
+    url: string;
+    publishedDate?: string;
+    author?: string;
+    score?: number;
+    id: string;
+    image?: string;
+    favicon?: string;
+} & ContentsResultComponent<T>;
+
+type Status = { id: string; status: string; source: string };
+type CostDollars = { total: number };
+
+export type SearchResponse<T extends ContentsOptions> = {
+    results: SearchResult<T>[];
+    context?: string;
+    autopromptString?: string;
+    autoDate?: string;
+    requestId: string;
+    statuses?: Array<Status>;
+    costDollars?: CostDollars;
+};
+        `,
+			},
+		},
 		{Code: `
 type Foo = { bar: unknown };
 const bar: any = 1;
