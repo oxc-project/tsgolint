@@ -44,6 +44,17 @@ function findSchemaDirs(dir) {
 const schemaDirs = findSchemaDirs(rulesDir);
 
 /**
+ * Rules that should not run through go-jsonschema codegen.
+ * Keep these options files manually maintained when the schema shape is unsupported.
+ */
+const skipSchemaGenerationRules = new Map([
+  [
+    'prefer_destructuring',
+    'schema uses tuple-style array items, which go-jsonschema cannot parse',
+  ],
+]);
+
+/**
  * Find fields in the schema that use oneOf with boolean + $ref to an object.
  * These need to be converted to utils.BoolOr[T] in the generated Go code.
  * @param {any} schema - The JSON schema
@@ -93,6 +104,13 @@ function findBoolOrFields(schema) {
 for (const schemaDir of schemaDirs) {
   const schemaPath = path.join(schemaDir, 'schema.json');
   const outputPath = path.join(schemaDir, 'options.go');
+  const ruleName = path.basename(schemaDir);
+  const skipReason = skipSchemaGenerationRules.get(ruleName);
+
+  if (skipReason) {
+    console.log(`Skipping schema codegen for ${ruleName}: ${skipReason}`);
+    continue;
+  }
 
   console.log(`Generating Go struct for schema: ${schemaPath} and outputting to: ${outputPath}`);
   try {
@@ -106,7 +124,6 @@ for (const schemaDir of schemaDirs) {
     );
 
     // Post-process specific rules that need custom modifications
-    const ruleName = path.basename(schemaDir);
     let content = fs.readFileSync(outputPath, 'utf8');
     let modified = false;
 

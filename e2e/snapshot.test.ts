@@ -51,6 +51,7 @@ const ALL_RULES = [
   'no-unsafe-unary-minus',
   'non-nullable-type-assertion-style',
   'only-throw-error',
+  'prefer-destructuring',
   'prefer-find',
   'prefer-includes',
   'prefer-nullish-coalescing',
