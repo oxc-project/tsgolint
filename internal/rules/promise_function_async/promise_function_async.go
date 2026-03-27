@@ -133,9 +133,22 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				}
 			}
 
-			insertAsyncBeforeNode := node
+			insertAsyncFix := func() rule.RuleFix {
+				return rule.RuleFixInsertBefore(ctx.SourceFile, node, " async ")
+			}
 			if ast.IsMethodDeclaration(node) {
-				insertAsyncBeforeNode = node.Name()
+				insertAsyncFix = func() rule.RuleFix {
+					return rule.RuleFixInsertBefore(ctx.SourceFile, node.Name(), " async ")
+				}
+			}
+			if ast.IsFunctionDeclaration(node) {
+				modifiers := node.Modifiers()
+				if modifiers != nil && len(modifiers.NodeList.Nodes) > 0 {
+					lastModifier := modifiers.NodeList.Nodes[len(modifiers.NodeList.Nodes)-1]
+					insertAsyncFix = func() rule.RuleFix {
+						return rule.RuleFixInsertAfter(lastModifier, " async")
+					}
+				}
 			}
 
 			// TODO(port): getFunctionHeadLoc
@@ -144,12 +157,12 @@ var PromiseFunctionAsyncRule = rule.Rule{
 				ctx.ReportNodeWithSuggestions(node, buildMissingAsyncHybridReturnMessage(), func() []rule.RuleSuggestion {
 					return []rule.RuleSuggestion{{
 						Message:  buildMissingAsyncHybridReturnSuggestionMessage(),
-						FixesArr: []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")},
+						FixesArr: []rule.RuleFix{insertAsyncFix()},
 					}}
 				})
 			} else {
 				ctx.ReportNodeWithFixes(node, buildMissingAsyncMessage(), func() []rule.RuleFix {
-					return []rule.RuleFix{rule.RuleFixInsertBefore(ctx.SourceFile, insertAsyncBeforeNode, " async ")}
+					return []rule.RuleFix{insertAsyncFix()}
 				})
 			}
 		}

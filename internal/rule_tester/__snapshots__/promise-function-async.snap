@@ -78,6 +78,32 @@ Message: Functions that return promises must be async.
 ---
 
 [TestPromiseFunctionAsyncRule/invalid-6 - 1]
+Diagnostic 1: missingAsync (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | export function nonAsyncExportedPromiseFunction() {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return new Promise<void>();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-7 - 1]
+Diagnostic 1: missingAsync (2:1 - 4:1)
+Message: Functions that return promises must be async.
+   1 | 
+   2 | export default function nonAsyncDefaultExportedPromiseFunction() {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return new Promise<void>();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+---
+
+[TestPromiseFunctionAsyncRule/invalid-8 - 1]
 Diagnostic 1: missingAsync (2:39 - 2:61)
 Message: Functions that return promises must be async.
    1 | 
@@ -86,7 +112,7 @@ Message: Functions that return promises must be async.
    3 |       
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-7 - 1]
+[TestPromiseFunctionAsyncRule/invalid-9 - 1]
 Diagnostic 1: missingAsync (2:39 - 2:63)
 Message: Functions that return promises must be async.
    1 | 
@@ -95,7 +121,7 @@ Message: Functions that return promises must be async.
    3 |       
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-8 - 1]
+[TestPromiseFunctionAsyncRule/invalid-10 - 1]
 Diagnostic 1: missingAsync (3:3 - 5:3)
 Message: Functions that return promises must be async.
    2 | const functions = {
@@ -108,7 +134,7 @@ Message: Functions that return promises must be async.
    6 | };
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-9 - 1]
+[TestPromiseFunctionAsyncRule/invalid-11 - 1]
 Diagnostic 1: missingAsync (3:3 - 5:3)
 Message: Functions that return promises must be async.
    2 | class Test {
@@ -132,7 +158,7 @@ Message: Functions that return promises must be async.
   10 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-10 - 1]
+[TestPromiseFunctionAsyncRule/invalid-12 - 1]
 Diagnostic 1: missingAsync (2:43 - 4:1)
 Message: Functions that return promises must be async.
    1 | 
@@ -167,7 +193,7 @@ Message: Functions that return promises must be async.
   16 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-11 - 1]
+[TestPromiseFunctionAsyncRule/invalid-13 - 1]
 Diagnostic 1: missingAsync (2:43 - 4:1)
 Message: Functions that return promises must be async.
    1 | 
@@ -198,7 +224,7 @@ Message: Functions that return promises must be async.
   16 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-12 - 1]
+[TestPromiseFunctionAsyncRule/invalid-14 - 1]
 Diagnostic 1: missingAsync (6:1 - 8:1)
 Message: Functions that return promises must be async.
    5 | 
@@ -229,7 +255,7 @@ Message: Functions that return promises must be async.
   16 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-13 - 1]
+[TestPromiseFunctionAsyncRule/invalid-15 - 1]
 Diagnostic 1: missingAsync (2:43 - 4:1)
 Message: Functions that return promises must be async.
    1 | 
@@ -260,7 +286,7 @@ Message: Functions that return promises must be async.
   11 | 
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-14 - 1]
+[TestPromiseFunctionAsyncRule/invalid-16 - 1]
 Diagnostic 1: missingAsync (4:27 - 4:49)
 Message: Functions that return promises must be async.
    3 | 
@@ -269,7 +295,7 @@ Message: Functions that return promises must be async.
    5 |       
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-15 - 1]
+[TestPromiseFunctionAsyncRule/invalid-17 - 1]
 Diagnostic 1: missingAsync (3:1 - 7:1)
 Message: Functions that return promises must be async.
    2 | interface SPromise<T> extends Promise<T> {}
@@ -286,7 +312,7 @@ Message: Functions that return promises must be async.
    8 |       
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-16 - 1]
+[TestPromiseFunctionAsyncRule/invalid-18 - 1]
 Diagnostic 1: missingAsync (3:3 - 6:3)
 Message: Functions that return promises must be async.
    2 | class Test {
@@ -301,7 +327,7 @@ Message: Functions that return promises must be async.
    7 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-17 - 1]
+[TestPromiseFunctionAsyncRule/invalid-19 - 1]
 Diagnostic 1: missingAsync (3:3 - 6:3)
 Message: Functions that return promises must be async.
    2 | class Test {
@@ -338,7 +364,7 @@ Message: Functions that return promises must be async.
   13 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-18 - 1]
+[TestPromiseFunctionAsyncRule/invalid-20 - 1]
 Diagnostic 1: missingAsync (3:3 - 5:3)
 Message: Functions that return promises must be async.
    2 | class Foo {
@@ -375,7 +401,7 @@ Message: Functions that return promises must be async.
   15 | }
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-19 - 1]
+[TestPromiseFunctionAsyncRule/invalid-21 - 1]
 Diagnostic 1: missingAsync (3:3 - 5:3)
 Message: Functions that return promises must be async.
    2 | const foo = {
@@ -388,7 +414,7 @@ Message: Functions that return promises must be async.
    6 | };
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-20 - 1]
+[TestPromiseFunctionAsyncRule/invalid-22 - 1]
 Diagnostic 1: missingAsyncHybridReturn (2:1 - 4:1)
 Message: Functions that return promises must be async.
 Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
@@ -403,7 +429,22 @@ Help: Consider adding an explicit return type annotation if the function is inte
   Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-21 - 1]
+[TestPromiseFunctionAsyncRule/invalid-23 - 1]
+Diagnostic 1: missingAsyncHybridReturn (2:1 - 4:1)
+Message: Functions that return promises must be async.
+Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
+   1 | 
+   2 | export function exportedPromiseInUnionWithoutExplicitReturnType(p: boolean) {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |   return p ? Promise.resolve(5) : 5;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+     | ~
+   5 |       
+  Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
+---
+
+[TestPromiseFunctionAsyncRule/invalid-24 - 1]
 Diagnostic 1: missingAsyncHybridReturn (4:1 - 10:1)
 Message: Functions that return promises must be async.
 Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
@@ -425,7 +466,7 @@ Help: Consider adding an explicit return type annotation if the function is inte
   Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-22 - 1]
+[TestPromiseFunctionAsyncRule/invalid-25 - 1]
 Diagnostic 1: missingAsyncHybridReturn (6:1 - 8:1)
 Message: Functions that return promises must be async.
 Help: Consider adding an explicit return type annotation if the function is intended to return a union of promise and non-promise types.
@@ -440,7 +481,7 @@ Help: Consider adding an explicit return type annotation if the function is inte
   Suggestion 1: [missingAsyncHybridReturnSuggestion] Add `async` keyword to the function.
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-23 - 1]
+[TestPromiseFunctionAsyncRule/invalid-26 - 1]
 Diagnostic 1: missingAsync (4:1 - 8:1)
 Message: Functions that return promises must be async.
    3 | function overloadingThatCanReturnPromise(a: boolean): Promise<string>;
@@ -457,7 +498,7 @@ Message: Functions that return promises must be async.
    9 |       
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-24 - 1]
+[TestPromiseFunctionAsyncRule/invalid-27 - 1]
 Diagnostic 1: missingAsync (4:1 - 6:1)
 Message: Functions that return promises must be async.
    3 | function overloadingThatIncludeAny(a: boolean): any;
@@ -470,7 +511,7 @@ Message: Functions that return promises must be async.
    7 |       
 ---
 
-[TestPromiseFunctionAsyncRule/invalid-25 - 1]
+[TestPromiseFunctionAsyncRule/invalid-28 - 1]
 Diagnostic 1: missingAsync (4:1 - 6:1)
 Message: Functions that return promises must be async.
    3 | function overloadingThatIncludeUnknown(a: boolean): unknown;

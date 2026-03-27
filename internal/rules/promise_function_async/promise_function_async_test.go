@@ -313,6 +313,42 @@ function nonAsyncPromiseFunctionDeclarationB() {
 		},
 		{
 			Code: `
+export function nonAsyncExportedPromiseFunction() {
+  return new Promise<void>();
+}
+      `,
+			Output: []string{`
+export async function nonAsyncExportedPromiseFunction() {
+  return new Promise<void>();
+}
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsync",
+				},
+			},
+		},
+		{
+			Code: `
+export default function nonAsyncDefaultExportedPromiseFunction() {
+  return new Promise<void>();
+}
+      `,
+			Output: []string{`
+export default async function nonAsyncDefaultExportedPromiseFunction() {
+  return new Promise<void>();
+}
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsync",
+				},
+			},
+		},
+		{
+			Code: `
 const nonAsyncPromiseArrowFunctionA = (p: Promise<void>) => p;
       `,
 			Output: []string{`
@@ -815,6 +851,28 @@ function promiseInUnionWithoutExplicitReturnType(p: boolean) {
 							MessageId: "missingAsyncHybridReturnSuggestion",
 							Output: `
  async function promiseInUnionWithoutExplicitReturnType(p: boolean) {
+  return p ? Promise.resolve(5) : 5;
+}
+      `,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+export function exportedPromiseInUnionWithoutExplicitReturnType(p: boolean) {
+  return p ? Promise.resolve(5) : 5;
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAsyncHybridReturn",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "missingAsyncHybridReturnSuggestion",
+							Output: `
+export async function exportedPromiseInUnionWithoutExplicitReturnType(p: boolean) {
   return p ? Promise.resolve(5) : 5;
 }
       `,
