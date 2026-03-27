@@ -3,6 +3,7 @@ package rule_tester
 import (
 	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
 
@@ -100,7 +101,14 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 		if sourceFile == nil {
 			sourceFile = program.GetSourceFile(resolvedFileName)
 		}
-		assert.Assert(t, sourceFile != nil, "couldn't get source file: "+fileName)
+		if sourceFile == nil {
+			programFiles := make([]string, 0, len(program.SourceFiles()))
+			for _, sf := range program.SourceFiles() {
+				programFiles = append(programFiles, sf.FileName())
+			}
+			slices.Sort(programFiles)
+			assert.Assert(t, false, "couldn't get source file: "+fileName+" (resolved: "+resolvedFileName+"). program source files ("+strconv.Itoa(len(programFiles))+"): "+strings.Join(programFiles, ", "))
+		}
 
 		files := []*ast.SourceFile{sourceFile}
 
