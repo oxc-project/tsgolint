@@ -11,14 +11,18 @@ import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
+let goJSONSchemaHelp = '';
+
 // ensure go-jsonschema is installed
 try {
-  execSync('go-jsonschema -h', { stdio: 'ignore' });
+  goJSONSchemaHelp = execSync('go-jsonschema -h', { encoding: 'utf8' });
   console.log('go-jsonschema is installed.');
 } catch (e) {
   console.log('go-jsonschema is not installed. Please install it first.');
   process.exit(1);
 }
+
+const supportsDisableOmitZero = goJSONSchemaHelp.includes('--disable-omitzero');
 
 console.log('Generating Go structs from JSON schemas...');
 
@@ -96,10 +100,11 @@ for (const schemaDir of schemaDirs) {
 
   console.log(`Generating Go struct for schema: ${schemaPath} and outputting to: ${outputPath}`);
   try {
+    const omitZeroArg = supportsDisableOmitZero ? ' --disable-omitzero' : '';
     execSync(
       `go-jsonschema  "${schemaPath}" -o "${outputPath}" -p ${
         path.basename(schemaDir)
-      } --tags json --resolve-extension json`,
+      } --tags json --resolve-extension json${omitZeroArg}`,
       {
         stdio: 'inherit',
       },

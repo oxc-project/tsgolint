@@ -33,7 +33,7 @@ jobs:
           go-version-file: go.mod
 
       - name: Install go-jsonschema
-        run: go install github.com/atombender/go-jsonschema@latest
+        run: go install github.com/atombender/go-jsonschema@v0.23.0
 
       - name: Generate JSON schemas
         run: node tools/gen-json-schemas.mjs
