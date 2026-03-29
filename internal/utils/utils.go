@@ -1,6 +1,7 @@
 package utils
 
 import (
+	stdjson "encoding/json"
 	"iter"
 	"slices"
 	"unicode"
@@ -190,12 +191,24 @@ func IsStringWhiteSpace(s string) bool {
 func UnmarshalOptions[T any](options any, ruleName string) T {
 	var result T
 
+	// Fast path: already strongly typed options.
+	switch opt := any(options).(type) {
+	case T:
+		return opt
+	case *T:
+		if opt != nil {
+			return *opt
+		}
+	}
+
 	// Always marshal and unmarshal to ensure defaults are applied via UnmarshalJSON
-	optsBytes, err := json.Marshal(options)
+	// Note: use encoding/json here so explicitly provided zero-values (e.g., false)
+	// are preserved even when struct tags include ",omitzero".
+	optsBytes, err := stdjson.Marshal(options)
 	if err != nil {
 		panic(ruleName + ": failed to marshal options: " + err.Error())
 	}
-	if err := json.Unmarshal(optsBytes, &result); err != nil {
+	if err := stdjson.Unmarshal(optsBytes, &result); err != nil {
 		panic(ruleName + ": failed to unmarshal options: " + err.Error())
 	}
 
