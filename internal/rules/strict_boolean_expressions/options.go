@@ -6,29 +6,29 @@ import "github.com/go-json-experiment/json"
 
 type StrictBooleanExpressionsOptions struct {
 	// AllowAny corresponds to the JSON schema field "allowAny".
-	AllowAny bool `json:"allowAny,omitempty"`
+	AllowAny bool `json:"allowAny,omitempty,omitzero"`
 
 	// AllowNullableBoolean corresponds to the JSON schema field
 	// "allowNullableBoolean".
-	AllowNullableBoolean bool `json:"allowNullableBoolean,omitempty"`
+	AllowNullableBoolean bool `json:"allowNullableBoolean,omitempty,omitzero"`
 
 	// AllowNullableEnum corresponds to the JSON schema field "allowNullableEnum".
-	AllowNullableEnum bool `json:"allowNullableEnum,omitempty"`
+	AllowNullableEnum bool `json:"allowNullableEnum,omitempty,omitzero"`
 
 	// AllowNullableNumber corresponds to the JSON schema field "allowNullableNumber".
-	AllowNullableNumber bool `json:"allowNullableNumber,omitempty"`
+	AllowNullableNumber bool `json:"allowNullableNumber,omitempty,omitzero"`
 
 	// AllowNullableObject corresponds to the JSON schema field "allowNullableObject".
-	AllowNullableObject bool `json:"allowNullableObject,omitempty"`
+	AllowNullableObject bool `json:"allowNullableObject,omitempty,omitzero"`
 
 	// AllowNullableString corresponds to the JSON schema field "allowNullableString".
-	AllowNullableString bool `json:"allowNullableString,omitempty"`
+	AllowNullableString bool `json:"allowNullableString,omitempty,omitzero"`
 
 	// AllowNumber corresponds to the JSON schema field "allowNumber".
-	AllowNumber bool `json:"allowNumber,omitempty"`
+	AllowNumber bool `json:"allowNumber,omitempty,omitzero"`
 
 	// AllowString corresponds to the JSON schema field "allowString".
-	AllowString bool `json:"allowString,omitempty"`
+	AllowString bool `json:"allowString,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

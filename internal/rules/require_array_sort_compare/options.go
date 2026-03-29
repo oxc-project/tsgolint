@@ -6,7 +6,7 @@ import "github.com/go-json-experiment/json"
 
 type RequireArraySortCompareOptions struct {
 	// IgnoreStringArrays corresponds to the JSON schema field "ignoreStringArrays".
-	IgnoreStringArrays bool `json:"ignoreStringArrays,omitempty"`
+	IgnoreStringArrays bool `json:"ignoreStringArrays,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

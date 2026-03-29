@@ -7,10 +7,10 @@ import "github.com/go-json-experiment/json"
 type NoUnnecessaryConditionOptions struct {
 	// Whether to allow constant loop conditions. true is treated as "always", false
 	// as "never".
-	AllowConstantLoopConditions interface{} `json:"allowConstantLoopConditions,omitempty"`
+	AllowConstantLoopConditions interface{} `json:"allowConstantLoopConditions,omitempty,omitzero"`
 
 	// Whether to check type predicate functions.
-	CheckTypePredicates bool `json:"checkTypePredicates,omitempty"`
+	CheckTypePredicates bool `json:"checkTypePredicates,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

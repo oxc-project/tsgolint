@@ -7,7 +7,7 @@ import "github.com/go-json-experiment/json"
 type ConsistentReturnOptions struct {
 	// TreatUndefinedAsUnspecified corresponds to the JSON schema field
 	// "treatUndefinedAsUnspecified".
-	TreatUndefinedAsUnspecified bool `json:"treatUndefinedAsUnspecified,omitempty"`
+	TreatUndefinedAsUnspecified bool `json:"treatUndefinedAsUnspecified,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

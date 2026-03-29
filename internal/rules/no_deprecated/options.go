@@ -7,7 +7,7 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type NoDeprecatedOptions struct {
 	// Allow corresponds to the JSON schema field "allow".
-	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

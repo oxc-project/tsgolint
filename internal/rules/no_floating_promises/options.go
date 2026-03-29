@@ -8,20 +8,20 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 type NoFloatingPromisesOptions struct {
 	// AllowForKnownSafeCalls corresponds to the JSON schema field
 	// "allowForKnownSafeCalls".
-	AllowForKnownSafeCalls []utils.TypeOrValueSpecifier `json:"allowForKnownSafeCalls,omitempty"`
+	AllowForKnownSafeCalls []utils.TypeOrValueSpecifier `json:"allowForKnownSafeCalls,omitempty,omitzero"`
 
 	// AllowForKnownSafePromises corresponds to the JSON schema field
 	// "allowForKnownSafePromises".
-	AllowForKnownSafePromises []utils.TypeOrValueSpecifier `json:"allowForKnownSafePromises,omitempty"`
+	AllowForKnownSafePromises []utils.TypeOrValueSpecifier `json:"allowForKnownSafePromises,omitempty,omitzero"`
 
 	// CheckThenables corresponds to the JSON schema field "checkThenables".
-	CheckThenables bool `json:"checkThenables,omitempty"`
+	CheckThenables bool `json:"checkThenables,omitempty,omitzero"`
 
 	// IgnoreIIFE corresponds to the JSON schema field "ignoreIIFE".
-	IgnoreIIFE bool `json:"ignoreIIFE,omitempty"`
+	IgnoreIIFE bool `json:"ignoreIIFE,omitempty,omitzero"`
 
 	// IgnoreVoid corresponds to the JSON schema field "ignoreVoid".
-	IgnoreVoid bool `json:"ignoreVoid,omitempty"`
+	IgnoreVoid bool `json:"ignoreVoid,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

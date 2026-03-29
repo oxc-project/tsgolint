@@ -6,10 +6,10 @@ import "github.com/go-json-experiment/json"
 
 type NoDuplicateTypeConstituentsOptions struct {
 	// IgnoreIntersections corresponds to the JSON schema field "ignoreIntersections".
-	IgnoreIntersections bool `json:"ignoreIntersections,omitempty"`
+	IgnoreIntersections bool `json:"ignoreIntersections,omitempty,omitzero"`
 
 	// IgnoreUnions corresponds to the JSON schema field "ignoreUnions".
-	IgnoreUnions bool `json:"ignoreUnions,omitempty"`
+	IgnoreUnions bool `json:"ignoreUnions,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

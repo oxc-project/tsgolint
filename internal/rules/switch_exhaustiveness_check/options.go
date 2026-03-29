@@ -6,17 +6,17 @@ import "github.com/go-json-experiment/json"
 
 type SwitchExhaustivenessCheckOptions struct {
 	// If true, allow default cases on switch statements that are already exhaustive
-	AllowDefaultCaseForExhaustiveSwitch bool `json:"allowDefaultCaseForExhaustiveSwitch,omitempty"`
+	AllowDefaultCaseForExhaustiveSwitch bool `json:"allowDefaultCaseForExhaustiveSwitch,omitempty,omitzero"`
 
 	// If true, the presence of a default case makes a union type switch exhaustive
-	ConsiderDefaultExhaustiveForUnions bool `json:"considerDefaultExhaustiveForUnions,omitempty"`
+	ConsiderDefaultExhaustiveForUnions bool `json:"considerDefaultExhaustiveForUnions,omitempty,omitzero"`
 
 	// A regular pattern for a comment explaining why the default case is not
 	// exhaustive
-	DefaultCaseCommentPattern *string `json:"defaultCaseCommentPattern,omitempty"`
+	DefaultCaseCommentPattern *string `json:"defaultCaseCommentPattern,omitempty,omitzero"`
 
 	// If true, require a default clause for switches on non-union types
-	RequireDefaultForNonUnion bool `json:"requireDefaultForNonUnion,omitempty"`
+	RequireDefaultForNonUnion bool `json:"requireDefaultForNonUnion,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

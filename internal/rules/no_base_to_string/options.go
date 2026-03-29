@@ -6,10 +6,10 @@ import "github.com/go-json-experiment/json"
 
 type NoBaseToStringOptions struct {
 	// Whether to also check values of type `unknown`.
-	CheckUnknown bool `json:"checkUnknown,omitempty"`
+	CheckUnknown bool `json:"checkUnknown,omitempty,omitzero"`
 
 	// IgnoredTypeNames corresponds to the JSON schema field "ignoredTypeNames".
-	IgnoredTypeNames []string `json:"ignoredTypeNames,omitempty"`
+	IgnoredTypeNames []string `json:"ignoredTypeNames,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

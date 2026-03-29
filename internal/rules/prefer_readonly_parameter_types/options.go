@@ -7,16 +7,16 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type PreferReadonlyParameterTypesOptions struct {
 	// An array of type specifiers to ignore.
-	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty,omitzero"`
 
 	// Whether to check class parameter properties.
-	CheckParameterProperties bool `json:"checkParameterProperties,omitempty"`
+	CheckParameterProperties bool `json:"checkParameterProperties,omitempty,omitzero"`
 
 	// Whether to ignore parameters which don't explicitly specify a type.
-	IgnoreInferredTypes bool `json:"ignoreInferredTypes,omitempty"`
+	IgnoreInferredTypes bool `json:"ignoreInferredTypes,omitempty,omitzero"`
 
 	// Whether to treat all mutable methods as though they are readonly.
-	TreatMethodsAsReadonly bool `json:"treatMethodsAsReadonly,omitempty"`
+	TreatMethodsAsReadonly bool `json:"treatMethodsAsReadonly,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

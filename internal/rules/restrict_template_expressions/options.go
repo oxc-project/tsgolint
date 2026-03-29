@@ -7,28 +7,28 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type RestrictTemplateExpressionsOptions struct {
 	// Allow corresponds to the JSON schema field "allow".
-	Allow []utils.TypeOrValueSpecifier `json:"allow"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty,omitzero"`
 
 	// AllowAny corresponds to the JSON schema field "allowAny".
-	AllowAny bool `json:"allowAny,omitempty"`
+	AllowAny bool `json:"allowAny,omitempty,omitzero"`
 
 	// AllowArray corresponds to the JSON schema field "allowArray".
-	AllowArray bool `json:"allowArray,omitempty"`
+	AllowArray bool `json:"allowArray,omitempty,omitzero"`
 
 	// AllowBoolean corresponds to the JSON schema field "allowBoolean".
-	AllowBoolean bool `json:"allowBoolean,omitempty"`
+	AllowBoolean bool `json:"allowBoolean,omitempty,omitzero"`
 
 	// AllowNever corresponds to the JSON schema field "allowNever".
-	AllowNever bool `json:"allowNever,omitempty"`
+	AllowNever bool `json:"allowNever,omitempty,omitzero"`
 
 	// AllowNullish corresponds to the JSON schema field "allowNullish".
-	AllowNullish bool `json:"allowNullish,omitempty"`
+	AllowNullish bool `json:"allowNullish,omitempty,omitzero"`
 
 	// AllowNumber corresponds to the JSON schema field "allowNumber".
-	AllowNumber bool `json:"allowNumber,omitempty"`
+	AllowNumber bool `json:"allowNumber,omitempty,omitzero"`
 
 	// AllowRegExp corresponds to the JSON schema field "allowRegExp".
-	AllowRegExp bool `json:"allowRegExp,omitempty"`
+	AllowRegExp bool `json:"allowRegExp,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

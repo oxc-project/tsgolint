@@ -6,22 +6,22 @@ import "github.com/go-json-experiment/json"
 
 type ChecksVoidReturnOptions struct {
 	// Arguments corresponds to the JSON schema field "arguments".
-	Arguments bool `json:"arguments,omitempty"`
+	Arguments bool `json:"arguments,omitempty,omitzero"`
 
 	// Attributes corresponds to the JSON schema field "attributes".
-	Attributes bool `json:"attributes,omitempty"`
+	Attributes bool `json:"attributes,omitempty,omitzero"`
 
 	// InheritedMethods corresponds to the JSON schema field "inheritedMethods".
-	InheritedMethods bool `json:"inheritedMethods,omitempty"`
+	InheritedMethods bool `json:"inheritedMethods,omitempty,omitzero"`
 
 	// Properties corresponds to the JSON schema field "properties".
-	Properties bool `json:"properties,omitempty"`
+	Properties bool `json:"properties,omitempty,omitzero"`
 
 	// Returns corresponds to the JSON schema field "returns".
-	Returns bool `json:"returns,omitempty"`
+	Returns bool `json:"returns,omitempty,omitzero"`
 
 	// Variables corresponds to the JSON schema field "variables".
-	Variables bool `json:"variables,omitempty"`
+	Variables bool `json:"variables,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -59,13 +59,13 @@ func (j *ChecksVoidReturnOptions) UnmarshalJSON(value []byte) error {
 
 type NoMisusedPromisesOptions struct {
 	// ChecksConditionals corresponds to the JSON schema field "checksConditionals".
-	ChecksConditionals bool `json:"checksConditionals,omitempty"`
+	ChecksConditionals bool `json:"checksConditionals,omitempty,omitzero"`
 
 	// ChecksSpreads corresponds to the JSON schema field "checksSpreads".
-	ChecksSpreads bool `json:"checksSpreads,omitempty"`
+	ChecksSpreads bool `json:"checksSpreads,omitempty,omitzero"`
 
 	// ChecksVoidReturn corresponds to the JSON schema field "checksVoidReturn".
-	ChecksVoidReturn interface{} `json:"checksVoidReturn,omitempty"`
+	ChecksVoidReturn interface{} `json:"checksVoidReturn,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

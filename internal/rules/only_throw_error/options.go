@@ -7,16 +7,16 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type OnlyThrowErrorOptions struct {
 	// An array of type or value specifiers which are allowed to be thrown
-	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty"`
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty,omitzero"`
 
 	// Whether to allow rethrowing caught values that are not Error objects
-	AllowRethrowing bool `json:"allowRethrowing,omitempty"`
+	AllowRethrowing bool `json:"allowRethrowing,omitempty,omitzero"`
 
 	// Whether to allow throwing values typed as any
-	AllowThrowingAny bool `json:"allowThrowingAny,omitempty"`
+	AllowThrowingAny bool `json:"allowThrowingAny,omitempty,omitzero"`
 
 	// Whether to allow throwing values typed as unknown
-	AllowThrowingUnknown bool `json:"allowThrowingUnknown,omitempty"`
+	AllowThrowingUnknown bool `json:"allowThrowingUnknown,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

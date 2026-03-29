@@ -7,21 +7,21 @@ import "github.com/go-json-experiment/json"
 type DotNotationOptions struct {
 	// Whether to allow accessing properties matching an index signature with array
 	// notation.
-	AllowIndexSignaturePropertyAccess bool `json:"allowIndexSignaturePropertyAccess,omitempty"`
+	AllowIndexSignaturePropertyAccess bool `json:"allowIndexSignaturePropertyAccess,omitempty,omitzero"`
 
 	// Whether to allow keywords such as ["class"].
-	AllowKeywords bool `json:"allowKeywords,omitempty"`
+	AllowKeywords bool `json:"allowKeywords,omitempty,omitzero"`
 
 	// Regular expression of names to allow.
-	AllowPattern string `json:"allowPattern,omitempty"`
+	AllowPattern string `json:"allowPattern,omitempty,omitzero"`
 
 	// Whether to allow accessing class members marked as `private` with array
 	// notation.
-	AllowPrivateClassPropertyAccess bool `json:"allowPrivateClassPropertyAccess,omitempty"`
+	AllowPrivateClassPropertyAccess bool `json:"allowPrivateClassPropertyAccess,omitempty,omitzero"`
 
 	// Whether to allow accessing class members marked as `protected` with array
 	// notation.
-	AllowProtectedClassPropertyAccess bool `json:"allowProtectedClassPropertyAccess,omitempty"`
+	AllowProtectedClassPropertyAccess bool `json:"allowProtectedClassPropertyAccess,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

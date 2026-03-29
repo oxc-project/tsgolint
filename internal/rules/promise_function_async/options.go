@@ -6,25 +6,25 @@ import "github.com/go-json-experiment/json"
 
 type PromiseFunctionAsyncOptions struct {
 	// AllowAny corresponds to the JSON schema field "allowAny".
-	AllowAny bool `json:"allowAny,omitempty"`
+	AllowAny bool `json:"allowAny,omitempty,omitzero"`
 
 	// AllowedPromiseNames corresponds to the JSON schema field "allowedPromiseNames".
-	AllowedPromiseNames []string `json:"allowedPromiseNames,omitempty"`
+	AllowedPromiseNames []string `json:"allowedPromiseNames,omitempty,omitzero"`
 
 	// CheckArrowFunctions corresponds to the JSON schema field "checkArrowFunctions".
-	CheckArrowFunctions bool `json:"checkArrowFunctions,omitempty"`
+	CheckArrowFunctions bool `json:"checkArrowFunctions,omitempty,omitzero"`
 
 	// CheckFunctionDeclarations corresponds to the JSON schema field
 	// "checkFunctionDeclarations".
-	CheckFunctionDeclarations bool `json:"checkFunctionDeclarations,omitempty"`
+	CheckFunctionDeclarations bool `json:"checkFunctionDeclarations,omitempty,omitzero"`
 
 	// CheckFunctionExpressions corresponds to the JSON schema field
 	// "checkFunctionExpressions".
-	CheckFunctionExpressions bool `json:"checkFunctionExpressions,omitempty"`
+	CheckFunctionExpressions bool `json:"checkFunctionExpressions,omitempty,omitzero"`
 
 	// CheckMethodDeclarations corresponds to the JSON schema field
 	// "checkMethodDeclarations".
-	CheckMethodDeclarations bool `json:"checkMethodDeclarations,omitempty"`
+	CheckMethodDeclarations bool `json:"checkMethodDeclarations,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

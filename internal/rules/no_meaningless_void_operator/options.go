@@ -6,7 +6,7 @@ import "github.com/go-json-experiment/json"
 
 type NoMeaninglessVoidOperatorOptions struct {
 	// CheckNever corresponds to the JSON schema field "checkNever".
-	CheckNever bool `json:"checkNever,omitempty"`
+	CheckNever bool `json:"checkNever,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

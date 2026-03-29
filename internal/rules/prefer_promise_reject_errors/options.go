@@ -6,14 +6,14 @@ import "github.com/go-json-experiment/json"
 
 type PreferPromiseRejectErrorsOptions struct {
 	// AllowEmptyReject corresponds to the JSON schema field "allowEmptyReject".
-	AllowEmptyReject bool `json:"allowEmptyReject,omitempty"`
+	AllowEmptyReject bool `json:"allowEmptyReject,omitempty,omitzero"`
 
 	// AllowThrowingAny corresponds to the JSON schema field "allowThrowingAny".
-	AllowThrowingAny bool `json:"allowThrowingAny,omitempty"`
+	AllowThrowingAny bool `json:"allowThrowingAny,omitempty,omitzero"`
 
 	// AllowThrowingUnknown corresponds to the JSON schema field
 	// "allowThrowingUnknown".
-	AllowThrowingUnknown bool `json:"allowThrowingUnknown,omitempty"`
+	AllowThrowingUnknown bool `json:"allowThrowingUnknown,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

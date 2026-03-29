@@ -6,22 +6,22 @@ import "github.com/go-json-experiment/json"
 
 type RestrictPlusOperandsOptions struct {
 	// Whether to allow `any` typed values
-	AllowAny bool `json:"allowAny,omitempty"`
+	AllowAny bool `json:"allowAny,omitempty,omitzero"`
 
 	// Whether to allow `boolean` typed values
-	AllowBoolean bool `json:"allowBoolean,omitempty"`
+	AllowBoolean bool `json:"allowBoolean,omitempty,omitzero"`
 
 	// Whether to allow potentially `null` or `undefined` typed values
-	AllowNullish bool `json:"allowNullish,omitempty"`
+	AllowNullish bool `json:"allowNullish,omitempty,omitzero"`
 
 	// Whether to allow mixing `number` and `string` typed values
-	AllowNumberAndString bool `json:"allowNumberAndString,omitempty"`
+	AllowNumberAndString bool `json:"allowNumberAndString,omitempty,omitzero"`
 
 	// Whether to allow `regexp` typed values
-	AllowRegExp bool `json:"allowRegExp,omitempty"`
+	AllowRegExp bool `json:"allowRegExp,omitempty,omitzero"`
 
 	// Whether to skip compound assignments such as `+=`
-	SkipCompoundAssignments bool `json:"skipCompoundAssignments,omitempty"`
+	SkipCompoundAssignments bool `json:"skipCompoundAssignments,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

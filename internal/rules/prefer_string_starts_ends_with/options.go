@@ -8,7 +8,7 @@ import "reflect"
 
 type PreferStringStartsEndsWithOptions struct {
 	// Whether to allow equality checks against the first or last element of a string.
-	AllowSingleElementEquality *PreferStringStartsEndsWithOptionsAllowSingleElementEquality `json:"allowSingleElementEquality,omitempty"`
+	AllowSingleElementEquality *PreferStringStartsEndsWithOptionsAllowSingleElementEquality `json:"allowSingleElementEquality,omitempty,omitzero"`
 }
 
 type PreferStringStartsEndsWithOptionsAllowSingleElementEquality string

@@ -7,11 +7,11 @@ import "github.com/go-json-experiment/json"
 type NoUnnecessaryBooleanLiteralCompareOptions struct {
 	// AllowComparingNullableBooleansToFalse corresponds to the JSON schema field
 	// "allowComparingNullableBooleansToFalse".
-	AllowComparingNullableBooleansToFalse bool `json:"allowComparingNullableBooleansToFalse,omitempty"`
+	AllowComparingNullableBooleansToFalse bool `json:"allowComparingNullableBooleansToFalse,omitempty,omitzero"`
 
 	// AllowComparingNullableBooleansToTrue corresponds to the JSON schema field
 	// "allowComparingNullableBooleansToTrue".
-	AllowComparingNullableBooleansToTrue bool `json:"allowComparingNullableBooleansToTrue,omitempty"`
+	AllowComparingNullableBooleansToTrue bool `json:"allowComparingNullableBooleansToTrue,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

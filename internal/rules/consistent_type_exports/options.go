@@ -7,7 +7,7 @@ import "github.com/go-json-experiment/json"
 type ConsistentTypeExportsOptions struct {
 	// FixMixedExportsWithInlineTypeSpecifier corresponds to the JSON schema field
 	// "fixMixedExportsWithInlineTypeSpecifier".
-	FixMixedExportsWithInlineTypeSpecifier bool `json:"fixMixedExportsWithInlineTypeSpecifier,omitempty"`
+	FixMixedExportsWithInlineTypeSpecifier bool `json:"fixMixedExportsWithInlineTypeSpecifier,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

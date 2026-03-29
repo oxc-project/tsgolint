@@ -7,35 +7,35 @@ import "github.com/go-json-experiment/json"
 type PreferOptionalChainOptions struct {
 	// Allow autofixers that will change the return type of the expression. This
 	// option is considered unsafe as it may break the build.
-	AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing bool `json:"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing,omitempty"`
+	AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing bool `json:"allowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing,omitempty,omitzero"`
 
 	// Check operands that are typed as `any` when inspecting 'loose boolean'
 	// operands.
-	CheckAny bool `json:"checkAny,omitempty"`
+	CheckAny bool `json:"checkAny,omitempty,omitzero"`
 
 	// Check operands that are typed as `bigint` when inspecting 'loose boolean'
 	// operands.
-	CheckBigInt bool `json:"checkBigInt,omitempty"`
+	CheckBigInt bool `json:"checkBigInt,omitempty,omitzero"`
 
 	// Check operands that are typed as `boolean` when inspecting 'loose boolean'
 	// operands.
-	CheckBoolean bool `json:"checkBoolean,omitempty"`
+	CheckBoolean bool `json:"checkBoolean,omitempty,omitzero"`
 
 	// Check operands that are typed as `number` when inspecting 'loose boolean'
 	// operands.
-	CheckNumber bool `json:"checkNumber,omitempty"`
+	CheckNumber bool `json:"checkNumber,omitempty,omitzero"`
 
 	// Check operands that are typed as `string` when inspecting 'loose boolean'
 	// operands.
-	CheckString bool `json:"checkString,omitempty"`
+	CheckString bool `json:"checkString,omitempty,omitzero"`
 
 	// Check operands that are typed as `unknown` when inspecting 'loose boolean'
 	// operands.
-	CheckUnknown bool `json:"checkUnknown,omitempty"`
+	CheckUnknown bool `json:"checkUnknown,omitempty,omitzero"`
 
 	// Skip operands that are not typed with `null` and/or `undefined` when inspecting
 	// 'loose boolean' operands.
-	RequireNullish bool `json:"requireNullish,omitempty"`
+	RequireNullish bool `json:"requireNullish,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

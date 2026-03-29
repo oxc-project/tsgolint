@@ -6,7 +6,7 @@ import "github.com/go-json-experiment/json"
 
 type UnboundMethodOptions struct {
 	// IgnoreStatic corresponds to the JSON schema field "ignoreStatic".
-	IgnoreStatic bool `json:"ignoreStatic,omitempty"`
+	IgnoreStatic bool `json:"ignoreStatic,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

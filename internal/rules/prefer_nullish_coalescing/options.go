@@ -7,16 +7,16 @@ import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type IgnorePrimitivesOptions struct {
 	// Ignore bigint primitive types.
-	Bigint bool `json:"bigint,omitempty"`
+	Bigint bool `json:"bigint,omitempty,omitzero"`
 
 	// Ignore boolean primitive types.
-	Boolean bool `json:"boolean,omitempty"`
+	Boolean bool `json:"boolean,omitempty,omitzero"`
 
 	// Ignore number primitive types.
-	Number bool `json:"number,omitempty"`
+	Number bool `json:"number,omitempty,omitzero"`
 
 	// Ignore string primitive types.
-	String bool `json:"string,omitempty"`
+	String bool `json:"string,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -48,26 +48,26 @@ func (j *IgnorePrimitivesOptions) UnmarshalJSON(value []byte) error {
 
 type PreferNullishCoalescingOptions struct {
 	// Whether to ignore arguments to the `Boolean` constructor
-	IgnoreBooleanCoercion bool `json:"ignoreBooleanCoercion,omitempty"`
+	IgnoreBooleanCoercion bool `json:"ignoreBooleanCoercion,omitempty,omitzero"`
 
 	// Whether to ignore cases that are located within a conditional test.
-	IgnoreConditionalTests bool `json:"ignoreConditionalTests,omitempty"`
+	IgnoreConditionalTests bool `json:"ignoreConditionalTests,omitempty,omitzero"`
 
 	// Whether to ignore any if statements that could be simplified by using the
 	// nullish coalescing operator.
-	IgnoreIfStatements bool `json:"ignoreIfStatements,omitempty"`
+	IgnoreIfStatements bool `json:"ignoreIfStatements,omitempty,omitzero"`
 
 	// Whether to ignore any logical or expressions that are part of a mixed logical
 	// expression (with `&&`).
-	IgnoreMixedLogicalExpressions bool `json:"ignoreMixedLogicalExpressions,omitempty"`
+	IgnoreMixedLogicalExpressions bool `json:"ignoreMixedLogicalExpressions,omitempty,omitzero"`
 
 	// Whether to ignore all (`true`) or some (an object with properties) primitive
 	// types.
-	IgnorePrimitives utils.BoolOr[IgnorePrimitivesOptions] `json:"ignorePrimitives,omitempty"`
+	IgnorePrimitives utils.BoolOr[IgnorePrimitivesOptions] `json:"ignorePrimitives,omitempty,omitzero"`
 
 	// Whether to ignore any ternary expressions that could be simplified by using the
 	// nullish coalescing operator.
-	IgnoreTernaryTests bool `json:"ignoreTernaryTests,omitempty"`
+	IgnoreTernaryTests bool `json:"ignoreTernaryTests,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

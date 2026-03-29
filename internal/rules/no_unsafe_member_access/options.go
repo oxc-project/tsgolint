@@ -6,7 +6,7 @@ import "github.com/go-json-experiment/json"
 
 type NoUnsafeMemberAccessOptions struct {
 	// Whether to allow `?.` optional chains on `any` values.
-	AllowOptionalChaining bool `json:"allowOptionalChaining,omitempty"`
+	AllowOptionalChaining bool `json:"allowOptionalChaining,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

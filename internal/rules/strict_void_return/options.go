@@ -6,7 +6,7 @@ import "github.com/go-json-experiment/json"
 
 type StrictVoidReturnOptions struct {
 	// AllowReturnAny corresponds to the JSON schema field "allowReturnAny".
-	AllowReturnAny bool `json:"allowReturnAny,omitempty"`
+	AllowReturnAny bool `json:"allowReturnAny,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

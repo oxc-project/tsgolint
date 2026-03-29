@@ -7,7 +7,7 @@ import "github.com/go-json-experiment/json"
 type PreferReadonlyOptions struct {
 	// Whether to restrict checking only to members immediately assigned a lambda
 	// value.
-	OnlyInlineLambdas bool `json:"onlyInlineLambdas,omitempty"`
+	OnlyInlineLambdas bool `json:"onlyInlineLambdas,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

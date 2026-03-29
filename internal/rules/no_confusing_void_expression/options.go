@@ -7,14 +7,14 @@ import "github.com/go-json-experiment/json"
 type NoConfusingVoidExpressionOptions struct {
 	// IgnoreArrowShorthand corresponds to the JSON schema field
 	// "ignoreArrowShorthand".
-	IgnoreArrowShorthand bool `json:"ignoreArrowShorthand,omitempty"`
+	IgnoreArrowShorthand bool `json:"ignoreArrowShorthand,omitempty,omitzero"`
 
 	// IgnoreVoidOperator corresponds to the JSON schema field "ignoreVoidOperator".
-	IgnoreVoidOperator bool `json:"ignoreVoidOperator,omitempty"`
+	IgnoreVoidOperator bool `json:"ignoreVoidOperator,omitempty,omitzero"`
 
 	// IgnoreVoidReturningFunctions corresponds to the JSON schema field
 	// "ignoreVoidReturningFunctions".
-	IgnoreVoidReturningFunctions bool `json:"ignoreVoidReturningFunctions,omitempty"`
+	IgnoreVoidReturningFunctions bool `json:"ignoreVoidReturningFunctions,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

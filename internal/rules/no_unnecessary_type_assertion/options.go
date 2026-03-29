@@ -6,10 +6,10 @@ import "github.com/go-json-experiment/json"
 
 type NoUnnecessaryTypeAssertionOptions struct {
 	// Whether to check literal const assertions.
-	CheckLiteralConstAssertions bool `json:"checkLiteralConstAssertions,omitempty"`
+	CheckLiteralConstAssertions bool `json:"checkLiteralConstAssertions,omitempty,omitzero"`
 
 	// TypesToIgnore corresponds to the JSON schema field "typesToIgnore".
-	TypesToIgnore []string `json:"typesToIgnore,omitempty"`
+	TypesToIgnore []string `json:"typesToIgnore,omitempty,omitzero"`
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
