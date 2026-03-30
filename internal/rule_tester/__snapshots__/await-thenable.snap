@@ -186,3 +186,244 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
    5 |   }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
+
+[TestAwaitThenable/invalid-18 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Array<number>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-19 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:14 - 3:14)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Array<number> | Array<Promise<number>>;
+   3 | Promise.race(x);
+     |              ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-20 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:20 - 3:20)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Array<number> | Array<string>;
+   3 | Promise.allSettled(x);
+     |                    ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-21 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Array<number | Promise<number>>;
+   3 | Promise.any(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-22 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: [number];
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-23 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: [number] | [Promise<number>];
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-24 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: [number | Promise<number>];
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-25 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: [Promise<number>, number];
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-26 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Iterable<number>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-27 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Iterable<number> | Iterable<Promise<number>>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-28 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Iterable<number | Promise<number>>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-29 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Iterable<string> | Array<Promise<unknown>>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-30 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Iterable<Promise<string>> | [string, Promise<unknown>];
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-31 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Array<string> | [Promise<string>, Promise<unknown>];
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-32 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Array<Array<Promise<number>>>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-33 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (5:13 - 5:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   4 | 
+   5 | Promise.all(x);
+     |             ~
+   6 |       
+---
+
+[TestAwaitThenable/invalid-34 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (7:13 - 7:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   6 | 
+   7 | Promise.all(x);
+     |             ~
+   8 |       
+---
+
+[TestAwaitThenable/invalid-35 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (8:13 - 8:15)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   7 | 
+   8 | Promise.all(x());
+     |             ~~~
+   9 |       
+---
+
+[TestAwaitThenable/invalid-36 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (6:13 - 6:15)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   5 | 
+   6 | Promise.all(x());
+     |             ~~~
+   7 |       
+---
+
+[TestAwaitThenable/invalid-37 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (6:13 - 6:15)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   5 | 
+   6 | Promise.all(x());
+     |             ~~~
+   7 |       
+---
+
+[TestAwaitThenable/invalid-38 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: Generator<number>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-39 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: ReadonlyArray<number>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-40 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   2 | declare const x: ReadonlyArray<number | Promise<string>>;
+   3 | Promise.all(x);
+     |             ~
+   4 |       
+---
+
+[TestAwaitThenable/invalid-41 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:34 - 2:34)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   1 | 
+   2 | Promise.all([Promise.resolve(1), 2, Promise.resolve(3)]);
+     |                                  ~
+   3 |       
+---
+
+[TestAwaitThenable/invalid-42 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:14)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   1 | 
+   2 | Promise.all([1, 2, Promise.resolve(3)]);
+     |              ~
+   3 |       
+
+Diagnostic 2: invalidPromiseAggregatorInput (2:17 - 2:17)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   1 | 
+   2 | Promise.all([1, 2, Promise.resolve(3)]);
+     |                 ~
+   3 |       
+---
+
+[TestAwaitThenable/invalid-43 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:25)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+   1 | 
+   2 | Promise.all([...[1, 2, 3]]);
+     |              ~~~~~~~~~~~~
+   3 |       
+---
