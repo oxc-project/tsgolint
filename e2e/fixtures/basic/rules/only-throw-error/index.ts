@@ -9,3 +9,4 @@ throw true; // throwing boolean
 throw { message: 'error' }; // throwing plain object
 
 throw null; // throwing null
+export {}

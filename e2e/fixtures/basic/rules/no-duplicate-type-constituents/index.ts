@@ -12,3 +12,4 @@ type T5 =
   | 'foo'
   | 'bar'
   | 'foo';
+export {}

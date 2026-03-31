@@ -11,3 +11,4 @@ const result3 = -bool; // unsafe on boolean
 
 declare const obj: object;
 const result4 = -obj; // unsafe on object
+export {}

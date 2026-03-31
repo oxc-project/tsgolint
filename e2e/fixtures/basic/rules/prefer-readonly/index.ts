@@ -10,3 +10,4 @@ class Example {
     return this.ok;
   }
 }
+export {}

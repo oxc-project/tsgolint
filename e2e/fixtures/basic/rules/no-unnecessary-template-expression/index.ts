@@ -8,3 +8,4 @@ const str3 = `true`;
 
 // Template with only literal expressions
 const str4 = `${'Hello'} ${'world'}`;
+export {}

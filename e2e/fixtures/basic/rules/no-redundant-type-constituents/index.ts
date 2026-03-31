@@ -8,3 +8,4 @@ type T2 = string | any;
 
 // never is redundant in unions
 type T3 = string | never;
+export {}

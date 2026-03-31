@@ -12,3 +12,4 @@ enum Color {
 
 // Comparing different enums
 const comparison = Status.Open === Color.Red;
+export {}

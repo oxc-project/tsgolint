@@ -10,3 +10,4 @@ function processValue(input: unknown) {
   const processed = input as any; // unsafe
   return processed.someProperty;
 }
+export {}

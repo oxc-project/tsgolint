@@ -9,3 +9,4 @@ anyValue.bar.baz; // unsafe nested member access
 anyValue['key']; // unsafe computed member access
 
 const result = anyValue.method(); // unsafe method access
+export {}

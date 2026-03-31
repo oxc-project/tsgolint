@@ -86,6 +86,36 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "await",
     },
     "range": {
+      "end": 70,
+      "pos": 65,
+    },
+    "rule": "await-thenable",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 70,
+              "pos": 65,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove unnecessary \`await\`.",
+          "id": "removeAwait",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/await-thenable/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "id": "await",
+    },
+    "range": {
       "end": 111,
       "pos": 106,
     },
@@ -97,6 +127,36 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
             "range": {
               "end": 111,
               "pos": 106,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove unnecessary \`await\`.",
+          "id": "removeAwait",
+        },
+      },
+    ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/await-thenable/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "id": "await",
+    },
+    "range": {
+      "end": 130,
+      "pos": 125,
+    },
+    "rule": "await-thenable",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 130,
+              "pos": 125,
             },
             "text": "",
           },
@@ -137,32 +197,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
     ],
-  },
-  {
-    "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe call of a(n) \`error\` type typed value.",
-      "id": "unsafeCall",
-    },
-    "range": {
-      "end": 70,
-      "pos": 65,
-    },
-    "rule": "no-unsafe-call",
-  },
-  {
-    "file_path": "fixtures/basic/rules/await-thenable/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "Unsafe call of a(n) \`error\` type typed value.",
-      "id": "unsafeCall",
-    },
-    "range": {
-      "end": 137,
-      "pos": 133,
-    },
-    "rule": "no-unsafe-call",
   },
   {
     "file_path": "fixtures/basic/rules/consistent-return/index.ts",
@@ -376,6 +410,45 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 245,
     },
     "rule": "no-unnecessary-condition",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe assignment of an error typed value.",
+      "id": "anyAssignment",
+    },
+    "range": {
+      "end": 215,
+      "pos": 176,
+    },
+    "rule": "no-unsafe-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe call of a(n) \`error\` type typed value.",
+      "id": "unsafeCall",
+    },
+    "range": {
+      "end": 139,
+      "pos": 136,
+    },
+    "rule": "no-unsafe-call",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe call of a(n) \`error\` type typed value.",
+      "id": "unsafeCall",
+    },
+    "range": {
+      "end": 213,
+      "pos": 210,
+    },
+    "rule": "no-unsafe-call",
   },
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
@@ -913,7 +986,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
+      "description": "void operator shouldn't be used on void; it should convey that a return value is being ignored",
       "id": "meaninglessVoidOperator",
     },
     "range": {
@@ -1941,19 +2014,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
-      "description": "Mixing number and string enums can be confusing.",
-      "id": "mixed",
-    },
-    "range": {
-      "end": 95,
-      "pos": 89,
-    },
-    "rule": "no-mixed-enums",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Unnecessary comparison between literal values.",
       "id": "comparisonBetweenLiteralTypes",
     },
@@ -1962,6 +2022,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 217,
     },
     "rule": "no-unnecessary-condition",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The two values in this comparison do not have a shared enum type.",
+      "id": "mismatchedCondition",
+    },
+    "range": {
+      "end": 242,
+      "pos": 217,
+    },
+    "rule": "no-unsafe-enum-comparison",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
@@ -2217,19 +2290,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
     "kind": 0,
     "message": {
-      "description": "Argument of unary negation should be assignable to number | bigint but is unknown instead.",
-      "id": "unaryMinus",
-    },
-    "range": {
-      "end": 110,
-      "pos": 104,
-    },
-    "rule": "no-unsafe-unary-minus",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
-    "kind": 0,
-    "message": {
       "description": "Argument of unary negation should be assignable to number | bigint but is string instead.",
       "id": "unaryMinus",
     },
@@ -2256,7 +2316,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-unary-minus/index.ts",
     "kind": 0,
     "message": {
-      "description": "Argument of unary negation should be assignable to number | bigint but is { prop: any; } instead.",
+      "description": "Argument of unary negation should be assignable to number | bigint but is object instead.",
       "id": "unaryMinus",
     },
     "range": {
@@ -3285,7 +3345,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "labeled_ranges": [
       {
-        "label": "Type: { prop: any; }",
+        "label": "Type: object",
         "range": {
           "end": 247,
           "pos": 244,
@@ -3329,7 +3389,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "labeled_ranges": [
       {
-        "label": "Type: (a: string, b: never) => string",
+        "label": "Type: () => void",
         "range": {
           "end": 400,
           "pos": 398,
@@ -3351,7 +3411,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "labeled_ranges": [
       {
-        "label": "Type: number[]",
+        "label": "Type: unknown[]",
         "range": {
           "end": 468,
           "pos": 465,

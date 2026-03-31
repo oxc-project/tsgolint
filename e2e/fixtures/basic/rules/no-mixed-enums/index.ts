@@ -11,3 +11,4 @@ enum Direction {
   Left = 'left',
   Right = 4,
 }
+export {}

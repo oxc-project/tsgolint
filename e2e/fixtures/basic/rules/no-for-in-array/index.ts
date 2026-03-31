@@ -9,3 +9,4 @@ for (const i in arr) {
 for (const i in arr) {
   console.log(i, arr[i]);
 }
+export {}

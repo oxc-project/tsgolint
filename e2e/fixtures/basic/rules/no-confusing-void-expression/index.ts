@@ -10,3 +10,4 @@ const result = condition ? void foo() : bar();
 if (void foo()) {
   // ...
 }
+export {}

@@ -5,3 +5,4 @@ interface MutableInput {
 function consume(input: MutableInput): void {
   input.value = input.value.trim();
 }
+export {}

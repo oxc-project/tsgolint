@@ -9,3 +9,4 @@ Promise.reject(true); // rejecting with boolean
 Promise.reject({ message: 'error' }); // rejecting with plain object
 
 Promise.reject(null); // rejecting with null
+export {}

@@ -10,3 +10,4 @@ const result = anyValue('hello'); // unsafe call
 
 // Chained unsafe calls
 anyValue().then().catch(); // unsafe
+export {}

@@ -9,3 +9,4 @@ const mapSpread = { ...map };
 
 declare const userName: string;
 const characters = [...userName];
+export {}

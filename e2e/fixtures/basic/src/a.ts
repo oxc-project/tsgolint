@@ -12,3 +12,4 @@ Promise.reject("value").catch();
 Promise.reject("value").finally();
 
 [1, 2, 3].map(async (x) => x + 1);
+export {}

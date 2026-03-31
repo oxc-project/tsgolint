@@ -7,3 +7,4 @@
 
 // This will evaluate to 'Symbol()'
 Symbol('foo').toString();
+export {}

@@ -10,3 +10,5 @@ const result = identity<string>('hello');
 interface Container<T = number> {
   value: T;
 }
+
+export {};

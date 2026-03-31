@@ -9,3 +9,4 @@ if (someCondition === true) {
 if (someCondition === false) {
   // ...
 }
+export {}

@@ -4,3 +4,4 @@ namespace A {
   export type B = number;
   const x: A.B = 3;
 }
+export {}

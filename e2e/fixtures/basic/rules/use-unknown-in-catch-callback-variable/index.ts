@@ -33,3 +33,4 @@ declare function riskyOperation(): void;
 declare function handleError(error: unknown): void;
 declare const promise: Promise<any>;
 declare function performOperation(): void;
+export {}

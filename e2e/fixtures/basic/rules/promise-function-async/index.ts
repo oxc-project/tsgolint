@@ -11,3 +11,4 @@ class DataService {
     return fetch('/api/data').then(res => res.json());
   }
 }
+export {}

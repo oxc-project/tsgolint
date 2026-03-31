@@ -29,3 +29,4 @@ setTimeout(calc.add, 1000, 10); // Error: 'this' context lost
 // Class method destructuring
 const { getValue: getVal } = calc;
 getVal(); // Error: 'this' context lost
+export {}

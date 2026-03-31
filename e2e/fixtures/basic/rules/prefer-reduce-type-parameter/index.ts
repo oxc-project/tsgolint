@@ -10,3 +10,4 @@ const result = [1, 2, 3].reduce((acc: string[], curr) => {
   acc.push(curr.toString());
   return acc;
 }, [] as string[]);
+export {}

@@ -11,3 +11,4 @@ function handleStatus(status: OrderStatus) {
     // Missing 'rejected' case
   }
 }
+export {}

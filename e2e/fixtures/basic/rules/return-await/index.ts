@@ -30,3 +30,4 @@ declare function fetchData(): Promise<string>;
 declare function handleAsync(): Promise<Response>;
 declare interface User { id: number; }
 declare interface Response { data: any; }
+export {}

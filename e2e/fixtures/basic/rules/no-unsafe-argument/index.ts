@@ -10,3 +10,4 @@ takesString(anyValue); // unsafe
 
 declare function takesNumber(num: number): number;
 const result = takesNumber(anyValue); // unsafe
+export {}

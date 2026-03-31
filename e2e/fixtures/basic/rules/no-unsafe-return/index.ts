@@ -11,3 +11,4 @@ const getNumber = (): number => anyValue; // unsafe return
 function processData(): { name: string; age: number } {
   return anyValue; // unsafe return
 }
+export {}

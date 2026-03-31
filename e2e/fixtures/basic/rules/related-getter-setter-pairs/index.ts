@@ -12,3 +12,4 @@ class Example {
     this._value = val;
   }
 }
+export {}

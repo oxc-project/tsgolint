@@ -10,3 +10,4 @@ num = anyValue; // unsafe assignment
 const obj = {
   prop: anyValue as any, // unsafe assignment
 };
+export {}

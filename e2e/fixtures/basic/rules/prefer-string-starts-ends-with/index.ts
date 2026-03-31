@@ -7,3 +7,4 @@ function startsCase(s: string): boolean {
 function endsCase(s: string): boolean {
   return s.slice(-3) === 'bar';
 }
+export {}

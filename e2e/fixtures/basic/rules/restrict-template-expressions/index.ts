@@ -16,3 +16,4 @@ const str3 = `Function: ${fn}`;
 
 // Arrays of unknown might be unsafe
 const str4 = `Array: ${arr}`;
+export {}
