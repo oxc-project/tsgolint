@@ -189,6 +189,15 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 		{
 			Code: "\n      class AbstractEntity {\n        public a: string | undefined;\n        public static fromJson<T extends { a: string }>(\n          this: new () => T,\n          { inner = { a: 'test' } }: { inner?: { a: string } },\n        ): T {\n          const entity = new this();\n          entity.a = inner?.a;\n          return entity;\n        }\n      }\n    ",
 		},
+		{
+			Code: "\n      type FetchFn<TParams> =\n        Partial<TParams> extends TParams\n          ? (params?: TParams) => void\n          : (params: TParams) => void;\n\n      function createFetcher<TParams>() {\n        type Params = TParams;\n\n        const fn: FetchFn<TParams> = (\n          params: Partial<Params> = {} as Partial<Params>,\n        ) => {\n          console.log(params);\n        };\n\n        return fn;\n      }\n    ",
+		},
+		{
+			Code: "\n      interface Foos {\n        bar?: number;\n      }\n      const foos: Foos[] = [];\n      foos.flatMap(({ bar = 42 }) => bar);\n    ",
+		},
+		{
+			Code: "\n      function f(this: void, { bar = 42 }: { bar?: number }) {\n        return bar;\n      }\n    ",
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: "\n        function Bar({ foo = '' }: { foo: string }) {\n          return foo;\n        }\n      ",

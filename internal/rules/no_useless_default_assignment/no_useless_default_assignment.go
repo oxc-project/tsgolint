@@ -441,7 +441,7 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 
 			if !utils.IsSymbolFlagSet(paramSymbol, ast.SymbolFlagsOptional) {
 				paramType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, paramSymbol)
-				if !canBeUndefined(paramType) {
+				if !utils.IsTypeParameter(paramType) && !canBeUndefined(paramType) {
 					reportUselessDefaultAssignment(node, "parameter", paramType)
 				}
 			}
