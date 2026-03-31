@@ -24,6 +24,9 @@ var PreferPromiseRejectErrorsRule = rule.Rule{
 				argument := callExpression.Arguments.Nodes[0]
 				t := ctx.TypeChecker.GetTypeAtLocation(argument)
 
+				if utils.TypeMatchesSomeSpecifier(t, opts.Allow, ctx.Program) {
+					return
+				}
 				if opts.AllowThrowingAny && utils.IsTypeAnyType(t) {
 					return
 				}

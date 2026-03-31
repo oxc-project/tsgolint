@@ -294,6 +294,68 @@ func TestPreferPromiseRejectErrors(t *testing.T) {
       `,
 			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allowThrowingAny": true, "allowThrowingUnknown": true}`),
 		},
+		{
+			Code: `
+        class CustomRejection {}
+        Promise.reject(new CustomRejection());
+      `,
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allow": [{"from": "file", "name": "CustomRejection"}]}`),
+		},
+		{
+			Code: `
+        class CustomRejection {}
+        Promise.reject(new CustomRejection());
+      `,
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allow": ["CustomRejection"]}`),
+		},
+		{
+			Code: `
+        Promise.reject(new Date());
+      `,
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allow": [{"from": "lib", "name": "Date"}]}`),
+		},
+		{
+			Code: `
+        new Promise((resolve, reject) => reject(new Date()));
+      `,
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allow": [{"from": "lib", "name": "Date"}]}`),
+		},
+		{
+			Code: `
+        import { createError } from 'errors';
+        Promise.reject(createError());
+      `,
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "errors"}]}`),
+			Files: map[string]string{
+				"node_modules/errors/package.json": `{
+          "name": "errors",
+          "version": "1.0.0",
+          "types": "index.d.ts"
+        }`,
+				"node_modules/errors/index.d.ts": `
+          export interface ErrorLike extends Error {}
+          export function createError(): ErrorLike;
+        `,
+			},
+		},
+		{
+			Code: `
+        import { createError } from 'errors';
+        new Promise((resolve, reject) => reject(createError()));
+      `,
+			Options: rule_tester.OptionsFromJSON[PreferPromiseRejectErrorsOptions](`{"allow": [{"from": "package", "name": "ErrorLike", "package": "errors"}]}`),
+			Files: map[string]string{
+				"node_modules/errors/package.json": `{
+          "name": "errors",
+          "version": "1.0.0",
+          "types": "index.d.ts"
+        }`,
+				"node_modules/errors/index.d.ts": `
+          export interface ErrorLike extends Error {}
+          export function createError(): ErrorLike;
+        `,
+			},
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: "Promise.reject(5);",
@@ -1438,6 +1500,49 @@ function fun<T extends number>(t: T): void {
 			Code: `
         declare const someAnyValue: any;
         Promise.reject(someAnyValue);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "rejectAnError",
+				},
+			},
+		},
+		{
+			Code: `
+class CustomRejection {}
+Promise.reject(new CustomRejection());
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "rejectAnError",
+				},
+			},
+		},
+		{
+			Code: `
+Promise.reject(new Date());
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "rejectAnError",
+				},
+			},
+		},
+		{
+			Code: `
+import { createError } from 'errors';
+Promise.reject(createError());
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "rejectAnError",
+				},
+			},
+		},
+		{
+			Code: `
+import { createError } from 'errors';
+new Promise((resolve, reject) => reject(createError()));
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{

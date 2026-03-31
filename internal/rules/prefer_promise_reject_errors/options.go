@@ -3,8 +3,12 @@
 package prefer_promise_reject_errors
 
 import "github.com/go-json-experiment/json"
+import "github.com/typescript-eslint/tsgolint/internal/utils"
 
 type PreferPromiseRejectErrorsOptions struct {
+	// Type specifiers that can be used as Promise rejection reasons
+	Allow []utils.TypeOrValueSpecifier `json:"allow,omitempty"`
+
 	// AllowEmptyReject corresponds to the JSON schema field "allowEmptyReject".
 	AllowEmptyReject bool `json:"allowEmptyReject,omitempty"`
 
@@ -26,6 +30,9 @@ func (j *PreferPromiseRejectErrorsOptions) UnmarshalJSON(value []byte) error {
 	var plain Plain
 	if err := json.Unmarshal(value, &plain); err != nil {
 		return err
+	}
+	if v, ok := raw["allow"]; !ok || v == nil {
+		plain.Allow = []utils.TypeOrValueSpecifier{}
 	}
 	if v, ok := raw["allowEmptyReject"]; !ok || v == nil {
 		plain.AllowEmptyReject = false

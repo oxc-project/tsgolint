@@ -667,3 +667,39 @@ Message: Expected the Promise rejection reason to be an Error.
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
 ---
+
+[TestPreferPromiseRejectErrors/invalid-82 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:37)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | class CustomRejection {}
+   3 | Promise.reject(new CustomRejection());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-83 - 1]
+Diagnostic 1: rejectAnError (2:1 - 2:26)
+Message: Expected the Promise rejection reason to be an Error.
+   1 | 
+   2 | Promise.reject(new Date());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-84 - 1]
+Diagnostic 1: rejectAnError (3:1 - 3:29)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | import { createError } from 'errors';
+   3 | Promise.reject(createError());
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPreferPromiseRejectErrors/invalid-85 - 1]
+Diagnostic 1: rejectAnError (3:34 - 3:54)
+Message: Expected the Promise rejection reason to be an Error.
+   2 | import { createError } from 'errors';
+   3 | new Promise((resolve, reject) => reject(createError()));
+     |                                  ~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
