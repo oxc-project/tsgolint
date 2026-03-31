@@ -341,6 +341,18 @@ func isParameterProperty(parameter *ast.Node) bool {
 	return parameter.ModifierFlags()&ast.ModifierFlagsParameterPropertyModifier != 0
 }
 
+func getParameterType(typeChecker *checker.Checker, parameter *ast.Node) *checker.Type {
+	if parameter == nil {
+		return nil
+	}
+
+	if typeNode := parameter.Type(); typeNode != nil {
+		return checker.Checker_getTypeFromTypeNode(typeChecker, typeNode)
+	}
+
+	return typeChecker.GetTypeAtLocation(parameter)
+}
+
 var PreferReadonlyParameterTypesRule = rule.Rule{
 	Name: "prefer-readonly-parameter-types",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -359,7 +371,7 @@ var PreferReadonlyParameterTypesRule = rule.Rule{
 					continue
 				}
 
-				t := ctx.TypeChecker.GetTypeAtLocation(actualParameter)
+				t := getParameterType(ctx.TypeChecker, actualParameter)
 				if t == nil {
 					continue
 				}

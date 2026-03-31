@@ -372,3 +372,12 @@ Message: Parameter should be a readonly type.
      |                      ~~~~~~~~~~~
    3 |       
 ---
+
+[TestPreferReadonlyParameterTypesRule/invalid-41 - 1]
+Diagnostic 1: shouldBeReadonly (3:23 - 3:25)
+Message: Parameter should be a readonly type.
+   2 |         declare function foo<T>(callback: (arg: T) => void): void;
+   3 |         foo<string[]>(arg => {});
+     |                       ~~~
+   4 |       
+---
