@@ -42,7 +42,8 @@
       "IsNullableType",
       "getIndexInfosOfType",
       "isReadonlySymbol",
-      "getContextFreeTypeOfExpression"
+      "getContextFreeTypeOfExpression",
+      "isReferenced"
     ]
   },
   "ExtraFields": {
