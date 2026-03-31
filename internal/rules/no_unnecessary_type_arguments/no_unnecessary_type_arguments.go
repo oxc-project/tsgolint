@@ -11,9 +11,16 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
-func buildUnnecessaryTypeParameterMessage() rule.RuleMessage {
+func buildCanBeInferredMessage() rule.RuleMessage {
 	return rule.RuleMessage{
-		Id:          "unnecessaryTypeParameter",
+		Id:          "canBeInferred",
+		Description: "This value can be trivially inferred for this type parameter, so it can be omitted.",
+	}
+}
+
+func buildIsDefaultParameterValueMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "isDefaultParameterValue",
 		Description: "This is the default value for this type parameter, so it can be omitted.",
 	}
 }
@@ -24,6 +31,40 @@ func isTypeContextDeclaration(decl *ast.Node) bool {
 
 func isInTypeContext(node *ast.Node) bool {
 	return ast.IsTypeReferenceNode(node) || ast.IsInterfaceDeclaration(node.Parent) || ast.IsTypeReferenceNode(node.Parent) || (ast.IsHeritageClause(node.Parent) && node.Parent.AsHeritageClause().Token == ast.KindImplementsKeyword)
+}
+
+func isEmptyObjectType(typeChecker *checker.Checker, t *checker.Type) bool {
+	if !utils.IsObjectType(t) {
+		return false
+	}
+
+	if len(checker.Checker_getPropertiesOfType(typeChecker, t)) != 0 {
+		return false
+	}
+
+	return len(checker.Checker_getIndexInfosOfType(typeChecker, t)) == 0
+}
+
+func areTypesEquivalent(typeChecker *checker.Checker, a *checker.Type, b *checker.Type) bool {
+	// If either type is `any` (including unresolved `error`-adjacent cases) or `{}`,
+	// only treat them as equivalent when they are literally the same type object.
+	if utils.IsTypeAnyType(a) || utils.IsTypeAnyType(b) || isEmptyObjectType(typeChecker, a) || isEmptyObjectType(typeChecker, b) {
+		return a == b
+	}
+
+	return checker.Checker_isTypeAssignableTo(typeChecker, a, b) && checker.Checker_isTypeAssignableTo(typeChecker, b, a)
+}
+
+func areDefaultValueTypesEquivalent(typeChecker *checker.Checker, a *checker.Type, b *checker.Type) bool {
+	if a == b {
+		return true
+	}
+
+	if utils.IsTypeAnyType(a) || utils.IsTypeAnyType(b) || a.Flags() != b.Flags() {
+		return false
+	}
+
+	return checker.Checker_isTypeIdenticalTo(typeChecker, a, b)
 }
 
 var NoUnnecessaryTypeArgumentsRule = rule.Rule{
@@ -91,7 +132,9 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, node, nil, checker.CheckModeNormal)
 			if signature != nil {
 				if declaration := checker.Signature_declaration(signature); declaration != nil {
-					return declaration.TypeParameters()
+					if typeParameters := declaration.TypeParameters(); len(typeParameters) != 0 {
+						return typeParameters
+					}
 				}
 			}
 			if ast.IsNewExpression(node) {
@@ -100,80 +143,119 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			return nil
 		}
 
-		checkArgsAndParameters := func(arguments *ast.NodeList, parameters []*ast.Node) {
+		checkArgsAndParameters := func(arguments *ast.NodeList, parameters []*ast.Node, callOrNewExpr *ast.Node) {
 			if arguments == nil || parameters == nil || len(arguments.Nodes) == 0 || len(parameters) == 0 {
 				return
 			}
 
 			// Just check the last one. Must specify previous type parameters if the last one is specified.
-			i := len(arguments.Nodes) - 1
+			lastParamIndex := len(arguments.Nodes) - 1
 
-			if i >= len(parameters) {
+			if lastParamIndex >= len(parameters) {
 				return
 			}
 
-			arg := arguments.Nodes[i]
-			param := parameters[i]
+			typeArgument := arguments.Nodes[lastParamIndex]
+			typeParameter := parameters[lastParamIndex]
 
-			defaultType := param.AsTypeParameter().DefaultType
+			typeArgumentType := ctx.TypeChecker.GetTypeAtLocation(typeArgument)
+			if utils.IsIntrinsicErrorType(typeArgumentType) {
+				return
+			}
+
+			if callOrNewExpr != nil {
+				signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callOrNewExpr, nil, checker.CheckModeNormal)
+				for argumentIndex, argument := range callOrNewExpr.Arguments() {
+					if signature == nil {
+						break
+					}
+
+					parameters := checker.Signature_parameters(signature)
+					if argumentIndex >= len(parameters) {
+						continue
+					}
+
+					parameter := parameters[argumentIndex]
+					if parameter == nil || parameter.ValueDeclaration == nil || !ast.IsParameter(parameter.ValueDeclaration) {
+						continue
+					}
+
+					parameterDecl := parameter.ValueDeclaration.AsParameterDeclaration()
+					if parameterDecl.Type == nil {
+						continue
+					}
+
+					typeParameterType := ctx.TypeChecker.GetTypeAtLocation(typeParameter)
+					parameterTypeFromDeclaration := checker.Checker_getTypeFromTypeNode(ctx.TypeChecker, parameterDecl.Type)
+					if utils.IsTypeAnyType(parameterTypeFromDeclaration) || !checker.Checker_isTypeAssignableTo(ctx.TypeChecker, typeParameterType, parameterTypeFromDeclaration) {
+						continue
+					}
+
+					argumentType := checker.Checker_getBaseTypeOfLiteralType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(argument))
+					if areTypesEquivalent(ctx.TypeChecker, typeArgumentType, argumentType) {
+						ctx.ReportNodeWithFixes(typeArgument, buildCanBeInferredMessage(), func() []rule.RuleFix {
+							var removeRange core.TextRange
+							if lastParamIndex == 0 {
+								removeRange = scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, arguments.End()).WithPos(arguments.Pos() - 1)
+							} else {
+								removeRange = typeArgument.Loc.WithPos(arguments.Nodes[lastParamIndex-1].End())
+							}
+							return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange)}
+						})
+					}
+				}
+			}
+
+			defaultType := typeParameter.AsTypeParameter().DefaultType
 			if defaultType == nil {
 				return
 			}
 
-			paramType := ctx.TypeChecker.GetTypeAtLocation(defaultType)
-			if utils.IsIntrinsicErrorType(paramType) {
+			defaultTypeValue := ctx.TypeChecker.GetTypeAtLocation(defaultType)
+			if utils.IsIntrinsicErrorType(defaultTypeValue) || !areDefaultValueTypesEquivalent(ctx.TypeChecker, defaultTypeValue, typeArgumentType) {
 				return
 			}
 
-			argType := ctx.TypeChecker.GetTypeAtLocation(arg)
-			if utils.IsIntrinsicErrorType(argType) {
-				return
-			}
-			if argType != paramType && (utils.IsTypeAnyType(argType) || utils.IsTypeAnyType(paramType) || (argType.Flags() != paramType.Flags()) || !checker.Checker_isTypeIdenticalTo(ctx.TypeChecker, argType, paramType)) {
-				return
-			}
-
-			ctx.ReportNodeWithFixes(arg, buildUnnecessaryTypeParameterMessage(), func() []rule.RuleFix {
+			ctx.ReportNodeWithFixes(typeArgument, buildIsDefaultParameterValueMessage(), func() []rule.RuleFix {
 				var removeRange core.TextRange
-				if i == 0 {
+				if lastParamIndex == 0 {
 					removeRange = scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, arguments.End()).WithPos(arguments.Pos() - 1)
 				} else {
-					removeRange = arg.Loc.WithPos(arguments.Nodes[i-1].End())
+					removeRange = typeArgument.Loc.WithPos(arguments.Nodes[lastParamIndex-1].End())
 				}
 				return []rule.RuleFix{rule.RuleFixRemoveRange(removeRange)}
 			})
-
 		}
 
 		return rule.RuleListeners{
 			ast.KindExpressionWithTypeArguments: func(node *ast.Node) {
 				expr := node.AsExpressionWithTypeArguments()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.Expression))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.Expression), nil)
 			},
 			ast.KindTypeReference: func(node *ast.Node) {
 				expr := node.AsTypeReference()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName), nil)
 			},
 
 			ast.KindCallExpression: func(node *ast.Node) {
 				expr := node.AsCallExpression()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node), node)
 			},
 			ast.KindNewExpression: func(node *ast.Node) {
 				expr := node.AsNewExpression()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node), node)
 			},
 			ast.KindTaggedTemplateExpression: func(node *ast.Node) {
 				expr := node.AsTaggedTemplateExpression()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node), nil)
 			},
 			ast.KindJsxOpeningElement: func(node *ast.Node) {
 				expr := node.AsJsxOpeningElement()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node), nil)
 			},
 			ast.KindJsxSelfClosingElement: func(node *ast.Node) {
 				expr := node.AsJsxSelfClosingElement()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node), nil)
 			},
 		}
 	},
