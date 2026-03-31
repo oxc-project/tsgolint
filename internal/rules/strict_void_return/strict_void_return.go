@@ -60,6 +60,21 @@ var StrictVoidReturnRule = rule.Rule{
 			})
 		}
 
+		isNullishOrAny := func(t *checker.Type) bool {
+			return utils.IsTypeFlagSet(
+				t,
+				checker.TypeFlagsVoidLike|
+					checker.TypeFlagsUndefined|
+					checker.TypeFlagsNull|
+					checker.TypeFlagsAny|
+					checker.TypeFlagsNever,
+			)
+		}
+
+		isVoid := func(t *checker.Type) bool {
+			return utils.IsTypeFlagSet(t, checker.TypeFlagsVoid)
+		}
+
 		var reportIfNonVoidFunction func(funcNode *ast.Node)
 		reportIfNonVoidFunction = func(funcNode *ast.Node) {
 			actualType := checker.Checker_getApparentType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(funcNode))
@@ -145,10 +160,6 @@ var StrictVoidReturnRule = rule.Rule{
 					continue
 				}
 
-				if checkExpressionNode(argNode) {
-					continue
-				}
-
 				argExpectedReturnTypes := []*checker.Type{}
 				for _, sig := range signatures {
 					parameters := checker.Signature_parameters(sig)
@@ -163,24 +174,16 @@ var StrictVoidReturnRule = rule.Rule{
 					}
 				}
 
-				if len(argExpectedReturnTypes) == 0 {
+				hasSingleSignature := len(signatures) == 1
+				allSignaturesReturnVoid := utils.Every(argExpectedReturnTypes, func(returnType *checker.Type) bool {
+					return isVoid(returnType) || isNullishOrAny(returnType) || utils.IsTypeParameter(returnType)
+				})
+
+				if (hasSingleSignature || allSignaturesReturnVoid) && checkExpressionNode(argNode) {
 					continue
 				}
 
-				anyVoid := utils.Some(argExpectedReturnTypes, func(returnType *checker.Type) bool {
-					return utils.IsTypeFlagSet(returnType, checker.TypeFlagsVoid)
-				})
-				allVoidLike := utils.Every(argExpectedReturnTypes, func(returnType *checker.Type) bool {
-					return utils.IsTypeFlagSet(
-						returnType,
-						checker.TypeFlagsVoidLike|
-							checker.TypeFlagsUndefined|
-							checker.TypeFlagsNull|
-							checker.TypeFlagsAny|
-							checker.TypeFlagsNever,
-					)
-				})
-				if anyVoid && allVoidLike {
+				if utils.Some(argExpectedReturnTypes, isVoid) && utils.Every(argExpectedReturnTypes, isNullishOrAny) {
 					reportIfNonVoidFunction(argNode)
 				}
 			}

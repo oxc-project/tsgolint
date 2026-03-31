@@ -217,8 +217,22 @@ foo(() => false);
 		},
 		{
 			Code: `
+declare function foo(cb: () => void): void;
+declare function foo(cb: () => boolean): void;
+foo(() => false);
+      `,
+		},
+		{
+			Code: `
 declare function foo(cb: () => Promise<void>): void;
 declare function foo(cb: () => void): void;
+foo(async () => {});
+      `,
+		},
+		{
+			Code: `
+declare function foo(fn: () => void): void;
+declare function foo(fn: () => Promise<void>): void;
 foo(async () => {});
       `,
 		},
@@ -917,6 +931,30 @@ foo((arg: number) => {
 function cb() {
   return true;
 }
+      `,
+		},
+		{
+			Code: `
+declare function f<T extends void>(arg: T, cb: () => T): void;
+declare function f<T extends string>(arg: T, cb: () => T): void;
+
+f('test', () => 'test');
+f(undefined, () => {});
+      `,
+		},
+		{
+			Code: `
+interface HookFunction<T extends void | Hook = void> {
+  (fn: () => void): T;
+  (fn: () => Promise<void>): T;
+}
+
+class Hook {}
+
+declare var beforeEach: HookFunction<Hook>;
+
+beforeEach(() => {});
+beforeEach(async () => {});
       `,
 		},
 	}
@@ -2314,6 +2352,16 @@ async function* cb() {
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "nonVoidFunc", Line: 5},
+			},
+		},
+		{
+			Code: `
+declare function f<T extends void>(arg: T, cb: () => T): void;
+
+f(undefined, () => 'test');
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "nonVoidReturn", Line: 4},
 			},
 		},
 	}

@@ -1206,3 +1206,12 @@ Message: Value-returning function used in a context where a void function is exp
      |          ~~
    6 | });
 ---
+
+[TestStrictVoidReturnRule/invalid-109 - 1]
+Diagnostic 1: nonVoidReturn (4:20 - 4:25)
+Message: Value returned in a context where a void return is expected.
+   3 | 
+   4 | f(undefined, () => 'test');
+     |                    ~~~~~~
+   5 |       
+---
