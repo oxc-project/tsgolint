@@ -390,3 +390,30 @@ Message: This is the default value for this type parameter, so it can be omitted
      |                                                       ~~~
    3 |       
 ---
+
+[TestNoUnnecessaryTypeArguments/invalid-43 - 1]
+Diagnostic 1: isDefaultParameterValue (10:3 - 10:5)
+Message: This is the default value for this type parameter, so it can be omitted.
+   9 | function f<T = Foo>() {}
+  10 | f<Bar>();
+     |   ~~~
+  11 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-44 - 1]
+Diagnostic 1: canBeInferred (3:52 - 3:62)
+Message: This value can be trivially inferred for this type parameter, so it can be omitted.
+   2 | declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
+   3 | const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+     |                                                    ~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-45 - 1]
+Diagnostic 1: canBeInferred (3:33 - 3:43)
+Message: This value can be trivially inferred for this type parameter, so it can be omitted.
+   2 | declare function useRef<T>(initialValue: T): { current: T };
+   3 | const activeIndexesRef = useRef<Set<number>>(new Set());
+     |                                 ~~~~~~~~~~~
+   4 |       
+---

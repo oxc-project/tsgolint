@@ -55,18 +55,6 @@ func areTypesEquivalent(typeChecker *checker.Checker, a *checker.Type, b *checke
 	return checker.Checker_isTypeAssignableTo(typeChecker, a, b) && checker.Checker_isTypeAssignableTo(typeChecker, b, a)
 }
 
-func areDefaultValueTypesEquivalent(typeChecker *checker.Checker, a *checker.Type, b *checker.Type) bool {
-	if a == b {
-		return true
-	}
-
-	if utils.IsTypeAnyType(a) || utils.IsTypeAnyType(b) || a.Flags() != b.Flags() {
-		return false
-	}
-
-	return checker.Checker_isTypeIdenticalTo(typeChecker, a, b)
-}
-
 var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 	Name: "no-unnecessary-type-arguments",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -159,9 +147,6 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			typeParameter := parameters[lastParamIndex]
 
 			typeArgumentType := ctx.TypeChecker.GetTypeAtLocation(typeArgument)
-			if utils.IsIntrinsicErrorType(typeArgumentType) {
-				return
-			}
 
 			if callOrNewExpr != nil {
 				signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callOrNewExpr, nil, checker.CheckModeNormal)
@@ -212,7 +197,7 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			}
 
 			defaultTypeValue := ctx.TypeChecker.GetTypeAtLocation(defaultType)
-			if utils.IsIntrinsicErrorType(defaultTypeValue) || !areDefaultValueTypesEquivalent(ctx.TypeChecker, defaultTypeValue, typeArgumentType) {
+			if !areTypesEquivalent(ctx.TypeChecker, defaultTypeValue, typeArgumentType) {
 				return
 			}
 

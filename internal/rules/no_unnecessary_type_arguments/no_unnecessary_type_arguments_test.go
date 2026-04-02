@@ -312,17 +312,6 @@ f<any>();
 function f<T = any>() {}
 f<string>();
     `},
-		{Code: `
-interface Foo {
-	foo?: string
-}
-interface Bar extends Foo {
-	bar?: string
-}
-
-function f<T = Foo>() {}
-f<Bar>();
-    `},
 		// https://github.com/oxc-project/oxc/issues/13164
 		{Code: `
 type OneParam<T = any> = T;
@@ -334,6 +323,31 @@ interface TestInterface {
 type OneParam<T = any, U = any, V = any> = T;
 interface TestInterface {
   prop?: OneParam<string, number>;  // TypeScript error, but shouldn't panic
+}
+    `},
+		// https://github.com/oxc-project/tsgolint/issues/861
+		{Code: `
+type Data = Record<never, never>
+
+type LocaleData<T extends Data = Data> = Record<string, T>
+
+interface Data1 { a: string }
+
+type Data2 = Partial<Data1>
+
+type LocaleData2 = LocaleData<Data2>
+    `},
+		{Code: `
+type Data = Record<never, never>
+
+type LocaleData<T extends Data = Data> = Record<string, T>
+
+interface Data1 { a: string }
+
+type Data2 = Partial<Data1>
+
+interface Wrapper {
+  value: LocaleData<Data2>
 }
     `},
 	}, []rule_tester.InvalidTestCase{
@@ -1148,6 +1162,71 @@ declare type MessageEventHandler = ((ev: MessageEvent) => any) | null;
 				{
 					Line:      2,
 					MessageId: "isDefaultParameterValue",
+				},
+			},
+		},
+		{
+			Code: `
+interface Foo {
+	foo?: string
+}
+interface Bar extends Foo {
+	bar?: string
+}
+
+function f<T = Foo>() {}
+f<Bar>();
+      `,
+			Output: []string{`
+interface Foo {
+	foo?: string
+}
+interface Bar extends Foo {
+	bar?: string
+}
+
+function f<T = Foo>() {}
+f();
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Line:      10,
+					MessageId: "isDefaultParameterValue",
+				},
+			},
+		},
+		{
+			Code: `
+declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
+const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+      `,
+			Output: []string{`
+declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
+const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Line:      3,
+					MessageId: "canBeInferred",
+				},
+			},
+		},
+		{
+			Code: `
+declare function useRef<T>(initialValue: T): { current: T };
+const activeIndexesRef = useRef<Set<number>>(new Set());
+      `,
+			Output: []string{`
+declare function useRef<T>(initialValue: T): { current: T };
+const activeIndexesRef = useRef(new Set());
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Line:      3,
+					MessageId: "canBeInferred",
 				},
 			},
 		},
