@@ -13,12 +13,43 @@ func buildMismatchedCaseMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "mismatchedCase",
 		Description: "The case statement does not have a shared enum type with the switch predicate.",
+		Help:        "Compare against a member of the same enum as the switch value, or normalize both sides to the same primitive representation first.",
 	}
 }
 func buildMismatchedConditionMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "mismatchedCondition",
 		Description: "The two values in this comparison do not have a shared enum type.",
+		Help:        "Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.",
+	}
+}
+
+func buildOperandRange(sourceFile *ast.SourceFile, label string, node *ast.Node, typeText string) rule.RuleLabeledRange {
+	return rule.RuleLabeledRange{
+		Label: label + ": " + typeText,
+		Range: utils.TrimNodeTextRange(sourceFile, node),
+	}
+}
+
+func buildComparisonDiagnostic(
+	sourceFile *ast.SourceFile,
+	typeChecker *checker.Checker,
+	node *ast.Node,
+	message rule.RuleMessage,
+	leftLabel string,
+	leftNode *ast.Node,
+	leftType *checker.Type,
+	rightLabel string,
+	rightNode *ast.Node,
+	rightType *checker.Type,
+) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range:   utils.TrimNodeTextRange(sourceFile, node),
+		Message: message,
+		LabeledRanges: []rule.RuleLabeledRange{
+			buildOperandRange(sourceFile, leftLabel, leftNode, typeChecker.TypeToString(leftType)),
+			buildOperandRange(sourceFile, rightLabel, rightNode, typeChecker.TypeToString(rightType)),
+		},
 	}
 }
 
@@ -139,17 +170,40 @@ var NoUnsafeEnumComparisonRule = rule.Rule{
 				rightType := ctx.TypeChecker.GetTypeAtLocation(expr.Right)
 
 				if isMismatchedComparison(leftType, rightType) {
-					// TODO(port): port suggestion
-					ctx.ReportNode(node, buildMismatchedConditionMessage())
+					ctx.ReportDiagnostic(buildComparisonDiagnostic(
+						ctx.SourceFile,
+						ctx.TypeChecker,
+						node,
+						buildMismatchedConditionMessage(),
+						"Left operand",
+						expr.Left,
+						leftType,
+						"Right operand",
+						expr.Right,
+						rightType,
+					))
 				}
 			},
 
 			ast.KindCaseClause: func(node *ast.Node) {
-				leftType := ctx.TypeChecker.GetTypeAtLocation(node.Parent.Parent.Expression())
-				rightType := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
+				switchExpression := node.Parent.Parent.Expression()
+				caseExpression := node.Expression()
+				leftType := ctx.TypeChecker.GetTypeAtLocation(switchExpression)
+				rightType := ctx.TypeChecker.GetTypeAtLocation(caseExpression)
 
 				if isMismatchedComparison(leftType, rightType) {
-					ctx.ReportNode(node, buildMismatchedCaseMessage())
+					ctx.ReportDiagnostic(buildComparisonDiagnostic(
+						ctx.SourceFile,
+						ctx.TypeChecker,
+						node,
+						buildMismatchedCaseMessage(),
+						"Switch value",
+						switchExpression,
+						leftType,
+						"Case value",
+						caseExpression,
+						rightType,
+					))
 				}
 			},
 		}

@@ -2,216 +2,481 @@
 [TestNoUnsafeEnumComparisonRule/invalid-0 - 1]
 Diagnostic 1: mismatchedCondition (5:9 - 5:23)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    4 |         }
    5 |         Fruit.Apple < 1;
      |         ~~~~~~~~~~~~~~~
+   6 |       
+  Label: Left operand: Fruit (5:9 - 5:19)
+   4 |         }
+   5 |         Fruit.Apple < 1;
+     |         ^^^^^^^^^^^ Left operand: Fruit
+   6 |       
+  Label: Right operand: 1 (5:23 - 5:23)
+   4 |         }
+   5 |         Fruit.Apple < 1;
+     |                       ^ Right operand: 1
    6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-1 - 1]
 Diagnostic 1: mismatchedCondition (5:9 - 5:23)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    4 |         }
    5 |         Fruit.Apple > 1;
      |         ~~~~~~~~~~~~~~~
+   6 |       
+  Label: Left operand: Fruit (5:9 - 5:19)
+   4 |         }
+   5 |         Fruit.Apple > 1;
+     |         ^^^^^^^^^^^ Left operand: Fruit
+   6 |       
+  Label: Right operand: 1 (5:23 - 5:23)
+   4 |         }
+   5 |         Fruit.Apple > 1;
+     |                       ^ Right operand: 1
    6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-2 - 1]
 Diagnostic 1: mismatchedCondition (5:9 - 5:24)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    4 |         }
    5 |         Fruit.Apple == 1;
      |         ~~~~~~~~~~~~~~~~
+   6 |       
+  Label: Left operand: Fruit (5:9 - 5:19)
+   4 |         }
+   5 |         Fruit.Apple == 1;
+     |         ^^^^^^^^^^^ Left operand: Fruit
+   6 |       
+  Label: Right operand: 1 (5:24 - 5:24)
+   4 |         }
+   5 |         Fruit.Apple == 1;
+     |                        ^ Right operand: 1
    6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-3 - 1]
 Diagnostic 1: mismatchedCondition (5:9 - 5:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    4 |         }
    5 |         Fruit.Apple === 1;
      |         ~~~~~~~~~~~~~~~~~
+   6 |       
+  Label: Left operand: Fruit (5:9 - 5:19)
+   4 |         }
+   5 |         Fruit.Apple === 1;
+     |         ^^^^^^^^^^^ Left operand: Fruit
+   6 |       
+  Label: Right operand: 1 (5:25 - 5:25)
+   4 |         }
+   5 |         Fruit.Apple === 1;
+     |                         ^ Right operand: 1
    6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-4 - 1]
 Diagnostic 1: mismatchedCondition (5:9 - 5:24)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    4 |         }
    5 |         Fruit.Apple != 1;
      |         ~~~~~~~~~~~~~~~~
+   6 |       
+  Label: Left operand: Fruit (5:9 - 5:19)
+   4 |         }
+   5 |         Fruit.Apple != 1;
+     |         ^^^^^^^^^^^ Left operand: Fruit
+   6 |       
+  Label: Right operand: 1 (5:24 - 5:24)
+   4 |         }
+   5 |         Fruit.Apple != 1;
+     |                        ^ Right operand: 1
    6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-5 - 1]
 Diagnostic 1: mismatchedCondition (5:9 - 5:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    4 |         }
    5 |         Fruit.Apple !== 1;
      |         ~~~~~~~~~~~~~~~~~
+   6 |       
+  Label: Left operand: Fruit (5:9 - 5:19)
+   4 |         }
+   5 |         Fruit.Apple !== 1;
+     |         ^^^^^^^^^^^ Left operand: Fruit
+   6 |       
+  Label: Right operand: 1 (5:25 - 5:25)
+   4 |         }
+   5 |         Fruit.Apple !== 1;
+     |                         ^ Right operand: 1
    6 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-6 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         }
    6 |         Fruit.Apple === 0;
      |         ~~~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: Fruit.Apple (6:9 - 6:19)
+   5 |         }
+   6 |         Fruit.Apple === 0;
+     |         ^^^^^^^^^^^ Left operand: Fruit.Apple
+   7 |       
+  Label: Right operand: 0 (6:25 - 6:25)
+   5 |         }
+   6 |         Fruit.Apple === 0;
+     |                         ^ Right operand: 0
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-7 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:27)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         }
    6 |         Fruit.Banana === '';
      |         ~~~~~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: Fruit.Banana (6:9 - 6:20)
+   5 |         }
+   6 |         Fruit.Banana === '';
+     |         ^^^^^^^^^^^^ Left operand: Fruit.Banana
+   7 |       
+  Label: Right operand: "" (6:26 - 6:27)
+   5 |         }
+   6 |         Fruit.Banana === '';
+     |                          ^^ Right operand: ""
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-8 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:38)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         }
    7 |         Vegetable.Asparagus === 'beet';
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: Vegetable.Asparagus (7:9 - 7:27)
+   6 |         }
+   7 |         Vegetable.Asparagus === 'beet';
+     |         ^^^^^^^^^^^^^^^^^^^ Left operand: Vegetable.Asparagus
+   8 |       
+  Label: Right operand: "beet" (7:33 - 7:38)
+   6 |         }
+   7 |         Vegetable.Asparagus === 'beet';
+     |                                 ^^^^^^ Right operand: "beet"
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-9 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         }
    7 |         1 === Fruit.Apple;
      |         ~~~~~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: 1 (7:9 - 7:9)
+   6 |         }
+   7 |         1 === Fruit.Apple;
+     |         ^ Left operand: 1
+   8 |       
+  Label: Right operand: Fruit.Apple (7:15 - 7:25)
+   6 |         }
+   7 |         1 === Fruit.Apple;
+     |               ^^^^^^^^^^^ Right operand: Fruit.Apple
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-10 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:38)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         }
    7 |         'beet' === Vegetable.Asparagus;
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: "beet" (7:9 - 7:14)
+   6 |         }
+   7 |         'beet' === Vegetable.Asparagus;
+     |         ^^^^^^ Left operand: "beet"
+   8 |       
+  Label: Right operand: Vegetable.Asparagus (7:20 - 7:38)
+   6 |         }
+   7 |         'beet' === Vegetable.Asparagus;
+     |                    ^^^^^^^^^^^^^^^^^^^ Right operand: Vegetable.Asparagus
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-11 - 1]
 Diagnostic 1: mismatchedCondition (8:9 - 8:19)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    7 |         const fruit = Fruit.Apple;
    8 |         fruit === 1;
      |         ~~~~~~~~~~~
+   9 |       
+  Label: Left operand: Fruit.Apple (8:9 - 8:13)
+   7 |         const fruit = Fruit.Apple;
+   8 |         fruit === 1;
+     |         ^^^^^ Left operand: Fruit.Apple
+   9 |       
+  Label: Right operand: 1 (8:19 - 8:19)
+   7 |         const fruit = Fruit.Apple;
+   8 |         fruit === 1;
+     |                   ^ Right operand: 1
    9 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-12 - 1]
 Diagnostic 1: mismatchedCondition (8:9 - 8:28)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    7 |         const vegetable = Vegetable.Asparagus;
    8 |         vegetable === 'beet';
      |         ~~~~~~~~~~~~~~~~~~~~
+   9 |       
+  Label: Left operand: Vegetable.Asparagus (8:9 - 8:17)
+   7 |         const vegetable = Vegetable.Asparagus;
+   8 |         vegetable === 'beet';
+     |         ^^^^^^^^^ Left operand: Vegetable.Asparagus
+   9 |       
+  Label: Right operand: "beet" (8:23 - 8:28)
+   7 |         const vegetable = Vegetable.Asparagus;
+   8 |         vegetable === 'beet';
+     |                       ^^^^^^ Right operand: "beet"
    9 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-13 - 1]
 Diagnostic 1: mismatchedCondition (8:9 - 8:19)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    7 |         const fruit = Fruit.Apple;
    8 |         1 === fruit;
      |         ~~~~~~~~~~~
+   9 |       
+  Label: Left operand: 1 (8:9 - 8:9)
+   7 |         const fruit = Fruit.Apple;
+   8 |         1 === fruit;
+     |         ^ Left operand: 1
+   9 |       
+  Label: Right operand: Fruit.Apple (8:15 - 8:19)
+   7 |         const fruit = Fruit.Apple;
+   8 |         1 === fruit;
+     |               ^^^^^ Right operand: Fruit.Apple
    9 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-14 - 1]
 Diagnostic 1: mismatchedCondition (8:9 - 8:28)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    7 |         const vegetable = Vegetable.Asparagus;
    8 |         'beet' === vegetable;
      |         ~~~~~~~~~~~~~~~~~~~~
+   9 |       
+  Label: Left operand: "beet" (8:9 - 8:14)
+   7 |         const vegetable = Vegetable.Asparagus;
+   8 |         'beet' === vegetable;
+     |         ^^^^^^ Left operand: "beet"
+   9 |       
+  Label: Right operand: Vegetable.Asparagus (8:20 - 8:28)
+   7 |         const vegetable = Vegetable.Asparagus;
+   8 |         'beet' === vegetable;
+     |                    ^^^^^^^^^ Right operand: Vegetable.Asparagus
    9 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-15 - 1]
 Diagnostic 1: mismatchedCondition (6:7 - 6:35)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 | }
    6 |       Fruit.Apple === Fruit2.Apple2;
      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         
+  Label: Left operand: Fruit.Apple (6:7 - 6:17)
+   5 | }
+   6 |       Fruit.Apple === Fruit2.Apple2;
+     |       ^^^^^^^^^^^ Left operand: Fruit.Apple
+   7 |         
+  Label: Right operand: Fruit2.Apple2 (6:23 - 6:35)
+   5 | }
+   6 |       Fruit.Apple === Fruit2.Apple2;
+     |                       ^^^^^^^^^^^^^ Right operand: Fruit2.Apple2
    7 |         
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-16 - 1]
 Diagnostic 1: mismatchedCondition (12:9 - 12:53)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
   11 |         }
   12 |         Vegetable.Asparagus === Vegetable2.Asparagus2;
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  13 |       
+  Label: Left operand: Vegetable.Asparagus (12:9 - 12:27)
+  11 |         }
+  12 |         Vegetable.Asparagus === Vegetable2.Asparagus2;
+     |         ^^^^^^^^^^^^^^^^^^^ Left operand: Vegetable.Asparagus
+  13 |       
+  Label: Right operand: Vegetable2.Asparagus2 (12:33 - 12:53)
+  11 |         }
+  12 |         Vegetable.Asparagus === Vegetable2.Asparagus2;
+     |                                 ^^^^^^^^^^^^^^^^^^^^^ Right operand: Vegetable2.Asparagus2
   13 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-17 - 1]
 Diagnostic 1: mismatchedCondition (7:7 - 7:29)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |       const fruit = Fruit.Apple;
    7 |       fruit === Fruit2.Apple2;
      |       ~~~~~~~~~~~~~~~~~~~~~~~
+   8 |         
+  Label: Left operand: Fruit.Apple (7:7 - 7:11)
+   6 |       const fruit = Fruit.Apple;
+   7 |       fruit === Fruit2.Apple2;
+     |       ^^^^^ Left operand: Fruit.Apple
+   8 |         
+  Label: Right operand: Fruit2.Apple2 (7:17 - 7:29)
+   6 |       const fruit = Fruit.Apple;
+   7 |       fruit === Fruit2.Apple2;
+     |                 ^^^^^^^^^^^^^ Right operand: Fruit2.Apple2
    8 |         
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-18 - 1]
 Diagnostic 1: mismatchedCondition (13:9 - 13:43)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
   12 |         const vegetable = Vegetable.Asparagus;
   13 |         vegetable === Vegetable2.Asparagus2;
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |       
+  Label: Left operand: Vegetable.Asparagus (13:9 - 13:17)
+  12 |         const vegetable = Vegetable.Asparagus;
+  13 |         vegetable === Vegetable2.Asparagus2;
+     |         ^^^^^^^^^ Left operand: Vegetable.Asparagus
+  14 |       
+  Label: Right operand: Vegetable2.Asparagus2 (13:23 - 13:43)
+  12 |         const vegetable = Vegetable.Asparagus;
+  13 |         vegetable === Vegetable2.Asparagus2;
+     |                       ^^^^^^^^^^^^^^^^^^^^^ Right operand: Vegetable2.Asparagus2
   14 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-19 - 1]
 Diagnostic 1: mismatchedCondition (18:9 - 18:19)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
   17 |         // following are all errors because the value might be an enum value
   18 |         str === 'a';
      |         ~~~~~~~~~~~
   19 |         num === 1;
+  Label: Left operand: Str (18:9 - 18:11)
+  17 |         // following are all errors because the value might be an enum value
+  18 |         str === 'a';
+     |         ^^^ Left operand: Str
+  19 |         num === 1;
+  Label: Right operand: "a" (18:17 - 18:19)
+  17 |         // following are all errors because the value might be an enum value
+  18 |         str === 'a';
+     |                 ^^^ Right operand: "a"
+  19 |         num === 1;
 
 Diagnostic 2: mismatchedCondition (19:9 - 19:17)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
   18 |         str === 'a';
   19 |         num === 1;
      |         ~~~~~~~~~
   20 |         mixed === 'a';
+  Label: Left operand: Num (19:9 - 19:11)
+  18 |         str === 'a';
+  19 |         num === 1;
+     |         ^^^ Left operand: Num
+  20 |         mixed === 'a';
+  Label: Right operand: 1 (19:17 - 19:17)
+  18 |         str === 'a';
+  19 |         num === 1;
+     |                 ^ Right operand: 1
+  20 |         mixed === 'a';
 
 Diagnostic 3: mismatchedCondition (20:9 - 20:21)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
   19 |         num === 1;
   20 |         mixed === 'a';
      |         ~~~~~~~~~~~~~
   21 |         mixed === 1;
+  Label: Left operand: Mixed (20:9 - 20:13)
+  19 |         num === 1;
+  20 |         mixed === 'a';
+     |         ^^^^^ Left operand: Mixed
+  21 |         mixed === 1;
+  Label: Right operand: "a" (20:19 - 20:21)
+  19 |         num === 1;
+  20 |         mixed === 'a';
+     |                   ^^^ Right operand: "a"
+  21 |         mixed === 1;
 
 Diagnostic 4: mismatchedCondition (21:9 - 21:19)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
   20 |         mixed === 'a';
   21 |         mixed === 1;
      |         ~~~~~~~~~~~
+  22 |       
+  Label: Left operand: Mixed (21:9 - 21:13)
+  20 |         mixed === 'a';
+  21 |         mixed === 1;
+     |         ^^^^^ Left operand: Mixed
+  22 |       
+  Label: Right operand: 1 (21:19 - 21:19)
+  20 |         mixed === 'a';
+  21 |         mixed === 1;
+     |                   ^ Right operand: 1
   22 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-20 - 1]
 Diagnostic 1: mismatchedCondition (10:9 - 10:44)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    9 |         declare const weirdString: __String;
   10 |         weirdString === 'someArbitraryValue';
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |       
+  Label: Left operand: __String (10:9 - 10:19)
+   9 |         declare const weirdString: __String;
+  10 |         weirdString === 'someArbitraryValue';
+     |         ^^^^^^^^^^^ Left operand: __String
+  11 |       
+  Label: Right operand: "someArbitraryValue" (10:25 - 10:44)
+   9 |         declare const weirdString: __String;
+  10 |         weirdString === 'someArbitraryValue';
+     |                         ^^^^^^^^^^^^^^^^^^^^ Right operand: "someArbitraryValue"
   11 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-21 - 1]
 Diagnostic 1: mismatchedCase (9:11 - 11:11)
 Message: The case statement does not have a shared enum type with the switch predicate.
+Help: Compare against a member of the same enum as the switch value, or normalize both sides to the same primitive representation first.
    8 |         switch (fruit) {
    9 |           case 0: {
      |           ~~~~~~~~~
@@ -220,11 +485,22 @@ Message: The case statement does not have a shared enum type with the switch pre
   11 |           }
      | ~~~~~~~~~~~
   12 |         }
+  Label: Switch value: Fruit (8:17 - 8:21)
+   7 | 
+   8 |         switch (fruit) {
+     |                 ^^^^^ Switch value: Fruit
+   9 |           case 0: {
+  Label: Case value: 0 (9:16 - 9:16)
+   8 |         switch (fruit) {
+   9 |           case 0: {
+     |                ^ Case value: 0
+  10 |             break;
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-22 - 1]
 Diagnostic 1: mismatchedCase (13:11 - 15:11)
 Message: The case statement does not have a shared enum type with the switch predicate.
+Help: Compare against a member of the same enum as the switch value, or normalize both sides to the same primitive representation first.
   12 |           }
   13 |           case 1: {
      |           ~~~~~~~~~
@@ -233,11 +509,22 @@ Message: The case statement does not have a shared enum type with the switch pre
   15 |           }
      | ~~~~~~~~~~~
   16 |         }
+  Label: Switch value: Fruit (9:17 - 9:21)
+   8 | 
+   9 |         switch (fruit) {
+     |                 ^^^^^ Switch value: Fruit
+  10 |           case Fruit.Apple: {
+  Label: Case value: 1 (13:16 - 13:16)
+  12 |           }
+  13 |           case 1: {
+     |                ^ Case value: 1
+  14 |             break;
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-23 - 1]
 Diagnostic 1: mismatchedCase (9:11 - 11:11)
 Message: The case statement does not have a shared enum type with the switch predicate.
+Help: Compare against a member of the same enum as the switch value, or normalize both sides to the same primitive representation first.
    8 |         switch (vegetable) {
    9 |           case 'asparagus': {
      |           ~~~~~~~~~~~~~~~~~~~
@@ -246,11 +533,22 @@ Message: The case statement does not have a shared enum type with the switch pre
   11 |           }
      | ~~~~~~~~~~~
   12 |         }
+  Label: Switch value: Vegetable (8:17 - 8:25)
+   7 | 
+   8 |         switch (vegetable) {
+     |                 ^^^^^^^^^ Switch value: Vegetable
+   9 |           case 'asparagus': {
+  Label: Case value: "asparagus" (9:16 - 9:26)
+   8 |         switch (vegetable) {
+   9 |           case 'asparagus': {
+     |                ^^^^^^^^^^^ Case value: "asparagus"
+  10 |             break;
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-24 - 1]
 Diagnostic 1: mismatchedCase (13:11 - 15:11)
 Message: The case statement does not have a shared enum type with the switch predicate.
+Help: Compare against a member of the same enum as the switch value, or normalize both sides to the same primitive representation first.
   12 |           }
   13 |           case 'beet': {
      |           ~~~~~~~~~~~~~~
@@ -259,11 +557,22 @@ Message: The case statement does not have a shared enum type with the switch pre
   15 |           }
      | ~~~~~~~~~~~
   16 |         }
+  Label: Switch value: Vegetable (9:17 - 9:25)
+   8 | 
+   9 |         switch (vegetable) {
+     |                 ^^^^^^^^^ Switch value: Vegetable
+  10 |           case Vegetable.Asparagus: {
+  Label: Case value: "beet" (13:16 - 13:21)
+  12 |           }
+  13 |           case 'beet': {
+     |                ^^^^^^ Case value: "beet"
+  14 |             break;
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-25 - 1]
 Diagnostic 1: mismatchedCase (13:11 - 15:11)
 Message: The case statement does not have a shared enum type with the switch predicate.
+Help: Compare against a member of the same enum as the switch value, or normalize both sides to the same primitive representation first.
   12 |           }
   13 |           case 'beet': {
      |           ~~~~~~~~~~~~~~
@@ -272,166 +581,374 @@ Message: The case statement does not have a shared enum type with the switch pre
   15 |           }
      | ~~~~~~~~~~~
   16 |           default: {
+  Label: Switch value: Vegetable (9:17 - 9:25)
+   8 | 
+   9 |         switch (vegetable) {
+     |                 ^^^^^^^^^ Switch value: Vegetable
+  10 |           case Vegetable.Asparagus: {
+  Label: Case value: "beet" (13:16 - 13:21)
+  12 |           }
+  13 |           case 'beet': {
+     |                ^^^^^^ Case value: "beet"
+  14 |             break;
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-26 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:19)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const str: Str;
    7 |         str === 'b';
      |         ~~~~~~~~~~~
+   8 |       
+  Label: Left operand: Str (7:9 - 7:11)
+   6 |         declare const str: Str;
+   7 |         str === 'b';
+     |         ^^^ Left operand: Str
+   8 |       
+  Label: Right operand: "b" (7:17 - 7:19)
+   6 |         declare const str: Str;
+   7 |         str === 'b';
+     |                 ^^^ Right operand: "b"
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-27 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const str: Str;
    7 |         str === 'a' + 'b';
      |         ~~~~~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: Str (7:9 - 7:11)
+   6 |         declare const str: Str;
+   7 |         str === 'a' + 'b';
+     |         ^^^ Left operand: Str
+   8 |       
+  Label: Right operand: string (7:17 - 7:25)
+   6 |         declare const str: Str;
+   7 |         str === 'a' + 'b';
+     |                 ^^^^^^^^^ Right operand: string
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-28 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:17)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const num: Num;
    7 |         1 === num;
      |         ~~~~~~~~~
+   8 |       
+  Label: Left operand: 1 (7:9 - 7:9)
+   6 |         declare const num: Num;
+   7 |         1 === num;
+     |         ^ Left operand: 1
+   8 |       
+  Label: Right operand: Num (7:15 - 7:17)
+   6 |         declare const num: Num;
+   7 |         1 === num;
+     |               ^^^ Right operand: Num
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-29 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:42)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const num: Num;
    7 |         1 /* with */ === /* comment */ num;
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: 1 (7:9 - 7:9)
+   6 |         declare const num: Num;
+   7 |         1 /* with */ === /* comment */ num;
+     |         ^ Left operand: 1
+   8 |       
+  Label: Right operand: Num (7:40 - 7:42)
+   6 |         declare const num: Num;
+   7 |         1 /* with */ === /* comment */ num;
+     |                                        ^^^ Right operand: Num
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-30 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:21)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const num: Num;
    7 |         1 + 1 === num;
      |         ~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: number (7:9 - 7:13)
+   6 |         declare const num: Num;
+   7 |         1 + 1 === num;
+     |         ^^^^^ Left operand: number
+   8 |       
+  Label: Right operand: Num (7:19 - 7:21)
+   6 |         declare const num: Num;
+   7 |         1 + 1 === num;
+     |                   ^^^ Right operand: Num
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-31 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:19)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const mixed: Mixed;
    7 |         mixed === 1;
      |         ~~~~~~~~~~~
+   8 |       
+  Label: Left operand: Mixed (7:9 - 7:13)
+   6 |         declare const mixed: Mixed;
+   7 |         mixed === 1;
+     |         ^^^^^ Left operand: Mixed
+   8 |       
+  Label: Right operand: 1 (7:19 - 7:19)
+   6 |         declare const mixed: Mixed;
+   7 |         mixed === 1;
+     |                   ^ Right operand: 1
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-32 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:21)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const mixed: Mixed;
    7 |         mixed === 'b';
      |         ~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: Mixed (7:9 - 7:13)
+   6 |         declare const mixed: Mixed;
+   7 |         mixed === 'b';
+     |         ^^^^^ Left operand: Mixed
+   8 |       
+  Label: Right operand: "b" (7:19 - 7:21)
+   6 |         declare const mixed: Mixed;
+   7 |         mixed === 'b';
+     |                   ^^^ Right operand: "b"
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-33 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:23)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const stringKey: StringKey;
    6 |         stringKey === 1;
      |         ~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: StringKey (6:9 - 6:17)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |         ^^^^^^^^^ Left operand: StringKey
+   7 |       
+  Label: Right operand: 1 (6:23 - 6:23)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |                       ^ Right operand: 1
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-34 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:23)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const stringKey: StringKey;
    6 |         stringKey === 1;
      |         ~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: StringKey (6:9 - 6:17)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |         ^^^^^^^^^ Left operand: StringKey
+   7 |       
+  Label: Right operand: 1 (6:23 - 6:23)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |                       ^ Right operand: 1
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-35 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:23)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const stringKey: StringKey;
    6 |         stringKey === 1;
      |         ~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: StringKey (6:9 - 6:17)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |         ^^^^^^^^^ Left operand: StringKey
+   7 |       
+  Label: Right operand: 1 (6:23 - 6:23)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |                       ^ Right operand: 1
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-36 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:23)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const stringKey: StringKey;
    6 |         stringKey === 1;
      |         ~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: StringKey (6:9 - 6:17)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |         ^^^^^^^^^ Left operand: StringKey
+   7 |       
+  Label: Right operand: 1 (6:23 - 6:23)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |                       ^ Right operand: 1
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-37 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const computedKey: ComputedKey;
    6 |         computedKey === 1;
      |         ~~~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: ComputedKey (6:9 - 6:19)
+   5 |         declare const computedKey: ComputedKey;
+   6 |         computedKey === 1;
+     |         ^^^^^^^^^^^ Left operand: ComputedKey
+   7 |       
+  Label: Right operand: 1 (6:25 - 6:25)
+   5 |         declare const computedKey: ComputedKey;
+   6 |         computedKey === 1;
+     |                         ^ Right operand: 1
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-38 - 1]
 Diagnostic 1: mismatchedCondition (6:9 - 6:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const computedKey: ComputedKey;
    6 |         computedKey === 1;
      |         ~~~~~~~~~~~~~~~~~
+   7 |       
+  Label: Left operand: ComputedKey (6:9 - 6:19)
+   5 |         declare const computedKey: ComputedKey;
+   6 |         computedKey === 1;
+     |         ^^^^^^^^^^^ Left operand: ComputedKey
+   7 |       
+  Label: Right operand: 1 (6:25 - 6:25)
+   5 |         declare const computedKey: ComputedKey;
+   6 |         computedKey === 1;
+     |                         ^ Right operand: 1
    7 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-39 - 1]
 Diagnostic 1: mismatchedCondition (7:9 - 7:25)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    6 |         declare const computedKey: ComputedKey;
    7 |         computedKey === 1;
      |         ~~~~~~~~~~~~~~~~~
+   8 |       
+  Label: Left operand: ComputedKey (7:9 - 7:19)
+   6 |         declare const computedKey: ComputedKey;
+   7 |         computedKey === 1;
+     |         ^^^^^^^^^^^ Left operand: ComputedKey
+   8 |       
+  Label: Right operand: 1 (7:25 - 7:25)
+   6 |         declare const computedKey: ComputedKey;
+   7 |         computedKey === 1;
+     |                         ^ Right operand: 1
    8 |       
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-40 - 1]
 Diagnostic 1: mismatchedCondition (6:13 - 6:31)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const foo: number & {};
    6 |         if (foo === Fruit.Apple) {
      |             ~~~~~~~~~~~~~~~~~~~
+   7 |         }
+  Label: Left operand: number & {} (6:13 - 6:15)
+   5 |         declare const foo: number & {};
+   6 |         if (foo === Fruit.Apple) {
+     |             ^^^ Left operand: number & {}
+   7 |         }
+  Label: Right operand: Fruit (6:21 - 6:31)
+   5 |         declare const foo: number & {};
+   6 |         if (foo === Fruit.Apple) {
+     |                     ^^^^^^^^^^^ Right operand: Fruit
    7 |         }
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-41 - 1]
 Diagnostic 1: mismatchedCondition (6:13 - 6:31)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const foo: number & { __someBrand: void };
    6 |         if (foo === Fruit.Apple) {
      |             ~~~~~~~~~~~~~~~~~~~
+   7 |         }
+  Label: Left operand: number & { __someBrand: void; } (6:13 - 6:15)
+   5 |         declare const foo: number & { __someBrand: void };
+   6 |         if (foo === Fruit.Apple) {
+     |             ^^^ Left operand: number & { __someBrand: void; }
+   7 |         }
+  Label: Right operand: Fruit (6:21 - 6:31)
+   5 |         declare const foo: number & { __someBrand: void };
+   6 |         if (foo === Fruit.Apple) {
+     |                     ^^^^^^^^^^^ Right operand: Fruit
    7 |         }
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-42 - 1]
 Diagnostic 1: mismatchedCondition (6:13 - 6:39)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const foo: string & {};
    6 |         if (foo === Vegetable.Asparagus) {
      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         }
+  Label: Left operand: string & {} (6:13 - 6:15)
+   5 |         declare const foo: string & {};
+   6 |         if (foo === Vegetable.Asparagus) {
+     |             ^^^ Left operand: string & {}
+   7 |         }
+  Label: Right operand: Vegetable (6:21 - 6:39)
+   5 |         declare const foo: string & {};
+   6 |         if (foo === Vegetable.Asparagus) {
+     |                     ^^^^^^^^^^^^^^^^^^^ Right operand: Vegetable
    7 |         }
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-43 - 1]
 Diagnostic 1: mismatchedCondition (6:13 - 6:39)
 Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
    5 |         declare const foo: string & { __someBrand: void };
    6 |         if (foo === Vegetable.Asparagus) {
      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         }
+  Label: Left operand: string & { __someBrand: void; } (6:13 - 6:15)
+   5 |         declare const foo: string & { __someBrand: void };
+   6 |         if (foo === Vegetable.Asparagus) {
+     |             ^^^ Left operand: string & { __someBrand: void; }
+   7 |         }
+  Label: Right operand: Vegetable (6:21 - 6:39)
+   5 |         declare const foo: string & { __someBrand: void };
+   6 |         if (foo === Vegetable.Asparagus) {
+     |                     ^^^^^^^^^^^^^^^^^^^ Right operand: Vegetable
    7 |         }
 ---

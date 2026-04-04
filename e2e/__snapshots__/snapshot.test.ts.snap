@@ -2098,8 +2098,25 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Left operand: Status.Open",
+        "range": {
+          "end": 228,
+          "pos": 217,
+        },
+      },
+      {
+        "label": "Right operand: Color.Red",
+        "range": {
+          "end": 242,
+          "pos": 233,
+        },
+      },
+    ],
     "message": {
       "description": "The two values in this comparison do not have a shared enum type.",
+      "help": "Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.",
       "id": "mismatchedCondition",
     },
     "range": {
