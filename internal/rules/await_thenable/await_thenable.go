@@ -5,6 +5,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -14,6 +15,7 @@ func buildAwaitMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "await",
 		Description: "Unexpected `await` of a non-Promise (non-\"Thenable\") value.",
+		Help:        "Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.",
 	}
 }
 
@@ -28,6 +30,7 @@ func buildForAwaitOfNonAsyncIterableMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "forAwaitOfNonAsyncIterable",
 		Description: "Unexpected `for await...of` of a value that is not async iterable.",
+		Help:        "Use `for...of` for synchronous iterables, or change the iterable to implement `Symbol.asyncIterator`.",
 	}
 }
 
@@ -42,6 +45,7 @@ func buildAwaitUsingOfNonAsyncDisposableMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "awaitUsingOfNonAsyncDisposable",
 		Description: "Unexpected `await using` of a value that is not async disposable.",
+		Help:        "Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.",
 	}
 }
 
@@ -49,6 +53,37 @@ func buildInvalidPromiseAggregatorInputMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "invalidPromiseAggregatorInput",
 		Description: "Unexpected iterable of non-Promise (non-\"Thenable\") values passed to promise aggregator.",
+		Help:        "Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.",
+	}
+}
+
+func buildAwaitedExpressionLabel(label string, nodeRange core.TextRange) rule.RuleLabeledRange {
+	return rule.RuleLabeledRange{
+		Label: label,
+		Range: nodeRange,
+	}
+}
+
+func buildDiagnosticLabelText(messageID string) string {
+	switch messageID {
+	case "forAwaitOfNonAsyncIterable":
+		return "This value is not async iterable"
+	case "awaitUsingOfNonAsyncDisposable":
+		return "This value is not async disposable"
+	default:
+		return "This expression is not Promise-like"
+	}
+}
+
+func buildAwaitThenableDiagnostic(diagnosticRange core.TextRange, message rule.RuleMessage, labelRange core.TextRange, extraLabels ...rule.RuleLabeledRange) rule.RuleDiagnostic {
+	labels := []rule.RuleLabeledRange{
+		buildAwaitedExpressionLabel(buildDiagnosticLabelText(message.Id), labelRange),
+	}
+	labels = append(labels, extraLabels...)
+	return rule.RuleDiagnostic{
+		Range:         diagnosticRange,
+		Message:       message,
+		LabeledRanges: labels,
 	}
 }
 
@@ -70,7 +105,11 @@ var AwaitThenableRule = rule.Rule{
 
 				if certainty == utils.TypeAwaitableNever {
 					awaitTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())
-					ctx.ReportRangeWithSuggestions(awaitTokenRange, buildAwaitMessage(), func() []rule.RuleSuggestion {
+					ctx.ReportDiagnosticWithSuggestions(buildAwaitThenableDiagnostic(
+						awaitTokenRange,
+						buildAwaitMessage(),
+						utils.TrimNodeTextRange(ctx.SourceFile, awaitArgument),
+					), func() []rule.RuleSuggestion {
 						return []rule.RuleSuggestion{{
 							Message: buildRemoveAwaitMessage(),
 							FixesArr: []rule.RuleFix{
@@ -103,7 +142,17 @@ var AwaitThenableRule = rule.Rule{
 
 						t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, element)
 						if isAlwaysNonAwaitableType(ctx.TypeChecker, element, t) {
-							ctx.ReportNode(element, buildInvalidPromiseAggregatorInputMessage())
+							argumentRange := utils.TrimNodeTextRange(ctx.SourceFile, argument)
+							elementRange := utils.TrimNodeTextRange(ctx.SourceFile, element)
+							ctx.ReportDiagnostic(buildAwaitThenableDiagnostic(
+								elementRange,
+								buildInvalidPromiseAggregatorInputMessage(),
+								elementRange,
+								rule.RuleLabeledRange{
+									Label: "Promise aggregator input",
+									Range: argumentRange,
+								},
+							))
 						}
 					}
 
@@ -112,7 +161,12 @@ var AwaitThenableRule = rule.Rule{
 
 				t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, argument)
 				if isInvalidPromiseAggregatorInput(ctx.TypeChecker, argument, t) {
-					ctx.ReportNode(argument, buildInvalidPromiseAggregatorInputMessage())
+					argRange := utils.TrimNodeTextRange(ctx.SourceFile, argument)
+					ctx.ReportDiagnostic(buildAwaitThenableDiagnostic(
+						argRange,
+						buildInvalidPromiseAggregatorInputMessage(),
+						argRange,
+					))
 				}
 			},
 			ast.KindForOfStatement: func(node *ast.Node) {
@@ -132,9 +186,12 @@ var AwaitThenableRule = rule.Rule{
 					}
 				}
 
-				ctx.ReportRangeWithSuggestions(
-					utils.GetForStatementHeadLoc(ctx.SourceFile, node),
-					buildForAwaitOfNonAsyncIterableMessage(),
+				ctx.ReportDiagnosticWithSuggestions(
+					buildAwaitThenableDiagnostic(
+						utils.GetForStatementHeadLoc(ctx.SourceFile, node),
+						buildForAwaitOfNonAsyncIterableMessage(),
+						utils.TrimNodeTextRange(ctx.SourceFile, stmt.Expression),
+					),
 					func() []rule.RuleSuggestion {
 						// Note that this suggestion causes broken code for sync iterables
 						// of promises, since the loop variable is not awaited.
@@ -183,7 +240,12 @@ var AwaitThenableRule = rule.Rule{
 						})
 					}
 
-					ctx.ReportNodeWithSuggestions(init, buildAwaitUsingOfNonAsyncDisposableMessage(), func() []rule.RuleSuggestion { return suggestions })
+					initRange := utils.TrimNodeTextRange(ctx.SourceFile, init)
+					ctx.ReportDiagnosticWithSuggestions(buildAwaitThenableDiagnostic(
+						initRange,
+						buildAwaitUsingOfNonAsyncDisposableMessage(),
+						initRange,
+					), func() []rule.RuleSuggestion { return suggestions })
 				}
 			},
 		}

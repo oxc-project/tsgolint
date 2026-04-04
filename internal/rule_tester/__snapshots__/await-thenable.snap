@@ -2,41 +2,63 @@
 [TestAwaitThenable/invalid-0 - 1]
 Diagnostic 1: await (1:1 - 1:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    1 | await 0;
      | ~~~~~
+  Label: This expression is not Promise-like (1:7 - 1:7)
+   1 | await 0;
+     |       ^ This expression is not Promise-like
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
 
 [TestAwaitThenable/invalid-1 - 1]
 Diagnostic 1: await (1:1 - 1:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    1 | await 'value';
      | ~~~~~
+  Label: This expression is not Promise-like (1:7 - 1:13)
+   1 | await 'value';
+     |       ^^^^^^^ This expression is not Promise-like
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
 
 [TestAwaitThenable/invalid-2 - 1]
 Diagnostic 1: await (1:13 - 1:17)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    1 | async () => await (Math.random() > 0.5 ? '' : 0);
      |             ~~~~~
+  Label: This expression is not Promise-like (1:19 - 1:48)
+   1 | async () => await (Math.random() > 0.5 ? '' : 0);
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression is not Promise-like
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
 
 [TestAwaitThenable/invalid-3 - 1]
 Diagnostic 1: await (1:13 - 1:17)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    1 | async () => await(Math.random() > 0.5 ? '' : 0);
      |             ~~~~~
+  Label: This expression is not Promise-like (1:18 - 1:47)
+   1 | async () => await(Math.random() > 0.5 ? '' : 0);
+     |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression is not Promise-like
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
 
 [TestAwaitThenable/invalid-4 - 1]
 Diagnostic 1: await (3:1 - 3:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    2 | class NonPromise extends Array {}
    3 | await new NonPromise();
      | ~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:7 - 3:22)
+   2 | class NonPromise extends Array {}
+   3 | await new NonPromise();
+     |       ^^^^^^^^^^^^^^^^ This expression is not Promise-like
    4 |       
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -44,9 +66,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-5 - 1]
 Diagnostic 1: await (8:3 - 8:7)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    7 | 
    8 |   await thenable;
      |   ~~~~~
+   9 | }
+  Label: This expression is not Promise-like (8:9 - 8:16)
+   7 | 
+   8 |   await thenable;
+     |         ^^^^^^^^ This expression is not Promise-like
    9 | }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -54,9 +82,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-6 - 1]
 Diagnostic 1: await (3:1 - 3:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    2 | declare const callback: (() => void) | undefined;
    3 | await callback?.();
      | ~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:7 - 3:18)
+   2 | declare const callback: (() => void) | undefined;
+   3 | await callback?.();
+     |       ^^^^^^^^^^^^ This expression is not Promise-like
    4 |       
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -64,9 +98,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-7 - 1]
 Diagnostic 1: await (3:1 - 3:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    2 | declare const obj: { a?: { b?: () => void } };
    3 | await obj.a?.b?.();
      | ~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:7 - 3:18)
+   2 | declare const obj: { a?: { b?: () => void } };
+   3 | await obj.a?.b?.();
+     |       ^^^^^^^^^^^^ This expression is not Promise-like
    4 |       
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -74,9 +114,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-8 - 1]
 Diagnostic 1: await (3:1 - 3:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    2 | declare const obj: { a: { b: { c?: () => void } } } | undefined;
    3 | await obj?.a.b.c?.();
      | ~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:7 - 3:20)
+   2 | declare const obj: { a: { b: { c?: () => void } } } | undefined;
+   3 | await obj?.a.b.c?.();
+     |       ^^^^^^^^^^^^^^ This expression is not Promise-like
    4 |       
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -84,9 +130,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-9 - 1]
 Diagnostic 1: forAwaitOfNonAsyncIterable (7:1 - 7:41)
 Message: Unexpected `for await...of` of a value that is not async iterable.
+Help: Use `for...of` for synchronous iterables, or change the iterable to implement `Symbol.asyncIterator`.
    6 | }
    7 | for await (const value of yieldNumbers()) {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   console.log(value);
+  Label: This value is not async iterable (7:27 - 7:40)
+   6 | }
+   7 | for await (const value of yieldNumbers()) {
+     |                           ^^^^^^^^^^^^^^ This value is not async iterable
    8 |   console.log(value);
   Suggestion 1: [convertToOrdinaryFor] Convert to an ordinary `for...of` loop.
 ---
@@ -94,9 +146,15 @@ Message: Unexpected `for await...of` of a value that is not async iterable.
 [TestAwaitThenable/invalid-10 - 1]
 Diagnostic 1: forAwaitOfNonAsyncIterable (7:1 - 7:48)
 Message: Unexpected `for await...of` of a value that is not async iterable.
+Help: Use `for...of` for synchronous iterables, or change the iterable to implement `Symbol.asyncIterator`.
    6 | }
    7 | for await (const value of yieldNumberPromises()) {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   console.log(value);
+  Label: This value is not async iterable (7:27 - 7:47)
+   6 | }
+   7 | for await (const value of yieldNumberPromises()) {
+     |                           ^^^^^^^^^^^^^^^^^^^^^ This value is not async iterable
    8 |   console.log(value);
   Suggestion 1: [convertToOrdinaryFor] Convert to an ordinary `for...of` loop.
 ---
@@ -104,9 +162,15 @@ Message: Unexpected `for await...of` of a value that is not async iterable.
 [TestAwaitThenable/invalid-11 - 1]
 Diagnostic 1: awaitUsingOfNonAsyncDisposable (4:19 - 4:28)
 Message: Unexpected `await using` of a value that is not async disposable.
+Help: Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.
    3 | async function foo() {
    4 |   await using d = disposable;
      |                   ~~~~~~~~~~
+   5 | }
+  Label: This value is not async disposable (4:19 - 4:28)
+   3 | async function foo() {
+   4 |   await using d = disposable;
+     |                   ^^^^^^^^^^ This value is not async disposable
    5 | }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -114,6 +178,7 @@ Message: Unexpected `await using` of a value that is not async disposable.
 [TestAwaitThenable/invalid-12 - 1]
 Diagnostic 1: awaitUsingOfNonAsyncDisposable (3:19 - 5:3)
 Message: Unexpected `await using` of a value that is not async disposable.
+Help: Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.
    2 | async function foo() {
    3 |   await using _ = {
      |                   ~
@@ -122,47 +187,86 @@ Message: Unexpected `await using` of a value that is not async disposable.
    5 |   };
      | ~~~
    6 | }
+  Label: This value is not async disposable (3:19 - 5:3)
+   2 | async function foo() {
+   3 |   await using _ = {
+     |                   ^ This value is not async disposable
+   4 |     async [Symbol.dispose]() {},
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This value is not async disposable
+   5 |   };
+     | ^^^ This value is not async disposable
+   6 | }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
 
 [TestAwaitThenable/invalid-13 - 1]
 Diagnostic 1: awaitUsingOfNonAsyncDisposable (5:19 - 5:28)
 Message: Unexpected `await using` of a value that is not async disposable.
+Help: Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.
    4 | async function foo() {
    5 |   await using a = disposable,
      |                   ~~~~~~~~~~
    6 |     b = asyncDisposable,
+  Label: This value is not async disposable (5:19 - 5:28)
+   4 | async function foo() {
+   5 |   await using a = disposable,
+     |                   ^^^^^^^^^^ This value is not async disposable
+   6 |     b = asyncDisposable,
 
 Diagnostic 2: awaitUsingOfNonAsyncDisposable (7:9 - 7:18)
 Message: Unexpected `await using` of a value that is not async disposable.
+Help: Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.
    6 |     b = asyncDisposable,
    7 |     c = disposable,
      |         ~~~~~~~~~~
    8 |     d = asyncDisposable,
+  Label: This value is not async disposable (7:9 - 7:18)
+   6 |     b = asyncDisposable,
+   7 |     c = disposable,
+     |         ^^^^^^^^^^ This value is not async disposable
+   8 |     d = asyncDisposable,
 
 Diagnostic 3: awaitUsingOfNonAsyncDisposable (9:9 - 9:18)
 Message: Unexpected `await using` of a value that is not async disposable.
+Help: Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.
    8 |     d = asyncDisposable,
    9 |     e = disposable;
      |         ~~~~~~~~~~
+  10 | }
+  Label: This value is not async disposable (9:9 - 9:18)
+   8 |     d = asyncDisposable,
+   9 |     e = disposable;
+     |         ^^^^^^^^^^ This value is not async disposable
   10 | }
 ---
 
 [TestAwaitThenable/invalid-14 - 1]
 Diagnostic 1: awaitUsingOfNonAsyncDisposable (6:9 - 6:18)
 Message: Unexpected `await using` of a value that is not async disposable.
+Help: Use plain `using` for synchronous disposables, or change the value to implement `Symbol.asyncDispose`.
    5 |   await using a = anee,
    6 |     b = disposable;
      |         ~~~~~~~~~~
+   7 | }
+  Label: This value is not async disposable (6:9 - 6:18)
+   5 |   await using a = anee,
+   6 |     b = disposable;
+     |         ^^^^^^^^^^ This value is not async disposable
    7 | }
 ---
 
 [TestAwaitThenable/invalid-15 - 1]
 Diagnostic 1: await (3:10 - 3:14)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    2 | async function wrapper<T extends number>(value: T) {
    3 |   return await value;
      |          ~~~~~
+   4 | }
+  Label: This expression is not Promise-like (3:16 - 3:20)
+   2 | async function wrapper<T extends number>(value: T) {
+   3 |   return await value;
+     |                ^^^^^ This expression is not Promise-like
    4 | }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -170,9 +274,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-16 - 1]
 Diagnostic 1: await (4:12 - 4:16)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    3 |   async wrapper<T extends string>(value: T) {
    4 |     return await value;
      |            ~~~~~
+   5 |   }
+  Label: This expression is not Promise-like (4:18 - 4:22)
+   3 |   async wrapper<T extends string>(value: T) {
+   4 |     return await value;
+     |                  ^^^^^ This expression is not Promise-like
    5 |   }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -180,9 +290,15 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-17 - 1]
 Diagnostic 1: await (4:12 - 4:16)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
+Help: Remove `await` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.
    3 |   async wrapper<T extends R>(value: T) {
    4 |     return await value;
      |            ~~~~~
+   5 |   }
+  Label: This expression is not Promise-like (4:18 - 4:22)
+   3 |   async wrapper<T extends R>(value: T) {
+   4 |     return await value;
+     |                  ^^^^^ This expression is not Promise-like
    5 |   }
   Suggestion 1: [removeAwait] Remove unnecessary `await`.
 ---
@@ -190,240 +306,422 @@ Message: Unexpected `await` of a non-Promise (non-"Thenable") value.
 [TestAwaitThenable/invalid-18 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Array<number>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Array<number>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-19 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:14 - 3:14)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Array<number> | Array<Promise<number>>;
    3 | Promise.race(x);
      |              ~
+   4 |       
+  Label: This expression is not Promise-like (3:14 - 3:14)
+   2 | declare const x: Array<number> | Array<Promise<number>>;
+   3 | Promise.race(x);
+     |              ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-20 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:20 - 3:20)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Array<number> | Array<string>;
    3 | Promise.allSettled(x);
      |                    ~
+   4 |       
+  Label: This expression is not Promise-like (3:20 - 3:20)
+   2 | declare const x: Array<number> | Array<string>;
+   3 | Promise.allSettled(x);
+     |                    ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-21 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Array<number | Promise<number>>;
    3 | Promise.any(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Array<number | Promise<number>>;
+   3 | Promise.any(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-22 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: [number];
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: [number];
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-23 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: [number] | [Promise<number>];
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: [number] | [Promise<number>];
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-24 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: [number | Promise<number>];
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: [number | Promise<number>];
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-25 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: [Promise<number>, number];
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: [Promise<number>, number];
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-26 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Iterable<number>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Iterable<number>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-27 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Iterable<number> | Iterable<Promise<number>>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Iterable<number> | Iterable<Promise<number>>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-28 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Iterable<number | Promise<number>>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Iterable<number | Promise<number>>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-29 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Iterable<string> | Array<Promise<unknown>>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Iterable<string> | Array<Promise<unknown>>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-30 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Iterable<Promise<string>> | [string, Promise<unknown>];
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Iterable<Promise<string>> | [string, Promise<unknown>];
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-31 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Array<string> | [Promise<string>, Promise<unknown>];
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Array<string> | [Promise<string>, Promise<unknown>];
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-32 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Array<Array<Promise<number>>>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Array<Array<Promise<number>>>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-33 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (5:13 - 5:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    4 | 
    5 | Promise.all(x);
      |             ~
+   6 |       
+  Label: This expression is not Promise-like (5:13 - 5:13)
+   4 | 
+   5 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    6 |       
 ---
 
 [TestAwaitThenable/invalid-34 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (7:13 - 7:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    6 | 
    7 | Promise.all(x);
      |             ~
+   8 |       
+  Label: This expression is not Promise-like (7:13 - 7:13)
+   6 | 
+   7 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    8 |       
 ---
 
 [TestAwaitThenable/invalid-35 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (8:13 - 8:15)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    7 | 
    8 | Promise.all(x());
      |             ~~~
+   9 |       
+  Label: This expression is not Promise-like (8:13 - 8:15)
+   7 | 
+   8 | Promise.all(x());
+     |             ^^^ This expression is not Promise-like
    9 |       
 ---
 
 [TestAwaitThenable/invalid-36 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (6:13 - 6:15)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    5 | 
    6 | Promise.all(x());
      |             ~~~
+   7 |       
+  Label: This expression is not Promise-like (6:13 - 6:15)
+   5 | 
+   6 | Promise.all(x());
+     |             ^^^ This expression is not Promise-like
    7 |       
 ---
 
 [TestAwaitThenable/invalid-37 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (6:13 - 6:15)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    5 | 
    6 | Promise.all(x());
      |             ~~~
+   7 |       
+  Label: This expression is not Promise-like (6:13 - 6:15)
+   5 | 
+   6 | Promise.all(x());
+     |             ^^^ This expression is not Promise-like
    7 |       
 ---
 
 [TestAwaitThenable/invalid-38 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: Generator<number>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: Generator<number>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-39 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: ReadonlyArray<number>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: ReadonlyArray<number>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-40 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:13)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    2 | declare const x: ReadonlyArray<number | Promise<string>>;
    3 | Promise.all(x);
      |             ~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:13)
+   2 | declare const x: ReadonlyArray<number | Promise<string>>;
+   3 | Promise.all(x);
+     |             ^ This expression is not Promise-like
    4 |       
 ---
 
 [TestAwaitThenable/invalid-41 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (2:34 - 2:34)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    1 | 
    2 | Promise.all([Promise.resolve(1), 2, Promise.resolve(3)]);
      |                                  ~
+   3 |       
+  Label: This expression is not Promise-like (2:34 - 2:34)
+   1 | 
+   2 | Promise.all([Promise.resolve(1), 2, Promise.resolve(3)]);
+     |                                  ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:55)
+   1 | 
+   2 | Promise.all([Promise.resolve(1), 2, Promise.resolve(3)]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Promise aggregator input
    3 |       
 ---
 
 [TestAwaitThenable/invalid-42 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:14)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    1 | 
    2 | Promise.all([1, 2, Promise.resolve(3)]);
      |              ~
    3 |       
+  Label: This expression is not Promise-like (2:14 - 2:14)
+   1 | 
+   2 | Promise.all([1, 2, Promise.resolve(3)]);
+     |              ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:38)
+   1 | 
+   2 | Promise.all([1, 2, Promise.resolve(3)]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^ Promise aggregator input
+   3 |       
 
 Diagnostic 2: invalidPromiseAggregatorInput (2:17 - 2:17)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    1 | 
    2 | Promise.all([1, 2, Promise.resolve(3)]);
      |                 ~
+   3 |       
+  Label: This expression is not Promise-like (2:17 - 2:17)
+   1 | 
+   2 | Promise.all([1, 2, Promise.resolve(3)]);
+     |                 ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:38)
+   1 | 
+   2 | Promise.all([1, 2, Promise.resolve(3)]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^ Promise aggregator input
    3 |       
 ---
 
 [TestAwaitThenable/invalid-43 - 1]
 Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:25)
 Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
    1 | 
    2 | Promise.all([...[1, 2, 3]]);
      |              ~~~~~~~~~~~~
+   3 |       
+  Label: This expression is not Promise-like (2:14 - 2:25)
+   1 | 
+   2 | Promise.all([...[1, 2, 3]]);
+     |              ^^^^^^^^^^^^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:26)
+   1 | 
+   2 | Promise.all([...[1, 2, 3]]);
+     |             ^^^^^^^^^^^^^^ Promise aggregator input
    3 |       
 ---

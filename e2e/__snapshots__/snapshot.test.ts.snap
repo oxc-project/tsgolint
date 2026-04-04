@@ -51,8 +51,18 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression is not Promise-like",
+        "range": {
+          "end": 63,
+          "pos": 61,
+        },
+      },
+    ],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "help": "Remove \`await\` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.",
       "id": "await",
     },
     "range": {
@@ -81,8 +91,18 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression is not Promise-like",
+        "range": {
+          "end": 81,
+          "pos": 71,
+        },
+      },
+    ],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "help": "Remove \`await\` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.",
       "id": "await",
     },
     "range": {
@@ -111,8 +131,18 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression is not Promise-like",
+        "range": {
+          "end": 123,
+          "pos": 112,
+        },
+      },
+    ],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "help": "Remove \`await\` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.",
       "id": "await",
     },
     "range": {
@@ -141,8 +171,18 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression is not Promise-like",
+        "range": {
+          "end": 144,
+          "pos": 131,
+        },
+      },
+    ],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "help": "Remove \`await\` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.",
       "id": "await",
     },
     "range": {
@@ -171,8 +211,18 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/await-thenable/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression is not Promise-like",
+        "range": {
+          "end": 278,
+          "pos": 268,
+        },
+      },
+    ],
     "message": {
       "description": "Unexpected \`await\` of a non-Promise (non-"Thenable") value.",
+      "help": "Remove \`await\` if the value is synchronous, or change the expression to return a Promise or Thenable before awaiting it.",
       "id": "await",
     },
     "range": {
