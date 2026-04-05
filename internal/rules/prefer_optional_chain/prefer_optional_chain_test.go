@@ -1000,6 +1000,14 @@ func TestPreferOptionalChainRule(t *testing.T) {
 
 			left !== shared.name && right.prop === shared.name;
 		`},
+		{
+			Code: `const a: string | null = '';
+const b: string = '';
+
+if (!a || b === a || b.indexOf('input, button, a')) {
+  console.log('Hello, World');
+}`,
+		},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{

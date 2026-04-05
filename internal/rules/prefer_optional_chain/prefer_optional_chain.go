@@ -1589,8 +1589,16 @@ outer3:
 		}
 
 		comparedExpr := left
+		hasPropertyAccess := leftIsAccess
 		if rightIsAccess {
 			comparedExpr = right
+			hasPropertyAccess = true
+		}
+		// OR chains can only safely extend through comparisons that actually inspect
+		// an access expression. Non-nullish identifier comparisons like `b === a`
+		// should not seed an optional-chain candidate such as `b === a || b.foo()`.
+		if !hasPropertyAccess {
+			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 		return Operand{typ: OperandTypeComparison, node: node, comparedExpr: comparedExpr}
 	}
