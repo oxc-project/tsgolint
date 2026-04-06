@@ -359,6 +359,16 @@ func TestPreferDestructuringRule(t *testing.T) {
           }
         }
       `, Options: preferDestructuringTupleOptionsFromJSON(`{"array":true,"object":true,"enforceForDeclarationWithTypeAnnotation":true}`)},
+		{Code: `
+      const obj = { foo: { [Symbol.dispose]() {} } };
+      using foo = obj.foo;
+    `},
+		{Code: `
+      let foo = object.foo;
+    `, Options: preferDestructuringTupleOptionsFromJSON(`{"AssignmentExpression":{"object":true}}`)},
+		{Code: `
+      foo = object.foo;
+    `, Options: preferDestructuringTupleOptionsFromJSON(`{"VariableDeclarator":{"object":true}}`)},
 	}, []rule_tester.InvalidTestCase{
 		// enforceForDeclarationWithTypeAnnotation: true
 		{
@@ -671,6 +681,37 @@ func TestPreferDestructuringRule(t *testing.T) {
       `,
 			Options: preferDestructuringTupleOptionsFromJSON(`{"object":true,"enforceForRenamedProperties":true}`),
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
+		},
+		{
+			Code: `
+        foo = object.foo;
+      `,
+			Options: preferDestructuringTupleOptionsFromJSON(`{"AssignmentExpression":{"object":true}}`),
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
+		},
+		{
+			Code: `
+        let foo = object.foo;
+      `,
+			Options: preferDestructuringTupleOptionsFromJSON(`{"VariableDeclarator":{"object":true}}`),
+			Output: []string{`
+        let {foo} = object;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
+		},
+		{
+			Code: `
+        const obj: { x: unknown } = { x: 1 };
+        const x = obj['x'];
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
+		},
+		{
+			Code: `
+        const obj = { foo: 100 };
+        const foo /* comment */ = obj.foo;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferDestructuring"}},
 		},
 	})
 }

@@ -13,6 +13,76 @@ Message: Use array destructuring.
      |     ~~~~~~~~~~~~~~~~~~~~~~
 ---
 
+[TestPreferDestructuringRule/invalid-2 - 1]
+Diagnostic 1: preferDestructuring (1:5 - 1:29)
+Message: Use object destructuring.
+   1 | var foo: unknown = object.bar;
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferDestructuringRule/invalid-3 - 1]
+Diagnostic 1: preferDestructuring (3:13 - 3:20)
+Message: Use array destructuring.
+   2 |         let x: { [Symbol.iterator]: unknown };
+   3 |         let y = x[0];
+     |             ~~~~~~~~
+   4 |       
+---
+
+[TestPreferDestructuringRule/invalid-4 - 1]
+Diagnostic 1: preferDestructuring (3:9 - 3:16)
+Message: Use array destructuring.
+   2 |         let x: { [Symbol.iterator]: unknown };
+   3 |         y = x[0];
+     |         ~~~~~~~~
+   4 |       
+---
+
+[TestPreferDestructuringRule/invalid-5 - 1]
+Diagnostic 1: preferDestructuring (3:13 - 3:20)
+Message: Use array destructuring.
+   2 |         let x: [1, 2, 3];
+   3 |         let y = x[0];
+     |             ~~~~~~~~
+   4 |       
+---
+
+[TestPreferDestructuringRule/invalid-6 - 1]
+Diagnostic 1: preferDestructuring (3:9 - 3:16)
+Message: Use array destructuring.
+   2 |         let x: [1, 2, 3];
+   3 |         y = x[0];
+     |         ~~~~~~~~
+   4 |       
+---
+
+[TestPreferDestructuringRule/invalid-7 - 1]
+Diagnostic 1: preferDestructuring (5:13 - 5:23)
+Message: Use array destructuring.
+   4 |         }
+   5 |         let y = it()[0];
+     |             ~~~~~~~~~~~
+   6 |       
+---
+
+[TestPreferDestructuringRule/invalid-8 - 1]
+Diagnostic 1: preferDestructuring (5:9 - 5:19)
+Message: Use array destructuring.
+   4 |         }
+   5 |         y = it()[0];
+     |         ~~~~~~~~~~~
+   6 |       
+---
+
+[TestPreferDestructuringRule/invalid-9 - 1]
+Diagnostic 1: preferDestructuring (3:13 - 3:20)
+Message: Use array destructuring.
+   2 |         let x: any;
+   3 |         let y = x[0];
+     |             ~~~~~~~~
+   4 |       
+---
+
 [TestPreferDestructuringRule/invalid-10 - 1]
 Diagnostic 1: preferDestructuring (3:9 - 3:16)
 Message: Use array destructuring.
@@ -103,13 +173,6 @@ Message: Use object destructuring.
    5 |       
 ---
 
-[TestPreferDestructuringRule/invalid-2 - 1]
-Diagnostic 1: preferDestructuring (1:5 - 1:29)
-Message: Use object destructuring.
-   1 | var foo: unknown = object.bar;
-     |     ~~~~~~~~~~~~~~~~~~~~~~~~~
----
-
 [TestPreferDestructuringRule/invalid-20 - 1]
 Diagnostic 1: preferDestructuring (4:9 - 4:16)
 Message: Use object destructuring.
@@ -198,15 +261,6 @@ Message: Use object destructuring.
      |       ~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestPreferDestructuringRule/invalid-3 - 1]
-Diagnostic 1: preferDestructuring (3:13 - 3:20)
-Message: Use array destructuring.
-   2 |         let x: { [Symbol.iterator]: unknown };
-   3 |         let y = x[0];
-     |             ~~~~~~~~
-   4 |       
----
-
 [TestPreferDestructuringRule/invalid-30 - 1]
 Diagnostic 1: preferDestructuring (4:13 - 4:31)
 Message: Use object destructuring.
@@ -270,56 +324,38 @@ Message: Use object destructuring.
    6 |       
 ---
 
-[TestPreferDestructuringRule/invalid-4 - 1]
-Diagnostic 1: preferDestructuring (3:9 - 3:16)
-Message: Use array destructuring.
-   2 |         let x: { [Symbol.iterator]: unknown };
-   3 |         y = x[0];
-     |         ~~~~~~~~
+[TestPreferDestructuringRule/invalid-37 - 1]
+Diagnostic 1: preferDestructuring (2:9 - 2:24)
+Message: Use object destructuring.
+   1 | 
+   2 |         foo = object.foo;
+     |         ~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferDestructuringRule/invalid-38 - 1]
+Diagnostic 1: preferDestructuring (2:13 - 2:28)
+Message: Use object destructuring.
+   1 | 
+   2 |         let foo = object.foo;
+     |             ~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestPreferDestructuringRule/invalid-39 - 1]
+Diagnostic 1: preferDestructuring (3:15 - 3:26)
+Message: Use object destructuring.
+   2 |         const obj: { x: unknown } = { x: 1 };
+   3 |         const x = obj['x'];
+     |               ~~~~~~~~~~~~
    4 |       
 ---
 
-[TestPreferDestructuringRule/invalid-5 - 1]
-Diagnostic 1: preferDestructuring (3:13 - 3:20)
-Message: Use array destructuring.
-   2 |         let x: [1, 2, 3];
-   3 |         let y = x[0];
-     |             ~~~~~~~~
-   4 |       
----
-
-[TestPreferDestructuringRule/invalid-6 - 1]
-Diagnostic 1: preferDestructuring (3:9 - 3:16)
-Message: Use array destructuring.
-   2 |         let x: [1, 2, 3];
-   3 |         y = x[0];
-     |         ~~~~~~~~
-   4 |       
----
-
-[TestPreferDestructuringRule/invalid-7 - 1]
-Diagnostic 1: preferDestructuring (5:13 - 5:23)
-Message: Use array destructuring.
-   4 |         }
-   5 |         let y = it()[0];
-     |             ~~~~~~~~~~~
-   6 |       
----
-
-[TestPreferDestructuringRule/invalid-8 - 1]
-Diagnostic 1: preferDestructuring (5:9 - 5:19)
-Message: Use array destructuring.
-   4 |         }
-   5 |         y = it()[0];
-     |         ~~~~~~~~~~~
-   6 |       
----
-
-[TestPreferDestructuringRule/invalid-9 - 1]
-Diagnostic 1: preferDestructuring (3:13 - 3:20)
-Message: Use array destructuring.
-   2 |         let x: any;
-   3 |         let y = x[0];
-     |             ~~~~~~~~
+[TestPreferDestructuringRule/invalid-40 - 1]
+Diagnostic 1: preferDestructuring (3:15 - 3:41)
+Message: Use object destructuring.
+   2 |         const obj = { foo: 100 };
+   3 |         const foo /* comment */ = obj.foo;
+     |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
 ---
