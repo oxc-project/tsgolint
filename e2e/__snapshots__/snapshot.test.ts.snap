@@ -2603,6 +2603,41 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "only-throw-error",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-destructuring/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 53,
+          "pos": 39,
+        },
+        "text": "{b} = myObject",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use object destructuring.",
+      "id": "preferDestructuring",
+    },
+    "range": {
+      "end": 53,
+      "pos": 39,
+    },
+    "rule": "prefer-destructuring",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-find/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Use array destructuring.",
+      "id": "preferDestructuring",
+    },
+    "range": {
+      "end": 51,
+      "pos": 6,
+    },
+    "rule": "prefer-destructuring",
+  },
+  {
     "file_path": "fixtures/basic/rules/prefer-find/index.ts",
     "kind": 0,
     "message": {
@@ -3633,6 +3668,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
     ],
+  },
+  {
+    "file_path": "fixtures/basic/rules/unbound-method/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 453,
+          "pos": 429,
+        },
+        "text": "{getValue} = calc",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "Use object destructuring.",
+      "id": "preferDestructuring",
+    },
+    "range": {
+      "end": 453,
+      "pos": 429,
+    },
+    "rule": "prefer-destructuring",
   },
   {
     "file_path": "fixtures/basic/rules/unbound-method/index.ts",

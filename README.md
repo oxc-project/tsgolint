@@ -158,10 +158,9 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 59/61.
+Implemented 60/61.
 
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
-- [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)
 - [x] [consistent-type-exports](https://typescript-eslint.io/rules/consistent-type-exports)
@@ -198,6 +197,7 @@ Implemented 59/61.
 - [x] [no-useless-default-assignment](https://typescript-eslint.io/rules/no-useless-default-assignment)
 - [x] [non-nullable-type-assertion-style](https://typescript-eslint.io/rules/non-nullable-type-assertion-style)
 - [x] [only-throw-error](https://typescript-eslint.io/rules/only-throw-error)
+- [x] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [x] [prefer-find](https://typescript-eslint.io/rules/prefer-find)
 - [x] [prefer-includes](https://typescript-eslint.io/rules/prefer-includes)
 - [x] [prefer-nullish-coalescing](https://typescript-eslint.io/rules/prefer-nullish-coalescing)
