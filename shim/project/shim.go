@@ -51,7 +51,7 @@ type Kind = project.Kind
 const KindConfigured = project.KindConfigured
 const KindInferred = project.KindInferred
 //go:linkname NewConfigFileRegistryBuilder github.com/microsoft/typescript-go/internal/project.NewConfigFileRegistryBuilder
-func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, sessionOptions *project.SessionOptions, customConfigFileName string, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
+func NewConfigFileRegistryBuilder(fs *project.SnapshotFSBuilder, oldConfigFileRegistry *project.ConfigFileRegistry, extendedConfigCache *project.ExtendedConfigCache, snapshotID uint64, sessionOptions *project.SessionOptions, customConfigFileName string, logger *logging.LogTree) *project.ConfigFileRegistryBuilder
 //go:linkname NewConfiguredProject github.com/microsoft/typescript-go/internal/project.NewConfiguredProject
 func NewConfiguredProject(configFileName string, configFilePath tspath.Path, builder *project.ProjectCollectionBuilder, logger *logging.LogTree) *project.Project
 //go:linkname NewExtendedConfigCache github.com/microsoft/typescript-go/internal/project.NewExtendedConfigCache
@@ -71,6 +71,7 @@ func NewSnapshot(id uint64, fs *project.SnapshotFS, sessionOptions *project.Sess
 //go:linkname NewSnapshotFSBuilder github.com/microsoft/typescript-go/internal/project.NewSnapshotFSBuilder
 func NewSnapshotFSBuilder(fs vfs.FS, prevOverlays map[tspath.Path]*project.Overlay, overlays map[tspath.Path]*project.Overlay, diskFiles map[tspath.Path]*project.DiskFile, diskDirectories map[tspath.Path]dirty.CloneableMap[tspath.Path, string], positionEncoding lsproto.PositionEncodingKind, toPath func(fileName string) tspath.Path) *project.SnapshotFSBuilder
 type Overlay = project.Overlay
+type OwnerCache[K comparable, V, LoadArgs any] = project.OwnerCache[K,V,LoadArgs]
 type ParseCache = project.ParseCache
 type ParseCacheKey = project.ParseCacheKey
 type PatternsAndIgnored = project.PatternsAndIgnored
@@ -90,7 +91,7 @@ type ProjectLoadKind = project.ProjectLoadKind
 const ProjectLoadKindCreate = project.ProjectLoadKindCreate
 const ProjectLoadKindFind = project.ProjectLoadKindFind
 type ProjectTreeRequest = project.ProjectTreeRequest
-type RefCountCache[K comparable, V, LoadArgs any] = project.RefCountCache[K,V,LoadArgs]
+type RefCountCache[K comparable, V, AcquireArgs any] = project.RefCountCache[K,V,AcquireArgs]
 type RefCountCacheOptions = project.RefCountCacheOptions
 type ResourceRequest = project.ResourceRequest
 type Session = project.Session

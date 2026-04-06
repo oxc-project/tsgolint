@@ -17,6 +17,7 @@ type CheckerPool = compiler.CheckerPool
 //go:linkname CombineEmitResults github.com/microsoft/typescript-go/internal/compiler.CombineEmitResults
 func CombineEmitResults(results []*compiler.EmitResult) *compiler.EmitResult
 type CompilerHost = compiler.CompilerHost
+type DuplicateSourceFile = compiler.DuplicateSourceFile
 const EmitAll = compiler.EmitAll
 type EmitHost = compiler.EmitHost
 type EmitOnly = compiler.EmitOnly
