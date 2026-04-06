@@ -2625,6 +2625,56 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "prefer-destructuring",
   },
   {
+    "file_path": "fixtures/basic/rules/prefer-find/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Use array destructuring.",
+      "id": "preferDestructuring",
+    },
+    "range": {
+      "end": 51,
+      "pos": 6,
+    },
+    "rule": "prefer-destructuring",
+  },
+  {
+    "file_path": "fixtures/basic/rules/prefer-find/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Prefer .find(...) instead of .filter(...)[0].",
+      "id": "preferFind",
+    },
+    "range": {
+      "end": 51,
+      "pos": 12,
+    },
+    "rule": "prefer-find",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 28,
+              "pos": 22,
+            },
+            "text": "find",
+          },
+          {
+            "range": {
+              "end": 51,
+              "pos": 48,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Use .find(...) instead of .filter(...)[0].",
+          "id": "preferFindSuggestion",
+        },
+      },
+    ],
+  },
+  {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
     "message": {
