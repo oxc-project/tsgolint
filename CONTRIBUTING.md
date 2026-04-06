@@ -212,7 +212,7 @@ rules/
 To generate the Go struct for the options, run:
 
 ```bash
-node tools/gen-json-schemas.mjs
+node tools/gen-json-schemas.ts
 ```
 
 This should create an `options.go` file in the same directory as the `schema.json` file. Then, you can use the generated JSON schema code to parse options in your rule implementation:

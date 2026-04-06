@@ -36,12 +36,12 @@ jobs:
         run: go install github.com/atombender/go-jsonschema@v0.23.0
 
       - name: Generate JSON schemas
-        run: node tools/gen-json-schemas.mjs
+        run: node tools/gen-json-schemas.ts
 
       - name: Check for uncommitted changes
         run: |
           if ! git diff --exit-code; then
-            echo "::error::Generated schema files don't match committed versions. Please run 'node tools/gen-json-schemas.mjs' and commit the changes."
+            echo "::error::Generated schema files don't match committed versions. Please run 'node tools/gen-json-schemas.ts' and commit the changes."
             exit 1
           fi
           echo "✓ All generated schemas match committed versions"

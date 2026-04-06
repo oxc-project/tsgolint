@@ -144,7 +144,7 @@ ast-grep --pattern 'expect($$$)' --lang ts internal/rules/fixtures/
 4. Register rule in `cmd/tsgolint/main.go`
 5. Add fixtures in `internal/rules/fixtures/`
 6. Create JSON schema for options at `internal/rules/rule_name/schema.json`
-7. Run `node tools/gen-json-schemas.mjs` to generate options struct and unmarshaling code
+7. Run `node tools/gen-json-schemas.ts` to generate options struct and unmarshaling code
 8. Run `just test` to verify your implementation
 
 ### Debugging

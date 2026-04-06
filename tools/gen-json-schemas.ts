@@ -1,15 +1,29 @@
-// @ts-check
 // Generate the Go structs for lint rule options from the JSON schemas.
-
+//
 // 1. Look for all `schema.json` files in `internal/rules`
 // 2. For each schema, generate a Go struct using `go-jsonschema` tool, and produce
 //    a `.go` file next to the `schema.json` file as `option.go`, under the same package.
 //    Example: `internal/rules/no_floating_promises/schema.json
 //          => `internal/rules/no_floating_promises/options.go` (with package `no_floating_promises`)
 
-import { execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+const { execSync } = require('node:child_process') as typeof import('node:child_process');
+const fs = require('node:fs') as typeof import('node:fs');
+const path = require('node:path') as typeof import('node:path');
+
+type Schema = {
+  $ref?: string;
+  default?: unknown;
+  definitions?: Record<string, Schema>;
+  oneOf?: Schema[];
+  properties?: Record<string, Schema>;
+  type?: string;
+};
+
+type BoolOrField = {
+  defaultValue: boolean | undefined;
+  fieldName: string;
+  optionsType: string;
+};
 
 let goJSONSchemaHelp = '';
 
@@ -17,7 +31,7 @@ let goJSONSchemaHelp = '';
 try {
   goJSONSchemaHelp = execSync('go-jsonschema -h', { encoding: 'utf8' });
   console.log('go-jsonschema is installed.');
-} catch (e) {
+} catch {
   console.log('go-jsonschema is not installed. Please install it first.');
   process.exit(1);
 }
@@ -29,9 +43,9 @@ console.log('Generating Go structs from JSON schemas...');
 // find every directory in internal/rules that contains schema.json and generate Go struct
 const rulesDir = path.join(process.cwd(), 'internal', 'rules');
 
-function findSchemaDirs(dir) {
+function findSchemaDirs(dir: string): string[] {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
-  const schemaDirs = [];
+  const schemaDirs: string[] = [];
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
@@ -45,60 +59,55 @@ function findSchemaDirs(dir) {
   return schemaDirs;
 }
 
-const schemaDirs = findSchemaDirs(rulesDir);
+// Find fields in the schema that use oneOf with boolean + $ref to an object.
+// These need to be converted to utils.BoolOr[T] in the generated Go code.
+function findBoolOrFields(schema: Schema): BoolOrField[] {
+  const results: BoolOrField[] = [];
+  const definitions = schema.definitions ?? {};
 
-/**
- * Find fields in the schema that use oneOf with boolean + $ref to an object.
- * These need to be converted to utils.BoolOr[T] in the generated Go code.
- * @param {any} schema - The JSON schema
- * @returns {Array<{fieldName: string, optionsType: string, defaultValue: boolean | undefined}>}
- */
-function findBoolOrFields(schema) {
-  const results = [];
-  const definitions = schema.definitions || {};
-
-  // Helper to convert definition name to Go type name (e.g., ignorePrimitivesOptions -> IgnorePrimitivesOptions)
-  function toGoTypeName(defName) {
-    // Split by underscore and capitalize each part
-    return defName
+  function toGoTypeName(definitionName: string): string {
+    return definitionName
       .split('_')
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join('');
   }
 
-  // Check each definition for properties with oneOf boolean + $ref pattern
-  for (const [defName, def] of Object.entries(definitions)) {
-    if (def.type !== 'object' || !def.properties) continue;
+  for (const [definitionName, definition] of Object.entries(definitions)) {
+    if (definition.type !== 'object' || !definition.properties) continue;
 
-    for (const [propName, prop] of Object.entries(def.properties)) {
-      if (!prop.oneOf) continue;
+    for (const [propertyName, property] of Object.entries(definition.properties)) {
+      if (!property.oneOf) continue;
 
-      // Check if oneOf contains boolean and a $ref
-      const hasBool = prop.oneOf.some((o) => o.type === 'boolean');
-      const refItem = prop.oneOf.find((o) => o.$ref);
+      const hasBool = property.oneOf.some((option) => option.type === 'boolean');
+      const referencedOption = property.oneOf.find((option) => option.$ref);
 
-      if (hasBool && refItem) {
-        // Extract the referenced type name from $ref (e.g., "#/definitions/ignorePrimitivesOptions" -> "ignorePrimitivesOptions")
-        const refMatch = refItem.$ref.match(/#\/definitions\/(\w+)/);
-        if (refMatch) {
-          const referencedDefName = refMatch[1];
-          const goTypeName = toGoTypeName(referencedDefName);
-          // Get the default value if it's a boolean
-          const defaultValue = typeof prop.default === 'boolean' ? prop.default : undefined;
-          results.push({ fieldName: propName, optionsType: goTypeName, defaultValue });
-        }
-      }
+      if (!hasBool || !referencedOption?.$ref) continue;
+
+      const refMatch = /#\/definitions\/(\w+)/.exec(referencedOption.$ref);
+      if (!refMatch) continue;
+
+      const referencedDefinitionName = refMatch[1];
+      const defaultValue = typeof property.default === 'boolean' ? property.default : undefined;
+
+      results.push({
+        fieldName: propertyName,
+        optionsType: toGoTypeName(referencedDefinitionName),
+        defaultValue,
+      });
     }
   }
 
   return results;
 }
 
+const schemaDirs = findSchemaDirs(rulesDir);
+
 for (const schemaDir of schemaDirs) {
   const schemaPath = path.join(schemaDir, 'schema.json');
   const outputPath = path.join(schemaDir, 'options.go');
 
   console.log(`Generating Go struct for schema: ${schemaPath} and outputting to: ${outputPath}`);
+
   try {
     const omitZeroArg = supportsDisableOmitZero ? ' --disable-omitzero' : '';
     execSync(
@@ -157,8 +166,8 @@ for (const schemaDir of schemaDirs) {
 
       // 4. Replace remaining unqualified references to TypeOrValueSpecifier
       content = content.replace(/\bTypeOrValueSpecifier\b/g, (match, offset) => {
-        const prev = offset > 0 ? content[offset - 1] : '';
-        return prev === '.' ? match : 'utils.TypeOrValueSpecifier';
+        const previousCharacter = offset > 0 ? content[offset - 1] : '';
+        return previousCharacter === '.' ? match : 'utils.TypeOrValueSpecifier';
       });
 
       // Clean up multiple consecutive empty lines
@@ -248,7 +257,7 @@ func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
     // These generate `interface{}` which requires manual type switching. Replace with utils.BoolOr[T].
     // Skip rules that already have manual handling for these patterns.
     const skipBoolOrRules = ['no_misused_promises'];
-    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8')) as Schema;
     const boolOrFields = skipBoolOrRules.includes(ruleName) ? [] : findBoolOrFields(schema);
 
     if (boolOrFields.length > 0) {
@@ -306,8 +315,8 @@ func (j *ReturnAwaitOptions) UnmarshalJSON(value []byte) error {
     if (modified) {
       fs.writeFileSync(outputPath, content, 'utf8');
     }
-  } catch (e) {
-    console.error(`Failed to generate Go struct for schema: ${schemaPath}`, e);
+  } catch (error) {
+    console.error(`Failed to generate Go struct for schema: ${schemaPath}`, error);
     process.exit(1);
   }
 }
