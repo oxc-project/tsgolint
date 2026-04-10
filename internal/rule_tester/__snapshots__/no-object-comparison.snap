@@ -1,0 +1,27 @@
+
+[TestNoObjectComparisonRule/invalid-0 - 1]
+Diagnostic 1: objectComparison (9:9 - 9:14)
+Message: Do not compare objects using this operator.
+   8 | 
+   9 |                 if (a <= b) {}
+     |                     ~~~~~~
+  10 |             
+---
+
+[TestNoObjectComparisonRule/invalid-1 - 1]
+Diagnostic 1: objectComparison (10:9 - 10:56)
+Message: Do not compare objects using this operator.
+   9 | 
+  10 |                 if (new OtherValueObject(10) === new ValueObject(11)) {}
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |             
+---
+
+[TestNoObjectComparisonRule/invalid-2 - 1]
+Diagnostic 1: objectComparison (13:9 - 13:15)
+Message: Do not compare objects using this operator.
+  12 | 
+  13 |                 if (a === b) {}
+     |                     ~~~~~~~
+  14 |             
+---
