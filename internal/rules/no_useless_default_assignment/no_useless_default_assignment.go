@@ -109,7 +109,7 @@ func findParameterIndex(parameters []*ast.ParameterDeclarationNode, target *ast.
 }
 
 func getDefaultAssignmentStart(node *ast.Node) int {
-	if ast.IsParameter(node) {
+	if ast.IsParameterDeclaration(node) {
 		parameter := node.AsParameterDeclaration()
 		if parameter.Type != nil {
 			return parameter.Type.End()
@@ -156,7 +156,7 @@ func getPluralAssignmentType(assignmentType string) string {
 }
 
 func getAssignmentTargetNode(node *ast.Node) *ast.Node {
-	if ast.IsParameter(node) {
+	if ast.IsParameterDeclaration(node) {
 		parameter := node.AsParameterDeclaration()
 		if parameter.Type != nil {
 			return parameter.Type
@@ -279,7 +279,7 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 				return ctx.TypeChecker.GetTypeAtLocation(parent.Initializer())
 			}
 
-			if ast.IsParameter(parent) {
+			if ast.IsParameterDeclaration(parent) {
 				functionNode := parent.Parent
 				if functionNode == nil || !ast.IsFunctionLike(functionNode) {
 					return nil
@@ -392,7 +392,7 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 			ctx.ReportNodeWithFixes(initializer, buildPreferOptionalSyntaxMessage(), func() []rule.RuleFix {
 				fixes := []rule.RuleFix{buildRemoveDefaultFix(node)}
 
-				if ast.IsParameter(node) {
+				if ast.IsParameterDeclaration(node) {
 					parameter := node.AsParameterDeclaration()
 					if name := parameter.Name(); ast.IsIdentifier(name) {
 						identifierRange := utils.TrimNodeTextRange(ctx.SourceFile, name)
@@ -435,7 +435,7 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 				return
 			}
 
-			if paramSymbol.ValueDeclaration != nil && ast.IsParameter(paramSymbol.ValueDeclaration) && paramSymbol.ValueDeclaration.AsParameterDeclaration().DotDotDotToken != nil {
+			if paramSymbol.ValueDeclaration != nil && ast.IsParameterDeclaration(paramSymbol.ValueDeclaration) && paramSymbol.ValueDeclaration.AsParameterDeclaration().DotDotDotToken != nil {
 				return
 			}
 
@@ -455,7 +455,7 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 			initializer = ast.SkipParentheses(initializer)
 
 			if utils.IsUndefinedIdentifier(initializer) {
-				if ast.IsParameter(node) {
+				if ast.IsParameterDeclaration(node) {
 					parameter := node.AsParameterDeclaration()
 					if parameter.Type != nil && canBeUndefined(checker.Checker_getTypeFromTypeNode(ctx.TypeChecker, parameter.Type)) {
 						reportPreferOptionalSyntax(node)
@@ -469,7 +469,7 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 				return
 			}
 
-			if ast.IsParameter(node) {
+			if ast.IsParameterDeclaration(node) {
 				checkFunctionExpressionParameter(node)
 				return
 			}

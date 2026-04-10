@@ -43,7 +43,7 @@ func isRethrownError(ctx rule.RuleContext, node *ast.Node) bool {
 
 	// Case 2 & 3: promise.catch(e => { throw e; }) or promise.then(onFulfilled, e => { throw e; })
 	// The declaration must be from a parameter of an arrow function
-	if !ast.IsParameter(decl) {
+	if !ast.IsParameterDeclaration(decl) {
 		return false
 	}
 

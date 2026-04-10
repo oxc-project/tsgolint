@@ -21,7 +21,7 @@ var PreferReturnThisTypeRule = rule.Rule{
 			node = ast.SkipParentheses(node)
 
 			if ast.IsTypeReferenceNode(node) {
-				n := node.AsTypeReference().TypeName
+				n := node.AsTypeReferenceNode().TypeName
 				if ast.IsIdentifier(n) && n.AsIdentifier().Text == name {
 					return node
 				}

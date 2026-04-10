@@ -115,7 +115,7 @@ func GetTypeName(
 		decls := symbol.Declarations
 		if decls != nil && len(decls) > 0 {
 			if ast.IsTypeParameterDeclaration(decls[0]) {
-				typeParamDecl := decls[0].AsTypeParameter()
+				typeParamDecl := decls[0].AsTypeParameterDeclaration()
 				if typeParamDecl.Constraint != nil {
 					return GetTypeName(typeChecker, checker.Checker_getTypeFromTypeNode(typeChecker, typeParamDecl.Constraint))
 				}
@@ -194,7 +194,7 @@ func IsArrayMethodCallWithPredicate(
 }
 
 func IsRestParameterDeclaration(decl *ast.Declaration) bool {
-	return ast.IsParameter(decl) && decl.AsParameterDeclaration().DotDotDotToken != nil
+	return ast.IsParameterDeclaration(decl) && decl.AsParameterDeclaration().DotDotDotToken != nil
 }
 
 /**
@@ -357,7 +357,7 @@ func GetContextualType(
 			// is the callee, so has no contextual type
 			return nil
 		}
-	} else if ast.IsVariableDeclaration(parent) || ast.IsPropertyDeclaration(parent) || ast.IsParameter(parent) {
+	} else if ast.IsVariableDeclaration(parent) || ast.IsPropertyDeclaration(parent) || ast.IsParameterDeclaration(parent) {
 		if t := parent.Type(); t != nil {
 			return checker.Checker_getTypeFromTypeNode(typeChecker, t)
 		}

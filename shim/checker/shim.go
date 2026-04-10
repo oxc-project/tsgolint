@@ -504,6 +504,10 @@ const ContextFlagsNone = checker.ContextFlagsNone
 const ContextFlagsSignature = checker.ContextFlagsSignature
 const ContextFlagsSkipBindingPatterns = checker.ContextFlagsSkipBindingPatterns
 type ContextualInfo = checker.ContextualInfo
+//go:linkname CreateModeMismatchDetails github.com/microsoft/typescript-go/internal/checker.CreateModeMismatchDetails
+func CreateModeMismatchDetails(program checker.Program, file *ast.SourceFile) checker.DiagnosticDetails
+//go:linkname CreateModuleNotFoundChain github.com/microsoft/typescript-go/internal/checker.CreateModuleNotFoundChain
+func CreateModuleNotFoundChain(program checker.Program, file *ast.SourceFile, moduleReference string, mode core.ResolutionMode, packageName string) checker.DiagnosticDetails
 type DeclarationFileLinks = checker.DeclarationFileLinks
 type DeclarationLinks = checker.DeclarationLinks
 type DeclarationMeaning = checker.DeclarationMeaning
@@ -523,6 +527,7 @@ type DeclaredTypeLinks = checker.DeclaredTypeLinks
 type DeferredSymbolLinks = checker.DeferredSymbolLinks
 type DeferredTypeMapper = checker.DeferredTypeMapper
 type DiagnosticAndArguments = checker.DiagnosticAndArguments
+type DiagnosticDetails = checker.DiagnosticDetails
 type DiscriminatedContextualTypeKey = checker.DiscriminatedContextualTypeKey
 type Discriminator = checker.Discriminator
 type ElementFlags = checker.ElementFlags

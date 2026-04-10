@@ -82,7 +82,7 @@ func symbolFromTypeParameter(ctx rule.RuleContext, typeParameter *ast.Node) *ast
 		return nil
 	}
 
-	return ctx.TypeChecker.GetSymbolAtLocation(typeParameter.AsTypeParameter().Name())
+	return ctx.TypeChecker.GetSymbolAtLocation(typeParameter.AsTypeParameterDeclaration().Name())
 }
 
 func collectTypeParameterReferenceNodes(ctx rule.RuleContext, node *ast.Node, symbol *ast.Symbol, declarationName *ast.Node) []*ast.Node {
@@ -124,7 +124,7 @@ func collectTypeParameterReferenceNodes(ctx rule.RuleContext, node *ast.Node, sy
 }
 
 func getTypeParameterConstraintText(ctx rule.RuleContext, typeParameter *ast.Node) (constraintText string, constraintNode *ast.Node) {
-	constraintNode = typeParameter.AsTypeParameter().Constraint
+	constraintNode = typeParameter.AsTypeParameterDeclaration().Constraint
 	if constraintNode == nil || constraintNode.Kind == ast.KindAnyKeyword {
 		return "unknown", constraintNode
 	}
@@ -394,7 +394,7 @@ func collectTypeParameterUsageCounts(
 				if ast.IsTypeParameterDeclaration(declaration) {
 					incrementIdentifierCount(typeParameterSymbol, assumeMultipleUses)
 
-					typeParameterDeclaration := declaration.AsTypeParameter()
+					typeParameterDeclaration := declaration.AsTypeParameterDeclaration()
 					if typeParameterDeclaration.Constraint != nil && !visitedConstraints[typeParameterDeclaration.Constraint] {
 						visitedConstraints[typeParameterDeclaration.Constraint] = true
 						visitType(ctx.TypeChecker.GetTypeAtLocation(typeParameterDeclaration.Constraint), false, false)
@@ -527,7 +527,7 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 			continue
 		}
 
-		typeParameterNameNode := typeParameter.AsTypeParameter().Name()
+		typeParameterNameNode := typeParameter.AsTypeParameterDeclaration().Name()
 		references := collectTypeParameterReferenceNodes(ctx, node, typeParameterSymbol, typeParameterNameNode)
 		if isTypeParameterRepeatedInAST(typeParameter, references, startOfBody) {
 			continue

@@ -1,4 +1,4 @@
-From 95dc4336cbde07a7000f5bcbfab94f86d0ff796c Mon Sep 17 00:00:00 2001
+From c802fa8f2f7eb4940de2bcb249b22ef2120c3220 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Sat, 22 Nov 2025 11:01:42 +0000
 Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
@@ -646,10 +646,10 @@ index e05b0ba711..e0fb9a9ba6 100644
  	project.Delete()
  }
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index 131eaab3c6..796794c090 100644
+index ce67f78c7c..af0c740158 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
-@@ -285,7 +285,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -278,7 +278,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  	}
  
  	start := time.Now()
@@ -658,7 +658,7 @@ index 131eaab3c6..796794c090 100644
  	if change.fileChanges.HasExcessiveWatchEvents() {
  		invalidateStart := time.Now()
  		if change.fileChanges.InvalidateAll {
-@@ -389,7 +389,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+@@ -382,7 +382,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
  		if len(projectsWithNewProgramStructure) > 0 || change.cleanDiskCache {
  			cleanFilesStart := time.Now()
  			removedFiles := 0

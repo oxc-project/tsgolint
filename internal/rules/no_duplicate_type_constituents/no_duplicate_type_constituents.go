@@ -270,7 +270,7 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 				}
 
 				checkDuplicate(node, func(constituentNodeType *checker.Type, constituentNode *ast.Node) {
-					if !ast.IsParameter(node.Parent) {
+					if !ast.IsParameterDeclaration(node.Parent) {
 						return
 					}
 					param := node.Parent.AsParameterDeclaration()

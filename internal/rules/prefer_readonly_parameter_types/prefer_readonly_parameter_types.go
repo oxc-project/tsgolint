@@ -330,7 +330,7 @@ func isTypeBrandedLiteralLike(typeChecker *checker.Checker, t *checker.Type) boo
 }
 
 func isParameterProperty(parameter *ast.Node) bool {
-	if !ast.IsParameter(parameter) {
+	if !ast.IsParameterDeclaration(parameter) {
 		return false
 	}
 

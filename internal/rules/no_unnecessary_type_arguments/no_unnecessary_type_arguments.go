@@ -161,7 +161,7 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 					}
 
 					parameter := parameters[argumentIndex]
-					if parameter == nil || parameter.ValueDeclaration == nil || !ast.IsParameter(parameter.ValueDeclaration) {
+					if parameter == nil || parameter.ValueDeclaration == nil || !ast.IsParameterDeclaration(parameter.ValueDeclaration) {
 						continue
 					}
 
@@ -191,7 +191,7 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 				}
 			}
 
-			defaultType := typeParameter.AsTypeParameter().DefaultType
+			defaultType := typeParameter.AsTypeParameterDeclaration().DefaultType
 			if defaultType == nil {
 				return
 			}
@@ -218,7 +218,7 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.Expression), nil)
 			},
 			ast.KindTypeReference: func(node *ast.Node) {
-				expr := node.AsTypeReference()
+				expr := node.AsTypeReferenceNode()
 				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName), nil)
 			},
 
