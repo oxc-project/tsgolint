@@ -1841,6 +1841,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "help": "Avoid asserting to \`any\`; use a specific target type or narrow the value with runtime checks before converting it. Original type: \`string\`. Asserted type: \`any\`.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -1854,6 +1855,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "help": "Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: \`any\`. Asserted type: \`T\`.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
@@ -2328,6 +2330,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "help": "Avoid asserting to \`any\`; use a specific target type or narrow the value with runtime checks before converting it. Original type: \`unknown\`. Asserted type: \`any\`.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2341,6 +2344,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "help": "Avoid asserting to \`any\`; use a specific target type or narrow the value with runtime checks before converting it. Original type: \`unknown\`. Asserted type: \`any\`.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2354,6 +2358,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "help": "Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: \`any\`. Asserted type: \`string\`.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
@@ -2367,6 +2372,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "help": "Avoid asserting to \`any\`; use a specific target type or narrow the value with runtime checks before converting it. Original type: \`unknown\`. Asserted type: \`any\`.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2458,6 +2464,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe type assertion: type 'string' is more narrow than the original type.",
+      "help": "Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: \`string | null\`. Asserted type: \`string\`.",
       "id": "unsafeTypeAssertion",
     },
     "range": {
@@ -2471,6 +2478,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "kind": 0,
     "message": {
       "description": "Unsafe type assertion: type 'number' is more narrow than the original type.",
+      "help": "Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: \`number | undefined\`. Asserted type: \`number\`.",
       "id": "unsafeTypeAssertion",
     },
     "range": {
