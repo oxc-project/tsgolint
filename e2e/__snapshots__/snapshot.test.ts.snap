@@ -554,6 +554,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type ''A'' is first declared here.",
+        "range": {
+          "end": 84,
+          "pos": 81,
+        },
+      },
+    ],
     "message": {
       "description": "Union type constituent is duplicated with  'A'.",
       "id": "duplicate",
@@ -583,6 +592,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type ''foo'' is first declared here.",
+        "range": {
+          "end": 195,
+          "pos": 190,
+        },
+      },
+    ],
     "message": {
       "description": "Union type constituent is duplicated with  'foo'.",
       "id": "duplicate",
