@@ -65,12 +65,19 @@ var NoArrayDeleteRule = rule.Rule{
 					return
 				}
 
-				ctx.ReportNodeWithSuggestions(node, buildNoArrayDeleteMessage(), func() []rule.RuleSuggestion {
-					expressionRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.Expression)
+				deleteTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())
+				arrayExprRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.Expression)
+
+				ctx.ReportDiagnosticWithSuggestions(rule.RuleDiagnostic{
+					Range:   deleteTokenRange,
+					Message: buildNoArrayDeleteMessage(),
+					LabeledRanges: []rule.RuleLabeledRange{
+						{Label: "This expression evaluates to an array.", Range: arrayExprRange},
+					},
+				}, func() []rule.RuleSuggestion {
 					argumentRange := utils.TrimNodeTextRange(ctx.SourceFile, expression.ArgumentExpression)
 
-					deleteTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())
-					leftBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, expressionRange.End())
+					leftBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, arrayExprRange.End())
 					rightBracketTokenRange := scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, argumentRange.End())
 
 					return []rule.RuleSuggestion{{
