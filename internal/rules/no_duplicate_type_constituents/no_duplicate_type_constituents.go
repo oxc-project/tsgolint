@@ -64,13 +64,31 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 			unionOrIntersection unionOrIntersection,
 			message rule.RuleMessage,
 			constituentNode *ast.Node,
+			firstOccurrence *ast.Node,
 		) {
+			var labeledRanges []rule.RuleLabeledRange
+			if firstOccurrence != nil {
+				firstRange := utils.TrimNodeTextRange(ctx.SourceFile, firstOccurrence)
+				firstText := ctx.SourceFile.Text()[firstRange.Pos():firstRange.End()]
+				labeledRanges = []rule.RuleLabeledRange{
+					{Label: fmt.Sprintf("Type '%v' is first declared here.", firstText), Range: firstRange},
+				}
+			}
+
 			if !withFix {
-				ctx.ReportNode(constituentNode, message)
+				ctx.ReportDiagnostic(rule.RuleDiagnostic{
+					Range:         utils.TrimNodeTextRange(ctx.SourceFile, constituentNode),
+					Message:       message,
+					LabeledRanges: labeledRanges,
+				})
 				return
 			}
 
-			ctx.ReportNodeWithFixes(constituentNode, message, func() []rule.RuleFix {
+			ctx.ReportDiagnosticWithFixes(rule.RuleDiagnostic{
+				Range:         utils.TrimNodeTextRange(ctx.SourceFile, constituentNode),
+				Message:       message,
+				LabeledRanges: labeledRanges,
+			}, func() []rule.RuleFix {
 				kind := ast.KindUnionType
 				if unionOrIntersection == unionOrIntersection_Intersection {
 					kind = ast.KindIntersectionType
@@ -186,7 +204,7 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 			duplicatedPreviousNode, duplicatedPrevious := cachedTypeMap[t]
 
 			if duplicatedPrevious {
-				report(withFix, unionOrIntersection, buildDuplicateMessage(unionOrIntersection, ctx.SourceFile.Text()[duplicatedPreviousNode.Pos():duplicatedPreviousNode.End()]), constituentNode)
+				report(withFix, unionOrIntersection, buildDuplicateMessage(unionOrIntersection, ctx.SourceFile.Text()[duplicatedPreviousNode.Pos():duplicatedPreviousNode.End()]), constituentNode, duplicatedPreviousNode)
 				return true
 			}
 
@@ -278,7 +296,7 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 						return
 					}
 					if utils.IsTypeFlagSet(constituentNodeType, checker.TypeFlagsUndefined) {
-						report(true, unionOrIntersection_Union, buildUnnecessaryMessage(), constituentNode)
+						report(true, unionOrIntersection_Union, buildUnnecessaryMessage(), constituentNode, nil)
 					}
 				})
 				return
