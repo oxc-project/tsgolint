@@ -7,6 +7,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -23,6 +24,7 @@ func buildSingleExportIsTypeMessage(exportName string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "singleExportIsType",
 		Description: "Type export " + exportName + " is not a value and should be exported using `export type`.",
+		Help:        "Try adding the `type` keyword: `type " + exportName + "`",
 	}
 }
 
@@ -114,6 +116,20 @@ func getExportSpecifierText(sourceFile *ast.SourceFile, specifierNode *ast.Node)
 	return localText + " as " + exportedText
 }
 
+func getExportKeywordRange(sourceFile *ast.SourceFile, node *ast.Node) core.TextRange {
+	s := scanner.GetScannerForSourceFile(sourceFile, node.Pos())
+	for {
+		if s.Token() == ast.KindExportKeyword {
+			return s.TokenRange()
+		}
+		if s.Token() == ast.KindEndOfFile || s.TokenRange().Pos() >= node.End() {
+			break
+		}
+		s.Scan()
+	}
+	return utils.TrimNodeTextRange(sourceFile, node)
+}
+
 func joinWordList(words []string) string {
 	switch len(words) {
 	case 0:
@@ -175,7 +191,11 @@ var ConsistentTypeExportsRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNodeWithFixes(node, buildTypeOverValueMessage(), func() []rule.RuleFix {
+			exportKeywordRange := getExportKeywordRange(ctx.SourceFile, node)
+			ctx.ReportDiagnosticWithFixes(rule.RuleDiagnostic{
+				Range:   exportKeywordRange,
+				Message: buildTypeOverValueMessage(),
+			}, func() []rule.RuleFix {
 				s := scanner.GetScannerForSourceFile(ctx.SourceFile, node.Pos())
 				for {
 					if s.Token() == ast.KindAsteriskToken {
@@ -249,8 +269,13 @@ var ConsistentTypeExportsRule = rule.Rule{
 				return
 			}
 
+			exportKeywordRange := getExportKeywordRange(ctx.SourceFile, report.node)
+
 			if len(report.valueTexts) == 0 {
-				ctx.ReportNodeWithFixes(report.node, buildTypeOverValueMessage(), func() []rule.RuleFix {
+				ctx.ReportDiagnosticWithFixes(rule.RuleDiagnostic{
+					Range:   exportKeywordRange,
+					Message: buildTypeOverValueMessage(),
+				}, func() []rule.RuleFix {
 					return []rule.RuleFix{
 						rule.RuleFixReplace(
 							ctx.SourceFile,
@@ -262,12 +287,28 @@ var ConsistentTypeExportsRule = rule.Rule{
 				return
 			}
 
-			msg := buildMultipleExportsAreTypesMessage(joinWordList(report.typeBasedNames))
+			var msg rule.RuleMessage
+			var labeledRanges []rule.RuleLabeledRange
+			var primaryRange core.TextRange
 			if len(report.typeBasedNames) == 1 {
 				msg = buildSingleExportIsTypeMessage(report.typeBasedNames[0])
+				primaryRange = utils.TrimNodeTextRange(ctx.SourceFile, report.typeBasedNodes[0])
+			} else {
+				msg = buildMultipleExportsAreTypesMessage(joinWordList(report.typeBasedNames))
+				labeledRanges = make([]rule.RuleLabeledRange, 0, len(report.typeBasedNodes))
+				for i, specifierNode := range report.typeBasedNodes {
+					labeledRanges = append(labeledRanges, rule.RuleLabeledRange{
+						Label: report.typeBasedNames[i] + " is a type export, try `type " + report.typeBasedNames[i] + "`",
+						Range: utils.TrimNodeTextRange(ctx.SourceFile, specifierNode),
+					})
+				}
 			}
 
-			ctx.ReportNodeWithFixes(report.node, msg, func() []rule.RuleFix {
+			ctx.ReportDiagnosticWithFixes(rule.RuleDiagnostic{
+				Range:         primaryRange,
+				Message:       msg,
+				LabeledRanges: labeledRanges,
+			}, func() []rule.RuleFix {
 				if opts.FixMixedExportsWithInlineTypeSpecifier {
 					fixes := make([]rule.RuleFix, 0, len(report.typeBasedNodes))
 					for _, specifierNode := range report.typeBasedNodes {
