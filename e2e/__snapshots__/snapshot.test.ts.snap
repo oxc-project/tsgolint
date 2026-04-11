@@ -293,12 +293,21 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-array-delete/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression evaluates to an array.",
+        "range": {
+          "end": 95,
+          "pos": 92,
+        },
+      },
+    ],
     "message": {
       "description": "Using the \`delete\` operator with an array expression is unsafe.",
       "id": "noArrayDelete",
     },
     "range": {
-      "end": 98,
+      "end": 91,
       "pos": 85,
     },
     "rule": "no-array-delete",
