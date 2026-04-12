@@ -4,6 +4,9 @@ Diagnostic 1: duplicate (1:14 - 1:14)
 Message: Union type constituent is duplicated with  1.
    1 | type T = 1 | 1;
      |              ~
+  Label: Type '1' is first declared here. (1:10 - 1:10)
+   1 | type T = 1 | 1;
+     |          ^ Type '1' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-1 - 1]
@@ -11,6 +14,9 @@ Diagnostic 1: duplicate (1:17 - 1:20)
 Message: Intersection type constituent is duplicated with  true.
    1 | type T = true & true;
      |                 ~~~~
+  Label: Type 'true' is first declared here. (1:10 - 1:13)
+   1 | type T = true & true;
+     |          ^^^^ Type 'true' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-2 - 1]
@@ -18,6 +24,9 @@ Diagnostic 1: duplicate (1:17 - 1:20)
 Message: Union type constituent is duplicated with  null.
    1 | type T = null | null;
      |                 ~~~~
+  Label: Type 'null' is first declared here. (1:10 - 1:13)
+   1 | type T = null | null;
+     |          ^^^^ Type 'null' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-3 - 1]
@@ -25,6 +34,9 @@ Diagnostic 1: duplicate (1:16 - 1:18)
 Message: Union type constituent is duplicated with  any.
    1 | type T = any | any;
      |                ~~~
+  Label: Type 'any' is first declared here. (1:10 - 1:12)
+   1 | type T = any | any;
+     |          ^^^ Type 'any' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-4 - 1]
@@ -32,6 +44,9 @@ Diagnostic 1: duplicate (1:24 - 1:29)
 Message: Union type constituent is duplicated with  string.
    1 | type T = { a: string | string };
      |                        ~~~~~~
+  Label: Type 'string' is first declared here. (1:15 - 1:20)
+   1 | type T = { a: string | string };
+     |               ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-7 - 1]
@@ -39,6 +54,9 @@ Diagnostic 1: duplicate (1:24 - 1:34)
 Message: Union type constituent is duplicated with  Set<string>.
    1 | type T = Set<string> | Set<string>;
      |                        ~~~~~~~~~~~
+  Label: Type 'Set<string>' is first declared here. (1:10 - 1:20)
+   1 | type T = Set<string> | Set<string>;
+     |          ^^^^^^^^^^^ Type 'Set<string>' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-8 - 1]
@@ -48,6 +66,11 @@ Message: Union type constituent is duplicated with  IsArray<number>.
    3 | type ActuallyDuplicated = IsArray<number> | IsArray<string>;
      |                                             ~~~~~~~~~~~~~~~
    4 |       
+  Label: Type 'IsArray<number>' is first declared here. (3:27 - 3:41)
+   2 | type IsArray<T> = T extends any[] ? true : false;
+   3 | type ActuallyDuplicated = IsArray<number> | IsArray<string>;
+     |                           ^^^^^^^^^^^^^^^ Type 'IsArray<number>' is first declared here.
+   4 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-9 - 1]
@@ -55,6 +78,9 @@ Diagnostic 1: duplicate (1:21 - 1:28)
 Message: Union type constituent is duplicated with  string[].
    1 | type T = string[] | string[];
      |                     ~~~~~~~~
+  Label: Type 'string[]' is first declared here. (1:10 - 1:17)
+   1 | type T = string[] | string[];
+     |          ^^^^^^^^ Type 'string[]' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-10 - 1]
@@ -62,6 +88,9 @@ Diagnostic 1: duplicate (1:23 - 1:32)
 Message: Union type constituent is duplicated with  string[][].
    1 | type T = string[][] | string[][];
      |                       ~~~~~~~~~~
+  Label: Type 'string[][]' is first declared here. (1:10 - 1:19)
+   1 | type T = string[][] | string[][];
+     |          ^^^^^^^^^^ Type 'string[][]' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-11 - 1]
@@ -69,6 +98,9 @@ Diagnostic 1: duplicate (1:22 - 1:30)
 Message: Union type constituent is duplicated with  [1, 2, 3].
    1 | type T = [1, 2, 3] | [1, 2, 3];
      |                      ~~~~~~~~~
+  Label: Type '[1, 2, 3]' is first declared here. (1:10 - 1:18)
+   1 | type T = [1, 2, 3] | [1, 2, 3];
+     |          ^^^^^^^^^ Type '[1, 2, 3]' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-12 - 1]
@@ -76,6 +108,9 @@ Diagnostic 1: duplicate (1:25 - 1:30)
 Message: Union type constituent is duplicated with  string.
    1 | type T = () => string | string;
      |                         ~~~~~~
+  Label: Type 'string' is first declared here. (1:16 - 1:21)
+   1 | type T = () => string | string;
+     |                ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-13 - 1]
@@ -83,6 +118,9 @@ Diagnostic 1: duplicate (1:23 - 1:26)
 Message: Union type constituent is duplicated with  null.
    1 | type T = () => null | null;
      |                       ~~~~
+  Label: Type 'null' is first declared here. (1:16 - 1:19)
+   1 | type T = () => null | null;
+     |                ^^^^ Type 'null' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-14 - 1]
@@ -90,6 +128,9 @@ Diagnostic 1: duplicate (1:25 - 1:30)
 Message: Union type constituent is duplicated with  string.
    1 | type T = (arg: string | string) => void;
      |                         ~~~~~~
+  Label: Type 'string' is first declared here. (1:16 - 1:21)
+   1 | type T = (arg: string | string) => void;
+     |                ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-15 - 1]
@@ -97,6 +138,9 @@ Diagnostic 1: duplicate (1:16 - 1:18)
 Message: Union type constituent is duplicated with  'A'.
    1 | type T = 'A' | 'A';
      |                ~~~
+  Label: Type ''A'' is first declared here. (1:10 - 1:12)
+   1 | type T = 'A' | 'A';
+     |          ^^^ Type ''A'' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-16 - 1]
@@ -105,6 +149,11 @@ Message: Union type constituent is duplicated with  A.
    2 | type A = 'A';
    3 | type T = A | A;
      |              ~
+   4 |       
+  Label: Type 'A' is first declared here. (3:10 - 3:10)
+   2 | type A = 'A';
+   3 | type T = A | A;
+     |          ^ Type 'A' is first declared here.
    4 |       
 ---
 
@@ -115,6 +164,11 @@ Message: Union type constituent is duplicated with  A.
    3 | const a: A | A = 'A';
      |              ~
    4 |       
+  Label: Type 'A' is first declared here. (3:10 - 3:10)
+   2 | type A = 'A';
+   3 | const a: A | A = 'A';
+     |          ^ Type 'A' is first declared here.
+   4 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-18 - 1]
@@ -123,6 +177,11 @@ Message: Union type constituent is duplicated with  A.
    2 | type A = 'A';
    3 | type T = A | /* comment */ A;
      |                            ~
+   4 |       
+  Label: Type 'A' is first declared here. (3:10 - 3:10)
+   2 | type A = 'A';
+   3 | type T = A | /* comment */ A;
+     |          ^ Type 'A' is first declared here.
    4 |       
 ---
 
@@ -133,12 +192,22 @@ Message: Union type constituent is duplicated with  A1.
    5 | type T = A1 | A2 | A3;
      |               ~~
    6 |       
+  Label: Type 'A1' is first declared here. (5:10 - 5:11)
+   4 | type A3 = 'A';
+   5 | type T = A1 | A2 | A3;
+     |          ^^ Type 'A1' is first declared here.
+   6 |       
 
 Diagnostic 2: duplicate (5:20 - 5:21)
 Message: Union type constituent is duplicated with  A1.
    4 | type A3 = 'A';
    5 | type T = A1 | A2 | A3;
      |                    ~~
+   6 |       
+  Label: Type 'A1' is first declared here. (5:10 - 5:11)
+   4 | type A3 = 'A';
+   5 | type T = A1 | A2 | A3;
+     |          ^^ Type 'A1' is first declared here.
    6 |       
 ---
 
@@ -149,6 +218,11 @@ Message: Union type constituent is duplicated with  A.
    4 | type T = A | B | A;
      |                  ~
    5 |       
+  Label: Type 'A' is first declared here. (4:10 - 4:10)
+   3 | type B = 'B';
+   4 | type T = A | B | A;
+     |          ^ Type 'A' is first declared here.
+   5 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-21 - 1]
@@ -158,12 +232,22 @@ Message: Union type constituent is duplicated with  A.
    4 | type T = A | B | A | B;
      |                  ~
    5 |       
+  Label: Type 'A' is first declared here. (4:10 - 4:10)
+   3 | type B = 'B';
+   4 | type T = A | B | A | B;
+     |          ^ Type 'A' is first declared here.
+   5 |       
 
 Diagnostic 2: duplicate (4:22 - 4:22)
 Message: Union type constituent is duplicated with  B.
    3 | type B = 'B';
    4 | type T = A | B | A | B;
      |                      ~
+   5 |       
+  Label: Type 'B' is first declared here. (4:14 - 4:14)
+   3 | type B = 'B';
+   4 | type T = A | B | A | B;
+     |              ^ Type 'B' is first declared here.
    5 |       
 ---
 
@@ -174,12 +258,22 @@ Message: Union type constituent is duplicated with  A.
    4 | type T = A | B | A | A;
      |                  ~
    5 |       
+  Label: Type 'A' is first declared here. (4:10 - 4:10)
+   3 | type B = 'B';
+   4 | type T = A | B | A | A;
+     |          ^ Type 'A' is first declared here.
+   5 |       
 
 Diagnostic 2: duplicate (4:22 - 4:22)
 Message: Union type constituent is duplicated with  A.
    3 | type B = 'B';
    4 | type T = A | B | A | A;
      |                      ~
+   5 |       
+  Label: Type 'A' is first declared here. (4:10 - 4:10)
+   3 | type B = 'B';
+   4 | type T = A | B | A | A;
+     |          ^ Type 'A' is first declared here.
    5 |       
 ---
 
@@ -190,6 +284,11 @@ Message: Union type constituent is duplicated with  A.
    5 | type T = A | B | A | C;
      |                  ~
    6 |       
+  Label: Type 'A' is first declared here. (5:10 - 5:10)
+   4 | type C = 'C';
+   5 | type T = A | B | A | C;
+     |          ^ Type 'A' is first declared here.
+   6 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-24 - 1]
@@ -198,6 +297,11 @@ Message: Union type constituent is duplicated with  (A | B).
    3 | type B = 'B';
    4 | type T = (A | B) | (A | B);
      |                    ~~~~~~~
+   5 |       
+  Label: Type '(A | B)' is first declared here. (4:10 - 4:16)
+   3 | type B = 'B';
+   4 | type T = (A | B) | (A | B);
+     |          ^^^^^^^ Type '(A | B)' is first declared here.
    5 |       
 ---
 
@@ -208,6 +312,11 @@ Message: Union type constituent is duplicated with  A.
    3 | type T = A | (A | A);
      |              ~~~~~~~
    4 |       
+  Label: Type 'A' is first declared here. (3:10 - 3:10)
+   2 | type A = 'A';
+   3 | type T = A | (A | A);
+     |          ^ Type 'A' is first declared here.
+   4 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-26 - 1]
@@ -217,12 +326,22 @@ Message: Union type constituent is duplicated with  (A | B).
    6 | type F = (A | B) | (A | B) | ((C | D) & (A | B)) | (A | B);
      |                    ~~~~~~~
    7 |       
+  Label: Type '(A | B)' is first declared here. (6:10 - 6:16)
+   5 | type D = 'D';
+   6 | type F = (A | B) | (A | B) | ((C | D) & (A | B)) | (A | B);
+     |          ^^^^^^^ Type '(A | B)' is first declared here.
+   7 |       
 
 Diagnostic 2: duplicate (6:52 - 6:58)
 Message: Union type constituent is duplicated with  (A | B).
    5 | type D = 'D';
    6 | type F = (A | B) | (A | B) | ((C | D) & (A | B)) | (A | B);
      |                                                    ~~~~~~~
+   7 |       
+  Label: Type '(A | B)' is first declared here. (6:10 - 6:16)
+   5 | type D = 'D';
+   6 | type F = (A | B) | (A | B) | ((C | D) & (A | B)) | (A | B);
+     |          ^^^^^^^ Type '(A | B)' is first declared here.
    7 |       
 ---
 
@@ -233,12 +352,22 @@ Message: Union type constituent is duplicated with A.
    4 | type C = (A | B) | A | B | (A | B);
      |                    ~
    5 |       
+  Label: Type 'A' is first declared here. (4:11 - 4:11)
+   3 | type B = 'B';
+   4 | type C = (A | B) | A | B | (A | B);
+     |           ^ Type 'A' is first declared here.
+   5 |       
 
 Diagnostic 2: duplicate (4:24 - 4:24)
 Message: Union type constituent is duplicated with  B.
    3 | type B = 'B';
    4 | type C = (A | B) | A | B | (A | B);
      |                        ~
+   5 |       
+  Label: Type 'B' is first declared here. (4:15 - 4:15)
+   3 | type B = 'B';
+   4 | type C = (A | B) | A | B | (A | B);
+     |               ^ Type 'B' is first declared here.
    5 |       
 
 Diagnostic 3: duplicate (4:28 - 4:34)
@@ -247,6 +376,11 @@ Message: Union type constituent is duplicated with  (A | B).
    4 | type C = (A | B) | A | B | (A | B);
      |                            ~~~~~~~
    5 |       
+  Label: Type '(A | B)' is first declared here. (4:10 - 4:16)
+   3 | type B = 'B';
+   4 | type C = (A | B) | A | B | (A | B);
+     |          ^^^^^^^ Type '(A | B)' is first declared here.
+   5 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-28 - 1]
@@ -254,11 +388,17 @@ Diagnostic 1: duplicate (1:30 - 1:35)
 Message: Union type constituent is duplicated with number.
    1 | type A = (number | string) | number | string;
      |                              ~~~~~~
+  Label: Type 'number' is first declared here. (1:11 - 1:16)
+   1 | type A = (number | string) | number | string;
+     |           ^^^^^^ Type 'number' is first declared here.
 
 Diagnostic 2: duplicate (1:39 - 1:44)
 Message: Union type constituent is duplicated with  string.
    1 | type A = (number | string) | number | string;
      |                                       ~~~~~~
+  Label: Type 'string' is first declared here. (1:20 - 1:25)
+   1 | type A = (number | string) | number | string;
+     |                    ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-29 - 1]
@@ -266,6 +406,9 @@ Diagnostic 1: duplicate (1:39 - 1:64)
 Message: Union type constituent is duplicated with  (number | (string | null)).
    1 | type A = (number | (string | null)) | (string | (null | number));
      |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Label: Type '(number | (string | null))' is first declared here. (1:10 - 1:35)
+   1 | type A = (number | (string | null)) | (string | (null | number));
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^ Type '(number | (string | null))' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-30 - 1]
@@ -273,11 +416,17 @@ Diagnostic 1: duplicate (1:30 - 1:35)
 Message: Intersection type constituent is duplicated with number.
    1 | type A = (number & string) & number & string;
      |                              ~~~~~~
+  Label: Type 'number' is first declared here. (1:11 - 1:16)
+   1 | type A = (number & string) & number & string;
+     |           ^^^^^^ Type 'number' is first declared here.
 
 Diagnostic 2: duplicate (1:39 - 1:44)
 Message: Intersection type constituent is duplicated with  string.
    1 | type A = (number & string) & number & string;
      |                                       ~~~~~~
+  Label: Type 'string' is first declared here. (1:20 - 1:25)
+   1 | type A = (number & string) & number & string;
+     |                    ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-31 - 1]
@@ -285,11 +434,17 @@ Diagnostic 1: duplicate (1:29 - 1:34)
 Message: Intersection type constituent is duplicated with  number.
    1 | type A = number & string & (number & string);
      |                             ~~~~~~
+  Label: Type 'number' is first declared here. (1:10 - 1:15)
+   1 | type A = number & string & (number & string);
+     |          ^^^^^^ Type 'number' is first declared here.
 
 Diagnostic 2: duplicate (1:38 - 1:43)
 Message: Intersection type constituent is duplicated with  string.
    1 | type A = number & string & (number & string);
      |                                      ~~~~~~
+  Label: Type 'string' is first declared here. (1:19 - 1:24)
+   1 | type A = number & string & (number & string);
+     |                   ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-32 - 1]
@@ -299,6 +454,11 @@ Message: Union type constituent is duplicated with  A.
    3 | type T = Record<string, A | A>;
      |                             ~
    4 |       
+  Label: Type 'A' is first declared here. (3:25 - 3:25)
+   2 | type A = 'A';
+   3 | type T = Record<string, A | A>;
+     |                         ^ Type 'A' is first declared here.
+   4 |       
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-33 - 1]
@@ -306,6 +466,9 @@ Diagnostic 1: duplicate (1:27 - 1:32)
 Message: Union type constituent is duplicated with  string.
    1 | type T = A | A | string | string;
      |                           ~~~~~~
+  Label: Type 'string' is first declared here. (1:18 - 1:23)
+   1 | type T = A | A | string | string;
+     |                  ^^^^^^ Type 'string' is first declared here.
 ---
 
 [TestNoDuplicateTypeConstituentsRule/invalid-34 - 1]
