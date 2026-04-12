@@ -133,7 +133,7 @@ export { A };
 				Code: `export { Type1, value1 } from './consistent-type-exports';`,
 				Output: []string{`export type { Type1 } from './consistent-type-exports';
 export { value1 } from './consistent-type-exports';`},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 1, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -143,7 +143,7 @@ export { Type1, value1, value2 } from './consistent-type-exports';
 export type { Type1 } from './consistent-type-exports';
 export { value1, value2 } from './consistent-type-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 2, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -153,7 +153,7 @@ export { Type1, value1, Type2, value2 } from './consistent-type-exports';
 export type { Type1, Type2 } from './consistent-type-exports';
 export { value1, value2 } from './consistent-type-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`, Line: 2, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`}},
 			},
 			{
 				Code:   `export { Type2 as Foo } from './consistent-type-exports';`,
@@ -168,7 +168,7 @@ export { Type2 as Foo, value1 } from './consistent-type-exports';
 export type { Type2 as Foo } from './consistent-type-exports';
 export { value1 } from './consistent-type-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 2, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -182,7 +182,7 @@ export {
 export type { Type2 as Foo } from './consistent-type-exports';
 export { value1 as BScope, value2 as CScope } from './consistent-type-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 2, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -205,7 +205,7 @@ import { value2, Type2 } from './consistent-type-exports';
 export type { Type2 };
 export { value2 };
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 3, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -229,7 +229,7 @@ namespace TypeNS {
 export type { Alias, IFace };
 export { TypeNS };
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`, Line: 9, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`}},
 			},
 			{
 				Code: `
@@ -282,7 +282,7 @@ const x = 1;
 export type { T, T };
 export { x };
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 4, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -296,7 +296,7 @@ type T = 1;
 const x = 1;
 export { type T, x };
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`, Line: 4, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `singleExportIsType`}},
 			},
 			{
 				Code: `
@@ -324,7 +324,7 @@ export {
 export type { Type1, Type2 as Foo, value1 as BScope } from './consistent-type-exports';
 export { value2 as CScope } from './consistent-type-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`, Line: 2, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`}},
 			},
 			{
 				Code: `
@@ -344,7 +344,7 @@ export {
   value2 as CScope,
 } from './consistent-type-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`, Line: 2, Column: 1}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `multipleExportsAreTypes`}},
 			},
 			{
 				Code: `
@@ -353,7 +353,7 @@ export {
 				Output: []string{`
         export type * from './consistent-type-exports/type-only-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 9, EndLine: 2, EndColumn: 69}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 9, EndLine: 2, EndColumn: 15}},
 			},
 			{
 				Code: `
@@ -368,7 +368,7 @@ export {
             // comment 3
             from './consistent-type-exports/type-only-exports';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 25, EndLine: 5, EndColumn: 64}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 25, EndLine: 2, EndColumn: 31}},
 			},
 			{
 				Code: `
@@ -377,7 +377,7 @@ export {
 				Output: []string{`
         export type * from './consistent-type-exports/type-only-reexport';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 9, EndLine: 2, EndColumn: 70}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 9, EndLine: 2, EndColumn: 15}},
 			},
 			{
 				Code: `
@@ -386,7 +386,7 @@ export {
 				Output: []string{`
         export type * as foo from './consistent-type-exports/type-only-reexport';
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 9, EndLine: 2, EndColumn: 77}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 2, Column: 9, EndLine: 2, EndColumn: 15}},
 			},
 			{
 				Code: `
@@ -399,7 +399,7 @@ export {
         type Foo = 1;
         export type { Foo };
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 4, Column: 9, EndLine: 4, EndColumn: 24}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 4, Column: 9, EndLine: 4, EndColumn: 15}},
 			},
 			{
 				Code: `
@@ -410,7 +410,7 @@ export {
         import { type NAME as Foo } from './consistent-type-exports';
         export type { Foo };
       `},
-				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 3, Column: 9, EndLine: 3, EndColumn: 24}},
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: `typeOverValue`, Line: 3, Column: 9, EndLine: 3, EndColumn: 15}},
 			},
 		})
 }
