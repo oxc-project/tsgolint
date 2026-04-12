@@ -9,7 +9,7 @@ runs:
       with:
         go-version-file: go.mod
 
-    - uses: extractions/setup-crate@0551596312d4008a6dfbc4d3c38fa20eaef46d2d # v2.0.0
+    - uses: extractions/setup-crate@7577c1bdf2d95e6d65d532788f35ed79d4b1dda2 # v2.0.1
       with:
         repo: casey/just
         version: ${{ inputs.just-version }}
