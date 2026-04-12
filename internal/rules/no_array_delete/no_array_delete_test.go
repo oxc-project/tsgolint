@@ -56,7 +56,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 22,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -80,7 +80,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      4,
 					Column:    9,
-					EndColumn: 24,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -110,7 +110,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      9,
 					Column:    9,
-					EndColumn: 27,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -140,7 +140,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      4,
 					Column:    9,
-					EndColumn: 34,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -164,7 +164,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 22,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -184,7 +184,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      1,
 					Column:    1,
-					EndColumn: 20,
+					EndColumn: 7,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -204,7 +204,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 42,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -227,7 +227,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 22,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -250,7 +250,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 22,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -273,7 +273,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 22,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -296,7 +296,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 28,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -319,7 +319,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 29,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -342,7 +342,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 29,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -366,7 +366,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    11,
-					EndColumn: 22,
+					EndColumn: 17,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -391,7 +391,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    11,
-					EndColumn: 22,
+					EndColumn: 17,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -416,7 +416,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    11,
-					EndColumn: 22,
+					EndColumn: 17,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -440,7 +440,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 24,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
@@ -571,7 +571,7 @@ func TestNoArrayDelete(t *testing.T) {
 					MessageId: "noArrayDelete",
 					Line:      3,
 					Column:    9,
-					EndColumn: 22,
+					EndColumn: 15,
 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
 						{
 							MessageId: "useSplice",
