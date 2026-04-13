@@ -82,5 +82,23 @@ function bar(x: never) {
 				},
 			},
 		},
+		{
+			Code: `
+const foo = (() => {}) as (() => void) | undefined;
+void foo?.();
+      `,
+			Output: []string{`
+const foo = (() => {}) as (() => void) | undefined;
+ foo?.();
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "meaninglessVoidOperator",
+					Line:      3,
+					Column:    1,
+				},
+			},
+		},
 	})
 }
