@@ -1509,7 +1509,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			leftFlags := checker.Type_flags(leftType)
 			rightFlags := checker.Type_flags(rightType)
 
-			isComparable := func(t *checker.Type, flags checker.TypeFlags) bool {
+			var isComparable func(t *checker.Type, flags checker.TypeFlags) bool
+			isComparable = func(t *checker.Type, flags checker.TypeFlags) bool {
 				if t == nil {
 					return false
 				}
@@ -1519,18 +1520,37 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					flags |= checker.TypeFlagsNull | checker.TypeFlagsUndefined | checker.TypeFlagsVoid
 				}
 
-				if checker.Type_flags(t)&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+				typeFlags := checker.Type_flags(t)
+				if typeFlags&flags != 0 {
 					return true
 				}
 
-				for _, part := range utils.UnionTypeParts(t) {
-					partFlags := checker.Type_flags(part)
-					if partFlags&flags != 0 {
-						return true
+				if typeFlags&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
+					return true
+				}
+
+				if utils.IsUnionType(t) {
+					for _, part := range t.Types() {
+						if isComparable(part, flags) {
+							return true
+						}
 					}
-					if partFlags&(checker.TypeFlagsConditional|checker.TypeFlagsTypeVariable|checker.TypeFlagsSubstitution|checker.TypeFlagsIncludesConstrainedTypeVariable) != 0 {
-						return true
+					return false
+				}
+
+				if utils.IsIntersectionType(t) {
+					parts := t.Types()
+					if len(parts) == 0 {
+						return false
 					}
+
+					for _, part := range parts {
+						if !isComparable(part, flags) {
+							return false
+						}
+					}
+
+					return true
 				}
 
 				return false

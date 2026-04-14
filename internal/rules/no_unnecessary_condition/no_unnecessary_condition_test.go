@@ -1386,6 +1386,11 @@ assertSecond(...[], true);
       `,
 			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
+		{
+			Code: `function _foo<T>(value: T) {
+	if (typeof value === 'object' && value !== null) { console.log('foo'); }
+}`,
+		},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
