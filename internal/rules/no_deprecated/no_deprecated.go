@@ -504,6 +504,12 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			switch parent.Kind {
+			case ast.KindBindingElement:
+				// Array binding elements only declare locals. Object binding patterns are
+				// handled separately because they also represent property reads.
+				return parent.Parent != nil &&
+					parent.Parent.Kind == ast.KindArrayBindingPattern &&
+					parent.Name() == node
 			case ast.KindClassExpression:
 				fallthrough
 			case ast.KindVariableDeclaration:

@@ -508,6 +508,10 @@ exists('/foo');
 	}
 }
 	`},
+		{Code: `const DISALLOWED_CATEGORY_ITEM_REGEXP: RegExp = /regexp/;
+			const content = "";
+			const result = [...content.matchAll(DISALLOWED_CATEGORY_ITEM_REGEXP)].map(([, term, description, name, link]) => ({ link, }));`,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
