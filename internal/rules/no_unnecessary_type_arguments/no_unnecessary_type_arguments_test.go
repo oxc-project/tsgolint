@@ -25,6 +25,177 @@ function f<T = number>() {}
 f<string>();
     `},
 		{Code: `
+declare const f: (<T = number>() => void) | null;
+f?.();
+    `},
+		{Code: `
+declare const f: (<T = number>() => void) | null;
+f?.<string>();
+    `},
+		{Code: `
+declare const f: any;
+f();
+    `},
+		{Code: `
+declare const f: any;
+f<string>();
+    `},
+		{Code: `
+declare const f: unknown;
+f();
+    `},
+		{Code: `
+declare const f: unknown;
+f<string>();
+    `},
+		{Code: `
+function g<T = number, U = string>() {}
+g<number, number>();
+    `},
+		{Code: `
+declare const g: any;
+g<string, string>();
+    `},
+		{Code: `
+declare const g: unknown;
+g<string, string>();
+    `},
+		{Code: `
+declare const f: unknown;
+f<string>` + "`" + `` + "`" + `;
+    `},
+		{Code: `
+function f<T = number>(template: TemplateStringsArray) {}
+f<string>` + "`" + `` + "`" + `;
+    `},
+		{Code: `
+class C<T = number> {}
+new C<string>();
+    `},
+		{Code: `
+declare const C: any;
+new C<string>();
+    `},
+		{Code: `
+declare const C: unknown;
+new C<string>();
+    `},
+		{Code: `
+class C<T = number> {}
+class D extends C<string> {}
+    `},
+		{Code: `
+declare const C: any;
+class D extends C<string> {}
+    `},
+		{Code: `
+declare const C: unknown;
+class D extends C<string> {}
+    `},
+		{Code: `
+interface I<T = number> {}
+class Impl implements I<string> {}
+    `},
+		{Code: `
+class C<TC = number> {}
+class D<TD = number> extends C {}
+    `},
+		{Code: `
+declare const C: any;
+class D<TD = number> extends C {}
+    `},
+		{Code: `
+declare const C: unknown;
+class D<TD = number> extends C {}
+    `},
+		{Code: "let a: A<number>;"},
+		{Code: `
+class Foo<T> {}
+const foo = new Foo<number>();
+    `},
+		{Code: "type Foo<T> = import('foo').Foo<T>;"},
+		{Code: `
+class Bar<T = number> {}
+class Foo<T = number> extends Bar<T> {}
+    `},
+		{Code: `
+interface Bar<T = number> {}
+class Foo<T = number> implements Bar<T> {}
+    `},
+		{Code: `
+class Bar<T = number> {}
+class Foo<T = number> extends Bar<string> {}
+    `},
+		{Code: `
+interface Bar<T = number> {}
+class Foo<T = number> implements Bar<string> {}
+    `},
+		{Code: `
+import { F } from './missing';
+function bar<T = F>() {}
+bar<F<number>>();
+    `},
+		{
+			Code: `
+type A<T = Element> = T;
+type B = A<HTMLInputElement>;
+      `,
+			TSConfig: "tsconfig.lib-dom.json",
+		},
+		{Code: `
+type A<T = Map<string, string>> = T;
+type B = A<Map<string, number>>;
+    `},
+		{Code: `
+type A = Map<string, string>;
+type B<T = A> = T;
+type C2 = B<Map<string, number>>;
+    `},
+		{Code: `
+interface Foo<T = string> {}
+declare var Foo: {
+  new <T>(type: T): any;
+};
+class Bar extends Foo<string> {}
+    `},
+		{Code: `
+interface Foo<T = string> {}
+class Foo<T> {}
+class Bar extends Foo<string> {}
+    `},
+		{Code: `
+class Foo<T = string> {}
+interface Foo<T> {}
+class Bar implements Foo<string> {}
+    `},
+		{Code: `
+class Foo<T> {}
+namespace Foo {
+  export class Bar {}
+}
+class Bar extends Foo<string> {}
+    `},
+		{
+			Code: `
+function Button<T>() {
+  return <div></div>;
+}
+const button = <Button<string>></Button>;
+      `,
+			Tsx: true,
+		},
+		{
+			Code: `
+function Button<T>() {
+  return <div></div>;
+}
+const button = <Button<string> />;
+      `,
+			Tsx: true,
+		},
+
+		// OXC-specific cases not present in upstream.
+		{Code: `
 function f<T>(x: T) {}
 f(10);
     `},
@@ -110,165 +281,14 @@ function f<T>(x: T) {}
 f<boolean | null>(true);
     `},
 		{Code: `
-declare const f: (<T = number>() => void) | null;
-f?.();
-    `},
-		{Code: `
-declare const f: (<T = number>() => void) | null;
-f?.<string>();
-    `},
-		{Code: `
-declare const f: any;
-f();
-    `},
-		{Code: `
-declare const f: any;
-f<string>();
-    `},
-		{Code: `
-declare const f: unknown;
-f();
-    `},
-		{Code: `
-declare const f: unknown;
-f<string>();
-    `},
-		{Code: `
-function g<T = number, U = string>() {}
-g<number, number>();
-    `},
-		{Code: `
-declare const g: any;
-g<string, string>();
-    `},
-		{Code: `
-declare const g: unknown;
-g<string, string>();
-    `},
-		{Code: `
-declare const f: unknown;
-f<string>` + "`" + `` + "`" + `;
-    `},
-		{Code: `
-function f<T = number>(template: TemplateStringsArray) {}
-f<string>` + "`" + `` + "`" + `;
-    `},
-		{Code: `
-class C<T = number> {}
-new C<string>();
-    `},
-		{Code: `
 class C<T> {}
 new C<string>();
-    `},
-		{Code: `
-declare const C: any;
-new C<string>();
-    `},
-		{Code: `
-declare const C: unknown;
-new C<string>();
-    `},
-		{Code: `
-class C<T = number> {}
-class D extends C<string> {}
-    `},
-		{Code: `
-declare const C: any;
-class D extends C<string> {}
-    `},
-		{Code: `
-declare const C: unknown;
-class D extends C<string> {}
-    `},
-		{Code: `
-interface I<T = number> {}
-class Impl implements I<string> {}
-    `},
-		{Code: `
-class C<TC = number> {}
-class D<TD = number> extends C {}
-    `},
-		{Code: `
-declare const C: any;
-class D<TD = number> extends C {}
-    `},
-		{Code: `
-declare const C: unknown;
-class D<TD = number> extends C {}
-    `},
-		{Code: "let a: A<number>;"},
-		{Code: `
-class Foo<T> {}
-const foo = new Foo<number>();
     `},
 		{Code: `
 class Foo<T> {
   constructor<T>(x: T) {}
 }
 const foo = new Foo(10);
-    `},
-		{Code: "type Foo<T> = import('foo').Foo<T>;"},
-		{Code: `
-class Bar<T = number> {}
-class Foo<T = number> extends Bar<T> {}
-    `},
-		{Code: `
-interface Bar<T = number> {}
-class Foo<T = number> implements Bar<T> {}
-    `},
-		{Code: `
-class Bar<T = number> {}
-class Foo<T = number> extends Bar<string> {}
-    `},
-		{Code: `
-interface Bar<T = number> {}
-class Foo<T = number> implements Bar<string> {}
-    `},
-		{Code: `
-import { F } from './missing';
-function bar<T = F>() {}
-bar<F<number>>();
-    `},
-		{
-			Code: `
-type A<T = Element> = T;
-type B = A<HTMLInputElement>;
-      `,
-			TSConfig: "tsconfig.lib-dom.json",
-		},
-		{Code: `
-type A<T = Map<string, string>> = T;
-type B = A<Map<string, number>>;
-    `},
-		{Code: `
-type A = Map<string, string>;
-type B<T = A> = T;
-type C2 = B<Map<string, number>>;
-    `},
-		{Code: `
-interface Foo<T = string> {}
-declare var Foo: {
-  new <T>(type: T): any;
-};
-class Bar extends Foo<string> {}
-    `},
-		{Code: `
-interface Foo<T = string> {}
-class Foo<T> {}
-class Bar extends Foo<string> {}
-    `},
-		{Code: `
-class Foo<T = string> {}
-interface Foo<T> {}
-class Bar implements Foo<string> {}
-    `},
-		{Code: `
-class Foo<T> {}
-namespace Foo {
-  export class Bar {}
-}
-class Bar extends Foo<string> {}
     `},
 		// Ignore invalid type arguments.
 		{Code: `
@@ -284,26 +304,6 @@ interface Bar {
 }
 let foo = new Foo<Bar>(0, 0, 0, { val: 0 });
     `},
-		{
-			Code: `
-function Button<T>() {
-  return <div></div>;
-}
-const button = <Button<string>></Button>;
-      `,
-			Tsx: true,
-		},
-		{
-			Code: `
-function Button<T>() {
-  return <div></div>;
-}
-const button = <Button<string> />;
-      `,
-			Tsx: true,
-		},
-
-		// Local regressions not present in upstream.
 		{Code: `
 function f<T = string>() {}
 f<any>();
@@ -311,6 +311,15 @@ f<any>();
 		{Code: `
 function f<T = any>() {}
 f<string>();
+    `},
+		// Inference reporting was reverted upstream and remains disabled locally.
+		{Code: `
+declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
+const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
+    `},
+		{Code: `
+declare function useRef<T>(initialValue: T): { current: T };
+const activeIndexesRef = useRef<Set<number>>(new Set());
     `},
 		// https://github.com/oxc-project/oxc/issues/13164
 		{Code: `
@@ -350,6 +359,21 @@ interface Wrapper {
   value: LocaleData<Data2>
 }
     `},
+		{Code: `
+
+type SessionDataT = Record<string, any>
+type SessionData<T extends SessionDataT = SessionDataT> = Partial<T>;
+declare function useSession<T extends SessionData = SessionData>(): any;
+
+
+export function scoped() {
+  interface SessionData {
+    userId?: string;
+  }
+
+  return useSession<SessionData>()
+}
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -364,282 +388,7 @@ f();
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Column:    3,
-					MessageId: "isDefaultParameterValue",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-f<number>(10);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-f(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-declare const x: number;
-f<number>(x);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-declare const x: number;
-f(x);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-declare const x: any;
-f<any>(x);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-declare const x: any;
-f(x);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-declare const x: {};
-f<{}>(x);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-declare const x: {};
-f(x);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-declare const x: Record<string, never>;
-f<Record<string, never>>(x);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-declare const x: Record<string, never>;
-f(x);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-interface F {}
-declare const x: F;
-f<F>(x);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-interface F {}
-declare const x: F;
-f(x);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T) {}
-declare function y(): number;
-f<number>(y());
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-declare function y(): number;
-f(y());
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-enum E {
-  A,
-  B,
-}
-function f<T>(x: T) {}
-f<E>(E.A);
-      `,
-			Output: []string{`
-enum E {
-  A,
-  B,
-}
-function f<T>(x: T) {}
-f(E.A);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T = number>(x: T) {}
-f<number>(10);
-      `,
-			Output: []string{`
-function f<T = number>(x: T) {}
-f(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-				{
-					MessageId: "isDefaultParameterValue",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T extends number>(x: T) {}
-f<number>(10);
-      `,
-			Output: []string{`
-function f<T extends number>(x: T) {}
-f(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T extends number | string>(x: T) {}
-f<number>(10);
-      `,
-			Output: []string{`
-function f<T extends number | string>(x: T) {}
-f(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-const curried =
-  <Outer,>(outer: Outer) =>
-  <Inner,>(inner: Inner) => {};
-curried<number>(10)<number>(10);
-      `,
-			Output: []string{`
-const curried =
-  <Outer,>(outer: Outer) =>
-  <Inner,>(inner: Inner) => {};
-curried(10)(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-declare function f<T>(x: T | (() => T)): [T, (x: T) => void];
-declare function f<T>(): [T | undefined, (x: T | undefined) => void];
-f<number>(10);
-      `,
-			Output: []string{`
-declare function f<T>(x: T | (() => T)): [T, (x: T) => void];
-declare function f<T>(): [T | undefined, (x: T | undefined) => void];
-f(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		// Ignore invalid arguments, check just ones we know the types of.
-		{
-			Code: `
-function f<T>(x: T) {}
-f<number>(10, 10);
-      `,
-			Output: []string{`
-function f<T>(x: T) {}
-f(10, 10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-function f<T>(x: T, y: number) {}
-f<number>(10, 10);
-      `,
-			Output: []string{`
-function f<T>(x: T, y: number) {}
-f(10, 10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -656,27 +405,7 @@ g<string>();
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Column:    11,
-					MessageId: "isDefaultParameterValue",
-				},
-			},
-		},
-		{
-			Code: `
-function g<T, U>(x: T, y: U) {}
-g<number, number>(10, 10);
-      `,
-			Output: []string{`
-function g<T, U>(x: T, y: U) {}
-g<number>(10, 10);
-      `,
-				`
-function g<T, U>(x: T, y: U) {}
-g(10, 10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -693,7 +422,7 @@ f` + "`" + `${1}` + "`" + `;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Column:    3,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -709,7 +438,7 @@ function h(c: C) {}
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -725,7 +454,7 @@ new C();
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -741,7 +470,7 @@ class D extends C {}
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -757,7 +486,7 @@ class Impl implements I {}
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -773,27 +502,7 @@ const foo = new Foo();
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
-				},
-			},
-		},
-		{
-			Code: `
-class Foo<T> {
-  constructor(x: T) {}
-}
-const foo = new Foo<number>(10);
-      `,
-			Output: []string{`
-class Foo<T> {
-  constructor(x: T) {}
-}
-const foo = new Foo(10);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "canBeInferred",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -809,7 +518,7 @@ class Foo<T = number> implements Bar {}
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -825,7 +534,7 @@ class Foo<T = number> extends Bar {}
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -847,7 +556,7 @@ bar();
 				{
 					Column:    5,
 					Line:      4,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -875,7 +584,7 @@ declare module 'bar' {
 				{
 					Column:    12,
 					Line:      4,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -892,7 +601,7 @@ type B = A;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      3,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -911,7 +620,7 @@ type C = B;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      4,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -930,7 +639,7 @@ type C = B;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      4,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -951,7 +660,7 @@ type D = C;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      5,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -976,7 +685,7 @@ type F = E;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      7,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -999,7 +708,7 @@ class Bar extends Foo {}
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      6,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1022,7 +731,7 @@ class Bar extends Foo {}
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      6,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1041,7 +750,7 @@ class Bar implements Foo {}
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      4,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1064,7 +773,7 @@ class Bar extends Foo {}
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      6,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1086,7 +795,7 @@ const button = <Button></Button>;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      5,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1108,12 +817,28 @@ const button = <Button />;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      5,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
 
-		// Local regressions not present in upstream.
+		// OXC-specific cases not present in upstream.
+		{
+			Code: `
+function f<T = number>(x: T) {}
+f<number>(10);
+      `,
+			Output: []string{`
+function f<T = number>(x: T) {}
+f(10);
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryTypeParameter",
+				},
+			},
+		},
 		{
 			Code: `
 function foo<T = any>() {}
@@ -1127,7 +852,7 @@ foo();
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      3,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1146,7 +871,7 @@ foo();
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      4,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1161,7 +886,7 @@ declare type MessageEventHandler = ((ev: MessageEvent) => any) | null;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      2,
-					MessageId: "isDefaultParameterValue",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},
@@ -1192,41 +917,7 @@ f();
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      10,
-					MessageId: "isDefaultParameterValue",
-				},
-			},
-		},
-		{
-			Code: `
-declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
-const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
-      `,
-			Output: []string{`
-declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
-const [bookmarkedIds, setBookmarkedIds] = useState(new Set());
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					Line:      3,
-					MessageId: "canBeInferred",
-				},
-			},
-		},
-		{
-			Code: `
-declare function useRef<T>(initialValue: T): { current: T };
-const activeIndexesRef = useRef<Set<number>>(new Set());
-      `,
-			Output: []string{`
-declare function useRef<T>(initialValue: T): { current: T };
-const activeIndexesRef = useRef(new Set());
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					Line:      3,
-					MessageId: "canBeInferred",
+					MessageId: "unnecessaryTypeParameter",
 				},
 			},
 		},

@@ -1395,30 +1395,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "This value can be trivially inferred for this type parameter, so it can be omitted.",
-      "id": "canBeInferred",
-    },
-    "range": {
-      "end": 213,
-      "pos": 207,
-    },
-    "rule": "no-unnecessary-type-arguments",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-unnecessary-type-arguments/index.ts",
-    "fixes": [
-      {
-        "range": {
-          "end": 214,
-          "pos": 206,
-        },
-        "text": "",
-      },
-    ],
-    "kind": 0,
-    "message": {
       "description": "This is the default value for this type parameter, so it can be omitted.",
-      "id": "isDefaultParameterValue",
+      "id": "unnecessaryTypeParameter",
     },
     "range": {
       "end": 213,

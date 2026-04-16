@@ -1,6 +1,6 @@
 
 [TestNoUnnecessaryTypeArguments/invalid-0 - 1]
-Diagnostic 1: isDefaultParameterValue (3:3 - 3:8)
+Diagnostic 1: unnecessaryTypeParameter (3:3 - 3:8)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | function f<T = number>() {}
    3 | f<number>();
@@ -9,156 +9,7 @@ Message: This is the default value for this type parameter, so it can be omitted
 ---
 
 [TestNoUnnecessaryTypeArguments/invalid-1 - 1]
-Diagnostic 1: canBeInferred (3:3 - 3:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function f<T>(x: T) {}
-   3 | f<number>(10);
-     |   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-2 - 1]
-Diagnostic 1: canBeInferred (4:3 - 4:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   3 | declare const x: number;
-   4 | f<number>(x);
-     |   ~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-3 - 1]
-Diagnostic 1: canBeInferred (4:3 - 4:5)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   3 | declare const x: any;
-   4 | f<any>(x);
-     |   ~~~
-   5 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-4 - 1]
-Diagnostic 1: canBeInferred (4:3 - 4:4)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   3 | declare const x: {};
-   4 | f<{}>(x);
-     |   ~~
-   5 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-5 - 1]
-Diagnostic 1: canBeInferred (4:3 - 4:23)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   3 | declare const x: Record<string, never>;
-   4 | f<Record<string, never>>(x);
-     |   ~~~~~~~~~~~~~~~~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-6 - 1]
-Diagnostic 1: canBeInferred (5:3 - 5:3)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   4 | declare const x: F;
-   5 | f<F>(x);
-     |   ~
-   6 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-7 - 1]
-Diagnostic 1: canBeInferred (4:3 - 4:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   3 | declare function y(): number;
-   4 | f<number>(y());
-     |   ~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-8 - 1]
-Diagnostic 1: canBeInferred (7:3 - 7:3)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   6 | function f<T>(x: T) {}
-   7 | f<E>(E.A);
-     |   ~
-   8 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-9 - 1]
-Diagnostic 1: canBeInferred (3:3 - 3:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function f<T = number>(x: T) {}
-   3 | f<number>(10);
-     |   ~~~~~~
-   4 |       
-
-Diagnostic 2: isDefaultParameterValue (3:3 - 3:8)
-Message: This is the default value for this type parameter, so it can be omitted.
-   2 | function f<T = number>(x: T) {}
-   3 | f<number>(10);
-     |   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-10 - 1]
-Diagnostic 1: canBeInferred (3:3 - 3:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function f<T extends number>(x: T) {}
-   3 | f<number>(10);
-     |   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-11 - 1]
-Diagnostic 1: canBeInferred (3:3 - 3:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function f<T extends number | string>(x: T) {}
-   3 | f<number>(10);
-     |   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-12 - 1]
-Diagnostic 1: canBeInferred (5:21 - 5:26)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   4 |   <Inner,>(inner: Inner) => {};
-   5 | curried<number>(10)<number>(10);
-     |                     ~~~~~~
-   6 |       
-
-Diagnostic 2: canBeInferred (5:9 - 5:14)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   4 |   <Inner,>(inner: Inner) => {};
-   5 | curried<number>(10)<number>(10);
-     |         ~~~~~~
-   6 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-13 - 1]
-Diagnostic 1: canBeInferred (4:3 - 4:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   3 | declare function f<T>(): [T | undefined, (x: T | undefined) => void];
-   4 | f<number>(10);
-     |   ~~~~~~
-   5 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-14 - 1]
-Diagnostic 1: canBeInferred (3:3 - 3:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function f<T>(x: T) {}
-   3 | f<number>(10, 10);
-     |   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-15 - 1]
-Diagnostic 1: canBeInferred (3:3 - 3:8)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function f<T>(x: T, y: number) {}
-   3 | f<number>(10, 10);
-     |   ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-16 - 1]
-Diagnostic 1: isDefaultParameterValue (3:11 - 3:16)
+Diagnostic 1: unnecessaryTypeParameter (3:11 - 3:16)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | function g<T = number, U = string>() {}
    3 | g<string, string>();
@@ -166,17 +17,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-17 - 1]
-Diagnostic 1: canBeInferred (3:11 - 3:16)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | function g<T, U>(x: T, y: U) {}
-   3 | g<number, number>(10, 10);
-     |           ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-18 - 1]
-Diagnostic 1: isDefaultParameterValue (3:3 - 3:8)
+[TestNoUnnecessaryTypeArguments/invalid-2 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:3 - 3:8)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | function f<T = number>(templates: TemplateStringsArray, arg: T) {}
    3 | f<number>`${1}`;
@@ -184,8 +26,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-19 - 1]
-Diagnostic 1: isDefaultParameterValue (3:17 - 3:22)
+[TestNoUnnecessaryTypeArguments/invalid-3 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:17 - 3:22)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | class C<T = number> {}
    3 | function h(c: C<number>) {}
@@ -193,8 +35,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-20 - 1]
-Diagnostic 1: isDefaultParameterValue (3:7 - 3:12)
+[TestNoUnnecessaryTypeArguments/invalid-4 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:7 - 3:12)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | class C<T = number> {}
    3 | new C<number>();
@@ -202,8 +44,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-21 - 1]
-Diagnostic 1: isDefaultParameterValue (3:19 - 3:24)
+[TestNoUnnecessaryTypeArguments/invalid-5 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:19 - 3:24)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | class C<T = number> {}
    3 | class D extends C<number> {}
@@ -211,8 +53,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-22 - 1]
-Diagnostic 1: isDefaultParameterValue (3:25 - 3:30)
+[TestNoUnnecessaryTypeArguments/invalid-6 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:25 - 3:30)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | interface I<T = number> {}
    3 | class Impl implements I<number> {}
@@ -220,8 +62,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-23 - 1]
-Diagnostic 1: isDefaultParameterValue (3:21 - 3:26)
+[TestNoUnnecessaryTypeArguments/invalid-7 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:21 - 3:26)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | class Foo<T = number> {}
    3 | const foo = new Foo<number>();
@@ -229,17 +71,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-24 - 1]
-Diagnostic 1: canBeInferred (5:21 - 5:26)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   4 | }
-   5 | const foo = new Foo<number>(10);
-     |                     ~~~~~~
-   6 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-25 - 1]
-Diagnostic 1: isDefaultParameterValue (3:38 - 3:43)
+[TestNoUnnecessaryTypeArguments/invalid-8 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:38 - 3:43)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | interface Bar<T = string> {}
    3 | class Foo<T = number> implements Bar<string> {}
@@ -247,8 +80,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-26 - 1]
-Diagnostic 1: isDefaultParameterValue (3:35 - 3:40)
+[TestNoUnnecessaryTypeArguments/invalid-9 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:35 - 3:40)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | class Bar<T = string> {}
    3 | class Foo<T = number> extends Bar<string> {}
@@ -256,8 +89,17 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-28 - 1]
-Diagnostic 1: isDefaultParameterValue (4:12 - 4:19)
+[TestNoUnnecessaryTypeArguments/invalid-10 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:35 - 3:40)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | class Bar<T = string> {}
+   3 | class Foo<T = number> extends Bar<string> {}
+     |                                   ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-11 - 1]
+Diagnostic 1: unnecessaryTypeParameter (4:12 - 4:19)
 Message: This is the default value for this type parameter, so it can be omitted.
    3 | type T<E = DefaultE> = { box: E };
    4 | type G = T<DefaultE>;
@@ -265,8 +107,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    5 | declare module 'bar' {
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-29 - 1]
-Diagnostic 1: isDefaultParameterValue (3:12 - 3:30)
+[TestNoUnnecessaryTypeArguments/invalid-12 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:12 - 3:30)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | type A<T = Map<string, string>> = T;
    3 | type B = A<Map<string, string>>;
@@ -274,8 +116,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-30 - 1]
-Diagnostic 1: isDefaultParameterValue (4:12 - 4:12)
+[TestNoUnnecessaryTypeArguments/invalid-13 - 1]
+Diagnostic 1: unnecessaryTypeParameter (4:12 - 4:12)
 Message: This is the default value for this type parameter, so it can be omitted.
    3 | type B<T = A> = T;
    4 | type C = B<A>;
@@ -283,8 +125,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    5 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-31 - 1]
-Diagnostic 1: isDefaultParameterValue (4:12 - 4:30)
+[TestNoUnnecessaryTypeArguments/invalid-14 - 1]
+Diagnostic 1: unnecessaryTypeParameter (4:12 - 4:30)
 Message: This is the default value for this type parameter, so it can be omitted.
    3 | type B<T = A> = T;
    4 | type C = B<Map<string, string>>;
@@ -292,8 +134,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    5 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-32 - 1]
-Diagnostic 1: isDefaultParameterValue (5:12 - 5:12)
+[TestNoUnnecessaryTypeArguments/invalid-15 - 1]
+Diagnostic 1: unnecessaryTypeParameter (5:12 - 5:12)
 Message: This is the default value for this type parameter, so it can be omitted.
    4 | type C<T = A> = T;
    5 | type D = C<B>;
@@ -301,8 +143,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    6 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-33 - 1]
-Diagnostic 1: isDefaultParameterValue (7:12 - 7:12)
+[TestNoUnnecessaryTypeArguments/invalid-16 - 1]
+Diagnostic 1: unnecessaryTypeParameter (7:12 - 7:12)
 Message: This is the default value for this type parameter, so it can be omitted.
    6 | type E<T = B> = T;
    7 | type F = E<D>;
@@ -310,8 +152,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    8 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-34 - 1]
-Diagnostic 1: isDefaultParameterValue (6:23 - 6:28)
+[TestNoUnnecessaryTypeArguments/invalid-17 - 1]
+Diagnostic 1: unnecessaryTypeParameter (6:23 - 6:28)
 Message: This is the default value for this type parameter, so it can be omitted.
    5 | };
    6 | class Bar extends Foo<string> {}
@@ -319,8 +161,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    7 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-35 - 1]
-Diagnostic 1: isDefaultParameterValue (6:23 - 6:28)
+[TestNoUnnecessaryTypeArguments/invalid-18 - 1]
+Diagnostic 1: unnecessaryTypeParameter (6:23 - 6:28)
 Message: This is the default value for this type parameter, so it can be omitted.
    5 | interface Foo {}
    6 | class Bar extends Foo<string> {}
@@ -328,8 +170,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    7 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-36 - 1]
-Diagnostic 1: isDefaultParameterValue (4:26 - 4:31)
+[TestNoUnnecessaryTypeArguments/invalid-19 - 1]
+Diagnostic 1: unnecessaryTypeParameter (4:26 - 4:31)
 Message: This is the default value for this type parameter, so it can be omitted.
    3 | interface Foo<T = string> {}
    4 | class Bar implements Foo<string> {}
@@ -337,8 +179,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    5 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-37 - 1]
-Diagnostic 1: isDefaultParameterValue (6:23 - 6:28)
+[TestNoUnnecessaryTypeArguments/invalid-20 - 1]
+Diagnostic 1: unnecessaryTypeParameter (6:23 - 6:28)
 Message: This is the default value for this type parameter, so it can be omitted.
    5 | }
    6 | class Bar extends Foo<string> {}
@@ -346,8 +188,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    7 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-38 - 1]
-Diagnostic 1: isDefaultParameterValue (5:24 - 5:29)
+[TestNoUnnecessaryTypeArguments/invalid-21 - 1]
+Diagnostic 1: unnecessaryTypeParameter (5:24 - 5:29)
 Message: This is the default value for this type parameter, so it can be omitted.
    4 | }
    5 | const button = <Button<string>></Button>;
@@ -355,8 +197,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    6 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-39 - 1]
-Diagnostic 1: isDefaultParameterValue (5:24 - 5:29)
+[TestNoUnnecessaryTypeArguments/invalid-22 - 1]
+Diagnostic 1: unnecessaryTypeParameter (5:24 - 5:29)
 Message: This is the default value for this type parameter, so it can be omitted.
    4 | }
    5 | const button = <Button<string> />;
@@ -364,8 +206,17 @@ Message: This is the default value for this type parameter, so it can be omitted
    6 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-40 - 1]
-Diagnostic 1: isDefaultParameterValue (3:5 - 3:7)
+[TestNoUnnecessaryTypeArguments/invalid-23 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:3 - 3:8)
+Message: This is the default value for this type parameter, so it can be omitted.
+   2 | function f<T = number>(x: T) {}
+   3 | f<number>(10);
+     |   ~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeArguments/invalid-24 - 1]
+Diagnostic 1: unnecessaryTypeParameter (3:5 - 3:7)
 Message: This is the default value for this type parameter, so it can be omitted.
    2 | function foo<T = any>() {}
    3 | foo<any>();
@@ -373,8 +224,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    4 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-41 - 1]
-Diagnostic 1: isDefaultParameterValue (4:5 - 4:15)
+[TestNoUnnecessaryTypeArguments/invalid-25 - 1]
+Diagnostic 1: unnecessaryTypeParameter (4:5 - 4:15)
 Message: This is the default value for this type parameter, so it can be omitted.
    3 | function foo<T = Foo<string>>() {}
    4 | foo<Foo<number>>();
@@ -382,8 +233,8 @@ Message: This is the default value for this type parameter, so it can be omitted
    5 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-42 - 1]
-Diagnostic 1: isDefaultParameterValue (2:55 - 2:57)
+[TestNoUnnecessaryTypeArguments/invalid-26 - 1]
+Diagnostic 1: unnecessaryTypeParameter (2:55 - 2:57)
 Message: This is the default value for this type parameter, so it can be omitted.
    1 | 
    2 | declare type MessageEventHandler = ((ev: MessageEvent<any>) => any) | null;
@@ -391,29 +242,11 @@ Message: This is the default value for this type parameter, so it can be omitted
    3 |       
 ---
 
-[TestNoUnnecessaryTypeArguments/invalid-43 - 1]
-Diagnostic 1: isDefaultParameterValue (10:3 - 10:5)
+[TestNoUnnecessaryTypeArguments/invalid-27 - 1]
+Diagnostic 1: unnecessaryTypeParameter (10:3 - 10:5)
 Message: This is the default value for this type parameter, so it can be omitted.
    9 | function f<T = Foo>() {}
   10 | f<Bar>();
      |   ~~~
   11 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-44 - 1]
-Diagnostic 1: canBeInferred (3:52 - 3:62)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | declare function useState<T>(initialState: T | (() => T)): [T, (value: T) => void];
-   3 | const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
-     |                                                    ~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeArguments/invalid-45 - 1]
-Diagnostic 1: canBeInferred (3:33 - 3:43)
-Message: This value can be trivially inferred for this type parameter, so it can be omitted.
-   2 | declare function useRef<T>(initialValue: T): { current: T };
-   3 | const activeIndexesRef = useRef<Set<number>>(new Set());
-     |                                 ~~~~~~~~~~~
-   4 |       
 ---
