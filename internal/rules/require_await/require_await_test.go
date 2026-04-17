@@ -236,16 +236,16 @@ async function numberOne(): Promise<number> {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function numberOne(): number {
-					//   return 1;
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function numberOne(): number {
+  return 1;
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -258,16 +258,16 @@ const numberOne = async function (): Promise<number> {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// const numberOne = function (): number {
-					//   return 1;
-					// };
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+const numberOne = function (): number {
+  return 1;
+};
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -276,12 +276,12 @@ const numberOne = async function (): Promise<number> {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//   {
-					//     MessageId: "removeAsync",
-					//     Output: "const numberOne = (): number => 1;",
-					//   },
-					// },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output:    "const numberOne = (): number => 1;",
+						},
+					},
 				},
 			},
 		},
@@ -294,16 +294,16 @@ async function values(): Promise<Array<number>> {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function values(): Array<number> {
-					//   return [1];
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function values(): Array<number> {
+  return [1];
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -318,18 +318,18 @@ async function values(): Promise<Array<number>> {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   function foo() {
-					//     function nested() {
-					//       await doSomething();
-					//     }
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function foo() {
+          function nested() {
+            await doSomething();
+          }
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -342,16 +342,16 @@ async function* foo(): void {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function* foo(): void {
-					//   doSomething();
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function* foo(): void {
+  doSomething();
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -364,16 +364,16 @@ async function* foo() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function* foo() {
-					//   yield 1;
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function* foo() {
+  yield 1;
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -386,16 +386,16 @@ const foo = async function* () {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// const foo = function* () {
-					//   console.log('bar');
-					// };
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+const foo = function* () {
+  console.log('bar');
+};
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -408,16 +408,16 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function* asyncGenerator() {
-					//   yield 1;
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function* asyncGenerator() {
+  yield 1;
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -430,16 +430,16 @@ async function* asyncGenerator(source: Iterable<any>) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function* asyncGenerator(source: Iterable<any>) {
-					//   yield* source;
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function* asyncGenerator(source: Iterable<any>) {
+  yield* source;
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -457,21 +457,21 @@ async function* asyncGenerator(source: Iterable<any> | AsyncIterable<any>) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function isAsyncIterable(value: unknown): value is AsyncIterable<any> {
-					//   return true;
-					// }
-					// function* asyncGenerator(source: Iterable<any> | AsyncIterable<any>) {
-					//   if (!isAsyncIterable(source)) {
-					//     yield* source;
-					//   }
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function isAsyncIterable(value: unknown): value is AsyncIterable<any> {
+  return true;
+}
+function* asyncGenerator(source: Iterable<any> | AsyncIterable<any>) {
+  if (!isAsyncIterable(source)) {
+    yield* source;
+  }
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -487,19 +487,19 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function* syncGenerator() {
-					//   yield 1;
-					// }
-					// function* asyncGenerator() {
-					//   yield* syncGenerator();
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function* syncGenerator() {
+  yield 1;
+}
+function* asyncGenerator() {
+  yield* syncGenerator();
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -512,16 +512,16 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//             Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//               {
-					//                 MessageId: "removeAsync",
-					//                 Output: `
-					// function* asyncGenerator() {
-					//   yield* anotherAsyncGenerator(); // Unknown function.
-					// }
-					//       `,
-					//               },
-					//             },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+function* asyncGenerator() {
+  yield* anotherAsyncGenerator(); // Unknown function.
+}
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -534,16 +534,16 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   const fn = () => {
-					//     using foo = new Bar();
-					//   };
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        const fn = () => {
+          using foo = new Bar();
+        };
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -557,17 +557,17 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   // intentional TS error
-					//   function* foo(): Promise<number> {
-					//     yield 1;
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        // intentional TS error
+        function* foo(): Promise<number> {
+          yield 1;
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -580,16 +580,16 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   function* foo(): Generator {
-					//     yield 1;
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function* foo(): Generator {
+          yield 1;
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -602,16 +602,16 @@ async function* asyncGenerator() {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   function* foo(): Generator<number> {
-					//     yield 1;
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function* foo(): Generator<number> {
+          yield 1;
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -711,16 +711,16 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   function foo() {
-					//     doSomething();
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function foo() {
+          doSomething();
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -733,16 +733,16 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   (function () {
-					//     doSomething();
-					//   });
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        (function () {
+          doSomething();
+        });
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -755,16 +755,16 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   () => {
-					//     doSomething();
-					//   };
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        () => {
+          doSomething();
+        };
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -773,12 +773,12 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//   {
-					//     MessageId: "removeAsync",
-					//     Output: "() => doSomething();",
-					//   },
-					// },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output:    "() => doSomething();",
+						},
+					},
 				},
 			},
 		},
@@ -793,18 +793,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   ({
-					//     foo() {
-					//       doSomething();
-					//     },
-					//   });
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        ({
+          foo() {
+            doSomething();
+          },
+        });
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -819,18 +819,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   class A {
-					//     foo() {
-					//       doSomething();
-					//     }
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        class A {
+          foo() {
+            doSomething();
+          }
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -845,18 +845,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   class A {
-					//     public foo() {
-					//       doSomething();
-					//     }
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        class A {
+          public foo() {
+            doSomething();
+          }
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -871,18 +871,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   (class {
-					//     foo() {
-					//       doSomething();
-					//     }
-					//   });
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        (class {
+          foo() {
+            doSomething();
+          }
+        });
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -897,18 +897,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   (class {
-					//     ''() {
-					//       doSomething();
-					//     }
-					//   });
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        (class {
+          ''() {
+            doSomething();
+          }
+        });
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -923,18 +923,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   function foo() {
-					//     async () => {
-					//       await doSomething();
-					//     };
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function foo() {
+          async () => {
+            await doSomething();
+          };
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -949,18 +949,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   async function foo() {
-					//     await (() => {
-					//       doSomething();
-					//     });
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        async function foo() {
+          await (() => {
+            doSomething();
+          });
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -975,18 +975,18 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   const obj = {
-					//     async: function foo() {
-					//       bar();
-					//     },
-					//   };
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        const obj = {
+          async: function foo() {
+            bar();
+          },
+        };
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -999,16 +999,16 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   /* test */ function foo() {
-					//     doSomething();
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        /* test */ function foo() {
+          doSomething();
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -1024,19 +1024,19 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   class A {
-					//     a = 0
-					//     ;[b]() {
-					//       return 0;
-					//     }
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        class A {
+          a = 0
+          ;[b]() {
+            return 0;
+          }
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -1050,17 +1050,17 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   foo
-					//   ;() => {
-					//     return 0;
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        foo
+        ;() => {
+          return 0;
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -1076,19 +1076,19 @@ for await (let num of asyncIterable) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "missingAwait",
-					//       Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-					//         {
-					//           MessageId: "removeAsync",
-					//           Output: `
-					//   class A {
-					//     foo() {}
-					//     [bar]() {
-					//       baz;
-					//     }
-					//   }
-					// `,
-					//         },
-					//       },
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        class A {
+          foo() {}
+          [bar]() {
+            baz;
+          }
+        }
+      `,
+						},
+					},
 				},
 			},
 		},
