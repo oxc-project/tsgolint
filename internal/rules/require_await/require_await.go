@@ -3,6 +3,8 @@ package require_await
 import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -14,18 +16,183 @@ func buildMissingAwaitMessage() rule.RuleMessage {
 	}
 }
 
-// func buildRemoveAsyncMessage() rule.RuleMessage {
-// return rule.RuleMessage{
-// Id:          "removeAsync",
-// Description: "Remove 'async'.",
-// }
-// }
+func buildRemoveAsyncMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "removeAsync",
+		Description: "Remove 'async'.",
+	}
+}
 
 type scopeInfo struct {
 	hasAwait      bool
 	isAsyncYield  bool
 	functionFlags ast.FunctionFlags
 	upper         *scopeInfo
+}
+
+func isMethodLike(node *ast.Node) bool {
+	return ast.IsMethodOrAccessor(node) || ast.IsConstructorDeclaration(node)
+}
+
+// previousSiblingIsMethodLike reports whether the node immediately preceding `node`
+// in `list` is a method, constructor, or accessor. Returns false if `node` is the
+// first element or not present.
+func previousSiblingIsMethodLike(list *ast.NodeList, node *ast.Node) bool {
+	if list == nil {
+		return false
+	}
+	for i, m := range list.Nodes {
+		if m == node {
+			return i > 0 && isMethodLike(list.Nodes[i-1])
+		}
+	}
+	return false
+}
+
+// needsPrecedingSemicolon reports whether inserting a `[` or `(` at `node`'s head
+// would require a preceding semicolon to avoid being parsed as part of the previous
+// expression or statement (the ASI hazard).
+//
+// This is a pragmatic port of eslint's `needsPrecedingSemicolon` that inspects the
+// last non-whitespace character before `node`. If a comment precedes `node` the
+// scan stops at whatever character happens to be the comment's trailing content,
+// which over-conservatively emits a `;` in a few edge cases — always safe.
+func needsPrecedingSemicolon(sourceFile *ast.SourceFile, node *ast.Node) bool {
+	pos := scanner.GetTokenPosOfNode(node, sourceFile, false)
+	text := sourceFile.Text()
+
+	lastPos := -1
+	for i := pos - 1; i >= 0; i-- {
+		c := text[i]
+		if c == ' ' || c == '\t' || c == '\n' || c == '\r' {
+			continue
+		}
+		lastPos = i
+		break
+	}
+	if lastPos < 0 {
+		return false
+	}
+	ch := text[lastPos]
+	switch ch {
+	case ';', ':', '{', ',', '(', '[':
+		return false
+	}
+	if lastPos >= 1 {
+		two := text[lastPos-1 : lastPos+1]
+		if two == "=>" || two == "++" || two == "--" {
+			return false
+		}
+	}
+	// A closing `}` that ends a class/object-literal member is self-delimiting, so
+	// no semicolon is required between it and the next member.
+	if ch == '}' {
+		if parent := node.Parent; parent != nil {
+			switch parent.Kind {
+			case ast.KindClassDeclaration, ast.KindClassExpression, ast.KindInterfaceDeclaration:
+				if previousSiblingIsMethodLike(parent.MemberList(), node) {
+					return false
+				}
+			case ast.KindObjectLiteralExpression:
+				if previousSiblingIsMethodLike(parent.AsObjectLiteralExpression().Properties, node) {
+					return false
+				}
+			}
+		}
+	}
+	return true
+}
+
+// isTypeReferenceNamed reports whether `typeRef` names `name`, either as a plain
+// identifier (`Promise`) or as the right-hand side of a qualified name
+// (`globalThis.Promise`). Callers must pass a non-nil `KindTypeReference` node.
+func isTypeReferenceNamed(typeRef *ast.TypeReferenceNode, name string) bool {
+	tn := typeRef.TypeName
+	if tn == nil {
+		return false
+	}
+	if tn.Kind == ast.KindIdentifier {
+		return tn.Text() == name
+	}
+	return ast.IsQualifiedName(tn) && tn.AsQualifiedName().Right.Text() == name
+}
+
+// buildRemoveAsyncFixes computes the list of edits that remove the `async` keyword
+// from a function-like declaration. It also adjusts the return type annotation (if
+// present) to drop the `Promise<...>` wrapper or rename `AsyncGenerator` to
+// `Generator` when the function is a generator.
+func buildRemoveAsyncFixes(sourceFile *ast.SourceFile, node *ast.Node, asyncToken *ast.Node, isGenerator bool) []rule.RuleFix {
+	fixes := make([]rule.RuleFix, 0, 3)
+
+	text := sourceFile.Text()
+	asyncStart := scanner.GetTokenPosOfNode(asyncToken, sourceFile, false)
+	// Remove the `async` keyword plus trailing whitespace, but preserve trailing
+	// comments (mirrors `sourceCode.getTokenAfter(asyncToken, {includeComments: true})`).
+	removeEnd := scanner.SkipTriviaEx(text, asyncToken.Loc.End(), &scanner.SkipTriviaOptions{StopAtComments: true})
+
+	// ASI: when the next real token starts with `(`, `[`, or a template literal, and
+	// the node begins an expression statement or class/object member, we may need to
+	// insert a `;` to prevent the replacement from being absorbed into the previous
+	// expression.
+	addSemicolon := false
+	nextToken := scanner.ScanTokenAtPosition(sourceFile, asyncToken.Loc.End())
+	if nextToken == ast.KindOpenParenToken ||
+		nextToken == ast.KindOpenBracketToken ||
+		nextToken == ast.KindNoSubstitutionTemplateLiteral ||
+		nextToken == ast.KindTemplateHead {
+		if (isAtStartOfExpressionStatement(node) || isMethodLike(node)) && needsPrecedingSemicolon(sourceFile, node) {
+			addSemicolon = true
+		}
+	}
+
+	removeRange := core.NewTextRange(asyncStart, removeEnd)
+	if addSemicolon {
+		fixes = append(fixes, rule.RuleFixReplaceRange(removeRange, ";"))
+	} else {
+		fixes = append(fixes, rule.RuleFixRemoveRange(removeRange))
+	}
+
+	returnType := node.Type()
+	if returnType == nil || returnType.Kind != ast.KindTypeReference {
+		return fixes
+	}
+	typeRef := returnType.AsTypeReferenceNode()
+	typeName := typeRef.TypeName
+	typeNameStart := scanner.GetTokenPosOfNode(typeName, sourceFile, false)
+
+	switch {
+	case isGenerator && isTypeReferenceNamed(typeRef, "AsyncGenerator"):
+		fixes = append(fixes, rule.RuleFixReplaceRange(
+			core.NewTextRange(typeNameStart, typeName.Loc.End()),
+			"Generator",
+		))
+	case !isGenerator && isTypeReferenceNamed(typeRef, "Promise") && typeRef.TypeArguments != nil && len(typeRef.TypeArguments.Nodes) > 0:
+		// Unwrap `Promise<T>` to `T` by deleting `Promise<` and the trailing `>`.
+		// `TypeArguments.Loc` spans the content between the angle brackets, so
+		// `Pos()-1` is the `<` and `End()` is the `>` (same invariant as parameter
+		// lists; `parseBracketedList` sets these bounds).
+		openAnglePos := typeRef.TypeArguments.Loc.Pos() - 1
+		closeAnglePos := typeRef.TypeArguments.Loc.End()
+		fixes = append(fixes,
+			rule.RuleFixRemoveRange(core.NewTextRange(closeAnglePos, closeAnglePos+1)),
+			rule.RuleFixRemoveRange(core.NewTextRange(typeNameStart, openAnglePos+1)),
+		)
+	}
+
+	return fixes
+}
+
+// isAtStartOfExpressionStatement reports whether `node` is at the same source
+// position as an ancestor `ExpressionStatement` — i.e. the node begins an
+// expression statement. Mirrors eslint's helper of the same name.
+func isAtStartOfExpressionStatement(node *ast.Node) bool {
+	start := node.Loc.Pos()
+	for a := node.Parent; a != nil && a.Loc.Pos() == start; a = a.Parent {
+		if a.Kind == ast.KindExpressionStatement {
+			return true
+		}
+	}
+	return false
 }
 
 var RequireAwaitRule = rule.Rule{
@@ -48,133 +215,21 @@ var RequireAwaitRule = rule.Rule{
 		}
 
 		exitFunction := func(node *ast.Node) {
-			if currentScope.functionFlags&ast.FunctionFlagsAsync != 0 && !currentScope.hasAwait && !(currentScope.functionFlags&ast.FunctionFlagsGenerator != 0 && currentScope.isAsyncYield) {
-				// TODO(port): implement suggestions
-				// // If the function belongs to a method definition or
-				// // property, then the function's range may not include the
-				// // `async` keyword and we should look at the parent instead.
-				// const nodeWithAsyncKeyword =
-				//   (node.parent.type === AST_NODE_TYPES.MethodDefinition &&
-				//     node.parent.value === node) ||
-				//   (node.parent.type === AST_NODE_TYPES.Property &&
-				//     node.parent.method &&
-				//     node.parent.value === node)
-				//     ? node.parent
-				//     : node;
-				//
-				// const asyncToken = nullThrows(
-				//   context.sourceCode.getFirstToken(
-				//     nodeWithAsyncKeyword,
-				//     token => token.value === 'async',
-				//   ),
-				//   'The node is an async function, so it must have an "async" token.',
-				// );
-				//
-				// const asyncRange: Readonly<AST.Range> = [
-				//   asyncToken.range[0],
-				//   nullThrows(
-				//     context.sourceCode.getTokenAfter(asyncToken, {
-				//       includeComments: true,
-				//     }),
-				//     'There will always be a token after the "async" keyword.',
-				//   ).range[0],
-				// ] as const;
-				//
-				// // Removing the `async` keyword can cause parsing errors if the
-				// // current statement is relying on automatic semicolon insertion.
-				// // If ASI is currently being used, then we should replace the
-				// // `async` keyword with a semicolon.
-				// const nextToken = nullThrows(
-				//   context.sourceCode.getTokenAfter(asyncToken),
-				//   'There will always be a token after the "async" keyword.',
-				// );
-				// const addSemiColon =
-				//   nextToken.type === AST_TOKEN_TYPES.Punctuator &&
-				//   (nextToken.value === '[' || nextToken.value === '(') &&
-				//   (nodeWithAsyncKeyword.type === AST_NODE_TYPES.MethodDefinition ||
-				//     isStartOfExpressionStatement(nodeWithAsyncKeyword)) &&
-				//   needsPrecedingSemicolon(context.sourceCode, nodeWithAsyncKeyword);
-				//
-				// const changes = [
-				//   { range: asyncRange, replacement: addSemiColon ? ';' : undefined },
-				// ];
-				//
-				// // If there's a return type annotation and it's a
-				// // `Promise<T>`, we can also change the return type
-				// // annotation to just `T` as part of the suggestion.
-				// // Alternatively, if the function is a generator and
-				// // the return type annotation is `AsyncGenerator<T>`,
-				// // then we can change it to `Generator<T>`.
-				// if (
-				//   node.returnType?.typeAnnotation.type ===
-				//   AST_NODE_TYPES.TSTypeReference
-				// ) {
-				//   if (scopeInfo.isGen) {
-				//     if (hasTypeName(node.returnType.typeAnnotation, 'AsyncGenerator')) {
-				//       changes.push({
-				//         range: node.returnType.typeAnnotation.typeName.range,
-				//         replacement: 'Generator',
-				//       });
-				//     }
-				//   } else if (
-				//     hasTypeName(node.returnType.typeAnnotation, 'Promise') &&
-				//     node.returnType.typeAnnotation.typeArguments != null
-				//   ) {
-				//     const openAngle = nullThrows(
-				//       context.sourceCode.getFirstToken(
-				//         node.returnType.typeAnnotation,
-				//         token =>
-				//           token.type === AST_TOKEN_TYPES.Punctuator &&
-				//           token.value === '<',
-				//       ),
-				//       'There are type arguments, so the angle bracket will exist.',
-				//     );
-				//     const closeAngle = nullThrows(
-				//       context.sourceCode.getLastToken(
-				//         node.returnType.typeAnnotation,
-				//         token =>
-				//           token.type === AST_TOKEN_TYPES.Punctuator &&
-				//           token.value === '>',
-				//       ),
-				//       'There are type arguments, so the angle bracket will exist.',
-				//     );
-				//     changes.push(
-				//       // Remove the closing angled bracket.
-				//       { range: closeAngle.range, replacement: undefined },
-				//       // Remove the "Promise" identifier
-				//       // and the opening angled bracket.
-				//       {
-				//         range: [
-				//           node.returnType.typeAnnotation.typeName.range[0],
-				//           openAngle.range[1],
-				//         ],
-				//         replacement: undefined,
-				//       },
-				//     );
-				//   }
-				// }
-				//
-				// context.report({
-				//   loc: getFunctionHeadLoc(node, context.sourceCode),
-				//   node,
-				//   messageId: 'missingAwait',
-				//   data: {
-				//     name: upperCaseFirst(getFunctionNameWithKind(node)),
-				//   },
-				//   suggest: [
-				//     {
-				//       messageId: 'removeAsync',
-				//       fix: (fixer): RuleFix[] =>
-				//         changes.map(change =>
-				//           change.replacement != null
-				//             ? fixer.replaceTextRange(change.range, change.replacement)
-				//             : fixer.removeRange(change.range),
-				//         ),
-				//     },
-				//   ],
-				// });
-				// TODO(port): getFunctionHeadLoc
-				ctx.ReportNode(node, buildMissingAwaitMessage())
+			isAsync := currentScope.functionFlags&ast.FunctionFlagsAsync != 0
+			isGen := currentScope.functionFlags&ast.FunctionFlagsGenerator != 0
+			if isAsync && !currentScope.hasAwait && !(isGen && currentScope.isAsyncYield) {
+				// `isAsync` guarantees the node has an `async` modifier.
+				asyncToken := utils.FindModifier(node, ast.KindAsyncKeyword)
+				ctx.ReportRangeWithSuggestions(
+					utils.GetFunctionHeadLoc(ctx.SourceFile, node),
+					buildMissingAwaitMessage(),
+					func() []rule.RuleSuggestion {
+						return []rule.RuleSuggestion{{
+							Message:  buildRemoveAsyncMessage(),
+							FixesArr: buildRemoveAsyncFixes(ctx.SourceFile, node, asyncToken, isGen),
+						}}
+					},
+				)
 			}
 
 			currentScope = currentScope.upper

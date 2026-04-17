@@ -146,13 +146,22 @@ func Flatten[T any](array [][]T) []T {
 }
 
 func IncludesModifier(node interface{ Modifiers() *ast.ModifierList }, modifier ast.Kind) bool {
+	return FindModifier(node, modifier) != nil
+}
+
+// FindModifier returns the modifier node of the given kind from `node`'s modifier
+// list, or nil if the node has no such modifier.
+func FindModifier(node interface{ Modifiers() *ast.ModifierList }, modifier ast.Kind) *ast.Node {
 	modifiers := node.Modifiers()
 	if modifiers == nil {
-		return false
+		return nil
 	}
-	return Some(modifiers.NodeList.Nodes, func(m *ast.Node) bool {
-		return m.Kind == modifier
-	})
+	for _, m := range modifiers.NodeList.Nodes {
+		if m.Kind == modifier {
+			return m
+		}
+	}
+	return nil
 }
 
 // Source: https://github.com/microsoft/typescript-go/blob/5652e65d5ae944375676d3955f9755e554576d41/internal/jsnum/string.go#L99
