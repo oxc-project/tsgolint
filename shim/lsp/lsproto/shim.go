@@ -756,8 +756,6 @@ type RequestFailureTelemetryEventOrPerformanceStatsTelemetryEventOrProjectInfoTe
 type RequestFailureTelemetryProperties = lsproto.RequestFailureTelemetryProperties
 type RequestInfo[Params, Resp any] = lsproto.RequestInfo[Params,Resp]
 type RequestMessage = lsproto.RequestMessage
-//go:linkname ResolveClientCapabilities github.com/microsoft/typescript-go/internal/lsp/lsproto.ResolveClientCapabilities
-func ResolveClientCapabilities(v *lsproto.ClientCapabilities) lsproto.ResolvedClientCapabilities
 type ResolvedCallHierarchyClientCapabilities = lsproto.ResolvedCallHierarchyClientCapabilities
 type ResolvedChangeAnnotationsSupportOptions = lsproto.ResolvedChangeAnnotationsSupportOptions
 type ResolvedClientCapabilities = lsproto.ResolvedClientCapabilities

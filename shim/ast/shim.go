@@ -149,8 +149,6 @@ const CommentDirectiveKindExpectError = ast.CommentDirectiveKindExpectError
 const CommentDirectiveKindIgnore = ast.CommentDirectiveKindIgnore
 const CommentDirectiveKindUnknown = ast.CommentDirectiveKindUnknown
 type CommentRange = ast.CommentRange
-type CommonJSExport = ast.CommonJSExport
-type CommonJSExportNode = ast.CommonJSExportNode
 //go:linkname CompareDiagnostics github.com/microsoft/typescript-go/internal/ast.CompareDiagnostics
 func CompareDiagnostics(d1 *ast.Diagnostic, d2 *ast.Diagnostic) int
 //go:linkname CompareNodePositions github.com/microsoft/typescript-go/internal/ast.CompareNodePositions
@@ -236,8 +234,6 @@ type EqualsToken = ast.EqualsToken
 type ExclamationToken = ast.ExclamationToken
 type ExponentiationOperator = ast.ExponentiationOperator
 type ExportAssignment = ast.ExportAssignment
-//go:linkname ExportAssignmentIsAlias github.com/microsoft/typescript-go/internal/ast.ExportAssignmentIsAlias
-func ExportAssignmentIsAlias(node *ast.Node) bool
 type ExportAssignmentNode = ast.ExportAssignmentNode
 type ExportDeclaration = ast.ExportDeclaration
 type ExportDeclarationNode = ast.ExportDeclarationNode
@@ -248,6 +244,8 @@ type ExportSpecifierNode = ast.ExportSpecifierNode
 type ExportableBase = ast.ExportableBase
 type Expression = ast.Expression
 type ExpressionBase = ast.ExpressionBase
+//go:linkname ExpressionIsAlias github.com/microsoft/typescript-go/internal/ast.ExpressionIsAlias
+func ExpressionIsAlias(node *ast.Node) bool
 type ExpressionStatement = ast.ExpressionStatement
 type ExpressionStatementNode = ast.ExpressionStatementNode
 type ExpressionWithTypeArguments = ast.ExpressionWithTypeArguments
@@ -388,6 +386,8 @@ func GetFunctionFlags(node *ast.Node) ast.FunctionFlags
 func GetHeritageClause(node *ast.Node, kind ast.Kind) *ast.Node
 //go:linkname GetHeritageElements github.com/microsoft/typescript-go/internal/ast.GetHeritageElements
 func GetHeritageElements(node *ast.Node, kind ast.Kind) []*ast.Node
+//go:linkname GetHostSignatureFromJSDoc github.com/microsoft/typescript-go/internal/ast.GetHostSignatureFromJSDoc
+func GetHostSignatureFromJSDoc(node *ast.Node) *ast.Node
 //go:linkname GetImmediatelyInvokedFunctionExpression github.com/microsoft/typescript-go/internal/ast.GetImmediatelyInvokedFunctionExpression
 func GetImmediatelyInvokedFunctionExpression(fn *ast.Node) *ast.Node
 //go:linkname GetImplementsHeritageClauseElements github.com/microsoft/typescript-go/internal/ast.GetImplementsHeritageClauseElements
@@ -406,6 +406,10 @@ func GetInitializerOfBinaryExpression(expr *ast.BinaryExpression) *ast.Expressio
 func GetInvokedExpression(node *ast.Node) *ast.Node
 //go:linkname GetJSDocDeprecatedTag github.com/microsoft/typescript-go/internal/ast.GetJSDocDeprecatedTag
 func GetJSDocDeprecatedTag(node *ast.Node) *ast.Node
+//go:linkname GetJSDocHost github.com/microsoft/typescript-go/internal/ast.GetJSDocHost
+func GetJSDocHost(node *ast.Node) *ast.Node
+//go:linkname GetJSDocRoot github.com/microsoft/typescript-go/internal/ast.GetJSDocRoot
+func GetJSDocRoot(node *ast.Node) *ast.Node
 //go:linkname GetJSXImplicitImportBase github.com/microsoft/typescript-go/internal/ast.GetJSXImplicitImportBase
 func GetJSXImplicitImportBase(compilerOptions *core.CompilerOptions, file *ast.SourceFile) string
 //go:linkname GetJSXRuntimeImport github.com/microsoft/typescript-go/internal/ast.GetJSXRuntimeImport
@@ -705,8 +709,6 @@ func IsClassStaticBlockDeclaration(node *ast.Node) bool
 func IsCommaExpression(node *ast.Node) bool
 //go:linkname IsCommaSequence github.com/microsoft/typescript-go/internal/ast.IsCommaSequence
 func IsCommaSequence(node *ast.Node) bool
-//go:linkname IsCommonJSExport github.com/microsoft/typescript-go/internal/ast.IsCommonJSExport
-func IsCommonJSExport(node *ast.Node) bool
 //go:linkname IsCompoundAssignment github.com/microsoft/typescript-go/internal/ast.IsCompoundAssignment
 func IsCompoundAssignment(token ast.Kind) bool
 //go:linkname IsCompoundAssignmentOperator github.com/microsoft/typescript-go/internal/ast.IsCompoundAssignmentOperator
@@ -1035,8 +1037,6 @@ func IsJSDocTypedefTag(node *ast.Node) bool
 func IsJSDocUnknownTag(node *ast.Node) bool
 //go:linkname IsJSDocVariadicType github.com/microsoft/typescript-go/internal/ast.IsJSDocVariadicType
 func IsJSDocVariadicType(node *ast.Node) bool
-//go:linkname IsJSExportAssignment github.com/microsoft/typescript-go/internal/ast.IsJSExportAssignment
-func IsJSExportAssignment(node *ast.Node) bool
 //go:linkname IsJSImportDeclaration github.com/microsoft/typescript-go/internal/ast.IsJSImportDeclaration
 func IsJSImportDeclaration(node *ast.Node) bool
 //go:linkname IsJSTypeAliasDeclaration github.com/microsoft/typescript-go/internal/ast.IsJSTypeAliasDeclaration
@@ -1699,7 +1699,6 @@ const KindCloseBracketToken = ast.KindCloseBracketToken
 const KindCloseParenToken = ast.KindCloseParenToken
 const KindColonToken = ast.KindColonToken
 const KindCommaToken = ast.KindCommaToken
-const KindCommonJSExport = ast.KindCommonJSExport
 const KindComputedPropertyName = ast.KindComputedPropertyName
 const KindConditionalExpression = ast.KindConditionalExpression
 const KindConditionalType = ast.KindConditionalType
@@ -1847,7 +1846,6 @@ const KindJSDocTypeTag = ast.KindJSDocTypeTag
 const KindJSDocTypedefTag = ast.KindJSDocTypedefTag
 const KindJSDocUnknownTag = ast.KindJSDocUnknownTag
 const KindJSDocVariadicType = ast.KindJSDocVariadicType
-const KindJSExportAssignment = ast.KindJSExportAssignment
 const KindJSImportDeclaration = ast.KindJSImportDeclaration
 const KindJSTypeAliasDeclaration = ast.KindJSTypeAliasDeclaration
 const KindJsxAttribute = ast.KindJsxAttribute
@@ -2192,6 +2190,7 @@ const NodeFlagsDecoratorContext = ast.NodeFlagsDecoratorContext
 const NodeFlagsDisallowConditionalTypesContext = ast.NodeFlagsDisallowConditionalTypesContext
 const NodeFlagsDisallowInContext = ast.NodeFlagsDisallowInContext
 const NodeFlagsExportContext = ast.NodeFlagsExportContext
+const NodeFlagsHasAsyncFunctions = ast.NodeFlagsHasAsyncFunctions
 const NodeFlagsHasExplicitReturn = ast.NodeFlagsHasExplicitReturn
 const NodeFlagsHasImplicitReturn = ast.NodeFlagsHasImplicitReturn
 const NodeFlagsHasJSDoc = ast.NodeFlagsHasJSDoc
@@ -2207,6 +2206,7 @@ const NodeFlagsPermanentlySetIncrementalFlags = ast.NodeFlagsPermanentlySetIncre
 const NodeFlagsPossiblyContainsDeprecatedTag = ast.NodeFlagsPossiblyContainsDeprecatedTag
 const NodeFlagsPossiblyContainsDynamicImport = ast.NodeFlagsPossiblyContainsDynamicImport
 const NodeFlagsPossiblyContainsImportMeta = ast.NodeFlagsPossiblyContainsImportMeta
+const NodeFlagsReachabilityAndEmitFlags = ast.NodeFlagsReachabilityAndEmitFlags
 const NodeFlagsReachabilityCheckFlags = ast.NodeFlagsReachabilityCheckFlags
 const NodeFlagsReparsed = ast.NodeFlagsReparsed
 const NodeFlagsSynthesized = ast.NodeFlagsSynthesized

@@ -10,6 +10,7 @@ import _ "unsafe"
 
 //go:linkname ApplyBulkEdits github.com/microsoft/typescript-go/internal/core.ApplyBulkEdits
 func ApplyBulkEdits(text string, edits []core.TextChange) string
+type Arena[T any] = core.Arena[T]
 //go:linkname BoolToTristate github.com/microsoft/typescript-go/internal/core.BoolToTristate
 func BoolToTristate(b bool) core.Tristate
 type BreadthFirstSearchLevel[K comparable, N any] = core.BreadthFirstSearchLevel[K,N]
@@ -48,6 +49,7 @@ const JsxEmitReactNative = core.JsxEmitReactNative
 type LanguageVariant = core.LanguageVariant
 const LanguageVariantJSX = core.LanguageVariantJSX
 const LanguageVariantStandard = core.LanguageVariantStandard
+type LimitedSemaphore = core.LimitedSemaphore
 type LinkStore[K comparable, V any] = core.LinkStore[K,V]
 type ModuleDetectionKind = core.ModuleDetectionKind
 const ModuleDetectionKindAuto = core.ModuleDetectionKindAuto
@@ -77,6 +79,8 @@ const ModuleResolutionKindNode10 = core.ModuleResolutionKindNode10
 const ModuleResolutionKindNode16 = core.ModuleResolutionKindNode16
 const ModuleResolutionKindNodeNext = core.ModuleResolutionKindNodeNext
 const ModuleResolutionKindUnknown = core.ModuleResolutionKindUnknown
+//go:linkname NewLimitedSemaphore github.com/microsoft/typescript-go/internal/core.NewLimitedSemaphore
+func NewLimitedSemaphore(maxConcurrency int) *core.LimitedSemaphore
 type NewLineKind = core.NewLineKind
 const NewLineKindCRLF = core.NewLineKindCRLF
 const NewLineKindLF = core.NewLineKindLF
@@ -98,7 +102,6 @@ const PollingKindFixedChunkSize = core.PollingKindFixedChunkSize
 const PollingKindFixedInterval = core.PollingKindFixedInterval
 const PollingKindNone = core.PollingKindNone
 const PollingKindPriorityInterval = core.PollingKindPriorityInterval
-type Pool[T any] = core.Pool[T]
 //go:linkname PositionToLineAndByteOffset github.com/microsoft/typescript-go/internal/core.PositionToLineAndByteOffset
 func PositionToLineAndByteOffset(position int, lineStarts []core.TextPos) (line int, byteOffset int)
 type ProjectReference = core.ProjectReference
@@ -137,6 +140,7 @@ const ScriptTargetJSON = core.ScriptTargetJSON
 const ScriptTargetLatest = core.ScriptTargetLatest
 const ScriptTargetLatestStandard = core.ScriptTargetLatestStandard
 const ScriptTargetNone = core.ScriptTargetNone
+type Semaphore = core.Semaphore
 //go:linkname ShouldRewriteModuleSpecifier github.com/microsoft/typescript-go/internal/core.ShouldRewriteModuleSpecifier
 func ShouldRewriteModuleSpecifier(specifier string, compilerOptions *core.CompilerOptions) bool
 type Stack[T any] = core.Stack[T]
@@ -158,6 +162,7 @@ func UTF16Len(s string) core.UTF16Offset
 type UTF16Offset = core.UTF16Offset
 //go:linkname UndefinedTextRange github.com/microsoft/typescript-go/internal/core.UndefinedTextRange
 func UndefinedTextRange() core.TextRange
+type UnlimitedSemaphore = core.UnlimitedSemaphore
 var UnprefixedNodeCoreModules = core.UnprefixedNodeCoreModules
 //go:linkname Version github.com/microsoft/typescript-go/internal/core.Version
 func Version() string
