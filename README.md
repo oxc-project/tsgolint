@@ -222,6 +222,13 @@ Implemented 59/61.
 - [x] [unbound-method](https://typescript-eslint.io/rules/unbound-method)
 - [x] [use-unknown-in-catch-callback-variable](https://typescript-eslint.io/rules/use-unknown-in-catch-callback-variable)
 
+## Custom Rules
+
+- [x] `no-object-comparison`
+      Prevents direct comparisons on configured object types. By default it forbids
+      relational operators (`<`, `<=`, `>`, `>=`), and
+      `forbidEqualityOperators: true` also forbids `==`, `===`, `!=`, and `!==`.
+
 ## Links
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
