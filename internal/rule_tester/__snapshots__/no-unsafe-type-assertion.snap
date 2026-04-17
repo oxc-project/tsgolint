@@ -2,6 +2,7 @@
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:15)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `any`. Asserted type: `string`.
    2 | declare const _any_: any;
    3 | _any_ as string;
      | ~~~~~~~~~~~~~~~
@@ -11,6 +12,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:16)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `unknown`. Asserted type: `any`.
    2 | declare const _unknown_: unknown;
    3 | _unknown_ as any;
      | ~~~~~~~~~~~~~~~~
@@ -20,6 +22,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:17)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `any`. Asserted type: `Function`.
    2 | declare const _any_: any;
    3 | _any_ as Function;
      | ~~~~~~~~~~~~~~~~~
@@ -29,6 +32,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-3 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:14)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `any`. Asserted type: `never`.
    2 | declare const _any_: any;
    3 | _any_ as never;
      | ~~~~~~~~~~~~~~
@@ -38,6 +42,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-4 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (2:1 - 2:12)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `"foo"`. Asserted type: `any`.
    1 | 
    2 | 'foo' as any;
      | ~~~~~~~~~~~~
@@ -47,6 +52,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-5 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (2:13 - 2:25)
 Message: Unsafe assertion from error typed detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `any`. Asserted type: `number`.
    1 | 
    2 | const bar = foo as number;
      |             ~~~~~~~~~~~~~
@@ -56,6 +62,7 @@ Message: Unsafe assertion from error typed detected: consider using type guards 
 [TestNoUnsafeTypeAssertionRule_AnyAssertions/invalid-6 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (2:13 - 2:30)
 Message: Unsafe assertion to error typed detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `"foo"`. Asserted type: `errorType`.
    1 | 
    2 | const bar = 'foo' as errorType;
      |             ~~~~~~~~~~~~~~~~~~
@@ -65,6 +72,7 @@ Message: Unsafe assertion to error typed detected: consider using a more specifi
 [TestNoUnsafeTypeAssertionRule_ArrayAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:13)
 Message: Unsafe type assertion: type 'string[]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `(string | number)[]`. Asserted type: `string[]`.
    2 | declare const a: (string | number)[];
    3 | a as string[];
      | ~~~~~~~~~~~~~
@@ -74,6 +82,7 @@ Message: Unsafe type assertion: type 'string[]' is more narrow than the original
 [TestNoUnsafeTypeAssertionRule_ArrayAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:13)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `any[]`. Asserted type: `number[]`.
    2 | declare const a: any[];
    3 | a as number[];
      | ~~~~~~~~~~~~~
@@ -83,6 +92,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_ArrayAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:10)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `number[]`. Asserted type: `any[]`.
    2 | declare const a: number[];
    3 | a as any[];
      | ~~~~~~~~~~
@@ -92,6 +102,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_ArrayAssertions/invalid-3 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:13)
 Message: Unsafe type assertion: type 'number[]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `unknown[]`. Asserted type: `number[]`.
    2 | declare const a: unknown[];
    3 | a as number[];
      | ~~~~~~~~~~~~~
@@ -101,6 +112,7 @@ Message: Unsafe type assertion: type 'number[]' is more narrow than the original
 [TestNoUnsafeTypeAssertionRule_ArrayAssertions/invalid-4 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:12)
 Message: Unsafe type assertion: type 'never[]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `number[]`. Asserted type: `never[]`.
    2 | declare const a: number[];
    3 | a as never[];
      | ~~~~~~~~~~~~
@@ -110,6 +122,7 @@ Message: Unsafe type assertion: type 'never[]' is more narrow than the original 
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:11)
 Message: Unsafe type assertion: type 'string' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string | number`. Asserted type: `string`.
    2 | declare const a: string | number;
    3 | a as string;
      | ~~~~~~~~~~~
@@ -119,6 +132,7 @@ Message: Unsafe type assertion: type 'string' is more narrow than the original t
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:28)
 Message: Unsafe type assertion: type 'string' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string | number`. Asserted type: `string`.
    2 | declare const a: string | number;
    3 | a satisfies string as string;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,6 +142,7 @@ Message: Unsafe type assertion: type 'string' is more narrow than the original t
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:9)
 Message: Unsafe type assertion: type 'string' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string | number`. Asserted type: `string`.
    2 | declare const a: string | number;
    3 | <string>a;
      | ~~~~~~~~~
@@ -137,6 +152,7 @@ Message: Unsafe type assertion: type 'string' is more narrow than the original t
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-3 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:21)
 Message: Unsafe type assertion: type 'string | boolean' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string | undefined`. Asserted type: `string | boolean`.
    2 | declare const a: string | undefined;
    3 | a as string | boolean;
      | ~~~~~~~~~~~~~~~~~~~~~
@@ -146,6 +162,7 @@ Message: Unsafe type assertion: type 'string | boolean' is more narrow than the 
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-4 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:19)
 Message: Unsafe type assertion: type '"bar"' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `"foo"`. Asserted type: `"bar"`.
    2 | declare const a: string;
    3 | a as 'foo' as 'bar';
      | ~~~~~~~~~~~~~~~~~~~
@@ -153,6 +170,7 @@ Message: Unsafe type assertion: type '"bar"' is more narrow than the original ty
 
 Diagnostic 2: unsafeTypeAssertion (3:1 - 3:10)
 Message: Unsafe type assertion: type '"foo"' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string`. Asserted type: `"foo"`.
    2 | declare const a: string;
    3 | a as 'foo' as 'bar';
      | ~~~~~~~~~~
@@ -162,6 +180,7 @@ Message: Unsafe type assertion: type '"foo"' is more narrow than the original ty
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-5 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:10 - 3:18)
 Message: Unsafe type assertion: type 'true' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `boolean`. Asserted type: `true`.
    2 | function foo<T extends boolean>(a: T) {
    3 |   return a as true;
      |          ~~~~~~~~~
@@ -171,6 +190,7 @@ Message: Unsafe type assertion: type 'true' is more narrow than the original typ
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-6 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:68)
 Message: Unsafe type assertion: type 'Omit<Required<Readonly<{ hello: "world"; foo: "bar"; }>>, "foo">' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string`. Asserted type: `Omit<Required<Readonly<{ hello: "world"; foo: "bar"; }>>, "foo">`.
    2 | declare const a: string;
    3 | a as Omit<Required<Readonly<{ hello: 'world'; foo: 'bar' }>>, 'foo'>;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,6 +200,7 @@ Message: Unsafe type assertion: type 'Omit<Required<Readonly<{ hello: "world"; f
 [TestNoUnsafeTypeAssertionRule_BasicAssertions/invalid-7 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:13 - 3:27)
 Message: Unsafe type assertion: type 'number[]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `readonly number[]`. Asserted type: `number[]`.
    2 | declare const foo: readonly number[];
    3 | const bar = foo as number[];
      |             ~~~~~~~~~~~~~~~
@@ -189,6 +210,7 @@ Message: Unsafe type assertion: type 'number[]' is more narrow than the original
 [TestNoUnsafeTypeAssertionRule_ClassAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (9:1 - 9:8)
 Message: Unsafe type assertion: type 'Bar' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `Foo`. Asserted type: `Bar`.
    8 | declare const a: Foo;
    9 | a as Bar;
      | ~~~~~~~~
@@ -198,6 +220,7 @@ Message: Unsafe type assertion: type 'Bar' is more narrow than the original type
 [TestNoUnsafeTypeAssertionRule_FunctionAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:24)
 Message: Unsafe type assertion: type '() => void' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `Function`. Asserted type: `() => void`.
    2 | declare const _function_: Function;
    3 | _function_ as () => void;
      | ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,6 +230,7 @@ Message: Unsafe type assertion: type '() => void' is more narrow than the origin
 [TestNoUnsafeTypeAssertionRule_FunctionAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:17)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `Function`. Asserted type: `any`.
    2 | declare const _function_: Function;
    3 | _function_ as any;
      | ~~~~~~~~~~~~~~~~~
@@ -216,6 +240,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_FunctionAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:19)
 Message: Unsafe type assertion: type 'never' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `Function`. Asserted type: `never`.
    2 | declare const _function_: Function;
    3 | _function_ as never;
      | ~~~~~~~~~~~~~~~~~~~
@@ -225,6 +250,7 @@ Message: Unsafe type assertion: type 'never' is more narrow than the original ty
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (4:17 - 4:34)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `{ foo: string; }`. Asserted type: `T`.
    3 | function func<T extends Obj>() {
    4 |   const myObj = { foo: 'hi' } as T;
      |                 ~~~~~~~~~~~~~~~~~~
@@ -234,6 +260,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (5:17 - 5:22)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `Obj`. Asserted type: `T`.
    4 |   const o: Obj = { foo: 'hi' };
    5 |   const myObj = o as T;
      |                 ~~~~~~
@@ -243,6 +270,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeTypeAssertion (5:27 - 5:48)
 Message: Unsafe type assertion: type 'CustomObjectT' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `number`. Asserted type: `CustomObjectT`.
    4 | ): CustomObjectT {
    5 |   const newCustomObject = input as CustomObjectT;
      |                           ~~~~~~~~~~~~~~~~~~~~~~
@@ -252,6 +280,7 @@ Message: Unsafe type assertion: type 'CustomObjectT' is more narrow than the ori
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-3 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (3:3 - 3:8)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `string`. Asserted type: `T`.
    2 | function unknownConstraint<T extends unknown>(x: T, y: string) {
    3 |   y as T; // banned; generic arbitrary subtype
      |   ~~~~~~
@@ -261,6 +290,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-4 - 1]
 Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
 Message: Unsafe type assertion: 'T' could be instantiated with an arbitrary type which could be unrelated to the original type.
+Help: Add a constraint to the type parameter, or assert to a concrete type that is actually related to the source expression. Original type: `string`. Asserted type: `T`.
    2 | function unconstrained<T>(x: T, y: string) {
    3 |   y as T;
      |   ~~~~~~
@@ -270,6 +300,7 @@ Message: Unsafe type assertion: 'T' could be instantiated with an arbitrary type
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-5 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (5:3 - 5:8)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `string`. Asserted type: `T`.
    4 | function anyConstraint<T extends any>(x: T, y: string) {
    5 |   y as T; // banned; generic arbitrary subtype
      |   ~~~~~~
@@ -279,6 +310,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-6 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (6:3 - 6:8)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `string`. Asserted type: `T`.
    5 | ) {
    6 |   y as T; // banned; assignable to constraint
      |   ~~~~~~
@@ -288,6 +320,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-7 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (3:3 - 3:8)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'T', but 'T' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `string`. Asserted type: `T`.
    2 | function constraintEqualUncastType<T extends string>(x: T, y: string) {
    3 |   y as T; // banned; assignable to constraint
      |   ~~~~~~
@@ -297,6 +330,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-8 - 1]
 Diagnostic 1: unsafeTypeAssertion (6:3 - 6:8)
 Message: Unsafe type assertion: type 'T' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string | number`. Asserted type: `T`.
    5 | ) {
    6 |   y as T; // banned; *not* assignable to constraint
      |   ~~~~~~
@@ -306,6 +340,7 @@ Message: Unsafe type assertion: type 'T' is more narrow than the original type.
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-9 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:3 - 3:8)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `any`. Asserted type: `T`.
    2 | function assertFromAny<T extends string | number>(x: T, y: any) {
    3 |   y as T; // banned; just an `any` complaint. Not a generic subtype.
      |   ~~~~~~
@@ -315,6 +350,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-10 - 1]
 Diagnostic 1: unsafeTypeAssertionAssignableToConstraint (6:3 - 6:8)
 Message: Unsafe type assertion: the original type is assignable to the constraint of type 'V', but 'V' could be instantiated with a different subtype of its constraint.
+Help: Keep the generic constrained, or narrow the value to the exact subtype you need before asserting to that type parameter. Original type: `T`. Asserted type: `V`.
    5 | ) {
    6 |   x as V; // banned; assignable to constraint
      |   ~~~~~~
@@ -324,6 +360,7 @@ Message: Unsafe type assertion: the original type is assignable to the constrain
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-11 - 1]
 Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
 Message: Unsafe type assertion: 'V' could be instantiated with an arbitrary type which could be unrelated to the original type.
+Help: Add a constraint to the type parameter, or assert to a concrete type that is actually related to the source expression. Original type: `T`. Asserted type: `V`.
    2 | function parameterExtendsUnconstrainedParameter<T, V extends T>(x: T, y: V) {
    3 |   x as V; // banned; unconstrained arbitrary type
      |   ~~~~~~
@@ -333,6 +370,7 @@ Message: Unsafe type assertion: 'V' could be instantiated with an arbitrary type
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-12 - 1]
 Diagnostic 1: unsafeToUnconstrainedTypeAssertion (3:3 - 3:8)
 Message: Unsafe type assertion: 'T' could be instantiated with an arbitrary type which could be unrelated to the original type.
+Help: Add a constraint to the type parameter, or assert to a concrete type that is actually related to the source expression. Original type: `V`. Asserted type: `T`.
    2 | function twoUnconstrained<T, V>(x: T, y: V) {
    3 |   y as T;
      |   ~~~~~~
@@ -342,6 +380,7 @@ Message: Unsafe type assertion: 'T' could be instantiated with an arbitrary type
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-13 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:3 - 3:13)
 Message: Unsafe type assertion: type 'string' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `T`. Asserted type: `string`.
    2 | function toNarrower<T>(x: T, y: string) {
    3 |   x as string; // banned; ordinary 'string' narrower than 'T'.
      |   ~~~~~~~~~~~
@@ -351,6 +390,7 @@ Message: Unsafe type assertion: type 'string' is more narrow than the original t
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-14 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:3 - 3:10)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `T`. Asserted type: `any`.
    2 | function unconstrainedToAny<T>(x: T) {
    3 |   x as any;
      |   ~~~~~~~~
@@ -360,6 +400,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-15 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:3 - 3:10)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `T`. Asserted type: `any`.
    2 | function stringToAny<T extends string>(x: T) {
    3 |   x as any;
      |   ~~~~~~~~
@@ -369,6 +410,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_GenericAssertions/invalid-16 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:3 - 3:16)
 Message: Unsafe type assertion: type '"a" | "b"' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `T`. Asserted type: `"a" | "b"`.
    2 | function stringToNarrower<T extends string>(x: T) {
    3 |   x as 'a' | 'b';
      |   ~~~~~~~~~~~~~~
@@ -378,6 +420,7 @@ Message: Unsafe type assertion: type '"a" | "b"' is more narrow than the origina
 [TestNoUnsafeTypeAssertionRule_NeverAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:14)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `never`. Asserted type: `any`.
    2 | declare const _never_: never;
    3 | _never_ as any;
      | ~~~~~~~~~~~~~~
@@ -387,6 +430,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_NeverAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:17)
 Message: Unsafe type assertion: type 'never' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `string`. Asserted type: `never`.
    2 | declare const _string_: string;
    3 | _string_ as never;
      | ~~~~~~~~~~~~~~~~~
@@ -396,6 +440,7 @@ Message: Unsafe type assertion: type 'never' is more narrow than the original ty
 [TestNoUnsafeTypeAssertionRule_ObjectAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (2:11 - 5:1)
 Message: Unsafe type assertion: type '{ bar: number; bas: string; }' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `{}`. Asserted type: `{ bar: number; bas: string; }`.
    1 | 
    2 | var foo = {} as {
      |           ~~~~~~~
@@ -411,6 +456,7 @@ Message: Unsafe type assertion: type '{ bar: number; bas: string; }' is more nar
 [TestNoUnsafeTypeAssertionRule_ObjectAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:70)
 Message: Unsafe type assertion: type '{ hello: string; world: string; }' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `{ hello: string; }`. Asserted type: `{ hello: string; world: string; }`.
    2 | declare const a: { hello: string };
    3 | a satisfies Record<string, string> as { hello: string; world: string };
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -420,6 +466,7 @@ Message: Unsafe type assertion: type '{ hello: string; world: string; }' is more
 [TestNoUnsafeTypeAssertionRule_ObjectAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:22)
 Message: Unsafe type assertion: type '{ hello: string; }' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `{ hello?: string | undefined; }`. Asserted type: `{ hello: string; }`.
    2 | declare const a: { hello?: string };
    3 | a as { hello: string };
      | ~~~~~~~~~~~~~~~~~~~~~~
@@ -429,6 +476,7 @@ Message: Unsafe type assertion: type '{ hello: string; }' is more narrow than th
 [TestNoUnsafeTypeAssertionRule_PromiseAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:20)
 Message: Unsafe type assertion: type 'Promise<string>' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `Promise<string | number>`. Asserted type: `Promise<string>`.
    2 | declare const a: Promise<string | number>;
    3 | a as Promise<string>;
      | ~~~~~~~~~~~~~~~~~~~~
@@ -438,6 +486,7 @@ Message: Unsafe type assertion: type 'Promise<string>' is more narrow than the o
 [TestNoUnsafeTypeAssertionRule_PromiseAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:20)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `Promise<any>`. Asserted type: `Promise<number>`.
    2 | declare const a: Promise<any>;
    3 | a as Promise<number>;
      | ~~~~~~~~~~~~~~~~~~~~
@@ -447,6 +496,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_PromiseAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:17)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `Promise<number>`. Asserted type: `Promise<any>`.
    2 | declare const a: Promise<number>;
    3 | a as Promise<any>;
      | ~~~~~~~~~~~~~~~~~
@@ -456,6 +506,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_PromiseAssertions/invalid-3 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:19)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `Promise<number[]>`. Asserted type: `Promise<any[]>`.
    2 | declare const a: Promise<number[]>;
    3 | a as Promise<any[]>;
      | ~~~~~~~~~~~~~~~~~~~
@@ -465,6 +516,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_PromiseAssertions/invalid-4 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:20)
 Message: Unsafe type assertion: type 'Promise<number>' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `Promise<unknown>`. Asserted type: `Promise<number>`.
    2 | declare const a: Promise<unknown>;
    3 | a as Promise<number>;
      | ~~~~~~~~~~~~~~~~~~~~
@@ -474,6 +526,7 @@ Message: Unsafe type assertion: type 'Promise<number>' is more narrow than the o
 [TestNoUnsafeTypeAssertionRule_PromiseAssertions/invalid-5 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:19)
 Message: Unsafe type assertion: type 'Promise<never>' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `Promise<number>`. Asserted type: `Promise<never>`.
    2 | declare const a: Promise<number>;
    3 | a as Promise<never>;
      | ~~~~~~~~~~~~~~~~~~~
@@ -483,6 +536,7 @@ Message: Unsafe type assertion: type 'Promise<never>' is more narrow than the or
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-0 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:13)
 Message: Unsafe type assertion: type '[string]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[string | number]`. Asserted type: `[string]`.
    2 | declare const a: [string | number];
    3 | a as [string];
      | ~~~~~~~~~~~~~
@@ -492,6 +546,7 @@ Message: Unsafe type assertion: type '[string]' is more narrow than the original
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-1 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:21)
 Message: Unsafe type assertion: type '[string, string]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[string, number]`. Asserted type: `[string, string]`.
    2 | declare const a: [string, number];
    3 | a as [string, string];
      | ~~~~~~~~~~~~~~~~~~~~~
@@ -501,6 +556,7 @@ Message: Unsafe type assertion: type '[string, string]' is more narrow than the 
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-2 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:21)
 Message: Unsafe type assertion: type '[string, number]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[string]`. Asserted type: `[string, number]`.
    2 | declare const a: [string];
    3 | a as [string, number];
      | ~~~~~~~~~~~~~~~~~~~~~
@@ -510,6 +566,7 @@ Message: Unsafe type assertion: type '[string, number]' is more narrow than the 
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-3 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:13)
 Message: Unsafe type assertion: type '[string]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[string, number]`. Asserted type: `[string]`.
    2 | declare const a: [string, number];
    3 | a as [string];
      | ~~~~~~~~~~~~~
@@ -519,6 +576,7 @@ Message: Unsafe type assertion: type '[string]' is more narrow than the original
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-4 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:13)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `[any]`. Asserted type: `[number]`.
    2 | declare const a: [any];
    3 | a as [number];
      | ~~~~~~~~~~~~~
@@ -528,6 +586,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-5 - 1]
 Diagnostic 1: unsafeOfAnyTypeAssertion (3:1 - 3:21)
 Message: Unsafe assertion from `any` detected: consider using type guards or a safer assertion.
+Help: Narrow the original value before asserting it, or replace the assertion with a type guard that proves the runtime shape. Original type: `[number, any]`. Asserted type: `[number, number]`.
    2 | declare const a: [number, any];
    3 | a as [number, number];
      | ~~~~~~~~~~~~~~~~~~~~~
@@ -537,6 +596,7 @@ Message: Unsafe assertion from `any` detected: consider using type guards or a s
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-6 - 1]
 Diagnostic 1: unsafeToAnyTypeAssertion (3:1 - 3:10)
 Message: Unsafe assertion to `any` detected: consider using a more specific type to ensure safety.
+Help: Avoid asserting to `any`; use a specific target type or narrow the value with runtime checks before converting it. Original type: `[number]`. Asserted type: `[any]`.
    2 | declare const a: [number];
    3 | a as [any];
      | ~~~~~~~~~~
@@ -546,6 +606,7 @@ Message: Unsafe assertion to `any` detected: consider using a more specific type
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-7 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:13)
 Message: Unsafe type assertion: type '[number]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[unknown]`. Asserted type: `[number]`.
    2 | declare const a: [unknown];
    3 | a as [number];
      | ~~~~~~~~~~~~~
@@ -555,6 +616,7 @@ Message: Unsafe type assertion: type '[number]' is more narrow than the original
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-8 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:12)
 Message: Unsafe type assertion: type '[never]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[number]`. Asserted type: `[never]`.
    2 | declare const a: [number];
    3 | a as [never];
      | ~~~~~~~~~~~~
@@ -564,6 +626,7 @@ Message: Unsafe type assertion: type '[never]' is more narrow than the original 
 [TestNoUnsafeTypeAssertionRule_TupleAssertions/invalid-9 - 1]
 Diagnostic 1: unsafeTypeAssertion (3:1 - 3:22)
 Message: Unsafe type assertion: type '[Promise<string>]' is more narrow than the original type.
+Help: Only assert to a narrower type after narrowing the value first, or rewrite the code so the desired type is proven without an unsafe cast. Original type: `[Promise<string | number>]`. Asserted type: `[Promise<string>]`.
    2 | declare const a: [Promise<string | number>];
    3 | a as [Promise<string>];
      | ~~~~~~~~~~~~~~~~~~~~~~
