@@ -615,6 +615,50 @@ function* asyncGenerator() {
 				},
 			},
 		},
+		{
+			Code: `
+        async function foo(): globalThis.Promise<number> {
+          return 1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAwait",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function foo(): number {
+          return 1;
+        }
+      `,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+        async function* foo(): globalThis.AsyncGenerator<number> {
+          yield 1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAwait",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        function* foo(): Generator<number> {
+          yield 1;
+        }
+      `,
+						},
+					},
+				},
+			},
+		},
 	})
 }
 

@@ -167,6 +167,26 @@ Message: Function has no 'await' expression.
   Suggestion 1: [removeAsync] Remove 'async'.
 ---
 
+[TestRequireAwaitRule/invalid-17 - 1]
+Diagnostic 1: missingAwait (2:9 - 2:26)
+Message: Function has no 'await' expression.
+   1 | 
+   2 |         async function foo(): globalThis.Promise<number> {
+     |         ~~~~~~~~~~~~~~~~~~
+   3 |           return 1;
+  Suggestion 1: [removeAsync] Remove 'async'.
+---
+
+[TestRequireAwaitRule/invalid-18 - 1]
+Diagnostic 1: missingAwait (2:9 - 2:27)
+Message: Function has no 'await' expression.
+   1 | 
+   2 |         async function* foo(): globalThis.AsyncGenerator<number> {
+     |         ~~~~~~~~~~~~~~~~~~~
+   3 |           yield 1;
+  Suggestion 1: [removeAsync] Remove 'async'.
+---
+
 [TestRequireAwaitRuleEslintBase/invalid-0 - 1]
 Diagnostic 1: missingAwait (2:9 - 2:26)
 Message: Function has no 'await' expression.
