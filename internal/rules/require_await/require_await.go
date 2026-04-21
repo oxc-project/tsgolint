@@ -103,8 +103,8 @@ func needsPrecedingSemicolon(sourceFile *ast.SourceFile, node *ast.Node) bool {
 	return true
 }
 
-// isTypeReferenceNamed reports whether `typeRef` names `name`, either as a plain
-// identifier (`Promise`) or as the right-hand side of a qualified name
+// isTypeReferenceNamed reports whether `typeRef` names the built-in type `name`,
+// either as a plain identifier (`Promise`) or as a direct globalThis qualifier
 // (`globalThis.Promise`). Callers must pass a non-nil `KindTypeReference` node.
 func isTypeReferenceNamed(typeRef *ast.TypeReferenceNode, name string) bool {
 	tn := typeRef.TypeName
@@ -114,7 +114,13 @@ func isTypeReferenceNamed(typeRef *ast.TypeReferenceNode, name string) bool {
 	if tn.Kind == ast.KindIdentifier {
 		return tn.Text() == name
 	}
-	return ast.IsQualifiedName(tn) && tn.AsQualifiedName().Right.Text() == name
+	if !ast.IsQualifiedName(tn) {
+		return false
+	}
+	qualifiedName := tn.AsQualifiedName()
+	return qualifiedName.Right.Text() == name &&
+		qualifiedName.Left.Kind == ast.KindIdentifier &&
+		qualifiedName.Left.Text() == "globalThis"
 }
 
 // buildRemoveAsyncFixes computes the list of edits that remove the `async` keyword

@@ -178,6 +178,16 @@ Message: Function has no 'await' expression.
 ---
 
 [TestRequireAwaitRule/invalid-18 - 1]
+Diagnostic 1: missingAwait (5:9 - 5:26)
+Message: Function has no 'await' expression.
+   4 |         }
+   5 |         async function foo(): Bluebird.Promise<number> {
+     |         ~~~~~~~~~~~~~~~~~~
+   6 |           return 1;
+  Suggestion 1: [removeAsync] Remove 'async'.
+---
+
+[TestRequireAwaitRule/invalid-19 - 1]
 Diagnostic 1: missingAwait (2:9 - 2:27)
 Message: Function has no 'await' expression.
    1 | 

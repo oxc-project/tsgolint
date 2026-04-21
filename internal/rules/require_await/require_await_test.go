@@ -639,6 +639,34 @@ function* asyncGenerator() {
 		},
 		{
 			Code: `
+        declare namespace Bluebird {
+          type Promise<T> = { value: T };
+        }
+        async function foo(): Bluebird.Promise<number> {
+          return 1;
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingAwait",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeAsync",
+							Output: `
+        declare namespace Bluebird {
+          type Promise<T> = { value: T };
+        }
+        function foo(): Bluebird.Promise<number> {
+          return 1;
+        }
+      `,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
         async function* foo(): globalThis.AsyncGenerator<number> {
           yield 1;
         }
