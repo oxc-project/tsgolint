@@ -172,6 +172,56 @@ func GetForStatementHeadLoc(
 	return TrimNodeTextRange(sourceFile, node).WithEnd(statement.Pos())
 }
 
+/**
+ * Gets the location of the head of the given function-like declaration for
+ * reporting. Port of typescript-eslint's `getFunctionHeadLoc`.
+ *
+ * - `function foo() {}`
+ *    ^^^^^^^^^^^^
+ * - `async function foo() {}`
+ *    ^^^^^^^^^^^^^^^^^^
+ * - `class A { async foo() {} }`
+ *              ^^^^^^^^^
+ * - `() => {}`
+ *       ^^
+ *
+ * For arrow functions this returns the `=>` token's range. For other function-
+ * like declarations (function/method/constructor/accessor/function expression)
+ * the range spans from the first non-decorator modifier (or the first keyword)
+ * up to the `(` that opens the parameter list.
+ */
+func GetFunctionHeadLoc(
+	sourceFile *ast.SourceFile,
+	node *ast.Node,
+) core.TextRange {
+	if ast.IsArrowFunction(node) {
+		if arrow := node.AsArrowFunction().EqualsGreaterThanToken; arrow != nil {
+			return arrow.Loc
+		}
+	}
+	params := node.ParameterList()
+	if params == nil {
+		return TrimNodeTextRange(sourceFile, node)
+	}
+	// The parameter list's range starts right after `(`, so `Pos() - 1` is the `(`.
+	end := params.Loc.Pos() - 1
+
+	// Skip leading decorators; keep modifiers such as `export`, `public`, `async`.
+	start := scanner.GetTokenPosOfNode(node, sourceFile, false)
+	if mods := node.Modifiers(); mods != nil {
+		for _, m := range mods.Nodes {
+			if m.Kind != ast.KindDecorator {
+				start = scanner.GetTokenPosOfNode(m, sourceFile, false)
+				break
+			}
+		}
+	}
+	if end < start {
+		return TrimNodeTextRange(sourceFile, node)
+	}
+	return core.NewTextRange(start, end)
+}
+
 var arrayPredicateFunctions = []string{"every", "filter", "find", "findIndex", "findLast", "findLastIndex", "some"}
 
 func IsArrayMethodCallWithPredicate(

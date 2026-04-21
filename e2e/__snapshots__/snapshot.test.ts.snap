@@ -912,10 +912,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 132,
+      "end": 108,
       "pos": 79,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 85,
+              "pos": 79,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
@@ -925,10 +942,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 270,
-      "pos": 252,
+      "end": 264,
+      "pos": 261,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 258,
+              "pos": 252,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
@@ -938,10 +972,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 53,
+      "end": 29,
       "pos": 0,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 6,
+              "pos": 0,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/no-for-in-array/index.ts",
@@ -3359,10 +3410,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 285,
-      "pos": 205,
+      "end": 216,
+      "pos": 213,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 211,
+              "pos": 205,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
@@ -4040,10 +4108,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 132,
+      "end": 108,
       "pos": 79,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 85,
+              "pos": 79,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/a.ts",
@@ -4053,10 +4138,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 270,
-      "pos": 252,
+      "end": 264,
+      "pos": 261,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 258,
+              "pos": 252,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
@@ -4320,10 +4422,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 132,
+      "end": 108,
       "pos": 79,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 85,
+              "pos": 79,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/b.mts",
@@ -4333,10 +4452,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 270,
-      "pos": 252,
+      "end": 264,
+      "pos": 261,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 258,
+              "pos": 252,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
@@ -4600,10 +4736,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 132,
+      "end": 108,
       "pos": 79,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 85,
+              "pos": 79,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/c.cts",
@@ -4613,10 +4766,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 270,
-      "pos": 252,
+      "end": 264,
+      "pos": 261,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 258,
+              "pos": 252,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
@@ -4880,10 +5050,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 132,
+      "end": 108,
       "pos": 79,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 85,
+              "pos": 79,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/src/d.tsx",
@@ -4893,10 +5080,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "id": "missingAwait",
     },
     "range": {
-      "end": 270,
-      "pos": 252,
+      "end": 264,
+      "pos": 261,
     },
     "rule": "require-await",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 258,
+              "pos": 252,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove 'async'.",
+          "id": "removeAsync",
+        },
+      },
+    ],
   },
 ]
 `;
