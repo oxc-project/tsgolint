@@ -368,7 +368,9 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	w.WriteString("  \x1b[2m╰────────────────────────────────\x1b[0m\n\n")
 }
 
-const usage = `✨ tsgolint - speedy TypeScript linter
+const unsupportedCliWarning = "Warning: the `tsgolint` CLI entrypoint is unsupported!\nUse Oxlint type-aware linting instead: https://oxc.rs/docs/guide/usage/linter/type-aware\n\n"
+
+const usage = unsupportedCliWarning + `✨ tsgolint - speedy TypeScript linter
 
 Usage:
     tsgolint [OPTIONS]
@@ -411,6 +413,8 @@ func runMain() int {
 		flag.Usage()
 		return 0
 	}
+
+	fmt.Fprintf(os.Stderr, unsupportedCliWarning)
 
 	enableVirtualTerminalProcessing()
 	timeBefore := time.Now()
