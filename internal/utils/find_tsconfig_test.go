@@ -153,6 +153,34 @@ func TestFindTsConfigParallel(t *testing.T) {
 	}
 }
 
+// Regression test for https://github.com/voidzero-dev/vite-plus/issues/1443.
+func TestFindTsConfigParallel_UsesAncestorConfigWhenNearestConfigExcludesFile(t *testing.T) {
+	rootDir := t.TempDir()
+	filePath := filepath.Join(rootDir, "packages", "cli", "src", "utils", "terminal.ts")
+	nestedConfigPath := filepath.Join(rootDir, "packages", "cli", "tsconfig.json")
+	rootConfigPath := filepath.Join(rootDir, "tsconfig.json")
+
+	assert.NilError(t, os.MkdirAll(filepath.Dir(filePath), 0o755))
+	assert.NilError(t, os.WriteFile(filePath, []byte("import { styleText } from 'node:util';\n"), 0o644))
+	assert.NilError(t, os.WriteFile(rootConfigPath, []byte(`{ "compilerOptions": { "types": ["node"] } }`), 0o644))
+	assert.NilError(t, os.WriteFile(nestedConfigPath, []byte(`{
+  "extends": "../../tsconfig.json",
+  "files": [],
+  "include": [],
+  "exclude": ["**/*"]
+}
+`), 0o644))
+
+	resolver := NewTsConfigResolver(osvfs.FS(), rootDir)
+
+	config, found := resolver.FindTsconfigForFile(filePath, false)
+	assert.Equal(t, true, found)
+	assert.Equal(t, rootConfigPath, config)
+
+	results := resolver.FindTsConfigParallel([]string{filePath})
+	assert.Equal(t, rootConfigPath, results[filePath])
+}
+
 // TestFindTsConfigParallel_Consistency verifies that the parallel
 // implementation produces identical results to the sequential implementation
 func TestFindTsConfigParallel_Consistency(t *testing.T) {

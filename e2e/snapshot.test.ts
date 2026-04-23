@@ -654,6 +654,22 @@ console.log(x);
     expect(diagnostics).toHaveLength(0);
   });
 
+  it('should use ancestor tsconfig when nearest tsconfig excludes the file (voidzero-dev/vite-plus#1443)', async () => {
+    const testFile = resolveTestFilePath('issue-vp-1443/packages/cli/src/utils/terminal.ts');
+    const config = generateConfig([testFile], ['no-floating-promises'], {
+      reportSemantic: true,
+    });
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    const diagnostics = parseHeadlessOutput(output);
+
+    expect(diagnostics).toStrictEqual([]);
+  });
+
   it('should report type errors', async () => {
     const testFiles = await getTestFiles('report-type-errors');
     expect(testFiles.length).toBeGreaterThan(0);
