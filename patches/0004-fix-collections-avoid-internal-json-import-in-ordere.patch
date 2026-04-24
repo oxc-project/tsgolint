@@ -1,4 +1,4 @@
-From bc87312886e25552e2e655a6ca57b5af3e2ced19 Mon Sep 17 00:00:00 2001
+From 14b3a1449cd80e548530ca8a8b163cc3981cb297 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 13 Feb 2026 18:37:25 +0000
 Subject: [PATCH 4/5] fix(collections): avoid internal json import in
@@ -9,7 +9,7 @@ Subject: [PATCH 4/5] fix(collections): avoid internal json import in
  1 file changed, 9 insertions(+), 8 deletions(-)
 
 diff --git a/internal/collections/ordered_map.go b/internal/collections/ordered_map.go
-index df66ec6401..02f0a56781 100644
+index df66ec640..02f0a5678 100644
 --- a/internal/collections/ordered_map.go
 +++ b/internal/collections/ordered_map.go
 @@ -9,7 +9,8 @@ import (
