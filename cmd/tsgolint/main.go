@@ -83,7 +83,6 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
-	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
@@ -246,13 +245,7 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 	codeboxEndLine := min(diagnosticEndline+1, len(lineMap)-1)
 
 	codeboxStart := scanner.GetECMAPositionOfLineAndUTF16Character(d.SourceFile, codeboxStartLine, 0)
-	var codeboxEndColumn int
-	if codeboxEndLine == len(lineMap)-1 {
-		codeboxEndColumn = len(text) - int(lineMap[len(lineMap)-1])
-	} else {
-		codeboxEndColumn = int(lineMap[codeboxEndLine+1]-lineMap[codeboxEndLine]) - 1
-	}
-	codeboxEnd := scanner.GetECMAPositionOfLineAndUTF16Character(d.SourceFile, codeboxEndLine, core.UTF16Offset(codeboxEndColumn))
+	codeboxEnd := scanner.GetECMAEndLinePosition(d.SourceFile, codeboxEndLine) + 1
 
 	w.Write([]byte{' ', 0x1b, '[', '7', 'm', 0x1b, '[', '1', 'm', 0x1b, '[', '3', '8', ';', '5', ';', '3', '7', 'm', ' '})
 	w.WriteString(d.RuleName)
@@ -337,12 +330,12 @@ func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions 
 
 		if diagnosticHighlightActive {
 			underlineEnd = lineTextEnd
-		} else if int(lineMap[line]) <= diagnosticStart && (line == len(lineMap) || diagnosticStart < int(lineMap[line+1])) {
+		} else if int(lineMap[line]) <= diagnosticStart && (line == len(lineMap)-1 || diagnosticStart < int(lineMap[line+1])) {
 			underlineStart = min(max(lineTextStart, diagnosticStart), lineTextEnd)
 			underlineEnd = lineTextEnd
 			diagnosticHighlightActive = true
 		}
-		if int(lineMap[line]) <= diagnosticEnd && (line == len(lineMap) || diagnosticEnd < int(lineMap[line+1])) {
+		if int(lineMap[line]) <= diagnosticEnd && (line == len(lineMap)-1 || diagnosticEnd < int(lineMap[line+1])) {
 			underlineEnd = min(max(underlineStart, diagnosticEnd), lineTextEnd)
 			diagnosticHighlightActive = false
 		}
