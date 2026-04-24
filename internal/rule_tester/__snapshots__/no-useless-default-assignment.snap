@@ -17,6 +17,7 @@ Help: Remove the default assignment
    2 |         function Bar({ foo = '' }: { foo: string }) {
      |                        ^^^ property type `string` is not nullish
    3 |           return foo;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-1 - 1]
@@ -37,6 +38,7 @@ Help: Remove the default assignment
    3 |           public method({ foo = '' }: { foo: string }) {
      |                           ^^^ property type `string` is not nullish
    4 |             return foo;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-2 - 1]
@@ -57,6 +59,7 @@ Help: Remove the default assignment
    2 |         const { 'literal-key': literalKey = 'default' } = { 'literal-key': 'value' };
      |                                ^^^^^^^^^^ property type `"value"` is not nullish
    3 |       
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-3 - 1]
@@ -77,6 +80,7 @@ Help: Remove the default assignment
    2 |         [1, 2, 3].map((a = 42) => a + 1);
      |                        ^ parameter type `number` is not nullish
    3 |       
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-4 - 1]
@@ -97,6 +101,7 @@ Help: Remove the default assignment
    4 |         function getValue({ value = '' }: { value: string } = {}): string | undefined {
      |                             ^^^^^ property type `string` is not nullish
    5 |           return value;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-5 - 1]
@@ -117,6 +122,7 @@ Help: Remove the default assignment
    2 |         function getValue([value = '']: [string]) {
      |                            ^^^^^ property type `string` is not nullish
    3 |           return value;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-6 - 1]
@@ -137,6 +143,7 @@ Help: Remove the default assignment
    5 |           hello: { world = '' },
      |                    ^^^^^ property type `string` is not nullish
    6 |         } = x;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-7 - 1]
@@ -157,6 +164,7 @@ Help: Remove the default assignment
    5 |           hello: [{ world = '' }],
      |                     ^^^^^ property type `string` is not nullish
    6 |         } = x;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-8 - 1]
@@ -172,6 +180,7 @@ Help: Remove the default assignment
    7 |           foo: (b = false) => {},
      |                     ^^^^^ Default value
    8 |         };
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-9 - 1]
@@ -253,6 +262,7 @@ Help: Remove the default assignment
    2 |         function Bar({ foo = '' }: { foo: string }) {
      |                        ^^^ property type `string` is not nullish
    3 |           return foo;
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-16 - 1]
@@ -281,6 +291,7 @@ Help: Remove the default assignment
    2 |         const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };
      |                     ^^^^^ Default value
    3 |       
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-18 - 1]
@@ -296,6 +307,7 @@ Help: Remove the default assignment
    2 |         const { a = 'baz' } =
      |                     ^^^^^ Default value
    3 |           Math.random() < 0.5
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-19 - 1]
@@ -311,6 +323,7 @@ Help: Remove the default assignment
    2 |         const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };
      |                     ^^^^^ Default value
    3 |       
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-20 - 1]
@@ -326,6 +339,7 @@ Help: Remove the default assignment
    2 |         const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };
      |                     ^^^^^ Default value
    3 |       
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---
 
 [TestNoUselessDefaultAssignmentRule/invalid-21 - 1]
@@ -341,18 +355,5 @@ Help: Remove the default assignment
    2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
      |                     ^^^ Default value
    3 |       
----
-
-[TestNoUselessDefaultAssignmentRule/invalid-22 - 1]
-Diagnostic 1: uselessDefaultAssignment (2:21 - 2:23)
-Message: Default value is useless because the property is not nullish. This default assignment will never be used.
-   1 | 
-   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
-     |                     ~~~
-   3 |       
-  Label: Default value (2:21 - 2:23)
-   1 | 
-   2 |         const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };
-     |                     ^^^ Default value
-   3 |       
+  Suggestion 1: [removeDefaultAssignment] Remove the default assignment.
 ---

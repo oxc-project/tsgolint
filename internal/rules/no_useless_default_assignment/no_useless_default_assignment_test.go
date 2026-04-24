@@ -201,127 +201,154 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: "\n        function Bar({ foo = '' }: { foo: string }) {\n          return foo;\n        }\n      ",
-			Output: []string{
-				"\n        function Bar({ foo }: { foo: string }) {\n          return foo;\n        }\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    30,
 					EndColumn: 32,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function Bar({ foo }: { foo: string }) {\n          return foo;\n        }\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        class C {\n          public method({ foo = '' }: { foo: string }) {\n            return foo;\n          }\n        }\n      ",
-			Output: []string{
-				"\n        class C {\n          public method({ foo }: { foo: string }) {\n            return foo;\n          }\n        }\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      3,
 					Column:    33,
 					EndColumn: 35,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        class C {\n          public method({ foo }: { foo: string }) {\n            return foo;\n          }\n        }\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const { 'literal-key': literalKey = 'default' } = { 'literal-key': 'value' };\n      ",
-			Output: []string{
-				"\n        const { 'literal-key': literalKey } = { 'literal-key': 'value' };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    45,
 					EndColumn: 54,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { 'literal-key': literalKey } = { 'literal-key': 'value' };\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        [1, 2, 3].map((a = 42) => a + 1);\n      ",
-			Output: []string{
-				"\n        [1, 2, 3].map((a) => a + 1);\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    28,
 					EndColumn: 30,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        [1, 2, 3].map((a) => a + 1);\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        function getValue(): undefined;\n        function getValue(box: { value: string }): string;\n        function getValue({ value = '' }: { value: string } = {}): string | undefined {\n          return value;\n        }\n      ",
-			Output: []string{
-				"\n        function getValue(): undefined;\n        function getValue(box: { value: string }): string;\n        function getValue({ value }: { value: string } = {}): string | undefined {\n          return value;\n        }\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      4,
 					Column:    37,
 					EndColumn: 39,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function getValue(): undefined;\n        function getValue(box: { value: string }): string;\n        function getValue({ value }: { value: string } = {}): string | undefined {\n          return value;\n        }\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        function getValue([value = '']: [string]) {\n          return value;\n        }\n      ",
-			Output: []string{
-				"\n        function getValue([value]: [string]) {\n          return value;\n        }\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    36,
 					EndColumn: 38,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function getValue([value]: [string]) {\n          return value;\n        }\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        declare const x: { hello: { world: string } };\n\n        const {\n          hello: { world = '' },\n        } = x;\n      ",
-			Output: []string{
-				"\n        declare const x: { hello: { world: string } };\n\n        const {\n          hello: { world },\n        } = x;\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      5,
 					Column:    28,
 					EndColumn: 30,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        declare const x: { hello: { world: string } };\n\n        const {\n          hello: { world },\n        } = x;\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        declare const x: { hello: Array<{ world: string }> };\n\n        const {\n          hello: [{ world = '' }],\n        } = x;\n      ",
-			Output: []string{
-				"\n        declare const x: { hello: Array<{ world: string }> };\n\n        const {\n          hello: [{ world }],\n        } = x;\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      5,
 					Column:    29,
 					EndColumn: 31,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        declare const x: { hello: Array<{ world: string }> };\n\n        const {\n          hello: [{ world }],\n        } = x;\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        interface B {\n          foo: (b: boolean | string) => void;\n        }\n\n        const h: B = {\n          foo: (b = false) => {},\n        };\n      ",
-			Output: []string{
-				"\n        interface B {\n          foo: (b: boolean | string) => void;\n        }\n\n        const h: B = {\n          foo: (b) => {},\n        };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      7,
 					Column:    21,
 					EndColumn: 26,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        interface B {\n          foo: (b: boolean | string) => void;\n        }\n\n        const h: B = {\n          foo: (b) => {},\n        };\n      ",
+						},
+					},
 				},
 			},
 		},
@@ -412,9 +439,6 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 		{
 			Code:     "\n        function Bar({ foo = '' }: { foo: string }) {\n          return foo;\n        }\n      ",
 			TSConfig: "tsconfig.unstrict.json",
-			Output: []string{
-				"\n        function Bar({ foo }: { foo: string }) {\n          return foo;\n        }\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noStrictNullCheck",
@@ -426,6 +450,12 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 					Line:      2,
 					Column:    30,
 					EndColumn: 32,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function Bar({ foo }: { foo: string }) {\n          return foo;\n        }\n      ",
+						},
+					},
 				},
 			},
 		},
@@ -451,71 +481,86 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 		},
 		{
 			Code: "\n        const { a = 'baz' } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };\n      ",
-			Output: []string{
-				"\n        const { a } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    21,
 					EndColumn: 26,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { a } = Math.random() < 0.5 ? { a: 'foo' } : { a: 'bar' };\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const { a = 'baz' } =\n          Math.random() < 0.5\n            ? { a: 'foo' }\n            : Math.random() > 0.2\n              ? { a: 'bar' }\n              : { a: 'qux' };\n      ",
-			Output: []string{
-				"\n        const { a } =\n          Math.random() < 0.5\n            ? { a: 'foo' }\n            : Math.random() > 0.2\n              ? { a: 'bar' }\n              : { a: 'qux' };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    21,
 					EndColumn: 26,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { a } =\n          Math.random() < 0.5\n            ? { a: 'foo' }\n            : Math.random() > 0.2\n              ? { a: 'bar' }\n              : { a: 'qux' };\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const { a = 'baz' } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };\n      ",
-			Output: []string{
-				"\n        const { a } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    21,
 					EndColumn: 26,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { a } = cond ? { ['a']: 'foo' } : { ['a']: 'bar' };\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const { a = 'baz' } = cond ? { a() {} } : { a: 'bar' };\n      ",
-			Output: []string{
-				"\n        const { a } = cond ? { a() {} } : { a: 'bar' };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    21,
 					EndColumn: 26,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { a } = cond ? { a() {} } : { a: 'bar' };\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const { a = 'b' } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };\n      ",
-			Output: []string{
-				"\n        const { a } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessDefaultAssignment",
 					Line:      2,
 					Column:    21,
 					EndColumn: 24,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { a } = Math.random() < 0.5 ? { [`a`]: 'a' } : { a: 'b' };\n      ",
+						},
+					},
 				},
 			},
 		},

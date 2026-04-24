@@ -2472,15 +2472,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-useless-default-assignment/index.ts",
-    "fixes": [
-      {
-        "range": {
-          "end": 21,
-          "pos": 16,
-        },
-        "text": "",
-      },
-    ],
     "kind": 0,
     "labeled_ranges": [
       {
@@ -2508,6 +2499,23 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 19,
     },
     "rule": "no-useless-default-assignment",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 21,
+              "pos": 16,
+            },
+            "text": "",
+          },
+        ],
+        "message": {
+          "description": "Remove the default assignment.",
+          "id": "removeDefaultAssignment",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",

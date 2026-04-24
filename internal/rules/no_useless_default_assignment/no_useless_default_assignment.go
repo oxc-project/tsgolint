@@ -43,6 +43,13 @@ func buildUselessDefaultAssignmentWithTypeMessage(assignmentType string, typeTex
 	}
 }
 
+func buildRemoveDefaultAssignmentSuggestionMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "removeDefaultAssignment",
+		Description: "Remove the default assignment.",
+	}
+}
+
 func buildUselessUndefinedMessage(pluralAssignmentType string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "uselessUndefined",
@@ -365,11 +372,15 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 				}
 			}
 
-			ctx.ReportDiagnostic(rule.RuleDiagnostic{
+			ctx.ReportDiagnosticWithSuggestions(rule.RuleDiagnostic{
 				Range:         diagnosticRange,
 				Message:       message,
-				FixesPtr:      &fixes,
 				LabeledRanges: labeledRanges,
+			}, func() []rule.RuleSuggestion {
+				return []rule.RuleSuggestion{{
+					Message:  buildRemoveDefaultAssignmentSuggestionMessage(),
+					FixesArr: fixes,
+				}}
 			})
 		}
 
