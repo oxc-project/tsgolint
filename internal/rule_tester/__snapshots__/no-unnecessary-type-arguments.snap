@@ -243,10 +243,10 @@ Message: This is the default value for this type parameter, so it can be omitted
 ---
 
 [TestNoUnnecessaryTypeArguments/invalid-27 - 1]
-Diagnostic 1: unnecessaryTypeParameter (10:3 - 10:5)
+Diagnostic 1: unnecessaryTypeParameter (5:3 - 5:7)
 Message: This is the default value for this type parameter, so it can be omitted.
-   9 | function f<T = Foo>() {}
-  10 | f<Bar>();
-     |   ~~~
-  11 |       
+   4 | function f<T = Default>() {}
+   5 | f<Alias>();
+     |   ~~~~~
+   6 |       
 ---

@@ -26,55 +26,22 @@ func isInTypeContext(node *ast.Node) bool {
 	return ast.IsTypeReferenceNode(node) || ast.IsInterfaceDeclaration(node.Parent) || ast.IsTypeReferenceNode(node.Parent) || (ast.IsHeritageClause(node.Parent) && node.Parent.AsHeritageClause().Token == ast.KindImplementsKeyword)
 }
 
-func isEmptyObjectType(typeChecker *checker.Checker, t *checker.Type) bool {
-	if !utils.IsObjectType(t) {
-		return false
-	}
-
-	if len(checker.Checker_getPropertiesOfType(typeChecker, t)) != 0 {
-		return false
-	}
-
-	return len(checker.Checker_getIndexInfosOfType(typeChecker, t)) == 0
+type typeForComparison struct {
+	typeValue     *checker.Type
+	typeArguments []*checker.Type
 }
 
-func areTypesEquivalent(typeChecker *checker.Checker, a *checker.Type, b *checker.Type) bool {
-	// If either type is `any` (including unresolved `error`-adjacent cases) or `{}`,
-	// only treat them as equivalent when they are literally the same type object.
-	if utils.IsTypeAnyType(a) || utils.IsTypeAnyType(b) || isEmptyObjectType(typeChecker, a) || isEmptyObjectType(typeChecker, b) {
-		return a == b
+func getTypeForComparison(typeChecker *checker.Checker, t *checker.Type) typeForComparison {
+	if checker.Type_objectFlags(t)&checker.ObjectFlagsReference != 0 {
+		return typeForComparison{
+			typeValue:     t.Target(),
+			typeArguments: checker.Checker_getTypeArguments(typeChecker, t),
+		}
 	}
 
-	return checker.Checker_isTypeAssignableTo(typeChecker, a, b) && checker.Checker_isTypeAssignableTo(typeChecker, b, a)
-}
-
-func resolveSymbol(typeChecker *checker.Checker, symbol *ast.Symbol) *ast.Symbol {
-	if symbol == nil || symbol.Flags&ast.SymbolFlagsAlias == 0 {
-		return symbol
+	return typeForComparison{
+		typeValue: t,
 	}
-
-	resolved, found := typeChecker.ResolveAlias(symbol)
-	if !found {
-		return symbol
-	}
-
-	return resolved
-}
-
-func hasShadowedTypeReferenceName(typeChecker *checker.Checker, defaultType *ast.Node, typeArgument *ast.Node) bool {
-	if !ast.IsTypeReferenceNode(defaultType) || !ast.IsTypeReferenceNode(typeArgument) {
-		return false
-	}
-
-	defaultName := defaultType.AsTypeReferenceNode().TypeName
-	typeArgumentName := typeArgument.AsTypeReferenceNode().TypeName
-	if !ast.IsIdentifier(defaultName) || !ast.IsIdentifier(typeArgumentName) || defaultName.Text() != typeArgumentName.Text() {
-		return false
-	}
-
-	defaultSymbol := resolveSymbol(typeChecker, typeChecker.GetSymbolAtLocation(defaultName))
-	typeArgumentSymbol := resolveSymbol(typeChecker, typeChecker.GetSymbolAtLocation(typeArgumentName))
-	return defaultSymbol != nil && typeArgumentSymbol != nil && defaultSymbol != typeArgumentSymbol
 }
 
 var NoUnnecessaryTypeArgumentsRule = rule.Rule{
@@ -168,19 +135,39 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			typeArgument := arguments.Nodes[lastParamIndex]
 			typeParameter := parameters[lastParamIndex]
 
-			typeArgumentType := ctx.TypeChecker.GetTypeAtLocation(typeArgument)
-
-			defaultType := typeParameter.AsTypeParameterDeclaration().DefaultType
-			if defaultType == nil {
+			defaultTypeNode := typeParameter.AsTypeParameterDeclaration().DefaultType
+			if defaultTypeNode == nil {
 				return
 			}
 
-			if hasShadowedTypeReferenceName(ctx.TypeChecker, defaultType, typeArgument) {
+			defaultType := ctx.TypeChecker.GetTypeAtLocation(defaultTypeNode)
+			argType := ctx.TypeChecker.GetTypeAtLocation(typeArgument)
+
+			if defaultType == nil || argType == nil {
 				return
 			}
 
-			defaultTypeValue := ctx.TypeChecker.GetTypeAtLocation(defaultType)
-			if !areTypesEquivalent(ctx.TypeChecker, defaultTypeValue, typeArgumentType) {
+			typesMatch := defaultType == argType
+			if !typesMatch {
+				// For more complex types (such as generic object types), TS won't always create a
+				// global shared type object for the type, so fall back to comparing the
+				// reference type and the passed type arguments.
+				defaultTypeResolved := getTypeForComparison(ctx.TypeChecker, defaultType)
+				argTypeResolved := getTypeForComparison(ctx.TypeChecker, argType)
+				typesMatch = defaultTypeResolved.typeValue == argTypeResolved.typeValue &&
+					len(defaultTypeResolved.typeArguments) == len(argTypeResolved.typeArguments)
+
+				if typesMatch {
+					for i, defaultTypeArgument := range defaultTypeResolved.typeArguments {
+						if defaultTypeArgument != argTypeResolved.typeArguments[i] {
+							typesMatch = false
+							break
+						}
+					}
+				}
+			}
+
+			if !typesMatch {
 				return
 			}
 

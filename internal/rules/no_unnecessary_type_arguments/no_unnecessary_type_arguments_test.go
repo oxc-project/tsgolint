@@ -374,6 +374,62 @@ export function scoped() {
   return useSession<SessionData>()
 }
     `},
+		{Code: `
+interface Foo {
+	foo?: string
+}
+interface Bar extends Foo {
+	bar?: string
+}
+
+function f<T = Foo>() {}
+f<Bar>();
+    `},
+		// https://github.com/oxc-project/tsgolint/issues/875
+		{Code: `
+type SessionDataT = Record<string, any>;
+type H3SessionData<T extends SessionDataT = SessionDataT> = T;
+interface SessionManager<T extends SessionDataT = SessionDataT> {
+  readonly data: H3SessionData<T>;
+}
+interface SessionConfig {
+  password: string;
+  name: string;
+  cookie: {
+    sameSite: 'strict';
+    httpOnly: true;
+    secure: true;
+  };
+}
+interface EventHandlerRequest {}
+declare class H3Event<_RequestT extends EventHandlerRequest = EventHandlerRequest> {}
+declare function useSession<T extends SessionDataT = SessionDataT>(
+  event: H3Event,
+  config: SessionConfig,
+): Promise<SessionManager<T>>;
+
+interface SessionData {
+  userId?: string;
+}
+
+function getSessionConfig(): SessionConfig {
+  return {
+    password: '',
+    name: '',
+    cookie: {
+      sameSite: 'strict',
+      httpOnly: true,
+      secure: true,
+    },
+  };
+}
+
+async function useAppSession(event: H3Event) {
+  const config = getSessionConfig();
+
+  return useSession<SessionData>(event, config);
+}
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -892,31 +948,21 @@ declare type MessageEventHandler = ((ev: MessageEvent) => any) | null;
 		},
 		{
 			Code: `
-interface Foo {
-	foo?: string
-}
-interface Bar extends Foo {
-	bar?: string
-}
-
-function f<T = Foo>() {}
-f<Bar>();
+type Default = Record<string, any>;
+type Alias = Default;
+function f<T = Default>() {}
+f<Alias>();
       `,
 			Output: []string{`
-interface Foo {
-	foo?: string
-}
-interface Bar extends Foo {
-	bar?: string
-}
-
-function f<T = Foo>() {}
+type Default = Record<string, any>;
+type Alias = Default;
+function f<T = Default>() {}
 f();
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					Line:      10,
+					Line:      5,
 					MessageId: "unnecessaryTypeParameter",
 				},
 			},
