@@ -52,6 +52,7 @@ func main() {
 		"checker",
 		"compiler",
 		"core",
+		"jsnum",
 		"lsp/lsproto",
 		"parser",
 		"project",

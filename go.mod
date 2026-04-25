@@ -8,6 +8,7 @@ replace (
 	github.com/microsoft/typescript-go/shim/checker => ./shim/checker
 	github.com/microsoft/typescript-go/shim/compiler => ./shim/compiler
 	github.com/microsoft/typescript-go/shim/core => ./shim/core
+	github.com/microsoft/typescript-go/shim/jsnum => ./shim/jsnum
 	github.com/microsoft/typescript-go/shim/lsp/lsproto => ./shim/lsp/lsproto
 	github.com/microsoft/typescript-go/shim/parser => ./shim/parser
 	github.com/microsoft/typescript-go/shim/project => ./shim/project
@@ -25,6 +26,7 @@ require (
 	github.com/microsoft/typescript-go/shim/checker v0.0.0
 	github.com/microsoft/typescript-go/shim/compiler v0.0.0
 	github.com/microsoft/typescript-go/shim/core v0.0.0
+	github.com/microsoft/typescript-go/shim/jsnum v0.0.0
 	github.com/microsoft/typescript-go/shim/parser v0.0.0
 	github.com/microsoft/typescript-go/shim/project v0.0.0
 	github.com/microsoft/typescript-go/shim/scanner v0.0.0

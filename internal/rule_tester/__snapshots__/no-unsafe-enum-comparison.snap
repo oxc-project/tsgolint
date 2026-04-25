@@ -137,6 +137,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         Fruit.Apple === 0;
      |                         ^ Right operand: 0
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-7 - 1]
@@ -397,6 +398,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
   18 |         str === 'a';
      |                 ^^^ Right operand: "a"
   19 |         num === 1;
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 
 Diagnostic 2: mismatchedCondition (19:9 - 19:17)
 Message: The two values in this comparison do not have a shared enum type.
@@ -415,6 +417,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
   19 |         num === 1;
      |                 ^ Right operand: 1
   20 |         mixed === 'a';
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 
 Diagnostic 3: mismatchedCondition (20:9 - 20:21)
 Message: The two values in this comparison do not have a shared enum type.
@@ -433,6 +436,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
   20 |         mixed === 'a';
      |                   ^^^ Right operand: "a"
   21 |         mixed === 1;
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 
 Diagnostic 4: mismatchedCondition (21:9 - 21:19)
 Message: The two values in this comparison do not have a shared enum type.
@@ -451,6 +455,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
   21 |         mixed === 1;
      |                   ^ Right operand: 1
   22 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-20 - 1]
@@ -611,6 +616,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         str === 'b';
      |                 ^^^ Right operand: "b"
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-27 - 1]
@@ -631,6 +637,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         str === 'a' + 'b';
      |                 ^^^^^^^^^ Right operand: string
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-28 - 1]
@@ -651,6 +658,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         1 === num;
      |               ^^^ Right operand: Num
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-29 - 1]
@@ -671,6 +679,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         1 /* with */ === /* comment */ num;
      |                                        ^^^ Right operand: Num
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-30 - 1]
@@ -691,6 +700,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         1 + 1 === num;
      |                   ^^^ Right operand: Num
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-31 - 1]
@@ -711,6 +721,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         mixed === 1;
      |                   ^ Right operand: 1
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-32 - 1]
@@ -731,6 +742,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         mixed === 'b';
      |                   ^^^ Right operand: "b"
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-33 - 1]
@@ -751,6 +763,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         stringKey === 1;
      |                       ^ Right operand: 1
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-34 - 1]
@@ -771,6 +784,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         stringKey === 1;
      |                       ^ Right operand: 1
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-35 - 1]
@@ -791,6 +805,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         stringKey === 1;
      |                       ^ Right operand: 1
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-36 - 1]
@@ -811,6 +826,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         stringKey === 1;
      |                       ^ Right operand: 1
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-37 - 1]
@@ -831,6 +847,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         computedKey === 1;
      |                         ^ Right operand: 1
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-38 - 1]
@@ -851,6 +868,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         computedKey === 1;
      |                         ^ Right operand: 1
    7 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-39 - 1]
@@ -871,6 +889,7 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    7 |         computedKey === 1;
      |                         ^ Right operand: 1
    8 |       
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
 
 [TestNoUnsafeEnumComparisonRule/invalid-40 - 1]
@@ -951,4 +970,111 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
    6 |         if (foo === Vegetable.Asparagus) {
      |                     ^^^^^^^^^^^^^^^^^^^ Right operand: Vegetable
    7 |         }
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-44 - 1]
+Diagnostic 1: mismatchedCondition (7:9 - 7:23)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+   6 |         declare const str: Str;
+   7 |         str === '' + -0;
+     |         ~~~~~~~~~~~~~~~
+  Label: Left operand: Str (7:9 - 7:11)
+   6 |         declare const str: Str;
+   7 |         str === '' + -0;
+     |         ^^^ Left operand: Str
+  Label: Right operand: string (7:17 - 7:23)
+   6 |         declare const str: Str;
+   7 |         str === '' + -0;
+     |                 ^^^^^^^ Right operand: string
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-45 - 1]
+Diagnostic 1: mismatchedCondition (7:9 - 7:25)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+   6 |         declare const str: Str;
+   7 |         str === '' + 1e20;
+     |         ~~~~~~~~~~~~~~~~~
+  Label: Left operand: Str (7:9 - 7:11)
+   6 |         declare const str: Str;
+   7 |         str === '' + 1e20;
+     |         ^^^ Left operand: Str
+  Label: Right operand: string (7:17 - 7:25)
+   6 |         declare const str: Str;
+   7 |         str === '' + 1e20;
+     |                 ^^^^^^^^^ Right operand: string
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-46 - 1]
+Diagnostic 1: mismatchedCondition (8:9 - 8:21)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+   7 |         }
+   8 |         N.E.A === 'a';
+     |         ~~~~~~~~~~~~~
+  Label: Left operand: E.A (8:9 - 8:13)
+   7 |         }
+   8 |         N.E.A === 'a';
+     |         ^^^^^ Left operand: E.A
+  Label: Right operand: "a" (8:19 - 8:21)
+   7 |         }
+   8 |         N.E.A === 'a';
+     |                   ^^^ Right operand: "a"
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-47 - 1]
+Diagnostic 1: mismatchedCondition (8:9 - 8:17)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+   7 |         declare const e: N.E;
+   8 |         e === 'a';
+     |         ~~~~~~~~~
+  Label: Left operand: E (8:9 - 8:9)
+   7 |         declare const e: N.E;
+   8 |         e === 'a';
+     |         ^ Left operand: E
+  Label: Right operand: "a" (8:15 - 8:17)
+   7 |         declare const e: N.E;
+   8 |         e === 'a';
+     |               ^^^ Right operand: "a"
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-48 - 1]
+Diagnostic 1: mismatchedCondition (6:9 - 6:25)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+   5 |         declare const box: { value: E };
+   6 |         box.value === 'a';
+     |         ~~~~~~~~~~~~~~~~~
+  Label: Left operand: E (6:9 - 6:17)
+   5 |         declare const box: { value: E };
+   6 |         box.value === 'a';
+     |         ^^^^^^^^^ Left operand: E
+  Label: Right operand: "a" (6:23 - 6:25)
+   5 |         declare const box: { value: E };
+   6 |         box.value === 'a';
+     |                       ^^^ Right operand: "a"
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
+---
+
+[TestNoUnsafeEnumComparisonRule/invalid-49 - 1]
+Diagnostic 1: mismatchedCondition (6:9 - 6:23)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |         ~~~~~~~~~~~~~~~
+  Label: Left operand: StringKey (6:9 - 6:17)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |         ^^^^^^^^^ Left operand: StringKey
+  Label: Right operand: 1 (6:23 - 6:23)
+   5 |         declare const stringKey: StringKey;
+   6 |         stringKey === 1;
+     |                       ^ Right operand: 1
+  Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---

@@ -53,13 +53,6 @@ func buildComparisonDiagnostic(
 	}
 }
 
-// func buildReplaceValueWithEnumMessage() rule.RuleMessage {
-// return rule.RuleMessage{
-// Id:          "replaceValueWithEnum",
-// Description: "Replace with an enum value comparison.",
-// }
-// }
-
 /**
  * @returns What type a type's enum value is (number or string), if either.
  */
@@ -170,7 +163,7 @@ var NoUnsafeEnumComparisonRule = rule.Rule{
 				rightType := ctx.TypeChecker.GetTypeAtLocation(expr.Right)
 
 				if isMismatchedComparison(leftType, rightType) {
-					ctx.ReportDiagnostic(buildComparisonDiagnostic(
+					diagnostic := buildComparisonDiagnostic(
 						ctx.SourceFile,
 						ctx.TypeChecker,
 						node,
@@ -181,7 +174,11 @@ var NoUnsafeEnumComparisonRule = rule.Rule{
 						"Right operand",
 						expr.Right,
 						rightType,
-					))
+					)
+
+					ctx.ReportDiagnosticWithSuggestions(diagnostic, func() []rule.RuleSuggestion {
+						return enumComparisonSuggestions(ctx.SourceFile, ctx.TypeChecker, node, expr, leftType, rightType)
+					})
 				}
 			},
 

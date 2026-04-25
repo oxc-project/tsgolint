@@ -155,13 +155,7 @@ func buildCaseTest(typeChecker *checker.Checker, missingBranchType *checker.Type
 	}
 
 	if symbolName != "" && requiresQuoting(missingBranchName) {
-		escapedBranchName := strings.NewReplacer(
-			"'", "\\'",
-			"\n", "\\n",
-			"\r", "\\r",
-		).Replace(missingBranchName)
-
-		return fmt.Sprintf("%s['%s']", symbolName, escapedBranchName)
+		return fmt.Sprintf("%s[%s]", symbolName, utils.QuoteSingleStringLiteral(missingBranchName))
 	}
 
 	return caseTest
