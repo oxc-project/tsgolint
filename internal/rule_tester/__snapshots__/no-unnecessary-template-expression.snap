@@ -1023,3 +1023,31 @@ Message: Template literal expression is unnecessary and can be simplified.
    1 | type FooBar = `${'foo' | 'bar'}`;
      |                ~~~~~~~~~~~~~~~~
 ---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-117 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0.000001}`;
+     |  ~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-118 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:13)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0.0000001}`;
+     |  ~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-119 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${0x20000000000001}`;
+     |  ~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-120 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | `${'abc' || 'def'}`[0];
+     |  ~~~~~~~~~~~~~~~~~
+---

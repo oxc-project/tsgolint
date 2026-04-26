@@ -1409,6 +1409,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 204,
+          "pos": 202,
+        },
+        "text": "",
+      },
+      {
+        "range": {
+          "end": 212,
+          "pos": 211,
+        },
+        "text": "",
+      },
+      {
+        "range": {
+          "end": 211,
+          "pos": 204,
+        },
+        "text": "Hello",
+      },
+    ],
     "kind": 0,
     "message": {
       "description": "Template literal expression is unnecessary and can be simplified.",
@@ -1422,6 +1445,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-template-expression/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 215,
+          "pos": 213,
+        },
+        "text": "",
+      },
+      {
+        "range": {
+          "end": 223,
+          "pos": 222,
+        },
+        "text": "",
+      },
+      {
+        "range": {
+          "end": 222,
+          "pos": 215,
+        },
+        "text": "world",
+      },
+    ],
     "kind": 0,
     "message": {
       "description": "Template literal expression is unnecessary and can be simplified.",
