@@ -1533,14 +1533,11 @@ outer3:
 		leftIsAccess := utils.IsAccessExpression(left)
 		rightIsAccess := utils.IsAccessExpression(right)
 
-		// If both sides are access expressions with the same base, we can't convert
-		// to optional chaining (e.g., foo && foo.bar === foo.baz)
+		// If both sides are access expressions, we can't convert to optional
+		// chaining without changing when the other side is evaluated.
+		// For example, `x && y && x.a === y.a` must keep both guards.
 		if leftIsAccess && rightIsAccess {
-			leftBase := getBaseIdentifier(left)
-			rightBase := getBaseIdentifier(right)
-			if areNodesStructurallyEqual(leftBase, rightBase) {
-				return Operand{typ: OperandTypeInvalid, node: node}
-			}
+			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
 		comparedExpr := left
@@ -1578,14 +1575,10 @@ outer3:
 		leftIsAccess := utils.IsAccessExpression(left)
 		rightIsAccess := utils.IsAccessExpression(right)
 
-		// If both sides are access expressions with the same base, we can't convert
-		// to optional chaining (e.g., foo == null || foo.bar === foo.baz)
+		// If both sides are access expressions, we can't convert to optional
+		// chaining without changing when the other side is evaluated.
 		if leftIsAccess && rightIsAccess {
-			leftBase := getBaseIdentifier(left)
-			rightBase := getBaseIdentifier(right)
-			if areNodesStructurallyEqual(leftBase, rightBase) {
-				return Operand{typ: OperandTypeInvalid, node: node}
-			}
+			return Operand{typ: OperandTypeInvalid, node: node}
 		}
 
 		comparedExpr := left

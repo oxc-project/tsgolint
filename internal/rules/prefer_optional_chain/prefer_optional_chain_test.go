@@ -1008,6 +1008,14 @@ if (!a || b === a || b.indexOf('input, button, a')) {
   console.log('Hello, World');
 }`,
 		},
+		{Code: `
+			function test() {
+				let x: undefined | { a: string }, y: undefined | { a: string }
+				if (x && y && x.a === y.a) {
+					console.log("x and y are equal")
+				}
+			}
+		`},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{
