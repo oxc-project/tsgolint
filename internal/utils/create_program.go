@@ -39,8 +39,8 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		internalDiags := make([]diagnostic.Internal, len(diagnostics))
 		for i, d := range diagnostics {
 			loc := d.Loc()
-			var filePath string
-			if d.File() != nil {
+			filePath := resolvedConfigPath
+			if d.File() != nil && d.File().FileName() != "" {
 				filePath = d.File().FileName()
 			}
 			internalDiags[i] = diagnostic.Internal{
@@ -58,8 +58,8 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		internalDiags := make([]diagnostic.Internal, len(configParseResult.Errors))
 		for i, e := range configParseResult.Errors {
 			loc := e.Loc()
-			var filePath string
-			if e.File() != nil {
+			filePath := resolvedConfigPath
+			if e.File() != nil && e.File().FileName() != "" {
 				filePath = e.File().FileName()
 			}
 			internalDiags[i] = diagnostic.Internal{
@@ -95,8 +95,8 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		internalDiags := make([]diagnostic.Internal, len(program_diagnostics))
 		for i, d := range program_diagnostics {
 			loc := d.Loc()
-			var filePath string
-			if d.File() != nil {
+			filePath := resolvedConfigPath
+			if d.File() != nil && d.File().FileName() != "" {
 				filePath = d.File().FileName()
 			}
 			internalDiags[i] = diagnostic.Internal{

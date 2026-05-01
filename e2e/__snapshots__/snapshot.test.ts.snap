@@ -1,9 +1,23 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`TSGoLint E2E Snapshot Tests > should attach the tsconfig path to tsconfig-error diagnostics without a TypeScript diagnostic file (oxc-project/oxc#2200) 1`] = `
+[
+  {
+    "file_path": "fixtures/issue-oxc-2200/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Invalid tsconfig",
+      "help": "Cannot find type definition file for 'tsgolint-missing-type-package'.",
+      "id": "tsconfig-error",
+    },
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should correctly evaluate project references 1`] = `
 [
   {
-    "file_path": "",
+    "file_path": "fixtures/project-references/img/typescript/tsconfig.app.json",
     "kind": 1,
     "message": {
       "description": "Invalid tsconfig",

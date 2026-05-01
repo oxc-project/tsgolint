@@ -736,4 +736,21 @@ console.log(x);
 
     expect(diagnostics).toMatchSnapshot();
   });
+
+  it('should attach the tsconfig path to tsconfig-error diagnostics without a TypeScript diagnostic file (oxc-project/oxc#2200)', async () => {
+    const testFiles = await getTestFiles('issue-oxc-2200');
+    expect(testFiles.length).toBeGreaterThan(0);
+
+    const config = generateConfig(testFiles, ['no-floating-promises']);
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: config,
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+  });
 });
