@@ -1146,3 +1146,39 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
      |                  ~~
    6 |       
 ---
+
+[TestPreferNullishCoalescingRule/invalid-122 - 1]
+Diagnostic 1: preferNullishOverOr (5:46 - 5:47)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | declare const fallback: boolean;
+   5 | export const result = isLoading || isPending || fallback;
+     |                                              ~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-123 - 1]
+Diagnostic 1: preferNullishOverOr (5:29 - 5:30)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | declare const alternate: string;
+   5 | export const result = value || fallback && alternate;
+     |                             ~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-124 - 1]
+Diagnostic 1: preferNullishOverOr (5:29 - 5:30)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   4 | declare const alternate: string;
+   5 | export const result = value || (fallback && alternate);
+     |                             ~~
+   6 |       
+---
+
+[TestPreferNullishCoalescingRule/invalid-125 - 1]
+Diagnostic 1: preferNullishOverOr (6:29 - 6:30)
+Message: Prefer using nullish coalescing operator (`??`) instead of a logical or (`||`), as it is a safer operator.
+   5 | declare const finalFallback: string;
+   6 | export const result = value || fallback && alternate || finalFallback;
+     |                             ~~
+   7 |       
+---

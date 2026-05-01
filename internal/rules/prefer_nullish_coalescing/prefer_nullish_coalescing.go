@@ -522,6 +522,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 
 			ctx.ReportNodeWithFixes(binExpr.OperatorToken, buildPreferNullishOverOrMessage(description, equals), func() []rule.RuleFix {
 				fixes := []rule.RuleFix{}
+				leftOperandStartsInsideLeftExpression := false
 
 				// If parent is a logical or expression (skipping parentheses), wrap with parentheses
 				// But don't add parentheses if already wrapped in parentheses
@@ -540,10 +541,26 @@ var PreferNullishCoalescingRule = rule.Rule{
 						// See: https://github.com/oxc-project/tsgolint/issues/604
 						if ast.IsBinaryExpression(leftExpr) && ast.IsLogicalExpression(leftExpr) && !isLogicalOrOperator(leftExpr.AsBinaryExpression().Left) {
 							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, leftExpr.AsBinaryExpression().Right, "("))
+							leftOperandStartsInsideLeftExpression = true
 						} else {
 							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Left, "("))
 						}
 						fixes = append(fixes, rule.RuleFixInsertAfter(binExpr.Right, ")"))
+					}
+				}
+
+				if binExpr.OperatorToken.Kind == ast.KindBarBarToken {
+					if !leftOperandStartsInsideLeftExpression && ast.IsLogicalExpression(binExpr.Left) && !ast.IsParenthesizedExpression(binExpr.Left) {
+						fixes = append(fixes,
+							rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Left, "("),
+							rule.RuleFixInsertAfter(binExpr.Left, ")"),
+						)
+					}
+					if ast.IsLogicalExpression(binExpr.Right) && !ast.IsParenthesizedExpression(binExpr.Right) {
+						fixes = append(fixes,
+							rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Right, "("),
+							rule.RuleFixInsertAfter(binExpr.Right, ")"),
+						)
 					}
 				}
 

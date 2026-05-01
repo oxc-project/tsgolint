@@ -2827,7 +2827,86 @@ const x = a && (b ?? c) || 'd';
 declare let a: string | null;
 declare let b: string;
 declare let c: string;
-const x = a && (b ?? c) ?? 'd';
+const x = (a && (b ?? c)) ?? 'd';
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+				},
+			},
+		},
+		// https://github.com/oxc-project/oxc/issues/21978
+		{
+			Code: `
+declare const isLoading: boolean;
+declare const isPending: boolean | undefined;
+declare const fallback: boolean;
+export const result = isLoading || isPending || fallback;
+      `,
+			Output: []string{`
+declare const isLoading: boolean;
+declare const isPending: boolean | undefined;
+declare const fallback: boolean;
+export const result = (isLoading || isPending) ?? fallback;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+				},
+			},
+		},
+		{
+			Code: `
+declare const value: string | undefined;
+declare const fallback: string;
+declare const alternate: string;
+export const result = value || fallback && alternate;
+      `,
+			Output: []string{`
+declare const value: string | undefined;
+declare const fallback: string;
+declare const alternate: string;
+export const result = value ?? (fallback && alternate);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+				},
+			},
+		},
+		{
+			Code: `
+declare const value: string | undefined;
+declare const fallback: string;
+declare const alternate: string;
+export const result = value || (fallback && alternate);
+      `,
+			Output: []string{`
+declare const value: string | undefined;
+declare const fallback: string;
+declare const alternate: string;
+export const result = value ?? (fallback && alternate);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+				},
+			},
+		},
+		{
+			Code: `
+declare const value: string | undefined;
+declare const fallback: string;
+declare const alternate: string;
+declare const finalFallback: string;
+export const result = value || fallback && alternate || finalFallback;
+      `,
+			Output: []string{`
+declare const value: string | undefined;
+declare const fallback: string;
+declare const alternate: string;
+declare const finalFallback: string;
+export const result = (value ?? (fallback && alternate)) || finalFallback;
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
