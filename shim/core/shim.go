@@ -10,6 +10,8 @@ import _ "unsafe"
 
 //go:linkname ApplyBulkEdits github.com/microsoft/typescript-go/internal/core.ApplyBulkEdits
 func ApplyBulkEdits(text string, edits []core.TextChange) string
+//go:linkname ApplyDebugStackLimit github.com/microsoft/typescript-go/internal/core.ApplyDebugStackLimit
+func ApplyDebugStackLimit()
 type Arena[T any] = core.Arena[T]
 //go:linkname BoolToTristate github.com/microsoft/typescript-go/internal/core.BoolToTristate
 func BoolToTristate(b bool) core.Tristate

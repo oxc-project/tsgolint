@@ -231,6 +231,8 @@ type EqualityOperator = ast.EqualityOperator
 type EqualityOperatorOrHigher = ast.EqualityOperatorOrHigher
 type EqualsGreaterThanToken = ast.EqualsGreaterThanToken
 type EqualsToken = ast.EqualsToken
+//go:linkname EscapeAllInternalSymbolNames github.com/microsoft/typescript-go/internal/ast.EscapeAllInternalSymbolNames
+func EscapeAllInternalSymbolNames(name string) string
 type ExclamationToken = ast.ExclamationToken
 type ExponentiationOperator = ast.ExponentiationOperator
 type ExportAssignment = ast.ExportAssignment

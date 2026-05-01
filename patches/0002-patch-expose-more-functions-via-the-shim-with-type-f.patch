@@ -1,4 +1,4 @@
-From 5cb842094809c1a698c4310c2598a6b00b135878 Mon Sep 17 00:00:00 2001
+From 3946aab31967fb0e99157c9fe4234579930040b5 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 17 Apr 2026 10:40:11 +0100
 Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
@@ -14,7 +14,7 @@ Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
  7 files changed, 155 insertions(+), 143 deletions(-)
 
 diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
-index 861123827..eb7356c0e 100644
+index 209487f22..8fb19b5ff 100644
 --- a/internal/project/autoimport.go
 +++ b/internal/project/autoimport.go
 @@ -13,7 +13,7 @@ import (
@@ -670,7 +670,7 @@ index a632f05a2..1cb3172c2 100644
  					if project.host != nil && project.host.sourceFS.SeenFile(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index e39e75471..c8e7ab656 100644
+index 4963d8a6f..ef2d93249 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -25,27 +25,27 @@ type FileSource interface {
@@ -1033,7 +1033,7 @@ index e39e75471..c8e7ab656 100644
  	if change.Opened != "" && !tspath.IsDynamicFileName(change.Opened.FileName()) {
  		path := s.toPath(change.Opened.FileName())
  		if entry, ok := s.diskFiles.Load(path); !ok || entry.Original() == nil {
-@@ -772,3 +775,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
+@@ -777,3 +780,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
  		}
  	}
  }

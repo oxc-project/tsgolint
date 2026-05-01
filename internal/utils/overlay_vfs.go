@@ -146,6 +146,13 @@ func (vfs *OverlayVFS) WriteFile(path string, data string) error {
 	return vfs.fs.WriteFile(path, data)
 }
 
+func (vfs *OverlayVFS) AppendFile(path string, data string) error {
+	if _, ok := vfs.VirtualFiles[path]; ok {
+		panic("not implemented: cannot append to overlay file system")
+	}
+	return vfs.fs.AppendFile(path, data)
+}
+
 func (vfs *OverlayVFS) Remove(path string) error {
 	if _, ok := vfs.VirtualFiles[path]; ok {
 		panic("not implemented: cannot remove from overlay file system")
