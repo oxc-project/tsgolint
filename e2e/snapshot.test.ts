@@ -31,6 +31,7 @@ const ALL_RULES = [
   'no-misused-promises',
   'no-misused-spread',
   'no-mixed-enums',
+  'no-object-comparison',
   'no-redundant-type-constituents',
   'no-unnecessary-boolean-literal-compare',
   'no-unnecessary-condition',
@@ -323,6 +324,67 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     diagnostics = parseHeadlessOutput(output);
     expect(diagnostics.length).toBe(0);
+  });
+
+  it('supports passing no-object-comparison rule config', async () => {
+    const testFile = resolveTestFilePath('basic/rules/no-object-comparison/index.ts');
+    const config = (
+      classes: {
+        name: string;
+        forbidEqualityOperators?: boolean;
+      }[],
+    ) => ({
+      version: 2,
+      configs: [
+        {
+          file_paths: [testFile],
+          rules: [
+            {
+              name: 'no-object-comparison',
+              options: {
+                classes,
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    let output: Buffer;
+    output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config([{ name: 'ValueObject' }])),
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    let diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+
+    output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(config([{ name: 'ValueObject', forbidEqualityOperators: true }])),
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
+
+    output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: JSON.stringify(
+        config([
+          { name: 'ValueObject' },
+          { name: 'OtherValueObject', forbidEqualityOperators: true },
+        ]),
+      ),
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    diagnostics = parseHeadlessOutput(output);
+    diagnostics = sortDiagnostics(diagnostics);
+
+    expect(diagnostics).toMatchSnapshot();
   });
 
   it.runIf(process.platform === 'win32')(
