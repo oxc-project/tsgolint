@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/dlclark/regexp2"
+	"github.com/dlclark/regexp2/v2"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
