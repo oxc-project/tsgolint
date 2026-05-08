@@ -804,7 +804,7 @@ func IsEqualityOperatorOrHigher(kind ast.Kind) bool
 //go:linkname IsExclusivelyTypeOnlyImportOrExport github.com/microsoft/typescript-go/internal/ast.IsExclusivelyTypeOnlyImportOrExport
 func IsExclusivelyTypeOnlyImportOrExport(node *ast.Node) bool
 //go:linkname IsExpandoInitializer github.com/microsoft/typescript-go/internal/ast.IsExpandoInitializer
-func IsExpandoInitializer(initializer *ast.Node) bool
+func IsExpandoInitializer(declaration *ast.Node, initializer *ast.Node) bool
 //go:linkname IsExpandoPropertyDeclaration github.com/microsoft/typescript-go/internal/ast.IsExpandoPropertyDeclaration
 func IsExpandoPropertyDeclaration(node *ast.Node) bool
 //go:linkname IsExponentiationOperator github.com/microsoft/typescript-go/internal/ast.IsExponentiationOperator
