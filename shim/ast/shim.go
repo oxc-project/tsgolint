@@ -436,6 +436,8 @@ func GetNameOfDeclaration(declaration *ast.Node) *ast.Node
 func GetNamespaceDeclarationNode(node *ast.Node) *ast.Node
 //go:linkname GetNewTargetContainer github.com/microsoft/typescript-go/internal/ast.GetNewTargetContainer
 func GetNewTargetContainer(node *ast.Node) *ast.Node
+//go:linkname GetNextJSDocCommentLocation github.com/microsoft/typescript-go/internal/ast.GetNextJSDocCommentLocation
+func GetNextJSDocCommentLocation(node *ast.Node) *ast.Node
 //go:linkname GetNodeAtPosition github.com/microsoft/typescript-go/internal/ast.GetNodeAtPosition
 func GetNodeAtPosition(file *ast.SourceFile, position int, includeJSDoc bool) *ast.Node
 //go:linkname GetNodeId github.com/microsoft/typescript-go/internal/ast.GetNodeId
