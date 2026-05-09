@@ -322,6 +322,9 @@ var NoMisusedPromisesRule = rule.Rule{
 			}
 			expressionContainer := node.Initializer.AsJsxExpression()
 			expression := expressionContainer.Expression
+			if expression == nil {
+				return
+			}
 			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, node.Initializer, checker.ContextFlagsNone)
 			if contextualType != nil && isVoidReturningFunctionType(node.Initializer, contextualType) && returnsThenable(expression) {
 				ctx.ReportNode(node.Initializer, buildVoidReturnAttributeMessage())

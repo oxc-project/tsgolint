@@ -258,6 +258,15 @@ const Component: any = () => null;
 		},
 		{
 			Code: `
+declare namespace JSX {
+  interface IntrinsicElements { div: { onClick?: () => void }; }
+}
+function MyComponent() { return <div onClick={} />; }
+      `,
+			Tsx: true,
+		},
+		{
+			Code: `
 interface ItLike {
   (name: string, callback: () => Promise<void>): void;
   (name: string, callback: () => void): void;
