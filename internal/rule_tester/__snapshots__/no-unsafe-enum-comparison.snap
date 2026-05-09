@@ -1078,3 +1078,59 @@ Help: Compare enum values to members of the same enum, or convert both sides to 
      |                       ^ Right operand: 1
   Suggestion 1: [replaceValueWithEnum] Replace with an enum value comparison.
 ---
+
+[TestNoUnsafeEnumComparisonRule/invalid-50 - 1]
+Diagnostic 1: mismatchedCondition (11:9 - 11:39)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+  10 |         declare const enumSortDir: UXSortDir;
+  11 |         stringSortDir === UXSortDir.asc;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 |         unionSortDir === UXSortDir.asc;
+  Label: Left operand: string (11:9 - 11:21)
+  10 |         declare const enumSortDir: UXSortDir;
+  11 |         stringSortDir === UXSortDir.asc;
+     |         ^^^^^^^^^^^^^ Left operand: string
+  12 |         unionSortDir === UXSortDir.asc;
+  Label: Right operand: UXSortDir.asc (11:27 - 11:39)
+  10 |         declare const enumSortDir: UXSortDir;
+  11 |         stringSortDir === UXSortDir.asc;
+     |                           ^^^^^^^^^^^^^ Right operand: UXSortDir.asc
+  12 |         unionSortDir === UXSortDir.asc;
+
+Diagnostic 2: mismatchedCondition (12:9 - 12:38)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+  11 |         stringSortDir === UXSortDir.asc;
+  12 |         unionSortDir === UXSortDir.asc;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  13 |         inlineUnionSortDir === UXSortDir.asc;
+  Label: Left operand: SortDir (12:9 - 12:20)
+  11 |         stringSortDir === UXSortDir.asc;
+  12 |         unionSortDir === UXSortDir.asc;
+     |         ^^^^^^^^^^^^ Left operand: SortDir
+  13 |         inlineUnionSortDir === UXSortDir.asc;
+  Label: Right operand: UXSortDir.asc (12:26 - 12:38)
+  11 |         stringSortDir === UXSortDir.asc;
+  12 |         unionSortDir === UXSortDir.asc;
+     |                          ^^^^^^^^^^^^^ Right operand: UXSortDir.asc
+  13 |         inlineUnionSortDir === UXSortDir.asc;
+
+Diagnostic 3: mismatchedCondition (13:9 - 13:44)
+Message: The two values in this comparison do not have a shared enum type.
+Help: Compare enum values to members of the same enum, or convert both sides to the same primitive type before comparing them.
+  12 |         unionSortDir === UXSortDir.asc;
+  13 |         inlineUnionSortDir === UXSortDir.asc;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  14 |         enumSortDir === UXSortDir.asc;
+  Label: Left operand: "asc" | "desc" (13:9 - 13:26)
+  12 |         unionSortDir === UXSortDir.asc;
+  13 |         inlineUnionSortDir === UXSortDir.asc;
+     |         ^^^^^^^^^^^^^^^^^^ Left operand: "asc" | "desc"
+  14 |         enumSortDir === UXSortDir.asc;
+  Label: Right operand: UXSortDir.asc (13:32 - 13:44)
+  12 |         unionSortDir === UXSortDir.asc;
+  13 |         inlineUnionSortDir === UXSortDir.asc;
+     |                                ^^^^^^^^^^^^^ Right operand: UXSortDir.asc
+  14 |         enumSortDir === UXSortDir.asc;
+---
