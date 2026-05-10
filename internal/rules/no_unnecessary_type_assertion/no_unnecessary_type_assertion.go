@@ -172,6 +172,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return true
 			}
 
+			if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, uncast, cast) &&
+				checker.Checker_isTypeAssignableTo(ctx.TypeChecker, cast, uncast) {
+				return true
+			}
+
 			if compilerOptions.ExactOptionalPropertyTypes.IsFalseOrUnknown() {
 				return false
 			}
