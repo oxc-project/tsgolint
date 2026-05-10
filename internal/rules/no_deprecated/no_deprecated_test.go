@@ -496,7 +496,7 @@ exists('/foo');
 			/** @deprecated */
 			prop: string;
 		}
-		const obj: MyInterface = { prop: 'value' };
+		declare const obj: MyInterface;
 		const key = 'prop';
 		const { [key]: value } = obj;
 	`},
@@ -2540,6 +2540,35 @@ exists('/foo');
         child.searchPaths();
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecatedWithReason",
+				},
+			},
+		},
+		{
+			Code: `
+        interface ErrorOptions {
+          /** @deprecated Use status instead. */
+          statusCode?: number;
+
+          status?: number;
+        }
+
+        declare function showError(error: ErrorOptions): void;
+        declare const statusCode: number;
+
+        showError({
+          statusCode: 500,
+        });
+
+        showError({
+          statusCode,
+        });
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecatedWithReason",
+				},
 				{
 					MessageId: "deprecatedWithReason",
 				},

@@ -1211,5 +1211,17 @@ Message: `searchPaths` is deprecated. use newMethod() instead
 ---
 
 [TestNoDeprecatedRule/invalid-145 - 1]
-No diagnostics
+Diagnostic 1: deprecatedWithReason (13:11 - 13:20)
+Message: `statusCode` is deprecated. Use status instead.
+  12 |         showError({
+  13 |           statusCode: 500,
+     |           ~~~~~~~~~~
+  14 |         });
+
+Diagnostic 2: deprecatedWithReason (17:11 - 17:20)
+Message: `statusCode` is deprecated. Use status instead.
+  16 |         showError({
+  17 |           statusCode,
+     |           ~~~~~~~~~~
+  18 |         });
 ---

@@ -275,6 +275,55 @@ var NoDeprecatedRule = rule.Rule{
 			return getJsDocDeprecation(symbol)
 		}
 
+		getObjectLiteralPropertyName := func(name *ast.Node) (string, bool) {
+			if name == nil || ast.IsComputedPropertyName(name) {
+				return "", false
+			}
+
+			nameText := name.Text()
+			return nameText, nameText != ""
+		}
+
+		getContextualObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) (string, *checker.Type, bool, string) {
+			if propertyNode == nil || propertyNode.Parent == nil || !ast.IsObjectLiteralExpression(propertyNode.Parent) {
+				return "", nil, false, ""
+			}
+
+			propertyName, ok := getObjectLiteralPropertyName(name)
+			if !ok {
+				return "", nil, false, ""
+			}
+
+			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, propertyNode.Parent, checker.ContextFlagsNone)
+			if contextualType == nil {
+				return "", nil, false, ""
+			}
+
+			property := checker.Checker_getPropertyOfType(ctx.TypeChecker, contextualType, propertyName)
+			isDeprecated, reason := getJsDocDeprecation(property)
+			return propertyName, contextualType, isDeprecated, reason
+		}
+
+		checkObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) {
+			propertyName, contextualType, isDeprecated, reason := getContextualObjectLiteralPropertyDeprecation(propertyNode, name)
+			if !isDeprecated {
+				return
+			}
+
+			nameType := ctx.TypeChecker.GetTypeAtLocation(name)
+			if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
+				utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
+				utils.ValueMatchesSomeSpecifier(name, opts.Allow, ctx.Program, nameType) {
+				return
+			}
+
+			if reason == "" {
+				ctx.ReportNode(name, buildDeprecatedMessage(propertyName))
+			} else {
+				ctx.ReportNode(name, buildDeprecatedWithReasonMessage(propertyName, strings.TrimSpace(reason)))
+			}
+		}
+
 		// Helper to get the source type for a binding pattern by walking up the tree
 		// This is declared as a variable to allow recursive calls
 		var getBindingPatternSourceType func(bindingPattern *ast.Node) *checker.Type
@@ -766,8 +815,17 @@ var NoDeprecatedRule = rule.Rule{
 			// We have checkElementAccessExpression registered to handle element access with literal keys.
 			// This handles cases like obj['deprecatedProp'] where the key is a literal.
 			ast.KindElementAccessExpression: checkElementAccessExpression,
-			ast.KindPrivateIdentifier:       checkIdentifier,
-			ast.KindSuperKeyword:            checkIdentifier,
+			ast.KindPropertyAssignment: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindShorthandPropertyAssignment: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindMethodDeclaration: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindPrivateIdentifier: checkIdentifier,
+			ast.KindSuperKeyword:      checkIdentifier,
 		}
 	},
 }
