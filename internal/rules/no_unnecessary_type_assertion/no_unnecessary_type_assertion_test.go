@@ -1813,5 +1813,27 @@ const s2 = (s);
 				},
 			},
 		},
+		{
+			Code: `
+interface Data { value: string }
+interface Item { data: Data }
+declare const item: Item;
+const d = item.data as Data;
+      `,
+			Output: []string{`
+interface Data { value: string }
+interface Item { data: Data }
+declare const item: Item;
+const d = item.data;
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      5,
+					Column:    21,
+				},
+			},
+		},
 	})
 }
