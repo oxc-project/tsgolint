@@ -4,6 +4,7 @@ Diagnostic 1: preferNullishOverTernary (1:1 - 1:28)
 Message: Prefer using nullish coalescing operator (`??`) instead of a ternary expression, as it is simpler to read.
    1 | this != undefined ? this : y;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-1 - 1]
@@ -18,6 +19,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-3 - 1]
@@ -27,6 +29,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-4 - 1]
@@ -36,6 +39,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-5 - 1]
@@ -45,6 +49,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-6 - 1]
@@ -54,6 +59,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-7 - 1]
@@ -63,6 +69,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-8 - 1]
@@ -72,6 +79,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-9 - 1]
@@ -81,6 +89,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-10 - 1]
@@ -90,6 +99,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-11 - 1]
@@ -99,6 +109,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-12 - 1]
@@ -108,6 +119,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-13 - 1]
@@ -117,6 +129,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-14 - 1]
@@ -126,6 +139,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-15 - 1]
@@ -135,6 +149,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-16 - 1]
@@ -144,6 +159,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-17 - 1]
@@ -153,6 +169,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-18 - 1]
@@ -162,6 +179,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-19 - 1]
@@ -171,6 +189,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-20 - 1]
@@ -180,6 +199,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-21 - 1]
@@ -189,6 +209,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-22 - 1]
@@ -198,6 +219,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-23 - 1]
@@ -207,6 +229,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-24 - 1]
@@ -216,6 +239,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-25 - 1]
@@ -225,6 +249,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-26 - 1]
@@ -234,6 +259,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-27 - 1]
@@ -243,6 +269,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-28 - 1]
@@ -252,6 +279,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-29 - 1]
@@ -261,6 +289,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-30 - 1]
@@ -270,6 +299,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-31 - 1]
@@ -279,6 +309,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-32 - 1]
@@ -288,6 +319,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-33 - 1]
@@ -297,6 +329,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-34 - 1]
@@ -306,6 +339,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-35 - 1]
@@ -315,6 +349,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-36 - 1]
@@ -324,6 +359,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-37 - 1]
@@ -333,6 +369,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-38 - 1]
@@ -342,6 +379,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-39 - 1]
@@ -351,6 +389,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-40 - 1]
@@ -360,6 +399,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-41 - 1]
@@ -369,6 +409,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-42 - 1]
@@ -378,6 +419,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-43 - 1]
@@ -387,6 +429,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-44 - 1]
@@ -396,6 +439,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-45 - 1]
@@ -405,6 +449,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-46 - 1]
@@ -414,6 +459,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-47 - 1]
@@ -423,6 +469,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-48 - 1]
@@ -432,6 +479,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-49 - 1]
@@ -441,6 +489,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-50 - 1]
@@ -450,6 +499,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-51 - 1]
@@ -459,6 +509,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-52 - 1]
@@ -468,6 +519,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-53 - 1]
@@ -477,6 +529,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-54 - 1]
@@ -486,6 +539,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-55 - 1]
@@ -495,6 +549,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-56 - 1]
@@ -504,6 +559,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-57 - 1]
@@ -513,6 +569,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-58 - 1]
@@ -522,6 +579,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-59 - 1]
@@ -531,6 +589,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-60 - 1]
@@ -540,6 +599,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | x ? x : y;
      | ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-61 - 1]
@@ -549,6 +609,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x ? y : x;
      | ~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-62 - 1]
@@ -558,6 +619,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-63 - 1]
@@ -567,6 +629,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    3 | x || y;
      |   ~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-64 - 1]
@@ -576,6 +639,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    2 | null || y;
      |      ~~
    3 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-65 - 1]
@@ -585,6 +649,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    2 | undefined || y;
      |           ~~
    3 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-66 - 1]
@@ -594,6 +659,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    8 | x || y;
      |   ~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-67 - 1]
@@ -603,6 +669,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    8 | x || y;
      |   ~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-68 - 1]
@@ -612,6 +679,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    8 | x || y;
      |   ~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-69 - 1]
@@ -621,6 +689,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    8 | x || y;
      |   ~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-70 - 1]
@@ -630,6 +699,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    6 | const x = Boolean(a || b);
      |                     ~~
    7 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-71 - 1]
@@ -639,6 +709,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = String(a || b);
      |                    ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-72 - 1]
@@ -648,6 +719,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = Boolean(() => a || b);
      |                           ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-73 - 1]
@@ -657,6 +729,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    6 |   return a || b;
      |            ~~
    7 | });
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-74 - 1]
@@ -666,6 +739,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    7 | const x = Boolean(f(a || b));
      |                       ~~
    8 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-75 - 1]
@@ -675,6 +749,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = Boolean(1 + (a || b));
      |                          ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-76 - 1]
@@ -684,6 +759,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    5 | const x = Boolean(a ? a : b);
      |                   ~~~~~~~~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-77 - 1]
@@ -693,6 +769,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    5 | const test = Boolean(!a ? b : a);
      |                      ~~~~~~~~~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-78 - 1]
@@ -702,6 +779,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    7 | if (f(a || b)) {
      |         ~~
    8 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-79 - 1]
@@ -711,6 +789,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | if (+(a || b)) {
      |         ~~
    6 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-80 - 1]
@@ -720,6 +799,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    8 | defaultBox || getFallbackBox();
      |            ~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-81 - 1]
@@ -729,6 +809,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    8 | defaultBox ? defaultBox : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-82 - 1]
@@ -738,6 +819,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    8 | defaultBoxOptional.a?.b != null ? defaultBoxOptional.a?.b : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-83 - 1]
@@ -747,6 +829,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    4 | x || y;
      |   ~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-84 - 1]
@@ -756,6 +839,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    4 | x || y;
      |   ~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-85 - 1]
@@ -765,6 +849,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    8 | defaultBoxOptional.a?.b != null ? defaultBoxOptional.a.b : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-86 - 1]
@@ -774,6 +859,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    8 | defaultBoxOptional.a?.b ? defaultBoxOptional.a?.b : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-87 - 1]
@@ -783,6 +869,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    8 | defaultBoxOptional.a?.b ? defaultBoxOptional.a.b : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-88 - 1]
@@ -796,6 +883,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
   10 |   : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~
   11 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-89 - 1]
@@ -809,6 +897,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
   10 |   : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~
   11 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-90 - 1]
@@ -822,6 +911,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
   10 |   : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~
   11 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-91 - 1]
@@ -835,6 +925,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
   10 |   : getFallbackBox();
      | ~~~~~~~~~~~~~~~~~~~~
   11 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-92 - 1]
@@ -844,6 +935,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    4 | !x ? y : x;
      | ~~~~~~~~~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-93 - 1]
@@ -853,6 +945,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    4 | x ? x : y;
      | ~~~~~~~~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-94 - 1]
@@ -862,6 +955,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | !x.n ? y : x.n;
      | ~~~~~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-95 - 1]
@@ -871,6 +965,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    4 | x?.['a'] != null ? x['a'] : 'foo';
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-96 - 1]
@@ -880,6 +975,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    4 | x?.['a'] != null ? x.a : 'foo';
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-97 - 1]
@@ -889,6 +985,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    4 | x?.a != null ? x['a'] : 'foo';
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    5 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-98 - 1]
@@ -898,6 +995,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    5 | x?.[a] != null ? x[a] : 'foo';
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-99 - 1]
@@ -911,6 +1009,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-100 - 1]
@@ -924,6 +1023,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-101 - 1]
@@ -937,6 +1037,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-102 - 1]
@@ -950,6 +1051,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 
 Diagnostic 2: preferNullishOverOr (7:9 - 7:11)
 Message: Prefer using nullish coalescing operator (`??=`) instead of a logical assignment (`||=`), as it is a safer operator.
@@ -957,6 +1059,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of a logical a
    7 |     foo ||= makeFoo();
      |         ~~~
    8 |   }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-103 - 1]
@@ -970,6 +1073,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-104 - 1]
@@ -979,6 +1083,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    6 |   if (foo == null) foo = makeFoo();
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    7 |   const bar = 42;
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-105 - 1]
@@ -988,6 +1093,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    6 |   if (foo == null) foo ??= makeFoo();
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    7 |   const bar = 42;
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-106 - 1]
@@ -997,6 +1103,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    6 |   if (foo == null) foo ||= makeFoo();
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    7 |   const bar = 42;
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 
 Diagnostic 2: preferNullishOverOr (6:24 - 6:26)
 Message: Prefer using nullish coalescing operator (`??=`) instead of a logical assignment (`||=`), as it is a safer operator.
@@ -1004,6 +1111,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of a logical a
    6 |   if (foo == null) foo ||= makeFoo();
      |                        ~~~
    7 |   const bar = 42;
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-107 - 1]
@@ -1017,6 +1125,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-108 - 1]
@@ -1030,6 +1139,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-109 - 1]
@@ -1043,6 +1153,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-110 - 1]
@@ -1056,6 +1167,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-111 - 1]
@@ -1069,6 +1181,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    9 |   }
      | ~~~
   10 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-114 - 1]
@@ -1078,6 +1191,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    5 | if (foo == null) /* comment before 1 */ /* comment before 2 */ foo = makeFoo(); // comment inline
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-115 - 1]
@@ -1091,6 +1205,7 @@ Message: Prefer using nullish coalescing operator (`??=`) instead of an assignme
    8 |   }
      | ~~~
    9 | }
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-116 - 1]
@@ -1100,6 +1215,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    5 | const foo = a ? a : b ? 1 : 2;
      |             ~~~~~~~~~~~~~~~~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-117 - 1]
@@ -1109,6 +1225,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    5 | const foo = a ? a : (b ? 1 : 2);
      |             ~~~~~~~~~~~~~~~~~~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-118 - 1]
@@ -1118,6 +1235,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a ternary ex
    3 | c !== null ? c : c ? 1 : 2;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-119 - 1]
@@ -1127,6 +1245,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = (a && b) || c || 'd';
      |                    ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-120 - 1]
@@ -1136,6 +1255,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = ((a && b)) || c || 'd';
      |                      ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-121 - 1]
@@ -1145,6 +1265,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | const x = a && b || c || 'd';
      |                  ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-122 - 1]
@@ -1154,6 +1275,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | export const result = isLoading || isPending || fallback;
      |                                              ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-123 - 1]
@@ -1163,6 +1285,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | export const result = value || fallback && alternate;
      |                             ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-124 - 1]
@@ -1172,6 +1295,7 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    5 | export const result = value || (fallback && alternate);
      |                             ~~
    6 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---
 
 [TestPreferNullishCoalescingRule/invalid-125 - 1]
@@ -1181,4 +1305,5 @@ Message: Prefer using nullish coalescing operator (`??`) instead of a logical or
    6 | export const result = value || fallback && alternate || finalFallback;
      |                             ~~
    7 |       
+  Suggestion 1: [suggestNullishCoalescing] Change to the nullish coalescing operator.
 ---

@@ -8,6 +8,13 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+func nullishSuggestion(output string) []rule_tester.InvalidTestCaseSuggestion {
+	return []rule_tester.InvalidTestCaseSuggestion{{
+		MessageId: "suggestNullishCoalescing",
+		Output:    output,
+	}}
+}
+
 func TestPreferNullishCoalescingRule(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferNullishCoalescingRule, []rule_tester.ValidTestCase{
@@ -426,11 +433,12 @@ const b = a || 'bar';
       `, Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": false, "string": false }}`)},
 	}, []rule_tester.InvalidTestCase{
 		{
-			Code:   `this != undefined ? this : y;`,
-			Output: []string{`this ?? y;`},
+			Code: `this != undefined ? this : y;`,
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					MessageId: "preferNullishOverTernary",
+					MessageId:   "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`this ?? y;`),
 				},
 			},
 		},
@@ -453,13 +461,14 @@ declare let x: string | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true }}`),
-			Output: []string{`
-declare let x: string | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: string | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -469,13 +478,14 @@ declare let x: number | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "string": true }}`),
-			Output: []string{`
-declare let x: number | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: number | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -485,13 +495,14 @@ declare let x: boolean | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: boolean | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: boolean | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -501,13 +512,14 @@ declare let x: bigint | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: bigint | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: bigint | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -517,13 +529,14 @@ declare let x: string | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true }}`),
-			Output: []string{`
-declare let x: string | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: string | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -533,13 +546,14 @@ declare let x: number | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "string": true }}`),
-			Output: []string{`
-declare let x: number | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: number | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -549,13 +563,14 @@ declare let x: boolean | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: boolean | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: boolean | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -565,13 +580,14 @@ declare let x: bigint | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: bigint | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -581,13 +597,14 @@ declare let x: '' | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: '' | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: '' | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -598,13 +615,14 @@ declare let x: ` + "`" + "`" + ` | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: ` + "`" + "`" + ` | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: ` + "`" + "`" + ` | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -614,13 +632,14 @@ declare let x: 0 | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 0 | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 0 | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -630,13 +649,14 @@ declare let x: 0n | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 0n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 0n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -646,13 +666,14 @@ declare let x: false | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: false | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: false | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -662,13 +683,14 @@ declare let x: '' | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: '' | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -679,13 +701,14 @@ declare let x: ` + "`" + "`" + ` | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: ` + "`" + "`" + ` | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -695,13 +718,14 @@ declare let x: 0 | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 0 | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -711,13 +735,14 @@ declare let x: 0n | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 0n | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -727,13 +752,14 @@ declare let x: false | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: false | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -743,13 +769,14 @@ declare let x: 'a' | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: 'a' | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 'a' | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -760,13 +787,14 @@ declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -776,13 +804,14 @@ declare let x: 1 | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 1 | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 1 | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -792,13 +821,14 @@ declare let x: 1n | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -808,13 +838,14 @@ declare let x: true | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: true | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -824,13 +855,14 @@ declare let x: 'a' | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 'a' | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -840,13 +872,14 @@ declare let x: 'a' | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 'a' | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -857,13 +890,14 @@ declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -874,13 +908,14 @@ declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: ` + "`" + `hello${'string'}` + "`" + ` | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -890,13 +925,14 @@ declare let x: 1 | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 1 | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 1 | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -906,13 +942,14 @@ declare let x: 1 | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 1 | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -922,13 +959,14 @@ declare let x: 1n | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -938,13 +976,14 @@ declare let x: 1n | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -954,13 +993,14 @@ declare let x: true | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: true | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -970,13 +1010,14 @@ declare let x: true | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: true | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -986,13 +1027,14 @@ declare let x: 'a' | 'b' | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: 'a' | 'b' | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 'a' | 'b' | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1003,13 +1045,14 @@ declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1019,13 +1062,14 @@ declare let x: 0 | 1 | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 0 | 1 | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 0 | 1 | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1035,13 +1079,14 @@ declare let x: 1 | 2 | 3 | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare let x: 1 | 2 | 3 | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1051,13 +1096,14 @@ declare let x: 0n | 1n | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 0n | 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 0n | 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1067,13 +1113,14 @@ declare let x: 1n | 2n | 3n | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 1n | 2n | 3n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 1n | 2n | 3n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1083,13 +1130,14 @@ declare let x: true | false | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | false | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: true | false | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1099,13 +1147,14 @@ declare let x: 'a' | 'b' | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: 'a' | 'b' | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 'a' | 'b' | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1115,13 +1164,14 @@ declare let x: 'a' | 'b' | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: 'a' | 'b' | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 'a' | 'b' | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1132,13 +1182,14 @@ declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
-declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1149,13 +1200,14 @@ declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": true, "string": false }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 'a' | ` + "`" + `b` + "`" + ` | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1165,13 +1217,14 @@ declare let x: 0 | 1 | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 0 | 1 | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 0 | 1 | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1181,13 +1234,14 @@ declare let x: 0 | 1 | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 0 | 1 | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1197,13 +1251,14 @@ declare let x: 1 | 2 | 3 | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 1 | 2 | 3 | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 1 | 2 | 3 | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1213,13 +1268,14 @@ declare let x: 1 | 2 | 3 | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 declare let x: 1 | 2 | 3 | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1229,13 +1285,14 @@ declare let x: 0n | 1n | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 0n | 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 0n | 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1245,13 +1302,14 @@ declare let x: 0n | 1n | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 0n | 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 0n | 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1261,13 +1319,14 @@ declare let x: 1n | 2n | 3n | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 1n | 2n | 3n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 1n | 2n | 3n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1277,13 +1336,14 @@ declare let x: 1n | 2n | 3n | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: 1n | 2n | 3n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 1n | 2n | 3n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1293,13 +1353,14 @@ declare let x: true | false | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | false | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: true | false | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1309,13 +1370,14 @@ declare let x: true | false | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | false | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: true | false | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1325,13 +1387,14 @@ declare let x: 0 | 1 | 0n | 1n | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 0 | 1 | 0n | 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: 0 | 1 | 0n | 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1341,13 +1404,14 @@ declare let x: true | false | null | undefined;
 x || y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | false | null | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: true | false | null | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1357,13 +1421,14 @@ declare let x: 0 | 1 | 0n | 1n | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 0 | 1 | 0n | 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 0 | 1 | 0n | 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1373,13 +1438,14 @@ declare let x: 0 | 1 | 0n | 1n | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": false, "boolean": true, "number": false, "string": true }}`),
-			Output: []string{`
-declare let x: 0 | 1 | 0n | 1n | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: 0 | 1 | 0n | 1n | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1389,13 +1455,14 @@ declare let x: true | false | null | undefined;
 x ? x : y;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | false | null | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: true | false | null | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1405,13 +1472,14 @@ declare let x: true | false | null | undefined;
 !x ? y : x;
       `,
 			Options: rule_tester.OptionsFromJSON[PreferNullishCoalescingOptions](`{"ignorePrimitives": { "bigint": true, "boolean": false, "number": true, "string": true }}`),
-			Output: []string{`
-declare let x: true | false | null | undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: true | false | null | undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1420,13 +1488,14 @@ x ?? y;
 declare let x: null;
 x || y;
       `,
-			Output: []string{`
-declare let x: null;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let x: null;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1435,13 +1504,14 @@ x ?? y;
 const x = undefined;
 x || y;
       `,
-			Output: []string{`
-const x = undefined;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+const x = undefined;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1449,12 +1519,13 @@ x ?? y;
 			Code: `
 null || y;
       `,
-			Output: []string{`
-null ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+null ?? y;
+      `),
 				},
 			},
 		},
@@ -1462,12 +1533,13 @@ null ?? y;
 			Code: `
 undefined || y;
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 undefined ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1481,7 +1553,11 @@ enum Enum {
 declare let x: Enum | undefined;
 x || y;
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 enum Enum {
   A = 0,
   B = 1,
@@ -1489,10 +1565,7 @@ enum Enum {
 }
 declare let x: Enum | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1506,7 +1579,11 @@ enum Enum {
 declare let x: Enum.A | Enum.B | undefined;
 x || y;
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 enum Enum {
   A = 0,
   B = 1,
@@ -1514,10 +1591,7 @@ enum Enum {
 }
 declare let x: Enum.A | Enum.B | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1531,7 +1605,11 @@ enum Enum {
 declare let x: Enum | undefined;
 x || y;
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 enum Enum {
   A = 'a',
   B = 'b',
@@ -1539,10 +1617,7 @@ enum Enum {
 }
 declare let x: Enum | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1556,7 +1631,11 @@ enum Enum {
 declare let x: Enum.A | Enum.B | undefined;
 x || y;
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 enum Enum {
   A = 'a',
   B = 'b',
@@ -1564,10 +1643,7 @@ enum Enum {
 }
 declare let x: Enum.A | Enum.B | undefined;
 x ?? y;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1580,16 +1656,17 @@ let c: boolean | undefined;
 const x = Boolean(a || b);
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 let c: boolean | undefined;
 
 const x = Boolean(a ?? b);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1601,15 +1678,16 @@ let b: string | boolean | undefined;
 const x = String(a || b);
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
 const x = String(a ?? b);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1621,15 +1699,16 @@ let b: string | boolean | undefined;
 const x = Boolean(() => a || b);
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
 const x = Boolean(() => a ?? b);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1643,17 +1722,18 @@ const x = Boolean(function weird() {
 });
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
 const x = Boolean(function weird() {
   return a ?? b;
 });
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1667,17 +1747,18 @@ declare function f(x: unknown): unknown;
 const x = Boolean(f(a || b));
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
 declare function f(x: unknown): unknown;
 
 const x = Boolean(f(a ?? b));
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1689,15 +1770,16 @@ let b: string | boolean | undefined;
 const x = Boolean(1 + (a || b));
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
 const x = Boolean(1 + (a ?? b));
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1709,15 +1791,16 @@ let b: string | boolean | undefined;
 const x = Boolean(a ? a : b);
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
 const x = Boolean(a ?? b);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1729,15 +1812,16 @@ let b: string | boolean | undefined;
 const test = Boolean(!a ? b : a);
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreBooleanCoercion: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 let a: string | boolean | undefined;
 let b: string | boolean | undefined;
 
 const test = Boolean(a ?? b);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1752,7 +1836,11 @@ if (f(a || b)) {
 }
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreConditionalTests: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 let a: string | true | undefined;
 let b: string | boolean | undefined;
 
@@ -1760,10 +1848,7 @@ declare function f(x: unknown): unknown;
 
 if (f(a ?? b)) {
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1776,16 +1861,17 @@ if (+(a || b)) {
 }
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreConditionalTests: true},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare const a: string | undefined;
 declare const b: string;
 
 if (+(a ?? b)) {
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1799,7 +1885,11 @@ declare const defaultBox: Box | undefined;
 
 defaultBox || getFallbackBox();
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1807,10 +1897,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBox: Box | undefined;
 
 defaultBox ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -1825,7 +1912,11 @@ declare const defaultBox: Box | undefined;
 defaultBox ? defaultBox : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1833,10 +1924,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBox: Box | undefined;
 
 defaultBox ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1851,7 +1939,11 @@ declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 defaultBoxOptional.a?.b != null ? defaultBoxOptional.a?.b : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1859,10 +1951,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1872,14 +1961,15 @@ declare const x: any;
 declare const y: any;
 x || y;
       `,
-			Output: []string{`
-declare const x: any;
-declare const y: any;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare const x: any;
+declare const y: any;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1889,14 +1979,15 @@ declare const x: unknown;
 declare const y: any;
 x || y;
       `,
-			Output: []string{`
-declare const x: unknown;
-declare const y: any;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare const x: unknown;
+declare const y: any;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -1911,7 +2002,11 @@ declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 defaultBoxOptional.a?.b != null ? defaultBoxOptional.a.b : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1919,10 +2014,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1937,7 +2029,11 @@ declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 defaultBoxOptional.a?.b ? defaultBoxOptional.a?.b : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1945,10 +2041,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1963,7 +2056,11 @@ declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 defaultBoxOptional.a?.b ? defaultBoxOptional.a.b : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1971,10 +2068,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -1991,7 +2085,11 @@ defaultBoxOptional.a?.b !== undefined
   : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -1999,10 +2097,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2019,7 +2114,11 @@ defaultBoxOptional.a?.b !== undefined
   : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -2027,10 +2126,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2047,7 +2143,11 @@ defaultBoxOptional.a?.b !== undefined && defaultBoxOptional.a?.b !== null
   : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -2055,10 +2155,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2075,7 +2172,11 @@ defaultBoxOptional.a?.b !== undefined && defaultBoxOptional.a?.b !== null
   : getFallbackBox();
       `,
 			Options: PreferNullishCoalescingOptions{IgnoreTernaryTests: false},
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 interface Box {
   value: string;
 }
@@ -2083,10 +2184,7 @@ declare function getFallbackBox(): Box;
 declare const defaultBoxOptional: { a?: { b?: Box | undefined } };
 
 defaultBoxOptional.a?.b ?? getFallbackBox();
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2096,14 +2194,15 @@ declare let x: unknown;
 declare let y: number;
 !x ? y : x;
       `,
-			Output: []string{`
-declare let x: unknown;
-declare let y: number;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: unknown;
+declare let y: number;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -2113,14 +2212,15 @@ declare let x: unknown;
 declare let y: number;
 x ? x : y;
       `,
-			Output: []string{`
-declare let x: unknown;
-declare let y: number;
-x ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: unknown;
+declare let y: number;
+x ?? y;
+      `),
 				},
 			},
 		},
@@ -2129,13 +2229,14 @@ x ?? y;
 declare let x: { n: unknown };
 !x.n ? y : x.n;
       `,
-			Output: []string{`
-declare let x: { n: unknown };
-x.n ?? y;
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: { n: unknown };
+x.n ?? y;
+      `),
 				},
 			},
 		},
@@ -2145,14 +2246,15 @@ declare let x: { a: string } | null;
 
 x?.['a'] != null ? x['a'] : 'foo';
       `,
-			Output: []string{`
-declare let x: { a: string } | null;
 
-x?.['a'] ?? 'foo';
-      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: { a: string } | null;
+
+x?.['a'] ?? 'foo';
+      `),
 				},
 			},
 		},
@@ -2163,14 +2265,15 @@ declare let x: { a: string } | null;
 
 x?.['a'] != null ? x.a : 'foo';
       `,
-			Output: []string{`
-declare let x: { a: string } | null;
 
-x?.['a'] ?? 'foo';
-      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: { a: string } | null;
+
+x?.['a'] ?? 'foo';
+      `),
 				},
 			},
 		},
@@ -2181,14 +2284,15 @@ declare let x: { a: string } | null;
 
 x?.a != null ? x['a'] : 'foo';
       `,
-			Output: []string{`
-declare let x: { a: string } | null;
 
-x?.a ?? 'foo';
-      `},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare let x: { a: string } | null;
+
+x?.a ?? 'foo';
+      `),
 				},
 			},
 		},
@@ -2199,15 +2303,16 @@ declare let x: { a: string; b: string } | null;
 
 x?.[a] != null ? x[a] : 'foo';
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 const a = 'b';
 declare let x: { a: string; b: string } | null;
 
 x?.[a] ?? 'foo';
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2222,17 +2327,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2247,17 +2353,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2272,17 +2379,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2297,21 +2405,30 @@ function lazyInitialize() {
   }
 }
       `,
-			// The rule produces one final output that fixes both issues at once
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let foo: { a: string } | null;
+declare function makeFoo(): { a: string };
+
+function lazyInitialize() {
+  if (foo == null) {
+    foo ??= makeFoo();
+  }
+}
+      `),
 				},
 			},
 		},
@@ -2326,17 +2443,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2351,7 +2469,11 @@ function lazyInitialize() {
   return bar;
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
@@ -2360,10 +2482,7 @@ function lazyInitialize() {
   const bar = 42;
   return bar;
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2378,7 +2497,11 @@ function lazyInitialize() {
   return bar;
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
@@ -2387,10 +2510,7 @@ function lazyInitialize() {
   const bar = 42;
   return bar;
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2405,8 +2525,10 @@ function lazyInitialize() {
   return bar;
 }
       `,
-			// The rule produces one final output that fixes both issues at once
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): { a: string };
 
@@ -2415,13 +2537,20 @@ function lazyInitialize() {
   const bar = 42;
   return bar;
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 				{
 					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
+declare let foo: { a: string } | null;
+declare function makeFoo(): { a: string };
+
+function lazyInitialize() {
+  if (foo == null) foo ??= makeFoo();
+  const bar = 42;
+  return bar;
+}
+      `),
 				},
 			},
 		},
@@ -2436,17 +2565,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | undefined;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2461,17 +2591,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null | undefined;
 declare function makeFoo(): { a: string };
 
 function lazyInitialize() {
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2486,17 +2617,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): string;
 
 function lazyInitialize() {
   foo.a ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2511,17 +2643,18 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string } | null;
 declare function makeFoo(): string;
 
 function lazyInitialize() {
   foo.a ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2537,7 +2670,11 @@ function lazyInitialize() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: string | null;
 declare function makeFoo(): string;
 
@@ -2545,10 +2682,7 @@ function lazyInitialize() {
   // comment
   foo ??= makeFoo();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2581,7 +2715,11 @@ if (foo == null) {
    */
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: string | null;
 declare function makeFoo(): string;
 
@@ -2604,10 +2742,7 @@ foo ??= makeFoo(); // comment inline
    * comment after 4
    * which is also multiline
    */
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2640,7 +2775,11 @@ if (foo == null) {
    */
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: string | null;
 declare function makeFoo(): string;
 
@@ -2663,10 +2802,7 @@ foo ??= makeFoo(); // comment inline
    * comment after 4
    * which is also multiline
    */
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2677,15 +2813,16 @@ declare function makeFoo(): string;
 
 if (foo == null) /* comment before 1 */ /* comment before 2 */ foo = makeFoo(); // comment inline
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: string | null;
 declare function makeFoo(): string;
 
 /* comment before 1 */ /* comment before 2 */ foo ??= makeFoo(); // comment inline
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2700,17 +2837,18 @@ function weirdParens() {
   }
 }
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverAssignment",
+					Suggestions: nullishSuggestion(`
 declare let foo: { a: string | null };
 declare function makeString(): string;
 
 function weirdParens() {
   ((foo).a) ??= makeString();
 }
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverAssignment",
+      `),
 				},
 			},
 		},
@@ -2721,15 +2859,16 @@ let b: { message: string } | undefined;
 
 const foo = a ? a : b ? 1 : 2;
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 let a: string | undefined;
 let b: { message: string } | undefined;
 
 const foo = a ?? (b ? 1 : 2);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2740,15 +2879,16 @@ let b: { message: string } | undefined;
 
 const foo = a ? a : (b ? 1 : 2);
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
 let a: string | undefined;
 let b: { message: string } | undefined;
 
 const foo = a ?? (b ? 1 : 2);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverTernary",
+      `),
 				},
 			},
 		},
@@ -2757,13 +2897,14 @@ const foo = a ?? (b ? 1 : 2);
 declare const c: string | null;
 c !== null ? c : c ? 1 : 2;
       `,
-			Output: []string{`
-declare const c: string | null;
-c ?? (c ? 1 : 2);
-      `},
+
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNullishOverTernary",
+					Suggestions: nullishSuggestion(`
+declare const c: string | null;
+c ?? (c ? 1 : 2);
+      `),
 				},
 			},
 		},
@@ -2776,15 +2917,16 @@ declare let b: string;
 declare let c: string;
 const x = (a && b) || c || 'd';
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare let a: string | null;
 declare let b: string;
 declare let c: string;
 const x = ((a && b) ?? c) || 'd';
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -2797,15 +2939,16 @@ declare let b: string;
 declare let c: string;
 const x = ((a && b)) || c || 'd';
       `,
-			Output: []string{`
+
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare let a: string | null;
 declare let b: string;
 declare let c: string;
 const x = (((a && b)) ?? c) || 'd';
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -2818,20 +2961,15 @@ declare let b: string;
 declare let c: string;
 const x = a && b || c || 'd';
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare let a: string | null;
 declare let b: string;
 declare let c: string;
 const x = a && (b ?? c) || 'd';
-      `, `
-declare let a: string | null;
-declare let b: string;
-declare let c: string;
-const x = (a && (b ?? c)) ?? 'd';
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -2843,15 +2981,15 @@ declare const isPending: boolean | undefined;
 declare const fallback: boolean;
 export const result = isLoading || isPending || fallback;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare const isLoading: boolean;
 declare const isPending: boolean | undefined;
 declare const fallback: boolean;
 export const result = (isLoading || isPending) ?? fallback;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -2862,15 +3000,15 @@ declare const fallback: string;
 declare const alternate: string;
 export const result = value || fallback && alternate;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare const value: string | undefined;
 declare const fallback: string;
 declare const alternate: string;
 export const result = value ?? (fallback && alternate);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -2881,15 +3019,15 @@ declare const fallback: string;
 declare const alternate: string;
 export const result = value || (fallback && alternate);
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare const value: string | undefined;
 declare const fallback: string;
 declare const alternate: string;
 export const result = value ?? (fallback && alternate);
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},
@@ -2901,16 +3039,16 @@ declare const alternate: string;
 declare const finalFallback: string;
 export const result = value || fallback && alternate || finalFallback;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNullishOverOr",
+					Suggestions: nullishSuggestion(`
 declare const value: string | undefined;
 declare const fallback: string;
 declare const alternate: string;
 declare const finalFallback: string;
 export const result = (value ?? (fallback && alternate)) || finalFallback;
-      `},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNullishOverOr",
+      `),
 				},
 			},
 		},

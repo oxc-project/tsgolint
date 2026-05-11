@@ -38,6 +38,13 @@ func buildPreferNullishOverAssignmentMessage() rule.RuleMessage {
 	}
 }
 
+func buildSuggestNullishCoalescingMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "suggestNullishCoalescing",
+		Description: "Change to the nullish coalescing operator.",
+	}
+}
+
 // NullishCheckOperator represents the operator used in nullish checks
 type NullishCheckOperator string
 
@@ -520,7 +527,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNodeWithFixes(binExpr.OperatorToken, buildPreferNullishOverOrMessage(description, equals), func() []rule.RuleFix {
+			ctx.ReportNodeWithSuggestions(binExpr.OperatorToken, buildPreferNullishOverOrMessage(description, equals), func() []rule.RuleSuggestion {
 				fixes := []rule.RuleFix{}
 				leftOperandStartsInsideLeftExpression := false
 
@@ -573,7 +580,10 @@ var PreferNullishCoalescingRule = rule.Rule{
 				}
 				fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, binExpr.OperatorToken, newOperator))
 
-				return fixes
+				return []rule.RuleSuggestion{{
+					Message:  buildSuggestNullishCoalescingMessage(),
+					FixesArr: fixes,
+				}}
 			})
 		}
 
@@ -763,7 +773,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 					return
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferNullishOverTernaryMessage(), func() []rule.RuleFix {
+				ctx.ReportNodeWithSuggestions(node, buildPreferNullishOverTernaryMessage(), func() []rule.RuleSuggestion {
 					leftText := ctx.SourceFile.Text()[nullishCoalescingLeftNode.Pos():nullishCoalescingLeftNode.End()]
 					rightText := ctx.SourceFile.Text()[nullishBranch.Pos():nullishBranch.End()]
 
@@ -776,9 +786,12 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 
 					newText := strings.TrimSpace(leftText) + " ?? " + rightText
-					return []rule.RuleFix{
-						rule.RuleFixReplace(ctx.SourceFile, node, newText),
-					}
+					return []rule.RuleSuggestion{{
+						Message: buildSuggestNullishCoalescingMessage(),
+						FixesArr: []rule.RuleFix{
+							rule.RuleFixReplace(ctx.SourceFile, node, newText),
+						},
+					}}
 				})
 			},
 
@@ -876,7 +889,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferNullishOverAssignmentMessage(), func() []rule.RuleFix {
+				ctx.ReportNodeWithSuggestions(node, buildPreferNullishOverAssignmentMessage(), func() []rule.RuleSuggestion {
 					// Strip all outer parentheses from the left node to get the inner expression
 					leftNodeUnwrapped := ast.SkipParentheses(nullishCoalescingLeftNode)
 					leftText := ctx.SourceFile.Text()[leftNodeUnwrapped.Pos():leftNodeUnwrapped.End()]
@@ -889,9 +902,12 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 					newText := leftTextTrimmed + " ??= " + strings.TrimSpace(rightText) + ";"
 
-					return []rule.RuleFix{
-						rule.RuleFixReplace(ctx.SourceFile, node, newText),
-					}
+					return []rule.RuleSuggestion{{
+						Message: buildSuggestNullishCoalescingMessage(),
+						FixesArr: []rule.RuleFix{
+							rule.RuleFixReplace(ctx.SourceFile, node, newText),
+						},
+					}}
 				})
 			},
 		}
