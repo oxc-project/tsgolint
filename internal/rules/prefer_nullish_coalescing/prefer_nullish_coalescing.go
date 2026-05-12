@@ -38,6 +38,13 @@ func buildPreferNullishOverAssignmentMessage() rule.RuleMessage {
 	}
 }
 
+func buildSuggestNullishCoalescingMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "suggestNullishCoalescing",
+		Description: "Change to the nullish coalescing operator.",
+	}
+}
+
 // NullishCheckOperator represents the operator used in nullish checks
 type NullishCheckOperator string
 
@@ -520,8 +527,9 @@ var PreferNullishCoalescingRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNodeWithFixes(binExpr.OperatorToken, buildPreferNullishOverOrMessage(description, equals), func() []rule.RuleFix {
+			ctx.ReportNodeWithSuggestions(binExpr.OperatorToken, buildPreferNullishOverOrMessage(description, equals), func() []rule.RuleSuggestion {
 				fixes := []rule.RuleFix{}
+				leftOperandStartsInsideLeftExpression := false
 
 				// If parent is a logical or expression (skipping parentheses), wrap with parentheses
 				// But don't add parentheses if already wrapped in parentheses
@@ -540,10 +548,26 @@ var PreferNullishCoalescingRule = rule.Rule{
 						// See: https://github.com/oxc-project/tsgolint/issues/604
 						if ast.IsBinaryExpression(leftExpr) && ast.IsLogicalExpression(leftExpr) && !isLogicalOrOperator(leftExpr.AsBinaryExpression().Left) {
 							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, leftExpr.AsBinaryExpression().Right, "("))
+							leftOperandStartsInsideLeftExpression = true
 						} else {
 							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Left, "("))
 						}
 						fixes = append(fixes, rule.RuleFixInsertAfter(binExpr.Right, ")"))
+					}
+				}
+
+				if binExpr.OperatorToken.Kind == ast.KindBarBarToken {
+					if !leftOperandStartsInsideLeftExpression && ast.IsLogicalExpression(binExpr.Left) && !ast.IsParenthesizedExpression(binExpr.Left) {
+						fixes = append(fixes,
+							rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Left, "("),
+							rule.RuleFixInsertAfter(binExpr.Left, ")"),
+						)
+					}
+					if ast.IsLogicalExpression(binExpr.Right) && !ast.IsParenthesizedExpression(binExpr.Right) {
+						fixes = append(fixes,
+							rule.RuleFixInsertBefore(ctx.SourceFile, binExpr.Right, "("),
+							rule.RuleFixInsertAfter(binExpr.Right, ")"),
+						)
 					}
 				}
 
@@ -556,7 +580,10 @@ var PreferNullishCoalescingRule = rule.Rule{
 				}
 				fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, binExpr.OperatorToken, newOperator))
 
-				return fixes
+				return []rule.RuleSuggestion{{
+					Message:  buildSuggestNullishCoalescingMessage(),
+					FixesArr: fixes,
+				}}
 			})
 		}
 
@@ -746,7 +773,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 					return
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferNullishOverTernaryMessage(), func() []rule.RuleFix {
+				ctx.ReportNodeWithSuggestions(node, buildPreferNullishOverTernaryMessage(), func() []rule.RuleSuggestion {
 					leftText := ctx.SourceFile.Text()[nullishCoalescingLeftNode.Pos():nullishCoalescingLeftNode.End()]
 					rightText := ctx.SourceFile.Text()[nullishBranch.Pos():nullishBranch.End()]
 
@@ -759,9 +786,12 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 
 					newText := strings.TrimSpace(leftText) + " ?? " + rightText
-					return []rule.RuleFix{
-						rule.RuleFixReplace(ctx.SourceFile, node, newText),
-					}
+					return []rule.RuleSuggestion{{
+						Message: buildSuggestNullishCoalescingMessage(),
+						FixesArr: []rule.RuleFix{
+							rule.RuleFixReplace(ctx.SourceFile, node, newText),
+						},
+					}}
 				})
 			},
 
@@ -859,7 +889,7 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferNullishOverAssignmentMessage(), func() []rule.RuleFix {
+				ctx.ReportNodeWithSuggestions(node, buildPreferNullishOverAssignmentMessage(), func() []rule.RuleSuggestion {
 					// Strip all outer parentheses from the left node to get the inner expression
 					leftNodeUnwrapped := ast.SkipParentheses(nullishCoalescingLeftNode)
 					leftText := ctx.SourceFile.Text()[leftNodeUnwrapped.Pos():leftNodeUnwrapped.End()]
@@ -872,9 +902,12 @@ var PreferNullishCoalescingRule = rule.Rule{
 					}
 					newText := leftTextTrimmed + " ??= " + strings.TrimSpace(rightText) + ";"
 
-					return []rule.RuleFix{
-						rule.RuleFixReplace(ctx.SourceFile, node, newText),
-					}
+					return []rule.RuleSuggestion{{
+						Message: buildSuggestNullishCoalescingMessage(),
+						FixesArr: []rule.RuleFix{
+							rule.RuleFixReplace(ctx.SourceFile, node, newText),
+						},
+					}}
 				})
 			},
 		}

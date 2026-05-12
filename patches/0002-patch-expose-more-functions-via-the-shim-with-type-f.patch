@@ -1,4 +1,4 @@
-From 5cb842094809c1a698c4310c2598a6b00b135878 Mon Sep 17 00:00:00 2001
+From e04127631dd7818d0f890cc64722516c789e625f Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 17 Apr 2026 10:40:11 +0100
 Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
@@ -14,7 +14,7 @@ Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
  7 files changed, 155 insertions(+), 143 deletions(-)
 
 diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
-index 861123827..eb7356c0e 100644
+index 209487f22..8fb19b5ff 100644
 --- a/internal/project/autoimport.go
 +++ b/internal/project/autoimport.go
 @@ -13,7 +13,7 @@ import (
@@ -49,7 +49,7 @@ index 212601d4b..73e4b4316 100644
  }
  
 diff --git a/internal/project/configfileregistrybuilder.go b/internal/project/configfileregistrybuilder.go
-index f543951f1..1660cda40 100644
+index 209cfc626..e5d0ef231 100644
 --- a/internal/project/configfileregistrybuilder.go
 +++ b/internal/project/configfileregistrybuilder.go
 @@ -16,14 +16,14 @@ import (
@@ -241,7 +241,7 @@ index f543951f1..1660cda40 100644
  	searchPath := tspath.GetDirectoryPath(fileName)
  	// Prefer custom config file if provided; search ancestors with correct skip behavior.
  	if c.customConfigFileName != "" {
-@@ -623,7 +623,7 @@ func (c *configFileRegistryBuilder) computeConfigFileName(fileName string, skipS
+@@ -631,7 +631,7 @@ func (c *configFileRegistryBuilder) computeConfigFileName(fileName string, skipS
  	return result
  }
  
@@ -250,7 +250,7 @@ index f543951f1..1660cda40 100644
  	if tspath.IsDynamicFileName(fileName) {
  		return ""
  	}
-@@ -632,7 +632,7 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
+@@ -640,7 +640,7 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
  		return entry.Value().nearestConfigFileName
  	}
  
@@ -259,7 +259,7 @@ index f543951f1..1660cda40 100644
  	if c.isOpenFile(path) {
  		c.configFileNames.Add(path, &configFileNames{
  			nearestConfigFileName: configName,
-@@ -641,7 +641,7 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
+@@ -649,7 +649,7 @@ func (c *configFileRegistryBuilder) getConfigFileNameForFile(fileName string, pa
  	return configName
  }
  
@@ -268,7 +268,7 @@ index f543951f1..1660cda40 100644
  	if tspath.IsDynamicFileName(string(path)) {
  		return
  	}
-@@ -659,7 +659,7 @@ func (c *configFileRegistryBuilder) forEachConfigFileNameFor(path tspath.Path, c
+@@ -667,7 +667,7 @@ func (c *configFileRegistryBuilder) forEachConfigFileNameFor(path tspath.Path, c
  	}
  }
  
@@ -277,7 +277,7 @@ index f543951f1..1660cda40 100644
  	if tspath.IsDynamicFileName(fileName) {
  		return ""
  	}
-@@ -674,7 +674,7 @@ func (c *configFileRegistryBuilder) getAncestorConfigFileName(fileName string, p
+@@ -682,7 +682,7 @@ func (c *configFileRegistryBuilder) getAncestorConfigFileName(fileName string, p
  	}
  
  	// Look for config in parent folders of config file
@@ -286,7 +286,7 @@ index f543951f1..1660cda40 100644
  
  	if c.isOpenFile(path) {
  		entry.Change(func(value *configFileNames) {
-@@ -688,17 +688,17 @@ func (c *configFileRegistryBuilder) getAncestorConfigFileName(fileName string, p
+@@ -696,17 +696,17 @@ func (c *configFileRegistryBuilder) getAncestorConfigFileName(fileName string, p
  }
  
  // FS implements tsoptions.ParseConfigHost.
@@ -307,7 +307,7 @@ index f543951f1..1660cda40 100644
  	var content string
  	fh := c.fs.GetFileByPath(fileName, path)
  	if fh != nil {
-@@ -715,7 +715,7 @@ func (c *configFileRegistryBuilder) GetExtendedConfig(fileName string, path tspa
+@@ -723,7 +723,7 @@ func (c *configFileRegistryBuilder) GetExtendedConfig(fileName string, path tspa
  	}).ExtendedConfigCacheEntry
  }
  
@@ -670,7 +670,7 @@ index a632f05a2..1cb3172c2 100644
  					if project.host != nil && project.host.sourceFS.SeenFile(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index e39e75471..c8e7ab656 100644
+index 4963d8a6f..ef2d93249 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -25,27 +25,27 @@ type FileSource interface {
@@ -1033,7 +1033,7 @@ index e39e75471..c8e7ab656 100644
  	if change.Opened != "" && !tspath.IsDynamicFileName(change.Opened.FileName()) {
  		path := s.toPath(change.Opened.FileName())
  		if entry, ok := s.diskFiles.Load(path); !ok || entry.Original() == nil {
-@@ -772,3 +775,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
+@@ -777,3 +780,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
  		}
  	}
  }

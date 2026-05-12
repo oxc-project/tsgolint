@@ -1,4 +1,4 @@
-From eb6ddfc67a70ff731e03c88ecd36c1c63f90fbd3 Mon Sep 17 00:00:00 2001
+From 6af00a3f8964c8a706a3dd1588871ec646070058 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
 Subject: [PATCH 1/5] Adapt project service for single run mode
@@ -8,7 +8,7 @@ Subject: [PATCH 1/5] Adapt project service for single run mode
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/internal/project/project.go b/internal/project/project.go
-index 5ae3cfb0d..83865786e 100644
+index 3f1a9d913..99e3977ee 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
 @@ -3,6 +3,7 @@ package project
@@ -19,12 +19,12 @@ index 5ae3cfb0d..83865786e 100644
  	"strings"
  	"sync"
  
-@@ -371,7 +372,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
- 				UseSourceOfProjectReference: true,
- 				TypingsLocation:             typingsLocation,
- 				CreateCheckerPool: func(program *compiler.Program) compiler.CheckerPool {
--					checkerPool = newCheckerPool(4, program, p.log)
-+					checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.log)
- 					return checkerPool
- 				},
- 			},
+@@ -342,7 +343,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
+ 	// the same project never share a captured variable through a stale closure
+ 	// stored in the old program's options.
+ 	createCheckerPool := func(program *compiler.Program) compiler.CheckerPool {
+-		checkerPool = newCheckerPool(4, program, nil)
++		checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.log)
+ 		return checkerPool
+ 	}
+ 

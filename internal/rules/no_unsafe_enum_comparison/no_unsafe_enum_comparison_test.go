@@ -329,6 +329,18 @@ func TestNoUnsafeEnumComparisonRule(t *testing.T) {
         }
       }
     `},
+		{Code: `
+      enum Fruit {
+        Apple,
+      }
+      enum Vegetable {
+        Asparagus = 'asparagus',
+      }
+      declare const numberOrBoolean: number | boolean;
+      declare const stringOrBoolean: string | boolean;
+      numberOrBoolean === Fruit.Apple;
+      stringOrBoolean === Vegetable.Asparagus;
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -1487,6 +1499,34 @@ func TestNoUnsafeEnumComparisonRule(t *testing.T) {
         stringKey === StringKey['line\nbreak'];`,
 						},
 					},
+				},
+			},
+		},
+		{
+			Code: `
+        enum UXSortDir {
+          asc = 'asc',
+          desc = 'desc',
+        }
+        type SortDir = 'asc' | 'desc';
+        declare const stringSortDir: string;
+        declare const unionSortDir: SortDir;
+        declare const inlineUnionSortDir: 'asc' | 'desc';
+        declare const enumSortDir: UXSortDir;
+        stringSortDir === UXSortDir.asc;
+        unionSortDir === UXSortDir.asc;
+        inlineUnionSortDir === UXSortDir.asc;
+        enumSortDir === UXSortDir.asc;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "mismatchedCondition",
+				},
+				{
+					MessageId: "mismatchedCondition",
+				},
+				{
+					MessageId: "mismatchedCondition",
 				},
 			},
 		},

@@ -40,6 +40,10 @@ func (o *overlayFS) WriteFile(path string, data string) error {
 	return o.underlying.WriteFile(path, data)
 }
 
+func (o *overlayFS) AppendFile(path string, data string) error {
+	return o.underlying.AppendFile(path, data)
+}
+
 func (o *overlayFS) Remove(path string) error {
 	return o.underlying.Remove(path)
 }

@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "types": ["tsgolint-missing-type-package"]
+  },
+  "include": ["src"]
+}

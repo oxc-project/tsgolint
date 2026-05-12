@@ -494,6 +494,10 @@ class C<R extends unknown> {
 }
       `,
 		},
+		{
+			Code:    `const example = () => Promise.resolve();`,
+			Options: rule_tester.OptionsFromJSON[ReturnAwaitOptions](`"always"`),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `

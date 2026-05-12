@@ -66,22 +66,20 @@ func getEnumValueType(t *checker.Type) checker.TypeFlags {
 	return checker.TypeFlagsNone
 }
 
+func typeIsPrimitiveLike(t *checker.Type, flags checker.TypeFlags) bool {
+	return utils.Every(utils.UnionTypeParts(t), func(unionPart *checker.Type) bool {
+		return utils.Some(utils.IntersectionTypeParts(unionPart), func(intersectionPart *checker.Type) bool {
+			return utils.IsTypeFlagSet(intersectionPart, flags)
+		})
+	})
+}
+
 /**
  * @returns Whether the right type is an unsafe comparison against any left type.
  */
 func typeViolates(leftTypeParts []*checker.Type, rightType *checker.Type) bool {
-	rightNumberLike, rightStringLike := false, false
-	for _, typePart := range utils.IntersectionTypeParts(rightType) {
-		if utils.IsTypeFlagSet(typePart, checker.TypeFlagsNumberLike) {
-			rightNumberLike = true
-		}
-		if utils.IsTypeFlagSet(typePart, checker.TypeFlagsStringLike) {
-			rightStringLike = true
-		}
-		if rightNumberLike && rightStringLike {
-			break
-		}
-	}
+	rightNumberLike := typeIsPrimitiveLike(rightType, checker.TypeFlagsNumber|checker.TypeFlagsNumberLike)
+	rightStringLike := typeIsPrimitiveLike(rightType, checker.TypeFlagsString|checker.TypeFlagsStringLike)
 	if !rightNumberLike && !rightStringLike {
 		return false
 	}
