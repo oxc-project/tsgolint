@@ -399,6 +399,33 @@ func typeMatchesSpecifier(
 	}
 }
 
+func SymbolMatchesSpecifierNameAndSource(
+	symbol *ast.Symbol,
+	name string,
+	specifier TypeOrValueSpecifier,
+	program *compiler.Program,
+) bool {
+	if symbol == nil || !slices.Contains(specifier.Name, name) {
+		return false
+	}
+
+	declarations := symbol.Declarations
+	declarationFiles := Map(declarations, func(d *ast.Node) *ast.SourceFile {
+		return ast.GetSourceFileOfNode(d)
+	})
+
+	switch specifier.From {
+	case TypeOrValueSpecifierFromFile:
+		return typeDeclaredInFile(specifier.Path, declarationFiles, program)
+	case TypeOrValueSpecifierFromLib:
+		return typeDeclaredInLib(declarationFiles, program)
+	case TypeOrValueSpecifierFromPackage:
+		return typeDeclaredInPackageDeclarationFile(specifier.Package, declarations, declarationFiles, program)
+	default:
+		panic(fmt.Sprintf("unknown value specifier from: %v", specifier.From))
+	}
+}
+
 // ConvertTypeOrValueSpecifier converts an interface{} (from JSON schema) to a TypeOrValueSpecifier struct.
 // The input can be:
 // - A string (universal string specifier - matches all names)
