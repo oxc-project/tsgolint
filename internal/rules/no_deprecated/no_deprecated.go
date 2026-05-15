@@ -1,11 +1,13 @@
 package no_deprecated
 
 import (
+	"encoding/json"
 	"slices"
 	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -22,6 +24,13 @@ func buildDeprecatedWithReasonMessage(name string, reason string) rule.RuleMessa
 		Id:          "deprecatedWithReason",
 		Description: "`" + name + "` is deprecated. " + reason,
 	}
+}
+
+func formatPropertyNameForReport(name string) string {
+	if name == "" {
+		return `""`
+	}
+	return name
 }
 
 func isNodeCalleeOfParent(node *ast.Node) bool {
@@ -315,36 +324,184 @@ var NoDeprecatedRule = rule.Rule{
 			return name.Text(), true
 		}
 
-		getContextualObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) (string, *checker.Type, bool, string) {
+		findParentModuleDeclaration := func(node *ast.Node) *ast.ModuleDeclaration {
+			for node != nil {
+				switch node.Kind {
+				case ast.KindModuleDeclaration:
+					decl := node.AsModuleDeclaration()
+					if decl.Keyword == ast.KindNamespaceKeyword {
+						node = node.Parent
+						continue
+					}
+					if ast.IsStringLiteral(decl.Name()) {
+						return decl
+					}
+					return nil
+				case ast.KindSourceFile:
+					return nil
+				default:
+					node = node.Parent
+				}
+			}
+
+			return nil
+		}
+
+		getSourceFilePackageName := func(sourceFile *ast.SourceFile) (string, bool) {
+			if sourceFile == nil {
+				return "", false
+			}
+
+			fileName := tspath.NormalizeSlashes(sourceFile.FileName())
+			if !strings.Contains("/"+fileName+"/", "/node_modules/") {
+				return "", false
+			}
+
+			fs := ctx.Program.Host().FS()
+			currentDir := tspath.GetDirectoryPath(fileName)
+			for currentDir != "" && strings.Contains("/"+tspath.NormalizeSlashes(currentDir)+"/", "/node_modules/") {
+				packageJSONPath := tspath.CombinePaths(currentDir, "package.json")
+				if contents, ok := fs.ReadFile(packageJSONPath); ok {
+					var packageJSON struct {
+						Name string `json:"name"`
+					}
+					if err := json.Unmarshal([]byte(contents), &packageJSON); err == nil && packageJSON.Name != "" {
+						return packageJSON.Name, true
+					}
+				}
+
+				parentDir := tspath.GetDirectoryPath(currentDir)
+				if parentDir == currentDir {
+					break
+				}
+				currentDir = parentDir
+			}
+
+			segments := strings.Split(fileName, "/")
+			for i := len(segments) - 1; i >= 0; i-- {
+				if segments[i] != "node_modules" {
+					continue
+				}
+				next := i + 1
+				if next >= len(segments) {
+					continue
+				}
+				name := segments[next]
+				if name == "" || name == "." || name == ".." {
+					continue
+				}
+				if strings.HasPrefix(name, "@") {
+					if next+1 < len(segments) && segments[next+1] != "" {
+						return name + "/" + segments[next+1], true
+					}
+					continue
+				}
+				return name, true
+			}
+
+			return "", false
+		}
+
+		getTypesPackageName := func(packageName string) string {
+			if packageName == "" || packageName[0] != '@' {
+				return packageName
+			}
+
+			slashIndex := strings.Index(packageName, "/")
+			if slashIndex <= 1 || slashIndex+1 >= len(packageName) {
+				return packageName
+			}
+
+			return packageName[1:slashIndex] + "__" + packageName[slashIndex+1:]
+		}
+
+		isPropertyAllowedBySpecifier := func(propertyName string, property *ast.Symbol, specifier utils.TypeOrValueSpecifier) bool {
+			if !slices.Contains(specifier.Name, propertyName) || property == nil {
+				return false
+			}
+
+			declarations := property.Declarations
+			declarationFiles := make([]*ast.SourceFile, 0, len(declarations))
+			for _, decl := range declarations {
+				declarationFiles = append(declarationFiles, ast.GetSourceFileOfNode(decl))
+			}
+
+			switch specifier.From {
+			case utils.TypeOrValueSpecifierFromFile:
+				cwd := ctx.Program.Host().GetCurrentDirectory()
+				if specifier.Path == "" {
+					return slices.ContainsFunc(declarationFiles, func(file *ast.SourceFile) bool {
+						return file != nil && strings.HasPrefix(file.FileName(), cwd)
+					})
+				}
+
+				absPath := tspath.GetNormalizedAbsolutePath(specifier.Path, cwd)
+				return slices.ContainsFunc(declarationFiles, func(file *ast.SourceFile) bool {
+					return file != nil && file.FileName() == absPath
+				})
+
+			case utils.TypeOrValueSpecifierFromLib:
+				if len(declarationFiles) == 0 {
+					return true
+				}
+				return slices.ContainsFunc(declarationFiles, func(file *ast.SourceFile) bool {
+					return utils.IsSourceFileDefaultLibrary(ctx.Program, file)
+				})
+
+			case utils.TypeOrValueSpecifierFromPackage:
+				if slices.ContainsFunc(declarations, func(decl *ast.Node) bool {
+					parentModule := findParentModuleDeclaration(decl)
+					return parentModule != nil && parentModule.Name().Text() == specifier.Package
+				}) {
+					return true
+				}
+
+				typesPackageName := getTypesPackageName(specifier.Package)
+				return slices.ContainsFunc(declarationFiles, func(file *ast.SourceFile) bool {
+					packageName, ok := getSourceFilePackageName(file)
+					if !ok || packageName == "" || !ctx.Program.IsSourceFileFromExternalLibrary(file) {
+						return false
+					}
+
+					return packageName == specifier.Package ||
+						packageName == typesPackageName ||
+						packageName == "@types/"+specifier.Package ||
+						packageName == "@types/"+typesPackageName
+				})
+			}
+
+			return false
+		}
+
+		getContextualObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) (string, *checker.Type, *ast.Symbol, bool, string) {
 			if propertyNode == nil || propertyNode.Parent == nil || !ast.IsObjectLiteralExpression(propertyNode.Parent) {
-				return "", nil, false, ""
+				return "", nil, nil, false, ""
 			}
 
 			propertyName, ok := getObjectLiteralPropertyName(name)
 			if !ok {
-				return "", nil, false, ""
+				return "", nil, nil, false, ""
 			}
 
 			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, propertyNode.Parent, checker.ContextFlagsNone)
 			if contextualType == nil {
-				return "", nil, false, ""
+				return "", nil, nil, false, ""
 			}
 
 			property := checker.Checker_getPropertyOfType(ctx.TypeChecker, contextualType, propertyName)
 			isDeprecated, reason := getJsDocDeprecation(property)
-			return propertyName, contextualType, isDeprecated, reason
+			return propertyName, contextualType, property, isDeprecated, reason
 		}
 
 		checkObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) {
-			propertyName, contextualType, isDeprecated, reason := getContextualObjectLiteralPropertyDeprecation(propertyNode, name)
+			propertyName, contextualType, property, isDeprecated, reason := getContextualObjectLiteralPropertyDeprecation(propertyNode, name)
 			if !isDeprecated {
 				return
 			}
 
 			nameType := ctx.TypeChecker.GetTypeAtLocation(name)
 			propertyNameAllowed := slices.ContainsFunc(opts.Allow, func(specifier utils.TypeOrValueSpecifier) bool {
-				return specifier.From != utils.TypeOrValueSpecifierFromPackage &&
-					slices.Contains(specifier.Name, propertyName)
+				return isPropertyAllowedBySpecifier(propertyName, property, specifier)
 			})
 			if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
 				utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
@@ -353,10 +510,11 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
+			reportedPropertyName := formatPropertyNameForReport(propertyName)
 			if reason == "" {
-				ctx.ReportNode(name, buildDeprecatedMessage(propertyName))
+				ctx.ReportNode(name, buildDeprecatedMessage(reportedPropertyName))
 			} else {
-				ctx.ReportNode(name, buildDeprecatedWithReasonMessage(propertyName, strings.TrimSpace(reason)))
+				ctx.ReportNode(name, buildDeprecatedWithReasonMessage(reportedPropertyName, strings.TrimSpace(reason)))
 			}
 		}
 
