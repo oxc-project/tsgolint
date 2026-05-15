@@ -1211,45 +1211,66 @@ Message: `searchPaths` is deprecated. use newMethod() instead
 ---
 
 [TestNoDeprecatedRule/invalid-145 - 1]
-Diagnostic 1: deprecatedWithReason (14:11 - 14:20)
-Message: `statusCode` is deprecated. Use status instead.
-  13 |         showError({
-  14 |           statusCode: 500,
-     |           ~~~~~~~~~~
-  15 |         });
-
-Diagnostic 2: deprecatedWithReason (18:11 - 18:20)
-Message: `statusCode` is deprecated. Use status instead.
+Diagnostic 1: deprecatedWithReason (18:11 - 18:12)
+Message: `` is deprecated. Use code instead.
   17 |         showError({
-  18 |           statusCode,
-     |           ~~~~~~~~~~
+  18 |           "": 500,
+     |           ~~
   19 |         });
 
-Diagnostic 3: deprecatedWithReason (22:11 - 22:24)
-Message: `statusCode` is deprecated. Use status instead.
+Diagnostic 2: deprecatedWithReason (22:11 - 22:14)
+Message: `` is deprecated. Use code instead.
   21 |         showError({
-  22 |           ['statusCode']: 500,
-     |           ~~~~~~~~~~~~~~
+  22 |           [""]: 500,
+     |           ~~~~
   23 |         });
 
-Diagnostic 4: deprecatedWithReason (26:11 - 26:26)
-Message: `statusCode` is deprecated. Use status instead.
+Diagnostic 3: deprecatedWithReason (26:11 - 26:21)
+Message: `` is deprecated. Use code instead.
   25 |         showError({
-  26 |           [statusCodeName]: 500,
-     |           ~~~~~~~~~~~~~~~~
+  26 |           [emptyName]: 500,
+     |           ~~~~~~~~~~~
   27 |         });
 
-Diagnostic 5: deprecatedWithReason (30:15 - 30:24)
+Diagnostic 4: deprecatedWithReason (30:11 - 30:20)
 Message: `statusCode` is deprecated. Use status instead.
   29 |         showError({
-  30 |           get statusCode() {
-     |               ~~~~~~~~~~
-  31 |             return 500;
+  30 |           statusCode: 500,
+     |           ~~~~~~~~~~
+  31 |         });
 
-Diagnostic 6: deprecatedWithReason (36:15 - 36:24)
+Diagnostic 5: deprecatedWithReason (34:11 - 34:20)
 Message: `statusCode` is deprecated. Use status instead.
-  35 |         showError({
-  36 |           set statusCode(value: number) {},
+  33 |         showError({
+  34 |           statusCode,
+     |           ~~~~~~~~~~
+  35 |         });
+
+Diagnostic 6: deprecatedWithReason (38:11 - 38:24)
+Message: `statusCode` is deprecated. Use status instead.
+  37 |         showError({
+  38 |           ['statusCode']: 500,
+     |           ~~~~~~~~~~~~~~
+  39 |         });
+
+Diagnostic 7: deprecatedWithReason (42:11 - 42:26)
+Message: `statusCode` is deprecated. Use status instead.
+  41 |         showError({
+  42 |           [statusCodeName]: 500,
+     |           ~~~~~~~~~~~~~~~~
+  43 |         });
+
+Diagnostic 8: deprecatedWithReason (46:15 - 46:24)
+Message: `statusCode` is deprecated. Use status instead.
+  45 |         showError({
+  46 |           get statusCode() {
      |               ~~~~~~~~~~
-  37 |         });
+  47 |             return 500;
+
+Diagnostic 9: deprecatedWithReason (52:15 - 52:24)
+Message: `statusCode` is deprecated. Use status instead.
+  51 |         showError({
+  52 |           set statusCode(value: number) {},
+     |               ~~~~~~~~~~
+  53 |         });
 ---

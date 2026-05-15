@@ -410,6 +410,25 @@ exists('/foo');
         const value = obj['prop'];
       `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "AllowedType"}]}`)},
 		{Code: `
+        interface ErrorOptions {
+          /** @deprecated Use status instead. */
+          statusCode?: number;
+
+          status?: number;
+        }
+
+        declare function showError(error: ErrorOptions): void;
+        declare const statusCodeName: 'statusCode';
+
+        showError({
+          ['statusCode']: 500,
+        });
+
+        showError({
+          [statusCodeName]: 500,
+        });
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "statusCode"}]}`)},
+		{Code: `
       const a = {
         /** @deprecated */
         b: 'string',
@@ -2548,6 +2567,9 @@ exists('/foo');
 		{
 			Code: `
         interface ErrorOptions {
+          /** @deprecated Use code instead. */
+          "": number;
+
           /** @deprecated Use status instead. */
           statusCode?: number;
 
@@ -2555,8 +2577,21 @@ exists('/foo');
         }
 
         declare function showError(error: ErrorOptions): void;
+        declare const emptyName: '';
         declare const statusCode: number;
         declare const statusCodeName: 'statusCode';
+
+        showError({
+          "": 500,
+        });
+
+        showError({
+          [""]: 500,
+        });
+
+        showError({
+          [emptyName]: 500,
+        });
 
         showError({
           statusCode: 500,
@@ -2585,6 +2620,15 @@ exists('/foo');
         });
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecatedWithReason",
+				},
+				{
+					MessageId: "deprecatedWithReason",
+				},
+				{
+					MessageId: "deprecatedWithReason",
+				},
 				{
 					MessageId: "deprecatedWithReason",
 				},

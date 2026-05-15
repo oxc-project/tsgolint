@@ -288,8 +288,7 @@ var NoDeprecatedRule = rule.Rule{
 
 				switch name.Kind {
 				case ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral:
-					nameText := name.Text()
-					return nameText, nameText != ""
+					return name.Text(), true
 				}
 
 				t := ctx.TypeChecker.GetTypeAtLocation(name)
@@ -297,10 +296,9 @@ var NoDeprecatedRule = rule.Rule{
 					if literalType := t.AsLiteralType(); literalType != nil {
 						if value := literalType.Value(); value != nil {
 							if str, ok := value.(string); ok {
-								return str, str != ""
+								return str, true
 							}
-							nameText := literalType.String()
-							return nameText, nameText != ""
+							return literalType.String(), true
 						}
 					}
 				}
@@ -314,8 +312,7 @@ var NoDeprecatedRule = rule.Rule{
 				return "", false
 			}
 
-			nameText := name.Text()
-			return nameText, nameText != ""
+			return name.Text(), true
 		}
 
 		getContextualObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) (string, *checker.Type, bool, string) {
@@ -345,9 +342,14 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			nameType := ctx.TypeChecker.GetTypeAtLocation(name)
+			propertyNameAllowed := slices.ContainsFunc(opts.Allow, func(specifier utils.TypeOrValueSpecifier) bool {
+				return specifier.From != utils.TypeOrValueSpecifierFromPackage &&
+					slices.Contains(specifier.Name, propertyName)
+			})
 			if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
 				utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
-				utils.ValueMatchesSomeSpecifier(name, opts.Allow, ctx.Program, nameType) {
+				utils.ValueMatchesSomeSpecifier(name, opts.Allow, ctx.Program, nameType) ||
+				propertyNameAllowed {
 				return
 			}
 
