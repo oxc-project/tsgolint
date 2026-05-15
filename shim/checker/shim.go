@@ -458,6 +458,7 @@ type extra_Checker struct {
   reportedUnreachableNodes collections.Set[*ast.Node]
   nonExistentProperties collections.Set[checker.NonExistentPropertyKey]
   deferredDiagnosticCallbacks []func()
+  typeToStringNodebuilder *checker.NodeBuilder
   mu sync.Mutex
   tracer *checker.Tracer
 }
@@ -563,6 +564,33 @@ const ExpandingFlagsTarget = checker.ExpandingFlagsTarget
 type ExportCollision = checker.ExportCollision
 type ExportCollisionTable = checker.ExportCollisionTable
 type ExportTypeLinks = checker.ExportTypeLinks
+type ExternalEmitHelpers = checker.ExternalEmitHelpers
+const ExternalEmitHelpersAddDisposableResourceAndDisposeResources = checker.ExternalEmitHelpersAddDisposableResourceAndDisposeResources
+const ExternalEmitHelpersAsyncDelegator = checker.ExternalEmitHelpersAsyncDelegator
+const ExternalEmitHelpersAsyncDelegatorIncludes = checker.ExternalEmitHelpersAsyncDelegatorIncludes
+const ExternalEmitHelpersAsyncGenerator = checker.ExternalEmitHelpersAsyncGenerator
+const ExternalEmitHelpersAsyncGeneratorIncludes = checker.ExternalEmitHelpersAsyncGeneratorIncludes
+const ExternalEmitHelpersAsyncValues = checker.ExternalEmitHelpersAsyncValues
+const ExternalEmitHelpersAwait = checker.ExternalEmitHelpersAwait
+const ExternalEmitHelpersAwaiter = checker.ExternalEmitHelpersAwaiter
+const ExternalEmitHelpersClassPrivateFieldGet = checker.ExternalEmitHelpersClassPrivateFieldGet
+const ExternalEmitHelpersClassPrivateFieldIn = checker.ExternalEmitHelpersClassPrivateFieldIn
+const ExternalEmitHelpersClassPrivateFieldSet = checker.ExternalEmitHelpersClassPrivateFieldSet
+const ExternalEmitHelpersDecorate = checker.ExternalEmitHelpersDecorate
+const ExternalEmitHelpersESDecorateAndRunInitializers = checker.ExternalEmitHelpersESDecorateAndRunInitializers
+const ExternalEmitHelpersExportStar = checker.ExternalEmitHelpersExportStar
+const ExternalEmitHelpersFirstEmitHelper = checker.ExternalEmitHelpersFirstEmitHelper
+const ExternalEmitHelpersForAwaitOfIncludes = checker.ExternalEmitHelpersForAwaitOfIncludes
+const ExternalEmitHelpersImportDefault = checker.ExternalEmitHelpersImportDefault
+const ExternalEmitHelpersImportStar = checker.ExternalEmitHelpersImportStar
+const ExternalEmitHelpersLastEmitHelper = checker.ExternalEmitHelpersLastEmitHelper
+const ExternalEmitHelpersMakeTemplateObject = checker.ExternalEmitHelpersMakeTemplateObject
+const ExternalEmitHelpersMetadata = checker.ExternalEmitHelpersMetadata
+const ExternalEmitHelpersParam = checker.ExternalEmitHelpersParam
+const ExternalEmitHelpersPropKey = checker.ExternalEmitHelpersPropKey
+const ExternalEmitHelpersRest = checker.ExternalEmitHelpersRest
+const ExternalEmitHelpersRewriteRelativeImportExtension = checker.ExternalEmitHelpersRewriteRelativeImportExtension
+const ExternalEmitHelpersSetFunctionName = checker.ExternalEmitHelpersSetFunctionName
 type FeatureMapEntry = checker.FeatureMapEntry
 type FlowLoopInfo = checker.FlowLoopInfo
 type FlowLoopKey = checker.FlowLoopKey

@@ -1185,6 +1185,8 @@ func IsModuleWithStringLiteralName(node *ast.Node) bool
 func IsMultiplicativeOperator(kind ast.Kind) bool
 //go:linkname IsMultiplicativeOperatorOrHigher github.com/microsoft/typescript-go/internal/ast.IsMultiplicativeOperatorOrHigher
 func IsMultiplicativeOperatorOrHigher(kind ast.Kind) bool
+//go:linkname IsNamedEvaluationSource github.com/microsoft/typescript-go/internal/ast.IsNamedEvaluationSource
+func IsNamedEvaluationSource(node *ast.Node) bool
 //go:linkname IsNamedExports github.com/microsoft/typescript-go/internal/ast.IsNamedExports
 func IsNamedExports(node *ast.Node) bool
 //go:linkname IsNamedImports github.com/microsoft/typescript-go/internal/ast.IsNamedImports
@@ -1309,6 +1311,8 @@ func IsPropertyName(node *ast.Node) bool
 func IsPropertyNameLiteral(node *ast.Node) bool
 //go:linkname IsPropertySignatureDeclaration github.com/microsoft/typescript-go/internal/ast.IsPropertySignatureDeclaration
 func IsPropertySignatureDeclaration(node *ast.Node) bool
+//go:linkname IsProtoSetter github.com/microsoft/typescript-go/internal/ast.IsProtoSetter
+func IsProtoSetter(node *ast.Node) bool
 //go:linkname IsPrototypeAccess github.com/microsoft/typescript-go/internal/ast.IsPrototypeAccess
 func IsPrototypeAccess(node *ast.Node) bool
 //go:linkname IsPseudoLiteralKind github.com/microsoft/typescript-go/internal/ast.IsPseudoLiteralKind
