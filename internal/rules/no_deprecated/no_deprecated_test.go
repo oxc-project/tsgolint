@@ -2556,6 +2556,7 @@ exists('/foo');
 
         declare function showError(error: ErrorOptions): void;
         declare const statusCode: number;
+        declare const statusCodeName: 'statusCode';
 
         showError({
           statusCode: 500,
@@ -2564,8 +2565,38 @@ exists('/foo');
         showError({
           statusCode,
         });
+
+        showError({
+          ['statusCode']: 500,
+        });
+
+        showError({
+          [statusCodeName]: 500,
+        });
+
+        showError({
+          get statusCode() {
+            return 500;
+          },
+        });
+
+        showError({
+          set statusCode(value: number) {},
+        });
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecatedWithReason",
+				},
+				{
+					MessageId: "deprecatedWithReason",
+				},
+				{
+					MessageId: "deprecatedWithReason",
+				},
+				{
+					MessageId: "deprecatedWithReason",
+				},
 				{
 					MessageId: "deprecatedWithReason",
 				},

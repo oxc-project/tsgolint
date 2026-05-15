@@ -276,7 +276,41 @@ var NoDeprecatedRule = rule.Rule{
 		}
 
 		getObjectLiteralPropertyName := func(name *ast.Node) (string, bool) {
-			if name == nil || ast.IsComputedPropertyName(name) {
+			if name == nil {
+				return "", false
+			}
+
+			if ast.IsComputedPropertyName(name) {
+				name = name.AsComputedPropertyName().Expression
+				if name == nil {
+					return "", false
+				}
+
+				switch name.Kind {
+				case ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral:
+					nameText := name.Text()
+					return nameText, nameText != ""
+				}
+
+				t := ctx.TypeChecker.GetTypeAtLocation(name)
+				if t != nil {
+					if literalType := t.AsLiteralType(); literalType != nil {
+						if value := literalType.Value(); value != nil {
+							if str, ok := value.(string); ok {
+								return str, str != ""
+							}
+							nameText := literalType.String()
+							return nameText, nameText != ""
+						}
+					}
+				}
+
+				return "", false
+			}
+
+			switch name.Kind {
+			case ast.KindIdentifier, ast.KindPrivateIdentifier, ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral:
+			default:
 				return "", false
 			}
 
@@ -822,6 +856,12 @@ var NoDeprecatedRule = rule.Rule{
 				checkObjectLiteralPropertyDeprecation(node, node.Name())
 			},
 			ast.KindMethodDeclaration: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindGetAccessor: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindSetAccessor: func(node *ast.Node) {
 				checkObjectLiteralPropertyDeprecation(node, node.Name())
 			},
 			ast.KindPrivateIdentifier: checkIdentifier,
