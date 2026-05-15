@@ -1,10 +1,10 @@
 package no_deprecated
 
 import (
-	"encoding/json"
 	"slices"
 	"strings"
 
+	json "github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/tspath"
