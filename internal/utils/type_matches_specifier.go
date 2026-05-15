@@ -24,6 +24,9 @@ const (
 type TypeOrValueSpecifier struct {
 	From TypeOrValueSpecifierFrom
 	Name []string
+	// True for shorthand string specifiers, which intentionally match by name
+	// regardless of declaration source.
+	Universal bool
 	// Can be used when From == TypeOrValueSpecifierFromFile
 	Path string
 	// Can be used when From == TypeOrValueSpecifierFromPackage
@@ -37,8 +40,9 @@ func (s *TypeOrValueSpecifier) UnmarshalJSON(data []byte) error {
 	var str string
 	if err := json.Unmarshal(data, &str); err == nil {
 		*s = TypeOrValueSpecifier{
-			From: TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
-			Name: []string{str},
+			From:      TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
+			Name:      []string{str},
+			Universal: true,
 		}
 		return nil
 	}
@@ -127,7 +131,7 @@ func (s TypeOrValueSpecifier) MarshalJSON() ([]byte, error) {
 		"name": s.Name,
 	}
 
-	if s.Path != "" {
+	if s.Path != "" && !s.Universal {
 		output["path"] = s.Path
 	}
 	if s.Package != "" {
@@ -408,6 +412,9 @@ func SymbolMatchesSpecifierNameAndSource(
 	if symbol == nil || !slices.Contains(specifier.Name, name) {
 		return false
 	}
+	if specifier.Universal {
+		return true
+	}
 
 	declarations := symbol.Declarations
 	declarationFiles := Map(declarations, func(d *ast.Node) *ast.SourceFile {
@@ -434,8 +441,9 @@ func ConvertTypeOrValueSpecifier(spec any) (TypeOrValueSpecifier, bool) {
 	// Handle string specifier
 	if str, ok := spec.(string); ok {
 		return TypeOrValueSpecifier{
-			From: TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
-			Name: []string{str},
+			From:      TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
+			Name:      []string{str},
+			Universal: true,
 		}, true
 	}
 

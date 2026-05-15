@@ -453,6 +453,30 @@ exists('/foo');
         });
       `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "package", "name": "statusCode", "package": "error-options"}]}`)},
 		{Code: `
+        declare module 'error-options' {
+          export interface ErrorOptions {
+            /** @deprecated Use status instead. */
+            statusCode?: number;
+
+            status?: number;
+          }
+
+          export function showError(error: ErrorOptions): void;
+        }
+
+        import { showError } from 'error-options';
+
+        declare const statusCodeName: 'statusCode';
+
+        showError({
+          ['statusCode']: 500,
+        });
+
+        showError({
+          [statusCodeName]: 500,
+        });
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": ["statusCode"]}`)},
+		{Code: `
       const a = {
         /** @deprecated */
         b: 'string',
