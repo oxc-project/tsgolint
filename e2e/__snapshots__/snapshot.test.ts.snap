@@ -2605,22 +2605,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
-    "fixes": [
-      {
-        "range": {
-          "end": 201,
-          "pos": 191,
-        },
-        "text": "",
-      },
-      {
-        "range": {
-          "end": 191,
-          "pos": 191,
-        },
-        "text": "!",
-      },
-    ],
     "kind": 0,
     "message": {
       "description": "Use a ! assertion to more succinctly remove null and undefined from the type.",
@@ -2631,25 +2615,33 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 186,
     },
     "rule": "non-nullable-type-assertion-style",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 201,
+              "pos": 191,
+            },
+            "text": "",
+          },
+          {
+            "range": {
+              "end": 191,
+              "pos": 191,
+            },
+            "text": "!",
+          },
+        ],
+        "message": {
+          "description": "Use a ! assertion to more succinctly remove null and undefined from the type.",
+          "id": "preferNonNullAssertion",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
-    "fixes": [
-      {
-        "range": {
-          "end": 276,
-          "pos": 266,
-        },
-        "text": "",
-      },
-      {
-        "range": {
-          "end": 266,
-          "pos": 266,
-        },
-        "text": "!",
-      },
-    ],
     "kind": 0,
     "message": {
       "description": "Use a ! assertion to more succinctly remove null and undefined from the type.",
@@ -2660,6 +2652,30 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 261,
     },
     "rule": "non-nullable-type-assertion-style",
+    "suggestions": [
+      {
+        "fixes": [
+          {
+            "range": {
+              "end": 276,
+              "pos": 266,
+            },
+            "text": "",
+          },
+          {
+            "range": {
+              "end": 266,
+              "pos": 266,
+            },
+            "text": "!",
+          },
+        ],
+        "message": {
+          "description": "Use a ! assertion to more succinctly remove null and undefined from the type.",
+          "id": "preferNonNullAssertion",
+        },
+      },
+    ],
   },
   {
     "file_path": "fixtures/basic/rules/only-throw-error/index.ts",

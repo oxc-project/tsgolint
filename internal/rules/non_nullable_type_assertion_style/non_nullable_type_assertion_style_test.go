@@ -63,16 +63,20 @@ const bar = foo() as number;
 declare const maybe: string | undefined;
 const bar = maybe as string;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNonNullAssertion",
+					Line:      3,
+					Column:    13,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
 declare const maybe: string | undefined;
 const bar = maybe!;
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNonNullAssertion",
-					Line:      3,
-					Column:    13,
+						},
+					},
 				},
 			},
 		},
@@ -81,16 +85,20 @@ const bar = maybe!;
 declare const maybe: string | null;
 const bar = maybe as string;
       `,
-			Output: []string{`
-declare const maybe: string | null;
-const bar = maybe!;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      3,
 					Column:    13,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+declare const maybe: string | null;
+const bar = maybe!;
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -99,16 +107,20 @@ const bar = maybe!;
 declare const maybe: string | null | undefined;
 const bar = maybe as string;
       `,
-			Output: []string{`
-declare const maybe: string | null | undefined;
-const bar = maybe!;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      3,
 					Column:    13,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+declare const maybe: string | null | undefined;
+const bar = maybe!;
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -118,17 +130,21 @@ type Type = { value: string };
 declare const maybe: Type | undefined;
 const bar = maybe as Type;
       `,
-			Output: []string{`
-type Type = { value: string };
-declare const maybe: Type | undefined;
-const bar = maybe!;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      4,
 					Column:    13,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+type Type = { value: string };
+declare const maybe: Type | undefined;
+const bar = maybe!;
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -140,19 +156,23 @@ interface Interface {
 declare const maybe: Interface | undefined;
 const bar = maybe as Interface;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNonNullAssertion",
+					Line:      6,
+					Column:    13,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
 interface Interface {
   value: string;
 }
 declare const maybe: Interface | undefined;
 const bar = maybe!;
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNonNullAssertion",
-					Line:      6,
-					Column:    13,
+						},
+					},
 				},
 			},
 		},
@@ -163,18 +183,22 @@ declare const x: T;
 
 const y = x as NonNullable<T>;
       `,
-			Output: []string{`
-type T = string | null;
-declare const x: T;
-
-const y = x!;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      5,
 					Column:    11,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+type T = string | null;
+declare const x: T;
+
+const y = x!;
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -185,18 +209,22 @@ declare const x: T;
 
 const y = x as NonNullable<T>;
       `,
-			Output: []string{`
-type T = string | null | undefined;
-declare const x: T;
-
-const y = x!;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      5,
 					Column:    11,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+type T = string | null | undefined;
+declare const x: T;
+
+const y = x!;
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -208,19 +236,23 @@ async function fn(): Promise<string> {
   return (await nullablePromise()) as string;
 }
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferNonNullAssertion",
+					Line:      5,
+					Column:    10,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
 declare function nullablePromise(): Promise<string | null>;
 
 async function fn(): Promise<string> {
   return (await nullablePromise())!;
 }
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "preferNonNullAssertion",
-					Line:      5,
-					Column:    10,
+						},
+					},
 				},
 			},
 		},
@@ -230,17 +262,21 @@ declare const a: string | null;
 
 const b = (a || undefined) as string;
       `,
-			Output: []string{`
-declare const a: string | null;
-
-const b = (a || undefined)!;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      4,
 					Column:    11,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+declare const a: string | null;
+
+const b = (a || undefined)!;
+      `,
+						},
+					},
 				},
 			},
 		},
@@ -285,17 +321,21 @@ function first<T extends string | number>(array: ArrayLike<T>): T | null {
   return array.length > 0 ? (array[0] as T) : null;
 }
         `,
-			Output: []string{`
-function first<T extends string | number>(array: ArrayLike<T>): T | null {
-  return array.length > 0 ? (array[0]!) : null;
-}
-        `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferNonNullAssertion",
 					Line:      3,
 					Column:    30,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "preferNonNullAssertion",
+							Output: `
+function first<T extends string | number>(array: ArrayLike<T>): T | null {
+  return array.length > 0 ? (array[0]!) : null;
+}
+        `,
+						},
+					},
 				},
 			},
 		},
