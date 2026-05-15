@@ -2688,5 +2688,27 @@ exists('/foo');
 				},
 			},
 		},
+		{
+			Code: `
+        interface ErrorOptions {
+          /** @deprecated Use status instead. */
+          statusCode?: number;
+
+          status?: number;
+        }
+
+        declare function showError(error: ErrorOptions): void;
+
+        showError({
+          statusCode: 500,
+        });
+      `,
+			Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": [{"from": "file", "name": "statusCode", "path": "other-file.ts"}]}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecatedWithReason",
+				},
+			},
+		},
 	})
 }

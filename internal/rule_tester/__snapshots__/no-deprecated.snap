@@ -1281,3 +1281,12 @@ Message: `statusCode` is deprecated. Use status instead.
      |           ~~~~~~~~~~
   63 |             return 500;
 ---
+
+[TestNoDeprecatedRule/invalid-146 - 1]
+Diagnostic 1: deprecatedWithReason (12:11 - 12:20)
+Message: `statusCode` is deprecated. Use status instead.
+  11 |         showError({
+  12 |           statusCode: 500,
+     |           ~~~~~~~~~~
+  13 |         });
+---

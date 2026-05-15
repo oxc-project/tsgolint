@@ -505,7 +505,6 @@ var NoDeprecatedRule = rule.Rule{
 			})
 			if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
 				utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
-				utils.ValueMatchesSomeSpecifier(name, opts.Allow, ctx.Program, nameType) ||
 				propertyNameAllowed {
 				return
 			}
