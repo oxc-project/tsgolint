@@ -10,7 +10,7 @@ Thank you for your interest in contributing to **tsgolint**! This document provi
 
 ### Prerequisites
 
-- Go 1.21 or later
+- Go 1.26 or later
 - Git with submodule support
 - [just](https://github.com/casey/just) command runner
 - Node.js and pnpm (for oxlint integration testing)
@@ -283,7 +283,7 @@ Debug logging provides information about:
 #### Build Issues
 
 - **Patch application fails:** Ensure you're in the `typescript-go` directory when applying patches
-- **Go build errors:** Check Go version (requires 1.21+) and ensure all dependencies are available
+- **Go build errors:** Check Go version (requires 1.26+) and ensure all dependencies are available
 
 #### Test Issues
 
