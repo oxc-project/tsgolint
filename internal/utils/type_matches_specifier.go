@@ -474,13 +474,24 @@ func TypeMatchesSomeSpecifier(
 	specifiers []TypeOrValueSpecifier,
 	program *compiler.Program,
 ) bool {
+	matches := func(t *checker.Type) bool {
+		if IsIntrinsicErrorType(t) {
+			return false
+		}
+		return Some(specifiers, func(s TypeOrValueSpecifier) bool {
+			return typeMatchesSpecifier(t, s, program)
+		})
+	}
+
+	if matches(t) {
+		return true
+	}
+
 	for _, typePart := range IntersectionTypeParts(t) {
-		if IsIntrinsicErrorType(typePart) {
+		if typePart == t {
 			continue
 		}
-		if Some(specifiers, func(s TypeOrValueSpecifier) bool {
-			return typeMatchesSpecifier(t, s, program)
-		}) {
+		if matches(typePart) {
 			return true
 		}
 	}

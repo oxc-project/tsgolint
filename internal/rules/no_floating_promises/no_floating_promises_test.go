@@ -786,6 +786,17 @@ declare function createMyThenable(): MyThenable;
 
 createMyThenable();
     `},
+		{
+			Code: `
+interface SafePromise<T> extends Promise<T> {
+  __brand: string;
+}
+type BrandedSafePromise = SafePromise<number> & { foo: 'bar' };
+declare function getPromise(): BrandedSafePromise;
+getPromise();
+      `,
+			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafePromises": [{"from": "file", "name": "SafePromise"}]}`),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
