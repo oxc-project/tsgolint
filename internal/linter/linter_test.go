@@ -3,6 +3,7 @@ package linter
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
@@ -280,4 +281,90 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 
 	assert.Equal(t, diagnostics[1].RuleName, ruleB, "second diagnostic should come from ruleB")
 	assert.Equal(t, diagnostics[1].Message.Id, msgB.Id, "second diagnostic should have ruleB's message")
+}
+
+func TestRunLinterOnProgramWithTimings(t *testing.T) {
+	rootDir := fixtures.GetRootDir()
+	fileName := "file.ts"
+	filePath := tspath.ResolvePath(rootDir, fileName)
+	code := `
+const x = 1;
+function greet() {
+	return x;
+}
+`
+
+	fs := utils.NewOverlayVFS(
+		cachedBaseFS,
+		map[string]string{filePath: code},
+	)
+	host := utils.CreateCompilerHost(rootDir, fs)
+
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
+	assert.NilError(t, err, "couldn't create program")
+
+	sourceFiles := []*ast.SourceFile{program.GetSourceFile(filePath)}
+
+	const ruleA = "timed-variable-rule"
+	const ruleB = "timed-function-rule"
+	const ruleC = "timed-run-only-rule"
+
+	timingStore := NewRuleTimingStore()
+	err = RunLinterOnProgramWithTimings(
+		utils.LogLevelNormal,
+		program,
+		sourceFiles,
+		1,
+		func(sourceFile *ast.SourceFile) []ConfiguredRule {
+			return []ConfiguredRule{
+				{
+					Name: ruleA,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						time.Sleep(time.Microsecond)
+						return rule.RuleListeners{
+							ast.KindVariableStatement: func(node *ast.Node) {
+								time.Sleep(time.Microsecond)
+							},
+						}
+					},
+				},
+				{
+					Name: ruleB,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						return rule.RuleListeners{
+							ast.KindFunctionDeclaration: func(node *ast.Node) {
+								time.Sleep(time.Microsecond)
+							},
+						}
+					},
+				},
+				{
+					Name: ruleC,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						time.Sleep(time.Microsecond)
+						return rule.RuleListeners{}
+					},
+				},
+			}
+		},
+		func(d rule.RuleDiagnostic) {},
+		func(d diagnostic.Internal) {},
+		Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+		timingStore,
+	)
+	assert.NilError(t, err, "unexpected error from RunLinterOnProgramWithTimings")
+
+	records := timingStore.Collect()
+	assert.Equal(t, len(records), 3, "expected timings for each configured rule")
+
+	recordsByRule := make(map[string]RuleTimingRecord, len(records))
+	for _, record := range records {
+		recordsByRule[record.RuleName] = record
+		assert.Assert(t, record.Duration > 0, "timing for %s should record a positive duration", record.RuleName)
+	}
+
+	assert.Equal(t, recordsByRule[ruleA].Calls, uint64(2), "rule A should count Run plus its variable listener")
+	assert.Equal(t, recordsByRule[ruleB].Calls, uint64(2), "rule B should count Run plus its function listener")
+	assert.Equal(t, recordsByRule[ruleC].Calls, uint64(1), "rule C should count its Run call")
 }

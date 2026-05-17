@@ -371,8 +371,61 @@ Usage:
 Options:
     --tsconfig PATH   Which tsconfig to use. Defaults to tsconfig.json.
 		--list-files      List matched files
+    --debug OPTIONS   Enable debug output options. Possible values: timings.
     -h, --help        Show help
 `
+
+func parseDebugTimings(options string) (bool, error) {
+	if options == "" {
+		return false, nil
+	}
+
+	timings := false
+	for _, option := range strings.Split(options, ",") {
+		if option == "" {
+			continue
+		}
+		switch option {
+		case "timings":
+			timings = true
+		default:
+			return false, fmt.Errorf("unknown debug option %q", option)
+		}
+	}
+
+	return timings, nil
+}
+
+func formatRuleTimingTable(records []linter.RuleTimingRecord) string {
+	if len(records) == 0 {
+		return ""
+	}
+
+	ruleWidth := len("Rule")
+	callsWidth := len("Calls")
+	var total time.Duration
+	for _, record := range records {
+		ruleWidth = max(ruleWidth, len(record.RuleName))
+		callsWidth = max(callsWidth, len(strconv.FormatUint(record.Calls, 10)))
+		total += record.Duration
+	}
+
+	var output strings.Builder
+	fmt.Fprintf(&output, "\nRule timings:\n")
+	fmt.Fprintf(&output, "%-*s  %10s  %8s  %*s\n", ruleWidth, "Rule", "Time (ms)", "Relative", callsWidth, "Calls")
+	fmt.Fprintf(&output, "%-*s  %-10s  %-8s  %-*s\n", ruleWidth, strings.Repeat("-", ruleWidth), strings.Repeat("-", 10), strings.Repeat("-", 8), callsWidth, strings.Repeat("-", callsWidth))
+
+	for _, record := range records {
+		millis := float64(record.Duration) / float64(time.Millisecond)
+		relative := 0.0
+		if total > 0 {
+			relative = float64(record.Duration) / float64(total) * 100
+		}
+		fmt.Fprintf(&output, "%-*s  %10.3f  %7.1f%%  %*d\n", ruleWidth, record.RuleName, millis, relative, callsWidth, record.Calls)
+	}
+
+	return output.String()
+}
 
 func runMain() int {
 	if len(os.Args) > 1 && os.Args[1] == "headless" {
@@ -385,6 +438,7 @@ func runMain() int {
 		help      bool
 		tsconfig  string
 		listFiles bool
+		debug     string
 
 		traceOut       string
 		cpuprofOut     string
@@ -393,6 +447,7 @@ func runMain() int {
 
 	flag.StringVar(&tsconfig, "tsconfig", "", "which tsconfig to use")
 	flag.BoolVar(&listFiles, "list-files", false, "list matched files")
+	flag.StringVar(&debug, "debug", "", "enable debug output options")
 	flag.BoolVar(&help, "help", false, "show help")
 	flag.BoolVar(&help, "h", false, "show help")
 
@@ -405,6 +460,12 @@ func runMain() int {
 	if help {
 		flag.Usage()
 		return 0
+	}
+
+	debugTimings, err := parseDebugTimings(debug)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error parsing debug options: %v\n", err)
+		return 1
 	}
 
 	fmt.Fprintf(os.Stderr, unsupportedCliWarning)
@@ -513,36 +574,37 @@ func runMain() int {
 		}
 	})
 
-	err = linter.RunLinterOnProgram(
-		utils.GetLogLevel(),
-		program,
-		files,
-		runtime.GOMAXPROCS(0),
-		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			return utils.Map(allRules, func(r rule.Rule) linter.ConfiguredRule {
-				return linter.ConfiguredRule{
-					Name: r.Name,
-					Run: func(ctx rule.RuleContext) rule.RuleListeners {
-						return r.Run(ctx, nil)
-					},
-				}
-			})
-		},
-		func(d rule.RuleDiagnostic) {
-			diagnosticsChan <- d
-		},
-		func(d diagnostic.Internal) {
-			// Internal diagnostics are not used in this mode
-		},
-		linter.Fixes{
-			Fix:            true,
-			FixSuggestions: true,
-		},
-		linter.TypeErrors{
-			ReportSyntactic: false,
-			ReportSemantic:  false,
-		},
-	)
+	getRulesForFile := func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
+		return utils.Map(allRules, func(r rule.Rule) linter.ConfiguredRule {
+			return linter.ConfiguredRule{
+				Name: r.Name,
+				Run: func(ctx rule.RuleContext) rule.RuleListeners {
+					return r.Run(ctx, nil)
+				},
+			}
+		})
+	}
+	onRuleDiagnostic := func(d rule.RuleDiagnostic) {
+		diagnosticsChan <- d
+	}
+	onInternalDiagnostic := func(d diagnostic.Internal) {
+		// Internal diagnostics are not used in this mode
+	}
+	fixes := linter.Fixes{
+		Fix:            true,
+		FixSuggestions: true,
+	}
+	typeErrors := linter.TypeErrors{
+		ReportSyntactic: false,
+		ReportSemantic:  false,
+	}
+	var timingStore *linter.RuleTimingStore
+	if debugTimings {
+		timingStore = linter.NewRuleTimingStore()
+		err = linter.RunLinterOnProgramWithTimings(utils.GetLogLevel(), program, files, runtime.GOMAXPROCS(0), getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixes, typeErrors, timingStore)
+	} else {
+		err = linter.RunLinterOnProgram(utils.GetLogLevel(), program, files, runtime.GOMAXPROCS(0), getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixes, typeErrors)
+	}
 
 	close(diagnosticsChan)
 	if err != nil {
@@ -585,6 +647,9 @@ func runMain() int {
 		time.Since(timeBefore).Round(time.Millisecond),
 		threadsCount,
 	)
+	if timingStore != nil {
+		os.Stdout.WriteString(formatRuleTimingTable(timingStore.Collect()))
+	}
 
 	return 0
 }
