@@ -74,8 +74,8 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          pnpm install --frozen-lockfile
-          pnpm run test
+          pnpm --ignore-workspace install --frozen-lockfile
+          pnpm --ignore-workspace run test
         working-directory: e2e
 
   lint:
