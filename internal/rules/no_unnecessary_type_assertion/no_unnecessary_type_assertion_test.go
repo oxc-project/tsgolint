@@ -1813,5 +1813,35 @@ const s2 = (s);
 				},
 			},
 		},
+		// Mapped types like Pick<T, keyof T> produce structurally identical but
+		// pointer-distinct types. The checker returns different type objects for
+		// `Data` and `Same<Data>` even though they are mutually assignable.
+		// Currently fails: isTypeUnchanged uses pointer equality only.
+		// Fixing this requires isTypeAssignableTo, but that is too lenient in
+		// typescript-go (e.g. array↔tuple, literal↔enum member), causing
+		// false positives on valid assertions. Blocked on typescript-go.
+		//
+		// {
+		// 	Code: `
+		// interface Data { name: string; value: number }
+		// type Same<T> = Pick<T, keyof T>;
+		// declare const item: Data;
+		// const d = item as Same<Data>;
+		//       `,
+		// 	Output: []string{`
+		// interface Data { name: string; value: number }
+		// type Same<T> = Pick<T, keyof T>;
+		// declare const item: Data;
+		// const d = item;
+		//       `,
+		// 	},
+		// 	Errors: []rule_tester.InvalidTestCaseError{
+		// 		{
+		// 			MessageId: "unnecessaryAssertion",
+		// 			Line:      5,
+		// 			Column:    16,
+		// 		},
+		// 	},
+		// },
 	})
 }
