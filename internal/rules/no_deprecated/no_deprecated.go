@@ -24,6 +24,13 @@ func buildDeprecatedWithReasonMessage(name string, reason string) rule.RuleMessa
 	}
 }
 
+func formatPropertyNameForReport(name string) string {
+	if name == "" {
+		return `""`
+	}
+	return name
+}
+
 func isNodeCalleeOfParent(node *ast.Node) bool {
 	if node.Parent == nil {
 		return false
@@ -273,6 +280,90 @@ var NoDeprecatedRule = rule.Rule{
 			symbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, contextualType, propertyName)
 
 			return getJsDocDeprecation(symbol)
+		}
+
+		getObjectLiteralPropertyName := func(name *ast.Node) (string, bool) {
+			if name == nil {
+				return "", false
+			}
+
+			if ast.IsComputedPropertyName(name) {
+				name = name.AsComputedPropertyName().Expression
+				if name == nil {
+					return "", false
+				}
+
+				switch name.Kind {
+				case ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral:
+					return name.Text(), true
+				}
+
+				t := ctx.TypeChecker.GetTypeAtLocation(name)
+				if t != nil {
+					if literalType := t.AsLiteralType(); literalType != nil {
+						if value := literalType.Value(); value != nil {
+							if str, ok := value.(string); ok {
+								return str, true
+							}
+							return literalType.String(), true
+						}
+					}
+				}
+
+				return "", false
+			}
+
+			switch name.Kind {
+			case ast.KindIdentifier, ast.KindPrivateIdentifier, ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral:
+			default:
+				return "", false
+			}
+
+			return name.Text(), true
+		}
+
+		getContextualObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) (string, *checker.Type, *ast.Symbol, bool, string) {
+			if propertyNode == nil || propertyNode.Parent == nil || !ast.IsObjectLiteralExpression(propertyNode.Parent) {
+				return "", nil, nil, false, ""
+			}
+
+			propertyName, ok := getObjectLiteralPropertyName(name)
+			if !ok {
+				return "", nil, nil, false, ""
+			}
+
+			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, propertyNode.Parent, checker.ContextFlagsNone)
+			if contextualType == nil {
+				return "", nil, nil, false, ""
+			}
+
+			property := checker.Checker_getPropertyOfType(ctx.TypeChecker, contextualType, propertyName)
+			isDeprecated, reason := getJsDocDeprecation(property)
+			return propertyName, contextualType, property, isDeprecated, reason
+		}
+
+		checkObjectLiteralPropertyDeprecation := func(propertyNode *ast.Node, name *ast.Node) {
+			propertyName, contextualType, property, isDeprecated, reason := getContextualObjectLiteralPropertyDeprecation(propertyNode, name)
+			if !isDeprecated {
+				return
+			}
+
+			nameType := ctx.TypeChecker.GetTypeAtLocation(name)
+			propertyNameAllowed := slices.ContainsFunc(opts.Allow, func(specifier utils.TypeOrValueSpecifier) bool {
+				return utils.SymbolMatchesSpecifierNameAndSource(property, propertyName, specifier, ctx.Program)
+			})
+			if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
+				utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
+				propertyNameAllowed {
+				return
+			}
+
+			reportedPropertyName := formatPropertyNameForReport(propertyName)
+			if reason == "" {
+				ctx.ReportNode(name, buildDeprecatedMessage(reportedPropertyName))
+			} else {
+				ctx.ReportNode(name, buildDeprecatedWithReasonMessage(reportedPropertyName, strings.TrimSpace(reason)))
+			}
 		}
 
 		// Helper to get the source type for a binding pattern by walking up the tree
@@ -766,8 +857,23 @@ var NoDeprecatedRule = rule.Rule{
 			// We have checkElementAccessExpression registered to handle element access with literal keys.
 			// This handles cases like obj['deprecatedProp'] where the key is a literal.
 			ast.KindElementAccessExpression: checkElementAccessExpression,
-			ast.KindPrivateIdentifier:       checkIdentifier,
-			ast.KindSuperKeyword:            checkIdentifier,
+			ast.KindPropertyAssignment: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindShorthandPropertyAssignment: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindMethodDeclaration: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindGetAccessor: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindSetAccessor: func(node *ast.Node) {
+				checkObjectLiteralPropertyDeprecation(node, node.Name())
+			},
+			ast.KindPrivateIdentifier: checkIdentifier,
+			ast.KindSuperKeyword:      checkIdentifier,
 		}
 	},
 }

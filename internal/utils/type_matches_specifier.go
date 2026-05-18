@@ -19,6 +19,7 @@ const (
 	TypeOrValueSpecifierFromFile TypeOrValueSpecifierFrom = iota
 	TypeOrValueSpecifierFromLib
 	TypeOrValueSpecifierFromPackage
+	TypeOrValueSpecifierFromName
 )
 
 type TypeOrValueSpecifier struct {
@@ -33,11 +34,11 @@ type TypeOrValueSpecifier struct {
 // UnmarshalJSON implements json.Unmarshaler for TypeOrValueSpecifier.
 // Handles both string specifiers and object specifiers with "from" field.
 func (s *TypeOrValueSpecifier) UnmarshalJSON(data []byte) error {
-	// Try to unmarshal as a string first (universal string specifier)
+	// Try to unmarshal as a string first (name-only specifier)
 	var str string
 	if err := json.Unmarshal(data, &str); err == nil {
 		*s = TypeOrValueSpecifier{
-			From: TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
+			From: TypeOrValueSpecifierFromName,
 			Name: []string{str},
 		}
 		return nil
@@ -117,6 +118,11 @@ func (s TypeOrValueSpecifier) MarshalJSON() ([]byte, error) {
 		fromStr = "lib"
 	case TypeOrValueSpecifierFromPackage:
 		fromStr = "package"
+	case TypeOrValueSpecifierFromName:
+		if len(s.Name) == 1 {
+			return json.Marshal(s.Name[0])
+		}
+		return nil, fmt.Errorf("name-only specifier must contain exactly one name")
 	default:
 		return nil, fmt.Errorf("invalid TypeOrValueSpecifierFrom value: %d", s.From)
 	}
@@ -388,6 +394,8 @@ func typeMatchesSpecifier(
 	})
 
 	switch specifier.From {
+	case TypeOrValueSpecifierFromName:
+		return true
 	case TypeOrValueSpecifierFromFile:
 		return typeDeclaredInFile(specifier.Path, declarationFiles, program)
 	case TypeOrValueSpecifierFromLib:
@@ -399,15 +407,51 @@ func typeMatchesSpecifier(
 	}
 }
 
+// SymbolMatchesSpecifierNameAndSource reports whether a symbol with a known
+// static name is allowed by a type-or-value specifier.
+//
+// This is used when the AST node being checked is not itself a value reference
+// with declarations that ValueMatchesSomeSpecifier can inspect. For example,
+// contextual object literal properties such as `{ statusCode: 500 }` are checked
+// by resolving the `statusCode` property symbol from the target object type, then
+// matching that symbol's declaration source against the allow specifier.
+func SymbolMatchesSpecifierNameAndSource(
+	symbol *ast.Symbol,
+	name string,
+	specifier TypeOrValueSpecifier,
+	program *compiler.Program,
+) bool {
+	if symbol == nil || !slices.Contains(specifier.Name, name) {
+		return false
+	}
+	declarations := symbol.Declarations
+	declarationFiles := Map(declarations, func(d *ast.Node) *ast.SourceFile {
+		return ast.GetSourceFileOfNode(d)
+	})
+
+	switch specifier.From {
+	case TypeOrValueSpecifierFromName:
+		return true
+	case TypeOrValueSpecifierFromFile:
+		return typeDeclaredInFile(specifier.Path, declarationFiles, program)
+	case TypeOrValueSpecifierFromLib:
+		return typeDeclaredInLib(declarationFiles, program)
+	case TypeOrValueSpecifierFromPackage:
+		return typeDeclaredInPackageDeclarationFile(specifier.Package, declarations, declarationFiles, program)
+	default:
+		panic(fmt.Sprintf("unknown value specifier from: %v", specifier.From))
+	}
+}
+
 // ConvertTypeOrValueSpecifier converts an interface{} (from JSON schema) to a TypeOrValueSpecifier struct.
 // The input can be:
-// - A string (universal string specifier - matches all names)
+// - A string (name-only specifier - matches all declarations with this name)
 // - A map with "from" field indicating file/lib/package specifier
 func ConvertTypeOrValueSpecifier(spec any) (TypeOrValueSpecifier, bool) {
 	// Handle string specifier
 	if str, ok := spec.(string); ok {
 		return TypeOrValueSpecifier{
-			From: TypeOrValueSpecifierFromFile, // Default to file for universal specifiers
+			From: TypeOrValueSpecifierFromName,
 			Name: []string{str},
 		}, true
 	}
