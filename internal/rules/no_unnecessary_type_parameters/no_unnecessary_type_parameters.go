@@ -196,25 +196,35 @@ func classMembers(node *ast.Node) []*ast.Node {
 	}
 }
 
-func countTypeParameterUsage(ctx rule.RuleContext, node *ast.Node) map[*ast.Symbol]int {
+func countTypeParameterUsage(ctx rule.RuleContext, node *ast.Node, targetSymbols map[*ast.Symbol]struct{}) map[*ast.Symbol]int {
 	counts := make(map[*ast.Symbol]int)
+	remainingTargets := len(targetSymbols)
 
 	if ast.IsClassLike(node) {
 		for _, typeParameter := range node.TypeParameters() {
-			collectTypeParameterUsageCounts(ctx, typeParameter, counts, true)
+			if remainingTargets == 0 {
+				break
+			}
+			remainingTargets = collectTypeParameterUsageCounts(ctx, typeParameter, counts, targetSymbols, remainingTargets, true)
 		}
 		if heritageClauses := utils.GetHeritageClauses(node); heritageClauses != nil {
 			for _, heritageClause := range heritageClauses.Nodes {
 				for _, heritageType := range heritageClause.AsHeritageClause().Types.Nodes {
-					collectTypeParameterUsageCounts(ctx, heritageType, counts, true)
+					if remainingTargets == 0 {
+						break
+					}
+					remainingTargets = collectTypeParameterUsageCounts(ctx, heritageType, counts, targetSymbols, remainingTargets, true)
 				}
 			}
 		}
 		for _, member := range classMembers(node) {
-			collectTypeParameterUsageCounts(ctx, member, counts, true)
+			if remainingTargets == 0 {
+				break
+			}
+			remainingTargets = collectTypeParameterUsageCounts(ctx, member, counts, targetSymbols, remainingTargets, true)
 		}
 	} else {
-		collectTypeParameterUsageCounts(ctx, node, counts, false)
+		collectTypeParameterUsageCounts(ctx, node, counts, targetSymbols, remainingTargets, false)
 	}
 
 	return counts
@@ -314,15 +324,26 @@ func collectTypeParameterUsageCounts(
 	ctx rule.RuleContext,
 	node *ast.Node,
 	foundIdentifierUsages map[*ast.Symbol]int,
+	targetSymbols map[*ast.Symbol]struct{},
+	remainingTargets int,
 	fromClass bool,
-) {
+) int {
 	typeUsages := make(map[*checker.Type]int)
 	visitedConstraints := make(map[*ast.Node]bool)
 	visitedDefault := false
 	functionLikeType := false
 
 	incrementIdentifierCount := func(symbol *ast.Symbol, assumeMultipleUses bool) {
+		if remainingTargets == 0 {
+			return
+		}
 		if symbol == nil {
+			return
+		}
+		if _, ok := targetSymbols[symbol]; !ok {
+			return
+		}
+		if foundIdentifierUsages[symbol] > 2 {
 			return
 		}
 		value := 1
@@ -330,6 +351,9 @@ func collectTypeParameterUsageCounts(
 			value = 2
 		}
 		foundIdentifierUsages[symbol] = foundIdentifierUsages[symbol] + value
+		if foundIdentifierUsages[symbol] > 2 {
+			remainingTargets--
+		}
 	}
 
 	incrementTypeUsages := func(t *checker.Type) int {
@@ -345,18 +369,24 @@ func collectTypeParameterUsageCounts(
 
 	visitTypesList = func(types []*checker.Type, assumeMultipleUses bool) {
 		for _, typeNode := range types {
+			if remainingTargets == 0 {
+				return
+			}
 			visitType(typeNode, assumeMultipleUses, false)
 		}
 	}
 
 	visitSymbolsList = func(symbols []*ast.Symbol, assumeMultipleUses bool) {
 		for _, symbol := range symbols {
+			if remainingTargets == 0 {
+				return
+			}
 			visitType(checker.Checker_getTypeOfSymbol(ctx.TypeChecker, symbol), assumeMultipleUses, false)
 		}
 	}
 
 	visitSignature = func(signature *checker.Signature) {
-		if signature == nil {
+		if signature == nil || remainingTargets == 0 {
 			return
 		}
 
@@ -365,10 +395,16 @@ func collectTypeParameterUsageCounts(
 		}
 
 		for _, parameter := range signature.Parameters() {
+			if remainingTargets == 0 {
+				return
+			}
 			visitType(checker.Checker_getTypeOfSymbol(ctx.TypeChecker, parameter), false, false)
 		}
 
 		for _, typeParameter := range signature.TypeParameters() {
+			if remainingTargets == 0 {
+				return
+			}
 			visitType(typeParameter, false, false)
 		}
 
@@ -383,7 +419,7 @@ func collectTypeParameterUsageCounts(
 	}
 
 	visitType = func(typeNode *checker.Type, assumeMultipleUses bool, isReturnType bool) {
-		if typeNode == nil || incrementTypeUsages(typeNode) > 9 {
+		if typeNode == nil || remainingTargets == 0 || incrementTypeUsages(typeNode) > 9 {
 			return
 		}
 
@@ -484,10 +520,16 @@ func collectTypeParameterUsageCounts(
 			visitType(ctx.TypeChecker.GetStringIndexType(typeNode), true, false)
 
 			for _, signature := range ctx.TypeChecker.GetCallSignatures(typeNode) {
+				if remainingTargets == 0 {
+					return
+				}
 				functionLikeType = true
 				visitSignature(signature)
 			}
 			for _, signature := range ctx.TypeChecker.GetConstructSignatures(typeNode) {
+				if remainingTargets == 0 {
+					return
+				}
 				functionLikeType = true
 				visitSignature(signature)
 			}
@@ -510,6 +552,8 @@ func collectTypeParameterUsageCounts(
 	if !functionLikeType {
 		visitType(ctx.TypeChecker.GetTypeAtLocation(node), false, false)
 	}
+
+	return remainingTargets
 }
 
 func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, descriptor string) {
@@ -518,9 +562,16 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 		return
 	}
 
-	identifierCounts := countTypeParameterUsage(ctx, node)
 	startOfBody := getStartOfBody(node)
 
+	type candidateTypeParameter struct {
+		node       *ast.Node
+		nameNode   *ast.Node
+		symbol     *ast.Symbol
+		references []*ast.Node
+	}
+
+	candidates := make([]candidateTypeParameter, 0, len(typeParameters))
 	for _, typeParameter := range typeParameters {
 		typeParameterSymbol := symbolFromTypeParameter(ctx, typeParameter)
 		if typeParameterSymbol == nil {
@@ -533,7 +584,24 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 			continue
 		}
 
-		identifierCount, ok := identifierCounts[typeParameterSymbol]
+		candidates = append(candidates, candidateTypeParameter{
+			node:       typeParameter,
+			nameNode:   typeParameterNameNode,
+			symbol:     typeParameterSymbol,
+			references: references,
+		})
+	}
+	if len(candidates) == 0 {
+		return
+	}
+
+	targetSymbols := make(map[*ast.Symbol]struct{}, len(candidates))
+	for _, candidate := range candidates {
+		targetSymbols[candidate.symbol] = struct{}{}
+	}
+	identifierCounts := countTypeParameterUsage(ctx, node, targetSymbols)
+	for _, candidate := range candidates {
+		identifierCount, ok := identifierCounts[candidate.symbol]
 		if !ok || identifierCount > 2 {
 			continue
 		}
@@ -543,26 +611,26 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 			uses = "never used"
 		}
 
-		typeParameterName := typeParameterNameNode.Text()
-		constraintText, constraintNode := getTypeParameterConstraintText(ctx, typeParameter)
-		typeParameterReferenceRange := utils.TrimNodeTextRange(ctx.SourceFile, typeParameterNameNode)
-		if len(references) > 0 {
-			typeParameterReferenceRange = utils.TrimNodeTextRange(ctx.SourceFile, references[0])
+		typeParameterName := candidate.nameNode.Text()
+		constraintText, constraintNode := getTypeParameterConstraintText(ctx, candidate.node)
+		typeParameterReferenceRange := utils.TrimNodeTextRange(ctx.SourceFile, candidate.nameNode)
+		if len(candidate.references) > 0 {
+			typeParameterReferenceRange = utils.TrimNodeTextRange(ctx.SourceFile, candidate.references[0])
 		}
 
 		ctx.ReportDiagnosticWithSuggestions(
 			buildSoleMessage(
-				utils.TrimNodeTextRange(ctx.SourceFile, typeParameter),
+				utils.TrimNodeTextRange(ctx.SourceFile, candidate.node),
 				typeParameterReferenceRange,
 				typeParameterName,
 				uses,
 				descriptor,
 			),
 			func() []rule.RuleSuggestion {
-				removalRange := getTypeParameterListRemovalRange(ctx, typeParameters, typeParameter)
-				fixes := make([]rule.RuleFix, 0, len(references)+1)
+				removalRange := getTypeParameterListRemovalRange(ctx, typeParameters, candidate.node)
+				fixes := make([]rule.RuleFix, 0, len(candidate.references)+1)
 
-				for _, reference := range references {
+				for _, reference := range candidate.references {
 					referenceRange := utils.TrimNodeTextRange(ctx.SourceFile, reference)
 					if referenceRange.Pos() < removalRange.End() && referenceRange.End() > removalRange.Pos() {
 						continue
