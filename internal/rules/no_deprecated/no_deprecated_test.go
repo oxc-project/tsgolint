@@ -512,6 +512,18 @@ exists('/foo');
 			const content = "";
 			const result = [...content.matchAll(DISALLOWED_CATEGORY_ITEM_REGEXP)].map(([, term, description, name, link]) => ({ link, }));`,
 		},
+		{Code: `
+export interface ErrorOptions {
+  /** @deprecated Use status instead. */
+  statusCode?: number;
+
+  status?: number;
+}
+
+const x: ErrorOptions = null!
+
+x.statusCode;
+      `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": ["statusCode"]}`)},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
