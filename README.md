@@ -145,6 +145,9 @@ The core architecture is stable and already powers Oxlint's type-aware linting m
 
 Because `tsgolint` relies on `typescript-go`, its long-term stability evolves alongside TypeScript itself.
 
+> [!NOTE]
+> We are not currently accepting PRs for new rules beyond what `typescript-eslint` supports, so that we can focus our limited engineering capacity on the items listed above.
+
 For detailed technical documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Contributing
