@@ -310,32 +310,32 @@ Help: The promise must end with a call to .catch, or end with a call to .then wi
 ---
 
 [TestNoFloatingPromisesRule/invalid-10 - 1]
-Diagnostic 1: floatingVoid (3:3 - 3:25)
+Diagnostic 1: floatingVoid (3:3 - 3:27)
 Message: Promises must be awaited, add void operator to ignore.
 Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
    2 | async function test() {
-   3 |   Promise.resolve(), 123;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~
-   4 |   123, Promise.resolve();
+   3 |   (Promise.resolve(), 123);
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   (123, Promise.resolve());
   Suggestion 1: [floatingFixVoid] Add void operator to ignore.
   Suggestion 2: [floatingFixAwait] Add await operator.
 
-Diagnostic 2: floatingVoid (4:3 - 4:25)
+Diagnostic 2: floatingVoid (4:3 - 4:27)
 Message: Promises must be awaited, add void operator to ignore.
 Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
-   3 |   Promise.resolve(), 123;
-   4 |   123, Promise.resolve();
-     |   ~~~~~~~~~~~~~~~~~~~~~~~
-   5 |   123, Promise.resolve(), 123;
+   3 |   (Promise.resolve(), 123);
+   4 |   (123, Promise.resolve());
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   (123, Promise.resolve(), 123);
   Suggestion 1: [floatingFixVoid] Add void operator to ignore.
   Suggestion 2: [floatingFixAwait] Add await operator.
 
-Diagnostic 3: floatingVoid (5:3 - 5:30)
+Diagnostic 3: floatingVoid (5:3 - 5:32)
 Message: Promises must be awaited, add void operator to ignore.
 Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
-   4 |   123, Promise.resolve();
-   5 |   123, Promise.resolve(), 123;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   (123, Promise.resolve());
+   5 |   (123, Promise.resolve(), 123);
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    6 | }
   Suggestion 1: [floatingFixVoid] Add void operator to ignore.
   Suggestion 2: [floatingFixAwait] Add await operator.
@@ -386,12 +386,12 @@ Help: The promise must end with a call to .catch, or end with a call to .then wi
 ---
 
 [TestNoFloatingPromisesRule/invalid-15 - 1]
-Diagnostic 1: floating (5:1 - 5:20)
+Diagnostic 1: floating (5:1 - 5:22)
 Message: Promises must be awaited, add await operator.
 Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
    4 | }
-   5 | 1, returnsPromise();
-     | ~~~~~~~~~~~~~~~~~~~~
+   5 | (1, returnsPromise());
+     | ~~~~~~~~~~~~~~~~~~~~~~
    6 |       
   Suggestion 1: [floatingFixAwait] Add await operator.
 ---
@@ -1144,12 +1144,12 @@ Help: The promise must end with a call to .catch, or end with a call to .then wi
 ---
 
 [TestNoFloatingPromisesRule/invalid-54 - 1]
-Diagnostic 1: floatingVoid (2:1 - 2:41)
+Diagnostic 1: floatingVoid (2:1 - 2:43)
 Message: Promises must be awaited, add void operator to ignore.
 Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
    1 | 
-   2 | Promise.resolve().finally(() => {}), 123;
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   2 | (Promise.resolve().finally(() => {}), 123);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    3 |       
   Suggestion 1: [floatingFixVoid] Add void operator to ignore.
   Suggestion 2: [floatingFixAwait] Add await operator.
@@ -1632,6 +1632,42 @@ Help: The promise must end with a call to .catch, or end with a call to .then wi
    1 | 
    2 | <Promise<number>>{};
      | ~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-97 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:29)
+Message: Promises must be awaited, add void operator to ignore.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
+   1 | 
+   2 | Promise.reject('foo').then();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-98 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:32)
+Message: Promises must be awaited, add void operator to ignore.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
+   1 | 
+   2 | Promise.reject('foo').finally();
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+  Suggestion 1: [floatingFixVoid] Add void operator to ignore.
+  Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesRule/invalid-99 - 1]
+Diagnostic 1: floatingVoid (2:1 - 2:47)
+Message: Promises must be awaited, add void operator to ignore.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
+   1 | 
+   2 | Promise.reject('foo').finally(...[], () => {});
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    3 |       
   Suggestion 1: [floatingFixVoid] Add void operator to ignore.
   Suggestion 2: [floatingFixAwait] Add await operator.
