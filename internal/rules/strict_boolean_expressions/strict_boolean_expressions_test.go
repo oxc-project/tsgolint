@@ -493,6 +493,13 @@ assert(nullableString);
 			},
 			{
 				Code: `
+declare function assert(x: unknown): asserts missing;
+declare const nullableString: string | null;
+assert(nullableString);
+      `,
+			},
+			{
+				Code: `
 class ThisAsserter {
   assertThis(this: unknown, arg2: unknown): asserts this {}
 }

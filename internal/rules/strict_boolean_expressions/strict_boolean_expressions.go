@@ -193,7 +193,13 @@ var StrictBooleanExpressionsRule = rule.Rule{
 
 func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.CallExpression) *ast.Node {
 	var checkableArguments []*ast.Node
+	if callExpr.Arguments == nil {
+		return nil
+	}
 	for _, argument := range callExpr.Arguments.Nodes {
+		if argument == nil {
+			continue
+		}
 		if argument.Kind == ast.KindSpreadElement {
 			break
 		}
@@ -219,21 +225,7 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 			return nil
 		}
 
-		for _, t := range unionTypes {
-			signatures := typeChecker.GetCallSignatures(t)
-			for _, sig := range signatures {
-				typePredicate := typeChecker.GetTypePredicateOfSignature(sig)
-				if typePredicate != nil &&
-					checker.TypePredicate_kind(typePredicate) == checker.TypePredicateKindAssertsIdentifier &&
-					checker.TypePredicate_t(typePredicate) == nil {
-					parameterIndex := checker.TypePredicate_parameterIndex(typePredicate)
-					if int(parameterIndex) < len(checkableArguments) {
-						return checkableArguments[parameterIndex]
-					}
-				}
-			}
-		}
-		return nil
+		return findTruthinessAssertedArgumentInUnionSignatures(typeChecker, unionTypes, checkableArguments)
 	}
 
 	firstTypePredicateResult := typeChecker.GetTypePredicateOfSignature(signature)
@@ -242,29 +234,35 @@ func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.
 			return nil
 		}
 
-		for _, t := range unionTypes {
-			signatures := typeChecker.GetCallSignatures(t)
-			for _, sig := range signatures {
-				typePredicate := typeChecker.GetTypePredicateOfSignature(sig)
-				if typePredicate != nil &&
-					checker.TypePredicate_kind(typePredicate) == checker.TypePredicateKindAssertsIdentifier &&
-					checker.TypePredicate_t(typePredicate) == nil {
-					parameterIndex := checker.TypePredicate_parameterIndex(typePredicate)
-					if int(parameterIndex) < len(checkableArguments) {
-						return checkableArguments[parameterIndex]
-					}
-				}
+		return findTruthinessAssertedArgumentInUnionSignatures(typeChecker, unionTypes, checkableArguments)
+	}
+
+	return findTruthinessAssertedArgumentInPredicate(firstTypePredicateResult, checkableArguments)
+}
+
+func findTruthinessAssertedArgumentInUnionSignatures(typeChecker *checker.Checker, unionTypes []*checker.Type, checkableArguments []*ast.Node) *ast.Node {
+	for _, t := range unionTypes {
+		signatures := typeChecker.GetCallSignatures(t)
+		for _, sig := range signatures {
+			typePredicate := typeChecker.GetTypePredicateOfSignature(sig)
+			argument := findTruthinessAssertedArgumentInPredicate(typePredicate, checkableArguments)
+			if argument != nil {
+				return argument
 			}
 		}
+	}
+	return nil
+}
+
+func findTruthinessAssertedArgumentInPredicate(typePredicate *checker.TypePredicate, checkableArguments []*ast.Node) *ast.Node {
+	if typePredicate == nil ||
+		checker.TypePredicate_kind(typePredicate) != checker.TypePredicateKindAssertsIdentifier ||
+		checker.TypePredicate_t(typePredicate) != nil {
 		return nil
 	}
 
-	if !(checker.TypePredicate_kind(firstTypePredicateResult) == checker.TypePredicateKindAssertsIdentifier &&
-		checker.TypePredicate_t(firstTypePredicateResult) == nil) {
-		return nil
-	}
-	parameterIndex := checker.TypePredicate_parameterIndex(firstTypePredicateResult)
-	if int(parameterIndex) >= len(checkableArguments) {
+	parameterIndex := int(checker.TypePredicate_parameterIndex(typePredicate))
+	if parameterIndex < 0 || parameterIndex >= len(checkableArguments) {
 		return nil
 	}
 	return checkableArguments[parameterIndex]

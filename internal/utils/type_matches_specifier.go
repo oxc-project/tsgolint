@@ -122,7 +122,7 @@ func (s TypeOrValueSpecifier) MarshalJSON() ([]byte, error) {
 		if len(s.Name) == 1 {
 			return json.Marshal(s.Name[0])
 		}
-		return nil, fmt.Errorf("name-only specifier must contain exactly one name")
+		return nil, errors.New("name-only specifier must contain exactly one name")
 	default:
 		return nil, fmt.Errorf("invalid TypeOrValueSpecifierFrom value: %d", s.From)
 	}
