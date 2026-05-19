@@ -244,6 +244,18 @@ var NoFloatingPromisesRule = rule.Rule{
 			return len(utils.GetCallSignatures(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(rejectionHandler))) > 0
 		}
 
+		isKnownArgumentAt := func(args *ast.ArgumentList, index int) bool {
+			if len(args.Nodes) <= index {
+				return false
+			}
+			for _, arg := range args.Nodes[:index+1] {
+				if ast.IsSpreadElement(arg) {
+					return false
+				}
+			}
+			return true
+		}
+
 		var isUnhandledPromise func(
 			node *ast.Node,
 		) (
@@ -315,12 +327,18 @@ var NoFloatingPromisesRule = rule.Rule{
 					methodName, _ := checker.Checker_getAccessedPropertyName(ctx.TypeChecker, callee)
 
 					if methodName == "catch" && len(callExpr.Arguments.Nodes) >= 1 {
+						if !isKnownArgumentAt(callExpr.Arguments, 0) {
+							return true, false, false
+						}
 						if isValidRejectionHandler(callExpr.Arguments.Nodes[0]) {
 							return false, false, false
 						}
 						return true, true, false
 					}
 					if methodName == "then" && len(callExpr.Arguments.Nodes) >= 2 {
+						if !isKnownArgumentAt(callExpr.Arguments, 1) {
+							return true, false, false
+						}
 						if isValidRejectionHandler(callExpr.Arguments.Nodes[1]) {
 							return false, false, false
 						}

@@ -5582,7 +5582,6 @@ await Promise.reject('foo').finally(...[], () => {});
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 Promise.reject('foo').then(...[], () => {});
       `,
