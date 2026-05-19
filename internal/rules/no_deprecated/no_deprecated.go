@@ -300,8 +300,7 @@ var NoDeprecatedRule = rule.Rule{
 
 				t := ctx.TypeChecker.GetTypeAtLocation(name)
 				if t != nil {
-					isLiteralType := t.IsStringLiteral() || t.IsNumberLiteral() || t.IsBigIntLiteral()
-					if isLiteralType {
+					if t.IsStringLiteral() || t.IsNumberLiteral() || t.IsBigIntLiteral() {
 						literalType := t.AsLiteralType()
 						if value := literalType.Value(); value != nil {
 							if str, ok := value.(string); ok {

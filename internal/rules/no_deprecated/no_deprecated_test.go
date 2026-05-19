@@ -510,6 +510,12 @@ exists('/foo');
 		const { [key]: value } = obj;
 	`},
 		{Code: `
+		declare const key: string;
+		const obj = {
+			[key]: 'value',
+		};
+	`},
+		{Code: `
 		export class Test {
 	/** @deprecated Use something else instead */
 	public get foo(): number {
