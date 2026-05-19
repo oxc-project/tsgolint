@@ -751,7 +751,6 @@ promise().then(() => {});
 			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "package", "name": "it", "package": "abc"}]}`),
 		},
 		{
-			Skip: true,
 			Code: `
         import { it } from 'node:test';
 
