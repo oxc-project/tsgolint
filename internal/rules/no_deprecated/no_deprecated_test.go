@@ -501,6 +501,15 @@ exists('/foo');
 		const { [key]: value } = obj;
 	`},
 		{Code: `
+		interface MyInterface {
+			/** @deprecated */
+			prop: string;
+		}
+		declare const obj: MyInterface;
+		declare const key: string;
+		const { [key]: value } = obj;
+	`},
+		{Code: `
 		export class Test {
 	/** @deprecated Use something else instead */
 	public get foo(): number {
