@@ -193,13 +193,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 
 func findTruthinessAssertedArgument(typeChecker *checker.Checker, callExpr *ast.CallExpression) *ast.Node {
 	var checkableArguments []*ast.Node
-	if callExpr.Arguments == nil {
-		return nil
-	}
 	for _, argument := range callExpr.Arguments.Nodes {
-		if argument == nil {
-			continue
-		}
 		if argument.Kind == ast.KindSpreadElement {
 			break
 		}
