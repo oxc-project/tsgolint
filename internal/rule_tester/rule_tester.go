@@ -112,12 +112,12 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 
 		files := []*ast.SourceFile{sourceFile}
 
-		err = linter.RunLinterOnProgram(
-			utils.LogLevelNormal,
-			program,
-			files,
-			1,
-			func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
+		err = linter.RunLinterOnProgram(linter.RunLinterOnProgramOptions{
+			LogLevel: utils.LogLevelNormal,
+			Program:  program,
+			Files:    files,
+			Workers:  1,
+			GetRulesForFile: func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 				return []linter.ConfiguredRule{
 					{
 						Name: "test",
@@ -127,24 +127,24 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 					},
 				}
 			},
-			func(diagnostic rule.RuleDiagnostic) {
+			OnDiagnostic: func(diagnostic rule.RuleDiagnostic) {
 				diagnosticsMu.Lock()
 				defer diagnosticsMu.Unlock()
 
 				diagnostics = append(diagnostics, diagnostic)
 			},
-			func(d diagnostic.Internal) {
+			OnInternalDiagnostic: func(d diagnostic.Internal) {
 				// Internal diagnostics are not used in rule tester
 			},
-			linter.Fixes{
+			Fixes: linter.Fixes{
 				Fix:            true,
 				FixSuggestions: true,
 			},
-			linter.TypeErrors{
+			TypeErrors: linter.TypeErrors{
 				ReportSyntactic: false,
 				ReportSemantic:  false,
 			},
-		)
+		})
 
 		assert.NilError(t, err, "error running linter. code:\n", code)
 

@@ -98,17 +98,15 @@ func runAllRulesBenchmark(b *testing.B, singleThreaded bool) {
 
 	// Warm up: run once to ensure everything is initialized
 	var diagnosticCount int64
-	err := linter.RunLinterOnProgram(
-		utils.LogLevelNormal,
-		env.program,
-		env.files,
-		workers,
-		env.getRulesForFile,
-		func(_ rule.RuleDiagnostic) { atomic.AddInt64(&diagnosticCount, 1) },
-		func(_ diagnostic.Internal) {},
-		linter.Fixes{},
-		linter.TypeErrors{},
-	)
+	err := linter.RunLinterOnProgram(linter.RunLinterOnProgramOptions{
+		LogLevel:             utils.LogLevelNormal,
+		Program:              env.program,
+		Files:                env.files,
+		Workers:              workers,
+		GetRulesForFile:      env.getRulesForFile,
+		OnDiagnostic:         func(_ rule.RuleDiagnostic) { atomic.AddInt64(&diagnosticCount, 1) },
+		OnInternalDiagnostic: func(_ diagnostic.Internal) {},
+	})
 	if err != nil {
 		b.Fatal("warmup linter failed:", err)
 	}
@@ -118,17 +116,15 @@ func runAllRulesBenchmark(b *testing.B, singleThreaded bool) {
 
 	b.ResetTimer()
 	for b.Loop() {
-		err := linter.RunLinterOnProgram(
-			utils.LogLevelNormal,
-			env.program,
-			env.files,
-			workers,
-			env.getRulesForFile,
-			func(_ rule.RuleDiagnostic) {},
-			func(_ diagnostic.Internal) {},
-			linter.Fixes{},
-			linter.TypeErrors{},
-		)
+		err := linter.RunLinterOnProgram(linter.RunLinterOnProgramOptions{
+			LogLevel:             utils.LogLevelNormal,
+			Program:              env.program,
+			Files:                env.files,
+			Workers:              workers,
+			GetRulesForFile:      env.getRulesForFile,
+			OnDiagnostic:         func(_ rule.RuleDiagnostic) {},
+			OnInternalDiagnostic: func(_ diagnostic.Internal) {},
+		})
 		if err != nil {
 			b.Fatal("linter failed:", err)
 		}
@@ -218,19 +214,16 @@ func BenchmarkE2E(b *testing.B) {
 		}
 
 		var diagnosticCount int64
-		err := linter.RunLinter(
-			utils.LogLevelNormal,
-			dir,
-			workload,
-			workers,
-			fs,
-			getRulesForFile,
-			func(_ rule.RuleDiagnostic) { atomic.AddInt64(&diagnosticCount, 1) },
-			func(_ diagnostic.Internal) {},
-			linter.Fixes{},
-			linter.TypeErrors{},
-			false,
-		)
+		err := linter.RunLinter(linter.RunLinterOptions{
+			LogLevel:             utils.LogLevelNormal,
+			CurrentDirectory:     dir,
+			Workload:             workload,
+			Workers:              workers,
+			FS:                   fs,
+			GetRulesForFile:      getRulesForFile,
+			OnRuleDiagnostic:     func(_ rule.RuleDiagnostic) { atomic.AddInt64(&diagnosticCount, 1) },
+			OnInternalDiagnostic: func(_ diagnostic.Internal) {},
+		})
 		if err != nil {
 			b.Fatal("warmup linter failed:", err)
 		}
@@ -244,19 +237,16 @@ func BenchmarkE2E(b *testing.B) {
 		// and diagnostic serialization to io.Discard.
 		workload, fs := buildWorkload()
 
-		err := linter.RunLinter(
-			utils.LogLevelNormal,
-			dir,
-			workload,
-			workers,
-			fs,
-			getRulesForFile,
-			func(_ rule.RuleDiagnostic) {},
-			func(_ diagnostic.Internal) {},
-			linter.Fixes{},
-			linter.TypeErrors{},
-			false,
-		)
+		err := linter.RunLinter(linter.RunLinterOptions{
+			LogLevel:             utils.LogLevelNormal,
+			CurrentDirectory:     dir,
+			Workload:             workload,
+			Workers:              workers,
+			FS:                   fs,
+			GetRulesForFile:      getRulesForFile,
+			OnRuleDiagnostic:     func(_ rule.RuleDiagnostic) {},
+			OnInternalDiagnostic: func(_ diagnostic.Internal) {},
+		})
 		if err != nil {
 			b.Fatal("linter failed:", err)
 		}

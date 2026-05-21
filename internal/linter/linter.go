@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
@@ -41,19 +42,54 @@ type TypeErrors struct {
 	ReportSemantic  bool
 }
 
-func RunLinter(
-	logLevel utils.LogLevel,
-	currentDirectory string,
-	workload Workload,
-	workers int,
-	fs vfs.FS,
-	getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule,
-	onRuleDiagnostic func(diagnostic rule.RuleDiagnostic),
-	onInternalDiagnostic func(d diagnostic.Internal),
-	fixState Fixes,
-	typeErrors TypeErrors,
-	suppressProgramDiagnostics bool,
-) error {
+type checkerWorkload struct {
+	checker *checker.Checker
+	program *compiler.Program
+	queue   chan *ast.SourceFile
+}
+
+type RunLinterOptions struct {
+	LogLevel                   utils.LogLevel
+	CurrentDirectory           string
+	Workload                   Workload
+	Workers                    int
+	FS                         vfs.FS
+	GetRulesForFile            func(sourceFile *ast.SourceFile) []ConfiguredRule
+	OnRuleDiagnostic           func(diagnostic rule.RuleDiagnostic)
+	OnInternalDiagnostic       func(d diagnostic.Internal)
+	Fixes                      Fixes
+	TypeErrors                 TypeErrors
+	SuppressProgramDiagnostics bool
+	TimingStore                *RuleTimingStore
+}
+
+// This is same as `RunLinterOptions` but for a single program.
+type RunLinterOnProgramOptions struct {
+	LogLevel             utils.LogLevel
+	Program              *compiler.Program
+	Files                []*ast.SourceFile
+	Workers              int
+	GetRulesForFile      func(sourceFile *ast.SourceFile) []ConfiguredRule
+	OnDiagnostic         func(diagnostic rule.RuleDiagnostic)
+	OnInternalDiagnostic func(d diagnostic.Internal)
+	Fixes                Fixes
+	TypeErrors           TypeErrors
+	TimingStore          *RuleTimingStore
+}
+
+func RunLinter(options RunLinterOptions) error {
+	logLevel := options.LogLevel
+	currentDirectory := options.CurrentDirectory
+	workload := options.Workload
+	workers := options.Workers
+	fs := options.FS
+	getRulesForFile := options.GetRulesForFile
+	onRuleDiagnostic := options.OnRuleDiagnostic
+	onInternalDiagnostic := options.OnInternalDiagnostic
+	fixState := options.Fixes
+	typeErrors := options.TypeErrors
+	suppressProgramDiagnostics := options.SuppressProgramDiagnostics
+	timingStore := options.TimingStore
 
 	idx := 0
 	for configFileName, filePaths := range workload.Programs {
@@ -112,7 +148,18 @@ func RunLinter(
 			panic(fmt.Sprintf("Expected file '%s' to be in program '%s'", unmatchedFilesString, configFileName))
 		}
 
-		err = RunLinterOnProgram(logLevel, program, sourceFiles, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
+		err = RunLinterOnProgram(RunLinterOnProgramOptions{
+			LogLevel:             logLevel,
+			Program:              program,
+			Files:                sourceFiles,
+			Workers:              workers,
+			GetRulesForFile:      getRulesForFile,
+			OnDiagnostic:         onRuleDiagnostic,
+			OnInternalDiagnostic: onInternalDiagnostic,
+			Fixes:                fixState,
+			TypeErrors:           typeErrors,
+			TimingStore:          timingStore,
+		})
 		if err != nil {
 			return err
 		}
@@ -143,7 +190,18 @@ func RunLinter(
 			files = append(files, sf)
 		}
 
-		err = RunLinterOnProgram(logLevel, program, files, workers, getRulesForFile, onRuleDiagnostic, onInternalDiagnostic, fixState, typeErrors)
+		err = RunLinterOnProgram(RunLinterOnProgramOptions{
+			LogLevel:             logLevel,
+			Program:              program,
+			Files:                files,
+			Workers:              workers,
+			GetRulesForFile:      getRulesForFile,
+			OnDiagnostic:         onRuleDiagnostic,
+			OnInternalDiagnostic: onInternalDiagnostic,
+			Fixes:                fixState,
+			TypeErrors:           typeErrors,
+			TimingStore:          timingStore,
+		})
 		if err != nil {
 			return err
 		}
@@ -239,21 +297,20 @@ func (b *ruleContextBuilder) reportNodeWithSuggestions(node *ast.Node, msg rule.
 	})
 }
 
-func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, files []*ast.SourceFile, workers int, getRulesForFile func(sourceFile *ast.SourceFile) []ConfiguredRule, onDiagnostic func(diagnostic rule.RuleDiagnostic), onInternalDiagnostic func(d diagnostic.Internal), fixState Fixes, typeErrors TypeErrors) error {
-	type checkerWorkload struct {
-		checker *checker.Checker
-		program *compiler.Program
-		queue   chan *ast.SourceFile
+func newRuleContext(ctxBuilder *ruleContextBuilder) rule.RuleContext {
+	return rule.RuleContext{
+		ReportDiagnostic:                ctxBuilder.emitDiagnostic,
+		ReportDiagnosticWithFixes:       ctxBuilder.reportDiagnosticWithFixes,
+		ReportDiagnosticWithSuggestions: ctxBuilder.reportDiagnosticWithSuggestions,
+		ReportRange:                     ctxBuilder.reportRange,
+		ReportRangeWithSuggestions:      ctxBuilder.reportRangeWithSuggestions,
+		ReportNode:                      ctxBuilder.reportNode,
+		ReportNodeWithFixes:             ctxBuilder.reportNodeWithFixes,
+		ReportNodeWithSuggestions:       ctxBuilder.reportNodeWithSuggestions,
 	}
-	flatQueue := []checkerWorkload{}
-	queue := make(chan *ast.SourceFile, len(files))
+}
 
-	for _, f := range files {
-		queue <- f
-	}
-
-	close(queue)
-
+func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceFile, typeErrors TypeErrors, onInternalDiagnostic func(d diagnostic.Internal)) {
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
 
 	if typeErrors.ReportSyntactic {
@@ -302,9 +359,21 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 				}
 			}
 		}
-
 	}
+}
 
+func makeSourceFileQueue(files []*ast.SourceFile) chan *ast.SourceFile {
+	queue := make(chan *ast.SourceFile, len(files))
+	for _, file := range files {
+		queue <- file
+	}
+	close(queue)
+	return queue
+}
+
+func makeCheckerWorkloadQueue(program *compiler.Program, files []*ast.SourceFile) chan checkerWorkload {
+	queue := makeSourceFileQueue(files)
+	flatQueue := []checkerWorkload{}
 	var flatQueueMu sync.Mutex
 	program.ForEachCheckerParallel(func(idx int, ch *checker.Checker) {
 		flatQueueMu.Lock()
@@ -317,18 +386,96 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 		workloadQueue <- w
 	}
 	close(workloadQueue)
+	return workloadQueue
+}
+
+func visitLintNodes(file *ast.SourceFile, runListeners func(kind ast.Kind, node *ast.Node)) {
+	/* convert.ts -> allowPattern:
+	catch name
+	variabledeclaration name
+	forinstatement initializer
+	forofstatement initializer
+	(propagation) allowPattern > arrayliteralexpression elements
+	(propagation) allowPattern > objectliteralexpression properties
+	(propagation) allowPattern > spreadassignment,spreadelement expression
+	(propagation) allowPattern > propertyassignment value
+	arraybindingpattern elements
+	objectbindingpattern elements
+	(init) binaryexpression(with '=' operator') left
+	*/
+
+	var childVisitor ast.Visitor
+	var patternVisitor func(node *ast.Node)
+	patternVisitor = func(node *ast.Node) {
+		runListeners(node.Kind, node)
+		kind := rule.ListenerOnAllowPattern(node.Kind)
+		runListeners(kind, node)
+
+		switch node.Kind {
+		case ast.KindArrayLiteralExpression:
+			for _, element := range node.AsArrayLiteralExpression().Elements.Nodes {
+				patternVisitor(element)
+			}
+		case ast.KindObjectLiteralExpression:
+			for _, property := range node.AsObjectLiteralExpression().Properties.Nodes {
+				patternVisitor(property)
+			}
+		case ast.KindSpreadElement, ast.KindSpreadAssignment:
+			patternVisitor(node.Expression())
+		case ast.KindPropertyAssignment:
+			patternVisitor(node.Initializer())
+		default:
+			node.ForEachChild(childVisitor)
+		}
+
+		runListeners(rule.ListenerOnExit(kind), node)
+		runListeners(rule.ListenerOnExit(node.Kind), node)
+	}
+	childVisitor = func(node *ast.Node) bool {
+		runListeners(node.Kind, node)
+
+		switch node.Kind {
+		case ast.KindArrayLiteralExpression, ast.KindObjectLiteralExpression:
+			kind := rule.ListenerOnNotAllowPattern(node.Kind)
+			runListeners(kind, node)
+			node.ForEachChild(childVisitor)
+			runListeners(rule.ListenerOnExit(kind), node)
+		default:
+			if ast.IsAssignmentExpression(node, true) {
+				expr := node.AsBinaryExpression()
+				patternVisitor(expr.Left)
+				childVisitor(expr.OperatorToken)
+				childVisitor(expr.Right)
+			} else {
+				node.ForEachChild(childVisitor)
+			}
+		}
+
+		runListeners(rule.ListenerOnExit(node.Kind), node)
+
+		return false
+	}
+	file.Node.ForEachChild(childVisitor)
+}
+
+func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
+	logLevel := options.LogLevel
+	program := options.Program
+	files := options.Files
+	workers := options.Workers
+	getRulesForFile := options.GetRulesForFile
+	onDiagnostic := options.OnDiagnostic
+	onInternalDiagnostic := options.OnInternalDiagnostic
+	fixState := options.Fixes
+	typeErrors := options.TypeErrors
+	timingStore := options.TimingStore
+
+	reportTypeScriptDiagnostics(program, files, typeErrors, onInternalDiagnostic)
+	workloadQueue := makeCheckerWorkloadQueue(program, files)
 
 	wg := core.NewWorkGroup(workers == 1)
 	for range workers {
 		wg.Queue(func() {
-			// Listeners are tagged with the rule that is associated with, so that when a diagnostic
-			// is emitted we know what rule it is coming from.
-			type taggedListener struct {
-				ruleName string
-				fn       func(node *ast.Node)
-			}
-			registeredListeners := make(map[ast.Kind][]taggedListener, 20)
-
 			ctxBuilder := &ruleContextBuilder{
 				fixState:     fixState,
 				onDiagnostic: onDiagnostic,
@@ -336,15 +483,73 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 
 			// These closures remain valid for the length of linting, as we mutate the fields
 			// of `ctxBuilder`, but `ctxBuilder` itself will not change.
-			ctx := rule.RuleContext{
-				ReportDiagnostic:                ctxBuilder.emitDiagnostic,
-				ReportDiagnosticWithFixes:       ctxBuilder.reportDiagnosticWithFixes,
-				ReportDiagnosticWithSuggestions: ctxBuilder.reportDiagnosticWithSuggestions,
-				ReportRange:                     ctxBuilder.reportRange,
-				ReportRangeWithSuggestions:      ctxBuilder.reportRangeWithSuggestions,
-				ReportNode:                      ctxBuilder.reportNode,
-				ReportNodeWithFixes:             ctxBuilder.reportNodeWithFixes,
-				ReportNodeWithSuggestions:       ctxBuilder.reportNodeWithSuggestions,
+			ctx := newRuleContext(ctxBuilder)
+
+			if timingStore == nil {
+				// Listeners are tagged with the rule that is associated with, so that when a diagnostic
+				// is emitted we know what rule it is coming from.
+				type taggedListener struct {
+					ruleName string
+					fn       func(node *ast.Node)
+				}
+				registeredListeners := make(map[ast.Kind][]taggedListener, 20)
+
+				for w := range workloadQueue {
+					ctxBuilder.program = w.program
+					ctxBuilder.checker = w.checker
+					ctx.Program = w.program
+					ctx.TypeChecker = w.checker
+
+					for file := range w.queue {
+						if logLevel == utils.LogLevelDebug {
+							log.Print(file.FileName())
+						}
+						ctxBuilder.file = file
+						ctx.SourceFile = file
+
+						rules := getRulesForFile(file)
+						for _, r := range rules {
+							ctxBuilder.ruleName = r.Name
+							for kind, listener := range r.Run(ctx) {
+								listeners, ok := registeredListeners[kind]
+								if !ok {
+									listeners = make([]taggedListener, 0, len(rules))
+								}
+								registeredListeners[kind] = append(listeners, taggedListener{ruleName: r.Name, fn: listener})
+							}
+						}
+
+						runListeners := func(kind ast.Kind, node *ast.Node) {
+							if listeners, ok := registeredListeners[kind]; ok {
+								for _, listener := range listeners {
+									ctxBuilder.ruleName = listener.ruleName
+									listener.fn(node)
+								}
+							}
+						}
+
+						visitLintNodes(file, runListeners)
+						// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
+						for k := range registeredListeners {
+							registeredListeners[k] = registeredListeners[k][:0]
+						}
+					}
+				}
+
+				return
+			}
+
+			type timedTaggedListener struct {
+				ruleName string
+				ruleIdx  int
+				fn       func(node *ast.Node)
+			}
+			registeredListeners := make(map[ast.Kind][]timedTaggedListener, 20)
+			localTimings := make(map[string]RuleTimingStat, 64)
+
+			recordTiming := func(stat *RuleTimingStat, duration time.Duration) {
+				stat.Duration += duration
+				stat.Calls++
 			}
 
 			for w := range workloadQueue {
@@ -361,14 +566,18 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 					ctx.SourceFile = file
 
 					rules := getRulesForFile(file)
-					for _, r := range rules {
+					timingStats := make([]RuleTimingStat, len(rules))
+					for ruleIdx, r := range rules {
 						ctxBuilder.ruleName = r.Name
-						for kind, listener := range r.Run(ctx) {
+						start := time.Now()
+						listenersByKind := r.Run(ctx)
+						recordTiming(&timingStats[ruleIdx], time.Since(start))
+						for kind, listener := range listenersByKind {
 							listeners, ok := registeredListeners[kind]
 							if !ok {
-								listeners = make([]taggedListener, 0, len(rules))
+								listeners = make([]timedTaggedListener, 0, len(rules))
 							}
-							registeredListeners[kind] = append(listeners, taggedListener{ruleName: r.Name, fn: listener})
+							registeredListeners[kind] = append(listeners, timedTaggedListener{ruleName: r.Name, ruleIdx: ruleIdx, fn: listener})
 						}
 					}
 
@@ -376,83 +585,30 @@ func RunLinterOnProgram(logLevel utils.LogLevel, program *compiler.Program, file
 						if listeners, ok := registeredListeners[kind]; ok {
 							for _, listener := range listeners {
 								ctxBuilder.ruleName = listener.ruleName
+								start := time.Now()
 								listener.fn(node)
+								recordTiming(&timingStats[listener.ruleIdx], time.Since(start))
 							}
 						}
 					}
 
-					/* convert.ts -> allowPattern:
-					catch name
-					variabledeclaration name
-					forinstatement initializer
-					forofstatement initializer
-					(propagation) allowPattern > arrayliteralexpression elements
-					(propagation) allowPattern > objectliteralexpression properties
-					(propagation) allowPattern > spreadassignment,spreadelement expression
-					(propagation) allowPattern > propertyassignment value
-					arraybindingpattern elements
-					objectbindingpattern elements
-					(init) binaryexpression(with '=' operator') left
-					*/
-
-					var childVisitor ast.Visitor
-					var patternVisitor func(node *ast.Node)
-					patternVisitor = func(node *ast.Node) {
-						runListeners(node.Kind, node)
-						kind := rule.ListenerOnAllowPattern(node.Kind)
-						runListeners(kind, node)
-
-						switch node.Kind {
-						case ast.KindArrayLiteralExpression:
-							for _, element := range node.AsArrayLiteralExpression().Elements.Nodes {
-								patternVisitor(element)
-							}
-						case ast.KindObjectLiteralExpression:
-							for _, property := range node.AsObjectLiteralExpression().Properties.Nodes {
-								patternVisitor(property)
-							}
-						case ast.KindSpreadElement, ast.KindSpreadAssignment:
-							patternVisitor(node.Expression())
-						case ast.KindPropertyAssignment:
-							patternVisitor(node.Initializer())
-						default:
-							node.ForEachChild(childVisitor)
+					visitLintNodes(file, runListeners)
+					for idx, stat := range timingStats {
+						if stat.Calls == 0 {
+							continue
 						}
-
-						runListeners(rule.ListenerOnExit(kind), node)
-						runListeners(rule.ListenerOnExit(node.Kind), node)
+						merged := localTimings[rules[idx].Name]
+						merged.add(stat)
+						localTimings[rules[idx].Name] = merged
 					}
-					childVisitor = func(node *ast.Node) bool {
-						runListeners(node.Kind, node)
-
-						switch node.Kind {
-						case ast.KindArrayLiteralExpression, ast.KindObjectLiteralExpression:
-							kind := rule.ListenerOnNotAllowPattern(node.Kind)
-							runListeners(kind, node)
-							node.ForEachChild(childVisitor)
-							runListeners(rule.ListenerOnExit(kind), node)
-						default:
-							if ast.IsAssignmentExpression(node, true) {
-								expr := node.AsBinaryExpression()
-								patternVisitor(expr.Left)
-								childVisitor(expr.OperatorToken)
-								childVisitor(expr.Right)
-							} else {
-								node.ForEachChild(childVisitor)
-							}
-						}
-
-						runListeners(rule.ListenerOnExit(node.Kind), node)
-
-						return false
-					}
-					file.Node.ForEachChild(childVisitor)
 					// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
 					for k := range registeredListeners {
 						registeredListeners[k] = registeredListeners[k][:0]
 					}
 				}
 			}
+
+			timingStore.merge(localTimings)
 		})
 	}
 	wg.RunAndWait()

@@ -33,10 +33,12 @@ type headlessOptions struct {
 	allocsOut      string
 	fix            bool
 	fixSuggestions bool
+	debugTimings   bool
 }
 
 func parseHeadlessOptions(args []string) (*headlessOptions, error) {
 	var opts headlessOptions
+	var debug string
 
 	flag.StringVar(&opts.traceOut, "trace", "", "file to put trace to")
 	flag.StringVar(&opts.cpuprofOut, "cpuprof", "", "file to put cpu profiling to")
@@ -44,10 +46,17 @@ func parseHeadlessOptions(args []string) (*headlessOptions, error) {
 	flag.StringVar(&opts.allocsOut, "allocs", "", "file to put allocs profiling to")
 	flag.BoolVar(&opts.fix, "fix", false, "generate fixes for code problems")
 	flag.BoolVar(&opts.fixSuggestions, "fix-suggestions", false, "generate suggestions for code problems")
+	flag.StringVar(&debug, "debug", "", "enable debug output options")
 
 	if err := flag.CommandLine.Parse(args); err != nil {
 		return nil, err
 	}
+
+	debugTimings, err := parseDebugTimings(debug)
+	if err != nil {
+		return nil, err
+	}
+	opts.debugTimings = debugTimings
 
 	return &opts, nil
 }
@@ -136,10 +145,33 @@ type headlessMessageType uint8
 const (
 	headlessMessageTypeError headlessMessageType = iota
 	headlessMessageTypeDiagnostic
+	headlessMessageTypeTiming
 )
 
 type headlessMessagePayloadError struct {
 	Error string `json:"error"`
+}
+
+type headlessTimingPayload struct {
+	Rules []headlessRuleTiming `json:"rules"`
+}
+
+type headlessRuleTiming struct {
+	RuleName string `json:"rule_name"`
+	Duration uint64 `json:"duration"`
+	Calls    uint64 `json:"calls"`
+}
+
+func headlessTimingPayloadFromRecords(records []linter.RuleTimingRecord) headlessTimingPayload {
+	rules := make([]headlessRuleTiming, len(records))
+	for i, record := range records {
+		rules[i] = headlessRuleTiming{
+			RuleName: record.RuleName,
+			Duration: uint64(record.Duration),
+			Calls:    record.Calls,
+		}
+	}
+	return headlessTimingPayload{Rules: rules}
 }
 
 // Unified diagnostic type for channel
@@ -365,19 +397,23 @@ func runHeadless(args []string) int {
 		}
 	})
 
-	suppressProgramDiagnostics := os.Getenv("OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true"
+	requestTimings := opts.debugTimings || os.Getenv("OXLINT_TSGOLINT_TIMINGS") == "1"
+	var timingStore *linter.RuleTimingStore
+	if requestTimings {
+		timingStore = linter.NewRuleTimingStore()
+	}
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Running Linter")
 	}
 
-	err = linter.RunLinter(
-		logLevel,
-		cwd,
-		workload,
-		runtime.GOMAXPROCS(0),
-		fs,
-		func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
+	err = linter.RunLinter(linter.RunLinterOptions{
+		LogLevel:         logLevel,
+		CurrentDirectory: cwd,
+		Workload:         workload,
+		Workers:          runtime.GOMAXPROCS(0),
+		FS:               fs,
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
 			cfg := fileConfigs[sourceFile.FileName()]
 			rules := make([]linter.ConfiguredRule, len(cfg))
 
@@ -396,22 +432,19 @@ func runHeadless(args []string) int {
 
 			return rules
 		},
-		func(d rule.RuleDiagnostic) {
-			diagnosticsChan <- ruleToAny(d)
-		},
-		func(d diagnostic.Internal) {
-			diagnosticsChan <- internalToAny(d)
-		},
-		linter.Fixes{
+		OnRuleDiagnostic:     func(d rule.RuleDiagnostic) { diagnosticsChan <- ruleToAny(d) },
+		OnInternalDiagnostic: func(d diagnostic.Internal) { diagnosticsChan <- internalToAny(d) },
+		Fixes: linter.Fixes{
 			Fix:            opts.fix,
 			FixSuggestions: opts.fixSuggestions,
 		},
-		linter.TypeErrors{
+		TypeErrors: linter.TypeErrors{
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
-		suppressProgramDiagnostics,
-	)
+		SuppressProgramDiagnostics: os.Getenv("OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true",
+		TimingStore:                timingStore,
+	})
 
 	close(diagnosticsChan)
 	if err != nil {
@@ -421,6 +454,13 @@ func runHeadless(args []string) int {
 	}
 
 	wg.Wait()
+
+	if requestTimings {
+		if err := writeMessage(os.Stdout, headlessMessageTypeTiming, headlessTimingPayloadFromRecords(timingStore.Collect())); err != nil {
+			log.Printf("ERROR: failed to write timing output: %v", err)
+			return 1
+		}
+	}
 
 	if logLevel == utils.LogLevelDebug {
 		log.Printf("Linting Complete")

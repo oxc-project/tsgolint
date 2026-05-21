@@ -3,6 +3,7 @@ package linter
 import (
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
@@ -54,12 +55,12 @@ function greet(name: string): string {
 	var mu sync.Mutex
 	var diagnostics []rule.RuleDiagnostic
 
-	err = RunLinterOnProgram(
-		utils.LogLevelNormal,
-		program,
-		sourceFiles,
-		1,
-		func(sourceFile *ast.SourceFile) []ConfiguredRule {
+	err = RunLinterOnProgram(RunLinterOnProgramOptions{
+		LogLevel: utils.LogLevelNormal,
+		Program:  program,
+		Files:    sourceFiles,
+		Workers:  1,
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []ConfiguredRule {
 			return []ConfiguredRule{
 				{
 					Name: ruleName,
@@ -76,15 +77,15 @@ function greet(name: string): string {
 				},
 			}
 		},
-		func(d rule.RuleDiagnostic) {
+		OnDiagnostic: func(d rule.RuleDiagnostic) {
 			mu.Lock()
 			defer mu.Unlock()
 			diagnostics = append(diagnostics, d)
 		},
-		func(d diagnostic.Internal) {},
-		Fixes{Fix: false, FixSuggestions: false},
-		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
-	)
+		OnInternalDiagnostic: func(d diagnostic.Internal) {},
+		Fixes:                Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors:           TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+	})
 	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
 
 	assert.Equal(t, len(diagnostics), 2, "expected exactly two diagnostics")
@@ -137,12 +138,12 @@ function add(a: number, b: number): number {
 	var mu sync.Mutex
 	var diagnostics []rule.RuleDiagnostic
 
-	err = RunLinterOnProgram(
-		utils.LogLevelNormal,
-		program,
-		sourceFiles,
-		1,
-		func(sourceFile *ast.SourceFile) []ConfiguredRule {
+	err = RunLinterOnProgram(RunLinterOnProgramOptions{
+		LogLevel: utils.LogLevelNormal,
+		Program:  program,
+		Files:    sourceFiles,
+		Workers:  1,
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []ConfiguredRule {
 			return []ConfiguredRule{
 				{
 					Name: ruleA,
@@ -166,15 +167,15 @@ function add(a: number, b: number): number {
 				},
 			}
 		},
-		func(d rule.RuleDiagnostic) {
+		OnDiagnostic: func(d rule.RuleDiagnostic) {
 			mu.Lock()
 			defer mu.Unlock()
 			diagnostics = append(diagnostics, d)
 		},
-		func(d diagnostic.Internal) {},
-		Fixes{Fix: false, FixSuggestions: false},
-		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
-	)
+		OnInternalDiagnostic: func(d diagnostic.Internal) {},
+		Fixes:                Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors:           TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+	})
 	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
 
 	assert.Equal(t, len(diagnostics), 2, "expected exactly two diagnostics")
@@ -226,12 +227,12 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 	var mu sync.Mutex
 	var diagnostics []rule.RuleDiagnostic
 
-	err = RunLinterOnProgram(
-		utils.LogLevelNormal,
-		program,
-		sourceFiles,
-		1,
-		func(sourceFile *ast.SourceFile) []ConfiguredRule {
+	err = RunLinterOnProgram(RunLinterOnProgramOptions{
+		LogLevel: utils.LogLevelNormal,
+		Program:  program,
+		Files:    sourceFiles,
+		Workers:  1,
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []ConfiguredRule {
 			return []ConfiguredRule{
 				{
 					Name: ruleA,
@@ -255,15 +256,15 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 				},
 			}
 		},
-		func(d rule.RuleDiagnostic) {
+		OnDiagnostic: func(d rule.RuleDiagnostic) {
 			mu.Lock()
 			defer mu.Unlock()
 			diagnostics = append(diagnostics, d)
 		},
-		func(d diagnostic.Internal) {},
-		Fixes{Fix: false, FixSuggestions: false},
-		TypeErrors{ReportSyntactic: false, ReportSemantic: false},
-	)
+		OnInternalDiagnostic: func(d diagnostic.Internal) {},
+		Fixes:                Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors:           TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+	})
 	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
 
 	assert.Equal(t, len(diagnostics), 2, "expected exactly two diagnostics")
@@ -280,4 +281,90 @@ func TestRunLinterOnProgram_DiagnosticsEmittedInRun(t *testing.T) {
 
 	assert.Equal(t, diagnostics[1].RuleName, ruleB, "second diagnostic should come from ruleB")
 	assert.Equal(t, diagnostics[1].Message.Id, msgB.Id, "second diagnostic should have ruleB's message")
+}
+
+func TestRunLinterOnProgramWithTimings(t *testing.T) {
+	rootDir := fixtures.GetRootDir()
+	fileName := "file.ts"
+	filePath := tspath.ResolvePath(rootDir, fileName)
+	code := `
+const x = 1;
+function greet() {
+	return x;
+}
+`
+
+	fs := utils.NewOverlayVFS(
+		cachedBaseFS,
+		map[string]string{filePath: code},
+	)
+	host := utils.CreateCompilerHost(rootDir, fs)
+
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
+	assert.NilError(t, err, "couldn't create program")
+
+	sourceFiles := []*ast.SourceFile{program.GetSourceFile(filePath)}
+
+	const ruleA = "timed-variable-rule"
+	const ruleB = "timed-function-rule"
+	const ruleC = "timed-run-only-rule"
+
+	timingStore := NewRuleTimingStore()
+	err = RunLinterOnProgram(RunLinterOnProgramOptions{
+		LogLevel: utils.LogLevelNormal,
+		Program:  program,
+		Files:    sourceFiles,
+		Workers:  1,
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []ConfiguredRule {
+			return []ConfiguredRule{
+				{
+					Name: ruleA,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						time.Sleep(time.Microsecond)
+						return rule.RuleListeners{
+							ast.KindVariableStatement: func(*ast.Node) {
+								time.Sleep(time.Microsecond)
+							},
+						}
+					},
+				},
+				{
+					Name: ruleB,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						return rule.RuleListeners{
+							ast.KindFunctionDeclaration: func(*ast.Node) {
+								time.Sleep(time.Microsecond)
+							},
+						}
+					},
+				},
+				{
+					Name: ruleC,
+					Run: func(ctx rule.RuleContext) rule.RuleListeners {
+						time.Sleep(time.Microsecond)
+						return rule.RuleListeners{}
+					},
+				},
+			}
+		},
+		OnDiagnostic:         func(d rule.RuleDiagnostic) {},
+		OnInternalDiagnostic: func(d diagnostic.Internal) {},
+		Fixes:                Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors:           TypeErrors{ReportSyntactic: false, ReportSemantic: false},
+		TimingStore:          timingStore,
+	})
+	assert.NilError(t, err, "unexpected error from RunLinterOnProgramWithTimings")
+
+	records := timingStore.Collect()
+	assert.Equal(t, len(records), 3, "expected timings for each configured rule")
+
+	recordsByRule := make(map[string]RuleTimingRecord, len(records))
+	for _, record := range records {
+		recordsByRule[record.RuleName] = record
+		assert.Assert(t, record.Duration > 0, "timing for %s should record a positive duration", record.RuleName)
+	}
+
+	assert.Equal(t, recordsByRule[ruleA].Calls, uint64(2), "rule A should count Run plus its variable listener")
+	assert.Equal(t, recordsByRule[ruleB].Calls, uint64(2), "rule B should count Run plus its function listener")
+	assert.Equal(t, recordsByRule[ruleC].Calls, uint64(1), "rule C should count its Run call")
 }
