@@ -65,6 +65,34 @@ const (
 	comparisonTypeContextual
 )
 
+func canSkipSenderTypeCheck(node *ast.Node, compType comparisonType) bool {
+	node = ast.SkipParentheses(node)
+	switch node.Kind {
+	case ast.KindStringLiteral,
+		ast.KindNumericLiteral,
+		ast.KindBigIntLiteral,
+		ast.KindRegularExpressionLiteral,
+		ast.KindNoSubstitutionTemplateLiteral,
+		ast.KindTrueKeyword,
+		ast.KindFalseKeyword,
+		ast.KindNullKeyword:
+		return true
+	case ast.KindPrefixUnaryExpression:
+		expr := node.AsPrefixUnaryExpression()
+		return (expr.Operator == ast.KindPlusToken || expr.Operator == ast.KindMinusToken) && ast.SkipParentheses(expr.Operand).Kind == ast.KindNumericLiteral
+	case ast.KindArrowFunction,
+		ast.KindFunctionExpression,
+		ast.KindClassExpression:
+		return true
+	case ast.KindObjectLiteralExpression:
+		return !utils.Some(node.AsObjectLiteralExpression().Properties.Nodes, ast.IsSpreadAssignment)
+	case ast.KindArrayLiteralExpression:
+		return compType == comparisonTypeNone && !utils.Some(node.AsArrayLiteralExpression().Elements.Nodes, ast.IsSpreadElement)
+	default:
+		return false
+	}
+}
+
 var NoUnsafeAssignmentRule = rule.Rule{
 	Name: "no-unsafe-assignment",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -287,16 +315,26 @@ var NoUnsafeAssignmentRule = rule.Rule{
 			reportingNode *ast.Node,
 			compType comparisonType,
 		) bool {
-			var receiverType *checker.Type
-			if compType == comparisonTypeContextual {
-				receiverType = utils.GetContextualType(ctx.TypeChecker, receiverNode)
+			// Fast path: return early when we know that the sender definitely cannot have an `any` type,
+			// because it is syntactically impossible given the sender's node kind.
+			if canSkipSenderTypeCheck(senderNode, compType) {
+				return false
 			}
-			if receiverType == nil {
-				receiverType = ctx.TypeChecker.GetTypeAtLocation(receiverNode)
-			}
+
 			senderType := ctx.TypeChecker.GetTypeAtLocation(senderNode)
 
+			getReceiverType := func() *checker.Type {
+				if compType == comparisonTypeContextual {
+					if receiverType := utils.GetContextualType(ctx.TypeChecker, receiverNode); receiverType != nil {
+						return receiverType
+					}
+				}
+				return ctx.TypeChecker.GetTypeAtLocation(receiverNode)
+			}
+
 			if utils.IsTypeAnyType(senderType) {
+				receiverType := getReceiverType()
+
 				// handle cases when we assign any ==> unknown.
 				if utils.IsTypeUnknownType(receiverType) {
 					return false
@@ -318,6 +356,11 @@ var NoUnsafeAssignmentRule = rule.Rule{
 			if compType == comparisonTypeNone {
 				return false
 			}
+			if !checker.IsNonDeferredTypeReference(senderType) {
+				return false
+			}
+
+			receiverType := getReceiverType()
 
 			receiver, sender, unsafe := utils.IsUnsafeAssignment(
 				senderType,
