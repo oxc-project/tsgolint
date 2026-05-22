@@ -188,8 +188,10 @@ type extra_Checker struct {
   evaluate evaluator.Evaluator
   stringLiteralTypes map[string]*checker.Type
   numberLiteralTypes map[jsnum.Number]*checker.Type
+  nanType *checker.Type
   bigintLiteralTypes map[jsnum.PseudoBigInt]*checker.Type
   enumLiteralTypes map[checker.EnumLiteralKey]*checker.Type
+  enumNaNLiteralTypes map[*ast.Symbol]*checker.Type
   indexedAccessTypes map[checker.CacheHashKey]*checker.Type
   templateLiteralTypes map[checker.CacheHashKey]*checker.Type
   stringMappingTypes map[checker.StringMappingKey]*checker.Type
@@ -217,6 +219,7 @@ type extra_Checker struct {
   errorTypes map[checker.CacheHashKey]*checker.Type
   moduleSymbols map[*ast.Node]*ast.Symbol
   globalThisSymbol *ast.Symbol
+  symbolTableAliasCache map[uint64][]*ast.Symbol
   resolveName func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
   resolveNameForSymbolSuggestion func(location *ast.Node, name string, meaning ast.SymbolFlags, nameNotFoundMessage *diagnostics.Message, isUse bool, excludeGlobals bool) *ast.Symbol
   tupleTypes map[checker.CacheHashKey]*checker.Type
@@ -601,8 +604,12 @@ func FormatTypeFlags(flags checker.TypeFlags) []string
 type FunctionTypeMapper = checker.FunctionTypeMapper
 //go:linkname GetDeclarationModifierFlagsFromSymbol github.com/microsoft/typescript-go/internal/checker.GetDeclarationModifierFlagsFromSymbol
 func GetDeclarationModifierFlagsFromSymbol(s *ast.Symbol) ast.ModifierFlags
+//go:linkname GetPropertyNameFromType github.com/microsoft/typescript-go/internal/checker.GetPropertyNameFromType
+func GetPropertyNameFromType(t *checker.Type) string
 //go:linkname GetResolvedSignatureForSignatureHelp github.com/microsoft/typescript-go/internal/checker.GetResolvedSignatureForSignatureHelp
 func GetResolvedSignatureForSignatureHelp(node *ast.Node, argumentCount int, c *checker.Checker) (*checker.Signature, []*checker.Signature)
+//go:linkname GetSetAccessorValueParameter github.com/microsoft/typescript-go/internal/checker.GetSetAccessorValueParameter
+func GetSetAccessorValueParameter(accessor *ast.Node) *ast.Node
 //go:linkname GetSingleVariableOfVariableStatement github.com/microsoft/typescript-go/internal/checker.GetSingleVariableOfVariableStatement
 func GetSingleVariableOfVariableStatement(node *ast.Node) *ast.Node
 type Host = checker.Host
@@ -704,6 +711,8 @@ func IsPrivateIdentifierSymbol(symbol *ast.Symbol) bool
 func IsTupleType(t *checker.Type) bool
 //go:linkname IsTypeAny github.com/microsoft/typescript-go/internal/checker.IsTypeAny
 func IsTypeAny(t *checker.Type) bool
+//go:linkname IsTypeUsableAsPropertyName github.com/microsoft/typescript-go/internal/checker.IsTypeUsableAsPropertyName
+func IsTypeUsableAsPropertyName(t *checker.Type) bool
 type IterationTypeKind = checker.IterationTypeKind
 const IterationTypeKindNext = checker.IterationTypeKindNext
 const IterationTypeKindReturn = checker.IterationTypeKindReturn

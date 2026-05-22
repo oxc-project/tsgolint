@@ -108,6 +108,7 @@ type TestConfigFileNamesEntry = project.TestConfigFileNamesEntry
 func TsGoLintNewSnapshotFSBuilder(fs vfs.FS, currentDirectory string) *project.SnapshotFSBuilder
 type UpdateReason = project.UpdateReason
 const UpdateReasonDidChangeCompilerOptionsForInferredProjects = project.UpdateReasonDidChangeCompilerOptionsForInferredProjects
+const UpdateReasonDidCloseFile = project.UpdateReasonDidCloseFile
 const UpdateReasonDidOpenFile = project.UpdateReasonDidOpenFile
 const UpdateReasonIdleCleanDiskCache = project.UpdateReasonIdleCleanDiskCache
 const UpdateReasonRequestedLanguageServiceForFileNotOpen = project.UpdateReasonRequestedLanguageServiceForFileNotOpen
