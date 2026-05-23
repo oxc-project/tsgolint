@@ -16,7 +16,7 @@ init:
   pushd typescript-go && git am --3way --no-gpg-sign ../patches/*.patch && popd
   mkdir -p internal/collections && find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
   pnpm install
-  cd e2e && pnpm install && cd ..
+  cd e2e && pnpm --ignore-workspace install && cd ..
 
 [windows]
 init:
@@ -25,7 +25,7 @@ init:
   New-Item -ItemType Directory -Force -Path internal\collections
   Get-ChildItem -Path .\typescript-go\internal\collections\* -File | Where-Object { $_.Name -notlike '*_test.go' } | ForEach-Object { Copy-Item $_.FullName -Destination .\internal\collections\ }
   pnpm install
-  Set-Location e2e; pnpm install; Set-Location ..
+  Set-Location e2e; pnpm --ignore-workspace install; Set-Location ..
 
 [unix]
 build:
@@ -36,7 +36,7 @@ build:
   $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o tsgolint.exe ./cmd/tsgolint
 
 test: build
-  cd e2e && pnpm run test --run && cd ..
+  cd e2e && pnpm --ignore-workspace run test --run && cd ..
   go test ./internal/...
 
 update-snaps:
