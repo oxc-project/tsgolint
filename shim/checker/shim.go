@@ -954,6 +954,9 @@ func Signature_declaration(v *checker.Signature) *ast.Node {
 func Signature_resolvedTypePredicate(v *checker.Signature) *checker.TypePredicate {
   return ((*extra_Signature)(unsafe.Pointer(v))).resolvedTypePredicate
 }
+func Signature_typeParameters(v *checker.Signature) []*checker.Type {
+  return ((*extra_Signature)(unsafe.Pointer(v))).typeParameters
+}
 type SignatureCheckMode = checker.SignatureCheckMode
 const SignatureCheckModeBivariantCallback = checker.SignatureCheckModeBivariantCallback
 const SignatureCheckModeCallback = checker.SignatureCheckModeCallback

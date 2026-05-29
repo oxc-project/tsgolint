@@ -269,45 +269,12 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return ctx.TypeChecker.GetTypeAtLocation(expression)
 		}
 
-		checkTypeAssertion := func(node *ast.Node) {
+		// reportAssertion reports a diagnostic on an `as T` / `<T>` assertion,
+		// computing the precise text range of the assertion (and its autofix) and
+		// delegating the diagnostic message to buildDiag. Shared by the
+		// `unnecessaryAssertion` and `contextuallyUnnecessary` paths.
+		reportAssertion := func(node *ast.Node, expression *ast.Node, buildDiag func(assertionRange core.TextRange) rule.RuleDiagnostic) {
 			typeNode := node.Type()
-			if slices.Contains(opts.TypesToIgnore, strings.TrimSpace(ctx.SourceFile.Text()[typeNode.Pos():typeNode.End()])) {
-				return
-			}
-
-			castType := ctx.TypeChecker.GetTypeAtLocation(node)
-			castTypeIsLiteral := isTypeLiteral(castType)
-			typeAnnotationIsConstAssertion := isConstAssertion(typeNode)
-
-			if !opts.CheckLiteralConstAssertions && castTypeIsLiteral && typeAnnotationIsConstAssertion {
-				return
-			}
-
-			expression := node.Expression()
-			uncastType := getUncastType(node)
-
-			expressionForType := ast.SkipParentheses(expression)
-			if uncastType == castType && ast.IsIdentifier(expressionForType) {
-				if symbol := ctx.TypeChecker.GetSymbolAtLocation(expressionForType); symbol != nil {
-					symbolType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, symbol)
-					if symbolType != nil && checker.Type_flags(symbolType)&checker.TypeFlagsConditional != 0 {
-						uncastType = symbolType
-					}
-				}
-			}
-
-			typeIsUnchanged := isTypeUnchanged(uncastType, castType)
-
-			var wouldSameTypeBeInferred bool
-			if castTypeIsLiteral {
-				wouldSameTypeBeInferred = isImplicitlyNarrowedLiteralDeclaration(node)
-			} else {
-				wouldSameTypeBeInferred = !typeAnnotationIsConstAssertion
-			}
-
-			if !typeIsUnchanged || !wouldSameTypeBeInferred {
-				return
-			}
 
 			if typeNode.Pos() < expression.Pos() {
 				searchStart := node.Pos()
@@ -328,12 +295,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 					assertionRange := core.NewTextRange(commentStart, commentEnd)
 					ctx.ReportDiagnosticWithFixes(
-						buildUnnecessaryTypeAssertionDiagnostic(
-							assertionRange,
-							utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
-							ctx.TypeChecker.TypeToString(uncastType),
-							ctx.TypeChecker.TypeToString(castType),
-						),
+						buildDiag(assertionRange),
 						func() []rule.RuleFix {
 							return []rule.RuleFix{rule.RuleFixRemoveRange(core.NewTextRange(commentStart, fixEnd))}
 						},
@@ -359,12 +321,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				assertionRange := asKeywordRange.WithEnd(typeNodeRange.End())
 
 				ctx.ReportDiagnosticWithFixes(
-					buildUnnecessaryTypeAssertionDiagnostic(
-						assertionRange,
-						utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
-						ctx.TypeChecker.TypeToString(uncastType),
-						ctx.TypeChecker.TypeToString(castType),
-					), func() []rule.RuleFix {
+					buildDiag(assertionRange), func() []rule.RuleFix {
 						// Extend the `as` keyword range backwards to include any leading whitespace.
 						// Input:
 						// `x /* comment 1 */ as /* comment 2 */ SomeType`
@@ -419,17 +376,193 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				closingAngleBracket := s.TokenRange()
 				assertionRange := openingAngleBracket.WithEnd(closingAngleBracket.End())
 				ctx.ReportDiagnosticWithFixes(
-					buildUnnecessaryTypeAssertionDiagnostic(
-						assertionRange,
-						utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
-						ctx.TypeChecker.TypeToString(uncastType),
-						ctx.TypeChecker.TypeToString(castType),
-					),
+					buildDiag(assertionRange),
 					func() []rule.RuleFix {
 						return []rule.RuleFix{rule.RuleFixRemoveRange(assertionRange)}
 					})
 			}
-			// TODO - add contextually unnecessary check for this
+		}
+
+		// isDoubleAssertionUnnecessary mirrors typescript-eslint: for a chained
+		// assertion `x as A as B`, detect when the outer assertion is redundant.
+		// Note: it reuses tsgolint's existing isTypeUnchanged(uncast, cast) rather
+		// than upstream's richer 4-arg variant, keeping the rule internally
+		// consistent.
+		isDoubleAssertionUnnecessary := func(node *ast.Node, contextualType *checker.Type) (string, bool) {
+			innerExpression := ast.SkipParentheses(node.Expression())
+			if innerExpression.Kind != ast.KindAsExpression && innerExpression.Kind != ast.KindTypeAssertionExpression {
+				return "", false
+			}
+
+			originalExpr := getOriginalExpression(node)
+			originalType := ctx.TypeChecker.GetTypeAtLocation(originalExpr)
+			castType := ctx.TypeChecker.GetTypeAtLocation(node)
+
+			if isTypeUnchanged(originalType, castType) && !utils.IsTypeAnyType(castType) {
+				return "unnecessaryAssertion", true
+			}
+
+			if contextualType != nil {
+				intermediateType := ctx.TypeChecker.GetTypeAtLocation(innerExpression)
+				if (utils.IsTypeAnyType(intermediateType) || utils.IsTypeFlagSet(intermediateType, checker.TypeFlagsUnknown)) &&
+					checker.Checker_isTypeAssignableTo(ctx.TypeChecker, originalType, contextualType) {
+					return "contextuallyUnnecessary", true
+				}
+			}
+
+			return "", false
+		}
+
+		reportDoubleAssertionIfUnnecessary := func(node *ast.Node, contextualType *checker.Type) {
+			messageId, ok := isDoubleAssertionUnnecessary(node, contextualType)
+			if !ok {
+				return
+			}
+
+			originalExpr := getOriginalExpression(node)
+			originalRange := utils.TrimNodeTextRange(ctx.SourceFile, originalExpr)
+			text := ctx.SourceFile.Text()[originalRange.Pos():originalRange.End()]
+			// An object literal used directly as an arrow function body must be
+			// re-parenthesized so it is not parsed as a block.
+			dblOuter := skipUpwardParentheses(node)
+			if originalExpr.Kind == ast.KindObjectLiteralExpression &&
+				dblOuter.Parent.Kind == ast.KindArrowFunction &&
+				dblOuter.Parent.Body() == dblOuter {
+				text = "(" + text + ")"
+			}
+
+			nodeRange := utils.TrimNodeTextRange(ctx.SourceFile, node)
+			var diag rule.RuleDiagnostic
+			if messageId == "contextuallyUnnecessary" {
+				diag = buildContextuallyUnnecessaryMessage(nodeRange)
+			} else {
+				diag = rule.RuleDiagnostic{
+					Range: nodeRange,
+					Message: rule.RuleMessage{
+						Id:          "unnecessaryAssertion",
+						Description: "This assertion is unnecessary since it does not change the type of the expression.",
+					},
+				}
+			}
+
+			ctx.ReportDiagnosticWithFixes(diag, func() []rule.RuleFix {
+				return []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, node, text)}
+			})
+		}
+
+		// checkContextuallyUnnecessary ports typescript-eslint's contextual
+		// ("the receiver accepts the original type") path for `as` / `<T>`
+		// assertions. It runs only when the assertion is not reported as a plain
+		// unnecessaryAssertion.
+		checkContextuallyUnnecessary := func(node *ast.Node, expression *ast.Node, castType *checker.Type, typeAnnotationIsConstAssertion bool) {
+			tc := ctx.TypeChecker
+			uncastType := getUncastType(node)
+
+			// typescript-eslint operates on an ESTree where parentheses are not
+			// nodes; skip TS AST ParenthesizedExpression wrappers to match.
+			effectiveParent := node
+			for effectiveParent.Parent != nil && ast.IsParenthesizedExpression(effectiveParent.Parent) {
+				effectiveParent = effectiveParent.Parent
+			}
+			parent := effectiveParent.Parent
+			nullishExpression := ast.SkipParentheses(expression)
+
+			castIsAny := utils.IsTypeAnyType(castType) && !isSkipParentKind(parent.Kind)
+
+			var contextualType *checker.Type
+			if !shouldSkipContextualTypeFallback(tc, node, castIsAny) {
+				// Use the raw checker API (not utils.GetContextualType) to mirror the
+				// upstream `as`-assertion path, which calls checker.getContextualType
+				// directly. The non-null path above intentionally uses the ESTree-style
+				// utils.GetContextualType wrapper, mirroring its own upstream path.
+				contextualType = checker.Checker_getContextualType(tc, node, checker.ContextFlagsNone)
+			}
+
+			if contextualType != nil {
+				contextualTypeIsAny := utils.IsTypeAnyType(contextualType)
+
+				isCallArgument := (ast.IsCallExpression(parent) || ast.IsNewExpression(parent)) &&
+					nodeInArguments(parent, effectiveParent)
+
+				var anyInvolvedInContextualCheck bool
+				if contextualTypeIsAny {
+					anyInvolvedInContextualCheck = isCallArgument && !containsAny(tc, castType)
+				} else {
+					anyInvolvedInContextualCheck = !containsAny(tc, contextualType)
+				}
+
+				isNullishLiteralToUnion := utils.IsUnionType(castType) &&
+					(nullishExpression.Kind == ast.KindNullKeyword ||
+						(ast.IsIdentifier(nullishExpression) && nullishExpression.Text() == "undefined"))
+
+				isContextuallyUnnecessary := !typeAnnotationIsConstAssertion &&
+					!containsAny(tc, uncastType) &&
+					anyInvolvedInContextualCheck &&
+					!hasPhantomTypeArgumentMismatch(tc, node, uncastType, contextualType) &&
+					(castIsAny || !genericsMismatch(tc, uncastType, contextualType)) &&
+					(contextualTypeIsAny || checker.Checker_isTypeAssignableTo(tc, uncastType, contextualType)) &&
+					!isNullishLiteralToUnion
+
+				if isContextuallyUnnecessary {
+					reportAssertion(node, expression, func(assertionRange core.TextRange) rule.RuleDiagnostic {
+						return buildContextuallyUnnecessaryMessage(assertionRange)
+					})
+					return
+				}
+			}
+
+			reportDoubleAssertionIfUnnecessary(node, contextualType)
+		}
+
+		checkTypeAssertion := func(node *ast.Node) {
+			typeNode := node.Type()
+			if slices.Contains(opts.TypesToIgnore, strings.TrimSpace(ctx.SourceFile.Text()[typeNode.Pos():typeNode.End()])) {
+				return
+			}
+
+			castType := ctx.TypeChecker.GetTypeAtLocation(node)
+			castTypeIsLiteral := isTypeLiteral(castType)
+			typeAnnotationIsConstAssertion := isConstAssertion(typeNode)
+
+			if !opts.CheckLiteralConstAssertions && castTypeIsLiteral && typeAnnotationIsConstAssertion {
+				return
+			}
+
+			expression := node.Expression()
+			uncastType := getUncastType(node)
+
+			expressionForType := ast.SkipParentheses(expression)
+			if uncastType == castType && ast.IsIdentifier(expressionForType) {
+				if symbol := ctx.TypeChecker.GetSymbolAtLocation(expressionForType); symbol != nil {
+					symbolType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, symbol)
+					if symbolType != nil && checker.Type_flags(symbolType)&checker.TypeFlagsConditional != 0 {
+						uncastType = symbolType
+					}
+				}
+			}
+
+			typeIsUnchanged := isTypeUnchanged(uncastType, castType)
+
+			var wouldSameTypeBeInferred bool
+			if castTypeIsLiteral {
+				wouldSameTypeBeInferred = isImplicitlyNarrowedLiteralDeclaration(node)
+			} else {
+				wouldSameTypeBeInferred = !typeAnnotationIsConstAssertion
+			}
+
+			if !typeIsUnchanged || !wouldSameTypeBeInferred {
+				checkContextuallyUnnecessary(node, expression, castType, typeAnnotationIsConstAssertion)
+				return
+			}
+
+			reportAssertion(node, expression, func(assertionRange core.TextRange) rule.RuleDiagnostic {
+				return buildUnnecessaryTypeAssertionDiagnostic(
+					assertionRange,
+					utils.TrimNodeTextRange(ctx.SourceFile, expressionForType),
+					ctx.TypeChecker.TypeToString(uncastType),
+					ctx.TypeChecker.TypeToString(castType),
+				)
+			})
 		}
 
 		return rule.RuleListeners{

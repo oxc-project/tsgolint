@@ -57,7 +57,8 @@
     "Signature": [
       "parameters",
       "declaration",
-      "resolvedTypePredicate"
+      "resolvedTypePredicate",
+      "typeParameters"
     ],
     "Checker": [
       "numberType",

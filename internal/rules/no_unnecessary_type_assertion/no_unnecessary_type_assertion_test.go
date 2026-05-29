@@ -551,6 +551,22 @@ function processValue<T extends NumberValuePairType | NumberValueType>(
 }
 		`},
 		{Code: `const cb = async (importOriginal: unknown) => { const actual = (await importOriginal()) as Record<string, unknown>; return { ...actual, useLocation: vi.fn() }; });`},
+		// contextuallyUnnecessary guards (parity-checked against typescript-eslint v8.60.0):
+		// nullish literal asserted to a union is not contextually unnecessary
+		{Code: "const t: string | null = null as string | null;\nvoid t;"},
+		{Code: "const u: string | undefined = undefined as string | undefined;\nvoid u;"},
+		// right-hand side of a logical assignment is skipped
+		{Code: "let ls: string | null = null;\nls ||= 'a' as string | null;\nvoid ls;"},
+		// assignment in a non-statement context is skipped
+		{Code: "let as1: string | null = null;\nconst ar = (as1 = 'a' as string | null);\nvoid ar;"},
+		// argument to an overloaded function is skipped
+		{Code: "declare function over(x: number): void;\ndeclare function over(x: string): void;\nover('a' as string);"},
+		// `as any` whose (paren-skipped) parent is a logical expression is skipped
+		{Code: "declare const anyObj: { x: number };\nconst ay: unknown = (anyObj as any) || {};\nvoid ay;"},
+		// property assertion inside a union-typed object literal is skipped
+		{Code: "declare const target: { a: string } | { a: number };\nconst po: typeof target = { a: 'x' as string };\nvoid po;"},
+		// assertion inside a `satisfies` object is skipped (SKIP_PARENT_TYPES)
+		{Code: "const so = { a: 'x' as string } satisfies { a: string };\nvoid so;"},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -1812,6 +1828,76 @@ const s2 = (s);
 					Column:    12,
 				},
 			},
+		},
+		// contextuallyUnnecessary path (parity-checked against typescript-eslint v8.60.0).
+		// This is the issue.md case: a literal asserted to a wider union already accepted
+		// by the receiver annotation.
+		{
+			Code:   "const cuX: string | null = 'a' as string | null;\nvoid cuX;",
+			Output: []string{"const cuX: string | null = 'a';\nvoid cuX;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 1}},
+		},
+		{
+			Code:   "const cuV: string | null | undefined = 'test' as string | null | undefined;\nvoid cuV;",
+			Output: []string{"const cuV: string | null | undefined = 'test';\nvoid cuV;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 1}},
+		},
+		// argument whose parameter type already accepts the expression
+		{
+			Code:   "function cuF(_p: string | null): void {}\ncuF('a' as string | null);",
+			Output: []string{"function cuF(_p: string | null): void {}\ncuF('a');"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 2}},
+		},
+		// assignment statement whose target type already accepts the expression
+		{
+			Code:   "let cuS: string | null = null;\ncuS = 'a' as string | null;\nvoid cuS;",
+			Output: []string{"let cuS: string | null = null;\ncuS = 'a';\nvoid cuS;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 2}},
+		},
+		// contextual type from a return statement (raw getContextualType)
+		{
+			Code:   "function cuG(): string | null {\n  return 'a' as string | null;\n}\nvoid cuG;",
+			Output: []string{"function cuG(): string | null {\n  return 'a';\n}\nvoid cuG;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 2}},
+		},
+		// widening a union literal to its base via a typed receiver
+		{
+			Code:   "declare const cuN: 1 | 2;\nconst cuM: number = cuN as number;\nvoid cuM;",
+			Output: []string{"declare const cuN: 1 | 2;\nconst cuM: number = cuN;\nvoid cuM;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 2}},
+		},
+		// generic call, literal argument: contextually unnecessary
+		{
+			Code:   "declare function cuId<T>(x: T): T;\ncuId('a' as string);",
+			Output: []string{"declare function cuId<T>(x: T): T;\ncuId('a');"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 2}},
+		},
+		// double assertion `x as any as T` where the receiver accepts the original
+		{
+			Code:   "const cuD: string = 'a' as any as string;\nvoid cuD;",
+			Output: []string{"const cuD: string = 'a';\nvoid cuD;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 1}},
+		},
+		// parenthesized double assertion (ParenthesizedExpression skipped to match ESTree)
+		{
+			Code:   "const cuPd: string = ('a' as any) as string;\nvoid cuPd;",
+			Output: []string{"const cuPd: string = 'a';\nvoid cuPd;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 1}},
+		},
+		// parenthesized chain, fixed across two passes
+		{
+			Code: "const cuPc: string | null = ('a' as string) as string | null;\nvoid cuPc;",
+			Output: []string{
+				"const cuPc: string | null = ('a' as string);\nvoid cuPc;",
+				"const cuPc: string | null = ('a');\nvoid cuPc;",
+			},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 1}},
+		},
+		// angle-bracket assertion contextually unnecessary
+		{
+			Code:   "const cuAb: string | null = <string | null>'a';\nvoid cuAb;",
+			Output: []string{"const cuAb: string | null = 'a';\nvoid cuAb;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "contextuallyUnnecessary", Line: 1}},
 		},
 	})
 }
