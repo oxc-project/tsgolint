@@ -1,4 +1,4 @@
-From a6b1bbc1a32389c268b03f88e91fdca1270fe80f Mon Sep 17 00:00:00 2001
+From 545789ea64d907fe6f69b77c7431374d4f59ba0a Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
 Subject: [PATCH 1/5] Adapt project service for single run mode
@@ -8,7 +8,7 @@ Subject: [PATCH 1/5] Adapt project service for single run mode
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/internal/project/project.go b/internal/project/project.go
-index 3f1a9d913..99e3977ee 100644
+index 3f1a9d9133..99e3977ee3 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
 @@ -3,6 +3,7 @@ package project
