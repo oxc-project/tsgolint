@@ -1,4 +1,4 @@
-From d31ab391de06b9efea5517cf00f838a097a71d74 Mon Sep 17 00:00:00 2001
+From 431963838c7609bfa81c2dcaa3da8164939ebe03 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 17 Apr 2026 10:40:11 +0100
 Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
@@ -14,7 +14,7 @@ Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
  7 files changed, 155 insertions(+), 143 deletions(-)
 
 diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
-index 209487f22..8fb19b5ff 100644
+index 209487f22f..8fb19b5ffd 100644
 --- a/internal/project/autoimport.go
 +++ b/internal/project/autoimport.go
 @@ -13,7 +13,7 @@ import (
@@ -36,7 +36,7 @@ index 209487f22..8fb19b5ff 100644
  	toPath func(fileName string) tspath.Path,
  ) *autoImportRegistryCloneHost {
 diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
-index 212601d4b..73e4b4316 100644
+index 212601d4b8..73e4b43166 100644
 --- a/internal/project/compilerhost.go
 +++ b/internal/project/compilerhost.go
 @@ -87,7 +87,7 @@ func (c *compilerHost) GetResolvedProjectReference(fileName string, path tspath.
@@ -49,7 +49,7 @@ index 212601d4b..73e4b4316 100644
  }
  
 diff --git a/internal/project/configfileregistrybuilder.go b/internal/project/configfileregistrybuilder.go
-index cd4a2f618..d1807453d 100644
+index cd4a2f6185..d1807453dc 100644
 --- a/internal/project/configfileregistrybuilder.go
 +++ b/internal/project/configfileregistrybuilder.go
 @@ -16,14 +16,14 @@ import (
@@ -317,7 +317,7 @@ index cd4a2f618..d1807453d 100644
  		entry.DeleteIf(func(value *configFileEntry) bool {
  			return len(value.retainingProjects) == 0 && len(value.retainingOpenFiles) == 0 && len(value.retainingConfigs) == 0
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index 8d3fbf8a8..866a860a3 100644
+index 8d3fbf8a8e..866a860a3c 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
 @@ -68,14 +68,14 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
@@ -373,7 +373,7 @@ index 8d3fbf8a8..866a860a3 100644
  		fileBase: fileBase{
  			fileName: f.fileName,
 diff --git a/internal/project/projectcollectionbuilder.go b/internal/project/projectcollectionbuilder.go
-index e3d3e6a4c..4243dc9ba 100644
+index e3d3e6a4c4..4243dc9ba6 100644
 --- a/internal/project/projectcollectionbuilder.go
 +++ b/internal/project/projectcollectionbuilder.go
 @@ -17,13 +17,13 @@ import (
@@ -648,7 +648,7 @@ index e3d3e6a4c..4243dc9ba 100644
  	project.Delete()
  }
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index b3e5fc6b1..8811afef8 100644
+index b3e5fc6b1a..8811afef8c 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
 @@ -284,7 +284,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
@@ -670,7 +670,7 @@ index b3e5fc6b1..8811afef8 100644
  					if project.host != nil && project.host.sourceFS.SeenFile(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 4963d8a6f..ef2d93249 100644
+index 4963d8a6f0..ef2d93249f 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
 @@ -25,27 +25,27 @@ type FileSource interface {

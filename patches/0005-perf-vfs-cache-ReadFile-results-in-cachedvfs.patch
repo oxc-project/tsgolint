@@ -1,4 +1,4 @@
-From 21c32bad7f9b24028595bb7ea8219d9b79720bc3 Mon Sep 17 00:00:00 2001
+From acf5379999ea1bcb80b3608f4461fada426b0c6d Mon Sep 17 00:00:00 2001
 From: Codex <codex@example.com>
 Date: Thu, 12 Feb 2026 13:55:47 +0900
 Subject: [PATCH 5/5] perf(vfs): cache ReadFile results in cachedvfs
@@ -8,7 +8,7 @@ Subject: [PATCH 5/5] perf(vfs): cache ReadFile results in cachedvfs
  1 file changed, 23 insertions(+), 1 deletion(-)
 
 diff --git a/internal/vfs/cachedvfs/cachedvfs.go b/internal/vfs/cachedvfs/cachedvfs.go
-index 7c3d5eb06..e26177f23 100644
+index 7c3d5eb06c..e26177f23b 100644
 --- a/internal/vfs/cachedvfs/cachedvfs.go
 +++ b/internal/vfs/cachedvfs/cachedvfs.go
 @@ -15,10 +15,16 @@ type FS struct {
