@@ -1138,3 +1138,94 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |            ^^^^^^^^^^^^^^^^^^^^^ Casting it to 'string' is unnecessary
    5 | 
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-72 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:32 - 1:47)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const cuX: string | null = 'a' as string | null;
+     |                                ~~~~~~~~~~~~~~~~
+   2 | void cuX;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-73 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:47 - 1:74)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const cuV: string | null | undefined = 'test' as string | null | undefined;
+     |                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   2 | void cuV;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-74 - 1]
+Diagnostic 1: contextuallyUnnecessary (2:9 - 2:24)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | function cuF(_p: string | null): void {}
+   2 | cuF('a' as string | null);
+     |         ~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-75 - 1]
+Diagnostic 1: contextuallyUnnecessary (2:11 - 2:26)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | let cuS: string | null = null;
+   2 | cuS = 'a' as string | null;
+     |           ~~~~~~~~~~~~~~~~
+   3 | void cuS;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-76 - 1]
+Diagnostic 1: contextuallyUnnecessary (2:14 - 2:29)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | function cuG(): string | null {
+   2 |   return 'a' as string | null;
+     |              ~~~~~~~~~~~~~~~~
+   3 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-77 - 1]
+Diagnostic 1: contextuallyUnnecessary (2:25 - 2:33)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | declare const cuN: 1 | 2;
+   2 | const cuM: number = cuN as number;
+     |                         ~~~~~~~~~
+   3 | void cuM;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-78 - 1]
+Diagnostic 1: contextuallyUnnecessary (2:10 - 2:18)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | declare function cuId<T>(x: T): T;
+   2 | cuId('a' as string);
+     |          ~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-79 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:21 - 1:40)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const cuD: string = 'a' as any as string;
+     |                     ~~~~~~~~~~~~~~~~~~~~
+   2 | void cuD;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-80 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:22 - 1:43)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const cuPd: string = ('a' as any) as string;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~
+   2 | void cuPd;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-81 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:45 - 1:60)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const cuPc: string | null = ('a' as string) as string | null;
+     |                                             ~~~~~~~~~~~~~~~~
+   2 | void cuPc;
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-82 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:29 - 1:43)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const cuAb: string | null = <string | null>'a';
+     |                             ~~~~~~~~~~~~~~~
+   2 | void cuAb;
+---
