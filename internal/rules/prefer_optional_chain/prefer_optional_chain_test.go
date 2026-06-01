@@ -4250,5 +4250,26 @@ declare const text: string | undefined;
 		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 	})
 
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string | null } | undefined;
+item === undefined || item.value === null;
+`,
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{
+						MessageId: "optionalChainSuggest",
+						Output: `
+declare const item: { value: string | null } | undefined;
+item?.value === null;
+`,
+					},
+				},
+			},
+		},
+	})
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
