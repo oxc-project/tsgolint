@@ -2,7 +2,7 @@
   "name": "tsgolint-e2e",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@11.0.4",
+  "packageManager": "pnpm@11.4.0",
   "type": "module",
   "scripts": {
     "test": "vitest"
