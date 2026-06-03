@@ -1138,3 +1138,495 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |            ^^^^^^^^^^^^^^^^^^^^^ Casting it to 'string' is unnecessary
    5 | 
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-72 - 1]
+Diagnostic 1: unnecessaryAssertion (2:25 - 2:36)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | 
+   2 | ((): undefined => {})() as undefined;
+     |                         ~~~~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'undefined' (2:1 - 2:23)
+   1 | 
+   2 | ((): undefined => {})() as undefined;
+     | ^^^^^^^^^^^^^^^^^^^^^^^ This expression already has the type 'undefined'
+   3 |       
+  Label: Casting it to 'undefined' is unnecessary (2:25 - 2:36)
+   1 | 
+   2 | ((): undefined => {})() as undefined;
+     |                         ^^^^^^^^^^^^ Casting it to 'undefined' is unnecessary
+   3 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-73 - 1]
+Diagnostic 1: unnecessaryAssertion (2:13 - 2:21)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | 
+   2 | (() => 1)() as number;
+     |             ~~~~~~~~~
+   3 |       
+  Label: This expression already has the type 'number' (2:1 - 2:11)
+   1 | 
+   2 | (() => 1)() as number;
+     | ^^^^^^^^^^^ This expression already has the type 'number'
+   3 |       
+  Label: Casting it to 'number' is unnecessary (2:13 - 2:21)
+   1 | 
+   2 | (() => 1)() as number;
+     |             ^^^^^^^^^ Casting it to 'number' is unnecessary
+   3 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-74 - 1]
+Diagnostic 1: unnecessaryAssertion (7:35 - 7:46)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   6 | 
+   7 | ((value => {}) as Overloaded)('') as undefined;
+     |                                   ~~~~~~~~~~~~
+   8 |       
+  Label: This expression already has the type 'undefined' (7:1 - 7:33)
+   6 | 
+   7 | ((value => {}) as Overloaded)('') as undefined;
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression already has the type 'undefined'
+   8 |       
+  Label: Casting it to 'undefined' is unnecessary (7:35 - 7:46)
+   6 | 
+   7 | ((value => {}) as Overloaded)('') as undefined;
+     |                                   ^^^^^^^^^^^^ Casting it to 'undefined' is unnecessary
+   8 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-75 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:9 - 3:16)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | function doThing(a: number) {}
+   3 | doThing(5 as any);
+     |         ~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-76 - 1]
+Diagnostic 1: contextuallyUnnecessary (7:9 - 7:51)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   6 | function doThing(a: A) {}
+   7 | doThing({ required: 'yes', alsoRequired: 1 } as any);
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-77 - 1]
+Diagnostic 1: unnecessaryAssertion (1:11 - 1:23)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | const x = 5 as any as 5;
+     |           ~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-78 - 1]
+Diagnostic 1: unnecessaryAssertion (3:11 - 3:32)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const v: number = 5;
+   3 | const x = v as unknown as number;
+     |           ~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-79 - 1]
+Diagnostic 1: unnecessaryAssertion (3:11 - 3:28)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const v: number = 5;
+   3 | const x = v as any as number;
+     |           ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-80 - 1]
+Diagnostic 1: unnecessaryAssertion (2:11 - 2:34)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | 
+   2 | const x = (1 + 1) as any as number;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-81 - 1]
+Diagnostic 1: unnecessaryAssertion (2:16 - 2:39)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | 
+   2 | const x = 2 * ((1 + 1) as any as number);
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-82 - 1]
+Diagnostic 1: unnecessaryAssertion (3:11 - 3:26)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const v: number = 5;
+   3 | const x = <number>(<any>v);
+     |           ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-83 - 1]
+Diagnostic 1: unnecessaryAssertion (3:18 - 3:34)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const obj = { id: '' };
+   3 | const obj2 = obj as { id: string };
+     |                  ~~~~~~~~~~~~~~~~~
+   4 |       
+  Label: This expression already has the type '{ id: string; }' (3:14 - 3:16)
+   2 | const obj = { id: '' };
+   3 | const obj2 = obj as { id: string };
+     |              ^^^ This expression already has the type '{ id: string; }'
+   4 |       
+  Label: Casting it to '{ id: string; }' is unnecessary (3:18 - 3:34)
+   2 | const obj = { id: '' };
+   3 | const obj2 = obj as { id: string };
+     |                  ^^^^^^^^^^^^^^^^^ Casting it to '{ id: string; }' is unnecessary
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-84 - 1]
+Diagnostic 1: unnecessaryAssertion (3:14 - 3:41)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const obj = { id: '' };
+   3 | const obj2 = obj as any as { id: string };
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-85 - 1]
+Diagnostic 1: unnecessaryAssertion (3:14 - 3:45)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const obj = { id: '' };
+   3 | const obj2 = obj as unknown as { id: string };
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-86 - 1]
+Diagnostic 1: unnecessaryAssertion (3:16 - 3:39)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const array = ['a', 'b'];
+   3 | const array2 = array as any as string[];
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-87 - 1]
+Diagnostic 1: unnecessaryAssertion (3:16 - 3:43)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | const array = ['a', 'b'];
+   3 | const array2 = array as unknown as string[];
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-88 - 1]
+Diagnostic 1: contextuallyUnnecessary (7:4 - 7:12)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   6 | const a: A = 'a';
+   7 | fn(a as AorB);
+     |    ~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-89 - 1]
+Diagnostic 1: unnecessaryAssertion (5:11 - 5:38)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | }
+   5 | const x = { a: 1 } as unknown as Props;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-90 - 1]
+Diagnostic 1: unnecessaryAssertion (5:20 - 5:27)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | }
+   5 | const x = { a: 1 } as Props;
+     |                    ~~~~~~~~
+   6 |       
+  Label: This expression already has the type '{ a: number; }' (5:11 - 5:18)
+   4 | }
+   5 | const x = { a: 1 } as Props;
+     |           ^^^^^^^^ This expression already has the type '{ a: number; }'
+   6 |       
+  Label: Casting it to 'Props' is unnecessary (5:20 - 5:27)
+   4 | }
+   5 | const x = { a: 1 } as Props;
+     |                    ^^^^^^^^ Casting it to 'Props' is unnecessary
+   6 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-91 - 1]
+Diagnostic 1: unnecessaryAssertion (5:25 - 5:54)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | }
+   5 | const fn = (): Props => ({ a: 1 }) as unknown as Props;
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-92 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:4 - 3:26)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(param: number): void;
+   3 | fn(42 as unknown as number);
+     |    ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-93 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:4 - 3:22)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(param: number): void;
+   3 | fn(42 as any as number);
+     |    ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-94 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:13 - 3:24)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(params: { param: number });
+   3 | fn({ param: 42 as number });
+     |             ~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-95 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:13 - 3:21)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(params: { param: number });
+   3 | fn({ param: 42 as any });
+     |             ~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-96 - 1]
+Diagnostic 1: contextuallyUnnecessary (4:4 - 4:30)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | declare function fn(param: StringOrNumber);
+   4 | fn(42 as any as StringOrNumber);
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-97 - 1]
+Diagnostic 1: contextuallyUnnecessary (5:12 - 5:32)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   4 | const data = { a: 1 };
+   5 | fn({ data: data as NumbersRecord });
+     |            ~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-98 - 1]
+Diagnostic 1: contextuallyUnnecessary (5:9 - 7:20)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   4 | fn({
+   5 |   data: {
+     |         ~
+   6 |     a: 1,
+     | ~~~~~~~~~
+   7 |   } as NumbersRecord,
+     | ~~~~~~~~~~~~~~~~~~~~
+   8 | });
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-99 - 1]
+Diagnostic 1: unnecessaryAssertion (5:16 - 5:74)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | declare const updatedColumn: Json;
+   5 | const result = updatedColumn as unknown as Tables<'my_table'>['my_column'];
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-100 - 1]
+Diagnostic 1: contextuallyUnnecessary (6:12 - 6:23)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   5 | declare function fn<U extends T>(args: Pick<U, 'a'>): void;
+   6 | fn<T>({ a: '' as string });
+     |            ~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-101 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:8 - 3:32)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function update<T extends string>(value: T): void;
+   3 | update('hi' as unknown as string);
+     |        ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-102 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:8 - 3:21)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function update<T extends string>(value: T): void;
+   3 | update('hi' as string);
+     |        ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-103 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:4 - 3:19)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(x: string[]): void;
+   3 | fn(['hello'] as any);
+     |    ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-104 - 1]
+Diagnostic 1: contextuallyUnnecessary (6:16 - 6:29)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   5 | declare const chat: ChatMessage[];
+   6 | update({ chat: chat as Json[] });
+     |                ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-105 - 1]
+Diagnostic 1: contextuallyUnnecessary (6:16 - 6:29)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   5 | declare const chat: ChatMessage[];
+   6 | update({ chat: chat as Json[] });
+     |                ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-106 - 1]
+Diagnostic 1: unnecessaryAssertion (7:11 - 7:27)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   6 | function fn2<T extends Node>(node: T): void {
+   7 |   fn(node as NonNullable<T>);
+     |           ~~~~~~~~~~~~~~~~~
+   8 | }
+  Label: This expression already has the type 'T' (7:6 - 7:9)
+   6 | function fn2<T extends Node>(node: T): void {
+   7 |   fn(node as NonNullable<T>);
+     |      ^^^^ This expression already has the type 'T'
+   8 | }
+  Label: Casting it to 'NonNullable<T>' is unnecessary (7:11 - 7:27)
+   6 | function fn2<T extends Node>(node: T): void {
+   7 |   fn(node as NonNullable<T>);
+     |           ^^^^^^^^^^^^^^^^^ Casting it to 'NonNullable<T>' is unnecessary
+   8 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-107 - 1]
+Diagnostic 1: contextuallyUnnecessary (11:4 - 11:9)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+  10 | declare const a: A;
+  11 | fn(a as B);
+     |    ~~~~~~
+  12 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-108 - 1]
+Diagnostic 1: contextuallyUnnecessary (4:38 - 4:50)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | declare const b: readonly string[];
+   4 | const fileNames: string[] = a.concat(b as string[]);
+     |                                      ~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-109 - 1]
+Diagnostic 1: contextuallyUnnecessary (4:4 - 4:18)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | declare const value: string | number;
+   4 | fn(value as number);
+     |    ~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-110 - 1]
+Diagnostic 1: contextuallyUnnecessary (12:6 - 12:16)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+  11 |   type: 'a',
+  12 |   a: a as string,
+     |      ~~~~~~~~~~~
+  13 | };
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-111 - 1]
+Diagnostic 1: contextuallyUnnecessary (12:6 - 12:16)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+  11 |   type: 'a',
+  12 |   a: a as string,
+     |      ~~~~~~~~~~~
+  13 | };
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-112 - 1]
+Diagnostic 1: contextuallyUnnecessary (5:7 - 5:17)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   4 | fn1(() => {
+   5 |   fn2('hi' as any);
+     |       ~~~~~~~~~~~
+   6 | });
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-113 - 1]
+Diagnostic 1: contextuallyUnnecessary (4:4 - 4:22)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | declare function fn(value: Empty<string>): void;
+   4 | fn({} as Empty<number>);
+     |    ~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-114 - 1]
+Diagnostic 1: contextuallyUnnecessary (7:9 - 7:34)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   6 | const result: { item: Box<Empty<string>> } = identity({
+   7 |   item: box as Box<Empty<boolean>>,
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | });
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-115 - 1]
+Diagnostic 1: contextuallyUnnecessary (4:3 - 4:33)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | const callback: <T extends string>(value: T) => void =
+   4 |   value as (text: string) => void;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-116 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:26 - 3:35)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | function f<T extends string>(value: string) {
+   3 |   const target: string = value as T;
+     |                          ~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-117 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:4 - 3:43)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(value: {}): void;
+   3 | fn({} as string extends string ? {} : never);
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-118 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:4 - 3:28)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(value: void): void;
+   3 | fn((() => {})() as undefined);
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-119 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:4 - 3:28)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function fn(value: unknown): void;
+   3 | fn((() => {})() as undefined);
+     |    ~~~~~~~~~~~~~~~~~~~~~~~~~
+---

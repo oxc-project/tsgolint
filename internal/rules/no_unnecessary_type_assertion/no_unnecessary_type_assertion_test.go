@@ -552,7 +552,6 @@ function processValue<T extends NumberValuePairType | NumberValueType>(
 		`},
 		{Code: `const cb = async (importOriginal: unknown) => { const actual = (await importOriginal()) as Record<string, unknown>; return { ...actual, useLocation: vi.fn() }; });`},
 		{
-			Skip: true,
 			Code: `
 type Data<T> = { value?: T };
 type ValueType<TData> = TData extends Data<infer T> ? T : never;
@@ -606,7 +605,6 @@ const b = a as const;
       `,
 		},
 		{
-			Skip: true,
 			Code: `
 (() => {})() as undefined;
       `,
@@ -618,7 +616,6 @@ f() as undefined;
       `,
 		},
 		{
-			Skip: true,
 			Code: `
 (function () {})() as undefined;
       `,
@@ -1084,6 +1081,17 @@ const test = inferred({
 });
 
 console.log(test.options.parameters.potato);
+    `,
+		},
+		{
+			Code: `
+declare function fn(value: string | null): void;
+fn((null) as string | null);
+    `,
+		},
+		{
+			Code: `
+const value: undefined = (() => {})() as undefined;
     `,
 		},
 	}, []rule_tester.InvalidTestCase{
@@ -2399,7 +2407,6 @@ interface Overloaded {
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 function doThing(a: number) {}
 doThing(5 as any);
@@ -2415,7 +2422,6 @@ doThing(5);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface A {
   required: string;
@@ -2439,7 +2445,6 @@ doThing({ required: 'yes', alsoRequired: 1 });
 			},
 		},
 		{
-			Skip:   true,
 			Code:   "const x = 5 as any as 5;",
 			Output: []string{"const x = 5;"},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -2449,7 +2454,6 @@ doThing({ required: 'yes', alsoRequired: 1 });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const v: number = 5;
 const x = v as unknown as number;
@@ -2465,7 +2469,6 @@ const x = v;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const v: number = 5;
 const x = v as any as number;
@@ -2481,7 +2484,6 @@ const x = v;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const x = (1 + 1) as any as number;
       `,
@@ -2495,7 +2497,6 @@ const x = 1 + 1;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const x = 2 * ((1 + 1) as any as number);
       `,
@@ -2509,7 +2510,6 @@ const x = 2 * (1 + 1);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const v: number = 5;
 const x = <number>(<any>v);
@@ -2525,7 +2525,6 @@ const x = v;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const obj = { id: '' };
 const obj2 = obj as { id: string };
@@ -2541,7 +2540,6 @@ const obj2 = obj;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const obj = { id: '' };
 const obj2 = obj as any as { id: string };
@@ -2557,7 +2555,6 @@ const obj2 = obj;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const obj = { id: '' };
 const obj2 = obj as unknown as { id: string };
@@ -2573,7 +2570,6 @@ const obj2 = obj;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const array = ['a', 'b'];
 const array2 = array as any as string[];
@@ -2589,7 +2585,6 @@ const array2 = array;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 const array = ['a', 'b'];
 const array2 = array as unknown as string[];
@@ -2605,7 +2600,6 @@ const array2 = array;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type A = 'a';
 type B = 'b';
@@ -2629,7 +2623,6 @@ fn(a);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface Props {
   a: number;
@@ -2649,7 +2642,6 @@ const x = { a: 1 };
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface Props {
   a: number;
@@ -2669,7 +2661,6 @@ const x = { a: 1 };
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface Props {
   a: number;
@@ -2689,7 +2680,6 @@ const fn = (): Props => ({ a: 1 });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn(param: number): void;
 fn(42 as unknown as number);
@@ -2705,7 +2695,6 @@ fn(42);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn(param: number): void;
 fn(42 as any as number);
@@ -2721,7 +2710,6 @@ fn(42);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn(params: { param: number });
 fn({ param: 42 as number });
@@ -2737,7 +2725,6 @@ fn({ param: 42 });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn(params: { param: number });
 fn({ param: 42 as any });
@@ -2753,7 +2740,6 @@ fn({ param: 42 });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type StringOrNumber = string | number;
 declare function fn(param: StringOrNumber);
@@ -2771,7 +2757,6 @@ fn(42);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type NumbersRecord = { [key: string]: number };
 declare function fn(params: { data: NumbersRecord });
@@ -2791,7 +2776,6 @@ fn({ data: data });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type NumbersRecord = { [key: string]: number };
 declare function fn(params: { data: NumbersRecord });
@@ -2817,7 +2801,6 @@ fn({
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
 type Tables<T extends 'my_table'> = { my_table: { my_column: Json } }[T];
@@ -2837,7 +2820,6 @@ const result = updatedColumn;
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface T {
   a: string;
@@ -2859,7 +2841,6 @@ fn<T>({ a: '' });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function update<T extends string>(value: T): void;
 update('hi' as unknown as string);
@@ -2875,7 +2856,6 @@ update('hi');
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function update<T extends string>(value: T): void;
 update('hi' as string);
@@ -2891,7 +2871,6 @@ update('hi');
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn(x: string[]): void;
 fn(['hello'] as any);
@@ -2907,7 +2886,6 @@ fn(['hello']);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type ChatMessage = { message: string };
 type Json = string | { [key: string]: Json };
@@ -2929,7 +2907,6 @@ update({ chat: chat });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 type ChatMessage = { message: string };
 type Json = string | { [key: string]: Json };
@@ -2951,7 +2928,6 @@ update({ chat: chat });
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface Node {
   parent: Node;
@@ -2977,7 +2953,6 @@ function fn2<T extends Node>(node: T): void {
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface A {
   a: string;
@@ -3009,7 +2984,6 @@ fn(a);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare const a: string[];
 declare const b: readonly string[];
@@ -3027,7 +3001,6 @@ const fileNames: string[] = a.concat(b);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn(text: any): void;
 declare const value: string | number;
@@ -3045,7 +3018,6 @@ fn(value);
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface A {
   type: 'a';
@@ -3081,7 +3053,6 @@ const schema: A | B = {
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 interface A {
   type: 'a';
@@ -3117,7 +3088,6 @@ const schema: A | B = {
 			},
 		},
 		{
-			Skip: true,
 			Code: `
 declare function fn1<T>(fn: () => void): void;
 declare function fn2(text: string): void;
@@ -3132,6 +3102,121 @@ fn1(() => {
   fn2('hi');
 });
       `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+type Empty<T> = {};
+declare function fn(value: Empty<string>): void;
+fn({} as Empty<number>);
+      `,
+			Output: []string{`
+type Empty<T> = {};
+declare function fn(value: Empty<string>): void;
+fn({});
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+type Empty<T> = {};
+type Box<T> = { value: T };
+declare const box: Box<Empty<number>>;
+declare function identity<T>(value: T): T;
+const result: { item: Box<Empty<string>> } = identity({
+  item: box as Box<Empty<boolean>>,
+});
+      `,
+			Output: []string{`
+type Empty<T> = {};
+type Box<T> = { value: T };
+declare const box: Box<Empty<number>>;
+declare function identity<T>(value: T): T;
+const result: { item: Box<Empty<string>> } = identity({
+  item: box,
+});
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+declare const value: (text: string) => string;
+const callback: <T extends string>(value: T) => void =
+  value as (text: string) => void;`,
+			Output: []string{`
+declare const value: (text: string) => string;
+const callback: <T extends string>(value: T) => void =
+  value;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+function f<T extends string>(value: string) {
+  const target: string = value as T;
+}`,
+			Output: []string{`
+function f<T extends string>(value: string) {
+  const target: string = value;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+declare function fn(value: {}): void;
+fn({} as string extends string ? {} : never);
+      `,
+			Output: []string{`
+declare function fn(value: {}): void;
+fn({});
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+declare function fn(value: void): void;
+fn((() => {})() as undefined);
+      `,
+			Output: []string{`
+declare function fn(value: void): void;
+fn((() => {})());
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+declare function fn(value: unknown): void;
+fn((() => {})() as undefined);`,
+			Output: []string{`
+declare function fn(value: unknown): void;
+fn((() => {})());`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
