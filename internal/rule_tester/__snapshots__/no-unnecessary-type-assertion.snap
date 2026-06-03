@@ -1630,3 +1630,11 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | fn((() => {})() as undefined);
      |    ~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-120 - 1]
+Diagnostic 1: contextuallyUnnecessary (1:26 - 1:45)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | const x: string | null = 'a' as string | null;
+     |                          ~~~~~~~~~~~~~~~~~~~~
+   2 | void x;
+---

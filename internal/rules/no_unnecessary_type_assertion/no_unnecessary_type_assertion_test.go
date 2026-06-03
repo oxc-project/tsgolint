@@ -3222,5 +3222,14 @@ fn((() => {})());`},
 					MessageId: "contextuallyUnnecessary",
 				},
 			},
+		},
+		{
+			Code:   "const x: string | null = 'a' as string | null;\nvoid x;",
+			Output: []string{"const x: string | null = 'a';\nvoid x;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
 		}})
 }
