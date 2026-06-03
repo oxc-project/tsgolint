@@ -193,6 +193,15 @@ const button = <Button<string> />;
       `,
 			Tsx: true,
 		},
+		{Code: `
+function f<T = number>() {}
+const g = f<number>;
+    `},
+		{Code: `
+function f<T = number>() {}
+function takesFn(fn: () => void) {}
+takesFn(f<number>);
+    `},
 
 		// OXC-specific cases not present in upstream.
 		{Code: `
