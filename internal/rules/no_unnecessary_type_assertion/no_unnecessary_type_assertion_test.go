@@ -551,6 +551,541 @@ function processValue<T extends NumberValuePairType | NumberValueType>(
 }
 		`},
 		{Code: `const cb = async (importOriginal: unknown) => { const actual = (await importOriginal()) as Record<string, unknown>; return { ...actual, useLocation: vi.fn() }; });`},
+		{
+			Skip: true,
+			Code: `
+type Data<T> = { value?: T };
+type ValueType<TData> = TData extends Data<infer T> ? T : never;
+
+export const foo = <TData extends Data<any>>(data: TData) => {
+  const getValue = () => data.value as ValueType<TData> | undefined;
+  const value: ValueType<TData> = getValue()!;
+  return value;
+};
+    `,
+		},
+		{
+			Code: `
+function bar<T extends any>(value: T | undefined): T {
+  return value!;
+}
+    `,
+		},
+		{
+			Code: `
+const array: object[] = [{}];
+
+let nullish: object | undefined;
+nullish ??= array[1] as object | undefined;
+
+let falsy: object | undefined;
+falsy ||= array[1] as object | undefined;
+
+let truthy: object | undefined = {};
+truthy &&= array[1] as object | undefined;
+    `,
+		},
+		{
+			Code: "const a = <const>'a';",
+		},
+		{
+			Code: `
+class T {
+  readonly a = 'a' as const;
+}
+      `,
+		},
+		{
+			Code: `
+enum T {
+  Value1,
+  Value2,
+}
+declare const a: T.Value1;
+const b = a as const;
+      `,
+		},
+		{
+			Skip: true,
+			Code: `
+(() => {})() as undefined;
+      `,
+		},
+		{
+			Code: `
+const f = () => {};
+f() as undefined;
+      `,
+		},
+		{
+			Skip: true,
+			Code: `
+(function () {})() as undefined;
+      `,
+		},
+		{
+			Code: `
+interface Overloaded {
+  (): undefined;
+  (value: string): void;
+}
+
+((value => {}) as Overloaded)('') as undefined;
+      `,
+		},
+		{
+			Code: `
+interface Overloaded {
+  (): void;
+  (value: string): undefined;
+}
+
+((() => {}) as Overloaded)() as undefined;
+      `,
+		},
+		{
+			Code: `
+interface GenericOverloaded {
+  <T extends string>(value: T): void;
+  (): undefined;
+}
+((value => {}) as GenericOverloaded)('') as undefined;
+      `,
+		},
+		{
+			Code: `
+interface Unioned {
+  (): undefined | void;
+}
+
+((() => {}) as Unioned)() as undefined;
+      `,
+		},
+		{
+			Code: `
+function fn<T>(items: ReadonlyArray<T>) {}
+fn([42] as const);
+      `,
+		},
+		{
+			Code: `
+declare const a: any;
+declare function foo(arg: string): void;
+foo(a as string);
+    `,
+		},
+		{
+			Code: `
+declare const a: object;
+const b = a as { id?: number };
+    `,
+		},
+		{
+			Code: `
+declare const array: any[];
+function foo(strings: string[]): void {}
+foo(array as string[]);
+    `,
+		},
+		{
+			Code: `
+declare const record: Record<string, unknown>;
+const obj = record as { id?: number };
+    `,
+		},
+		{
+			Code: `
+declare const obj: { [key: string]: unknown };
+const foo = obj as {};
+    `,
+		},
+		{
+			Code: `
+interface Empty {}
+declare function getAny(): any;
+const result = getAny() as Empty;
+    `,
+		},
+		{
+			Code: `
+interface Empty {}
+declare function getObject(): object;
+const result = getObject() as Empty;
+    `,
+		},
+		{
+			Code: `
+interface Obj {
+  id: number;
+}
+declare const obj: Readonly<Obj>;
+const obj2 = obj as Obj;
+    `,
+		},
+		{
+			Code: `
+declare const record: Record<string, unknown>;
+const obj = record as { [additionalProperties: string]: unknown; id?: number };
+    `,
+		},
+		{
+			Code: `
+interface PropsA {
+  a?: number;
+}
+interface PropsB extends PropsA {
+  b?: string;
+}
+declare const propsB: PropsB;
+const propsA = propsB as PropsA;
+    `,
+		},
+		{
+			Code: `
+interface PropsA {
+  a?: number;
+}
+interface PropsB extends PropsA {
+  b?: string;
+}
+declare const propsB: PropsB[];
+const propsA = propsB as PropsA[];
+    `,
+		},
+		{
+			Code: `
+class Box<T> {
+  value: T;
+}
+class PairBox<T, U> {
+  value: T;
+}
+declare const pairBox: PairBox<string, number>;
+const box = pairBox as Box<string>;
+    `,
+		},
+		{
+			Code: `
+type ObjectLike = Record<string, unknown>;
+declare const result: ObjectLike;
+declare const key: string;
+result[key] = { ...(result[key] as ObjectLike) };
+    `,
+		},
+		{
+			Code: `
+interface AST {
+  comments: string[] | undefined;
+}
+const ast: AST = {
+  comments: [],
+};
+const { comments } = ast as { comments: string[] };
+    `,
+		},
+		{
+			Code: `
+type Tuple = [string | undefined, number];
+const tuple: Tuple = ['hello', 42];
+const [first, second] = tuple as [string, number];
+    `,
+		},
+		{
+			Code: `
+interface Wide {
+  name?: string;
+}
+interface Narrow {
+  name: string;
+}
+declare const narrow: Narrow;
+const obj = { value: narrow as Wide } satisfies Record<string, Wide>;
+    `,
+		},
+		{
+			Code: `
+interface Wide {
+  name?: string;
+}
+interface Narrow {
+  name: string;
+}
+declare const narrow: Narrow;
+const value = narrow as Wide satisfies Wide;
+    `,
+		},
+		{
+			Code: `
+interface Wide {
+  name?: string;
+}
+interface Narrow {
+  name: string;
+}
+declare const narrow: Narrow;
+declare function identity<T>(x: T): T;
+const result = identity({ value: narrow as Wide }) satisfies { value: Wide };
+    `,
+		},
+		{
+			Code: `
+declare const x: string | number;
+const result: { tag: string; value: string | number } | { value: number } = {
+  value: x as number,
+};
+    `,
+		},
+		{
+			Code: `
+declare const x: string | number;
+function fn(): { tag: string; value: string | number } | { value: number } {
+  return {
+    value: x as number,
+  };
+}
+    `,
+		},
+		{
+			Code: `
+interface A {
+  a: string;
+}
+interface B extends A {
+  b: string;
+}
+declare const a: A;
+let result;
+result = a as B;
+result.b;
+    `,
+		},
+		{
+			Code: `
+interface A {
+  a: string;
+}
+interface B extends A {
+  b: string;
+}
+interface C extends B {
+  c: string;
+}
+declare let a: A;
+declare let b: B;
+const c = (a = b as C);
+c.c;
+    `,
+		},
+		{
+			Code: `
+type NumberRecord = { readonly [P in number]: number };
+function fn<T extends NumberRecord>(record: T) {
+  for (const key of Object.keys(record)) {
+    const index = +key as keyof T & number;
+    record[index] = record[index] + 1;
+  }
+}
+    `,
+		},
+		{
+			Code: `
+interface ReadonlyMap<K, V> {
+  get(key: K): V | undefined;
+}
+type T = { get<K>(key: K): K };
+declare const x: ReadonlyMap<string, string>;
+declare let y: T;
+y = x as T;
+    `,
+		},
+		{
+			Code: `
+declare function find<T>(array: readonly T[] | undefined): T | undefined;
+declare const array: string[] | number[];
+find(array as (string | number)[]);
+    `,
+		},
+		{
+			Code: `
+interface A {
+  a: string;
+}
+interface B extends A {
+  b: string;
+}
+declare function mapDefined<T>(fn: () => T): T;
+declare const b: B;
+declare const arrayA: A[];
+const a = mapDefined(() => b as A);
+[a].concat(arrayA);
+    `,
+		},
+		{
+			Code: `
+interface A {
+  a: string;
+}
+interface B extends A {
+  b: string;
+}
+declare function mapDefined<T>(fn: () => T): T;
+declare const b: B;
+declare const arrayA: A[];
+const a = mapDefined(() =>
+  Math.random() > 0.5 ? (b as A) : (null as unknown as A),
+);
+[a].concat(arrayA);
+    `,
+		},
+		{
+			Code: `
+interface Params {
+  a?: string;
+  b?: string;
+}
+declare const params: Omit<Params, 'a'> & { c?: string };
+(params as Params).a = 'c';
+    `,
+		},
+		{
+			Code: `
+const text: string | null = null as string | null;
+if (text) {
+  text.toLowerCase();
+}
+    `,
+		},
+		{
+			Code: `
+const text: string | undefined = undefined as string | undefined;
+if (text) {
+  text.toLowerCase();
+}
+    `,
+		},
+		{
+			Code: `
+type Infer<T> = T extends ObjectConstructor
+  ? never
+  : T extends () => infer V
+    ? V
+    : never;
+declare function fn<T>(o: { p: T }): { [K in keyof T]: Infer<T[K]> };
+const result = fn({ p: { a: Object as () => string } });
+result.a.toLowerCase();
+    `,
+		},
+		{
+			Code: `
+type Accessor<T> = () => T;
+declare function inner<T>(): Accessor<T>;
+function outer<T>(): Accessor<T> {
+  return inner<string>() as Accessor<any>;
+}
+    `,
+		},
+		{
+			Code: `
+interface InjectionConstraint<T> {}
+type InjectionKey<T> = symbol & InjectionConstraint<T>;
+declare function inject<T>(key: InjectionKey<T>): T;
+const context = Symbol('ctx') as InjectionKey<{ value: string }>;
+inject(context).value;
+    `,
+		},
+		{
+			Code: `
+declare function fn<U>(g: (memo: U) => U, initial: U): U;
+declare function fn<T>(g: (memo: T) => T): T | undefined;
+enum E {
+  A = 1,
+}
+const x: E = fn(n => n | 0, 0 as E);
+    `,
+		},
+		{
+			Code: `
+type BasePayload = { id: string };
+
+abstract class AbstractHandler {
+  constructor(_ctx: { token: number }) {}
+}
+
+abstract class AbstractPayloadHandler<
+  TPayload extends BasePayload = BasePayload,
+> extends AbstractHandler {}
+
+type HandlerCtor = new (ctx: { token: number }) => AbstractHandler;
+
+declare const registeredHandlers: HandlerCtor[];
+
+function example<TItem extends BasePayload>(
+  handlerClass: typeof AbstractPayloadHandler<TItem>,
+) {
+  registeredHandlers.includes(
+    handlerClass as new (...args: any[]) => AbstractPayloadHandler<TItem>,
+  );
+}
+    `,
+		},
+		{
+			Code: `
+function fn<T extends { type: string }, K extends string, V>(
+  node: T,
+): T & Record<K, V> {
+  return node as T & Record<K, V>;
+}
+    `,
+		},
+		{
+			Code: `
+declare function fn<T extends boolean>(
+  options: {
+    a: T extends true ? never : unknown;
+  } & {
+    b: T;
+  },
+): void;
+
+fn({
+  a: true,
+  b: true as any,
+});
+    `,
+		},
+		{
+			Code: `
+declare const a: number[] | number | undefined;
+const b: number[] = a ?? ([0] as any);
+    `,
+		},
+		{
+			Code: `
+const context: { meta: Record<string, unknown> | undefined } = { meta: {} };
+const meta = context.meta as { schema?: object } | undefined;
+    `,
+		},
+		{
+			Code: `
+type Test<T extends Record<string, unknown>> = {};
+
+function inferred<T extends Test<never>[]>(_input: {
+  addons?: T;
+}): {
+  options: T extends Test<infer C>[] ? C : never;
+} {
+  return {
+    options: {} as T extends Test<infer C>[] ? C : never,
+  };
+}
+
+const test = inferred({
+  addons: [{} as Test<{ parameters: { potato: boolean } }>],
+});
+
+console.log(test.options.parameters.potato);
+    `,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -1813,5 +2348,794 @@ const s2 = (s);
 				},
 			},
 		},
-	})
+		// Additional upstream cases from typescript-eslint main.
+		{
+			Code: `
+((): undefined => {})() as undefined;
+      `,
+			Output: []string{`
+((): undefined => {})();
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `
+(() => 1)() as number;
+      `,
+			Output: []string{`
+(() => 1)();
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `
+interface Overloaded {
+  (): void;
+  (value: string): undefined;
+}
+
+((value => {}) as Overloaded)('') as undefined;
+      `,
+			Output: []string{`
+interface Overloaded {
+  (): void;
+  (value: string): undefined;
+}
+
+((value => {}) as Overloaded)('');
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+function doThing(a: number) {}
+doThing(5 as any);
+      `,
+			Output: []string{`
+function doThing(a: number) {}
+doThing(5);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface A {
+  required: string;
+  alsoRequired: number;
+}
+function doThing(a: A) {}
+doThing({ required: 'yes', alsoRequired: 1 } as any);
+      `,
+			Output: []string{`
+interface A {
+  required: string;
+  alsoRequired: number;
+}
+function doThing(a: A) {}
+doThing({ required: 'yes', alsoRequired: 1 });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip:   true,
+			Code:   "const x = 5 as any as 5;",
+			Output: []string{"const x = 5;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const v: number = 5;
+const x = v as unknown as number;
+      `,
+			Output: []string{`
+const v: number = 5;
+const x = v;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const v: number = 5;
+const x = v as any as number;
+      `,
+			Output: []string{`
+const v: number = 5;
+const x = v;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const x = (1 + 1) as any as number;
+      `,
+			Output: []string{`
+const x = 1 + 1;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const x = 2 * ((1 + 1) as any as number);
+      `,
+			Output: []string{`
+const x = 2 * (1 + 1);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const v: number = 5;
+const x = <number>(<any>v);
+      `,
+			Output: []string{`
+const v: number = 5;
+const x = v;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const obj = { id: '' };
+const obj2 = obj as { id: string };
+      `,
+			Output: []string{`
+const obj = { id: '' };
+const obj2 = obj;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const obj = { id: '' };
+const obj2 = obj as any as { id: string };
+      `,
+			Output: []string{`
+const obj = { id: '' };
+const obj2 = obj;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const obj = { id: '' };
+const obj2 = obj as unknown as { id: string };
+      `,
+			Output: []string{`
+const obj = { id: '' };
+const obj2 = obj;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const array = ['a', 'b'];
+const array2 = array as any as string[];
+      `,
+			Output: []string{`
+const array = ['a', 'b'];
+const array2 = array;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+const array = ['a', 'b'];
+const array2 = array as unknown as string[];
+      `,
+			Output: []string{`
+const array = ['a', 'b'];
+const array2 = array;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type A = 'a';
+type B = 'b';
+type AorB = A | B;
+function fn(aorb: AorB) {}
+const a: A = 'a';
+fn(a as AorB);
+      `,
+			Output: []string{`
+type A = 'a';
+type B = 'b';
+type AorB = A | B;
+function fn(aorb: AorB) {}
+const a: A = 'a';
+fn(a);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface Props {
+  a: number;
+}
+const x = { a: 1 } as unknown as Props;
+      `,
+			Output: []string{`
+interface Props {
+  a: number;
+}
+const x = { a: 1 };
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface Props {
+  a: number;
+}
+const x = { a: 1 } as Props;
+      `,
+			Output: []string{`
+interface Props {
+  a: number;
+}
+const x = { a: 1 };
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface Props {
+  a: number;
+}
+const fn = (): Props => ({ a: 1 }) as unknown as Props;
+      `,
+			Output: []string{`
+interface Props {
+  a: number;
+}
+const fn = (): Props => ({ a: 1 });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn(param: number): void;
+fn(42 as unknown as number);
+      `,
+			Output: []string{`
+declare function fn(param: number): void;
+fn(42);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn(param: number): void;
+fn(42 as any as number);
+      `,
+			Output: []string{`
+declare function fn(param: number): void;
+fn(42);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn(params: { param: number });
+fn({ param: 42 as number });
+      `,
+			Output: []string{`
+declare function fn(params: { param: number });
+fn({ param: 42 });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn(params: { param: number });
+fn({ param: 42 as any });
+      `,
+			Output: []string{`
+declare function fn(params: { param: number });
+fn({ param: 42 });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type StringOrNumber = string | number;
+declare function fn(param: StringOrNumber);
+fn(42 as any as StringOrNumber);
+      `,
+			Output: []string{`
+type StringOrNumber = string | number;
+declare function fn(param: StringOrNumber);
+fn(42);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type NumbersRecord = { [key: string]: number };
+declare function fn(params: { data: NumbersRecord });
+const data = { a: 1 };
+fn({ data: data as NumbersRecord });
+      `,
+			Output: []string{`
+type NumbersRecord = { [key: string]: number };
+declare function fn(params: { data: NumbersRecord });
+const data = { a: 1 };
+fn({ data: data });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type NumbersRecord = { [key: string]: number };
+declare function fn(params: { data: NumbersRecord });
+fn({
+  data: {
+    a: 1,
+  } as NumbersRecord,
+});
+      `,
+			Output: []string{`
+type NumbersRecord = { [key: string]: number };
+declare function fn(params: { data: NumbersRecord });
+fn({
+  data: {
+    a: 1,
+  },
+});
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+type Tables<T extends 'my_table'> = { my_table: { my_column: Json } }[T];
+declare const updatedColumn: Json;
+const result = updatedColumn as unknown as Tables<'my_table'>['my_column'];
+      `,
+			Output: []string{`
+type Json = string | number | boolean | null | { [key: string]: Json } | Json[];
+type Tables<T extends 'my_table'> = { my_table: { my_column: Json } }[T];
+declare const updatedColumn: Json;
+const result = updatedColumn;
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface T {
+  a: string;
+}
+declare function fn<U extends T>(args: Pick<U, 'a'>): void;
+fn<T>({ a: '' as string });
+      `,
+			Output: []string{`
+interface T {
+  a: string;
+}
+declare function fn<U extends T>(args: Pick<U, 'a'>): void;
+fn<T>({ a: '' });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function update<T extends string>(value: T): void;
+update('hi' as unknown as string);
+      `,
+			Output: []string{`
+declare function update<T extends string>(value: T): void;
+update('hi');
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function update<T extends string>(value: T): void;
+update('hi' as string);
+      `,
+			Output: []string{`
+declare function update<T extends string>(value: T): void;
+update('hi');
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn(x: string[]): void;
+fn(['hello'] as any);
+      `,
+			Output: []string{`
+declare function fn(x: string[]): void;
+fn(['hello']);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type ChatMessage = { message: string };
+type Json = string | { [key: string]: Json };
+declare function update(values: { chat: Json[] }): void;
+declare const chat: ChatMessage[];
+update({ chat: chat as Json[] });
+      `,
+			Output: []string{`
+type ChatMessage = { message: string };
+type Json = string | { [key: string]: Json };
+declare function update(values: { chat: Json[] }): void;
+declare const chat: ChatMessage[];
+update({ chat: chat });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+type ChatMessage = { message: string };
+type Json = string | { [key: string]: Json };
+declare function update<Row extends { chat: Json[] }>(values: Row): void;
+declare const chat: ChatMessage[];
+update({ chat: chat as Json[] });
+      `,
+			Output: []string{`
+type ChatMessage = { message: string };
+type Json = string | { [key: string]: Json };
+declare function update<Row extends { chat: Json[] }>(values: Row): void;
+declare const chat: ChatMessage[];
+update({ chat: chat });
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface Node {
+  parent: Node;
+}
+declare function fn<T extends Node>(node: T): T;
+function fn2<T extends Node>(node: T): void {
+  fn(node as NonNullable<T>);
+}
+      `,
+			Output: []string{`
+interface Node {
+  parent: Node;
+}
+declare function fn<T extends Node>(node: T): T;
+function fn2<T extends Node>(node: T): void {
+  fn(node);
+}
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface A {
+  a: string;
+}
+interface B extends A {
+  b: string;
+}
+declare function fn(a: A): A;
+declare function fn(a: A): A | undefined;
+declare const a: A;
+fn(a as B);
+      `,
+			Output: []string{`
+interface A {
+  a: string;
+}
+interface B extends A {
+  b: string;
+}
+declare function fn(a: A): A;
+declare function fn(a: A): A | undefined;
+declare const a: A;
+fn(a);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare const a: string[];
+declare const b: readonly string[];
+const fileNames: string[] = a.concat(b as string[]);
+      `,
+			Output: []string{`
+declare const a: string[];
+declare const b: readonly string[];
+const fileNames: string[] = a.concat(b);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn(text: any): void;
+declare const value: string | number;
+fn(value as number);
+      `,
+			Output: []string{`
+declare function fn(text: any): void;
+declare const value: string | number;
+fn(value);
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface A {
+  type: 'a';
+  a: string;
+}
+interface B {
+  type: 'b';
+}
+declare const a: '1' | '2';
+const schema: A | B = {
+  type: 'a',
+  a: a as string,
+};
+      `,
+			Output: []string{`
+interface A {
+  type: 'a';
+  a: string;
+}
+interface B {
+  type: 'b';
+}
+declare const a: '1' | '2';
+const schema: A | B = {
+  type: 'a',
+  a: a,
+};
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+interface A {
+  type: 'a';
+  a?: string;
+}
+interface B {
+  type: 'b';
+}
+declare const a: '1' | '2';
+const schema: A | B = {
+  type: 'a',
+  a: a as string,
+};
+      `,
+			Output: []string{`
+interface A {
+  type: 'a';
+  a?: string;
+}
+interface B {
+  type: 'b';
+}
+declare const a: '1' | '2';
+const schema: A | B = {
+  type: 'a',
+  a: a,
+};
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Skip: true,
+			Code: `
+declare function fn1<T>(fn: () => void): void;
+declare function fn2(text: string): void;
+fn1(() => {
+  fn2('hi' as any);
+});
+      `,
+			Output: []string{`
+declare function fn1<T>(fn: () => void): void;
+declare function fn2(text: string): void;
+fn1(() => {
+  fn2('hi');
+});
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		}})
 }
