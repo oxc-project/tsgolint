@@ -36,6 +36,10 @@ type headlessOptions struct {
 	debugTimings   bool
 }
 
+var suppressProgramDiagnostics = sync.OnceValue(func() bool {
+	return os.Getenv("OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true"
+})
+
 func parseHeadlessOptions(args []string) (*headlessOptions, error) {
 	var opts headlessOptions
 	var debug string
@@ -442,7 +446,7 @@ func runHeadless(args []string) int {
 			ReportSyntactic: payload.ReportSyntactic,
 			ReportSemantic:  payload.ReportSemantic,
 		},
-		SuppressProgramDiagnostics: os.Getenv("OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true",
+		SuppressProgramDiagnostics: suppressProgramDiagnostics(),
 		TimingStore:                timingStore,
 	})
 
