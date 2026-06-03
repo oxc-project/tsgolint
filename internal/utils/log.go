@@ -12,20 +12,11 @@ const (
 	LogLevelDebug
 )
 
-var (
-	logLevel     LogLevel
-	logLevelOnce sync.Once
-)
-
-func GetLogLevel() LogLevel {
-	logLevelOnce.Do(func() {
-		switch os.Getenv("OXC_LOG") {
-		case "debug":
-			logLevel = LogLevelDebug
-		default:
-			logLevel = LogLevelNormal
-		}
-	})
-
-	return logLevel
-}
+var GetLogLevel = sync.OnceValue(func() LogLevel {
+	switch os.Getenv("OXC_LOG") {
+	case "debug":
+		return LogLevelDebug
+	default:
+		return LogLevelNormal
+	}
+})
