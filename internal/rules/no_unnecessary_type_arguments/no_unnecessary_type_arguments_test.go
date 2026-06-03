@@ -439,6 +439,42 @@ async function useAppSession(event: H3Event) {
   return useSession<SessionData>(event, config);
 }
     `},
+		// https://github.com/oxc-project/oxc/issues/22915
+		{Code: `
+type RecordToTuple<T> = {
+  [K in keyof T]: [K, T[K]];
+}[keyof T][];
+
+class RequestContext<
+  Values extends Record<string, unknown> | unknown = unknown,
+> {
+  constructor(
+    _iterable?: Values extends Record<string, unknown>
+      ? RecordToTuple<Partial<Values>>
+      : Iterable<readonly [string, unknown]>,
+  ) {}
+
+  set<K extends Values extends Record<string, unknown> ? keyof Values : string>(
+    _key: K,
+    _value: Values extends Record<string, unknown>
+      ? K extends keyof Values
+        ? Values[K]
+        : never
+      : unknown,
+  ): void {}
+}
+
+type UntypedRequestContext = RequestContext;
+
+function acceptsUntypedContext(_context: UntypedRequestContext): void {}
+
+const context = new RequestContext<unknown>([
+  ['instructions', 'Reply for the agent.'],
+  ['tools', {}],
+]);
+
+acceptsUntypedContext(context);
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -967,6 +1003,27 @@ type Default = Record<string, any>;
 type Alias = Default;
 function f<T = Default>() {}
 f();
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Line:      5,
+					MessageId: "unnecessaryTypeParameter",
+				},
+			},
+		},
+		{
+			Code: `
+class C<T, U = unknown> {
+  constructor(_value: U) {}
+}
+new C<string, unknown>('value');
+      `,
+			Output: []string{`
+class C<T, U = unknown> {
+  constructor(_value: U) {}
+}
+new C<string>('value');
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{

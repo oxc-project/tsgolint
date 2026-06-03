@@ -120,7 +120,67 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			return nil
 		}
 
-		checkArgsAndParameters := func(arguments *ast.NodeList, parameters []*ast.Node) {
+		typeNodeReferencesTypeParameter := func(typeNode *ast.Node, typeParameterSymbols map[*ast.Symbol]struct{}) bool {
+			var visit func(node *ast.Node) bool
+			visit = func(node *ast.Node) bool {
+				if node == nil {
+					return false
+				}
+
+				if ast.IsIdentifier(node) {
+					if symbol := ctx.TypeChecker.GetSymbolAtLocation(node); symbol != nil {
+						if _, ok := typeParameterSymbols[symbol]; ok {
+							return true
+						}
+					}
+				}
+
+				return node.ForEachChild(func(child *ast.Node) bool {
+					return visit(child)
+				})
+			}
+
+			return visit(typeNode)
+		}
+
+		constructorArgumentsCanInferTypeParameters := func(node *ast.Node, parameters []*ast.Node) bool {
+			if !ast.IsNewExpression(node) || len(node.Arguments()) == 0 {
+				return false
+			}
+
+			typeParameterSymbols := make(map[*ast.Symbol]struct{}, len(parameters))
+			for _, parameter := range parameters {
+				name := parameter.Name()
+				if name == nil {
+					continue
+				}
+				if symbol := ctx.TypeChecker.GetSymbolAtLocation(name); symbol != nil {
+					typeParameterSymbols[symbol] = struct{}{}
+				}
+			}
+			if len(typeParameterSymbols) == 0 {
+				return false
+			}
+
+			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, node, nil, checker.CheckModeNormal)
+			if signature == nil {
+				return false
+			}
+			declaration := checker.Signature_declaration(signature)
+			if declaration == nil || declaration.FunctionLikeData() == nil {
+				return false
+			}
+
+			for _, parameter := range declaration.Parameters() {
+				if typeNode := parameter.Type(); typeNode != nil && typeNodeReferencesTypeParameter(typeNode, typeParameterSymbols) {
+					return true
+				}
+			}
+
+			return false
+		}
+
+		checkArgsAndParameters := func(node *ast.Node, arguments *ast.NodeList, parameters []*ast.Node) {
 			if arguments == nil || parameters == nil || len(arguments.Nodes) == 0 || len(parameters) == 0 {
 				return
 			}
@@ -171,6 +231,12 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 				return
 			}
 
+			// Removing the entire type argument list from a constructor can re-enable
+			// inference for all class type parameters used by constructor parameters.
+			if lastParamIndex == 0 && constructorArgumentsCanInferTypeParameters(node, parameters) {
+				return
+			}
+
 			ctx.ReportNodeWithFixes(typeArgument, buildUnnecessaryTypeParameterMessage(), func() []rule.RuleFix {
 				var removeRange core.TextRange
 				if lastParamIndex == 0 {
@@ -185,32 +251,32 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 		return rule.RuleListeners{
 			ast.KindExpressionWithTypeArguments: func(node *ast.Node) {
 				expr := node.AsExpressionWithTypeArguments()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.Expression))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromType(node, expr.Expression))
 			},
 			ast.KindTypeReference: func(node *ast.Node) {
 				expr := node.AsTypeReferenceNode()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName))
 			},
 
 			ast.KindCallExpression: func(node *ast.Node) {
 				expr := node.AsCallExpression()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindNewExpression: func(node *ast.Node) {
 				expr := node.AsNewExpression()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindTaggedTemplateExpression: func(node *ast.Node) {
 				expr := node.AsTaggedTemplateExpression()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindJsxOpeningElement: func(node *ast.Node) {
 				expr := node.AsJsxOpeningElement()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindJsxSelfClosingElement: func(node *ast.Node) {
 				expr := node.AsJsxSelfClosingElement()
-				checkArgsAndParameters(expr.TypeArguments, getTypeParametersFromCall(node))
+				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 		}
 	},

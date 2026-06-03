@@ -250,3 +250,12 @@ Message: This is the default value for this type parameter, so it can be omitted
      |   ~~~~~
    6 |       
 ---
+
+[TestNoUnnecessaryTypeArguments/invalid-28 - 1]
+Diagnostic 1: unnecessaryTypeParameter (5:15 - 5:21)
+Message: This is the default value for this type parameter, so it can be omitted.
+   4 | }
+   5 | new C<string, unknown>('value');
+     |               ~~~~~~~
+   6 |       
+---
