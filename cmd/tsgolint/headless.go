@@ -401,9 +401,8 @@ func runHeadless(args []string) int {
 		}
 	})
 
-	requestTimings := opts.debugTimings || os.Getenv("OXLINT_TSGOLINT_TIMINGS") == "1"
 	var timingStore *linter.RuleTimingStore
-	if requestTimings {
+	if opts.debugTimings {
 		timingStore = linter.NewRuleTimingStore()
 	}
 
@@ -459,7 +458,7 @@ func runHeadless(args []string) int {
 
 	wg.Wait()
 
-	if requestTimings {
+	if opts.debugTimings {
 		if err := writeMessage(os.Stdout, headlessMessageTypeTiming, headlessTimingPayloadFromRecords(timingStore.Collect())); err != nil {
 			log.Printf("ERROR: failed to write timing output: %v", err)
 			return 1
