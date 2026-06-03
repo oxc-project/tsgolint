@@ -103,6 +103,32 @@ func isStrictNullComparison(op Operand) bool {
 	return isComparisonAgainst(op, utils.IsNullLiteral)
 }
 
+func isStrictNullCheckForOrChain(op Operand) bool {
+	switch op.typ {
+	case OperandTypeStrictEqualNull, OperandTypeNotStrictEqualNull:
+		return true
+	case OperandTypeComparison:
+		if bin := unwrapBinary(op.node); bin != nil {
+			return bin.operator == ast.KindEqualsEqualsEqualsToken &&
+				(utils.IsNullLiteral(bin.left) || utils.IsNullLiteral(bin.right))
+		}
+	}
+	return false
+}
+
+func isStrictUndefinedCheckForOrChain(op Operand) bool {
+	switch op.typ {
+	case OperandTypeStrictEqualUndef, OperandTypeNotStrictEqualUndef, OperandTypeTypeofCheck:
+		return true
+	case OperandTypeComparison:
+		if bin := unwrapBinary(op.node); bin != nil {
+			return bin.operator == ast.KindEqualsEqualsEqualsToken &&
+				(utils.IsUndefinedLiteral(bin.left) || utils.IsUndefinedLiteral(bin.right))
+		}
+	}
+	return false
+}
+
 func isOrChainNullishCheck(op Operand) bool {
 	switch op.typ {
 	case OperandTypeStrictEqualNull, OperandTypeStrictEqualUndef, OperandTypeEqualNull:
@@ -201,6 +227,34 @@ func analyzeNullishChecks(chain []Operand, orChainMode bool) NullishCheckAnalysi
 	}
 
 	return analysis
+}
+
+func (processor *chainProcessor) hasShorterUndefinedCheckBeforeStrictNullComparison(chain []Operand) bool {
+	if len(chain) < 2 {
+		return false
+	}
+
+	lastOp := chain[len(chain)-1]
+	if !isStrictNullCheckForOrChain(lastOp) || lastOp.comparedExpr == nil {
+		return false
+	}
+
+	lastParts := processor.flattenForFix(lastOp.comparedExpr)
+	for _, op := range chain[:len(chain)-1] {
+		if op.comparedExpr == nil {
+			continue
+		}
+		if !isStrictUndefinedCheckForOrChain(op) {
+			continue
+		}
+
+		opParts := processor.flattenForFix(op.comparedExpr)
+		if len(opParts) < len(lastParts) {
+			return true
+		}
+	}
+
+	return false
 }
 
 type Operand struct {
@@ -3587,6 +3641,9 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 					strictCheckRequiresSuggestion = true
 				}
 			}
+		}
+		if !strictCheckRequiresSuggestion {
+			strictCheckRequiresSuggestion = processor.hasShorterUndefinedCheckBeforeStrictNullComparison(chain)
 		}
 		if !strictCheckRequiresSuggestion {
 			useSuggestion = false

@@ -2794,5 +2794,44 @@ exists('/foo');
 				},
 			},
 		},
+		{
+			Code: `interface Something {
+  /**
+   * @deprecated
+   */
+  field: number;
+}
+function bar(_options: Something) {
+}
+bar({ field: 0 });`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecated",
+					Line:      9,
+					Column:    7,
+					EndColumn: 12,
+				},
+			},
+		},
+		{
+			Tsx: true,
+			Code: `interface SomethingProps {
+  /**
+   * @deprecated
+   */
+  field: number;
+}
+function Foo(props: SomethingProps) {
+}
+const jsx = <Foo field={0} />;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecated",
+					Line:      9,
+					Column:    18,
+					EndColumn: 23,
+				},
+			},
+		},
 	})
 }

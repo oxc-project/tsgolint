@@ -1290,3 +1290,19 @@ Message: `statusCode` is deprecated. Use status instead.
      |           ~~~~~~~~~~
   13 |         });
 ---
+
+[TestNoDeprecatedRule/invalid-147 - 1]
+Diagnostic 1: deprecated (9:7 - 9:11)
+Message: `field` is deprecated.
+   8 | }
+   9 | bar({ field: 0 });
+     |       ~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-148 - 1]
+Diagnostic 1: deprecated (9:18 - 9:22)
+Message: `field` is deprecated.
+   8 | }
+   9 | const jsx = <Foo field={0} />;
+     |                  ~~~~~
+---
