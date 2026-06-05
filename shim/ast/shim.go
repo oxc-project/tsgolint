@@ -891,8 +891,8 @@ func IsIdentifier(node *ast.Node) bool
 func IsIdentifierName(node *ast.Node) bool
 //go:linkname IsIfStatement github.com/microsoft/typescript-go/internal/ast.IsIfStatement
 func IsIfStatement(node *ast.Node) bool
-//go:linkname IsImplicitlyExportedJSTypeAlias github.com/microsoft/typescript-go/internal/ast.IsImplicitlyExportedJSTypeAlias
-func IsImplicitlyExportedJSTypeAlias(node *ast.Node) bool
+//go:linkname IsImplicitlyExportedJSDocDeclaration github.com/microsoft/typescript-go/internal/ast.IsImplicitlyExportedJSDocDeclaration
+func IsImplicitlyExportedJSDocDeclaration(node *ast.Node) bool
 //go:linkname IsImportAttribute github.com/microsoft/typescript-go/internal/ast.IsImportAttribute
 func IsImportAttribute(node *ast.Node) bool
 //go:linkname IsImportAttributes github.com/microsoft/typescript-go/internal/ast.IsImportAttributes
@@ -1547,6 +1547,7 @@ type JSDocComment = ast.JSDocComment
 type JSDocCommentBase = ast.JSDocCommentBase
 type JSDocDeprecatedTag = ast.JSDocDeprecatedTag
 type JSDocDeprecatedTagNode = ast.JSDocDeprecatedTagNode
+type JSDocFullName = ast.JSDocFullName
 type JSDocImplementsTag = ast.JSDocImplementsTag
 type JSDocImplementsTagNode = ast.JSDocImplementsTagNode
 type JSDocImportTag = ast.JSDocImportTag
@@ -2205,11 +2206,13 @@ const NodeFlagsHasExplicitReturn = ast.NodeFlagsHasExplicitReturn
 const NodeFlagsHasImplicitReturn = ast.NodeFlagsHasImplicitReturn
 const NodeFlagsHasJSDoc = ast.NodeFlagsHasJSDoc
 const NodeFlagsIdentifierHasExtendedUnicodeEscape = ast.NodeFlagsIdentifierHasExtendedUnicodeEscape
+const NodeFlagsIdentifierIsInJSDocNamespace = ast.NodeFlagsIdentifierIsInJSDocNamespace
 const NodeFlagsInWithStatement = ast.NodeFlagsInWithStatement
 const NodeFlagsJSDoc = ast.NodeFlagsJSDoc
 const NodeFlagsJavaScriptFile = ast.NodeFlagsJavaScriptFile
 const NodeFlagsJsonFile = ast.NodeFlagsJsonFile
 const NodeFlagsLet = ast.NodeFlagsLet
+const NodeFlagsNestedNamespace = ast.NodeFlagsNestedNamespace
 const NodeFlagsNone = ast.NodeFlagsNone
 const NodeFlagsOptionalChain = ast.NodeFlagsOptionalChain
 const NodeFlagsPermanentlySetIncrementalFlags = ast.NodeFlagsPermanentlySetIncrementalFlags

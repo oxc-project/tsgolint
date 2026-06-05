@@ -44,7 +44,7 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/mackerelio/go-osstat v0.2.7 // indirect
-	github.com/microsoft/typescript-go v0.0.0-20260528190657-0970dc40fa83 // indirect
+	github.com/microsoft/typescript-go v0.0.0-20260604205727-69d658da1a63 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	golang.org/x/mod v0.36.0 // indirect
 	golang.org/x/sync v0.20.0 // indirect
