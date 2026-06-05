@@ -5389,3 +5389,10 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    4 | 
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
+
+[TestPreferOptionalChainRule/invalid-601 - 1]
+Diagnostic 1: preferOptionalChain (1:1 - 1:69)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | foo && foo[bar as string | number] && foo[bar as string | number].baz;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---

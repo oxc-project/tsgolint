@@ -308,17 +308,13 @@ func unwrapForComparison(n *ast.Node) *ast.Node {
 			n = n.AsParenthesizedExpression().Expression
 		case ast.IsNonNullExpression(n):
 			n = n.AsNonNullExpression().Expression
-		case n.Kind == ast.KindAsExpression:
-			n = n.AsAsExpression().Expression
-		case n.Kind == ast.KindTypeAssertionExpression:
-			n = n.AsTypeAssertion().Expression
 		default:
 			return n
 		}
 	}
 }
 
-// Ignores parentheses, non-null assertions, type assertions.
+// Ignores parentheses and non-null assertions.
 func areNodesStructurallyEqual(a, b *ast.Node) bool {
 	a = unwrapForComparison(a)
 	b = unwrapForComparison(b)
@@ -388,6 +384,16 @@ func areNodesStructurallyEqual(a, b *ast.Node) bool {
 			}
 		}
 		return true
+
+	case ast.KindAsExpression:
+		aAs := a.AsAsExpression()
+		bAs := b.AsAsExpression()
+		return areNodesStructurallyEqual(aAs.Expression, bAs.Expression)
+
+	case ast.KindTypeAssertionExpression:
+		aAssertion := a.AsTypeAssertion()
+		bAssertion := b.AsTypeAssertion()
+		return areNodesStructurallyEqual(aAssertion.Expression, bAssertion.Expression)
 
 	case ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral,
 		ast.KindNoSubstitutionTemplateLiteral:

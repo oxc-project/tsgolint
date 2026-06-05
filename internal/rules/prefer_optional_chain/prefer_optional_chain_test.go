@@ -4219,6 +4219,12 @@ foo.bar?.() === undefined || foo.bar?.().baz;
               intervention.projectId.toString(),
         );
       `,
+	}, rule_tester.ValidTestCase{
+		Code: `
+        export function buggy_memberReceiver(e: { relatedTarget: EventTarget | null }): void {
+          if (!e.relatedTarget || !(e.relatedTarget as HTMLElement).closest('.c')) {}
+        }
+      `,
 	})
 
 	// --- Spacing sanity checks ---
@@ -4267,6 +4273,16 @@ item?.value === null;
 `,
 					},
 				},
+			},
+		},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code:   `foo && foo[bar as string | number] && foo[bar as string | number].baz;`,
+		Output: []string{`foo?.[bar as string | number]?.baz;`},
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
 			},
 		},
 	})
