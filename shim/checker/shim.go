@@ -163,6 +163,7 @@ type extra_Checker struct {
   instantiationCount uint32
   instantiationDepth uint32
   inlineLevel int
+  serializationLevel int
   currentNode *ast.Node
   varianceTypeParameter *checker.Type
   languageVersion core.ScriptTarget

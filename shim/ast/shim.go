@@ -2222,6 +2222,7 @@ const NodeFlagsPossiblyContainsImportMeta = ast.NodeFlagsPossiblyContainsImportM
 const NodeFlagsReachabilityAndEmitFlags = ast.NodeFlagsReachabilityAndEmitFlags
 const NodeFlagsReachabilityCheckFlags = ast.NodeFlagsReachabilityCheckFlags
 const NodeFlagsReparsed = ast.NodeFlagsReparsed
+const NodeFlagsReparserTransformedLiteral = ast.NodeFlagsReparserTransformedLiteral
 const NodeFlagsSynthesized = ast.NodeFlagsSynthesized
 const NodeFlagsThisNodeHasError = ast.NodeFlagsThisNodeHasError
 const NodeFlagsThisNodeOrAnySubNodesHasError = ast.NodeFlagsThisNodeOrAnySubNodesHasError
