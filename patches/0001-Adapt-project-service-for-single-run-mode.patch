@@ -24,7 +24,7 @@ index 37abaff97..19dac4dfc 100644
  	// stored in the old program's options.
  	createCheckerPool := func(program *compiler.Program) compiler.CheckerPool {
 -		checkerPool = newCheckerPool(4, program, nil)
-+		checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.log)
++		checkerPool = newCheckerPool(min(4, runtime.GOMAXPROCS(0)), program, p.log)
  		return checkerPool
  	}
  
