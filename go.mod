@@ -11,6 +11,7 @@ replace (
 	github.com/microsoft/typescript-go/shim/jsnum => ./shim/jsnum
 	github.com/microsoft/typescript-go/shim/lsp/lsproto => ./shim/lsp/lsproto
 	github.com/microsoft/typescript-go/shim/parser => ./shim/parser
+	github.com/microsoft/typescript-go/shim/pnp => ./shim/pnp
 	github.com/microsoft/typescript-go/shim/project => ./shim/project
 	github.com/microsoft/typescript-go/shim/scanner => ./shim/scanner
 	github.com/microsoft/typescript-go/shim/tsoptions => ./shim/tsoptions
@@ -18,6 +19,7 @@ replace (
 	github.com/microsoft/typescript-go/shim/vfs => ./shim/vfs
 	github.com/microsoft/typescript-go/shim/vfs/cachedvfs => ./shim/vfs/cachedvfs
 	github.com/microsoft/typescript-go/shim/vfs/osvfs => ./shim/vfs/osvfs
+	github.com/microsoft/typescript-go/shim/vfs/pnpvfs => ./shim/vfs/pnpvfs
 )
 
 require (
@@ -28,6 +30,7 @@ require (
 	github.com/microsoft/typescript-go/shim/core v0.0.0
 	github.com/microsoft/typescript-go/shim/jsnum v0.0.0
 	github.com/microsoft/typescript-go/shim/parser v0.0.0
+	github.com/microsoft/typescript-go/shim/pnp v0.0.0
 	github.com/microsoft/typescript-go/shim/project v0.0.0
 	github.com/microsoft/typescript-go/shim/scanner v0.0.0
 	github.com/microsoft/typescript-go/shim/tsoptions v0.0.0
@@ -35,6 +38,7 @@ require (
 	github.com/microsoft/typescript-go/shim/vfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/cachedvfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/osvfs v0.0.0
+	github.com/microsoft/typescript-go/shim/vfs/pnpvfs v0.0.0
 	golang.org/x/sys v0.46.0
 	golang.org/x/tools v0.46.0
 	gotest.tools/v3 v3.5.2

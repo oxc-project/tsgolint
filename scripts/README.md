@@ -51,10 +51,14 @@ export OXLINT_TSGOLINT_PATH="$HOME/.local/bin/tsgolint"
 oxlint --type-aware
 ```
 
-## Note: Yarn PnP support is a separate change
+## Yarn PnP support
 
-These scripts build and ship whatever is in this branch. For `tsgolint` to
-resolve a Yarn PnP monorepo's modules and `tsconfig extends`, the Yarn PnP
-patch to typescript-go must be added as a new `patches/000N-*.patch` (applied by
-`just init` onto the submodule). Without it, the released binary still fails to
-resolve PnP modules — same as upstream.
+This fork includes Yarn Plug'n'Play resolution support, applied to the
+typescript-go submodule by `just init` via `patches/0006-Add-Yarn-PnP-support.patch`
+(ported from upstream PR microsoft/typescript-go#1966) plus the `shim/pnp` and
+`shim/vfs/pnpvfs` shims and the `PnpApi()` wiring in `internal/utils/host.go`.
+
+A `.pnp.cjs` manifest is auto-detected from the working directory, so a binary
+built and installed from this fork resolves a Yarn PnP workspace's modules and
+`tsconfig extends` with no extra flags. Point oxlint at it with
+`OXLINT_TSGOLINT_PATH` (see below).

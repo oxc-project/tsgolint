@@ -55,6 +55,7 @@ func main() {
 		"jsnum",
 		"lsp/lsproto",
 		"parser",
+		"pnp",
 		"project",
 		"scanner",
 		"tsoptions",
@@ -62,6 +63,7 @@ func main() {
 		"vfs",
 		"vfs/cachedvfs",
 		"vfs/osvfs",
+		"vfs/pnpvfs",
 	}
 
 	packagesToShimFullNames := make([]string, len(packagesToShim))

@@ -1,0 +1,2568 @@
+From 249fb9b43223245e9ded4432681a8dccc126bb01 Mon Sep 17 00:00:00 2001
+From: Robin Nagpal <robin.nagpal@newsela.com>
+Date: Wed, 24 Jun 2026 14:40:15 -0400
+Subject: [PATCH] Add Yarn PnP support
+
+Ports the Yarn Plug'n'Play resolution support from upstream PR
+microsoft/typescript-go#1966 (author: GGomez99 / guyllian.gomez), adapted
+to apply on top of the tsgolint shim patches (keeps the exported
+SnapshotFSBuilder / ConfigFileRegistryBuilder names from the shim patch and
+threads the new pnpApi through them).
+
+Adds internal/pnp (manifest parser + PnP API) and internal/vfs/pnpvfs, and
+wires PnpApi() into the resolver, compiler host and project hosts so module
+and tsconfig-extends resolution work inside a Yarn PnP workspace.
+
+Test files, baselines and the VS Code extension change from the PR are
+omitted (not needed to build/run tsgolint).
+---
+ cmd/tsgo/sys.go                               |  17 +-
+ internal/api/server.go                        |  15 +-
+ internal/compiler/emitHost.go                 |   5 +-
+ internal/compiler/host.go                     |  13 +-
+ internal/compiler/program.go                  |   6 +
+ .../compiler/projectreferencedtsfakinghost.go |   6 +
+ internal/core/compileroptions.go              |  10 +
+ internal/diagnostics/diagnostics_generated.go |  32 ++
+ .../diagnostics/extraDiagnosticMessages.json  |  32 ++
+ internal/diagnostics/loc_generated.go         |   5 +-
+ internal/execute/build/compilerHost.go        |   5 +
+ internal/execute/build/host.go                |   5 +
+ internal/execute/build/orchestrator.go        |   1 +
+ internal/execute/tsc.go                       |   4 +-
+ internal/execute/tsc/compile.go               |   3 +
+ internal/execute/watcher.go                   |   4 +-
+ internal/ls/autoimport/aliasresolver.go       |   6 +
+ internal/ls/autoimport/registry.go            |  17 +-
+ internal/ls/autoimport/util.go                |   7 +
+ internal/ls/host.go                           |   2 +
+ internal/ls/lsconv/converters.go              |   9 +-
+ internal/ls/string_completions.go             |   2 +
+ internal/lsp/lsproto/lsp.go                   |   2 +-
+ internal/module/resolver.go                   | 101 ++++-
+ internal/module/types.go                      |   2 +
+ internal/modulespecifiers/specifiers.go       | 145 ++++++-
+ internal/modulespecifiers/types.go            |   3 +
+ internal/pnp/manifestparser.go                | 332 +++++++++++++++
+ internal/pnp/pnp.go                           |  23 ++
+ internal/pnp/pnpapi.go                        | 388 ++++++++++++++++++
+ internal/project/autoimport.go                |   9 +
+ internal/project/compilerhost.go              |   8 +
+ internal/project/configfileregistrybuilder.go |  10 +
+ internal/project/projectcollectionbuilder.go  |   6 +-
+ internal/project/session.go                   |  10 +
+ internal/project/snapshot.go                  |  19 +-
+ internal/tsoptions/tsconfigparsing.go         |   2 +
+ internal/tspath/path.go                       |   4 +
+ internal/vfs/cachedvfs/cachedvfs.go           |   9 +
+ internal/vfs/pnpvfs/pnpvfs.go                 | 250 +++++++++++
+ 40 files changed, 1501 insertions(+), 28 deletions(-)
+ create mode 100644 internal/pnp/manifestparser.go
+ create mode 100644 internal/pnp/pnp.go
+ create mode 100644 internal/pnp/pnpapi.go
+ create mode 100644 internal/vfs/pnpvfs/pnpvfs.go
+
+diff --git a/cmd/tsgo/sys.go b/cmd/tsgo/sys.go
+index e5b2b8d56..e423fff24 100644
+--- a/cmd/tsgo/sys.go
++++ b/cmd/tsgo/sys.go
+@@ -8,9 +8,11 @@ import (
+ 
+ 	"github.com/microsoft/typescript-go/internal/bundled"
+ 	"github.com/microsoft/typescript-go/internal/execute/tsc"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+ 	"github.com/microsoft/typescript-go/internal/vfs/osvfs"
++	"github.com/microsoft/typescript-go/internal/vfs/pnpvfs"
+ 	"golang.org/x/term"
+ )
+ 
+@@ -20,6 +22,7 @@ type osSys struct {
+ 	defaultLibraryPath string
+ 	cwd                string
+ 	start              time.Time
++	pnpApi             *pnp.PnpApi
+ }
+ 
+ func (s *osSys) SinceStart() time.Duration {
+@@ -59,6 +62,10 @@ func (s *osSys) GetEnvironmentVariable(name string) string {
+ 	return os.Getenv(name)
+ }
+ 
++func (s *osSys) PnpApi() *pnp.PnpApi {
++	return s.pnpApi
++}
++
+ func newSystem() *osSys {
+ 	cwd, err := os.Getwd()
+ 	if err != nil {
+@@ -66,11 +73,19 @@ func newSystem() *osSys {
+ 		os.Exit(int(tsc.ExitStatusInvalidProject_OutputsSkipped))
+ 	}
+ 
++	var fs vfs.FS = osvfs.FS()
++
++	pnpApi := pnp.InitPnpApi(fs, tspath.NormalizePath(cwd))
++	if pnpApi != nil {
++		fs = pnpvfs.From(fs)
++	}
++
+ 	return &osSys{
+ 		cwd:                tspath.NormalizePath(cwd),
+-		fs:                 bundled.WrapFS(osvfs.FS()),
++		fs:                 bundled.WrapFS(fs),
+ 		defaultLibraryPath: bundled.LibPath(),
+ 		writer:             os.Stdout,
+ 		start:              time.Now(),
++		pnpApi:             pnpApi,
+ 	}
+ }
+diff --git a/internal/api/server.go b/internal/api/server.go
+index b8995ea8e..2c89d7236 100644
+--- a/internal/api/server.go
++++ b/internal/api/server.go
+@@ -7,8 +7,11 @@ import (
+ 
+ 	"github.com/microsoft/typescript-go/internal/bundled"
+ 	"github.com/microsoft/typescript-go/internal/lsp/lsproto"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project"
++	"github.com/microsoft/typescript-go/internal/vfs"
+ 	"github.com/microsoft/typescript-go/internal/vfs/osvfs"
++	"github.com/microsoft/typescript-go/internal/vfs/pnpvfs"
+ )
+ 
+ // StdioServerOptions configures the STDIO-based API server.
+@@ -63,7 +66,14 @@ func (s *StdioServer) Run(ctx context.Context) error {
+ 		transport = t
+ 	}
+ 
+-	fs := bundled.WrapFS(osvfs.FS())
++	var fs vfs.FS = osvfs.FS()
++
++	pnpApi := pnp.InitPnpApi(fs, s.options.Cwd)
++	if pnpApi != nil {
++		fs = pnpvfs.From(fs)
++	}
++
++	fs = bundled.WrapFS(fs)
+ 
+ 	// Wrap the base FS with callbackFS if callbacks are requested
+ 	var callbackFS *callbackFS
+@@ -75,7 +85,8 @@ func (s *StdioServer) Run(ctx context.Context) error {
+ 	projectSession := project.NewSession(&project.SessionInit{
+ 		BackgroundCtx: ctx,
+ 		Logger:        nil, // TODO: Add logging support
+-		FS:            fs,
++		FS:                fs,
++		PnpApi:            pnpApi,
+ 		Options: &project.SessionOptions{
+ 			CurrentDirectory:   s.options.Cwd,
+ 			DefaultLibraryPath: s.options.DefaultLibraryPath,
+diff --git a/internal/compiler/emitHost.go b/internal/compiler/emitHost.go
+index 0215b4d5e..873958861 100644
+--- a/internal/compiler/emitHost.go
++++ b/internal/compiler/emitHost.go
+@@ -8,6 +8,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/module"
+ 	"github.com/microsoft/typescript-go/internal/outputpaths"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/printer"
+ 	"github.com/microsoft/typescript-go/internal/symlinks"
+ 	"github.com/microsoft/typescript-go/internal/transformers/declarations"
+@@ -25,6 +26,7 @@ type EmitHost interface {
+ 	GetCurrentDirectory() string
+ 	CommonSourceDirectory() string
+ 	IsEmitBlocked(file string) bool
++	PnpApi() *pnp.PnpApi
+ }
+ 
+ var _ EmitHost = (*emitHost)(nil)
+@@ -108,11 +110,12 @@ func (host *emitHost) Options() *core.CompilerOptions { return host.program.Opti
+ func (host *emitHost) SourceFiles() []*ast.SourceFile { return host.program.SourceFiles() }
+ func (host *emitHost) GetCurrentDirectory() string    { return host.program.GetCurrentDirectory() }
+ func (host *emitHost) CommonSourceDirectory() string  { return host.program.CommonSourceDirectory() }
+-
+ func (host *emitHost) UseCaseSensitiveFileNames() bool {
+ 	return host.program.UseCaseSensitiveFileNames()
+ }
+ 
++func (host *emitHost) PnpApi() *pnp.PnpApi { return host.program.PnpApi() }
++
+ func (host *emitHost) IsEmitBlocked(file string) bool {
+ 	return host.program.IsEmitBlocked(file)
+ }
+diff --git a/internal/compiler/host.go b/internal/compiler/host.go
+index 17751307f..6f77887a1 100644
+--- a/internal/compiler/host.go
++++ b/internal/compiler/host.go
+@@ -5,6 +5,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
+ 	"github.com/microsoft/typescript-go/internal/parser"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+@@ -18,6 +19,7 @@ type CompilerHost interface {
+ 	Trace(msg *diagnostics.Message, args ...any)
+ 	GetSourceFile(opts ast.SourceFileParseOptions) *ast.SourceFile
+ 	GetResolvedProjectReference(fileName string, path tspath.Path) *tsoptions.ParsedCommandLine
++	PnpApi() *pnp.PnpApi
+ }
+ 
+ var _ CompilerHost = (*compilerHost)(nil)
+@@ -27,6 +29,7 @@ type compilerHost struct {
+ 	fs                  vfs.FS
+ 	defaultLibraryPath  string
+ 	extendedConfigCache tsoptions.ExtendedConfigCache
++	pnpApi              *pnp.PnpApi
+ 	trace               func(msg *diagnostics.Message, args ...any)
+ }
+ 
+@@ -35,9 +38,10 @@ func NewCachedFSCompilerHost(
+ 	fs vfs.FS,
+ 	defaultLibraryPath string,
+ 	extendedConfigCache tsoptions.ExtendedConfigCache,
++	pnpApi *pnp.PnpApi,
+ 	trace func(msg *diagnostics.Message, args ...any),
+ ) CompilerHost {
+-	return NewCompilerHost(currentDirectory, cachedvfs.From(fs), defaultLibraryPath, extendedConfigCache, trace)
++	return NewCompilerHost(currentDirectory, cachedvfs.From(fs), defaultLibraryPath, extendedConfigCache, pnpApi, trace)
+ }
+ 
+ func NewCompilerHost(
+@@ -45,17 +49,20 @@ func NewCompilerHost(
+ 	fs vfs.FS,
+ 	defaultLibraryPath string,
+ 	extendedConfigCache tsoptions.ExtendedConfigCache,
++	pnpApi *pnp.PnpApi,
+ 	trace func(msg *diagnostics.Message, args ...any),
+ ) CompilerHost {
+ 	if trace == nil {
+ 		trace = func(msg *diagnostics.Message, args ...any) {}
+ 	}
++
+ 	return &compilerHost{
+ 		currentDirectory:    currentDirectory,
+ 		fs:                  fs,
+ 		defaultLibraryPath:  defaultLibraryPath,
+ 		extendedConfigCache: extendedConfigCache,
+ 		trace:               trace,
++		pnpApi:              pnpApi,
+ 	}
+ }
+ 
+@@ -71,6 +78,10 @@ func (h *compilerHost) GetCurrentDirectory() string {
+ 	return h.currentDirectory
+ }
+ 
++func (h *compilerHost) PnpApi() *pnp.PnpApi {
++	return h.pnpApi
++}
++
+ func (h *compilerHost) Trace(msg *diagnostics.Message, args ...any) {
+ 	h.trace(msg, args...)
+ }
+diff --git a/internal/compiler/program.go b/internal/compiler/program.go
+index 4a6b6e253..8fda13ae7 100644
+--- a/internal/compiler/program.go
++++ b/internal/compiler/program.go
+@@ -23,6 +23,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/outputpaths"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
+ 	"github.com/microsoft/typescript-go/internal/parser"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/printer"
+ 	"github.com/microsoft/typescript-go/internal/scanner"
+ 	"github.com/microsoft/typescript-go/internal/sourcemap"
+@@ -128,6 +129,11 @@ func (p *Program) GetCurrentDirectory() string {
+ 	return p.Host().GetCurrentDirectory()
+ }
+ 
++// PnpApi implements checker.Program.
++func (p *Program) PnpApi() *pnp.PnpApi {
++	return p.Host().PnpApi()
++}
++
+ // GetGlobalTypingsCacheLocation implements checker.Program.
+ func (p *Program) GetGlobalTypingsCacheLocation() string {
+ 	return p.opts.TypingsLocation
+diff --git a/internal/compiler/projectreferencedtsfakinghost.go b/internal/compiler/projectreferencedtsfakinghost.go
+index 8cbcda0ac..663d450b4 100644
+--- a/internal/compiler/projectreferencedtsfakinghost.go
++++ b/internal/compiler/projectreferencedtsfakinghost.go
+@@ -7,6 +7,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/collections"
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/module"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/symlinks"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+@@ -43,6 +44,11 @@ func (h *projectReferenceDtsFakingHost) GetCurrentDirectory() string {
+ 	return h.host.GetCurrentDirectory()
+ }
+ 
++// PnpApi implements module.ResolutionHost.
++func (h *projectReferenceDtsFakingHost) PnpApi() *pnp.PnpApi {
++	return h.host.PnpApi()
++}
++
+ type projectReferenceDtsFakingVfs struct {
+ 	projectReferenceFileMapper *projectReferenceFileMapper
+ 	dtsDirectories             collections.Set[tspath.Path]
+diff --git a/internal/core/compileroptions.go b/internal/core/compileroptions.go
+index e60d85a29..21c2c69d9 100644
+--- a/internal/core/compileroptions.go
++++ b/internal/core/compileroptions.go
+@@ -300,6 +300,13 @@ func (options *CompilerOptions) GetEffectiveTypeRoots(currentDirectory string) (
+ 	if options.TypeRoots != nil {
+ 		return options.TypeRoots, true
+ 	}
++	baseDir := options.GetBaseDirFromOptions(currentDirectory)
++
++	nmTypes, nmFromConfig := options.GetNodeModulesTypeRoots(baseDir)
++	return nmTypes, nmFromConfig
++}
++
++func (options *CompilerOptions) GetBaseDirFromOptions(currentDirectory string) string {
+ 	var baseDir string
+ 	if options.ConfigFilePath != "" {
+ 		baseDir = tspath.GetDirectoryPath(options.ConfigFilePath)
+@@ -311,7 +318,10 @@ func (options *CompilerOptions) GetEffectiveTypeRoots(currentDirectory string) (
+ 			panic("cannot get effective type roots without a config file path or current directory")
+ 		}
+ 	}
++	return baseDir
++}
+ 
++func (options *CompilerOptions) GetNodeModulesTypeRoots(baseDir string) (result []string, fromConfig bool) {
+ 	typeRoots := make([]string, 0, strings.Count(baseDir, "/"))
+ 	tspath.ForEachAncestorDirectory(baseDir, func(dir string) (any, bool) {
+ 		typeRoots = append(typeRoots, tspath.CombinePaths(dir, "node_modules", "@types"))
+diff --git a/internal/diagnostics/diagnostics_generated.go b/internal/diagnostics/diagnostics_generated.go
+index d166cf18e..ce67bbbe2 100644
+--- a/internal/diagnostics/diagnostics_generated.go
++++ b/internal/diagnostics/diagnostics_generated.go
+@@ -4308,6 +4308,22 @@ var Remove_Unused_Imports = &Message{code: 100017, category: CategoryMessage, ke
+ 
+ var Sort_Imports = &Message{code: 100018, category: CategoryMessage, key: "Sort_Imports_100018", text: "Sort Imports"}
+ 
++var Your_application_tried_to_access_0_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_running_inside_a_non_Node_resolution_context_where_such_builtins_are_ignored_Since_0_isn_t_otherwise_declared_in_your_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_0_1_Required_by_Colon_2 = &Message{code: 110001, category: CategoryError, key: "Your_application_tried_to_access_0_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_r_110001", text: "Your application tried to access '{0}'. While this module is usually interpreted as a Node builtin, your resolver is running inside a non-Node resolution context where such builtins are ignored. Since '{0}' isn't otherwise declared in your dependencies, this makes the require call ambiguous and unsound.\n\nRequired package: {0}{1}\nRequired by: {2}"}
++
++var X_0_tried_to_access_1_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_running_inside_a_non_Node_resolution_context_where_such_builtins_are_ignored_Since_1_isn_t_otherwise_declared_in_0_s_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_1_2_Required_by_Colon_3 = &Message{code: 110002, category: CategoryError, key: "_0_tried_to_access_1_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_run_110002", text: "{0} tried to access '{1}'. While this module is usually interpreted as a Node builtin, your resolver is running inside a non-Node resolution context where such builtins are ignored. Since '{1}' isn't otherwise declared in {0}'s dependencies, this makes the require call ambiguous and unsound.\n\nRequired package: {1}{2}\nRequired by: {3}"}
++
++var Your_application_tried_to_access_0_but_it_isn_t_declared_in_your_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_0_1_Required_by_Colon_2 = &Message{code: 110003, category: CategoryError, key: "Your_application_tried_to_access_0_but_it_isn_t_declared_in_your_dependencies_this_makes_the_require_110003", text: "Your application tried to access '{0}', but it isn't declared in your dependencies; this makes the require call ambiguous and unsound.\n\nRequired package: {0}{1}\nRequired by: {2}"}
++
++var Your_application_tried_to_access_0_a_peer_dependency_this_isn_t_allowed_as_there_is_no_ancestor_to_satisfy_the_requirement_Use_a_devDependency_if_needed_Required_package_Colon_0_Required_by_Colon_1 = &Message{code: 110004, category: CategoryError, key: "Your_application_tried_to_access_0_a_peer_dependency_this_isn_t_allowed_as_there_is_no_ancestor_to_s_110004", text: "Your application tried to access '{0}' (a peer dependency); this isn't allowed as there is no ancestor to satisfy the requirement. Use a devDependency if needed.\n\nRequired package: {0}\nRequired by: {1}"}
++
++var X_0_tried_to_access_1_a_peer_dependency_but_it_isn_t_provided_by_its_ancestors_Slashyour_application_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_1_Required_by_Colon_2 = &Message{code: 110005, category: CategoryError, key: "_0_tried_to_access_1_a_peer_dependency_but_it_isn_t_provided_by_its_ancestors_Slashyour_application__110005", text: "{0} tried to access '{1}' (a peer dependency) but it isn't provided by its ancestors/your application; this makes the require call ambiguous and unsound.\n\nRequired package: {1}\nRequired by: {2}"}
++
++var X_no_package_found_for_path_0 = &Message{code: 110006, category: CategoryError, key: "no_package_found_for_path_0_110006", text: "no package found for path '{0}'"}
++
++var Empty_specifier_Colon_0 = &Message{code: 110007, category: CategoryError, key: "Empty_specifier_Colon_0_110007", text: "Empty specifier: '{0}'"}
++
++var Invalid_specifier_Colon_0 = &Message{code: 110008, category: CategoryError, key: "Invalid_specifier_Colon_0_110008", text: "Invalid specifier: '{0}'"}
++
+ func keyToMessage(key Key) *Message {
+ 	switch key {
+ 	case "Unterminated_string_literal_1002":
+@@ -8616,6 +8632,22 @@ func keyToMessage(key Key) *Message {
+ 		return Remove_Unused_Imports
+ 	case "Sort_Imports_100018":
+ 		return Sort_Imports
++	case "Your_application_tried_to_access_0_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_r_110001":
++		return Your_application_tried_to_access_0_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_running_inside_a_non_Node_resolution_context_where_such_builtins_are_ignored_Since_0_isn_t_otherwise_declared_in_your_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_0_1_Required_by_Colon_2
++	case "_0_tried_to_access_1_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_run_110002":
++		return X_0_tried_to_access_1_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_running_inside_a_non_Node_resolution_context_where_such_builtins_are_ignored_Since_1_isn_t_otherwise_declared_in_0_s_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_1_2_Required_by_Colon_3
++	case "Your_application_tried_to_access_0_but_it_isn_t_declared_in_your_dependencies_this_makes_the_require_110003":
++		return Your_application_tried_to_access_0_but_it_isn_t_declared_in_your_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_0_1_Required_by_Colon_2
++	case "Your_application_tried_to_access_0_a_peer_dependency_this_isn_t_allowed_as_there_is_no_ancestor_to_s_110004":
++		return Your_application_tried_to_access_0_a_peer_dependency_this_isn_t_allowed_as_there_is_no_ancestor_to_satisfy_the_requirement_Use_a_devDependency_if_needed_Required_package_Colon_0_Required_by_Colon_1
++	case "_0_tried_to_access_1_a_peer_dependency_but_it_isn_t_provided_by_its_ancestors_Slashyour_application__110005":
++		return X_0_tried_to_access_1_a_peer_dependency_but_it_isn_t_provided_by_its_ancestors_Slashyour_application_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_1_Required_by_Colon_2
++	case "no_package_found_for_path_0_110006":
++		return X_no_package_found_for_path_0
++	case "Empty_specifier_Colon_0_110007":
++		return Empty_specifier_Colon_0
++	case "Invalid_specifier_Colon_0_110008":
++		return Invalid_specifier_Colon_0
+ 	default:
+ 		return nil
+ 	}
+diff --git a/internal/diagnostics/extraDiagnosticMessages.json b/internal/diagnostics/extraDiagnosticMessages.json
+index 409b3f1c3..0cfc37330 100644
+--- a/internal/diagnostics/extraDiagnosticMessages.json
++++ b/internal/diagnostics/extraDiagnosticMessages.json
+@@ -39,6 +39,38 @@
+         "category": "Message",
+         "code": 100009
+     },
++    "Your application tried to access '{0}'. While this module is usually interpreted as a Node builtin, your resolver is running inside a non-Node resolution context where such builtins are ignored. Since '{0}' isn't otherwise declared in your dependencies, this makes the require call ambiguous and unsound.\n\nRequired package: {0}{1}\nRequired by: {2}": {
++        "category": "Error",
++        "code": 110001
++    },
++    "{0} tried to access '{1}'. While this module is usually interpreted as a Node builtin, your resolver is running inside a non-Node resolution context where such builtins are ignored. Since '{1}' isn't otherwise declared in {0}'s dependencies, this makes the require call ambiguous and unsound.\n\nRequired package: {1}{2}\nRequired by: {3}": {
++        "category": "Error",
++        "code": 110002
++    },
++    "Your application tried to access '{0}', but it isn't declared in your dependencies; this makes the require call ambiguous and unsound.\n\nRequired package: {0}{1}\nRequired by: {2}": {
++        "category": "Error",
++        "code": 110003
++    },
++    "Your application tried to access '{0}' (a peer dependency); this isn't allowed as there is no ancestor to satisfy the requirement. Use a devDependency if needed.\n\nRequired package: {0}\nRequired by: {1}": {
++        "category": "Error",
++        "code": 110004
++    },
++    "{0} tried to access '{1}' (a peer dependency) but it isn't provided by its ancestors/your application; this makes the require call ambiguous and unsound.\n\nRequired package: {1}\nRequired by: {2}": {
++        "category": "Error",
++        "code": 110005
++    },
++    "no package found for path '{0}'": {
++        "category": "Error",
++        "code": 110006
++    },
++    "Empty specifier: '{0}'": {
++        "category": "Error",
++        "code": 110007
++    },
++    "Invalid specifier: '{0}'": {
++        "category": "Error",
++        "code": 110008
++    },
+     "Non-relative paths are not allowed. Did you forget a leading './'?": {
+         "category": "Error",
+         "code": 5090
+diff --git a/internal/diagnostics/loc_generated.go b/internal/diagnostics/loc_generated.go
+index 80496cb66..f530fd962 100644
+--- a/internal/diagnostics/loc_generated.go
++++ b/internal/diagnostics/loc_generated.go
+@@ -5,11 +5,10 @@ package diagnostics
+ import (
+ 	"compress/gzip"
+ 	_ "embed"
+-	"strings"
+-	"sync"
+-
+ 	"github.com/microsoft/typescript-go/internal/json"
+ 	"golang.org/x/text/language"
++	"strings"
++	"sync"
+ )
+ 
+ var matcher = language.NewMatcher([]language.Tag{
+diff --git a/internal/execute/build/compilerHost.go b/internal/execute/build/compilerHost.go
+index 3004c4cca..ca8e4492f 100644
+--- a/internal/execute/build/compilerHost.go
++++ b/internal/execute/build/compilerHost.go
+@@ -4,6 +4,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/ast"
+ 	"github.com/microsoft/typescript-go/internal/compiler"
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+@@ -28,6 +29,10 @@ func (h *compilerHost) GetCurrentDirectory() string {
+ 	return h.host.GetCurrentDirectory()
+ }
+ 
++func (h *compilerHost) PnpApi() *pnp.PnpApi {
++	return h.host.PnpApi()
++}
++
+ func (h *compilerHost) Trace(msg *diagnostics.Message, args ...any) {
+ 	h.trace(msg, args...)
+ }
+diff --git a/internal/execute/build/host.go b/internal/execute/build/host.go
+index 99563863b..e25b66368 100644
+--- a/internal/execute/build/host.go
++++ b/internal/execute/build/host.go
+@@ -9,6 +9,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
+ 	"github.com/microsoft/typescript-go/internal/execute/incremental"
+ 	"github.com/microsoft/typescript-go/internal/execute/tsc"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+@@ -46,6 +47,10 @@ func (h *host) GetCurrentDirectory() string {
+ 	return h.host.GetCurrentDirectory()
+ }
+ 
++func (h *host) PnpApi() *pnp.PnpApi {
++	return h.host.PnpApi()
++}
++
+ func (h *host) Trace(msg *diagnostics.Message, args ...any) {
+ 	panic("build.Orchestrator.host does not support tracing, use a different host for tracing")
+ }
+diff --git a/internal/execute/build/orchestrator.go b/internal/execute/build/orchestrator.go
+index fc8c5ac3d..5d68ab938 100644
+--- a/internal/execute/build/orchestrator.go
++++ b/internal/execute/build/orchestrator.go
+@@ -390,6 +390,7 @@ func NewOrchestrator(opts Options) *Orchestrator {
+ 			orchestrator.opts.Sys.FS(),
+ 			orchestrator.opts.Sys.DefaultLibraryPath(),
+ 			nil,
++			orchestrator.opts.Sys.PnpApi(),
+ 			nil,
+ 		),
+ 		mTimes: &collections.SyncMap[tspath.Path, time.Time]{},
+diff --git a/internal/execute/tsc.go b/internal/execute/tsc.go
+index 385ceba18..e5d7ee688 100644
+--- a/internal/execute/tsc.go
++++ b/internal/execute/tsc.go
+@@ -289,7 +289,7 @@ func performIncrementalCompilation(
+ 	compileTimes *tsc.CompileTimes,
+ 	testing tsc.CommandLineTesting,
+ ) tsc.CommandLineResult {
+-	host := compiler.NewCachedFSCompilerHost(sys.GetCurrentDirectory(), sys.FS(), sys.DefaultLibraryPath(), extendedConfigCache, getTraceFromSys(sys, config.Locale(), testing))
++	host := compiler.NewCachedFSCompilerHost(sys.GetCurrentDirectory(), sys.FS(), sys.DefaultLibraryPath(), extendedConfigCache, sys.PnpApi(), getTraceFromSys(sys, config.Locale(), testing))
+ 	buildInfoReadStart := sys.Now()
+ 	oldProgram := incremental.ReadBuildInfoProgram(config, incremental.NewBuildInfoReader(host), host)
+ 	compileTimes.BuildInfoReadTime = sys.Now().Sub(buildInfoReadStart)
+@@ -338,7 +338,7 @@ func performCompilation(
+ 	compileTimes *tsc.CompileTimes,
+ 	testing tsc.CommandLineTesting,
+ ) tsc.CommandLineResult {
+-	host := compiler.NewCachedFSCompilerHost(sys.GetCurrentDirectory(), sys.FS(), sys.DefaultLibraryPath(), extendedConfigCache, getTraceFromSys(sys, config.Locale(), testing))
++	host := compiler.NewCachedFSCompilerHost(sys.GetCurrentDirectory(), sys.FS(), sys.DefaultLibraryPath(), extendedConfigCache, sys.PnpApi(), getTraceFromSys(sys, config.Locale(), testing))
+ 
+ 	tr := startTracingIfNeeded(sys, config, testing)
+ 
+diff --git a/internal/execute/tsc/compile.go b/internal/execute/tsc/compile.go
+index 4f69345ef..33160fb73 100644
+--- a/internal/execute/tsc/compile.go
++++ b/internal/execute/tsc/compile.go
+@@ -10,6 +10,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
+ 	"github.com/microsoft/typescript-go/internal/execute/incremental"
+ 	"github.com/microsoft/typescript-go/internal/locale"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+ )
+@@ -23,6 +24,8 @@ type System interface {
+ 	GetWidthOfTerminal() int
+ 	GetEnvironmentVariable(name string) string
+ 
++	PnpApi() *pnp.PnpApi
++
+ 	Now() time.Time
+ 	SinceStart() time.Duration
+ }
+diff --git a/internal/execute/watcher.go b/internal/execute/watcher.go
+index 1502a9aed..4a71eaf8d 100644
+--- a/internal/execute/watcher.go
++++ b/internal/execute/watcher.go
+@@ -108,7 +108,7 @@ func createWatcher(
+ func (w *Watcher) start() {
+ 	w.mu.Lock()
+ 	w.extendedConfigCache = &tsc.ExtendedConfigCache{}
+-	host := compiler.NewCompilerHost(w.sys.GetCurrentDirectory(), w.sys.FS(), w.sys.DefaultLibraryPath(), w.extendedConfigCache, getTraceFromSys(w.sys, w.config.Locale(), w.testing))
++	host := compiler.NewCompilerHost(w.sys.GetCurrentDirectory(), w.sys.FS(), w.sys.DefaultLibraryPath(), w.extendedConfigCache, w.sys.PnpApi(), getTraceFromSys(w.sys, w.config.Locale(), w.testing))
+ 	w.program = incremental.ReadBuildInfoProgram(w.config, incremental.NewBuildInfoReader(host), host)
+ 
+ 	if w.configFileName != "" {
+@@ -152,7 +152,7 @@ func (w *Watcher) doBuild() {
+ 
+ 	cached := cachedvfs.From(w.sys.FS())
+ 	tfs := &trackingvfs.FS{Inner: cached}
+-	innerHost := compiler.NewCompilerHost(w.sys.GetCurrentDirectory(), tfs, w.sys.DefaultLibraryPath(), w.extendedConfigCache, getTraceFromSys(w.sys, w.config.Locale(), w.testing))
++	innerHost := compiler.NewCompilerHost(w.sys.GetCurrentDirectory(), tfs, w.sys.DefaultLibraryPath(), w.extendedConfigCache, w.sys.PnpApi(), getTraceFromSys(w.sys, w.config.Locale(), w.testing))
+ 	host := &watchCompilerHost{CompilerHost: innerHost, cache: w.sourceFileCache}
+ 
+ 	var wildcardDirs map[string]bool
+diff --git a/internal/ls/autoimport/aliasresolver.go b/internal/ls/autoimport/aliasresolver.go
+index e34b62822..2f547654c 100644
+--- a/internal/ls/autoimport/aliasresolver.go
++++ b/internal/ls/autoimport/aliasresolver.go
+@@ -8,6 +8,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/module"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/symlinks"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+@@ -229,6 +230,11 @@ func (r *aliasResolver) SourceFileMayBeEmitted(sourceFile *ast.SourceFile, force
+ 	panic("unimplemented")
+ }
+ 
++// PnpApi implements checker.Program.
++func (r *aliasResolver) PnpApi() *pnp.PnpApi {
++	panic("unimplemented")
++}
++
+ func (r *aliasResolver) GetPackagesMap() map[string]bool {
+ 	return nil
+ }
+diff --git a/internal/ls/autoimport/registry.go b/internal/ls/autoimport/registry.go
+index e34802922..068c7a28a 100644
+--- a/internal/ls/autoimport/registry.go
++++ b/internal/ls/autoimport/registry.go
+@@ -20,6 +20,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/lsp/lsproto"
+ 	"github.com/microsoft/typescript-go/internal/module"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project/dirty"
+ 	"github.com/microsoft/typescript-go/internal/project/logging"
+ 	"github.com/microsoft/typescript-go/internal/symlinks"
+@@ -495,6 +496,7 @@ type RegistryChange struct {
+ type RegistryCloneHost interface {
+ 	module.ResolutionHost
+ 	FS() vfs.FS
++	PnpApi() *pnp.PnpApi
+ 	GetDefaultProject(path tspath.Path) (tspath.Path, *compiler.Program)
+ 	GetProgramForProject(projectPath tspath.Path) *compiler.Program
+ 	GetPackageJson(fileName string) *packagejson.InfoCacheEntry
+@@ -1253,9 +1255,18 @@ func (b *registryBuilder) buildProjectBucket(
+ 			skippedFileCount++
+ 			continue
+ 		}
+-		// Skip all node_modules files - they are always handled by node_modules buckets.
+-		// This simplifies the logic and ensures exports are indexed consistently.
+-		if strings.Contains(file.FileName(), "/node_modules/") {
++
++		// If pnp is available, node_modules buckets won't be built as all packages are located in `.yarn/cache`
++		// This is why we need to handle all files, except the ones that are not importable in the project
++		pnpApi := b.host.PnpApi()
++		if pnpApi != nil {
++			if !pnpApi.IsImportable(string(projectPath), file.FileName()) {
++				continue
++			}
++
++			// Skip all node_modules files - they are always handled by node_modules buckets.
++			// This simplifies the logic and ensures exports are indexed consistently.
++		} else if strings.Contains(file.FileName(), "/node_modules/") {
+ 			continue
+ 		}
+ 		// Skip files that are realpaths of symlinks in node_modules.
+diff --git a/internal/ls/autoimport/util.go b/internal/ls/autoimport/util.go
+index d8300a3c0..80e46d75a 100644
+--- a/internal/ls/autoimport/util.go
++++ b/internal/ls/autoimport/util.go
+@@ -16,6 +16,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/module"
+ 	"github.com/microsoft/typescript-go/internal/modulespecifiers"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+ 	"github.com/microsoft/typescript-go/internal/vfs/wrapvfs"
+@@ -302,6 +303,7 @@ func getPackageRealpathFuncs(fs vfs.FS, packageDir string) (toRealpath, toSymlin
+ type resolutionHost struct {
+ 	fs               vfs.FS
+ 	currentDirectory string
++	pnpApi           *pnp.PnpApi
+ }
+ 
+ var _ module.ResolutionHost = (*resolutionHost)(nil)
+@@ -314,10 +316,15 @@ func (rh *resolutionHost) FS() vfs.FS {
+ 	return rh.fs
+ }
+ 
++func (rh *resolutionHost) PnpApi() *pnp.PnpApi {
++	return rh.pnpApi
++}
++
+ func getModuleResolver(host RegistryCloneHost, realpath func(string) string, opts module.ResolverOptions) *module.Resolver {
+ 	rh := &resolutionHost{
+ 		fs:               wrapvfs.Wrap(host.FS(), wrapvfs.Replacements{Realpath: realpath}),
+ 		currentDirectory: host.GetCurrentDirectory(),
++		pnpApi:           host.PnpApi(),
+ 	}
+ 	return module.NewResolverWithOptions(rh, core.EmptyCompilerOptions, "", "", opts)
+ }
+diff --git a/internal/ls/host.go b/internal/ls/host.go
+index 847e63563..5c7cb3a23 100644
+--- a/internal/ls/host.go
++++ b/internal/ls/host.go
+@@ -4,10 +4,12 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/ls/autoimport"
+ 	"github.com/microsoft/typescript-go/internal/ls/lsconv"
+ 	"github.com/microsoft/typescript-go/internal/ls/lsutil"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/sourcemap"
+ )
+ 
+ type Host interface {
++	PnpApi() *pnp.PnpApi
+ 	UseCaseSensitiveFileNames() bool
+ 	ReadFile(path string) (contents string, ok bool)
+ 	Converters() *lsconv.Converters
+diff --git a/internal/ls/lsconv/converters.go b/internal/ls/lsconv/converters.go
+index 0ff39bea1..1d4d0ae02 100644
+--- a/internal/ls/lsconv/converters.go
++++ b/internal/ls/lsconv/converters.go
+@@ -138,7 +138,14 @@ func FileNameToDocumentURI(fileName string) lsproto.DocumentUri {
+ 		parts[i] = extraEscapeReplacer.Replace(url.PathEscape(part))
+ 	}
+ 
+-	return lsproto.DocumentUri("file://" + volume + strings.Join(parts, "/"))
++	var prefix string
++	if tspath.IsZipPath(fileName) {
++		prefix = "zip:"
++	} else {
++		prefix = "file:"
++	}
++
++	return lsproto.DocumentUri(prefix + "//" + volume + strings.Join(parts, "/"))
+ }
+ 
+ func (c *Converters) LineAndCharacterToPosition(script Script, lineAndCharacter lsproto.Position) core.TextPos {
+diff --git a/internal/ls/string_completions.go b/internal/ls/string_completions.go
+index f5240bcf3..cb61d1dd0 100644
+--- a/internal/ls/string_completions.go
++++ b/internal/ls/string_completions.go
+@@ -583,6 +583,8 @@ func (l *LanguageService) getStringLiteralCompletionsFromModuleNames(
+ 	program *compiler.Program,
+ 	checker *checker.Checker,
+ ) *stringLiteralCompletions {
++	// !!! needs `getModeForUsageLocationWorker`
++	// TODO investigate if we will need to update this for pnp
+ 	nameAndKinds := l.getStringLiteralCompletionsFromModuleNamesWorker(
+ 		file,
+ 		node,
+diff --git a/internal/lsp/lsproto/lsp.go b/internal/lsp/lsproto/lsp.go
+index 60c4b4477..efde069fa 100644
+--- a/internal/lsp/lsproto/lsp.go
++++ b/internal/lsp/lsproto/lsp.go
+@@ -20,7 +20,7 @@ func (uri DocumentUri) FileName() string {
+ 	if bundled.IsBundled(string(uri)) {
+ 		return string(uri)
+ 	}
+-	if strings.HasPrefix(string(uri), "file://") {
++	if strings.HasPrefix(string(uri), "file://") || strings.HasPrefix(string(uri), "zip:") {
+ 		parsed, err := url.Parse(string(uri))
+ 		if err != nil {
+ 			panic(fmt.Sprintf("invalid file URI: %s", uri))
+diff --git a/internal/module/resolver.go b/internal/module/resolver.go
+index cad204f5b..dd4851b80 100644
+--- a/internal/module/resolver.go
++++ b/internal/module/resolver.go
+@@ -12,6 +12,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/stringutil"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs/vfsmatch"
+@@ -246,6 +247,9 @@ func (r *Resolver) ResolveTypeReferenceDirective(
+ 	compilerOptions := GetCompilerOptionsWithRedirect(r.compilerOptions, redirectedReference)
+ 
+ 	typeRoots, fromConfig := compilerOptions.GetEffectiveTypeRoots(r.host.GetCurrentDirectory())
++	if pnpApi := r.host.PnpApi(); pnpApi != nil {
++		typeRoots, fromConfig = pnpApi.AppendPnpTypeRoots(typeRoots, r.host.GetCurrentDirectory(), compilerOptions, fromConfig)
++	}
+ 	if traceBuilder != nil {
+ 		traceBuilder.write(diagnostics.Resolving_type_reference_directive_0_containing_file_1_root_directory_2, typeReferenceDirectiveName, containingFile, strings.Join(typeRoots, ","))
+ 		traceBuilder.traceResolutionUsingProjectReference(redirectedReference)
+@@ -575,7 +579,7 @@ func (r *resolutionState) resolveNodeLikeWorker() *ResolvedModule {
+ 		resolved := r.nodeLoadModuleByRelativeName(r.extensions, candidate, true)
+ 		return r.createResolvedModule(
+ 			resolved,
+-			resolved != nil && strings.Contains(resolved.path, "/node_modules/"),
++			r.isExternalLibraryImport(resolved),
+ 		)
+ 	}
+ 	return r.createResolvedModule(nil, false)
+@@ -1007,6 +1011,11 @@ func (r *resolutionState) loadModuleFromNearestNodeModulesDirectory(typesScopeOn
+ }
+ 
+ func (r *resolutionState) loadModuleFromNearestNodeModulesDirectoryWorker(ext extensions, mode core.ResolutionMode, typesScopeOnly bool) *resolved {
++	if r.resolver.host.PnpApi() != nil {
++		// !!! stop at global cache
++		return r.loadModuleFromImmediateNodeModulesDirectoryPnP(ext, r.containingDirectory, typesScopeOnly)
++	}
++
+ 	result, _ := tspath.ForEachAncestorDirectory(
+ 		r.containingDirectory,
+ 		func(directory string) (result *resolved, stop bool) {
+@@ -1050,6 +1059,48 @@ func (r *resolutionState) loadModuleFromImmediateNodeModulesDirectory(extensions
+ 	return continueSearching()
+ }
+ 
++/*
++With Plug and Play, we directly resolve the path of the moduleName using the PnP API, instead of searching for it in the node_modules directory
++
++See github.com/microsoft/typescript-go/internal/pnp package for more details
++*/
++func (r *resolutionState) loadModuleFromImmediateNodeModulesDirectoryPnP(extensions extensions, directory string, typesScopeOnly bool) *resolved {
++	if !typesScopeOnly {
++		if packageResult := r.loadModuleFromPnpResolution(extensions, r.name, directory); !packageResult.shouldContinueSearching() {
++			return packageResult
++		}
++	}
++
++	if extensions&extensionsDeclaration != 0 {
++		result := r.loadModuleFromPnpResolution(extensionsDeclaration, "@types/"+r.mangleScopedPackageName(r.name), directory)
++
++		return result
++	}
++
++	return nil
++}
++
++func (r *resolutionState) loadModuleFromPnpResolution(ext extensions, moduleName string, issuer string) *resolved {
++	pnpApi := r.resolver.host.PnpApi()
++
++	if pnpApi != nil {
++		packageName, rest := ParsePackageName(moduleName)
++		packageDirectory, err := pnpApi.ResolveToUnqualified(packageName, issuer)
++		if err != nil {
++			if r.tracer != nil {
++				r.tracer.write(err.Message, err.Args...)
++			}
++			return nil
++		}
++		if packageDirectory != "" {
++			candidate := tspath.NormalizePath(tspath.CombinePaths(packageDirectory, rest))
++			return r.loadModuleFromSpecificNodeModulesDirectoryImpl(ext, candidate, rest, packageDirectory)
++		}
++	}
++
++	return nil
++}
++
+ func (r *resolutionState) loadModuleFromSpecificNodeModulesDirectory(ext extensions, moduleName string, nodeModulesDirectory string) *resolved {
+ 	// Strip any trailing directory separator so that imports like `pkg/` and `pkg`
+ 	// produce identical `candidate` and `packageDirectory` strings. Otherwise the
+@@ -1073,6 +1124,10 @@ func (r *resolutionState) loadModuleFromSpecificNodeModulesDirectory(ext extensi
+ 		return continueSearching()
+ 	}
+ 
++	return r.loadModuleFromSpecificNodeModulesDirectoryImpl(ext, candidate, rest, packageDirectory)
++}
++
++func (r *resolutionState) loadModuleFromSpecificNodeModulesDirectoryImpl(ext extensions, candidate string, rest string, packageDirectory string) *resolved {
+ 	var rootPackageInfo *packagejson.InfoCacheEntry
+ 	// First look for a nested package.json, as in `node_modules/foo/bar/package.json`
+ 	packageInfo := r.getPackageJsonInfo(candidate)
+@@ -1151,7 +1206,8 @@ func (r *resolutionState) loadModuleFromSpecificNodeModulesDirectory(ext extensi
+ }
+ 
+ func (r *resolutionState) createResolvedModuleHandlingSymlink(resolved *resolved) *ResolvedModule {
+-	isExternalLibraryImport := resolved != nil && strings.Contains(resolved.path, "/node_modules/")
++	isExternalLibraryImport := r.isExternalLibraryImport(resolved)
++
+ 	if r.compilerOptions.PreserveSymlinks != core.TSTrue &&
+ 		isExternalLibraryImport &&
+ 		resolved.originalPath == "" &&
+@@ -1191,7 +1247,8 @@ func (r *resolutionState) createResolvedTypeReferenceDirective(resolved *resolve
+ 		resolvedTypeReferenceDirective.ResolvedFileName = resolved.path
+ 		resolvedTypeReferenceDirective.Primary = primary
+ 		resolvedTypeReferenceDirective.PackageId = resolved.packageId
+-		resolvedTypeReferenceDirective.IsExternalLibraryImport = strings.Contains(resolved.path, "/node_modules/")
++
++		resolvedTypeReferenceDirective.IsExternalLibraryImport = r.isExternalLibraryImport(resolved)
+ 
+ 		if r.compilerOptions.PreserveSymlinks != core.TSTrue {
+ 			originalPath, resolvedFileName := r.getOriginalAndResolvedFileName(resolved.path)
+@@ -1840,8 +1897,26 @@ func (r *resolutionState) readPackageJsonPeerDependencies(packageJsonInfo *packa
+ 	names := slices.AppendSeq(make([]string, 0, len(peerDependencies.Value)), maps.Keys(peerDependencies.Value))
+ 	slices.Sort(names)
+ 	builder := strings.Builder{}
++	pnpApi := r.resolver.host.PnpApi()
+ 	for _, name := range names {
+-		peerPackageJson := r.getPackageJsonInfo(nodeModules + name)
++		var peerDependencyPath string
++
++		if pnpApi != nil {
++			var err *pnp.PnpError
++			peerDependencyPath, err = pnpApi.ResolveToUnqualified(name, packageDirectory)
++			if err != nil {
++				if r.tracer != nil {
++					r.tracer.write(err.Message, err.Args...)
++				}
++				continue
++			}
++		}
++
++		if peerDependencyPath == "" {
++			peerDependencyPath = nodeModules + name
++		}
++
++		peerPackageJson := r.getPackageJsonInfo(peerDependencyPath)
+ 		if peerPackageJson != nil {
+ 			version := peerPackageJson.Contents.Version.Value
+ 			builder.WriteString("+")
+@@ -1908,6 +1983,21 @@ func (r *resolutionState) conditionMatches(condition string) bool {
+ 	return IsApplicableVersionedTypesKey(condition)
+ }
+ 
++func (r *resolutionState) isExternalLibraryImport(resolved *resolved) bool {
++	if resolved == nil {
++		return false
++	}
++
++	isExternalLibraryImport := strings.Contains(resolved.path, "/node_modules/")
++
++	pnpApi := r.resolver.host.PnpApi()
++	if pnpApi != nil && !isExternalLibraryImport {
++		isExternalLibraryImport = pnpApi.IsInPnpModule(resolved.path, r.containingDirectory)
++	}
++
++	return isExternalLibraryImport
++}
++
+ func (r *resolutionState) getTraceFunc() func(m *diagnostics.Message, args ...any) {
+ 	if r.tracer != nil {
+ 		return r.tracer.write
+@@ -2083,6 +2173,9 @@ func GetAutomaticTypeDirectiveNames(options *core.CompilerOptions, host Resoluti
+ 	// Walk the primary type lookup locations
+ 	var wildcardMatches []string
+ 	typeRoots, _ := options.GetEffectiveTypeRoots(host.GetCurrentDirectory())
++	if pnpApi := host.PnpApi(); pnpApi != nil {
++		typeRoots, _ = pnpApi.AppendPnpTypeRoots(typeRoots, host.GetCurrentDirectory(), options, false)
++	}
+ 	for _, root := range typeRoots {
+ 		if host.FS().DirectoryExists(root) {
+ 			for _, typeDirectivePath := range host.FS().GetAccessibleEntries(root).Directories {
+diff --git a/internal/module/types.go b/internal/module/types.go
+index 32d185302..3671497d1 100644
+--- a/internal/module/types.go
++++ b/internal/module/types.go
+@@ -7,6 +7,7 @@ import (
+ 
+ 	"github.com/microsoft/typescript-go/internal/ast"
+ 	"github.com/microsoft/typescript-go/internal/core"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+ )
+@@ -14,6 +15,7 @@ import (
+ type ResolutionHost interface {
+ 	FS() vfs.FS
+ 	GetCurrentDirectory() string
++	PnpApi() *pnp.PnpApi
+ }
+ 
+ type ModeAwareCacheKey struct {
+diff --git a/internal/modulespecifiers/specifiers.go b/internal/modulespecifiers/specifiers.go
+index 61b6ce97e..509f32813 100644
+--- a/internal/modulespecifiers/specifiers.go
++++ b/internal/modulespecifiers/specifiers.go
+@@ -285,9 +285,14 @@ func GetEachFileNameOfModule(
+ 	if !preferSymlinks {
+ 		for _, p := range targets {
+ 			if !(shouldFilterIgnoredPaths && containsIgnoredPath(p)) {
++				IsInNodeModules := ContainsNodeModules(p)
++				if pnpApi := host.PnpApi(); pnpApi != nil {
++					IsInNodeModules = IsInNodeModules || pnpApi.IsInPnpModule(p, importingFileName)
++				}
++
+ 				results = append(results, ModulePath{
+ 					FileName:        p,
+-					IsInNodeModules: ContainsNodeModules(p),
++					IsInNodeModules: IsInNodeModules,
+ 					IsRedirect:      referenceRedirect == p,
+ 				})
+ 			}
+@@ -344,9 +349,14 @@ func GetEachFileNameOfModule(
+ 	if preferSymlinks {
+ 		for _, p := range targets {
+ 			if !(shouldFilterIgnoredPaths && containsIgnoredPath(p)) {
++				IsInNodeModules := ContainsNodeModules(p)
++				if pnpApi := host.PnpApi(); pnpApi != nil {
++					IsInNodeModules = IsInNodeModules || pnpApi.IsInPnpModule(p, importingFileName)
++				}
++
+ 				results = append(results, ModulePath{
+ 					FileName:        p,
+-					IsInNodeModules: ContainsNodeModules(p),
++					IsInNodeModules: IsInNodeModules,
+ 					IsRedirect:      referenceRedirect == p,
+ 				})
+ 			}
+@@ -740,6 +750,122 @@ func tryGetModuleNameFromRootDirs(
+ 	return processEnding(shortest, allowedEndings, compilerOptions, host)
+ }
+ 
++// TODO: This code partially duplicates tryGetModuleNameAsNodeModule, is it better to keep it isolated from the node module version or should we merge them?
++func tryGetModuleNameAsPnpPackage(
++	pathObj ModulePath,
++	info Info,
++	importingSourceFile SourceFileForSpecifierGeneration,
++	host ModuleSpecifierGenerationHost,
++	options *core.CompilerOptions,
++	userPreferences UserPreferences,
++	packageNameOnly bool,
++	overrideMode core.ResolutionMode,
++) string {
++	pnpApi := host.PnpApi()
++	if pnpApi == nil {
++		return ""
++	}
++
++	pnpPackageName := ""
++	fromLocator, _ := pnpApi.FindLocator(importingSourceFile.FileName())
++	toLocator, _ := pnpApi.FindLocator(pathObj.FileName)
++	parts := GetNodeModulePathParts(pathObj.FileName)
++
++	if fromLocator != nil && toLocator != nil {
++		// Don't use the package name when the imported file is inside
++		// the source directory (prefer a relative path instead)
++		if *fromLocator == *toLocator {
++			return ""
++		}
++
++		fromInfo := pnpApi.GetPackage(fromLocator)
++
++		for i := range fromInfo.PackageDependencies {
++			dep := fromInfo.PackageDependencies[i]
++			isAlias := dep.IsAlias()
++			if isAlias && dep.AliasName == toLocator.Name && dep.Reference == toLocator.Reference {
++				pnpPackageName = toLocator.Name
++				break
++			} else if dep.Ident == toLocator.Name && dep.Reference == toLocator.Reference {
++				pnpPackageName = toLocator.Name
++				break
++			}
++		}
++
++		if parts == nil {
++			toInfo := pnpApi.GetPackage(toLocator)
++			packageRootAbsolutePath := pnpApi.GetPackageLocationAbsolutePath(toInfo)
++			parts = &NodeModulePathParts{
++				TopLevelNodeModulesIndex: -1,
++				TopLevelPackageNameIndex: -1,
++				PackageRootIndex:         len(packageRootAbsolutePath),
++				FileNameIndex:            strings.LastIndex(pathObj.FileName, "/"),
++			}
++		}
++	}
++
++	// Simplify the full file path to something that can be resolved by Node.
++	preferences := getModuleSpecifierPreferences(userPreferences, host, options, importingSourceFile, "")
++	allowedEndings := preferences.getAllowedEndingsInPreferredOrder(core.ResolutionModeNone)
++
++	moduleSpecifier := pathObj.FileName
++	isPackageRootPath := false
++	if !packageNameOnly {
++		packageRootIndex := parts.PackageRootIndex
++		var moduleFileName string
++		for true {
++			// If the module could be imported by a directory name, use that directory's name
++			pkgJsonResults := tryDirectoryWithPackageJson(
++				*parts,
++				pathObj,
++				importingSourceFile,
++				host,
++				overrideMode,
++				options,
++				allowedEndings,
++				pnpPackageName,
++			)
++			moduleFileToTry := pkgJsonResults.moduleFileToTry
++			packageRootPath := pkgJsonResults.packageRootPath
++			blockedByExports := pkgJsonResults.blockedByExports
++			verbatimFromExports := pkgJsonResults.verbatimFromExports
++			if blockedByExports {
++				return "" // File is under this package.json, but is not publicly exported - there's no way to name it via `node_modules` resolution
++			}
++			if verbatimFromExports {
++				return moduleFileToTry
++			}
++			//}
++			if len(packageRootPath) > 0 {
++				moduleSpecifier = packageRootPath
++				isPackageRootPath = true
++				break
++			}
++			if len(moduleFileName) == 0 {
++				moduleFileName = moduleFileToTry
++			}
++			// try with next level of directory
++			packageRootIndex = core.IndexAfter(pathObj.FileName, "/", packageRootIndex+1)
++			if packageRootIndex == -1 {
++				moduleSpecifier = processEnding(moduleFileName, allowedEndings, options, host)
++				break
++			}
++		}
++	}
++
++	if pathObj.IsRedirect && !isPackageRootPath {
++		return ""
++	}
++
++	// If the module was found in @types, get the actual Node package name
++	nodeModulesDirectoryName := moduleSpecifier[parts.TopLevelPackageNameIndex+1:]
++	if pnpPackageName != "" {
++		nodeModulesDirectoryName = pnpPackageName + moduleSpecifier[parts.PackageRootIndex:]
++	}
++
++	return module.GetPackageNameFromTypesPackageName(nodeModulesDirectoryName)
++}
++
+ func tryGetModuleNameAsNodeModule(
+ 	pathObj ModulePath,
+ 	info Info,
+@@ -750,6 +876,11 @@ func tryGetModuleNameAsNodeModule(
+ 	packageNameOnly bool,
+ 	overrideMode core.ResolutionMode,
+ ) string {
++	pnpModuleName := tryGetModuleNameAsPnpPackage(pathObj, info, importingSourceFile, host, options, userPreferences, packageNameOnly, overrideMode)
++	if pnpModuleName != "" {
++		return pnpModuleName
++	}
++
+ 	parts := GetNodeModulePathParts(pathObj.FileName)
+ 	if parts == nil {
+ 		return ""
+@@ -775,6 +906,7 @@ func tryGetModuleNameAsNodeModule(
+ 				overrideMode,
+ 				options,
+ 				allowedEndings,
++				"",
+ 			)
+ 			moduleFileToTry := pkgJsonResults.moduleFileToTry
+ 			packageRootPath := pkgJsonResults.packageRootPath
+@@ -837,6 +969,7 @@ func tryDirectoryWithPackageJson(
+ 	overrideMode core.ResolutionMode,
+ 	options *core.CompilerOptions,
+ 	allowedEndings []ModuleSpecifierEnding,
++	packageNameOverride string,
+ ) pkgJsonDirAttemptResult {
+ 	rootIdx := parts.PackageRootIndex
+ 	if rootIdx == -1 {
+@@ -868,7 +1001,13 @@ func tryDirectoryWithPackageJson(
+ 		// name in the package.json content via url/filepath dependency specifiers. We need to
+ 		// use the actual directory name, so don't look at `packageJsonContent.name` here.
+ 		nodeModulesDirectoryName := packageRootPath[parts.TopLevelPackageNameIndex+1:]
+-		packageName := module.GetPackageNameFromTypesPackageName(nodeModulesDirectoryName)
++
++		var packageName string
++		if packageNameOverride != "" {
++			packageName = packageNameOverride
++		} else {
++			packageName = module.GetPackageNameFromTypesPackageName(nodeModulesDirectoryName)
++		}
+ 
+ 		// Determine resolution mode for package.json exports condition matching.
+ 		// TypeScript's tryDirectoryWithPackageJson uses the importing file's mode (moduleSpecifiers.ts:1257),
+diff --git a/internal/modulespecifiers/types.go b/internal/modulespecifiers/types.go
+index e164cc15d..053381a46 100644
+--- a/internal/modulespecifiers/types.go
++++ b/internal/modulespecifiers/types.go
+@@ -5,6 +5,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/module"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/symlinks"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+@@ -48,6 +49,8 @@ type ModuleSpecifierGenerationHost interface {
+ 	UseCaseSensitiveFileNames() bool
+ 	GetCurrentDirectory() string
+ 
++	PnpApi() *pnp.PnpApi
++
+ 	GetProjectReferenceFromSource(path tspath.Path) *tsoptions.SourceOutputAndProjectReference
+ 	GetRedirectTargets(path tspath.Path) []string
+ 	GetSourceOfProjectReferenceIfOutputIncluded(file ast.HasFileName) string
+diff --git a/internal/pnp/manifestparser.go b/internal/pnp/manifestparser.go
+new file mode 100644
+index 000000000..283da74ee
+--- /dev/null
++++ b/internal/pnp/manifestparser.go
+@@ -0,0 +1,332 @@
++package pnp
++
++import (
++	"errors"
++	"fmt"
++	"regexp"
++	"strings"
++
++	"github.com/microsoft/typescript-go/internal/json"
++
++	"github.com/microsoft/typescript-go/internal/tspath"
++	"github.com/microsoft/typescript-go/internal/vfs"
++)
++
++var manifestRegex = regexp.MustCompile(`(const[ \r\n]+RAW_RUNTIME_STATE[ \r\n]*=[ \r\n]*|hydrateRuntimeState\(JSON\.parse\()'`)
++
++type LinkType string
++
++const (
++	LinkTypeSoft LinkType = "SOFT"
++	LinkTypeHard LinkType = "HARD"
++)
++
++type PackageDependency struct {
++	Ident     string
++	Reference string // Either the direct reference or alias reference
++	AliasName string // Empty if not an alias
++}
++
++func (pd PackageDependency) IsAlias() bool {
++	return pd.AliasName != ""
++}
++
++type PackageInfo struct {
++	PackageLocation     string              `json:"packageLocation"`
++	PackageDependencies []PackageDependency `json:"packageDependencies,omitempty"`
++	LinkType            LinkType            `json:"linkType,omitempty"`
++	DiscardFromLookup   bool                `json:"discardFromLookup,omitempty"`
++	PackagePeers        []string            `json:"packagePeers,omitempty"`
++}
++
++type Locator struct {
++	Name      string `json:"name"`
++	Reference string `json:"reference"`
++}
++
++type FallbackExclusion struct {
++	Name    string   `json:"name"`
++	Entries []string `json:"entries"`
++}
++
++type PackageTrieData struct {
++	ident     string
++	reference string
++	info      *PackageInfo
++}
++
++type PackageRegistryTrie struct {
++	pathSegment          string
++	childrenPathSegments map[string]*PackageRegistryTrie
++	packageData          *PackageTrieData
++}
++
++type PnpManifestData struct {
++	dirPath string
++
++	ignorePatternData      *regexp.Regexp
++	enableTopLevelFallback bool
++
++	fallbackPool         [][2]string
++	fallbackExclusionMap map[string]*FallbackExclusion
++
++	dependencyTreeRoots []Locator
++
++	// Nested maps for package registry (ident -> reference -> PackageInfo)
++	packageRegistryMap  map[string]map[string]*PackageInfo
++	packageRegistryTrie *PackageRegistryTrie
++}
++
++func parseManifestFromPath(fs vfs.FS, manifestDir string) (*PnpManifestData, error) {
++	pnpDataString := ""
++
++	data, ok := fs.ReadFile(tspath.CombinePaths(manifestDir, ".pnp.data.json"))
++	if ok {
++		pnpDataString = data
++	} else {
++		dataString, err := extractPnpDataStringFromPath(fs, tspath.CombinePaths(manifestDir, ".pnp.cjs"))
++		if err != nil {
++			return nil, err
++		}
++		pnpDataString = dataString
++	}
++
++	return parseManifestFromData(pnpDataString, manifestDir)
++}
++
++func extractPnpDataStringFromPath(fs vfs.FS, path string) (string, error) {
++	pnpScriptString, ok := fs.ReadFile(path)
++	if !ok {
++		return "", errors.New("failed to read file: " + path)
++	}
++	loc := manifestRegex.FindStringIndex(pnpScriptString)
++	if loc == nil {
++		return "", errors.New("we failed to locate the PnP data payload inside its manifest file. Did you manually edit the file?")
++	}
++
++	start := loc[1]
++	var b strings.Builder
++	b.Grow(len(pnpScriptString))
++	for i := start; i < len(pnpScriptString); i++ {
++		if pnpScriptString[i] == '\'' {
++			break
++		}
++
++		if pnpScriptString[i] != '\\' {
++			b.WriteByte(pnpScriptString[i])
++		}
++	}
++	return b.String(), nil
++}
++
++func parseManifestFromData(pnpDataString string, manifestDir string) (*PnpManifestData, error) {
++	var rawData map[string]any
++	if err := json.Unmarshal([]byte(pnpDataString), &rawData); err != nil {
++		return nil, fmt.Errorf("failed to parse JSON PnP data: %w", err)
++	}
++
++	pnpData, err := parsePnpManifest(rawData, manifestDir)
++	if err != nil {
++		return nil, fmt.Errorf("failed to parse PnP data: %w", err)
++	}
++
++	return pnpData, nil
++}
++
++// TODO add error handling for corrupted data
++func parsePnpManifest(rawData map[string]any, manifestDir string) (*PnpManifestData, error) {
++	data := &PnpManifestData{dirPath: manifestDir}
++
++	if roots, ok := rawData["dependencyTreeRoots"].([]any); ok {
++		for _, root := range roots {
++			if rootMap, ok := root.(map[string]any); ok {
++				data.dependencyTreeRoots = append(data.dependencyTreeRoots, Locator{
++					Name:      getField(rootMap, "name", parseString),
++					Reference: getField(rootMap, "reference", parseString),
++				})
++			}
++		}
++	}
++
++	ignorePatternData := getField(rawData, "ignorePatternData", parseString)
++	if ignorePatternData != "" {
++		ignorePatternDataRegexp, err := regexp.Compile(ignorePatternData)
++		// Skipping ignorePatternData if the regex is invalid, which can happen if the regex is not go-compatible
++		if err == nil {
++			data.ignorePatternData = ignorePatternDataRegexp
++		}
++	}
++
++	data.enableTopLevelFallback = getField(rawData, "enableTopLevelFallback", parseBool)
++
++	data.fallbackPool = getField(rawData, "fallbackPool", parseStringPairs)
++
++	data.fallbackExclusionMap = make(map[string]*FallbackExclusion)
++
++	if exclusions, ok := rawData["fallbackExclusionList"].([]any); ok {
++		for _, exclusion := range exclusions {
++			if exclusionArr, ok := exclusion.([]any); ok && len(exclusionArr) == 2 {
++				name := parseString(exclusionArr[0])
++				entries := parseStringArray(exclusionArr[1])
++				exclusionEntry := &FallbackExclusion{
++					Name:    name,
++					Entries: entries,
++				}
++				data.fallbackExclusionMap[exclusionEntry.Name] = exclusionEntry
++			}
++		}
++	}
++
++	data.packageRegistryMap = make(map[string]map[string]*PackageInfo)
++
++	if registryData, ok := rawData["packageRegistryData"].([]any); ok {
++		for _, entry := range registryData {
++			if entryArr, ok := entry.([]any); ok && len(entryArr) == 2 {
++				ident := parseString(entryArr[0])
++
++				if data.packageRegistryMap[ident] == nil {
++					data.packageRegistryMap[ident] = make(map[string]*PackageInfo)
++				}
++
++				if versions, ok := entryArr[1].([]any); ok {
++					for _, version := range versions {
++						if versionArr, ok := version.([]any); ok && len(versionArr) == 2 {
++							reference := parseString(versionArr[0])
++
++							if infoMap, ok := versionArr[1].(map[string]any); ok {
++								packageInfo := &PackageInfo{
++									PackageLocation:     getField(infoMap, "packageLocation", parseString),
++									PackageDependencies: getField(infoMap, "packageDependencies", parsePackageDependencies),
++									LinkType:            LinkType(getField(infoMap, "linkType", parseString)),
++									DiscardFromLookup:   getField(infoMap, "discardFromLookup", parseBool),
++									PackagePeers:        getField(infoMap, "packagePeers", parseStringArray),
++								}
++
++								data.packageRegistryMap[ident][reference] = packageInfo
++								data.addPackageToTrie(ident, reference, packageInfo)
++							}
++						}
++					}
++				}
++			}
++		}
++	}
++
++	return data, nil
++}
++
++func (data *PnpManifestData) addPackageToTrie(ident string, reference string, packageInfo *PackageInfo) {
++	if data.packageRegistryTrie == nil {
++		data.packageRegistryTrie = &PackageRegistryTrie{
++			pathSegment:          "",
++			childrenPathSegments: make(map[string]*PackageRegistryTrie),
++			packageData:          nil,
++		}
++	}
++
++	packageData := &PackageTrieData{
++		ident:     ident,
++		reference: reference,
++		info:      packageInfo,
++	}
++
++	packagePath := tspath.RemoveTrailingDirectorySeparator(packageInfo.PackageLocation)
++	packagePathSegments := strings.Split(packagePath, "/")
++
++	currentTrie := data.packageRegistryTrie
++
++	for _, segment := range packagePathSegments {
++		if currentTrie.childrenPathSegments[segment] == nil {
++			currentTrie.childrenPathSegments[segment] = &PackageRegistryTrie{
++				pathSegment:          segment,
++				childrenPathSegments: make(map[string]*PackageRegistryTrie),
++				packageData:          nil,
++			}
++		}
++
++		currentTrie = currentTrie.childrenPathSegments[segment]
++	}
++
++	currentTrie.packageData = packageData
++}
++
++// Helper functions for parsing JSON values - following patterns from tsoptions.parseString, etc.
++func parseString(value any) string {
++	if str, ok := value.(string); ok {
++		return str
++	}
++	return ""
++}
++
++func parseBool(value any) bool {
++	if val, ok := value.(bool); ok {
++		return val
++	}
++	return false
++}
++
++func parseStringArray(value any) []string {
++	if arr, ok := value.([]any); ok {
++		if arr == nil {
++			return nil
++		}
++		result := make([]string, 0, len(arr))
++		for _, v := range arr {
++			if str, ok := v.(string); ok {
++				result = append(result, str)
++			}
++		}
++		return result
++	}
++	return nil
++}
++
++func parseStringPairs(value any) [][2]string {
++	var result [][2]string
++	if arr, ok := value.([]any); ok {
++		for _, item := range arr {
++			if pair, ok := item.([]any); ok && len(pair) == 2 {
++				result = append(result, [2]string{
++					parseString(pair[0]),
++					parseString(pair[1]),
++				})
++			}
++		}
++	}
++	return result
++}
++
++func parsePackageDependencies(value any) []PackageDependency {
++	var result []PackageDependency
++	if arr, ok := value.([]any); ok {
++		for _, item := range arr {
++			if pair, ok := item.([]any); ok && len(pair) == 2 {
++				ident := parseString(pair[0])
++
++				// Check if second element is string (simple reference) or array (alias)
++				if str, ok := pair[1].(string); ok {
++					result = append(result, PackageDependency{
++						Ident:     ident,
++						Reference: str,
++						AliasName: "",
++					})
++				} else if aliasPair, ok := pair[1].([]any); ok && len(aliasPair) == 2 {
++					result = append(result, PackageDependency{
++						Ident:     ident,
++						Reference: parseString(aliasPair[1]),
++						AliasName: parseString(aliasPair[0]),
++					})
++				}
++			}
++		}
++	}
++	return result
++}
++
++func getField[T any](m map[string]any, key string, parser func(any) T) T {
++	if val, exists := m[key]; exists {
++		return parser(val)
++	}
++	var zero T
++	return zero
++}
+diff --git a/internal/pnp/pnp.go b/internal/pnp/pnp.go
+new file mode 100644
+index 000000000..c1ef2598d
+--- /dev/null
++++ b/internal/pnp/pnp.go
+@@ -0,0 +1,23 @@
++package pnp
++
++import (
++	"strings"
++
++	"github.com/microsoft/typescript-go/internal/vfs"
++)
++
++func InitPnpApi(fs vfs.FS, filePath string) *PnpApi {
++	pnpApi := &PnpApi{fs: fs, url: filePath}
++
++	manifestData, err := pnpApi.findClosestPnpManifest()
++	if err == nil {
++		pnpApi.manifest = manifestData
++		return pnpApi
++	}
++
++	return nil
++}
++
++func IsPnpLoaderFile(path string) bool {
++	return strings.HasSuffix(path, ".pnp.cjs")
++}
+diff --git a/internal/pnp/pnpapi.go b/internal/pnp/pnpapi.go
+new file mode 100644
+index 000000000..0fb2efe30
+--- /dev/null
++++ b/internal/pnp/pnpapi.go
+@@ -0,0 +1,388 @@
++package pnp
++
++/*
++ * Yarn Plug'n'Play (generally referred to as Yarn PnP) is the default installation strategy in modern releases of Yarn.
++ * Yarn PnP generates a single Node.js loader file in place of the typical node_modules folder.
++ * This loader file, named .pnp.cjs, contains all information about your project's dependency tree, informing your tools as to
++ * the location of the packages on the disk and letting them know how to resolve require and import calls.
++ *
++ * The full specification is available at https://yarnpkg.com/advanced/pnp-spec
++ */
++import (
++	"errors"
++	"slices"
++	"strings"
++
++	"github.com/microsoft/typescript-go/internal/core"
++	"github.com/microsoft/typescript-go/internal/diagnostics"
++	"github.com/microsoft/typescript-go/internal/tspath"
++	"github.com/microsoft/typescript-go/internal/vfs"
++)
++
++type PnpApi struct {
++	fs       vfs.FS
++	url      string
++	manifest *PnpManifestData
++}
++
++func isNodeJSBuiltin(name string) bool {
++	return core.NodeCoreModules()[name]
++}
++
++func isDependencyTreeRoot(m *PnpManifestData, loc *Locator) bool {
++	return slices.Contains(m.dependencyTreeRoots, *loc)
++}
++
++func viaSuffix(specifier string, ident string) string {
++	if ident != specifier {
++		return ident + " (via \"" + specifier + "\")"
++	}
++	return ""
++}
++
++// TODO: implement this from yarn sourcecode
++// https://github.com/yarnpkg/berry/blob/master/packages/yarnpkg-pnp/sources/loader/makeApi.ts#L458
++func findBrokenPeerDependencies(specifier string, parent *Locator) []Locator {
++	return []Locator{}
++}
++
++func (p *PnpApi) RefreshManifest() error {
++	var newData *PnpManifestData
++	var err error
++
++	if p.manifest == nil {
++		newData, err = p.findClosestPnpManifest()
++	} else {
++		newData, err = parseManifestFromPath(p.fs, p.manifest.dirPath)
++	}
++
++	if err != nil {
++		return err
++	}
++
++	p.manifest = newData
++	return nil
++}
++
++type PnpError struct {
++	Message *diagnostics.Message
++	Args    []any
++}
++
++func (p *PnpApi) ResolveToUnqualified(specifier string, parentPath string) (string, *PnpError) {
++	if p.manifest == nil {
++		panic("ResolveToUnqualified called with no PnP manifest available")
++	}
++
++	ident, modulePath, err := p.ParseBareIdentifier(specifier)
++	if err != nil {
++		// Skipping resolution
++		return "", err
++	}
++
++	parentLocator, err := p.FindLocator(parentPath)
++	if err != nil || parentLocator == nil {
++		// Skipping resolution
++		return "", err
++	}
++
++	parentPkg := p.GetPackage(parentLocator)
++
++	var referenceOrAlias *PackageDependency
++	for _, dep := range parentPkg.PackageDependencies {
++		if dep.Ident == ident {
++			referenceOrAlias = &dep
++			break
++		}
++	}
++
++	// If not found, try fallback if enabled
++	if referenceOrAlias == nil {
++		if p.manifest.enableTopLevelFallback {
++			excluded := false
++			if exclusion, ok := p.manifest.fallbackExclusionMap[parentLocator.Name]; ok {
++				if slices.Contains(exclusion.Entries, parentLocator.Reference) {
++					excluded = true
++				}
++			}
++			if !excluded {
++				fallback := p.ResolveViaFallback(ident)
++				if fallback != nil {
++					referenceOrAlias = fallback
++				}
++			}
++		}
++	}
++
++	if referenceOrAlias == nil {
++		if isNodeJSBuiltin(specifier) {
++			if isDependencyTreeRoot(p.manifest, parentLocator) {
++				return "", &PnpError{Message: diagnostics.Your_application_tried_to_access_0_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_running_inside_a_non_Node_resolution_context_where_such_builtins_are_ignored_Since_0_isn_t_otherwise_declared_in_your_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_0_1_Required_by_Colon_2, Args: []any{ident, ident, viaSuffix(specifier, ident), parentPath}}
++			}
++			return "", &PnpError{Message: diagnostics.X_0_tried_to_access_1_While_this_module_is_usually_interpreted_as_a_Node_builtin_your_resolver_is_running_inside_a_non_Node_resolution_context_where_such_builtins_are_ignored_Since_1_isn_t_otherwise_declared_in_0_s_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_1_2_Required_by_Colon_3, Args: []any{parentLocator.Name, ident, ident, parentLocator.Name, ident, viaSuffix(specifier, ident), parentPath}}
++		}
++
++		if isDependencyTreeRoot(p.manifest, parentLocator) {
++			return "", &PnpError{Message: diagnostics.Your_application_tried_to_access_0_but_it_isn_t_declared_in_your_dependencies_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_0_1_Required_by_Colon_2, Args: []any{ident, ident, viaSuffix(specifier, ident), parentPath}}
++		}
++
++		brokenAncestors := findBrokenPeerDependencies(specifier, parentLocator)
++		allBrokenAreRoots := len(brokenAncestors) > 0
++		if allBrokenAreRoots {
++			for _, brokenAncestor := range brokenAncestors {
++				if !isDependencyTreeRoot(p.manifest, &brokenAncestor) {
++					allBrokenAreRoots = false
++					break
++				}
++			}
++		}
++
++		if len(brokenAncestors) > 0 && allBrokenAreRoots {
++			return "", &PnpError{Message: diagnostics.Your_application_tried_to_access_0_a_peer_dependency_this_isn_t_allowed_as_there_is_no_ancestor_to_satisfy_the_requirement_Use_a_devDependency_if_needed_Required_package_Colon_0_Required_by_Colon_1, Args: []any{ident, ident, parentPath}}
++		} else {
++			return "", &PnpError{Message: diagnostics.X_0_tried_to_access_1_a_peer_dependency_but_it_isn_t_provided_by_its_ancestors_Slashyour_application_this_makes_the_require_call_ambiguous_and_unsound_Required_package_Colon_1_Required_by_Colon_2, Args: []any{parentLocator.Name, ident, ident, parentPath}}
++		}
++	}
++
++	var dependencyPkg *PackageInfo
++	if referenceOrAlias.IsAlias() {
++		dependencyPkg = p.GetPackage(&Locator{Name: referenceOrAlias.AliasName, Reference: referenceOrAlias.Reference})
++	} else {
++		dependencyPkg = p.GetPackage(&Locator{Name: referenceOrAlias.Ident, Reference: referenceOrAlias.Reference})
++	}
++
++	return tspath.ResolvePath(p.manifest.dirPath, dependencyPkg.PackageLocation, modulePath), nil
++}
++
++func (p *PnpApi) findClosestPnpManifest() (*PnpManifestData, error) {
++	directoryPath := tspath.GetNormalizedAbsolutePath(p.url, "/")
++
++	for {
++		pnpPath := tspath.CombinePaths(directoryPath, ".pnp.cjs")
++		if p.fs.FileExists(pnpPath) {
++			return parseManifestFromPath(p.fs, directoryPath)
++		}
++
++		if tspath.IsDiskPathRoot(directoryPath) {
++			return nil, errors.New("no PnP manifest found")
++		}
++
++		directoryPath = tspath.GetDirectoryPath(directoryPath)
++	}
++}
++
++func (p *PnpApi) GetPackage(locator *Locator) *PackageInfo {
++	packageRegistryMap := p.manifest.packageRegistryMap
++	packageInfo, ok := packageRegistryMap[locator.Name][locator.Reference]
++	if !ok {
++		panic(locator.Name + " should have an entry in the package registry")
++	}
++
++	return packageInfo
++}
++
++func (p *PnpApi) FindLocator(parentPath string) (*Locator, *PnpError) {
++	if parentPath == "" {
++		return nil, nil
++	}
++
++	relativePath := tspath.GetRelativePathFromDirectory(p.manifest.dirPath, parentPath,
++		tspath.ComparePathsOptions{UseCaseSensitiveFileNames: true})
++
++	if p.manifest.ignorePatternData != nil {
++		match := p.manifest.ignorePatternData.MatchString(relativePath)
++
++		if match {
++			return nil, nil
++		}
++	}
++
++	var relativePathWithDot string
++	if strings.HasPrefix(relativePath, "../") {
++		relativePathWithDot = relativePath
++	} else {
++		relativePathWithDot = "./" + relativePath
++	}
++
++	var bestLength int
++	var bestLocator *Locator
++	pathSegments := strings.Split(relativePathWithDot, "/")
++	currentTrie := p.manifest.packageRegistryTrie
++
++	// Go down the trie, looking for the latest defined packageInfo that matches the path
++	for index, segment := range pathSegments {
++		currentTrie = currentTrie.childrenPathSegments[segment]
++
++		if currentTrie == nil || currentTrie.childrenPathSegments == nil {
++			break
++		}
++
++		if currentTrie.packageData != nil && index >= bestLength {
++			bestLength = index
++			bestLocator = &Locator{Name: currentTrie.packageData.ident, Reference: currentTrie.packageData.reference}
++		}
++	}
++
++	if bestLocator == nil {
++		return nil, &PnpError{Message: diagnostics.X_no_package_found_for_path_0, Args: []any{relativePath}}
++	}
++
++	return bestLocator, nil
++}
++
++func (p *PnpApi) ResolveViaFallback(name string) *PackageDependency {
++	topLevelPkg := p.GetPackage(&Locator{Name: "", Reference: ""})
++
++	if topLevelPkg != nil {
++		for _, dep := range topLevelPkg.PackageDependencies {
++			if dep.Ident == name {
++				return &dep
++			}
++		}
++	}
++
++	for _, dep := range p.manifest.fallbackPool {
++		if dep[0] == name {
++			return &PackageDependency{
++				Ident:     dep[0],
++				Reference: dep[1],
++				AliasName: "",
++			}
++		}
++	}
++
++	return nil
++}
++
++func (p *PnpApi) ParseBareIdentifier(specifier string) (ident string, modulePath string, err *PnpError) {
++	if len(specifier) == 0 {
++		return "", "", &PnpError{Message: diagnostics.Empty_specifier_Colon_0, Args: []any{specifier}}
++	}
++
++	firstSlash := strings.Index(specifier, "/")
++
++	if specifier[0] == '@' {
++		if firstSlash == -1 {
++			return "", "", &PnpError{Message: diagnostics.Invalid_specifier_Colon_0, Args: []any{specifier}}
++		}
++
++		secondSlash := strings.Index(specifier[firstSlash+1:], "/")
++
++		if secondSlash == -1 {
++			ident = specifier
++		} else {
++			ident = specifier[:firstSlash+1+secondSlash]
++		}
++	} else {
++		beforeFirstSlash, _, found := strings.Cut(specifier, "/")
++
++		if !found {
++			ident = specifier
++		} else {
++			ident = beforeFirstSlash
++		}
++	}
++
++	modulePath = specifier[len(ident):]
++
++	return ident, modulePath, nil
++}
++
++func (p *PnpApi) GetPnpTypeRoots(currentDirectory string) []string {
++	if p.manifest == nil {
++		return []string{}
++	}
++
++	currentDirectory = tspath.NormalizePath(currentDirectory)
++
++	currentPackage, err := p.FindLocator(currentDirectory)
++	if err != nil {
++		return []string{}
++	}
++
++	if currentPackage == nil {
++		return []string{}
++	}
++
++	packageDependencies := p.GetPackage(currentPackage).PackageDependencies
++
++	typeRoots := []string{}
++	for _, dep := range packageDependencies {
++		if strings.HasPrefix(dep.Ident, "@types/") && dep.Reference != "" {
++			packageInfo := p.GetPackage(&Locator{Name: dep.Ident, Reference: dep.Reference})
++			typeRoots = append(typeRoots, tspath.GetDirectoryPath(
++				tspath.ResolvePath(p.manifest.dirPath, packageInfo.PackageLocation),
++			))
++		}
++	}
++
++	return typeRoots
++}
++
++func (p *PnpApi) IsImportable(fromFileName string, toFileName string) bool {
++	fromLocator, errFromLocator := p.FindLocator(fromFileName)
++	toLocator, errToLocator := p.FindLocator(toFileName)
++
++	if fromLocator == nil || toLocator == nil || errFromLocator != nil || errToLocator != nil {
++		return false
++	}
++
++	fromInfo := p.GetPackage(fromLocator)
++	for _, dep := range fromInfo.PackageDependencies {
++		if dep.Reference == toLocator.Reference {
++			if dep.IsAlias() && dep.AliasName == toLocator.Name {
++				return true
++			}
++
++			if dep.Ident == toLocator.Name {
++				return true
++			}
++		}
++	}
++
++	return false
++}
++
++func (p *PnpApi) GetPackageLocationAbsolutePath(packageInfo *PackageInfo) string {
++	if packageInfo == nil {
++		return ""
++	}
++
++	packageLocation := packageInfo.PackageLocation
++	return tspath.RemoveTrailingDirectorySeparators(tspath.ResolvePath(p.manifest.dirPath, packageLocation))
++}
++
++// Checks if toFileName is in a module defined in the dependencies of fromFileName
++func (p *PnpApi) IsInPnpModule(toFileName string, fromFileName string) bool {
++	fromLocator, _ := p.FindLocator(fromFileName)
++	toLocator, _ := p.FindLocator(toFileName)
++
++	if fromLocator != nil && toLocator != nil && fromLocator.Name != toLocator.Name {
++		fromInfo := p.GetPackage(fromLocator)
++		for _, dep := range fromInfo.PackageDependencies {
++			if dep.Ident == toLocator.Name {
++				return true
++			}
++
++			if dep.IsAlias() && dep.AliasName == toLocator.Name {
++				return true
++			}
++		}
++	}
++	return false
++}
++
++func (p *PnpApi) AppendPnpTypeRoots(nmTypes []string, currentDirectory string, compilerOptions *core.CompilerOptions, nmFromConfig bool) ([]string, bool) {
++	baseDir := compilerOptions.GetBaseDirFromOptions(currentDirectory)
++	pnpTypes := p.GetPnpTypeRoots(baseDir)
++
++	if len(nmTypes) > 0 {
++		return append(nmTypes, pnpTypes...), nmFromConfig
++	}
++
++	if len(pnpTypes) > 0 {
++		return pnpTypes, false
++	}
++
++	return nil, false
++}
+diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
+index 8fb19b5ff..0ff75da9e 100644
+--- a/internal/project/autoimport.go
++++ b/internal/project/autoimport.go
+@@ -8,6 +8,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/compiler"
+ 	"github.com/microsoft/typescript-go/internal/ls/autoimport"
+ 	"github.com/microsoft/typescript-go/internal/packagejson"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+ )
+@@ -69,6 +70,7 @@ type autoImportRegistryCloneHost struct {
+ 	parseCache        *ParseCache
+ 	fs                *sourceFS
+ 	currentDirectory  string
++	pnpApi            *pnp.PnpApi
+ 
+ 	filesMu sync.Mutex
+ 	files   []ParseCacheKey
+@@ -80,6 +82,7 @@ func newAutoImportRegistryCloneHost(
+ 	projectCollection *ProjectCollection,
+ 	parseCache *ParseCache,
+ 	snapshotFSBuilder *SnapshotFSBuilder,
++	pnpApi *pnp.PnpApi,
+ 	currentDirectory string,
+ 	toPath func(fileName string) tspath.Path,
+ ) *autoImportRegistryCloneHost {
+@@ -87,6 +90,7 @@ func newAutoImportRegistryCloneHost(
+ 		projectCollection: projectCollection,
+ 		parseCache:        parseCache,
+ 		fs:                newSourceFS(false, &autoImportBuilderFS{snapshotFSBuilder: snapshotFSBuilder}, toPath),
++		pnpApi:            pnpApi,
+ 		currentDirectory:  currentDirectory,
+ 	}
+ }
+@@ -101,6 +105,11 @@ func (a *autoImportRegistryCloneHost) GetCurrentDirectory() string {
+ 	return a.currentDirectory
+ }
+ 
++// PnpApi implements autoimport.RegistryCloneHost.
++func (a *autoImportRegistryCloneHost) PnpApi() *pnp.PnpApi {
++	return a.pnpApi
++}
++
+ // GetDefaultProject implements autoimport.RegistryCloneHost.
+ func (a *autoImportRegistryCloneHost) GetDefaultProject(path tspath.Path) (tspath.Path, *compiler.Program) {
+ 	project := a.projectCollection.GetDefaultProject(path)
+diff --git a/internal/project/compilerhost.go b/internal/project/compilerhost.go
+index 73e4b4316..fa3eac749 100644
+--- a/internal/project/compilerhost.go
++++ b/internal/project/compilerhost.go
+@@ -5,6 +5,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/compiler"
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
+ 	"github.com/microsoft/typescript-go/internal/locale"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project/logging"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+@@ -18,6 +19,7 @@ type compilerHost struct {
+ 	currentDirectory string
+ 	sessionOptions   *SessionOptions
+ 
++	pnpApi             *pnp.PnpApi
+ 	sourceFS           *sourceFS
+ 	configFileRegistry *ConfigFileRegistry
+ 
+@@ -37,6 +39,7 @@ func newCompilerHost(
+ 		currentDirectory: currentDirectory,
+ 		sessionOptions:   builder.sessionOptions,
+ 
++		pnpApi:   builder.pnpApi,
+ 		sourceFS: newSourceFS(true, builder.fs, builder.toPath),
+ 
+ 		project: project,
+@@ -80,6 +83,11 @@ func (c *compilerHost) GetCurrentDirectory() string {
+ 	return c.currentDirectory
+ }
+ 
++// PnpApi implements compiler.CompilerHost.
++func (c *compilerHost) PnpApi() *pnp.PnpApi {
++	return c.pnpApi
++}
++
+ // GetResolvedProjectReference implements compiler.CompilerHost.
+ func (c *compilerHost) GetResolvedProjectReference(fileName string, path tspath.Path) *tsoptions.ParsedCommandLine {
+ 	if c.builder == nil {
+diff --git a/internal/project/configfileregistrybuilder.go b/internal/project/configfileregistrybuilder.go
+index d1807453d..c76f05af7 100644
+--- a/internal/project/configfileregistrybuilder.go
++++ b/internal/project/configfileregistrybuilder.go
+@@ -8,6 +8,7 @@ import (
+ 
+ 	"github.com/microsoft/typescript-go/internal/collections"
+ 	"github.com/microsoft/typescript-go/internal/core"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project/dirty"
+ 	"github.com/microsoft/typescript-go/internal/project/logging"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+@@ -32,6 +33,8 @@ type ConfigFileRegistryBuilder struct {
+ 	sessionOptions               *SessionOptions
+ 	customConfigFileName         string
+ 
++	pnpApi *pnp.PnpApi
++
+ 	base                        *ConfigFileRegistry
+ 	configs                     *dirty.SyncMap[tspath.Path, *configFileEntry]
+ 	configFileNames             *dirty.Map[tspath.Path, *configFileNames]
+@@ -45,6 +48,7 @@ func NewConfigFileRegistryBuilder(
+ 	extendedConfigCache *ExtendedConfigCache,
+ 	snapshotID uint64,
+ 	sessionOptions *SessionOptions,
++	pnpApi *pnp.PnpApi,
+ 	customConfigFileName string,
+ 	logger *logging.LogTree,
+ ) *ConfigFileRegistryBuilder {
+@@ -55,6 +59,7 @@ func NewConfigFileRegistryBuilder(
+ 		base:                         oldConfigFileRegistry,
+ 		sessionOptions:               sessionOptions,
+ 		extendedConfigCache:          extendedConfigCache,
++		pnpApi:                       pnpApi,
+ 		snapshotID:                   snapshotID,
+ 		customConfigFileName:         customConfigFileName,
+ 		customConfigFileNameChanged:  customConfigFileName != oldConfigFileRegistry.customConfigFileName,
+@@ -705,6 +710,11 @@ func (c *ConfigFileRegistryBuilder) GetCurrentDirectory() string {
+ 	return c.sessionOptions.CurrentDirectory
+ }
+ 
++// PnpApi implements tsoptions.ParseConfigHost.
++func (c *ConfigFileRegistryBuilder) PnpApi() *pnp.PnpApi {
++	return c.pnpApi
++}
++
+ // GetExtendedConfig implements tsoptions.ExtendedConfigCache.
+ func (c *ConfigFileRegistryBuilder) GetExtendedConfig(fileName string, path tspath.Path, resolutionStack []tspath.Path, host tsoptions.ParseConfigHost) *tsoptions.ExtendedConfigCacheEntry {
+ 	var content string
+diff --git a/internal/project/projectcollectionbuilder.go b/internal/project/projectcollectionbuilder.go
+index 4ede4335b..b8a2e88a8 100644
+--- a/internal/project/projectcollectionbuilder.go
++++ b/internal/project/projectcollectionbuilder.go
+@@ -11,6 +11,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/core"
+ 	"github.com/microsoft/typescript-go/internal/diagnostics"
+ 	"github.com/microsoft/typescript-go/internal/lsp/lsproto"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project/dirty"
+ 	"github.com/microsoft/typescript-go/internal/project/logging"
+ 	"github.com/microsoft/typescript-go/internal/tsoptions"
+@@ -34,6 +35,7 @@ type ProjectCollectionBuilder struct {
+ 
+ 	ctx                                context.Context
+ 	fs                                 *SnapshotFSBuilder
++	pnpApi                             *pnp.PnpApi
+ 	base                               *ProjectCollection
+ 	compilerOptionsForInferredProjects *core.CompilerOptions
+ 	ConfigFileRegistryBuilder          *ConfigFileRegistryBuilder
+@@ -56,6 +58,7 @@ func newProjectCollectionBuilder(
+ 	ctx context.Context,
+ 	newSnapshotID uint64,
+ 	fs *SnapshotFSBuilder,
++	pnpApi *pnp.PnpApi,
+ 	oldProjectCollection *ProjectCollection,
+ 	oldConfigFileRegistry *ConfigFileRegistry,
+ 	oldAPIOpenedProjects map[tspath.Path]struct{},
+@@ -69,13 +72,14 @@ func newProjectCollectionBuilder(
+ 	return &ProjectCollectionBuilder{
+ 		ctx:                                ctx,
+ 		fs:                                 fs,
++		pnpApi:                             pnpApi,
+ 		toPath:                             fs.toPath,
+ 		compilerOptionsForInferredProjects: compilerOptionsForInferredProjects,
+ 		sessionOptions:                     sessionOptions,
+ 		parseCache:                         parseCache,
+ 		extendedConfigCache:                extendedConfigCache,
+ 		base:                               oldProjectCollection,
+-		ConfigFileRegistryBuilder:          NewConfigFileRegistryBuilder(lsproto.GetClientCapabilities(ctx).Workspace.DidChangeWatchedFiles.RelativePatternSupport, fs, oldConfigFileRegistry, extendedConfigCache, newSnapshotID, sessionOptions, customConfigFileName, nil),
++		ConfigFileRegistryBuilder:          NewConfigFileRegistryBuilder(lsproto.GetClientCapabilities(ctx).Workspace.DidChangeWatchedFiles.RelativePatternSupport, fs, oldConfigFileRegistry, extendedConfigCache, newSnapshotID, sessionOptions, pnpApi, customConfigFileName, nil),
+ 		newSnapshotID:                      newSnapshotID,
+ 		configuredProjects:                 dirty.NewSyncMap(oldProjectCollection.configuredProjects),
+ 		inferredProject:                    dirty.NewBox(oldProjectCollection.inferredProject),
+diff --git a/internal/project/session.go b/internal/project/session.go
+index 4fb513460..b426171d7 100644
+--- a/internal/project/session.go
++++ b/internal/project/session.go
+@@ -23,6 +23,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/ls/lsconv"
+ 	"github.com/microsoft/typescript-go/internal/ls/lsutil"
+ 	"github.com/microsoft/typescript-go/internal/lsp/lsproto"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project/ata"
+ 	"github.com/microsoft/typescript-go/internal/project/background"
+ 	"github.com/microsoft/typescript-go/internal/project/logging"
+@@ -73,6 +74,7 @@ type SessionInit struct {
+ 	Logger        logging.Logger
+ 	NpmExecutor   ata.NpmExecutor
+ 	ParseCache    *ParseCache
++	PnpApi *pnp.PnpApi
+ }
+ 
+ // Session manages the state of an LSP session. It receives textDocument
+@@ -90,6 +92,7 @@ type Session struct {
+ 	logger        logging.Logger
+ 	npmExecutor   ata.NpmExecutor
+ 	fs            *overlayFS
++	pnpApi        *pnp.PnpApi
+ 
+ 	// parseCache is the ref-counted cache of source files used when
+ 	// creating programs during snapshot cloning.
+@@ -201,6 +204,7 @@ func NewSession(init *SessionInit) *Session {
+ 		logger:              sessionLogger,
+ 		npmExecutor:         init.NpmExecutor,
+ 		fs:                  overlayFS,
++		pnpApi:              init.PnpApi,
+ 		parseCache:          parseCache,
+ 		extendedConfigCache: extendedConfigCache,
+ 		programCounter:      &programCounter{},
+@@ -233,6 +237,7 @@ func NewSession(init *SessionInit) *Session {
+ 				},
+ 			),
+ 			toPath,
++			init.PnpApi,
+ 		),
+ 		initialUserPreferences:   lsutil.NewDefaultUserPreferences(),
+ 		workspaceUserPreferences: lsutil.NewDefaultUserPreferences(),
+@@ -260,6 +265,11 @@ func (s *Session) GetCurrentDirectory() string {
+ 	return s.options.CurrentDirectory
+ }
+ 
++// PnpApi implements module.ResolutionHost
++func (s *Session) PnpApi() *pnp.PnpApi {
++	return s.pnpApi
++}
++
+ // Gets copy of current configuration
+ func (s *Session) Config() lsutil.UserPreferences {
+ 	s.userConfigRWMu.Lock()
+diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
+index 8811afef8..0389267a1 100644
+--- a/internal/project/snapshot.go
++++ b/internal/project/snapshot.go
+@@ -15,6 +15,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/ls/lsconv"
+ 	"github.com/microsoft/typescript-go/internal/ls/lsutil"
+ 	"github.com/microsoft/typescript-go/internal/lsp/lsproto"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/project/ata"
+ 	"github.com/microsoft/typescript-go/internal/project/dirty"
+ 	"github.com/microsoft/typescript-go/internal/project/logging"
+@@ -45,6 +46,8 @@ type Snapshot struct {
+ 
+ 	builderLogs *logging.LogTree
+ 	apiError    error
++
++	pnpApi *pnp.PnpApi
+ }
+ 
+ // NewSnapshot initializes a snapshot with refCount 1.
+@@ -59,6 +62,7 @@ func NewSnapshot(
+ 	autoImports *autoimport.Registry,
+ 	autoImportsWatch *WatchedFiles[map[tspath.Path]string],
+ 	toPath func(fileName string) tspath.Path,
++	pnpApi *pnp.PnpApi,
+ ) *Snapshot {
+ 	s := &Snapshot{
+ 		id: id,
+@@ -70,9 +74,11 @@ func NewSnapshot(
+ 		ConfigFileRegistry:                 configFileRegistry,
+ 		ProjectCollection:                  &ProjectCollection{toPath: toPath, openFiles: openFilePaths(fs.overlays)},
+ 		compilerOptionsForInferredProjects: compilerOptionsForInferredProjects,
+-		userPreferences:                    userPreferences,
+-		AutoImports:                        autoImports,
+-		autoImportsWatch:                   autoImportsWatch,
++
++		userPreferences:  userPreferences,
++		AutoImports:      autoImports,
++		autoImportsWatch: autoImportsWatch,
++		pnpApi:           pnpApi,
+ 	}
+ 	s.refCount.Store(1)
+ 	s.converters = lsconv.NewConverters(s.sessionOptions.PositionEncoding, s.LSPLineMap)
+@@ -132,6 +138,10 @@ func (s *Snapshot) UseCaseSensitiveFileNames() bool {
+ 	return s.fs.fs.UseCaseSensitiveFileNames()
+ }
+ 
++func (s *Snapshot) PnpApi() *pnp.PnpApi {
++	return s.pnpApi
++}
++
+ func (s *Snapshot) ReadFile(fileName string) (string, bool) {
+ 	handle := s.GetFile(fileName)
+ 	if handle == nil {
+@@ -325,6 +335,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 		ctx,
+ 		newSnapshotID,
+ 		fs,
++		session.pnpApi,
+ 		s.ProjectCollection,
+ 		s.ConfigFileRegistry,
+ 		s.ProjectCollection.apiOpenedProjects,
+@@ -414,6 +425,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 		projectCollection,
+ 		session.parseCache,
+ 		fs,
++		session.pnpApi,
+ 		s.sessionOptions.CurrentDirectory,
+ 		s.toPath,
+ 	)
+@@ -454,6 +466,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
+ 		autoImports,
+ 		autoImportsWatch,
+ 		s.toPath,
++		session.pnpApi,
+ 	)
+ 	newSnapshot.parentId = s.id
+ 	newSnapshot.ProjectCollection = projectCollection
+diff --git a/internal/tsoptions/tsconfigparsing.go b/internal/tsoptions/tsconfigparsing.go
+index 39a867f9e..0f20bc3d0 100644
+--- a/internal/tsoptions/tsconfigparsing.go
++++ b/internal/tsoptions/tsconfigparsing.go
+@@ -15,6 +15,7 @@ import (
+ 	"github.com/microsoft/typescript-go/internal/locale"
+ 	"github.com/microsoft/typescript-go/internal/module"
+ 	"github.com/microsoft/typescript-go/internal/parser"
++	"github.com/microsoft/typescript-go/internal/pnp"
+ 	"github.com/microsoft/typescript-go/internal/tspath"
+ 	"github.com/microsoft/typescript-go/internal/vfs"
+ 	"github.com/microsoft/typescript-go/internal/vfs/vfsmatch"
+@@ -726,6 +727,7 @@ func ParseConfigFileTextToJson(fileName string, path tspath.Path, jsonText strin
+ type ParseConfigHost interface {
+ 	FS() vfs.FS
+ 	GetCurrentDirectory() string
++	PnpApi() *pnp.PnpApi
+ }
+ 
+ type resolverHost struct {
+diff --git a/internal/tspath/path.go b/internal/tspath/path.go
+index e128d54d8..f1a9bfa74 100644
+--- a/internal/tspath/path.go
++++ b/internal/tspath/path.go
+@@ -1090,6 +1090,10 @@ func HasExtension(fileName string) bool {
+ 	return strings.Contains(GetBaseFileName(fileName), ".")
+ }
+ 
++func IsZipPath(path string) bool {
++	return strings.Contains(path, ".zip/") || strings.HasSuffix(path, ".zip")
++}
++
+ func SplitVolumePath(path string) (volume string, rest string, ok bool) {
+ 	if len(path) >= 2 && IsVolumeCharacter(path[0]) && path[1] == ':' {
+ 		return strings.ToLower(path[0:2]), path[2:], true
+diff --git a/internal/vfs/cachedvfs/cachedvfs.go b/internal/vfs/cachedvfs/cachedvfs.go
+index e26177f23..7355e0496 100644
+--- a/internal/vfs/cachedvfs/cachedvfs.go
++++ b/internal/vfs/cachedvfs/cachedvfs.go
+@@ -43,6 +43,11 @@ func (fsys *FS) Enable() {
+ 	fsys.enabled.Store(true)
+ }
+ 
++// Some filesystems maintain their own caches that need to be cleared (e.g. pnpvfs's zip reader cache).
++type clearableFS interface {
++	ClearCache() error
++}
++
+ func (fsys *FS) ClearCache() {
+ 	fsys.directoryExistsCache.Clear()
+ 	fsys.fileExistsCache.Clear()
+@@ -50,6 +55,10 @@ func (fsys *FS) ClearCache() {
+ 	fsys.readFileCache.Clear()
+ 	fsys.realpathCache.Clear()
+ 	fsys.statCache.Clear()
++
++	if c, ok := fsys.fs.(clearableFS); ok {
++		_ = c.ClearCache()
++	}
+ }
+ 
+ func (fsys *FS) DirectoryExists(path string) bool {
+diff --git a/internal/vfs/pnpvfs/pnpvfs.go b/internal/vfs/pnpvfs/pnpvfs.go
+new file mode 100644
+index 000000000..e1aafd4c0
+--- /dev/null
++++ b/internal/vfs/pnpvfs/pnpvfs.go
+@@ -0,0 +1,250 @@
++package pnpvfs
++
++import (
++	"archive/zip"
++	"path"
++	"strconv"
++	"strings"
++	"sync"
++	"time"
++
++	"github.com/microsoft/typescript-go/internal/tspath"
++	"github.com/microsoft/typescript-go/internal/vfs"
++	"github.com/microsoft/typescript-go/internal/vfs/iovfs"
++)
++
++type pnpFS struct {
++	fs                  vfs.FS
++	cachedZipReadersMap map[string]*zip.ReadCloser
++	cacheReaderMutex    sync.Mutex
++}
++
++var _ vfs.FS = (*pnpFS)(nil)
++
++func From(fs vfs.FS) vfs.FS {
++	pnpFS := &pnpFS{
++		fs:                  fs,
++		cachedZipReadersMap: make(map[string]*zip.ReadCloser),
++	}
++
++	return pnpFS
++}
++
++func (pnpFS *pnpFS) DirectoryExists(path string) bool {
++	path, _, _ = resolveVirtual(path)
++
++	if strings.HasSuffix(path, ".zip") {
++		return pnpFS.fs.FileExists(path)
++	}
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++
++	return fs.DirectoryExists(formattedPath)
++}
++
++func (pnpFS *pnpFS) FileExists(path string) bool {
++	path, _, _ = resolveVirtual(path)
++
++	if strings.HasSuffix(path, ".zip") {
++		return pnpFS.fs.FileExists(path)
++	}
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++	return fs.FileExists(formattedPath)
++}
++
++func (pnpFS *pnpFS) GetAccessibleEntries(path string) vfs.Entries {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++	return fs.GetAccessibleEntries(formattedPath)
++}
++
++func (pnpFS *pnpFS) ReadFile(path string) (contents string, ok bool) {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++	return fs.ReadFile(formattedPath)
++}
++
++func (pnpFS *pnpFS) Chtimes(path string, mtime time.Time, atime time.Time) error {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++	return fs.Chtimes(formattedPath, mtime, atime)
++}
++
++func (pnpFS *pnpFS) Realpath(path string) string {
++	path, hash, basePath := resolveVirtual(path)
++
++	fs, formattedPath, zipPath := getMatchingFS(pnpFS, path)
++	fullPath := zipPath + fs.Realpath(formattedPath)
++	return makeVirtualPath(basePath, hash, fullPath)
++}
++
++func (pnpFS *pnpFS) Remove(path string) error {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++	return fs.Remove(formattedPath)
++}
++
++func (pnpFS *pnpFS) Stat(path string) vfs.FileInfo {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, _ := getMatchingFS(pnpFS, path)
++	return fs.Stat(formattedPath)
++}
++
++func (pnpFS *pnpFS) UseCaseSensitiveFileNames() bool {
++	// pnp fs is always case sensitive
++	return true
++}
++
++func (pnpFS *pnpFS) WalkDir(root string, walkFn vfs.WalkDirFunc) error {
++	root, hash, basePath := resolveVirtual(root)
++
++	fs, formattedPath, zipPath := getMatchingFS(pnpFS, root)
++	return fs.WalkDir(formattedPath, (func(path string, d vfs.DirEntry, err error) error {
++		fullPath := zipPath + path
++		return walkFn(makeVirtualPath(basePath, hash, fullPath), d, err)
++	}))
++}
++
++func (pnpFS *pnpFS) WriteFile(path string, data string) error {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, zipPath := getMatchingFS(pnpFS, path)
++	if zipPath != "" {
++		panic("cannot write to zip file")
++	}
++
++	return fs.WriteFile(formattedPath, data)
++}
++
++func (pnpFS *pnpFS) AppendFile(path string, data string) error {
++	path, _, _ = resolveVirtual(path)
++
++	fs, formattedPath, zipPath := getMatchingFS(pnpFS, path)
++	if zipPath != "" {
++		panic("cannot append to zip file")
++	}
++
++	return fs.AppendFile(formattedPath, data)
++}
++
++func splitZipPath(path string) (string, string) {
++	parts := strings.Split(path, ".zip/")
++	if len(parts) < 2 {
++		return path, "/"
++	}
++	return parts[0] + ".zip", "/" + parts[1]
++}
++
++func getMatchingFS(pnpFS *pnpFS, path string) (vfs.FS, string, string) {
++	if !tspath.IsZipPath(path) {
++		return pnpFS.fs, path, ""
++	}
++
++	zipPath, internalPath := splitZipPath(path)
++
++	zipStat := pnpFS.fs.Stat(zipPath)
++	if zipStat == nil {
++		return pnpFS.fs, path, ""
++	}
++
++	var usedReader *zip.ReadCloser
++
++	pnpFS.cacheReaderMutex.Lock()
++	defer pnpFS.cacheReaderMutex.Unlock()
++
++	cachedReader, ok := pnpFS.cachedZipReadersMap[zipPath]
++	if ok {
++		usedReader = cachedReader
++	} else {
++		zipReader, err := zip.OpenReader(zipPath)
++		if err != nil {
++			return pnpFS.fs, path, ""
++		}
++
++		usedReader = zipReader
++		pnpFS.cachedZipReadersMap[zipPath] = usedReader
++	}
++
++	return iovfs.From(usedReader /*useCaseSensitiveFileNames, always true for pnpfs*/, true), internalPath, zipPath
++}
++
++// Virtual paths are used to make different paths resolve to the same real file or folder, which is necessary in some cases when PnP is enabled
++// See https://yarnpkg.com/advanced/lexicon#virtual-package and https://yarnpkg.com/advanced/pnpapi#resolvevirtual for more details
++func resolveVirtual(path string) (realPath string, hash string, basePath string) {
++	base, rest, found := strings.Cut(path, "/__virtual__/")
++	if !found {
++		return path, "", ""
++	}
++
++	parts := strings.SplitN(rest, "/", 3)
++	if len(parts) < 3 {
++		// Not enough parts to match the pattern, return as is
++		return path, "", ""
++	}
++	hash = parts[0]
++	subpath := parts[2]
++	depth, err := strconv.Atoi(parts[1])
++	if err != nil || depth < 0 {
++		// Invalid n, return as is
++		return path, "", ""
++	}
++
++	basePath = base + "/__virtual__"
++
++	// Apply dirname n times to base
++	for range depth {
++		base = tspath.GetDirectoryPath(base)
++	}
++	// Join base and subpath
++	if base == "/" {
++		return "/" + subpath, hash, basePath
++	}
++
++	return tspath.CombinePaths(base, subpath), hash, basePath
++}
++
++func makeVirtualPath(basePath string, hash string, targetPath string) string {
++	if basePath == "" || hash == "" {
++		return targetPath
++	}
++
++	relativePath := tspath.GetRelativePathFromDirectory(
++		tspath.GetDirectoryPath(basePath),
++		targetPath,
++		tspath.ComparePathsOptions{UseCaseSensitiveFileNames: true})
++
++	segments := strings.Split(relativePath, "/")
++
++	depth := 0
++	for depth < len(segments) && segments[depth] == ".." {
++		depth++
++	}
++
++	subPath := strings.Join(segments[depth:], "/")
++
++	return path.Join(basePath, hash, strconv.Itoa(depth), subPath)
++}
++
++// TODO: improve the cache clearing system, as somehow the GC is not able to collect all zip readers
++// even when they are all closed and cleared from the map
++func (pnpFS *pnpFS) ClearCache() error {
++	pnpFS.cacheReaderMutex.Lock()
++	defer pnpFS.cacheReaderMutex.Unlock()
++
++	for _, reader := range pnpFS.cachedZipReadersMap {
++		err := reader.Close()
++		if err != nil {
++			return err
++		}
++	}
++
++	pnpFS.cachedZipReadersMap = make(map[string]*zip.ReadCloser)
++
++	return nil
++}
+-- 
+2.50.1 (Apple Git-155)
+
