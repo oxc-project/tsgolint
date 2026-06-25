@@ -132,11 +132,42 @@ func needsSpaceAfterIdentifier(sourceText string, memberExprEnd int) bool {
 	return scanner.IsIdentifierPart(nextRune)
 }
 
-func getFirstDeclaration(symbol *ast.Symbol) *ast.Node {
+// getRelevantDeclaration returns the property declaration whose visibility
+// modifiers should be consulted for the given element-access expression.
+func getRelevantDeclaration(symbol *ast.Symbol, accessNode *ast.Node) *ast.Node {
 	if symbol == nil || len(symbol.Declarations) == 0 {
 		return nil
 	}
-	return symbol.Declarations[0]
+
+	var getter, setter *ast.Node
+	for _, declaration := range symbol.Declarations {
+		switch {
+		case getter == nil && ast.IsGetAccessorDeclaration(declaration):
+			getter = declaration
+		case setter == nil && ast.IsSetAccessorDeclaration(declaration):
+			setter = declaration
+		}
+	}
+
+	if getter == nil && setter == nil {
+		return symbol.Declarations[0]
+	}
+
+	// For a get/set accessor pair, consult the accessor actually involved in the
+	// access: a write (e.g. `obj["x"] = 1`) goes through the setter, while a read
+	// goes through the getter. Always using the first declaration (as a plain
+	// `getDeclarations()[0]` would) reports a false positive when a public getter
+	// is paired with a non-public setter that is being written to.
+	if ast.IsWriteAccess(accessNode) {
+		if setter != nil {
+			return setter
+		}
+		return getter
+	}
+	if getter != nil {
+		return getter
+	}
+	return setter
 }
 
 var DotNotationRule = rule.Rule{
@@ -264,7 +295,7 @@ var DotNotationRule = rule.Rule{
 				}
 			}
 
-			declaration := getFirstDeclaration(propertySymbol)
+			declaration := getRelevantDeclaration(propertySymbol, node)
 			if declaration != nil {
 				if opts.AllowPrivateClassPropertyAccess && ast.HasModifier(declaration, ast.ModifierFlagsPrivate) {
 					return true
