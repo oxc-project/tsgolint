@@ -1,14 +1,14 @@
-From 633e5b93baee4cb244e7f75f1a71b3dcd1c47816 Mon Sep 17 00:00:00 2001
+From 27c7d5e89cdfa87a303dfff2a13d4214b90c8c8a Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
 Subject: [PATCH 1/5] Adapt project service for single run mode
 
 ---
- internal/project/project.go | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ internal/project/project.go | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/internal/project/project.go b/internal/project/project.go
-index 37abaff97..19dac4dfc 100644
+index 39c77aa78..01ec37142 100644
 --- a/internal/project/project.go
 +++ b/internal/project/project.go
 @@ -3,6 +3,7 @@ package project
@@ -16,15 +16,17 @@ index 37abaff97..19dac4dfc 100644
  	"context"
  	"fmt"
 +	"runtime"
+ 	"slices"
  	"strings"
  	"sync"
- 
-@@ -358,7 +359,7 @@ func (p *Project) CreateProgram() CreateProgramResult {
+@@ -358,7 +359,9 @@ func (p *Project) CreateProgram() CreateProgramResult {
  	// the same project never share a captured variable through a stale closure
  	// stored in the old program's options.
  	createCheckerPool := func(program *compiler.Program) compiler.CheckerPool {
--		checkerPool = newCheckerPool(4, program, nil)
-+		checkerPool = newCheckerPool(runtime.GOMAXPROCS(0), program, p.log)
- 		return checkerPool
+-		return newCheckerPool(p.host.sessionOptions.CheckerPoolOptions, program, p.log)
++		opts := p.host.sessionOptions.CheckerPoolOptions
++		opts.MaxCheckers = runtime.GOMAXPROCS(0)
++		return newCheckerPool(opts, program, p.log)
  	}
  
+ 	// Create the command line, potentially augmented with typing files
