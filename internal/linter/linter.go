@@ -462,7 +462,8 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 	logLevel := options.LogLevel
 	program := options.Program
 	files := options.Files
-	workers := options.Workers
+	// Cap workers to prevent excessive goroutine count and GC pressure
+	workers := min(options.Workers, 4)
 	getRulesForFile := options.GetRulesForFile
 	onDiagnostic := options.OnDiagnostic
 	onInternalDiagnostic := options.OnInternalDiagnostic
@@ -501,38 +502,49 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 					ctx.TypeChecker = w.checker
 
 					for file := range w.queue {
-						if logLevel == utils.LogLevelDebug {
-							log.Print(file.FileName())
-						}
-						ctxBuilder.file = file
-						ctx.SourceFile = file
-
-						rules := getRulesForFile(file)
-						for _, r := range rules {
-							ctxBuilder.ruleName = r.Name
-							for kind, listener := range r.Run(ctx) {
-								listeners, ok := registeredListeners[kind]
-								if !ok {
-									listeners = make([]taggedListener, 0, len(rules))
+						func() {
+							defer func() {
+								if r := recover(); r != nil {
+									log.Printf("panic in rule %q while processing %s: %v", ctxBuilder.ruleName, file.FileName(), r)
+									for k := range registeredListeners {
+										registeredListeners[k] = registeredListeners[k][:0]
+									}
 								}
-								registeredListeners[kind] = append(listeners, taggedListener{ruleName: r.Name, fn: listener})
-							}
-						}
+							}()
 
-						runListeners := func(kind ast.Kind, node *ast.Node) {
-							if listeners, ok := registeredListeners[kind]; ok {
-								for _, listener := range listeners {
-									ctxBuilder.ruleName = listener.ruleName
-									listener.fn(node)
+							if logLevel == utils.LogLevelDebug {
+								log.Print(file.FileName())
+							}
+							ctxBuilder.file = file
+							ctx.SourceFile = file
+
+							rules := getRulesForFile(file)
+							for _, r := range rules {
+								ctxBuilder.ruleName = r.Name
+								for kind, listener := range r.Run(ctx) {
+									listeners, ok := registeredListeners[kind]
+									if !ok {
+										listeners = make([]taggedListener, 0, len(rules))
+									}
+									registeredListeners[kind] = append(listeners, taggedListener{ruleName: r.Name, fn: listener})
 								}
 							}
-						}
 
-						visitLintNodes(file, runListeners)
-						// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
-						for k := range registeredListeners {
-							registeredListeners[k] = registeredListeners[k][:0]
-						}
+							runListeners := func(kind ast.Kind, node *ast.Node) {
+								if listeners, ok := registeredListeners[kind]; ok {
+									for _, listener := range listeners {
+										ctxBuilder.ruleName = listener.ruleName
+										listener.fn(node)
+									}
+								}
+							}
+
+							visitLintNodes(file, runListeners)
+							// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
+							for k := range registeredListeners {
+								registeredListeners[k] = registeredListeners[k][:0]
+							}
+						}()
 					}
 				}
 
@@ -559,52 +571,63 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 				ctx.TypeChecker = w.checker
 
 				for file := range w.queue {
-					if logLevel == utils.LogLevelDebug {
-						log.Print(file.FileName())
-					}
-					ctxBuilder.file = file
-					ctx.SourceFile = file
-
-					rules := getRulesForFile(file)
-					timingStats := make([]RuleTimingStat, len(rules))
-					for ruleIdx, r := range rules {
-						ctxBuilder.ruleName = r.Name
-						start := time.Now()
-						listenersByKind := r.Run(ctx)
-						recordTiming(&timingStats[ruleIdx], time.Since(start))
-						for kind, listener := range listenersByKind {
-							listeners, ok := registeredListeners[kind]
-							if !ok {
-								listeners = make([]timedTaggedListener, 0, len(rules))
+					func() {
+						defer func() {
+							if r := recover(); r != nil {
+								log.Printf("panic in rule %q while processing %s: %v", ctxBuilder.ruleName, file.FileName(), r)
+								for k := range registeredListeners {
+									registeredListeners[k] = registeredListeners[k][:0]
+								}
 							}
-							registeredListeners[kind] = append(listeners, timedTaggedListener{ruleName: r.Name, ruleIdx: ruleIdx, fn: listener})
-						}
-					}
+						}()
 
-					runListeners := func(kind ast.Kind, node *ast.Node) {
-						if listeners, ok := registeredListeners[kind]; ok {
-							for _, listener := range listeners {
-								ctxBuilder.ruleName = listener.ruleName
-								start := time.Now()
-								listener.fn(node)
-								recordTiming(&timingStats[listener.ruleIdx], time.Since(start))
+						if logLevel == utils.LogLevelDebug {
+							log.Print(file.FileName())
+						}
+						ctxBuilder.file = file
+						ctx.SourceFile = file
+
+						rules := getRulesForFile(file)
+						timingStats := make([]RuleTimingStat, len(rules))
+						for ruleIdx, r := range rules {
+							ctxBuilder.ruleName = r.Name
+							start := time.Now()
+							listenersByKind := r.Run(ctx)
+							recordTiming(&timingStats[ruleIdx], time.Since(start))
+							for kind, listener := range listenersByKind {
+								listeners, ok := registeredListeners[kind]
+								if !ok {
+									listeners = make([]timedTaggedListener, 0, len(rules))
+								}
+								registeredListeners[kind] = append(listeners, timedTaggedListener{ruleName: r.Name, ruleIdx: ruleIdx, fn: listener})
 							}
 						}
-					}
 
-					visitLintNodes(file, runListeners)
-					for idx, stat := range timingStats {
-						if stat.Calls == 0 {
-							continue
+						runListeners := func(kind ast.Kind, node *ast.Node) {
+							if listeners, ok := registeredListeners[kind]; ok {
+								for _, listener := range listeners {
+									ctxBuilder.ruleName = listener.ruleName
+									start := time.Now()
+									listener.fn(node)
+									recordTiming(&timingStats[listener.ruleIdx], time.Since(start))
+								}
+							}
 						}
-						merged := localTimings[rules[idx].Name]
-						merged.add(stat)
-						localTimings[rules[idx].Name] = merged
-					}
-					// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
-					for k := range registeredListeners {
-						registeredListeners[k] = registeredListeners[k][:0]
-					}
+
+						visitLintNodes(file, runListeners)
+						for idx, stat := range timingStats {
+							if stat.Calls == 0 {
+								continue
+							}
+							merged := localTimings[rules[idx].Name]
+							merged.add(stat)
+							localTimings[rules[idx].Name] = merged
+						}
+						// Instead of clearing the map, we clear the slices in-place to avoid re-allocating memory for the listeners on each file.
+						for k := range registeredListeners {
+							registeredListeners[k] = registeredListeners[k][:0]
+						}
+					}()
 				}
 			}
 
