@@ -25,14 +25,14 @@ func buildUnexpectedReturnValueMessage(functionNameWithKind string) rule.RuleMes
 }
 
 type functionState struct {
-	node                 *ast.Node
-	upper                *functionState
-	hasReturn            bool
-	hasReturnValue       bool
-	hasMismatch          bool
-	allowsVoidReturn     bool
-	functionNameWithKind string
-	messageId            string
+	node                     *ast.Node
+	upper                    *functionState
+	hasReturn                bool
+	hasReturnValue           bool
+	hasMismatch              bool
+	allowsVoidReturn         bool
+	allowsVoidReturnComputed bool
+	messageId                string
 }
 
 func getFunctionNameWithKind(sourceFile *ast.SourceFile, node *ast.Node) string {
@@ -132,9 +132,9 @@ func getHasReturnValue(ctx rule.RuleContext, node *ast.ReturnStatement, treatUnd
 func reportMismatchedReturnStatement(ctx rule.RuleContext, node *ast.Node, currentFunction *functionState) {
 	switch currentFunction.messageId {
 	case "missingReturnValue":
-		ctx.ReportNode(node, buildMissingReturnValueMessage(currentFunction.functionNameWithKind))
+		ctx.ReportNode(node, buildMissingReturnValueMessage(getFunctionNameWithKind(ctx.SourceFile, currentFunction.node)))
 	case "unexpectedReturnValue":
-		ctx.ReportNode(node, buildUnexpectedReturnValueMessage(currentFunction.functionNameWithKind))
+		ctx.ReportNode(node, buildUnexpectedReturnValueMessage(getFunctionNameWithKind(ctx.SourceFile, currentFunction.node)))
 	}
 }
 
@@ -145,12 +145,22 @@ var ConsistentReturnRule = rule.Rule{
 
 		var currentFunction *functionState
 
+		// allowsVoidReturn lazily computes (and memoizes) whether the function may
+		// legitimately return void/thenable-void. This requires a GetTypeAtLocation
+		// call, which we defer until a return statement or the exit check actually
+		// needs it — most functions never reach those branches.
+		allowsVoidReturn := func(fn *functionState) bool {
+			if !fn.allowsVoidReturnComputed {
+				fn.allowsVoidReturn = isReturnVoidOrThenableVoid(ctx, fn.node)
+				fn.allowsVoidReturnComputed = true
+			}
+			return fn.allowsVoidReturn
+		}
+
 		enterFunction := func(node *ast.Node) {
 			currentFunction = &functionState{
-				node:                 node,
-				upper:                currentFunction,
-				allowsVoidReturn:     isReturnVoidOrThenableVoid(ctx, node),
-				functionNameWithKind: getFunctionNameWithKind(ctx.SourceFile, node),
+				node:  node,
+				upper: currentFunction,
 			}
 		}
 
@@ -159,9 +169,9 @@ var ConsistentReturnRule = rule.Rule{
 				if !currentFunction.hasMismatch &&
 					currentFunction.hasReturn &&
 					currentFunction.hasReturnValue &&
-					!currentFunction.allowsVoidReturn &&
-					currentFunction.node.Flags&ast.NodeFlagsHasImplicitReturn != 0 {
-					ctx.ReportNode(currentFunction.node, buildMissingReturnValueMessage(currentFunction.functionNameWithKind))
+					currentFunction.node.Flags&ast.NodeFlagsHasImplicitReturn != 0 &&
+					!allowsVoidReturn(currentFunction) {
+					ctx.ReportNode(currentFunction.node, buildMissingReturnValueMessage(getFunctionNameWithKind(ctx.SourceFile, currentFunction.node)))
 				}
 				currentFunction = currentFunction.upper
 			}
@@ -173,7 +183,7 @@ var ConsistentReturnRule = rule.Rule{
 			}
 
 			returnStatement := node.AsReturnStatement()
-			if returnStatement.Expression == nil && currentFunction.allowsVoidReturn {
+			if returnStatement.Expression == nil && allowsVoidReturn(currentFunction) {
 				return
 			}
 
