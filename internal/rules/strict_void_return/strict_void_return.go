@@ -111,6 +111,13 @@ var StrictVoidReturnRule = rule.Rule{
 			}
 
 			var visit func(node *ast.Node)
+			// Allocate the ForEachChild visitor once and reuse it for every node.
+			// Declaring the callback inline inside visit would heap-allocate a new
+			// closure on every recursive call (once per node in the function body).
+			visitChild := func(child *ast.Node) bool {
+				visit(child)
+				return false
+			}
 			visit = func(node *ast.Node) {
 				if node == nil {
 					return
@@ -129,10 +136,7 @@ var StrictVoidReturnRule = rule.Rule{
 					}
 				}
 
-				node.ForEachChild(func(child *ast.Node) bool {
-					visit(child)
-					return false
-				})
+				node.ForEachChild(visitChild)
 			}
 			visit(funcNode)
 		}
