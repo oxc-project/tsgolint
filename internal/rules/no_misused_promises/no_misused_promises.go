@@ -735,7 +735,19 @@ var NoMisusedPromisesRule = rule.Rule{
 
 		listeners := rule.RuleListeners{
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				if opts.ChecksConditionals {
+				// Only logical/coalescing binaries (`&&`, `||`, `??`) are
+				// conditional contexts; checkConditional recurses into their
+				// operands. For any other binary (comparisons, arithmetic, comma)
+				// checkConditional falls straight through to a
+				// GetTypeAtLocation-backed isAlwaysThenable check whose result is
+				// a non-thenable primitive, so it can never fire. The only
+				// non-logical binaries whose *result* can be thenable are bare
+				// `x = promise` / `a, promise` statements, which are not
+				// conditional contexts (real test positions report via the
+				// if/while/for/!/?: listeners with isTestExpr=true). Gating on the
+				// cheap syntactic IsLogicalExpression avoids the type query on the
+				// vast majority of binary expressions.
+				if opts.ChecksConditionals && ast.IsLogicalExpression(node) {
 					checkConditional(node, false)
 				}
 

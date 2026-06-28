@@ -272,6 +272,27 @@ func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpressi
 	traverseNode(ctx, binExpr.Right, opts, traversedNodes, isCondition)
 }
 
+// isBooleanResultOperator reports whether a binary operator always evaluates to
+// a `boolean` value (equality, relational, and the `instanceof`/`in` keywords).
+// Shift/arithmetic/bitwise operators are intentionally excluded — they yield
+// numbers.
+func isBooleanResultOperator(kind ast.Kind) bool {
+	switch kind {
+	case ast.KindEqualsEqualsToken,
+		ast.KindExclamationEqualsToken,
+		ast.KindEqualsEqualsEqualsToken,
+		ast.KindExclamationEqualsEqualsToken,
+		ast.KindLessThanToken,
+		ast.KindGreaterThanToken,
+		ast.KindLessThanEqualsToken,
+		ast.KindGreaterThanEqualsToken,
+		ast.KindInstanceOfKeyword,
+		ast.KindInKeyword:
+		return true
+	}
+	return false
+}
+
 func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions, traversedNodes *utils.Set[*ast.Node], isCondition bool) {
 	if traversedNodes.Has(node) {
 		return
@@ -287,6 +308,13 @@ func traverseNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpres
 		binExpr := node.AsBinaryExpression()
 		if ast.IsLogicalExpression(node) && binExpr.OperatorToken.Kind != ast.KindQuestionQuestionToken {
 			traverseLogicalExpression(ctx, binExpr, opts, traversedNodes, isCondition)
+			return
+		}
+		// Comparison / equality / relational operators always produce a
+		// `boolean`, which is always an acceptable condition type, so checkNode
+		// could never report on them. Skip the GetConstrainedTypeAtLocation that
+		// checkNode would otherwise perform for these (very common) operators.
+		if isBooleanResultOperator(binExpr.OperatorToken.Kind) {
 			return
 		}
 	}

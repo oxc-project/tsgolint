@@ -29,6 +29,26 @@ func buildUnsafeReturnThisMessage(t string) rule.RuleMessage {
 	}
 }
 
+// isConcretePrimitiveLiteral reports whether a returned expression is a literal
+// of a concrete primitive type (number, bigint, string, boolean, RegExp). Such
+// a value can never be `any`/`any[]`/`Promise<any>` and is never an unsafe
+// assignment, so no-unsafe-return can never report on it. Composite literals
+// (arrays, objects, arrow/function expressions) are intentionally excluded —
+// they can nest `any` values.
+func isConcretePrimitiveLiteral(kind ast.Kind) bool {
+	switch kind {
+	case ast.KindNumericLiteral,
+		ast.KindBigIntLiteral,
+		ast.KindStringLiteral,
+		ast.KindNoSubstitutionTemplateLiteral,
+		ast.KindTrueKeyword,
+		ast.KindFalseKeyword,
+		ast.KindRegularExpressionLiteral:
+		return true
+	}
+	return false
+}
+
 var NoUnsafeReturnRule = rule.Rule{
 	Name: "no-unsafe-return",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -42,6 +62,12 @@ var NoUnsafeReturnRule = rule.Rule{
 			returnNode *ast.Node,
 			reportingNode *ast.Node,
 		) {
+			// Fast path: a concrete primitive literal can never be unsafe, so skip
+			// the (expensive) type queries below for it.
+			if isConcretePrimitiveLiteral(returnNode.Kind) {
+				return
+			}
+
 			t := ctx.TypeChecker.GetTypeAtLocation(returnNode)
 
 			anyType := utils.DiscriminateAnyType(
