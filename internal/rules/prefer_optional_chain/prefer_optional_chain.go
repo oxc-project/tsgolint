@@ -725,15 +725,13 @@ type chainProcessor struct {
 }
 
 func newChainProcessor(ctx rule.RuleContext, opts PreferOptionalChainOptions) *chainProcessor {
+	// The caches are lazily allocated on first write (see the guarded writes
+	// below): files with no `&&`/`||`/`??` chains never touch them, so eager
+	// allocation here would waste five maps per such file.
 	return &chainProcessor{
-		ctx:                ctx,
-		opts:               opts,
-		sourceText:         ctx.SourceFile.Text(),
-		seenRanges:         make(map[textRange]bool, 16),
-		typeCache:          make(map[*ast.Node]*TypeInfo, 32),
-		flattenCache:       make(map[*ast.Node][]ChainPart, 16),
-		callSigCache:       make(map[*ast.Node]map[string]string, 8),
-		optionalChainCache: make(map[*ast.Node]bool, 16),
+		ctx:        ctx,
+		opts:       opts,
+		sourceText: ctx.SourceFile.Text(),
 	}
 }
 
@@ -800,6 +798,9 @@ func (processor *chainProcessor) getTypeInfo(node *ast.Node) *TypeInfo {
 		}
 	}
 
+	if processor.typeCache == nil {
+		processor.typeCache = make(map[*ast.Node]*TypeInfo, 32)
+	}
 	processor.typeCache[node] = info
 	return info
 }
@@ -832,6 +833,9 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 	}
 	visit(node)
 
+	if processor.callSigCache == nil {
+		processor.callSigCache = make(map[*ast.Node]map[string]string, 8)
+	}
 	processor.callSigCache[node] = signatures
 	return signatures
 }
@@ -1320,6 +1324,9 @@ func (processor *chainProcessor) flattenForFix(node *ast.Node) []ChainPart {
 
 	visit(node, false)
 
+	if processor.flattenCache == nil {
+		processor.flattenCache = make(map[*ast.Node][]ChainPart, 16)
+	}
 	processor.flattenCache[node] = parts
 	return parts
 }
@@ -1388,6 +1395,9 @@ func (processor *chainProcessor) containsOptionalChain(n *ast.Node) bool {
 	}
 
 	result := processor.containsOptionalChainUncached(n)
+	if processor.optionalChainCache == nil {
+		processor.optionalChainCache = make(map[*ast.Node]bool, 16)
+	}
 	processor.optionalChainCache[n] = result
 	return result
 }
@@ -1693,6 +1703,9 @@ func (processor *chainProcessor) collectOperands(node *ast.Node, operatorKind as
 			collect(binExpr.Right)
 			// Mark this binary expression as seen to prevent re-processing
 			r := processor.getNodeRange(unwrapped)
+			if processor.seenRanges == nil {
+				processor.seenRanges = make(map[textRange]bool, 16)
+			}
 			processor.seenRanges[textRange{start: r.Pos(), end: r.End()}] = true
 		} else {
 			operandNodes = append(operandNodes, n)
