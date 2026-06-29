@@ -54,6 +54,21 @@ func TestDotNotation(t *testing.T) {
 		{Code: "a['Prénom'];"},
 		{Code: "a['π'];"},
 		{Code: "a['has space'];"},
+		// https://github.com/oxc-project/tsgolint/issues/1027
+		// A write goes through the (non-public) setter, so visibility must be
+		// evaluated from the setter and not the paired public getter.
+		{
+			Code:    "\nclass Example {\n  private _a = 0;\n  public get prot(): number {\n    return this._a;\n  }\n  protected set prot(v: number) {\n    this._a = v;\n  }\n}\n\ndeclare const obj: Example;\n\nobj['prot'] = 1;",
+			Options: rule_tester.OptionsFromJSON[DotNotationOptions]("{\"allowProtectedClassPropertyAccess\":true}"),
+		},
+		{
+			Code:    "\nclass Example {\n  private _b = 0;\n  public get priv(): number {\n    return this._b;\n  }\n  private set priv(v: number) {\n    this._b = v;\n  }\n}\n\ndeclare const obj: Example;\n\nobj['priv'] = 1;",
+			Options: rule_tester.OptionsFromJSON[DotNotationOptions]("{\"allowPrivateClassPropertyAccess\":true}"),
+		},
+		{
+			Code:    "\nclass Example {\n  private _a = 0;\n  public get prot(): number {\n    return this._a;\n  }\n  protected set prot(v: number) {\n    this._a = v;\n  }\n\n  private _b = 0;\n  public get priv(): number {\n    return this._b;\n  }\n  private set priv(v: number) {\n    this._b = v;\n  }\n}\n\ndeclare const obj: Example;\n\nobj['prot'] = 1;\nobj['priv'] = 1;",
+			Options: rule_tester.OptionsFromJSON[DotNotationOptions]("{\"allowPrivateClassPropertyAccess\":true,\"allowProtectedClassPropertyAccess\":true}"),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:    "\nclass X {\n  private priv_prop = 123;\n}\n\nconst x = new X();\nx['priv_prop'] = 123;\n      ",
@@ -249,6 +264,17 @@ func TestDotNotation(t *testing.T) {
 		{
 			Code:   "foo?.['bar'];",
 			Output: []string{"foo?.bar;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "useDot"},
+			},
+		},
+		// https://github.com/oxc-project/tsgolint/issues/1027
+		// A read goes through the public getter, so it must still be reported
+		// even when the paired setter is protected and the option is enabled.
+		{
+			Code:    "\nclass Example {\n  private _a = 0;\n  public get prot(): number {\n    return this._a;\n  }\n  protected set prot(v: number) {\n    this._a = v;\n  }\n}\n\ndeclare const obj: Example;\n\nobj['prot'];",
+			Options: rule_tester.OptionsFromJSON[DotNotationOptions]("{\"allowProtectedClassPropertyAccess\":true}"),
+			Output:  []string{"\nclass Example {\n  private _a = 0;\n  public get prot(): number {\n    return this._a;\n  }\n  protected set prot(v: number) {\n    this._a = v;\n  }\n}\n\ndeclare const obj: Example;\n\nobj.prot;"},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "useDot"},
 			},

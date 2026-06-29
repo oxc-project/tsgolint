@@ -213,3 +213,11 @@ Message: ["bar"] is better written in dot notation.
    1 | foo?.['bar'];
      |       ~~~~~
 ---
+
+[TestDotNotation/invalid-27 - 1]
+Diagnostic 1: useDot (14:5 - 14:10)
+Message: ["prot"] is better written in dot notation.
+  13 | 
+  14 | obj['prot'];
+     |     ~~~~~~
+---
