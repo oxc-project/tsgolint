@@ -13,6 +13,15 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+// Built-in symbol-name sets for each conversion function, hoisted to package
+// scope so they aren't reallocated on every matching call expression.
+var (
+	bigIntConversionBuiltins  = []string{"BigInt", "BigIntConstructor"}
+	booleanConversionBuiltins = []string{"Boolean", "BooleanConstructor"}
+	numberConversionBuiltins  = []string{"Number", "NumberConstructor"}
+	stringConversionBuiltins  = []string{"String", "StringConstructor"}
+)
+
 func buildUnnecessaryTypeConversionDiagnostic(conversion, expression core.TextRange, expressionType string) rule.RuleDiagnostic {
 	return rule.RuleDiagnostic{
 		Message: rule.RuleMessage{
@@ -280,19 +289,19 @@ var NoUnnecessaryTypeConversionRule = rule.Rule{
 			switch callee.AsIdentifier().Text {
 			case "BigInt":
 				typeFlag = checker.TypeFlagsBigIntLike
-				builtins = []string{"BigInt", "BigIntConstructor"}
+				builtins = bigIntConversionBuiltins
 				ok = true
 			case "Boolean":
 				typeFlag = checker.TypeFlagsBooleanLike
-				builtins = []string{"Boolean", "BooleanConstructor"}
+				builtins = booleanConversionBuiltins
 				ok = true
 			case "Number":
 				typeFlag = checker.TypeFlagsNumberLike
-				builtins = []string{"Number", "NumberConstructor"}
+				builtins = numberConversionBuiltins
 				ok = true
 			case "String":
 				typeFlag = checker.TypeFlagsStringLike
-				builtins = []string{"String", "StringConstructor"}
+				builtins = stringConversionBuiltins
 				ok = true
 			}
 
