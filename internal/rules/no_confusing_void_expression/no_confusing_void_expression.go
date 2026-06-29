@@ -178,14 +178,14 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 		}
 
 		checkExpression := func(node *ast.Node) {
-			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node)
-			if !utils.IsTypeFlagSet(t, checker.TypeFlagsVoidLike) {
-				return
-			}
-
 			invalidAncestor := findInvalidAncestor(node)
 			if invalidAncestor == nil {
 				// void expression is in valid position
+				return
+			}
+
+			t := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node)
+			if !utils.IsTypeFlagSet(t, checker.TypeFlagsVoidLike) {
 				return
 			}
 

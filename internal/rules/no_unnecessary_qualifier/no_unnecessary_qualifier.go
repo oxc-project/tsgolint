@@ -89,6 +89,13 @@ var NoUnnecessaryQualifierRule = rule.Rule{
 			if currentFailedNamespaceExpression != nil {
 				return
 			}
+			// A qualifier can only ever be unnecessary when we are inside an enum or
+			// namespace declaration (the only places that populate namespacesInScope).
+			// The vast majority of property accesses occur outside any such scope, so
+			// bail out before doing any (expensive) symbol resolution.
+			if len(namespacesInScope) == 0 {
+				return
+			}
 			if !qualifierIsUnnecessary(qualifier, name) {
 				return
 			}

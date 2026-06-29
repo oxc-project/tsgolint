@@ -920,35 +920,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			// 2. If expression uses optional chaining AND contains unguarded element access - skip (arr[0]?.foo?.bar)
 			// 3. If expression doesn't use optional chaining - don't skip (arr[0].foo?.bar)
 
-			// Helper: Check if expression or its chain contains unguarded element access
-			var containsUnguardedElementAccess func(*ast.Node) bool
-			containsUnguardedElementAccess = func(expr *ast.Node) bool {
-				if expr == nil {
-					return false
-				}
-				expr = ast.SkipParentheses(expr)
-
-				// Check if this is an unguarded element access
-				if isElementAccess(expr) {
-					elemAccess := expr.AsElementAccessExpression()
-					if elemAccess.QuestionDotToken == nil && !ctx.Program.Options().NoUncheckedIndexedAccess.IsTrue() {
-						return true
-					}
-					// Check deeper
-					return containsUnguardedElementAccess(elemAccess.Expression)
-				}
-
-				// Check deeper in property/call chains
-				if isPropertyAccess(expr) {
-					return containsUnguardedElementAccess(expr.AsPropertyAccessExpression().Expression)
-				}
-				if isCallExpr(expr) {
-					return containsUnguardedElementAccess(expr.AsCallExpression().Expression)
-				}
-
-				return false
-			}
-
 			// Helper: Check if expression uses optional chaining
 			var usesOptionalChaining func(*ast.Node) bool
 			usesOptionalChaining = func(expr *ast.Node) bool {
