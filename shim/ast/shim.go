@@ -2262,8 +2262,12 @@ type NumericLiteral = ast.NumericLiteral
 type NumericLiteralNode = ast.NumericLiteralNode
 type NumericOrStringLikeLiteral = ast.NumericOrStringLikeLiteral
 const OEKAll = ast.OEKAll
+const OEKAllExceptAssertionsOrExpressionsWithTypeArguments = ast.OEKAllExceptAssertionsOrExpressionsWithTypeArguments
 const OEKAssertions = ast.OEKAssertions
+const OEKAssignments = ast.OEKAssignments
+const OEKComma = ast.OEKComma
 const OEKExcludeJSDocTypeAssertion = ast.OEKExcludeJSDocTypeAssertion
+const OEKExpressionTypePassthrough = ast.OEKExpressionTypePassthrough
 const OEKExpressionsWithTypeArguments = ast.OEKExpressionsWithTypeArguments
 const OEKNonNullAssertions = ast.OEKNonNullAssertions
 const OEKParentheses = ast.OEKParentheses
@@ -2427,6 +2431,7 @@ func SkipPartiallyEmittedExpressions(node *ast.Expression) *ast.Expression
 //go:linkname SkipTypeParentheses github.com/microsoft/typescript-go/internal/ast.SkipTypeParentheses
 func SkipTypeParentheses(node *ast.Node) *ast.Node
 type SourceFile = ast.SourceFile
+type SourceFileDataKey[T any] = ast.SourceFileDataKey[T]
 type SourceFileLike = ast.SourceFileLike
 type SourceFileMetaData = ast.SourceFileMetaData
 type SourceFileNode = ast.SourceFileNode

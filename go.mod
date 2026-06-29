@@ -36,7 +36,7 @@ require (
 	github.com/microsoft/typescript-go/shim/vfs/cachedvfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/osvfs v0.0.0
 	golang.org/x/sys v0.46.0
-	golang.org/x/tools v0.46.0
+	golang.org/x/tools v0.47.0
 	gotest.tools/v3 v3.5.2
 )
 
@@ -44,14 +44,14 @@ require (
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/mackerelio/go-osstat v0.2.7 // indirect
-	github.com/microsoft/typescript-go v0.0.0-20260611224133-79fe60a804ac // indirect
+	github.com/microsoft/typescript-go v0.0.0-20260625204729-c080da62e73c // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
-	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
 )
 
 require (
 	github.com/dlclark/regexp2/v2 v2.2.2
-	github.com/go-json-experiment/json v0.0.0-20260601182631-00ed12fed2a6
+	github.com/go-json-experiment/json v0.0.0-20260623181947-01eb4420fa68
 	golang.org/x/text v0.38.0
 )

@@ -19,6 +19,10 @@ type BreadthFirstSearchLevel[K comparable, N any] = core.BreadthFirstSearchLevel
 type BreadthFirstSearchOptions[K comparable, N any] = core.BreadthFirstSearchOptions[K,N]
 type BreadthFirstSearchResult[N any] = core.BreadthFirstSearchResult[N]
 type BuildOptions = core.BuildOptions
+type CheckerLifetime = core.CheckerLifetime
+const CheckerLifetimeAPI = core.CheckerLifetimeAPI
+const CheckerLifetimeDiagnostics = core.CheckerLifetimeDiagnostics
+const CheckerLifetimeTemporary = core.CheckerLifetimeTemporary
 //go:linkname CompareBooleans github.com/microsoft/typescript-go/internal/core.CompareBooleans
 func CompareBooleans(a bool, b bool) int
 //go:linkname CompareTextRanges github.com/microsoft/typescript-go/internal/core.CompareTextRanges
@@ -31,6 +35,8 @@ func ComputeECMALineStartsSeq(text string) iter.Seq[core.TextPos]
 type ECMALineStarts = core.ECMALineStarts
 var EmptyCompilerOptions = core.EmptyCompilerOptions
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
+//go:linkname GetCheckerLifetime github.com/microsoft/typescript-go/internal/core.GetCheckerLifetime
+func GetCheckerLifetime(ctx context.Context) core.CheckerLifetime
 //go:linkname GetNewLineKind github.com/microsoft/typescript-go/internal/core.GetNewLineKind
 func GetNewLineKind(s string) core.NewLineKind
 //go:linkname GetRequestID github.com/microsoft/typescript-go/internal/core.GetRequestID
@@ -185,6 +191,8 @@ const WatchFileKindPriorityPollingInterval = core.WatchFileKindPriorityPollingIn
 const WatchFileKindUseFsEvents = core.WatchFileKindUseFsEvents
 const WatchFileKindUseFsEventsOnParentDirectory = core.WatchFileKindUseFsEventsOnParentDirectory
 type WatchOptions = core.WatchOptions
+//go:linkname WithCheckerLifetime github.com/microsoft/typescript-go/internal/core.WithCheckerLifetime
+func WithCheckerLifetime(ctx context.Context, lifetime core.CheckerLifetime) context.Context
 //go:linkname WithRequestID github.com/microsoft/typescript-go/internal/core.WithRequestID
 func WithRequestID(ctx context.Context, id string) context.Context
 type WorkGroup = core.WorkGroup

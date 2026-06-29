@@ -18,8 +18,9 @@ import "github.com/zeebo/xxh3"
 import _ "unsafe"
 
 type APISnapshotRequest = project.APISnapshotRequest
+type APIState = project.APIState
 type ATAStateChange = project.ATAStateChange
-type CheckerPool = project.CheckerPool
+type CheckerPoolOptions = project.CheckerPoolOptions
 type Client = project.Client
 type ConfigFileRegistry = project.ConfigFileRegistry
 type ConfigFileRegistryBuilder = project.ConfigFileRegistryBuilder
