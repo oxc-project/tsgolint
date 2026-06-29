@@ -93,10 +93,6 @@ func collectTypeParameterReferenceNodes(ctx rule.RuleContext, node *ast.Node, sy
 	references := make([]*ast.Node, 0, 8)
 
 	var walk func(current *ast.Node)
-	// Allocate the ForEachChildAndJSDoc visitor once and reuse it for every
-	// node. Declaring the callback inline inside walk would heap-allocate a new
-	// closure on every recursive call (once per node in the subtree), which on
-	// large files dominated this rule's allocation churn (and thus GC time).
 	visitChild := func(child *ast.Node) bool {
 		walk(child)
 		return false
