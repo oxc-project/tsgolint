@@ -36,7 +36,7 @@ require (
 	github.com/microsoft/typescript-go/shim/vfs/cachedvfs v0.0.0
 	github.com/microsoft/typescript-go/shim/vfs/osvfs v0.0.0
 	golang.org/x/sys v0.46.0
-	golang.org/x/tools v0.46.0
+	golang.org/x/tools v0.47.0
 	gotest.tools/v3 v3.5.2
 )
 
@@ -52,6 +52,6 @@ require (
 
 require (
 	github.com/dlclark/regexp2/v2 v2.2.2
-	github.com/go-json-experiment/json v0.0.0-20260601182631-00ed12fed2a6
+	github.com/go-json-experiment/json v0.0.0-20260623181947-01eb4420fa68
 	golang.org/x/text v0.38.0
 )
