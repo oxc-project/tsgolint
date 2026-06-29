@@ -178,12 +178,6 @@ var NoConfusingVoidExpressionRule = rule.Rule{
 		}
 
 		checkExpression := func(node *ast.Node) {
-			// Cheap, pure-AST check first: most call/await expressions sit in a
-			// valid position (e.g. an expression statement), for which
-			// findInvalidAncestor returns nil immediately. Doing this before the
-			// (expensive) type query means those nodes never pay for it. The two
-			// guards are independent and side-effect free, so order does not
-			// affect which nodes report.
 			invalidAncestor := findInvalidAncestor(node)
 			if invalidAncestor == nil {
 				// void expression is in valid position
