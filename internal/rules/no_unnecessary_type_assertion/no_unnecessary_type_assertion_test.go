@@ -3266,5 +3266,14 @@ fn((() => {})());`},
 					MessageId: "contextuallyUnnecessary",
 				},
 			},
+		},
+		{
+			Code:   "type StringsWithMeta<T> = string[] & { meta?: T };\ndeclare function f<T>(xs: StringsWithMeta<T>, tag: T): void;\nf(['x' as string], 1);",
+			Output: []string{"type StringsWithMeta<T> = string[] & { meta?: T };\ndeclare function f<T>(xs: StringsWithMeta<T>, tag: T): void;\nf(['x'], 1);"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
 		}})
 }
