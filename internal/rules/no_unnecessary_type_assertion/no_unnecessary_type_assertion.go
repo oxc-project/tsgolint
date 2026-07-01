@@ -648,6 +648,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 						paramType = typeArguments[0]
 					}
 				}
+				if elementType := utils.GetNumberIndexType(ctx.TypeChecker, paramType); elementType != nil {
+					paramType = elementType
+				}
 
 				return containsTypeVariable(paramType)
 			})
