@@ -647,7 +647,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					if typeArguments := getTypeArguments(paramType); len(typeArguments) > 0 {
 						typeArgumentIndex := 0
 						if len(typeArguments) > 1 {
-							typeArgumentIndex = min(argIndex, len(typeArguments)-1)
+							typeArgumentIndex = min(argIndex-paramIndex, len(typeArguments)-1)
 						}
 						paramType = typeArguments[typeArgumentIndex]
 					}

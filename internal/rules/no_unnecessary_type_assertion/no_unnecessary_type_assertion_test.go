@@ -975,6 +975,21 @@ const result = combine('items', [{ id: 0 } as Item], items);
 		},
 		{
 			Code: `
+type Item = { id: string | number };
+
+declare function combine<T>(
+  enabled: boolean,
+  ...args: [a: readonly T[], b: readonly Item[]]
+): T[];
+
+declare const items: Item[];
+
+const result = combine(true, [{ id: 0 } as Item], items);
+result[0].id = 'x';
+    `,
+		},
+		{
+			Code: `
 interface Params {
   a?: string;
   b?: string;
