@@ -1638,3 +1638,11 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |                          ~~~~~~~~~~~~~~~~~~~~
    2 | void x;
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-121 - 1]
+Diagnostic 1: contextuallyUnnecessary (2:4 - 2:16)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   1 | declare function f<T>(xs: string[], tag: T): void;
+   2 | f(['x' as string], 1);
+     |    ~~~~~~~~~~~~~
+---

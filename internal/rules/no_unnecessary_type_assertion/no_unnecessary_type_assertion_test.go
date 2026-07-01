@@ -948,6 +948,20 @@ const result = combine([{ id: 0 } as Item], items);
 		},
 		{
 			Code: `
+type Item = { id: string | number };
+
+interface Combiner {
+  new <T1, T2 extends T1>(a: readonly T1[], b: readonly T2[]): unknown;
+}
+
+declare const Combiner: Combiner;
+declare const items: Item[];
+
+const result = new Combiner([{ id: 0 } as Item], items);
+    `,
+		},
+		{
+			Code: `
 interface Params {
   a?: string;
   b?: string;
@@ -3238,6 +3252,15 @@ fn((() => {})());`},
 		{
 			Code:   "const x: string | null = 'a' as string | null;\nvoid x;",
 			Output: []string{"const x: string | null = 'a';\nvoid x;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code:   "declare function f<T>(xs: string[], tag: T): void;\nf(['x' as string], 1);",
+			Output: []string{"declare function f<T>(xs: string[], tag: T): void;\nf(['x'], 1);"},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
