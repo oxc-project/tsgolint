@@ -935,6 +935,60 @@ const a = mapDefined(() =>
     `,
 		},
 		{
+			// https://github.com/oxc-project/tsgolint/issues/1044
+			Code: `
+type Item = { id: string | number };
+
+declare function combine<T1, T2 extends T1>(a: readonly T1[], b: readonly T2[]): T1[];
+
+declare const items: Item[];
+
+const result = combine([{ id: 0 } as Item], items);
+    `,
+		},
+		{
+			Code: `
+type Item = { id: string | number };
+
+interface Combiner {
+  new <T1, T2 extends T1>(a: readonly T1[], b: readonly T2[]): unknown;
+}
+
+declare const Combiner: Combiner;
+declare const items: Item[];
+
+const result = new Combiner([{ id: 0 } as Item], items);
+    `,
+		},
+		{
+			Code: `
+type Item = { id: string | number };
+
+declare function combine<T1, T2 extends T1>(
+  ...args: [label: string, a: readonly T1[], b: readonly T2[]]
+): T1[];
+
+declare const items: Item[];
+
+const result = combine('items', [{ id: 0 } as Item], items);
+    `,
+		},
+		{
+			Code: `
+type Item = { id: string | number };
+
+declare function combine<T>(
+  enabled: boolean,
+  ...args: [a: readonly T[], b: readonly Item[]]
+): T[];
+
+declare const items: Item[];
+
+const result = combine(true, [{ id: 0 } as Item], items);
+result[0].id = 'x';
+    `,
+		},
+		{
 			Code: `
 interface Params {
   a?: string;
@@ -3226,6 +3280,24 @@ fn((() => {})());`},
 		{
 			Code:   "const x: string | null = 'a' as string | null;\nvoid x;",
 			Output: []string{"const x: string | null = 'a';\nvoid x;"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code:   "declare function f<T>(xs: string[], tag: T): void;\nf(['x' as string], 1);",
+			Output: []string{"declare function f<T>(xs: string[], tag: T): void;\nf(['x'], 1);"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code:   "type StringsWithMeta<T> = string[] & { meta?: T };\ndeclare function f<T>(xs: StringsWithMeta<T>, tag: T): void;\nf(['x' as string], 1);",
+			Output: []string{"type StringsWithMeta<T> = string[] & { meta?: T };\ndeclare function f<T>(xs: StringsWithMeta<T>, tag: T): void;\nf(['x'], 1);"},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",

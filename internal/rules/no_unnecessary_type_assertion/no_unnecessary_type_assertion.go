@@ -616,6 +616,50 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			})
 		}
 
+		hasGenericInferenceParameterAtArgument := func(callOrNew *ast.Node, argIndex int) bool {
+			calleeType := ctx.TypeChecker.GetTypeAtLocation(callOrNew.Expression())
+			var signatures []*checker.Signature
+			if ast.IsNewExpression(callOrNew) {
+				signatures = utils.GetConstructSignatures(ctx.TypeChecker, calleeType)
+			} else {
+				signatures = utils.GetCallSignatures(ctx.TypeChecker, calleeType)
+			}
+
+			return slices.ContainsFunc(signatures, func(sig *checker.Signature) bool {
+				if len(sig.TypeParameters()) == 0 {
+					return false
+				}
+
+				params := checker.Signature_parameters(sig)
+				if len(params) == 0 {
+					return false
+				}
+
+				paramIndex := argIndex
+				if paramIndex >= len(params) {
+					paramIndex = len(params) - 1
+				}
+				param := params[paramIndex]
+				paramType := checker.Checker_getTypeOfSymbol(ctx.TypeChecker, param)
+				if valueDeclaration := param.ValueDeclaration; valueDeclaration != nil &&
+					valueDeclaration.Kind == ast.KindParameter &&
+					valueDeclaration.AsParameterDeclaration().DotDotDotToken != nil {
+					if typeArguments := getTypeArguments(paramType); len(typeArguments) > 0 {
+						typeArgumentIndex := 0
+						if len(typeArguments) > 1 {
+							typeArgumentIndex = min(argIndex-paramIndex, len(typeArguments)-1)
+						}
+						paramType = typeArguments[typeArgumentIndex]
+					}
+				}
+				if elementType := utils.GetNumberIndexType(ctx.TypeChecker, paramType); elementType != nil {
+					paramType = elementType
+				}
+
+				return containsTypeVariable(paramType)
+			})
+		}
+
 		genericsMismatch := func(uncast, contextual *checker.Type) bool {
 			return slices.ContainsFunc(checker.Checker_getPropertiesOfType(ctx.TypeChecker, contextual), func(prop *ast.Symbol) bool {
 				contextualSigs := checker.Checker_getSignaturesOfType(
@@ -738,6 +782,35 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				ast.IsLogicalOrCoalescingAssignmentOperator(parent.AsBinaryExpression().OperatorToken.Kind)
 		}
 
+		isNestedInArrayLiteralArgumentToGenericCall := func(node *ast.Node) bool {
+			for current := node.Parent; current != nil; current = current.Parent {
+				if ast.IsFunctionExpression(current) || ast.IsArrowFunction(current) {
+					return false
+				}
+				if !ast.IsArrayLiteralExpression(current) {
+					continue
+				}
+
+				parent := parentThroughParens(current)
+				if parent == nil || (!ast.IsCallExpression(parent) && !ast.IsNewExpression(parent)) {
+					continue
+				}
+				if parent.TypeArguments() != nil {
+					return false
+				}
+
+				argIndex := slices.IndexFunc(parent.Arguments(), func(argument *ast.Node) bool {
+					return argument == current || ast.SkipParentheses(argument) == current
+				})
+				if argIndex == -1 {
+					continue
+				}
+
+				return hasGenericInferenceParameterAtArgument(parent, argIndex)
+			}
+			return false
+		}
+
 		isInGenericContext := func(node *ast.Node) bool {
 			seenFunction := false
 			for current := node.Parent; current != nil; current = current.Parent {
@@ -789,6 +862,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 			if skipParentTypeForContextualAny(node) ||
 				ast.IsArrayLiteralExpression(node.Expression()) ||
+				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
 				isAssignmentInNonStatementContext(node) ||
