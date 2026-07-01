@@ -935,6 +935,18 @@ const a = mapDefined(() =>
     `,
 		},
 		{
+			// https://github.com/oxc-project/tsgolint/issues/1044
+			Code: `
+type Item = { id: string | number };
+
+declare function combine<T1, T2 extends T1>(a: readonly T1[], b: readonly T2[]): T1[];
+
+declare const items: Item[];
+
+const result = combine([{ id: 0 } as Item], items);
+    `,
+		},
+		{
 			Code: `
 interface Params {
   a?: string;

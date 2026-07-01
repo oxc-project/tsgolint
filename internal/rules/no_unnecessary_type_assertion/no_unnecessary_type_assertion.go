@@ -738,6 +738,34 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				ast.IsLogicalOrCoalescingAssignmentOperator(parent.AsBinaryExpression().OperatorToken.Kind)
 		}
 
+		isNestedInArrayLiteralArgumentToGenericCall := func(node *ast.Node) bool {
+			for current := node.Parent; current != nil; current = current.Parent {
+				if ast.IsFunctionExpression(current) || ast.IsArrowFunction(current) {
+					return false
+				}
+				if !ast.IsArrayLiteralExpression(current) {
+					continue
+				}
+
+				parent := parentThroughParens(current)
+				if parent == nil || (!ast.IsCallExpression(parent) && !ast.IsNewExpression(parent)) {
+					continue
+				}
+				if parent.TypeArguments() != nil {
+					return false
+				}
+				if !slices.ContainsFunc(parent.Arguments(), func(argument *ast.Node) bool {
+					return argument == current || ast.SkipParentheses(argument) == current
+				}) {
+					continue
+				}
+
+				calleeType := ctx.TypeChecker.GetTypeAtLocation(parent.Expression())
+				return hasGenericCallSignature(calleeType)
+			}
+			return false
+		}
+
 		isInGenericContext := func(node *ast.Node) bool {
 			seenFunction := false
 			for current := node.Parent; current != nil; current = current.Parent {
@@ -789,6 +817,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 			if skipParentTypeForContextualAny(node) ||
 				ast.IsArrayLiteralExpression(node.Expression()) ||
+				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
 				isAssignmentInNonStatementContext(node) ||
