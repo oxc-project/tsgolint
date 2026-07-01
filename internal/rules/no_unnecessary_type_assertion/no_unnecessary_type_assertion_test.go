@@ -962,6 +962,19 @@ const result = new Combiner([{ id: 0 } as Item], items);
 		},
 		{
 			Code: `
+type Item = { id: string | number };
+
+declare function combine<T1, T2 extends T1>(
+  ...args: [label: string, a: readonly T1[], b: readonly T2[]]
+): T1[];
+
+declare const items: Item[];
+
+const result = combine('items', [{ id: 0 } as Item], items);
+    `,
+		},
+		{
+			Code: `
 interface Params {
   a?: string;
   b?: string;

@@ -645,7 +645,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					valueDeclaration.Kind == ast.KindParameter &&
 					valueDeclaration.AsParameterDeclaration().DotDotDotToken != nil {
 					if typeArguments := getTypeArguments(paramType); len(typeArguments) > 0 {
-						paramType = typeArguments[0]
+						typeArgumentIndex := 0
+						if len(typeArguments) > 1 {
+							typeArgumentIndex = min(argIndex, len(typeArguments)-1)
+						}
+						paramType = typeArguments[typeArgumentIndex]
 					}
 				}
 				if elementType := utils.GetNumberIndexType(ctx.TypeChecker, paramType); elementType != nil {
