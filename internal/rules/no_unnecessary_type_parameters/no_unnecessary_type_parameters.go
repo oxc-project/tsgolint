@@ -93,6 +93,10 @@ func collectTypeParameterReferenceNodes(ctx rule.RuleContext, node *ast.Node, sy
 	references := make([]*ast.Node, 0, 8)
 
 	var walk func(current *ast.Node)
+	visitChild := func(child *ast.Node) bool {
+		walk(child)
+		return false
+	}
 	walk = func(current *ast.Node) {
 		if current == nil {
 			return
@@ -108,10 +112,7 @@ func collectTypeParameterReferenceNodes(ctx rule.RuleContext, node *ast.Node, sy
 			}
 		}
 
-		ast.ForEachChildAndJSDoc(current, ctx.SourceFile, func(child *ast.Node) bool {
-			walk(child)
-			return false
-		})
+		ast.ForEachChildAndJSDoc(current, ctx.SourceFile, visitChild)
 	}
 
 	walk(node)
