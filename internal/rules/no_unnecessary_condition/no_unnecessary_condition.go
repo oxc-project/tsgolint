@@ -445,6 +445,34 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return constraintType, false
 		}
 
+		// constrainConditionalType returns the base constraint of a deferred
+		// conditional (the union of its branches). An unresolved conditional has no
+		// nullish flag, so isNullishType misreads it.
+		constrainConditionalType := func(t *checker.Type) *checker.Type {
+			if t == nil || checker.Type_flags(t)&checker.TypeFlagsConditional == 0 {
+				return t
+			}
+			if constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t); constraint != nil {
+				return constraint
+			}
+			return t
+		}
+
+		// isNullishType, but applies constrainConditionalType at every level,
+		// recursing into union members.
+		var isConstrainedNullishType func(t *checker.Type) bool
+		isConstrainedNullishType = func(t *checker.Type) bool {
+			if t == nil {
+				return false
+			}
+			t = constrainConditionalType(t)
+			if utils.IsUnionType(t) {
+				return slices.ContainsFunc(t.Types(), isConstrainedNullishType)
+			}
+			flags := checker.Type_flags(t)
+			return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
+		}
+
 		getPropertyNameFromLiteralType := func(t *checker.Type) (string, bool) {
 			if t == nil {
 				return "", false
@@ -717,8 +745,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			for _, part := range prevType.Types() {
 				signatures := ctx.TypeChecker.GetCallSignatures(part)
 				for _, sig := range signatures {
+					// Constrain so a conditional nullish return isn't misread as non-nullable.
 					returnType := ctx.TypeChecker.GetReturnTypeOfSignature(sig)
-					if returnType != nil && isNullishType(returnType) {
+					if returnType != nil && isConstrainedNullishType(returnType) {
 						isOwnNullable = true
 						break
 					}
@@ -1264,7 +1293,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 			}
 
-			if !isNullishType(exprType) {
+			if !isConstrainedNullishType(exprType) {
 				ctx.ReportNode(node, buildNeverOptionalChainMessage())
 			}
 		}
