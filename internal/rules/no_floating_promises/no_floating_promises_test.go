@@ -807,7 +807,6 @@ myAsyncFunction();
 			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": ["myAsyncFunction"]}`),
 		},
 		{
-			Skip: true,
 			Code: `
       interface CustomNode<P> {
         getNextNode: () => CustomNode<P>;
@@ -5606,7 +5605,6 @@ await Promise.reject('foo').then(...[], () => {});
 			},
 		},
 		{
-			Skip: true,
 			Code: `
         interface CustomNode<P> {
           getNextNode: () => CustomNode<P>;
@@ -5678,6 +5676,36 @@ await Promise.reject('foo').then(...[], () => {});
             return wrapNode<typeof node.getNextNode<any>>(node.getNextNode);
           });
         })();
+      `,
+						},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+declare function maybePromise<T>(value: T): T extends string ? Promise<void> : void;
+
+maybePromise('value');
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "floatingVoid",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "floatingFixVoid",
+							Output: `
+declare function maybePromise<T>(value: T): T extends string ? Promise<void> : void;
+
+void maybePromise('value');
+      `,
+						},
+						{
+							MessageId: "floatingFixAwait",
+							Output: `
+declare function maybePromise<T>(value: T): T extends string ? Promise<void> : void;
+
+await maybePromise('value');
       `,
 						},
 					},
