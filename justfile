@@ -29,11 +29,11 @@ init:
 
 [unix]
 build:
-  go build -o tsgolint ./cmd/tsgolint
+  go build -ldflags="-s -w" -o tsgolint ./cmd/tsgolint
 
 [windows]
 build:
-  $env:GOOS="windows"; $env:GOARCH="amd64"; go build -o tsgolint.exe ./cmd/tsgolint
+  $env:GOOS="windows"; $env:GOARCH="amd64"; go build -ldflags="-s -w" -o tsgolint.exe ./cmd/tsgolint
 
 test: build
   cd e2e && pnpm --ignore-workspace run test --run && cd ..
