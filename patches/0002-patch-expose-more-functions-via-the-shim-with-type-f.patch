@@ -1,4 +1,4 @@
-From e9a920c6ff0c59ef1159c628042eb0b1d8072111 Mon Sep 17 00:00:00 2001
+From eb938f1026d5dca3d85a18d7ab4f57a36ddd97ae Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 17 Apr 2026 10:40:11 +0100
 Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes

@@ -163,6 +163,7 @@ type extra_Checker struct {
   TotalInstantiationCount uint32
   instantiationCount uint32
   instantiationDepth uint32
+  conditionalConstraintDepth uint32
   inlineLevel int
   serializationLevel int
   currentNode *ast.Node
