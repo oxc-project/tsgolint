@@ -333,12 +333,15 @@ var NoDeprecatedRule = rule.Rule{
 				return "", nil, nil, false, ""
 			}
 
-			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, propertyNode.Parent, checker.ContextFlagsNone)
+			contextualType := checker.Checker_getApparentTypeOfContextualType(ctx.TypeChecker, propertyNode.Parent, checker.ContextFlagsNone)
 			if contextualType == nil {
 				return "", nil, nil, false, ""
 			}
 
 			property := checker.Checker_getPropertyOfType(ctx.TypeChecker, contextualType, propertyName)
+			if property == nil || !checker.Checker_isDeprecatedSymbol(ctx.TypeChecker, property) {
+				return propertyName, contextualType, property, false, ""
+			}
 			isDeprecated, reason := getJsDocDeprecation(property)
 			return propertyName, contextualType, property, isDeprecated, reason
 		}

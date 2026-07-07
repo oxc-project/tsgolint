@@ -10,7 +10,6 @@ import (
 func TestNoDeprecatedRule(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.includeTypes.json", t, &NoDeprecatedRule, []rule_tester.ValidTestCase{
-
 		{Code: `/** @deprecated */ var a;`},
 		{Code: `/** @deprecated */ var a = 1;`},
 		{Code: `/** @deprecated */ let a;`},
@@ -606,6 +605,34 @@ x.statusCode;
           [statusCodeName]: 500,
         });
       `, Options: rule_tester.OptionsFromJSON[NoDeprecatedOptions](`{"allow": ["statusCode"]}`)},
+		{Code: `
+			interface NavItemOptions { text: string; icon?: string }
+			interface AutoLinkOptions extends NavItemOptions { link: string }
+			interface SidebarGroupOptions extends NavItemOptions {
+				prefix?: string;
+				link?: string;
+				children: SidebarItemOptions[];
+			}
+			interface SidebarStructureOptions extends NavItemOptions {
+				prefix?: string;
+				link?: string;
+				children: "structure";
+			}
+			type SidebarItemOptions = AutoLinkOptions | SidebarGroupOptions | SidebarStructureOptions | string;
+			type SidebarArrayOptions = SidebarItemOptions[];
+			type SidebarObjectOptions = Record<string, SidebarArrayOptions | "structure" | false>;
+			type SidebarOptions = SidebarArrayOptions | SidebarObjectOptions | "structure" | false;
+			declare const sidebar: (options: SidebarOptions) => SidebarOptions;
+
+			sidebar({
+				"/": [{
+					text: "Demo",
+					prefix: "demo/",
+					link: "demo/",
+					children: "structure",
+				}],
+			});
+		`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,

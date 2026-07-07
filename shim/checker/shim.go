@@ -89,6 +89,8 @@ func Checker_getResolvedSignature(recv *checker.Checker, node *ast.Node, candida
 func Checker_isReadonlySymbol(recv *checker.Checker, symbol *ast.Symbol) bool
 //go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
 func Checker_IsDeprecatedDeclaration(recv *checker.Checker, declaration *ast.Node) bool
+//go:linkname Checker_isDeprecatedSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).isDeprecatedSymbol
+func Checker_isDeprecatedSymbol(recv *checker.Checker, symbol *ast.Symbol) bool
 //go:linkname Checker_getDeclarationOfAliasSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getDeclarationOfAliasSymbol
 func Checker_getDeclarationOfAliasSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Node
 //go:linkname Checker_getTypeOfSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfSymbol
@@ -135,6 +137,8 @@ func Checker_getBaseConstraintOfType(recv *checker.Checker, t *checker.Type) *ch
 func Checker_getContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
 //go:linkname Checker_getContextualTypeForArgumentAtIndex github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualTypeForArgumentAtIndex
 func Checker_getContextualTypeForArgumentAtIndex(recv *checker.Checker, callTarget *ast.Node, argIndex int) *checker.Type
+//go:linkname Checker_getApparentTypeOfContextualType github.com/microsoft/typescript-go/internal/checker.(*Checker).getApparentTypeOfContextualType
+func Checker_getApparentTypeOfContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
 //go:linkname Checker_getAwaitedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getAwaitedType
 func Checker_getAwaitedType(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_getAccessedPropertyName github.com/microsoft/typescript-go/internal/checker.(*Checker).getAccessedPropertyName
