@@ -4287,5 +4287,57 @@ item?.value === null;
 		},
 	})
 
+	// https://github.com/oxc-project/tsgolint/issues/1060
+	// `x == null || !x.y` collapses to `!x?.y`, not `x?.y`.
+	// Dropping the outer negation inverts runtime behaviour, so this fix must
+	// preserve it.
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { myField?: string } | undefined;
+if (item == null || !item.myField) {
+  throw new Error('missing');
+}
+`,
+		Output: []string{`
+declare const item: { myField?: string } | undefined;
+if (!item?.myField) {
+  throw new Error('missing');
+}
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { myField?: string } | null;
+if (item === null || !item.myField) {
+  throw new Error('missing');
+}
+`,
+		Output: []string{`
+declare const item: { myField?: string } | null;
+if (!item?.myField) {
+  throw new Error('missing');
+}
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { myField?: string } | undefined;
+if (item === undefined || !item.myField) {
+  throw new Error('missing');
+}
+`,
+		Output: []string{`
+declare const item: { myField?: string } | undefined;
+if (!item?.myField) {
+  throw new Error('missing');
+}
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }

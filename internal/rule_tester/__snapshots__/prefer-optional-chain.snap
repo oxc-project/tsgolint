@@ -5396,3 +5396,30 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    1 | foo && foo[bar as string | number] && foo[bar as string | number].baz;
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-602 - 1]
+Diagnostic 1: preferOptionalChain (3:5 - 3:33)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 | declare const item: { myField?: string } | undefined;
+   3 | if (item == null || !item.myField) {
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   throw new Error('missing');
+---
+
+[TestPreferOptionalChainRule/invalid-603 - 1]
+Diagnostic 1: preferOptionalChain (3:5 - 3:34)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 | declare const item: { myField?: string } | null;
+   3 | if (item === null || !item.myField) {
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   throw new Error('missing');
+---
+
+[TestPreferOptionalChainRule/invalid-604 - 1]
+Diagnostic 1: preferOptionalChain (3:5 - 3:39)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 | declare const item: { myField?: string } | undefined;
+   3 | if (item === undefined || !item.myField) {
+     |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |   throw new Error('missing');
+---

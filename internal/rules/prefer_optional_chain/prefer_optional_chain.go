@@ -3571,10 +3571,13 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 			newCode = optionalChainCode
 		}
 	} else {
-		firstOpIsNegated := chainForOptional[0].typ == OperandTypeNot
-		lastOpIsNegated := chainForOptional[len(chainForOptional)-1].typ == OperandTypeNot
-
-		if firstOpIsNegated && lastOpIsNegated {
+		// An OR chain that reduces to a plain optional-chain access (no trailing
+		// nullish/comparison) obeys De Morgan's law:
+		//   A || B || ... || Z == !(!A && !B && ... && !Z)
+		// If the deepest access operand is `!x.y.z`, the reduced expression is
+		// `!x?.y?.z`, even when earlier operands are nullish-equality guards
+		// like `x == null`.
+		if chainForOptional[len(chainForOptional)-1].typ == OperandTypeNot {
 			newCode = "!" + optionalChainCode
 		} else {
 			newCode = optionalChainCode
