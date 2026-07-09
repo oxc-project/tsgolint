@@ -66,87 +66,31 @@ jobs:
       - name: chmod +x
         run: find build -type f -name tsgolint -exec chmod +x {} \;
 
-      # ---------------------------------------------------------------------
-      # Authenticode-sign the Windows binaries.
-      #
-      # Company-managed Windows machines enforce Microsoft Defender's ASR rule
-      # "Block executable files from running unless they meet a prevalence, age,
-      # or trusted list criteria", which silently blocks the unsigned
-      # tsgolint.exe that oxlint spawns for type-aware rules:
-      #
-      #   Error: spawnSync ...\@oxlint-tsgolint\win32-x64\tsgolint.exe EACCES
-      #     errno: -4092, code: 'EACCES', syscall: 'spawnSync ...tsgolint.exe'
-      #
-      # It is a policy block (no user-facing "Unblock" prompt), so end users
-      # cannot override it. Authenticode-signing gives the binary a publisher
-      # reputation that satisfies the ASR "trusted" criterion for all enterprise
-      # Windows users. See https://github.com/oxc-project/tsgolint/issues/876.
-      #
-      # Signing uses SignPath Foundation (free Authenticode signing for OSS),
-      # which signs a GitHub-uploaded artifact via their service and works from
-      # this all-Linux pipeline (no Windows runner / signtool required). The
-      # cross-compiled binaries are still named `tsgolint` (no extension) at this
-      # stage; Authenticode signs the PE image regardless of file name, and the
-      # signed bytes are copied to `tsgolint.exe` by gen-npm-packages.mjs.
-      #
-      # TODO(maintainers): provision a SignPath Foundation project for this repo
-      # and add the following repository configuration. Until SIGNPATH_API_TOKEN
-      # is set, the steps below are skipped and the release publishes unsigned
-      # binaries (i.e. current behaviour), so the pipeline never breaks.
-      #   secrets:
-      #     SIGNPATH_API_TOKEN                    # SignPath REST API access token
-      #   variables (repository "Variables", not secrets):
-      #     SIGNPATH_ORGANIZATION_ID
-      #     SIGNPATH_PROJECT_SLUG
-      #     SIGNPATH_SIGNING_POLICY_SLUG
-      #     SIGNPATH_ARTIFACT_CONFIGURATION_SLUG  # must sign the extension-less
-      #                                           # `tsgolint` PE inside the zip
-      # ---------------------------------------------------------------------
-      - name: Upload unsigned Windows amd64 binary for signing
-        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
-        id: upload-unsigned-windows-amd64
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: unsigned-tsgolint-windows-amd64
-          path: build/tsgolint-windows-amd64/tsgolint
-          if-no-files-found: error
-
+      # Authenticode-sign the Windows binaries so Microsoft Defender's ASR rule
+      # "Block executable files ... unless they meet a prevalence, age, or
+      # trusted list criteria" stops blocking tsgolint.exe on managed machines
+      # (#876). Skipped until the SIGNPATH_* secret/vars are provisioned (see PR).
       - name: Sign Windows amd64 binary
         if: ${{ env.SIGNPATH_API_TOKEN != '' }}
-        uses: SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
+        uses: ./.github/actions/sign-windows-binary
         with:
+          goarch: amd64
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
           artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
-          github-artifact-id: ${{ steps.upload-unsigned-windows-amd64.outputs.artifact-id }}
-          wait-for-completion: true
-          # Extracts the signed `tsgolint` back over the unsigned one so that
-          # gen-npm-packages.mjs packs the signed binary.
-          output-artifact-directory: build/tsgolint-windows-amd64
-
-      - name: Upload unsigned Windows arm64 binary for signing
-        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
-        id: upload-unsigned-windows-arm64
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: unsigned-tsgolint-windows-arm64
-          path: build/tsgolint-windows-arm64/tsgolint
-          if-no-files-found: error
 
       - name: Sign Windows arm64 binary
         if: ${{ env.SIGNPATH_API_TOKEN != '' }}
-        uses: SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
+        uses: ./.github/actions/sign-windows-binary
         with:
+          goarch: arm64
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
           project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
           signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
           artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
-          github-artifact-id: ${{ steps.upload-unsigned-windows-arm64.outputs.artifact-id }}
-          wait-for-completion: true
-          output-artifact-directory: build/tsgolint-windows-arm64
 
       - name: Generate npm packages
         env:
