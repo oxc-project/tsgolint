@@ -957,3 +957,31 @@ Message: Import name `foo` must match one of the following formats: PascalCase
    1 | import { "🍎" as foo } from 'foo_bar';
      |                  ~~~
 ---
+
+[TestNamingConventionUpstreamParity/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:12 - 1:16)
+Message: Type Property name `123` must match one of the following formats: snake_case
+   1 | type T = { '123': number };
+     |            ~~~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:20 - 1:30)
+Message: Object Literal Property name `validName` must match one of the following formats: snake_case
+   1 | export const o = { 'validName': 1 };
+     |                    ~~~~~~~~~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:60 - 1:69)
+Message: Variable name `unused_var` must match one of the following formats: PascalCase
+   1 | const obj = { unused_var: 1 }; export default obj; const { unused_var } = obj;
+     |                                                            ~~~~~~~~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:72 - 1:80)
+Message: Variable name `top_level` must match one of the following formats: camelCase
+   1 | const top_level = 1; export { top_level }; export function f() { const top_level = 2; return top_level; }
+     |                                                                        ~~~~~~~~~
+---

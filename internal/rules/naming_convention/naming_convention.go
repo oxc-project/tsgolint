@@ -12,6 +12,8 @@ import (
 	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -125,8 +127,9 @@ type normalizedSelector struct {
 	prefix             []string
 	suffix             []string
 	weight             int
-	selectorName       string
-	hasFormats         bool // true when format was explicitly set (even if empty slice); false means format was null
+	// selectorName is the human-readable selector name used in messages
+	// (e.g. "Class Method"), precomputed once per selector config.
+	selectorName string
 }
 
 // selectorGroups provides O(1) lookup by individual selector, indexed by bit position.
@@ -358,105 +361,106 @@ func checkFormat(format PredefinedFormat, name string) bool {
 	return false
 }
 
+// The checkers mirror upstream format.ts: an empty name is valid, only the
+// first character's case-fold is inspected (so `$`, digits, and caseless
+// scripts pass), and underscores are the only forbidden interior characters.
+
 func isCamelCase(name string) bool {
 	if name == "" {
-		return false
+		return true
 	}
-	for i, r := range name {
-		if i == 0 && !unicode.IsLower(r) {
-			return false
-		}
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
+	r := firstRune(name)
+	return r == unicode.ToLower(r) && !strings.Contains(name, "_")
 }
 
 func isStrictCamelCase(name string) bool {
-	return isCamelCase(name) && !hasConsecutiveUppercase(name)
+	if name == "" {
+		return true
+	}
+	r := firstRune(name)
+	return r == unicode.ToLower(r) && hasStrictCamelHumps(name, false)
 }
 
 func isPascalCase(name string) bool {
 	if name == "" {
-		return false
+		return true
 	}
-	for i, r := range name {
-		if i == 0 && !unicode.IsUpper(r) {
-			return false
-		}
-		if !unicode.IsLetter(r) && !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
+	r := firstRune(name)
+	return r == unicode.ToUpper(r) && !strings.Contains(name, "_")
 }
 
 func isStrictPascalCase(name string) bool {
-	return isPascalCase(name) && !hasConsecutiveUppercase(name)
+	if name == "" {
+		return true
+	}
+	r := firstRune(name)
+	return r == unicode.ToUpper(r) && hasStrictCamelHumps(name, true)
 }
 
 func isSnakeCase(name string) bool {
-	if name == "" {
-		return false
-	}
-	if name[0] == '_' || name[len(name)-1] == '_' {
-		return false
-	}
-	prevUnderscore := false
-	for _, r := range name {
-		if r == '_' {
-			if prevUnderscore {
-				return false
-			}
-			prevUnderscore = true
-			continue
-		}
-		prevUnderscore = false
-		if !unicode.IsLower(r) && !unicode.IsDigit(r) {
-			return false
-		}
-	}
-	return true
+	return name == "" || (name == strings.ToLower(name) && validateUnderscores(name))
 }
 
 func isUpperCase(name string) bool {
-	if name == "" {
-		return false
-	}
-	if name[0] == '_' || name[len(name)-1] == '_' {
-		return false
-	}
-	prevUnderscore := false
+	return name == "" || (name == strings.ToUpper(name) && validateUnderscores(name))
+}
+
+func firstRune(name string) rune {
 	for _, r := range name {
-		if r == '_' {
-			if prevUnderscore {
-				return false
-			}
-			prevUnderscore = true
+		return r
+	}
+	return 0
+}
+
+// hasStrictCamelHumps mirrors upstream: no leading or interior underscores and
+// no consecutive uppercase humps; wasUpper is the case of the first character.
+func hasStrictCamelHumps(name string, wasUpper bool) bool {
+	if strings.HasPrefix(name, "_") {
+		return false
+	}
+	first := true
+	for _, r := range name {
+		if first {
+			first = false
 			continue
 		}
-		prevUnderscore = false
-		if !unicode.IsUpper(r) && !unicode.IsDigit(r) {
+		if r == '_' {
 			return false
+		}
+		isUpper := r == unicode.ToUpper(r) && r != unicode.ToLower(r)
+		if wasUpper == isUpper {
+			if wasUpper {
+				return false
+			}
+		} else {
+			wasUpper = isUpper
 		}
 	}
 	return true
 }
 
-func hasConsecutiveUppercase(name string) bool {
-	prevUpper := false
+// validateUnderscores checks for leading, trailing, and adjacent underscores.
+func validateUnderscores(name string) bool {
+	if strings.HasPrefix(name, "_") {
+		return false
+	}
+	wasUnderscore := false
+	first := true
 	for _, r := range name {
-		if unicode.IsUpper(r) {
-			if prevUpper {
-				return true
+		if first {
+			first = false
+			continue
+		}
+		if r == '_' {
+			if wasUnderscore {
+				return false
 			}
-			prevUpper = true
+			wasUnderscore = true
 		} else {
-			prevUpper = false
+			wasUnderscore = false
 		}
 	}
-	return false
+	return !wasUnderscore
 }
 
 // Option normalization
@@ -467,16 +471,15 @@ func normalizeOptions(rawOptions []NamingConventionOption) selectorGroups {
 		selectors := parseSelectorNames(opt.Selector)
 		modifiers := parseModifiers(opt.Modifiers)
 		types := parseTypeModifiers(opt.Types)
-		formats, hasFormats := parseFormats(opt.Format)
+		formats := parseFormats(opt.Format)
 		leadingUnderscore := parseUnderscoreOption(opt.LeadingUnderscore)
 		trailingUnderscore := parseUnderscoreOption(opt.TrailingUnderscore)
 		filter := parseFilter(opt.Filter)
 		custom := parseCustomRegex(opt.Custom)
 
 		for _, sel := range selectors {
-			expandedSelectors := expandSelector(sel)
-			for _, expandedSel := range expandedSelectors {
-				weight := calculateWeight(sel, modifiers, types, filter)
+			weight := calculateWeight(sel, modifiers, types, filter)
+			for _, expandedSel := range expandSelector(sel) {
 				all = append(all, normalizedSelector{
 					selector:           expandedSel,
 					modifiers:          modifiers,
@@ -489,8 +492,7 @@ func normalizeOptions(rawOptions []NamingConventionOption) selectorGroups {
 					prefix:             opt.Prefix,
 					suffix:             opt.Suffix,
 					weight:             weight,
-					selectorName:       selectorTypeString[expandedSel],
-					hasFormats:         hasFormats,
+					selectorName:       selectorTypeToMessageString(selectorTypeString[expandedSel]),
 				})
 			}
 		}
@@ -539,6 +541,9 @@ func parseSelectorNames(selectorRaw any) []Selector {
 		if sel, ok := selectorNameMap[v]; ok {
 			return []Selector{sel}
 		}
+		// Unknown selector names are dropped, consistent with the array path;
+		// falling back to SelectorDefault would turn a typo into a catch-all.
+		return nil
 	case []any:
 		var selectors []Selector
 		for _, item := range v {
@@ -546,14 +551,6 @@ func parseSelectorNames(selectorRaw any) []Selector {
 				if sel, ok := selectorNameMap[s]; ok {
 					selectors = append(selectors, sel)
 				}
-			}
-		}
-		return selectors
-	case []string:
-		var selectors []Selector
-		for _, s := range v {
-			if sel, ok := selectorNameMap[s]; ok {
-				selectors = append(selectors, sel)
 			}
 		}
 		return selectors
@@ -581,9 +578,9 @@ func parseTypeModifiers(types []string) TypeModifier {
 	return result
 }
 
-func parseFormats(formats *[]string) ([]PredefinedFormat, bool) {
+func parseFormats(formats *[]string) []PredefinedFormat {
 	if formats == nil {
-		return nil, false
+		return nil
 	}
 	var result []PredefinedFormat
 	for _, f := range *formats {
@@ -591,7 +588,7 @@ func parseFormats(formats *[]string) ([]PredefinedFormat, bool) {
 			result = append(result, pf)
 		}
 	}
-	return result, true
+	return result
 }
 
 func parseUnderscoreOption(opt *string) UnderscoreOption {
@@ -604,28 +601,34 @@ func parseUnderscoreOption(opt *string) UnderscoreOption {
 	return 0
 }
 
+// mustCompileOption compiles a user-supplied regex, panicking with a clear
+// message on failure. Silently dropping an uncompilable filter would make its
+// selector apply to every name, and dropping a custom regex would skip the
+// check entirely — both silently wrong results. Panicking matches how
+// utils.UnmarshalOptions handles invalid options. Note Go's RE2 does not
+// support JS-only constructs like lookahead or backreferences.
+func mustCompileOption(kind, regexStr string) *regexp.Regexp {
+	compiled, err := regexp.Compile(regexStr)
+	if err != nil {
+		panic(fmt.Sprintf("naming-convention: invalid or unsupported %s regex %q: %v", kind, regexStr, err))
+	}
+	return compiled
+}
+
 func parseFilter(filterRaw any) *normalizedFilter {
 	if filterRaw == nil {
 		return nil
 	}
 	switch v := filterRaw.(type) {
 	case string:
-		compiled, err := regexp.Compile(v)
-		if err != nil {
-			return nil
-		}
-		return &normalizedFilter{regex: compiled, match: true}
+		return &normalizedFilter{regex: mustCompileOption("filter", v), match: true}
 	case map[string]any:
 		regexStr, _ := v["regex"].(string)
 		match, ok := v["match"].(bool)
 		if !ok {
 			match = true
 		}
-		compiled, err := regexp.Compile(regexStr)
-		if err != nil {
-			return nil
-		}
-		return &normalizedFilter{regex: compiled, match: match}
+		return &normalizedFilter{regex: mustCompileOption("filter", regexStr), match: match}
 	default:
 		data, err := json.Marshal(v)
 		if err != nil {
@@ -637,17 +640,9 @@ func parseFilter(filterRaw any) *normalizedFilter {
 			if err := json.Unmarshal(data, &s); err != nil {
 				return nil
 			}
-			compiled, err := regexp.Compile(s)
-			if err != nil {
-				return nil
-			}
-			return &normalizedFilter{regex: compiled, match: true}
+			return &normalizedFilter{regex: mustCompileOption("filter", s), match: true}
 		}
-		compiled, err := regexp.Compile(mr.Regex)
-		if err != nil {
-			return nil
-		}
-		return &normalizedFilter{regex: compiled, match: mr.Match}
+		return &normalizedFilter{regex: mustCompileOption("filter", mr.Regex), match: mr.Match}
 	}
 }
 
@@ -655,11 +650,7 @@ func parseCustomRegex(custom *MatchRegex) *normalizedMatchRegex {
 	if custom == nil {
 		return nil
 	}
-	compiled, err := regexp.Compile(custom.Regex)
-	if err != nil {
-		return nil
-	}
-	return &normalizedMatchRegex{regex: compiled, match: custom.Match}
+	return &normalizedMatchRegex{regex: mustCompileOption("custom", custom.Regex), match: custom.Match}
 }
 
 func expandSelector(sel Selector) []Selector {
@@ -679,9 +670,6 @@ func expandSelector(sel Selector) []Selector {
 }
 
 func isMetaSelector(sel Selector) bool {
-	if sel == SelectorDefault {
-		return true
-	}
 	return bits.OnesCount(uint(sel)) > 1
 }
 
@@ -694,30 +682,31 @@ func isGroupMetaSelector(sel Selector) bool {
 
 // calculateWeight determines the specificity of a selector configuration.
 // Higher weight = more specific = should be checked first.
-// Specificity tiers: default(0) < group meta(1) < sub-group meta(2) < individual(3) < modifiers < type modifiers < filter
 func calculateWeight(originalSel Selector, modifiers Modifier, types TypeModifier, filter *normalizedFilter) int {
-	weight := 0
+	// Upstream's modifierWeight is the OR of the modifier and type-modifier
+	// bit VALUES (not a count); the Modifier/TypeModifier constants share
+	// upstream's exact bit layout, so ORing them reproduces upstream's
+	// same-selector ordering bit for bit (bits 0-21).
+	weight := int(modifiers) | int(types)
 
-	// Four tiers of selector specificity at bits 0-1:
+	// Selector specificity tier. Upstream compares modifierWeight only when
+	// two configs name the SAME selector; between different selectors the
+	// tier always wins (non-meta beats meta), so it sits above the modifier
+	// bits:
 	// - default = 0
 	// - group meta selectors (memberLike, variableLike, typeLike) = 1
 	// - sub-group meta selectors (method, property, accessor) = 2
 	// - individual selectors (classMethod, objectLiteralMethod, etc.) = 3
-	if originalSel == SelectorDefault {
+	switch {
+	case originalSel == SelectorDefault:
 		// weight stays 0
-	} else if isGroupMetaSelector(originalSel) {
-		weight |= 1
-	} else if isMetaSelector(originalSel) {
-		weight |= 2
-	} else {
-		weight |= 3
+	case isGroupMetaSelector(originalSel):
+		weight |= 1 << 22
+	case isMetaSelector(originalSel):
+		weight |= 2 << 22
+	default:
+		weight |= 3 << 22
 	}
-
-	// Each modifier adds weight (bits 2+)
-	weight |= bits.OnesCount(uint(modifiers)) << 2
-
-	// Type modifiers add more weight (bits 9+)
-	weight |= bits.OnesCount(uint(types)) << 9
 
 	// Filter adds the most weight
 	if filter != nil {
@@ -766,15 +755,15 @@ func validateName(
 		}
 
 		// Found matching selector - run format validation
-		return runFormatValidation(name, sel)
+		return runFormatValidation(name, sel, nodeModifiers)
 	}
 
 	return nil
 }
 
-func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage {
+func runFormatValidation(name string, sel *normalizedSelector, nodeModifiers Modifier) *rule.RuleMessage {
 	processedName := name
-	selectorName := selectorTypeToMessageString(sel.selectorName)
+	selectorName := sel.selectorName
 
 	if sel.leadingUnderscore != 0 {
 		stripped, msg := validateUnderscore("leading", processedName, sel.leadingUnderscore, selectorName, name)
@@ -814,8 +803,8 @@ func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage
 		}
 	}
 
-	if sel.hasFormats && len(sel.formats) > 0 {
-		if msg := validatePredefinedFormat(name, processedName, sel.formats, selectorName); msg != nil {
+	if len(sel.formats) > 0 {
+		if msg := validatePredefinedFormat(name, processedName, sel.formats, selectorName, nodeModifiers); msg != nil {
 			return msg
 		}
 	}
@@ -896,6 +885,11 @@ func validateAffix(affixType string, name string, affixes []string, selectorName
 			}
 		} else {
 			if strings.HasSuffix(name, affix) {
+				if affix == "" {
+					// Mirror upstream's name.slice(0, -affix.length): for an
+					// empty suffix, slice(0, -0) trims the whole name.
+					return "", nil
+				}
 				return name[:len(name)-len(affix)], nil
 			}
 		}
@@ -916,10 +910,14 @@ func validateCustomRegex(name string, custom *normalizedMatchRegex, selectorName
 	return nil
 }
 
-func validatePredefinedFormat(originalName string, processedName string, formats []PredefinedFormat, selectorName string) *rule.RuleMessage {
-	for _, format := range formats {
-		if checkFormat(format, processedName) {
-			return nil
+func validatePredefinedFormat(originalName string, processedName string, formats []PredefinedFormat, selectorName string, nodeModifiers Modifier) *rule.RuleMessage {
+	// Upstream skips the format check for names that require quoting: such
+	// names can never satisfy a format, so they are always reported.
+	if nodeModifiers&ModifierRequiresQuotes == 0 {
+		for _, format := range formats {
+			if checkFormat(format, processedName) {
+				return nil
+			}
 		}
 	}
 
@@ -935,6 +933,42 @@ func validatePredefinedFormat(originalName string, processedName string, formats
 	}
 	msg := buildDoesNotMatchFormatTrimmedMessage(selectorName, originalName, processedName, joined)
 	return &msg
+}
+
+// nameRequiresQuotes mirrors upstream requiresQuoting: a member name written
+// as a string literal only carries the requiresQuotes modifier when it is not
+// a valid identifier.
+func nameRequiresQuotes(name string) bool {
+	return !scanner.IsIdentifierText(name, core.LanguageVariantStandard)
+}
+
+// extractDeclarationName returns the name text and quote-related modifiers for
+// a declaration name node. Name kinds needing caller-specific handling
+// (private identifiers, numeric literals) must be checked before calling.
+// ok is false when the name is computed or empty.
+func extractDeclarationName(nameNode *ast.Node) (string, Modifier, bool) {
+	if ast.IsComputedPropertyName(nameNode) {
+		return "", 0, false
+	}
+	var name string
+	var modifiers Modifier
+	isStringLiteralName := false
+	switch {
+	case ast.IsIdentifier(nameNode):
+		name = nameNode.AsIdentifier().Text
+	case ast.IsStringLiteral(nameNode):
+		name = nameNode.AsStringLiteral().Text
+		if nameRequiresQuotes(name) {
+			modifiers |= ModifierRequiresQuotes
+		}
+		isStringLiteralName = true
+	default:
+		name = nameNode.Text()
+	}
+	if name == "" && !isStringLiteralName {
+		return "", 0, false
+	}
+	return name, modifiers, true
 }
 
 // Default options and rule definition
@@ -982,7 +1016,9 @@ var NamingConventionRule = rule.Rule{
 
 		report := func(node *ast.Node, name string, nodeSelector Selector, nodeModifiers Modifier) {
 			var nodeTypes TypeModifier
-			if needsTypeInfo {
+			// validateName only consults nodeTypes for selectors in
+			// selectorsWithTypesMask, so skip the checker query for the rest.
+			if needsTypeInfo && nodeSelector&selectorsWithTypesMask != 0 {
 				nodeTypes = detectTypeModifiers(ctx, node)
 			}
 
@@ -1004,35 +1040,24 @@ var NamingConventionRule = rule.Rule{
 				return
 			}
 
-			if ast.IsComputedPropertyName(nameNode) {
+			name, mods, ok := extractDeclarationName(nameNode)
+			if !ok {
 				return
 			}
 
-			var name string
-			isStringLiteralName := false
-			if ast.IsIdentifier(nameNode) {
-				name = nameNode.AsIdentifier().Text
-			} else if ast.IsPrivateIdentifier(nameNode) {
-				name = nameNode.Text()
-			} else if ast.IsStringLiteral(nameNode) {
-				name = nameNode.AsStringLiteral().Text
-				baseModifiers |= ModifierRequiresQuotes
-				isStringLiteralName = true
-			} else {
-				name = nameNode.Text()
-			}
-
-			if name == "" && !isStringLiteralName {
-				return
-			}
-
-			report(nameNode, name, nodeSelector, baseModifiers)
+			report(nameNode, name, nodeSelector, baseModifiers|mods)
 		}
 
 		listeners := make(rule.RuleListeners)
 
 		// Variable declarations
 		listeners[ast.KindVariableDeclaration] = func(node *ast.Node) {
+			// typescript-go parses `catch (e)` as a VariableDeclaration, but
+			// upstream never visits catch bindings.
+			if node.Parent != nil && node.Parent.Kind == ast.KindCatchClause {
+				return
+			}
+
 			varDecl := node.AsVariableDeclaration()
 			nameNode := varDecl.Name()
 			if nameNode == nil {
@@ -1040,7 +1065,7 @@ var NamingConventionRule = rule.Rule{
 			}
 
 			if ast.IsObjectBindingPattern(nameNode) || ast.IsArrayBindingPattern(nameNode) {
-				processBindingPattern(nameNode, report, node, ctx, exportedViaBlock)
+				processBindingPattern(nameNode, report, unusedModifier, node, exportedViaBlock)
 				return
 			}
 
@@ -1049,7 +1074,7 @@ var NamingConventionRule = rule.Rule{
 			}
 
 			name := nameNode.AsIdentifier().Text
-			modifiers := detectVariableModifiers(node, ctx, exportedViaBlock)
+			modifiers := detectVariableModifiers(node, exportedViaBlock)
 			modifiers |= unusedModifier(nameNode)
 			report(nameNode, name, SelectorVariable, modifiers)
 		}
@@ -1064,7 +1089,7 @@ var NamingConventionRule = rule.Rule{
 				return
 			}
 			name := nameNode.AsIdentifier().Text
-			modifiers := detectFunctionModifiers(node, ctx, exportedViaBlock)
+			modifiers := detectFunctionModifiers(node, exportedViaBlock)
 			modifiers |= unusedModifier(nameNode)
 			report(nameNode, name, SelectorFunction, modifiers)
 		}
@@ -1086,19 +1111,31 @@ var NamingConventionRule = rule.Rule{
 			report(nameNode, name, SelectorFunction, modifiers)
 		}
 
-		// Parameters
+		// Parameters. Upstream only visits parameters of concrete function-like
+		// declarations/expressions, never parameters in type positions
+		// (function types, method/call/construct/index signatures).
 		listeners[ast.KindParameter] = func(node *ast.Node) {
+			if node.Parent == nil {
+				return
+			}
+			switch node.Parent.Kind {
+			case ast.KindFunctionDeclaration, ast.KindFunctionExpression, ast.KindArrowFunction,
+				ast.KindMethodDeclaration, ast.KindConstructor, ast.KindGetAccessor, ast.KindSetAccessor:
+			default:
+				return
+			}
+
 			paramDecl := node.AsParameterDeclaration()
 			nameNode := paramDecl.Name()
 			if nameNode == nil {
 				return
 			}
 
-			isParamProp := paramDecl.ModifierFlags()&ast.ModifierFlagsParameterPropertyModifier != 0
+			isParamProp := ast.IsParameterPropertyDeclaration(node, node.Parent)
 
 			if ast.IsObjectBindingPattern(nameNode) || ast.IsArrayBindingPattern(nameNode) {
 				if !isParamProp {
-					processBindingPattern(nameNode, report, node, ctx, exportedViaBlock)
+					processBindingPattern(nameNode, report, unusedModifier, node, exportedViaBlock)
 				}
 				return
 			}
@@ -1164,7 +1201,7 @@ var NamingConventionRule = rule.Rule{
 			processNode(node, SelectorEnum, modifiers)
 		}
 
-		// Enum members
+		// Enum members. Upstream assigns them no accessibility modifier.
 		listeners[ast.KindEnumMember] = func(node *ast.Node) {
 			enumMember := node.AsEnumMember()
 			nameNode := enumMember.Name()
@@ -1172,23 +1209,8 @@ var NamingConventionRule = rule.Rule{
 				return
 			}
 
-			var name string
-			var modifiers Modifier
-			modifiers |= ModifierPublic
-			isStringLiteralName := false
-			if ast.IsIdentifier(nameNode) {
-				name = nameNode.AsIdentifier().Text
-			} else if ast.IsStringLiteral(nameNode) {
-				name = nameNode.AsStringLiteral().Text
-				modifiers |= ModifierRequiresQuotes
-				isStringLiteralName = true
-			} else if ast.IsComputedPropertyName(nameNode) {
-				return
-			} else {
-				name = nameNode.Text()
-			}
-
-			if name == "" && !isStringLiteralName {
+			name, modifiers, ok := extractDeclarationName(nameNode)
+			if !ok {
 				return
 			}
 			report(nameNode, name, SelectorEnumMember, modifiers)
@@ -1277,26 +1299,14 @@ var NamingConventionRule = rule.Rule{
 				sel = SelectorObjectLiteralMethod
 			}
 
-			var name string
-			var modifiers Modifier
+			if ast.IsNumericLiteral(nameNode) {
+				return
+			}
+			name, modifiers, ok := extractDeclarationName(nameNode)
+			if !ok {
+				return
+			}
 			modifiers |= ModifierPublic
-			isStringLiteralName := false
-
-			if ast.IsIdentifier(nameNode) {
-				name = nameNode.AsIdentifier().Text
-			} else if ast.IsStringLiteral(nameNode) {
-				name = nameNode.AsStringLiteral().Text
-				modifiers |= ModifierRequiresQuotes
-				isStringLiteralName = true
-			} else if ast.IsNumericLiteral(nameNode) {
-				return
-			} else {
-				name = nameNode.Text()
-			}
-
-			if name == "" && !isStringLiteralName {
-				return
-			}
 
 			// Add async modifier if the function value is async
 			if sel == SelectorObjectLiteralMethod && propAssign.Initializer != nil &&
@@ -1323,31 +1333,13 @@ var NamingConventionRule = rule.Rule{
 				return
 			}
 
-			if ast.IsComputedPropertyName(nameNode) {
+			name, modifiers, ok := extractDeclarationName(nameNode)
+			if !ok {
 				return
 			}
-
-			var name string
-			var modifiers Modifier
 			modifiers |= ModifierPublic
-			isStringLiteralName := false
-
 			if node.ModifierFlags()&ast.ModifierFlagsReadonly != 0 {
 				modifiers |= ModifierReadonly
-			}
-
-			if ast.IsIdentifier(nameNode) {
-				name = nameNode.AsIdentifier().Text
-			} else if ast.IsStringLiteral(nameNode) {
-				name = nameNode.AsStringLiteral().Text
-				modifiers |= ModifierRequiresQuotes
-				isStringLiteralName = true
-			} else {
-				name = nameNode.Text()
-			}
-
-			if name == "" && !isStringLiteralName {
-				return
 			}
 
 			// Properties with function type annotations are classified as methods
@@ -1367,29 +1359,11 @@ var NamingConventionRule = rule.Rule{
 				return
 			}
 
-			if ast.IsComputedPropertyName(nameNode) {
+			name, modifiers, ok := extractDeclarationName(nameNode)
+			if !ok {
 				return
 			}
-
-			var name string
-			var modifiers Modifier
-			modifiers |= ModifierPublic
-			isStringLiteralName := false
-
-			if ast.IsIdentifier(nameNode) {
-				name = nameNode.AsIdentifier().Text
-			} else if ast.IsStringLiteral(nameNode) {
-				name = nameNode.AsStringLiteral().Text
-				modifiers |= ModifierRequiresQuotes
-				isStringLiteralName = true
-			} else {
-				name = nameNode.Text()
-			}
-
-			if name == "" && !isStringLiteralName {
-				return
-			}
-			report(nameNode, name, SelectorTypeMethod, modifiers)
+			report(nameNode, name, SelectorTypeMethod, modifiers|ModifierPublic)
 		}
 
 		// Import clause (default imports)
@@ -1458,7 +1432,7 @@ func parseOptions(options any) []NamingConventionOption {
 	return selectorOptions
 }
 
-func processBindingPattern(pattern *ast.Node, report func(*ast.Node, string, Selector, Modifier), parentDecl *ast.Node, ctx rule.RuleContext, exportedViaBlock map[string]bool) {
+func processBindingPattern(pattern *ast.Node, report func(*ast.Node, string, Selector, Modifier), unusedModifier func(*ast.Node) Modifier, parentDecl *ast.Node, exportedViaBlock map[string]bool) {
 	bindingPattern := pattern.AsBindingPattern()
 	if bindingPattern.Elements == nil {
 		return
@@ -1475,26 +1449,28 @@ func processBindingPattern(pattern *ast.Node, report func(*ast.Node, string, Sel
 			continue
 		}
 		if ast.IsObjectBindingPattern(nameNode) || ast.IsArrayBindingPattern(nameNode) {
-			processBindingPattern(nameNode, report, parentDecl, ctx, exportedViaBlock)
+			processBindingPattern(nameNode, report, unusedModifier, parentDecl, exportedViaBlock)
 			continue
 		}
 		if ast.IsIdentifier(nameNode) {
 			name := nameNode.AsIdentifier().Text
-			// Only mark as destructured if the binding element has no property name
-			// (shorthand like { name }). Renamed bindings like { prop: name } are
-			// not considered destructured because the user chose the local name.
-			isDestructured := child.AsBindingElement().PropertyName == nil
+			// Only object-pattern shorthand like { name } is destructured
+			// upstream. Renamed bindings like { prop: name } are not (the user
+			// chose the local name), and array-pattern elements never are.
+			isDestructured := ast.IsObjectBindingPattern(pattern) && child.AsBindingElement().PropertyName == nil
 			if isParam {
 				var modifiers Modifier
 				if isDestructured {
 					modifiers |= ModifierDestructured
 				}
+				modifiers |= unusedModifier(nameNode)
 				report(nameNode, name, SelectorParameter, modifiers)
 			} else {
-				modifiers := detectVariableModifiers(parentDecl, ctx, exportedViaBlock)
+				modifiers := detectVariableModifiers(parentDecl, exportedViaBlock)
 				if isDestructured {
 					modifiers |= ModifierDestructured
 				}
+				modifiers |= unusedModifier(nameNode)
 				report(nameNode, name, SelectorVariable, modifiers)
 			}
 		}
@@ -1502,51 +1478,38 @@ func processBindingPattern(pattern *ast.Node, report func(*ast.Node, string, Sel
 }
 
 func processClassMember(nameNode *ast.Node, sel Selector, modifiers Modifier, report func(*ast.Node, string, Selector, Modifier)) {
-	if ast.IsComputedPropertyName(nameNode) {
-		return
-	}
-
-	var name string
-	isStringLiteralName := false
-	if ast.IsIdentifier(nameNode) {
-		name = nameNode.AsIdentifier().Text
-	} else if ast.IsPrivateIdentifier(nameNode) {
-		name = nameNode.Text()
-		modifiers |= ModifierHashPrivate
+	if ast.IsPrivateIdentifier(nameNode) {
+		name := nameNode.Text()
 		// Strip the leading # for format validation
 		if len(name) > 0 && name[0] == '#' {
 			name = name[1:]
 		}
-	} else if ast.IsStringLiteral(nameNode) {
-		name = nameNode.AsStringLiteral().Text
-		modifiers |= ModifierRequiresQuotes
-		isStringLiteralName = true
-	} else {
-		name = nameNode.Text()
-	}
-
-	if name == "" && !isStringLiteralName {
+		if name == "" {
+			return
+		}
+		report(nameNode, name, sel, modifiers|ModifierHashPrivate)
 		return
 	}
-	report(nameNode, name, sel, modifiers)
+
+	name, nameModifiers, ok := extractDeclarationName(nameNode)
+	if !ok {
+		return
+	}
+	report(nameNode, name, sel, modifiers|nameModifiers)
 }
 
 // Modifier detection functions
 
-func detectVariableModifiers(node *ast.Node, ctx rule.RuleContext, exportedViaBlock map[string]bool) Modifier {
+func detectVariableModifiers(node *ast.Node, exportedViaBlock map[string]bool) Modifier {
 	var modifiers Modifier
 
 	if node.Parent != nil && ast.IsVariableDeclarationList(node.Parent) && node.Parent.Flags&ast.NodeFlagsConst != 0 {
 		modifiers |= ModifierConst
 	}
 
-	if node.ModifierFlags()&ast.ModifierFlagsExport != 0 {
-		modifiers |= ModifierExported
-	} else if isExportedViaParent(node, exportedViaBlock) {
-		modifiers |= ModifierExported
-	}
+	modifiers |= detectExportedModifier(node, exportedViaBlock)
 
-	if isGlobalScope(node, ctx) {
+	if isGlobalScope(node) {
 		modifiers |= ModifierGlobal
 	}
 
@@ -1561,16 +1524,12 @@ func detectVariableModifiers(node *ast.Node, ctx rule.RuleContext, exportedViaBl
 	return modifiers
 }
 
-func detectFunctionModifiers(node *ast.Node, ctx rule.RuleContext, exportedViaBlock map[string]bool) Modifier {
+func detectFunctionModifiers(node *ast.Node, exportedViaBlock map[string]bool) Modifier {
 	var modifiers Modifier
 
-	if node.ModifierFlags()&ast.ModifierFlagsExport != 0 {
-		modifiers |= ModifierExported
-	} else if isExportedViaParent(node, exportedViaBlock) {
-		modifiers |= ModifierExported
-	}
+	modifiers |= detectExportedModifier(node, exportedViaBlock)
 
-	if isGlobalScope(node, ctx) {
+	if isGlobalScope(node) {
 		modifiers |= ModifierGlobal
 	}
 
@@ -1613,11 +1572,7 @@ func detectClassModifiers(node *ast.Node, exportedViaBlock map[string]bool) Modi
 		modifiers |= ModifierAbstract
 	}
 
-	if flags&ast.ModifierFlagsExport != 0 {
-		modifiers |= ModifierExported
-	} else if isExportedViaParent(node, exportedViaBlock) {
-		modifiers |= ModifierExported
-	}
+	modifiers |= detectExportedModifier(node, exportedViaBlock)
 
 	return modifiers
 }
@@ -1774,13 +1729,6 @@ func detectUnusedModifier(ctx rule.RuleContext, nameNode *ast.Node, exportedViaB
 // isDeclarationExported checks if the declaration containing nameNode has an export modifier
 // or is exported via an `export { ... }` block.
 func isDeclarationExported(nameNode *ast.Node, exportedViaBlock map[string]bool) bool {
-	// Check export-via-block map
-	if ast.IsIdentifier(nameNode) {
-		name := nameNode.AsIdentifier().Text
-		if exportedViaBlock[name] {
-			return true
-		}
-	}
 	node := nameNode.Parent
 	if node == nil {
 		return false
@@ -1795,34 +1743,61 @@ func isDeclarationExported(nameNode *ast.Node, exportedViaBlock map[string]bool)
 	if node == nil {
 		return false
 	}
-	return node.ModifierFlags()&ast.ModifierFlagsExport != 0
+	if node.ModifierFlags()&ast.ModifierFlagsExport != 0 {
+		return true
+	}
+	// `export { name }` re-exports module-scope bindings only, so consult the
+	// name-keyed map just for top-level declarations; nested locals merely
+	// sharing the name must not be treated as exported.
+	if ast.IsIdentifier(nameNode) && node.Parent != nil && node.Parent.Kind == ast.KindSourceFile {
+		return exportedViaBlock[nameNode.AsIdentifier().Text]
+	}
+	return false
 }
 
+// detectTypeModifiers mirrors upstream isCorrectType: strip null/undefined,
+// then require EVERY union constituent to match for array/function, and exact
+// whole-type string equality on the widened base literal type for
+// boolean/string/number — so a mixed union like `string | number` matches
+// no type modifier at all.
 func detectTypeModifiers(ctx rule.RuleContext, node *ast.Node) TypeModifier {
 	t := ctx.TypeChecker.GetTypeAtLocation(node)
 	if t == nil {
 		return 0
 	}
+	t = checker.Checker_GetNonNullableType(ctx.TypeChecker, t)
 
 	var result TypeModifier
 
-	allParts := utils.UnionTypeParts(t)
-	for _, part := range allParts {
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLike) {
-			result |= TypeModifierBoolean
+	parts := utils.UnionTypeParts(t)
+	allPartsMatch := func(pred func(part *checker.Type) bool) bool {
+		for _, part := range parts {
+			if !pred(part) {
+				return false
+			}
 		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsStringLike) {
-			result |= TypeModifierString
-		}
-		if utils.IsTypeFlagSet(part, checker.TypeFlagsNumberLike) {
-			result |= TypeModifierNumber
-		}
-		if len(utils.GetCallSignatures(ctx.TypeChecker, part)) > 0 {
-			result |= TypeModifierFunction
-		}
-		if checker.Checker_isArrayOrTupleType(ctx.TypeChecker, part) {
-			result |= TypeModifierArray
-		}
+		return len(parts) > 0
+	}
+
+	if allPartsMatch(func(part *checker.Type) bool {
+		return checker.Checker_isArrayOrTupleType(ctx.TypeChecker, part)
+	}) {
+		result |= TypeModifierArray
+	}
+	if allPartsMatch(func(part *checker.Type) bool {
+		return len(utils.GetCallSignatures(ctx.TypeChecker, part)) > 0
+	}) {
+		result |= TypeModifierFunction
+	}
+
+	widened := checker.Checker_getWidenedType(ctx.TypeChecker, checker.Checker_getBaseTypeOfLiteralType(ctx.TypeChecker, t))
+	switch ctx.TypeChecker.TypeToString(widened) {
+	case "boolean":
+		result |= TypeModifierBoolean
+	case "string":
+		result |= TypeModifierString
+	case "number":
+		result |= TypeModifierNumber
 	}
 
 	return result
@@ -1832,18 +1807,23 @@ func isExportedViaParent(node *ast.Node, exportedViaBlock map[string]bool) bool 
 	if node.Parent == nil {
 		return false
 	}
+	stmt := node
 	parent := node.Parent
 	if ast.IsVariableDeclarationList(parent) {
+		stmt = parent.Parent
 		parent = parent.Parent
 	}
 	if parent != nil && parent.ModifierFlags()&ast.ModifierFlagsExport != 0 {
 		return true
 	}
-	// Check if exported via `export { name }` block
+	// `export { name }` re-exports module-scope bindings only, so consult the
+	// name-keyed map just for top-level declarations; nested locals merely
+	// sharing the name must not inherit the exported modifier.
+	if stmt == nil || stmt.Parent == nil || stmt.Parent.Kind != ast.KindSourceFile {
+		return false
+	}
 	if nameNode := node.Name(); nameNode != nil && ast.IsIdentifier(nameNode) {
-		if exportedViaBlock[nameNode.AsIdentifier().Text] {
-			return true
-		}
+		return exportedViaBlock[nameNode.AsIdentifier().Text]
 	}
 	return false
 }
@@ -1889,7 +1869,7 @@ func buildExportedViaBlockMap(sourceFile *ast.SourceFile) map[string]bool {
 	return result
 }
 
-func isGlobalScope(node *ast.Node, ctx rule.RuleContext) bool {
+func isGlobalScope(node *ast.Node) bool {
 	ancestor := node.Parent
 	// For variables: VarDecl → VDL → VarStmt → SourceFile (unwrap twice)
 	if ancestor != nil && ast.IsVariableDeclarationList(ancestor) {
@@ -1904,8 +1884,5 @@ func isGlobalScope(node *ast.Node, ctx rule.RuleContext) bool {
 	}
 	// For functions: FuncDecl.Parent should be SourceFile directly.
 	// For block-scoped: FuncDecl.Parent is Block → not SourceFile → false.
-	if ancestor.Kind == ast.KindSourceFile {
-		return !ast.IsExternalOrCommonJSModule(ctx.SourceFile)
-	}
-	return false
+	return ast.IsGlobalSourceFile(ancestor)
 }
