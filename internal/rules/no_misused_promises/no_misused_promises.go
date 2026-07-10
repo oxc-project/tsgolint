@@ -535,11 +535,13 @@ var NoMisusedPromisesRule = rule.Rule{
 				return
 			}
 
-			heritageTypes := utils.Flatten(utils.Map(heritageClauses.Nodes, func(h *ast.Node) []*checker.Type {
-				return utils.Map(h.AsHeritageClause().Types.Nodes, func(n *ast.Node) *checker.Type {
-					return ctx.TypeChecker.GetTypeAtLocation(n)
-				})
-			}))
+			// Resolving the heritage clause types (one GetTypeAtLocation per
+			// extended/implemented type) is only needed once we actually find a
+			// Promise-returning member to check against them. Classes/interfaces
+			// whose members are all synchronous — the common case — never need it,
+			// so compute it lazily on first use.
+			var heritageTypes []*checker.Type
+			heritageResolved := false
 
 			for _, nodeMember := range node.Members() {
 				if nodeMember.Name() == nil {
@@ -558,6 +560,14 @@ var NoMisusedPromisesRule = rule.Rule{
 				}
 				if !returnsThenable(nodeMember) {
 					continue
+				}
+				if !heritageResolved {
+					heritageTypes = utils.Flatten(utils.Map(heritageClauses.Nodes, func(h *ast.Node) []*checker.Type {
+						return utils.Map(h.AsHeritageClause().Types.Nodes, func(n *ast.Node) *checker.Type {
+							return ctx.TypeChecker.GetTypeAtLocation(n)
+						})
+					}))
+					heritageResolved = true
 				}
 				for _, heritageType := range heritageTypes {
 					checkHeritageTypeForMemberReturningVoid(
