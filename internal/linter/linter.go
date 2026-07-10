@@ -289,7 +289,10 @@ func (b *ruleContextBuilder) reportNodeWithFixes(node *ast.Node, msg rule.RuleMe
 }
 
 func (b *ruleContextBuilder) reportNodeWithSuggestions(node *ast.Node, msg rule.RuleMessage, suggestionsFn func() []rule.RuleSuggestion) {
-	suggestions := suggestionsFn()
+	var suggestions []rule.RuleSuggestion
+	if b.fixState.FixSuggestions {
+		suggestions = suggestionsFn()
+	}
 	b.emitDiagnostic(rule.RuleDiagnostic{
 		Range:       utils.TrimNodeTextRange(b.file, node),
 		Message:     msg,
