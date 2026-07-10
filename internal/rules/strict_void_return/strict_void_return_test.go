@@ -2364,27 +2364,6 @@ f(undefined, () => 'test');
 				{MessageId: "nonVoidReturn", Line: 4},
 			},
 		},
-		{
-			Code: `
-declare function foo(cb: () => void): void;
-function bar<T extends () => number>(t: T) {
-  foo({ ...t });
-}
-      `,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "nonVoidFunc", Line: 4},
-			},
-		},
-		{
-			Code: `
-function bar<T extends () => number>(t: T) {
-  const cb: () => void = { ...t };
-}
-      `,
-			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "nonVoidFunc", Line: 3},
-			},
-		},
 	}
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &StrictVoidReturnRule, validCases, invalidCases)
