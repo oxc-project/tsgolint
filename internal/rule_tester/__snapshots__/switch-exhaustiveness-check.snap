@@ -522,6 +522,35 @@ Message: Switch is not exhaustive. Cases not matched: undefined
   Suggestion 1: [addMissingCases] Add branches for missing cases.
 ---
 
+[TestSwitchExhaustivenessCheckRule/invalid-47 - 1]
+Diagnostic 1: dangerousDefaultCase (8:3 - 8:15)
+Message: The switch statement is exhaustive, so the default case is unnecessary.
+   7 |     return 'b';
+   8 |   // no default
+     |   ~~~~~~~~~~~~~
+   9 | }
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-48 - 1]
+Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
+Message: Switch is not exhaustive. Cases not matched: "b" | "c"
+   3 | 
+   4 | switch (literal) {
+     |         ~~~~~~~
+   5 |   case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
+[TestSwitchExhaustivenessCheckRule/invalid-49 - 1]
+Diagnostic 1: switchIsNotExhaustive (4:9 - 4:15)
+Message: Switch is not exhaustive. Cases not matched: "b" | "c"
+   3 | 
+   4 | switch (literal) {
+     |         ~~~~~~~
+   5 |   case 'a':
+  Suggestion 1: [addMissingCases] Add branches for missing cases.
+---
+
 [TestSwitchExhaustivenessCheckRule/invalid-50 - 1]
 Diagnostic 1: switchIsNotExhaustive (9:17 - 9:19)
 Message: Switch is not exhaustive. Cases not matched: B.D

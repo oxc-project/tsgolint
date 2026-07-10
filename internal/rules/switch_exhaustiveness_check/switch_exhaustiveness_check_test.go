@@ -730,8 +730,6 @@ switch (value) {
   // no default
 }
       `,
-			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip:    true,
 			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"requireDefaultForNonUnion": true}`),
 		},
 		{
@@ -743,8 +741,6 @@ switch (value) {
   // no default
 }
       `,
-			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip:    true,
 			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
 		},
 		{
@@ -756,9 +752,21 @@ switch (value) {
   // skip default
 }
       `,
-			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip:    true,
-			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true}`),
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": true, "defaultCaseCommentPattern": "^skip\\sdefault"}`),
+		},
+		{
+			Code: `
+declare const value: number;
+switch (value) {
+  case 0:
+    break;
+  case 1:
+    break;
+  // no default
+  // TODO: add another case
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"requireDefaultForNonUnion": true}`),
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -2401,8 +2409,6 @@ switch (myValue) {
   // no default
 }
       `,
-			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip:    true,
 			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"allowDefaultCaseForExhaustiveSwitch": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "dangerousDefaultCase",
 			},
@@ -2418,8 +2424,6 @@ switch (literal) {
   // no default
 }
       `,
-			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip:    true,
 			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`), Errors: []rule_tester.InvalidTestCaseError{{
 				MessageId: "switchIsNotExhaustive",
 				Line:      4,
@@ -2453,9 +2457,7 @@ switch (literal) {
   // skip default
 }
       `,
-			// TODO(port): add support for DefaultCaseCommentPattern
-			Skip:    true,
-			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false}`),
+			Options: rule_tester.OptionsFromJSON[SwitchExhaustivenessCheckOptions](`{"considerDefaultExhaustiveForUnions": false, "defaultCaseCommentPattern": "^skip\\sdefault"}`),
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "switchIsNotExhaustive",

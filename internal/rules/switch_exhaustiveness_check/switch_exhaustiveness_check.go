@@ -5,6 +5,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/dlclark/regexp2/v2"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -35,10 +36,15 @@ func buildSwitchIsNotExhaustiveMessage(missingBranches string) rule.RuleMessage 
 
 type SwitchMetadata struct {
 	ContainsNonLiteralType bool
-	// nil if there is no default case
+	// Both are nil if there is no default case or matching default-case comment.
 	DefaultCase               *ast.CaseOrDefaultClause
+	DefaultCaseComment        *ast.CommentRange
 	MissingLiteralBranchTypes []*checker.Type
 	SymbolName                string
+}
+
+func (m *SwitchMetadata) hasDefaultCase() bool {
+	return m.DefaultCase != nil || m.DefaultCaseComment != nil
 }
 
 func isLiteralLikeType(t *checker.Type) bool {
@@ -71,7 +77,35 @@ func doesTypeContainNonLiteralType(t *checker.Type) bool {
 	)
 }
 
-func getSwitchMetadata(typeChecker *checker.Checker, node *ast.SwitchStatement) *SwitchMetadata {
+func getCommentDefaultCase(sourceFile *ast.SourceFile, node *ast.SwitchStatement, commentPattern *regexp2.Regexp) *ast.CommentRange {
+	cases := node.CaseBlock.AsCaseBlock().Clauses.Nodes
+	if len(cases) == 0 {
+		return nil
+	}
+
+	commentRange := core.NewTextRange(cases[len(cases)-1].End(), node.CaseBlock.End())
+	for comment := range utils.GetCommentsInRange(sourceFile, commentRange) {
+		commentText := sourceFile.Text()[comment.Pos():comment.End()]
+		switch comment.Kind {
+		case ast.KindSingleLineCommentTrivia:
+			commentText = strings.TrimPrefix(commentText, "//")
+		case ast.KindMultiLineCommentTrivia:
+			commentText = strings.TrimSuffix(strings.TrimPrefix(commentText, "/*"), "*/")
+		}
+
+		matched, err := commentPattern.MatchString(strings.TrimSpace(commentText))
+		if err != nil {
+			return nil
+		}
+		if matched {
+			current := comment
+			return &current
+		}
+	}
+	return nil
+}
+
+func getSwitchMetadata(sourceFile *ast.SourceFile, typeChecker *checker.Checker, node *ast.SwitchStatement, commentPattern *regexp2.Regexp) *SwitchMetadata {
 	cases := node.CaseBlock.AsCaseBlock().Clauses.Nodes
 	defaultCaseIndex := slices.IndexFunc(cases, func(clause *ast.Node) bool {
 		return clause.Kind == ast.KindDefaultClause
@@ -79,6 +113,10 @@ func getSwitchMetadata(typeChecker *checker.Checker, node *ast.SwitchStatement) 
 	var defaultCase *ast.CaseOrDefaultClause
 	if defaultCaseIndex > -1 {
 		defaultCase = cases[defaultCaseIndex].AsCaseOrDefaultClause()
+	}
+	var defaultCaseComment *ast.CommentRange
+	if defaultCase == nil {
+		defaultCaseComment = getCommentDefaultCase(sourceFile, node, commentPattern)
 	}
 
 	discriminantType := utils.GetConstrainedTypeAtLocation(typeChecker, node.Expression)
@@ -123,6 +161,7 @@ func getSwitchMetadata(typeChecker *checker.Checker, node *ast.SwitchStatement) 
 	return &SwitchMetadata{
 		ContainsNonLiteralType:    containsNonLiteralType,
 		DefaultCase:               defaultCase,
+		DefaultCaseComment:        defaultCaseComment,
 		MissingLiteralBranchTypes: missingLiteralBranchTypes,
 		SymbolName:                symbolName,
 	}
@@ -240,11 +279,15 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 	Name: "switch-exhaustiveness-check",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[SwitchExhaustivenessCheckOptions](options, "switch-exhaustiveness-check")
+		commentPattern := regexp2.MustCompile("^no default$", regexp2.ECMAScript|regexp2.Unicode|regexp2.IgnoreCase)
+		if opts.DefaultCaseCommentPattern != nil {
+			commentPattern = regexp2.MustCompile(*opts.DefaultCaseCommentPattern, regexp2.ECMAScript|regexp2.Unicode)
+		}
 
 		checkSwitchExhaustive := func(node *ast.SwitchStatement, switchMetadata *SwitchMetadata) {
 			// If considerDefaultExhaustiveForUnions is enabled, the presence of a default case
 			// always makes the switch exhaustive.
-			if opts.ConsiderDefaultExhaustiveForUnions && switchMetadata.DefaultCase != nil {
+			if opts.ConsiderDefaultExhaustiveForUnions && switchMetadata.hasDefaultCase() {
 				return
 			}
 
@@ -274,9 +317,13 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 			}
 
 			if len(switchMetadata.MissingLiteralBranchTypes) == 0 &&
-				switchMetadata.DefaultCase != nil &&
+				switchMetadata.hasDefaultCase() &&
 				!switchMetadata.ContainsNonLiteralType {
-				ctx.ReportNode(&switchMetadata.DefaultCase.Node, buildDangerousDefaultCaseMessage())
+				if switchMetadata.DefaultCaseComment != nil {
+					ctx.ReportRange(switchMetadata.DefaultCaseComment.TextRange, buildDangerousDefaultCaseMessage())
+				} else {
+					ctx.ReportNode(&switchMetadata.DefaultCase.Node, buildDangerousDefaultCaseMessage())
+				}
 			}
 		}
 		checkSwitchNoUnionDefaultCase := func(node *ast.SwitchStatement, switchMetadata *SwitchMetadata) {
@@ -284,7 +331,7 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 				return
 			}
 
-			if switchMetadata.ContainsNonLiteralType && switchMetadata.DefaultCase == nil {
+			if switchMetadata.ContainsNonLiteralType && !switchMetadata.hasDefaultCase() {
 				ctx.ReportNodeWithSuggestions(node.Expression, buildSwitchIsNotExhaustiveMessage("default"), func() []rule.RuleSuggestion {
 					return []rule.RuleSuggestion{{
 						Message:  buildAddMissingCasesMessage(),
@@ -299,7 +346,7 @@ var SwitchExhaustivenessCheckRule = rule.Rule{
 
 				stmt := node.AsSwitchStatement()
 
-				metadata := getSwitchMetadata(ctx.TypeChecker, stmt)
+				metadata := getSwitchMetadata(ctx.SourceFile, ctx.TypeChecker, stmt, commentPattern)
 				checkSwitchExhaustive(stmt, metadata)
 				checkSwitchUnnecessaryDefaultCase(metadata)
 				checkSwitchNoUnionDefaultCase(stmt, metadata)
