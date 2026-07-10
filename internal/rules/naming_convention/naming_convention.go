@@ -1497,7 +1497,7 @@ func processBindingPattern(pattern *ast.Node, report func(*ast.Node, string, Sel
 		return
 	}
 
-	isParam := ast.IsParameter(parentDecl)
+	isParam := ast.IsParameterDeclaration(parentDecl)
 
 	for _, child := range bindingPattern.Elements.Nodes {
 		if !ast.IsBindingElement(child) {
