@@ -81,6 +81,8 @@ const CheckModeTypeOnly = checker.CheckModeTypeOnly
 type Checker = checker.Checker
 //go:linkname Checker_getImmediateAliasedSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getImmediateAliasedSymbol
 func Checker_getImmediateAliasedSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Symbol
+//go:linkname Checker_checkSourceFile github.com/microsoft/typescript-go/internal/checker.(*Checker).checkSourceFile
+func Checker_checkSourceFile(recv *checker.Checker, ctx context.Context, sourceFile *ast.SourceFile, checkUnused bool)
 //go:linkname Checker_isReferenced github.com/microsoft/typescript-go/internal/checker.(*Checker).isReferenced
 func Checker_isReferenced(recv *checker.Checker, symbol *ast.Symbol) bool
 //go:linkname Checker_getContextFreeTypeOfExpression github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextFreeTypeOfExpression

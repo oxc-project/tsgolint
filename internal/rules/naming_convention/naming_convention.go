@@ -8,7 +8,6 @@ import (
 	"slices"
 	"strings"
 	"unicode"
-	_ "unsafe"
 
 	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -16,9 +15,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
-
-//go:linkname checkerCheckSourceFile github.com/microsoft/typescript-go/internal/checker.(*Checker).checkSourceFile
-func checkerCheckSourceFile(recv *checker.Checker, ctx context.Context, sourceFile *ast.SourceFile)
 
 // Selector bit flags for matching AST node types.
 type Selector int
@@ -161,31 +157,24 @@ func buildUnexpectedUnderscoreMessage(selectorName, name, position string) rule.
 	}
 }
 
-func buildMissingUnderscoreMessage(selectorName, name, position string) rule.RuleMessage {
+func buildMissingUnderscoreMessage(selectorName, name, position, count string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "missingUnderscore",
-		Description: fmt.Sprintf("%s name `%s` must have a %s underscore.", selectorName, name, position),
-	}
-}
-
-func buildMissingDoubleUnderscoreMessage(selectorName, name, position string) rule.RuleMessage {
-	return rule.RuleMessage{
-		Id:          "missingUnderscore",
-		Description: fmt.Sprintf("%s name `%s` must have a %s double underscore.", selectorName, name, position),
+		Description: fmt.Sprintf("%s name `%s` must have %s %s underscore(s).", selectorName, name, count, position),
 	}
 }
 
 func buildMissingAffixMessage(selectorName, name, affixType string, affixes []string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "missingAffix",
-		Description: fmt.Sprintf("%s name `%s` must have one of the following %ses: %s", selectorName, name, affixType, formatAffixList(affixes)),
+		Description: fmt.Sprintf("%s name `%s` must have one of the following %ses: %s", selectorName, name, affixType, strings.Join(affixes, ", ")),
 	}
 }
 
 func buildSatisfyCustomMessage(selectorName, name, matchStr, regex string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "satisfyCustom",
-		Description: fmt.Sprintf("%s name `%s` must %s the RegExp `%s`.", selectorName, name, matchStr, regex),
+		Description: fmt.Sprintf("%s name `%s` must %s the RegExp: %s", selectorName, name, matchStr, regex),
 	}
 }
 
@@ -201,6 +190,23 @@ func buildDoesNotMatchFormatTrimmedMessage(selectorName, originalName, processed
 		Id:          "doesNotMatchFormatTrimmed",
 		Description: fmt.Sprintf("%s name `%s` trimmed as `%s` must match one of the following formats: %s", selectorName, originalName, processedName, formatNames),
 	}
+}
+
+// selectorTypeToMessageString mirrors the upstream helper of the same name:
+// "classMethod" -> "Class Method", "variable" -> "Variable".
+func selectorTypeToMessageString(selectorType string) string {
+	var sb strings.Builder
+	for _, r := range selectorType {
+		if unicode.IsUpper(r) {
+			sb.WriteByte(' ')
+		}
+		sb.WriteRune(r)
+	}
+	notCamelCase := sb.String()
+	if notCamelCase == "" {
+		return notCamelCase
+	}
+	return strings.ToUpper(notCamelCase[:1]) + notCamelCase[1:]
 }
 
 var selectorNameMap = map[string]Selector{
@@ -768,10 +774,10 @@ func validateName(
 
 func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage {
 	processedName := name
-	selectorName := sel.selectorName
+	selectorName := selectorTypeToMessageString(sel.selectorName)
 
 	if sel.leadingUnderscore != 0 {
-		stripped, msg := validateUnderscore("leading", processedName, sel.leadingUnderscore, selectorName)
+		stripped, msg := validateUnderscore("leading", processedName, sel.leadingUnderscore, selectorName, name)
 		if msg != nil {
 			return msg
 		}
@@ -779,7 +785,7 @@ func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage
 	}
 
 	if sel.trailingUnderscore != 0 {
-		stripped, msg := validateUnderscore("trailing", processedName, sel.trailingUnderscore, selectorName)
+		stripped, msg := validateUnderscore("trailing", processedName, sel.trailingUnderscore, selectorName, name)
 		if msg != nil {
 			return msg
 		}
@@ -787,7 +793,7 @@ func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage
 	}
 
 	if len(sel.prefix) > 0 {
-		stripped, msg := validateAffix("prefix", processedName, sel.prefix, selectorName)
+		stripped, msg := validateAffix("prefix", processedName, sel.prefix, selectorName, name)
 		if msg != nil {
 			return msg
 		}
@@ -795,7 +801,7 @@ func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage
 	}
 
 	if len(sel.suffix) > 0 {
-		stripped, msg := validateAffix("suffix", processedName, sel.suffix, selectorName)
+		stripped, msg := validateAffix("suffix", processedName, sel.suffix, selectorName, name)
 		if msg != nil {
 			return msg
 		}
@@ -803,7 +809,7 @@ func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage
 	}
 
 	if sel.custom != nil {
-		if msg := validateCustomRegex(processedName, sel.custom, selectorName); msg != nil {
+		if msg := validateCustomRegex(processedName, sel.custom, selectorName, name); msg != nil {
 			return msg
 		}
 	}
@@ -817,91 +823,72 @@ func runFormatValidation(name string, sel *normalizedSelector) *rule.RuleMessage
 	return nil
 }
 
-func validateUnderscore(position string, name string, option UnderscoreOption, selectorName string) (string, *rule.RuleMessage) {
-	var count int
+func validateUnderscore(position string, name string, option UnderscoreOption, selectorName string, originalName string) (string, *rule.RuleMessage) {
+	var hasSingle, hasDouble bool
+	var trimSingle, trimDouble string
 	if position == "leading" {
-		count = countLeadingUnderscores(name)
+		hasSingle = strings.HasPrefix(name, "_")
+		hasDouble = strings.HasPrefix(name, "__")
+		trimSingle = strings.TrimPrefix(name, "_")
+		trimDouble = strings.TrimPrefix(name, "__")
 	} else {
-		count = countTrailingUnderscores(name)
+		hasSingle = strings.HasSuffix(name, "_")
+		hasDouble = strings.HasSuffix(name, "__")
+		trimSingle = strings.TrimSuffix(name, "_")
+		trimDouble = strings.TrimSuffix(name, "__")
 	}
 
 	switch option {
-	case UnderscoreForbid:
-		if count > 0 {
-			msg := buildUnexpectedUnderscoreMessage(selectorName, name, position)
-			return "", &msg
-		}
-		return name, nil
-
+	// ALLOW - no conditions as the user doesn't care if it's there or not
 	case UnderscoreAllow:
-		if position == "leading" {
-			if count > 0 {
-				return name[1:], nil
-			}
-		} else {
-			if count > 0 {
-				return name[:len(name)-1], nil
-			}
+		if hasSingle {
+			return trimSingle, nil
 		}
 		return name, nil
-
-	case UnderscoreRequire:
-		if count == 0 {
-			msg := buildMissingUnderscoreMessage(selectorName, name, position)
-			return "", &msg
-		}
-		if position == "leading" {
-			return name[1:], nil
-		}
-		return name[:len(name)-1], nil
-
-	case UnderscoreRequireDouble:
-		if count < 2 {
-			msg := buildMissingDoubleUnderscoreMessage(selectorName, name, position)
-			return "", &msg
-		}
-		if position == "leading" {
-			return name[2:], nil
-		}
-		return name[:len(name)-2], nil
 
 	case UnderscoreAllowDouble:
-		if count == 2 {
-			if position == "leading" {
-				return name[2:], nil
-			}
-			return name[:len(name)-2], nil
-		}
-		if count > 0 {
-			msg := buildUnexpectedUnderscoreMessage(selectorName, name, position)
-			return "", &msg
+		if hasDouble {
+			return trimDouble, nil
 		}
 		return name, nil
 
 	case UnderscoreAllowSingleOrDouble:
-		if count == 1 {
-			if position == "leading" {
-				return name[1:], nil
-			}
-			return name[:len(name)-1], nil
+		if hasDouble {
+			return trimDouble, nil
 		}
-		if count == 2 {
-			if position == "leading" {
-				return name[2:], nil
-			}
-			return name[:len(name)-2], nil
+		if hasSingle {
+			return trimSingle, nil
 		}
-		if count > 2 {
-			msg := buildUnexpectedUnderscoreMessage(selectorName, name, position)
+		return name, nil
+
+	// FORBID
+	case UnderscoreForbid:
+		if hasSingle {
+			msg := buildUnexpectedUnderscoreMessage(selectorName, originalName, position)
 			return "", &msg
 		}
 		return name, nil
+
+	// REQUIRE
+	case UnderscoreRequire:
+		if !hasSingle {
+			msg := buildMissingUnderscoreMessage(selectorName, originalName, position, "one")
+			return "", &msg
+		}
+		return trimSingle, nil
+
+	case UnderscoreRequireDouble:
+		if !hasDouble {
+			msg := buildMissingUnderscoreMessage(selectorName, originalName, position, "two")
+			return "", &msg
+		}
+		return trimDouble, nil
 	}
 
 	return name, nil
 }
 
-func validateAffix(affixType string, name string, affixes []string, selectorName string) (string, *rule.RuleMessage) {
+func validateAffix(affixType string, name string, affixes []string, selectorName string, originalName string) (string, *rule.RuleMessage) {
 	for _, affix := range affixes {
 		if affixType == "prefix" {
 			if strings.HasPrefix(name, affix) {
@@ -913,17 +900,17 @@ func validateAffix(affixType string, name string, affixes []string, selectorName
 			}
 		}
 	}
-	msg := buildMissingAffixMessage(selectorName, name, affixType, affixes)
+	msg := buildMissingAffixMessage(selectorName, originalName, affixType, affixes)
 	return "", &msg
 }
 
-func validateCustomRegex(name string, custom *normalizedMatchRegex, selectorName string) *rule.RuleMessage {
+func validateCustomRegex(name string, custom *normalizedMatchRegex, selectorName string, originalName string) *rule.RuleMessage {
 	if custom.regex.MatchString(name) != custom.match {
 		matchStr := "match"
 		if !custom.match {
 			matchStr = "not match"
 		}
-		msg := buildSatisfyCustomMessage(selectorName, name, matchStr, custom.regex.String())
+		msg := buildSatisfyCustomMessage(selectorName, originalName, matchStr, "/"+custom.regex.String()+"/u")
 		return &msg
 	}
 	return nil
@@ -948,34 +935,6 @@ func validatePredefinedFormat(originalName string, processedName string, formats
 	}
 	msg := buildDoesNotMatchFormatTrimmedMessage(selectorName, originalName, processedName, joined)
 	return &msg
-}
-
-func countLeadingUnderscores(name string) int {
-	i := 0
-	for i < len(name) && name[i] == '_' {
-		i++
-	}
-	return i
-}
-
-func countTrailingUnderscores(name string) int {
-	count := 0
-	for i := len(name) - 1; i >= 0; i-- {
-		if name[i] == '_' {
-			count++
-		} else {
-			break
-		}
-	}
-	return count
-}
-
-func formatAffixList(affixes []string) string {
-	quoted := make([]string, len(affixes))
-	for i, a := range affixes {
-		quoted[i] = "`" + a + "`"
-	}
-	return strings.Join(quoted, ", ")
 }
 
 // Default options and rule definition
@@ -1015,7 +974,7 @@ var NamingConventionRule = rule.Rule{
 
 		// Force full type checking on this checker so that isReferenced returns correct results
 		if needsUnusedCheck {
-			checkerCheckSourceFile(ctx.TypeChecker, context.Background(), ctx.SourceFile)
+			checker.Checker_checkSourceFile(ctx.TypeChecker, context.Background(), ctx.SourceFile, true)
 		}
 
 		// Build a map of names exported via `export { ... }` blocks
@@ -1346,6 +1305,15 @@ var NamingConventionRule = rule.Rule{
 			}
 
 			report(nameNode, name, sel, modifiers)
+		}
+
+		// Shorthand properties ({ foo }) are object literal properties too
+		listeners[ast.KindShorthandPropertyAssignment] = func(node *ast.Node) {
+			nameNode := node.Name()
+			if nameNode == nil || !ast.IsIdentifier(nameNode) {
+				return
+			}
+			report(nameNode, nameNode.AsIdentifier().Text, SelectorObjectLiteralProperty, ModifierPublic)
 		}
 
 		// Property signatures (type properties)

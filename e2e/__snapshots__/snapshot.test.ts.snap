@@ -1287,7 +1287,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Open\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Open\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -1300,7 +1300,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Closed\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Closed\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -1313,7 +1313,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Up\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Up\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -1326,7 +1326,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Down\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Down\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -1339,7 +1339,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Left\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Left\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -1352,7 +1352,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Right\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Right\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -2280,7 +2280,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Open\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Open\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -2293,7 +2293,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Closed\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Closed\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -2306,7 +2306,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Red\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Red\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {
@@ -2319,7 +2319,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
-      "description": "enumMember name \`Blue\` must match one of the following formats: camelCase",
+      "description": "Enum Member name \`Blue\` must match one of the following formats: camelCase",
       "id": "doesNotMatchFormat",
     },
     "range": {

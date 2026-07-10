@@ -43,7 +43,8 @@
       "getIndexInfosOfType",
       "isReadonlySymbol",
       "getContextFreeTypeOfExpression",
-      "isReferenced"
+      "isReferenced",
+      "checkSourceFile"
     ]
   },
   "ExtraFields": {
