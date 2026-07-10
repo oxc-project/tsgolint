@@ -248,34 +248,59 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			})
 		}
 
+		hasTypeArguments := func(arguments *ast.NodeList) bool {
+			return arguments != nil && len(arguments.Nodes) != 0
+		}
+
 		return rule.RuleListeners{
 			ast.KindExpressionWithTypeArguments: func(node *ast.Node) {
 				expr := node.AsExpressionWithTypeArguments()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromType(node, expr.Expression))
 			},
 			ast.KindTypeReference: func(node *ast.Node) {
 				expr := node.AsTypeReferenceNode()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName))
 			},
 
 			ast.KindCallExpression: func(node *ast.Node) {
 				expr := node.AsCallExpression()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindNewExpression: func(node *ast.Node) {
 				expr := node.AsNewExpression()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindTaggedTemplateExpression: func(node *ast.Node) {
 				expr := node.AsTaggedTemplateExpression()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindJsxOpeningElement: func(node *ast.Node) {
 				expr := node.AsJsxOpeningElement()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 			ast.KindJsxSelfClosingElement: func(node *ast.Node) {
 				expr := node.AsJsxSelfClosingElement()
+				if !hasTypeArguments(expr.TypeArguments) {
+					return
+				}
 				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
 			},
 		}
