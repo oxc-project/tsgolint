@@ -116,6 +116,20 @@ func TestNamingConventionUpstreamParity(t *testing.T) {
 				{Selector: "objectLiteralProperty", Format: &[]string{"snake_case"}},
 			},
 		},
+		// Interface and type-literal accessors are TSMethodSignature nodes
+		// upstream, so classicAccessor configs never visit them.
+		{
+			Code: "interface I { get Foo(): string }",
+			Options: []NamingConventionOption{
+				{Selector: "classicAccessor", Format: &[]string{"camelCase"}},
+			},
+		},
+		{
+			Code: "type T = { set Foo(v: string) };",
+			Options: []NamingConventionOption{
+				{Selector: "classicAccessor", Format: &[]string{"camelCase"}},
+			},
+		},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{
@@ -244,6 +258,36 @@ func TestNamingConventionUpstreamParity(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "doesNotMatchFormat", Message: "Class Property name `123` must match one of the following formats: camelCase"},
+			},
+		},
+		// Interface and type-literal accessors are typeMethod upstream
+		// (TSMethodSignature has no kind filter).
+		{
+			Code: "interface I { get Foo(): string }",
+			Options: []NamingConventionOption{
+				{Selector: "typeMethod", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Type Method name `Foo` must match one of the following formats: camelCase"},
+			},
+		},
+		{
+			Code: "type T = { set Foo(v: string) };",
+			Options: []NamingConventionOption{
+				{Selector: "typeMethod", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Type Method name `Foo` must match one of the following formats: camelCase"},
+			},
+		},
+		// Class and object-literal accessors remain classicAccessor.
+		{
+			Code: "const o = { get Foo() { return 1; } };",
+			Options: []NamingConventionOption{
+				{Selector: "classicAccessor", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Classic Accessor name `Foo` must match one of the following formats: camelCase"},
 			},
 		},
 	}

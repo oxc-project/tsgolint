@@ -1041,3 +1041,24 @@ Message: Class Property name `123` must match one of the following formats: came
    1 | class MyClass { 123 = 'a'; }
      |                 ~~~
 ---
+
+[TestNamingConventionUpstreamParity/invalid-11 - 1]
+Diagnostic 1: doesNotMatchFormat (1:19 - 1:21)
+Message: Type Method name `Foo` must match one of the following formats: camelCase
+   1 | interface I { get Foo(): string }
+     |                   ~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-12 - 1]
+Diagnostic 1: doesNotMatchFormat (1:16 - 1:18)
+Message: Type Method name `Foo` must match one of the following formats: camelCase
+   1 | type T = { set Foo(v: string) };
+     |                ~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-13 - 1]
+Diagnostic 1: doesNotMatchFormat (1:17 - 1:19)
+Message: Classic Accessor name `Foo` must match one of the following formats: camelCase
+   1 | const o = { get Foo() { return 1; } };
+     |                 ~~~
+---

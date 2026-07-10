@@ -1294,24 +1294,28 @@ var NamingConventionRule = rule.Rule{
 			processClassMember(nameNode, sel, modifiers, report)
 		}
 
-		// Get/Set accessors
-		listeners[ast.KindGetAccessor] = func(node *ast.Node) {
+		// Get/Set accessors. Upstream's classicAccessor selectors only cover
+		// class members (MethodDefinition) and object literal properties
+		// (Property); a get/set member of an interface or type literal is a
+		// TSMethodSignature upstream, whose handler has no kind filter, so it
+		// is classified as typeMethod with the public modifier.
+		handleAccessor := func(node *ast.Node) {
 			nameNode := node.Name()
 			if nameNode == nil {
 				return
 			}
-			modifiers := detectAccessorModifiers(node)
-			processClassMember(nameNode, SelectorClassicAccessor, modifiers, report)
-		}
-
-		listeners[ast.KindSetAccessor] = func(node *ast.Node) {
-			nameNode := node.Name()
-			if nameNode == nil {
-				return
+			if parent := node.Parent; parent != nil {
+				switch parent.Kind {
+				case ast.KindInterfaceDeclaration, ast.KindTypeLiteral:
+					processClassMember(nameNode, SelectorTypeMethod, ModifierPublic, report)
+					return
+				}
 			}
 			modifiers := detectAccessorModifiers(node)
 			processClassMember(nameNode, SelectorClassicAccessor, modifiers, report)
 		}
+		listeners[ast.KindGetAccessor] = handleAccessor
+		listeners[ast.KindSetAccessor] = handleAccessor
 
 		// Property assignments (object literal properties)
 		listeners[ast.KindPropertyAssignment] = func(node *ast.Node) {
