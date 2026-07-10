@@ -76,6 +76,46 @@ func TestNamingConventionUpstreamParity(t *testing.T) {
 			Code:    "const snake_name = 1;",
 			Options: []NamingConventionOption{{Selector: "notARealSelector", Format: &[]string{"PascalCase"}}},
 		},
+		// A non-string selector value is likewise dropped, not treated as
+		// `default`.
+		{
+			Code:    "const snake_name = 1;",
+			Options: []NamingConventionOption{{Selector: 42, Format: &[]string{"PascalCase"}}},
+		},
+		// JS-only regex constructs (lookahead) are valid upstream and must not
+		// crash the run; the negative lookahead excludes this name, so the
+		// UPPER_CASE config never applies.
+		{
+			Code: "const mapStateToProps = 1;",
+			Options: []NamingConventionOption{
+				{Selector: "variable", Filter: MatchRegex{Match: true, Regex: "^(?!mapStateToProps$).*"}, Format: &[]string{"UPPER_CASE"}},
+			},
+		},
+		// A #private member never carries the public modifier upstream, so a
+		// public-requiring config must not match it.
+		{
+			Code: "class MyClass { #foo = 1; }",
+			Options: []NamingConventionOption{
+				{Selector: "classProperty", Modifiers: []string{"public"}, Format: &[]string{"UPPER_CASE"}},
+			},
+		},
+		// Enums never get the const modifier upstream, so a const-requiring
+		// config never matches — even a `const enum`.
+		{
+			Code: "const enum fooEnum {}",
+			Options: []NamingConventionOption{
+				{Selector: "enum", Modifiers: []string{"const"}, Format: &[]string{"UPPER_CASE"}},
+			},
+		},
+		// A numeric key that only matches the requiresQuotes exemption config
+		// is skipped by it (no format), mirroring upstream's exemption idiom.
+		{
+			Code: "const x = { 123: 'a' };",
+			Options: []NamingConventionOption{
+				{Selector: "objectLiteralProperty", Modifiers: []string{"requiresQuotes"}},
+				{Selector: "objectLiteralProperty", Format: &[]string{"snake_case"}},
+			},
+		},
 	}
 
 	invalidCases := []rule_tester.InvalidTestCase{
@@ -125,6 +165,85 @@ func TestNamingConventionUpstreamParity(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "doesNotMatchFormat", Message: "Variable name `top_level` must match one of the following formats: camelCase"},
+			},
+		},
+		// A lookahead filter that does apply still enforces the format
+		// (exercises regexp2 matching, not just compilation).
+		{
+			Code: "const foo_bar = 1;",
+			Options: []NamingConventionOption{
+				{Selector: "variable", Filter: MatchRegex{Match: true, Regex: "^(?!mapStateToProps$).*"}, Format: &[]string{"PascalCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Variable name `foo_bar` must match one of the following formats: PascalCase"},
+			},
+		},
+		// Upstream never honors `types` on autoAccessor (it is not in
+		// SelectorsAllowedToHaveTypes), so the config applies to a number-typed
+		// accessor unconditionally.
+		{
+			Code: "class MyClass { accessor foo = 5; }",
+			Options: []NamingConventionOption{
+				{Selector: "autoAccessor", Types: []string{"string"}, Format: &[]string{"PascalCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Auto Accessor name `foo` must match one of the following formats: PascalCase"},
+			},
+		},
+		// Between different meta selectors upstream orders by raw selector
+		// value descending (accessor is NOT in the method/property tier), so
+		// memberLike outranks accessor even when accessor is listed first.
+		{
+			Code: "class MyClass { get Foo() { return 1; } }",
+			Options: []NamingConventionOption{
+				{Selector: "accessor", Format: &[]string{"PascalCase"}},
+				{Selector: "memberLike", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Classic Accessor name `Foo` must match one of the following formats: camelCase"},
+			},
+		},
+		// A string-literal imported name gets the default modifier upstream
+		// (only Identifier names other than `default` are skipped).
+		{
+			Code: "import { \"foo-bar\" as Bar } from 'foo_bar';",
+			Options: []NamingConventionOption{
+				{Selector: "import", Modifiers: []string{"default"}, Format: &[]string{"UPPER_CASE"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Import name `Bar` must match one of the following formats: UPPER_CASE"},
+			},
+		},
+		// Numeric keys are validated upstream: the stringified value always
+		// requires quotes, so a format config always reports it.
+		{
+			Code: "const x = { 123: 'a' };",
+			Options: []NamingConventionOption{
+				{Selector: "objectLiteralProperty", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Object Literal Property name `123` must match one of the following formats: camelCase"},
+			},
+		},
+		// The numeric name is the JS value string (`${node.value}`), not the
+		// source text: 0x10 is validated as `16`.
+		{
+			Code: "const x = { 0x10: 'a' };",
+			Options: []NamingConventionOption{
+				{Selector: "objectLiteralProperty", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Object Literal Property name `16` must match one of the following formats: camelCase"},
+			},
+		},
+		// Numeric class member names get the same treatment via handleMember.
+		{
+			Code: "class MyClass { 123 = 'a'; }",
+			Options: []NamingConventionOption{
+				{Selector: "classProperty", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Class Property name `123` must match one of the following formats: camelCase"},
 			},
 		},
 	}

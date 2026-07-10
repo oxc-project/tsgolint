@@ -992,3 +992,52 @@ Message: Variable name `top_level` must match one of the following formats: came
    1 | const top_level = 1; export { top_level }; export function f() { const top_level = 2; return top_level; }
      |                                                                        ~~~~~~~~~
 ---
+
+[TestNamingConventionUpstreamParity/invalid-4 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
+Message: Variable name `foo_bar` must match one of the following formats: PascalCase
+   1 | const foo_bar = 1;
+     |       ~~~~~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-5 - 1]
+Diagnostic 1: doesNotMatchFormat (1:26 - 1:28)
+Message: Auto Accessor name `foo` must match one of the following formats: PascalCase
+   1 | class MyClass { accessor foo = 5; }
+     |                          ~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-6 - 1]
+Diagnostic 1: doesNotMatchFormat (1:21 - 1:23)
+Message: Classic Accessor name `Foo` must match one of the following formats: camelCase
+   1 | class MyClass { get Foo() { return 1; } }
+     |                     ~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-7 - 1]
+Diagnostic 1: doesNotMatchFormat (1:23 - 1:25)
+Message: Import name `Bar` must match one of the following formats: UPPER_CASE
+   1 | import { "foo-bar" as Bar } from 'foo_bar';
+     |                       ~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-8 - 1]
+Diagnostic 1: doesNotMatchFormat (1:13 - 1:15)
+Message: Object Literal Property name `123` must match one of the following formats: camelCase
+   1 | const x = { 123: 'a' };
+     |             ~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-9 - 1]
+Diagnostic 1: doesNotMatchFormat (1:13 - 1:16)
+Message: Object Literal Property name `16` must match one of the following formats: camelCase
+   1 | const x = { 0x10: 'a' };
+     |             ~~~~
+---
+
+[TestNamingConventionUpstreamParity/invalid-10 - 1]
+Diagnostic 1: doesNotMatchFormat (1:17 - 1:19)
+Message: Class Property name `123` must match one of the following formats: camelCase
+   1 | class MyClass { 123 = 'a'; }
+     |                 ~~~
+---

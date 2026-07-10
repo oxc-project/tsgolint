@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"math/bits"
-	"regexp"
 	"slices"
 	"strings"
 	"unicode"
 
+	"github.com/dlclark/regexp2/v2"
 	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -126,7 +126,11 @@ type normalizedSelector struct {
 	trailingUnderscore UnderscoreOption
 	prefix             []string
 	suffix             []string
-	weight             int
+	// originalSelector is the selector as configured (possibly a meta
+	// selector), before expansion; with modifierWeight it drives the config
+	// sort (see compareSelectors).
+	originalSelector Selector
+	modifierWeight   int
 	// selectorName is the human-readable selector name used in messages
 	// (e.g. "Class Method"), precomputed once per selector config.
 	selectorName string
@@ -141,13 +145,13 @@ func selectorIndex(sel Selector) int {
 
 // normalizedFilter is a compiled filter regex.
 type normalizedFilter struct {
-	regex *regexp.Regexp
+	regex *regexp2.Regexp
 	match bool
 }
 
 // normalizedMatchRegex is a compiled custom regex.
 type normalizedMatchRegex struct {
-	regex *regexp.Regexp
+	regex *regexp2.Regexp
 	match bool
 }
 
@@ -478,7 +482,14 @@ func normalizeOptions(rawOptions []NamingConventionOption) selectorGroups {
 		custom := parseCustomRegex(opt.Custom)
 
 		for _, sel := range selectors {
-			weight := calculateWeight(sel, modifiers, types, filter)
+			// Upstream's modifierWeight is the OR of the modifier and
+			// type-modifier bit VALUES (not a count); the Modifier/TypeModifier
+			// constants share upstream's exact bit layout. A filter adds the
+			// most weight.
+			modifierWeight := int(modifiers) | int(types)
+			if filter != nil {
+				modifierWeight |= 1 << 30
+			}
 			for _, expandedSel := range expandSelector(sel) {
 				all = append(all, normalizedSelector{
 					selector:           expandedSel,
@@ -491,17 +502,16 @@ func normalizeOptions(rawOptions []NamingConventionOption) selectorGroups {
 					trailingUnderscore: trailingUnderscore,
 					prefix:             opt.Prefix,
 					suffix:             opt.Suffix,
-					weight:             weight,
+					originalSelector:   sel,
+					modifierWeight:     modifierWeight,
 					selectorName:       selectorTypeToMessageString(selectorTypeString[expandedSel]),
 				})
 			}
 		}
 	}
 
-	// Sort by weight descending (most specific first)
-	slices.SortStableFunc(all, func(a, b normalizedSelector) int {
-		return b.weight - a.weight
-	})
+	// Sort most specific first, mirroring upstream's comparator.
+	slices.SortStableFunc(all, compareSelectors)
 
 	// Group by selector for O(1) lookup in validateName
 	groups := make(selectorGroups, len(individualSelectors))
@@ -555,7 +565,10 @@ func parseSelectorNames(selectorRaw any) []Selector {
 		}
 		return selectors
 	}
-	return []Selector{SelectorDefault}
+	// Non-string selector values (number/bool/object) are dropped for the same
+	// reason as unknown names above: falling back to SelectorDefault would turn
+	// a malformed config into a catch-all matching every identifier.
+	return nil
 }
 
 func parseModifiers(modifiers []string) Modifier {
@@ -601,16 +614,18 @@ func parseUnderscoreOption(opt *string) UnderscoreOption {
 	return 0
 }
 
-// mustCompileOption compiles a user-supplied regex, panicking with a clear
-// message on failure. Silently dropping an uncompilable filter would make its
-// selector apply to every name, and dropping a custom regex would skip the
-// check entirely — both silently wrong results. Panicking matches how
-// utils.UnmarshalOptions handles invalid options. Note Go's RE2 does not
-// support JS-only constructs like lookahead or backreferences.
-func mustCompileOption(kind, regexStr string) *regexp.Regexp {
-	compiled, err := regexp.Compile(regexStr)
+// mustCompileOption compiles a user-supplied regex in ECMAScript mode (via
+// regexp2, like switch-exhaustiveness-check) so that JS-only constructs such
+// as lookahead and backreferences — accepted by upstream's `new RegExp(re,
+// 'u')` — work here too. It panics on a genuinely malformed pattern: silently
+// dropping an uncompilable filter would make its selector apply to every
+// name, and dropping a custom regex would skip the check entirely — both
+// silently wrong results. Panicking matches how utils.UnmarshalOptions
+// handles invalid options.
+func mustCompileOption(kind, regexStr string) *regexp2.Regexp {
+	compiled, err := regexp2.Compile(regexStr, regexp2.ECMAScript|regexp2.Unicode)
 	if err != nil {
-		panic(fmt.Sprintf("naming-convention: invalid or unsupported %s regex %q: %v", kind, regexStr, err))
+		panic(fmt.Sprintf("naming-convention: invalid %s regex %q: %v", kind, regexStr, err))
 	}
 	return compiled
 }
@@ -673,55 +688,45 @@ func isMetaSelector(sel Selector) bool {
 	return bits.OnesCount(uint(sel)) > 1
 }
 
-// isGroupMetaSelector returns true for the top-level meta selectors
-// (memberLike, variableLike, typeLike) which are less specific than
-// sub-group meta selectors (method, property, accessor).
-func isGroupMetaSelector(sel Selector) bool {
-	return sel == SelectorMemberLike || sel == SelectorVariableLike || sel == SelectorTypeLike
-}
-
-// calculateWeight determines the specificity of a selector configuration.
-// Higher weight = more specific = should be checked first.
-func calculateWeight(originalSel Selector, modifiers Modifier, types TypeModifier, filter *normalizedFilter) int {
-	// Upstream's modifierWeight is the OR of the modifier and type-modifier
-	// bit VALUES (not a count); the Modifier/TypeModifier constants share
-	// upstream's exact bit layout, so ORing them reproduces upstream's
-	// same-selector ordering bit for bit (bits 0-21).
-	weight := int(modifiers) | int(types)
-
-	// Selector specificity tier. Upstream compares modifierWeight only when
-	// two configs name the SAME selector; between different selectors the
-	// tier always wins (non-meta beats meta), so it sits above the modifier
-	// bits:
-	// - default = 0
-	// - group meta selectors (memberLike, variableLike, typeLike) = 1
-	// - sub-group meta selectors (method, property, accessor) = 2
-	// - individual selectors (classMethod, objectLiteralMethod, etc.) = 3
-	switch {
-	case originalSel == SelectorDefault:
-		// weight stays 0
-	case isGroupMetaSelector(originalSel):
-		weight |= 1 << 22
-	case isMetaSelector(originalSel):
-		weight |= 2 << 22
-	default:
-		weight |= 3 << 22
+// compareSelectors mirrors upstream's config sort (parse-options.ts): configs
+// naming the SAME selector are ordered by modifier weight descending; between
+// different selectors the modifier weight is ignored — individual selectors
+// precede meta selectors, the method/property metas precede other metas
+// (upstream backward compat; accessor is deliberately NOT in this tier), and
+// remaining ties order by raw selector value descending, so memberLike
+// precedes accessor and default (-1) sorts last.
+func compareSelectors(a, b normalizedSelector) int {
+	if a.originalSelector == b.originalSelector {
+		return b.modifierWeight - a.modifierWeight
 	}
-
-	// Filter adds the most weight
-	if filter != nil {
-		weight |= 1 << 30
+	aMeta := isMetaSelector(a.originalSelector)
+	bMeta := isMetaSelector(b.originalSelector)
+	if aMeta != bMeta {
+		if aMeta {
+			return 1
+		}
+		return -1
 	}
-
-	return weight
+	aMethodOrProperty := a.originalSelector == SelectorMethod || a.originalSelector == SelectorProperty
+	bMethodOrProperty := b.originalSelector == SelectorMethod || b.originalSelector == SelectorProperty
+	if aMethodOrProperty != bMethodOrProperty {
+		if aMethodOrProperty {
+			return -1
+		}
+		return 1
+	}
+	return int(b.originalSelector) - int(a.originalSelector)
 }
 
 // Validation pipeline
 
-// selectorsWithTypesMask is the set of selectors that support type annotations.
+// selectorsWithTypesMask is the set of selectors whose `types` constraint is
+// honored, mirroring upstream's SelectorsAllowedToHaveTypes. autoAccessor is
+// deliberately absent (as upstream omits it): a `types` constraint on an
+// autoAccessor config is ignored and the config applies unconditionally.
 const selectorsWithTypesMask Selector = SelectorVariable | SelectorParameter | SelectorParameterProperty |
 	SelectorClassProperty | SelectorObjectLiteralProperty | SelectorTypeProperty |
-	SelectorClassicAccessor | SelectorAutoAccessor
+	SelectorClassicAccessor
 
 func validateName(
 	name string,
@@ -739,7 +744,8 @@ func validateName(
 
 		// Check filter
 		if sel.filter != nil {
-			if sel.filter.regex.MatchString(name) != sel.filter.match {
+			matched, _ := sel.filter.regex.MatchString(name)
+			if matched != sel.filter.match {
 				continue
 			}
 		}
@@ -899,7 +905,8 @@ func validateAffix(affixType string, name string, affixes []string, selectorName
 }
 
 func validateCustomRegex(name string, custom *normalizedMatchRegex, selectorName string, originalName string) *rule.RuleMessage {
-	if custom.regex.MatchString(name) != custom.match {
+	matched, _ := custom.regex.MatchString(name)
+	if matched != custom.match {
 		matchStr := "match"
 		if !custom.match {
 			matchStr = "not match"
@@ -944,7 +951,7 @@ func nameRequiresQuotes(name string) bool {
 
 // extractDeclarationName returns the name text and quote-related modifiers for
 // a declaration name node. Name kinds needing caller-specific handling
-// (private identifiers, numeric literals) must be checked before calling.
+// (private identifiers) must be checked before calling.
 // ok is false when the name is computed or empty.
 func extractDeclarationName(nameNode *ast.Node) (string, Modifier, bool) {
 	if ast.IsComputedPropertyName(nameNode) {
@@ -962,6 +969,16 @@ func extractDeclarationName(nameNode *ast.Node) (string, Modifier, bool) {
 			modifiers |= ModifierRequiresQuotes
 		}
 		isStringLiteralName = true
+	case ast.IsNumericLiteral(nameNode):
+		// The scanner normalizes numeric literal text to its JS value string
+		// ("0x10" -> "16"), matching upstream's `${node.value}`. Upstream then
+		// applies the same requiresQuoting check as for string names — which a
+		// numeric name always fails, so it is always reported when a format is
+		// configured.
+		name = nameNode.Text()
+		if nameRequiresQuotes(name) {
+			modifiers |= ModifierRequiresQuotes
+		}
 	default:
 		name = nameNode.Text()
 	}
@@ -1006,7 +1023,13 @@ var NamingConventionRule = rule.Rule{
 		needsTypeInfo := ctx.TypeChecker != nil && hasTypeModifierSelectors(groups)
 		needsUnusedCheck := ctx.TypeChecker != nil && hasModifierInSelectors(groups, ModifierUnused)
 
-		// Force full type checking on this checker so that isReferenced returns correct results
+		// Force full type checking on this checker so that isReferenced returns
+		// correct results. This is a deliberate tradeoff: it semantically checks
+		// the whole file eagerly (work the linter otherwise does lazily), which
+		// is why it only runs when a selector actually uses the `unused`
+		// modifier. The port has no scope manager, so upstream's
+		// variable.references bookkeeping has no cheaper equivalent here.
+		// context.Background() is unavoidable: RuleContext carries no context.
 		if needsUnusedCheck {
 			checker.Checker_checkSourceFile(ctx.TypeChecker, context.Background(), ctx.SourceFile, true)
 		}
@@ -1189,12 +1212,10 @@ var NamingConventionRule = rule.Rule{
 			processNode(node, SelectorTypeAlias, modifiers)
 		}
 
-		// Enum declarations
+		// Enum declarations. Upstream only ever assigns exported/unused here —
+		// `const enum` does NOT get the const modifier.
 		listeners[ast.KindEnumDeclaration] = func(node *ast.Node) {
 			modifiers := detectExportedModifier(node, exportedViaBlock)
-			if node.ModifierFlags()&ast.ModifierFlagsConst != 0 {
-				modifiers |= ModifierConst
-			}
 			if nameNode := node.Name(); nameNode != nil {
 				modifiers |= unusedModifier(nameNode)
 			}
@@ -1310,9 +1331,6 @@ var NamingConventionRule = rule.Rule{
 				sel = SelectorObjectLiteralMethod
 			}
 
-			if ast.IsNumericLiteral(nameNode) {
-				return
-			}
 			name, modifiers, ok := extractDeclarationName(nameNode)
 			if !ok {
 				return
@@ -1420,8 +1438,11 @@ var NamingConventionRule = rule.Rule{
 			if ast.IsIdentifier(propName) && propName.AsIdentifier().Text == "default" {
 				modifiers = ModifierDefaultImport
 			} else if ast.IsStringLiteral(propName) {
-				// String literal import like import { "🍎" as Foo }
-				// No special modifier, just SelectorImport
+				// String literal import like import { "🍎" as Foo }: upstream's
+				// guard only skips Identifier imported names other than
+				// `default`, so any non-identifier name falls through and gets
+				// the default modifier.
+				modifiers = ModifierDefaultImport
 			} else {
 				return // Regular renamed import { foo as bar } — not matched
 			}
@@ -1498,7 +1519,10 @@ func processClassMember(nameNode *ast.Node, sel Selector, modifiers Modifier, re
 		if name == "" {
 			return
 		}
-		report(nameNode, name, sel, modifiers|ModifierHashPrivate)
+		// Upstream adds #private exclusively: a private-identifier member never
+		// gets the public modifier (accessibility keywords are illegal on it,
+		// so public is the only detectAccessibility result to strip).
+		report(nameNode, name, sel, (modifiers&^ModifierPublic)|ModifierHashPrivate)
 		return
 	}
 
