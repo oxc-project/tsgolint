@@ -167,10 +167,6 @@ func getSwitchMetadata(sourceFile *ast.SourceFile, typeChecker *checker.Checker,
 	}
 }
 
-func requiresQuoting(text string) bool {
-	return !scanner.IsIdentifierText(text, core.LanguageVariantStandard)
-}
-
 func getNodeIndent(sourceFile *ast.SourceFile, node *ast.Node) string {
 	trimmed := utils.TrimNodeTextRange(sourceFile, node)
 	_, column := scanner.GetECMALineAndUTF16CharacterOfPosition(sourceFile, trimmed.Pos())
@@ -193,7 +189,7 @@ func buildCaseTest(typeChecker *checker.Checker, missingBranchType *checker.Type
 		caseTest = typeChecker.TypeToString(missingBranchType)
 	}
 
-	if symbolName != "" && requiresQuoting(missingBranchName) {
+	if symbolName != "" && utils.RequiresQuoting(missingBranchName) {
 		return fmt.Sprintf("%s[%s]", symbolName, utils.QuoteSingleStringLiteral(missingBranchName))
 	}
 

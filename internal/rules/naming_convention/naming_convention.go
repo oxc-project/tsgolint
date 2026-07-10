@@ -9,11 +9,8 @@ import (
 	"unicode"
 
 	"github.com/dlclark/regexp2/v2"
-	"github.com/go-json-experiment/json"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
-	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -523,10 +520,12 @@ func normalizeOptions(rawOptions []NamingConventionOption) selectorGroups {
 	return groups
 }
 
-func hasTypeModifierSelectors(groups selectorGroups) bool {
+// anySelectorMatches reports whether any normalized selector in any group
+// satisfies pred.
+func anySelectorMatches(groups selectorGroups, pred func(*normalizedSelector) bool) bool {
 	for i := range groups {
 		for j := range groups[i] {
-			if groups[i][j].types != 0 {
+			if pred(&groups[i][j]) {
 				return true
 			}
 		}
@@ -534,15 +533,12 @@ func hasTypeModifierSelectors(groups selectorGroups) bool {
 	return false
 }
 
+func hasTypeModifierSelectors(groups selectorGroups) bool {
+	return anySelectorMatches(groups, func(s *normalizedSelector) bool { return s.types != 0 })
+}
+
 func hasModifierInSelectors(groups selectorGroups, mod Modifier) bool {
-	for i := range groups {
-		for j := range groups[i] {
-			if groups[i][j].modifiers&mod != 0 {
-				return true
-			}
-		}
-	}
-	return false
+	return anySelectorMatches(groups, func(s *normalizedSelector) bool { return s.modifiers&mod != 0 })
 }
 
 func parseSelectorNames(selectorRaw any) []Selector {
@@ -644,21 +640,12 @@ func parseFilter(filterRaw any) *normalizedFilter {
 			match = true
 		}
 		return &normalizedFilter{regex: mustCompileOption("filter", regexStr), match: match}
-	default:
-		data, err := json.Marshal(v)
-		if err != nil {
-			return nil
-		}
-		var mr MatchRegex
-		if err := json.Unmarshal(data, &mr); err != nil {
-			var s string
-			if err := json.Unmarshal(data, &s); err != nil {
-				return nil
-			}
-			return &normalizedFilter{regex: mustCompileOption("filter", s), match: true}
-		}
-		return &normalizedFilter{regex: mustCompileOption("filter", mr.Regex), match: mr.Match}
+	case MatchRegex:
+		// JSON configs arrive as string or map[string]any above; a typed
+		// MatchRegex only comes from programmatic options (tests).
+		return &normalizedFilter{regex: mustCompileOption("filter", v.Regex), match: v.Match}
 	}
+	return nil
 }
 
 func parseCustomRegex(custom *MatchRegex) *normalizedMatchRegex {
@@ -942,13 +929,6 @@ func validatePredefinedFormat(originalName string, processedName string, formats
 	return &msg
 }
 
-// nameRequiresQuotes mirrors upstream requiresQuoting: a member name written
-// as a string literal only carries the requiresQuotes modifier when it is not
-// a valid identifier.
-func nameRequiresQuotes(name string) bool {
-	return !scanner.IsIdentifierText(name, core.LanguageVariantStandard)
-}
-
 // extractDeclarationName returns the name text and quote-related modifiers for
 // a declaration name node. Name kinds needing caller-specific handling
 // (private identifiers) must be checked before calling.
@@ -965,7 +945,7 @@ func extractDeclarationName(nameNode *ast.Node) (string, Modifier, bool) {
 		name = nameNode.AsIdentifier().Text
 	case ast.IsStringLiteral(nameNode):
 		name = nameNode.AsStringLiteral().Text
-		if nameRequiresQuotes(name) {
+		if utils.RequiresQuoting(name) {
 			modifiers |= ModifierRequiresQuotes
 		}
 		isStringLiteralName = true
@@ -976,7 +956,7 @@ func extractDeclarationName(nameNode *ast.Node) (string, Modifier, bool) {
 		// numeric name always fails, so it is always reported when a format is
 		// configured.
 		name = nameNode.Text()
-		if nameRequiresQuotes(name) {
+		if utils.RequiresQuoting(name) {
 			modifiers |= ModifierRequiresQuotes
 		}
 	default:
@@ -1311,7 +1291,7 @@ var NamingConventionRule = rule.Rule{
 					return
 				}
 			}
-			modifiers := detectAccessorModifiers(node)
+			modifiers := detectClassMemberModifiers(node.ModifierFlags())
 			processClassMember(nameNode, SelectorClassicAccessor, modifiers, report)
 		}
 		listeners[ast.KindGetAccessor] = handleAccessor
@@ -1617,26 +1597,49 @@ func detectClassModifiers(node *ast.Node, exportedViaBlock map[string]bool) Modi
 }
 
 func detectExportedModifier(node *ast.Node, exportedViaBlock map[string]bool) Modifier {
-	var modifiers Modifier
-
-	if node.ModifierFlags()&ast.ModifierFlagsExport != 0 {
-		modifiers |= ModifierExported
-	} else if isExportedViaParent(node, exportedViaBlock) {
-		modifiers |= ModifierExported
+	if isExported(node, exportedViaBlock) {
+		return ModifierExported
 	}
-
-	return modifiers
+	return 0
 }
 
-func detectPropertyModifiers(node *ast.Node) Modifier {
-	var modifiers Modifier
-	flags := node.ModifierFlags()
+// isExported reports whether a declaration node is exported: directly (an
+// export modifier on the declaration or, for variables, on the enclosing
+// variable statement) or via a top-level `export { ... }` block. The block
+// only re-exports module-scope bindings, so the name-keyed map is consulted
+// just for top-level declarations; nested locals merely sharing the name must
+// not be treated as exported.
+func isExported(node *ast.Node, exportedViaBlock map[string]bool) bool {
+	if node == nil {
+		return false
+	}
+	// For variables the export modifier lives on the statement:
+	// VarDecl → VariableDeclarationList → VariableStatement.
+	stmt := node
+	if node.Parent != nil && ast.IsVariableDeclarationList(node.Parent) {
+		stmt = node.Parent.Parent
+		if stmt == nil {
+			return false
+		}
+	}
+	if stmt.ModifierFlags()&ast.ModifierFlagsExport != 0 {
+		return true
+	}
+	if stmt.Parent == nil || stmt.Parent.Kind != ast.KindSourceFile {
+		return false
+	}
+	if nameNode := node.Name(); nameNode != nil && ast.IsIdentifier(nameNode) {
+		return exportedViaBlock[nameNode.AsIdentifier().Text]
+	}
+	return false
+}
 
+// detectClassMemberModifiers detects the modifier bits shared by all class
+// members: static/abstract/override plus accessibility.
+func detectClassMemberModifiers(flags ast.ModifierFlags) Modifier {
+	var modifiers Modifier
 	if flags&ast.ModifierFlagsStatic != 0 {
 		modifiers |= ModifierStatic
-	}
-	if flags&ast.ModifierFlagsReadonly != 0 {
-		modifiers |= ModifierReadonly
 	}
 	if flags&ast.ModifierFlagsAbstract != 0 {
 		modifiers |= ModifierAbstract
@@ -1644,9 +1647,15 @@ func detectPropertyModifiers(node *ast.Node) Modifier {
 	if flags&ast.ModifierFlagsOverride != 0 {
 		modifiers |= ModifierOverride
 	}
+	return modifiers | detectAccessibility(flags)
+}
 
-	modifiers |= detectAccessibility(flags)
-
+func detectPropertyModifiers(node *ast.Node) Modifier {
+	flags := node.ModifierFlags()
+	modifiers := detectClassMemberModifiers(flags)
+	if flags&ast.ModifierFlagsReadonly != 0 {
+		modifiers |= ModifierReadonly
+	}
 	return modifiers
 }
 
@@ -1669,20 +1678,10 @@ func detectMethodModifiers(node *ast.Node, sel Selector) Modifier {
 	flags := node.ModifierFlags()
 
 	if sel == SelectorClassMethod {
-		if flags&ast.ModifierFlagsStatic != 0 {
-			modifiers |= ModifierStatic
-		}
-		if flags&ast.ModifierFlagsAbstract != 0 {
-			modifiers |= ModifierAbstract
-		}
-		if flags&ast.ModifierFlagsOverride != 0 {
-			modifiers |= ModifierOverride
-		}
-		modifiers |= detectAccessibility(flags)
-	} else if sel == SelectorObjectLiteralMethod {
-		modifiers |= ModifierPublic
-	} else if sel == SelectorTypeMethod {
-		modifiers |= ModifierPublic
+		modifiers = detectClassMemberModifiers(flags)
+	} else {
+		// Object literal and type methods are always public upstream.
+		modifiers = ModifierPublic
 	}
 
 	if flags&ast.ModifierFlagsAsync != 0 {
@@ -1692,41 +1691,10 @@ func detectMethodModifiers(node *ast.Node, sel Selector) Modifier {
 	return modifiers
 }
 
-func detectAccessorModifiers(node *ast.Node) Modifier {
-	var modifiers Modifier
-	flags := node.ModifierFlags()
-
-	if flags&ast.ModifierFlagsStatic != 0 {
-		modifiers |= ModifierStatic
-	}
-	if flags&ast.ModifierFlagsAbstract != 0 {
-		modifiers |= ModifierAbstract
-	}
-	if flags&ast.ModifierFlagsOverride != 0 {
-		modifiers |= ModifierOverride
-	}
-
-	modifiers |= detectAccessibility(flags)
-
-	return modifiers
-}
-
 // detectClassMethodModifiersFromProperty detects method modifiers for a class property
 // that has been reclassified as a method (because its initializer is a function/arrow expression).
 func detectClassMethodModifiersFromProperty(node *ast.Node, initializer *ast.Node) Modifier {
-	var modifiers Modifier
-	flags := node.ModifierFlags()
-
-	if flags&ast.ModifierFlagsStatic != 0 {
-		modifiers |= ModifierStatic
-	}
-	if flags&ast.ModifierFlagsAbstract != 0 {
-		modifiers |= ModifierAbstract
-	}
-	if flags&ast.ModifierFlagsOverride != 0 {
-		modifiers |= ModifierOverride
-	}
-	modifiers |= detectAccessibility(flags)
+	modifiers := detectClassMemberModifiers(node.ModifierFlags())
 
 	// Async is on the initializer (the arrow/function expression), not on the property itself
 	if initializer != nil && initializer.ModifierFlags()&ast.ModifierFlagsAsync != 0 {
@@ -1759,39 +1727,10 @@ func detectUnusedModifier(ctx rule.RuleContext, nameNode *ast.Node, exportedViaB
 		return 0
 	}
 	// Exported symbols are considered "used" even if not referenced within the file
-	if isDeclarationExported(nameNode, exportedViaBlock) {
+	if isExported(nameNode.Parent, exportedViaBlock) {
 		return 0
 	}
 	return ModifierUnused
-}
-
-// isDeclarationExported checks if the declaration containing nameNode has an export modifier
-// or is exported via an `export { ... }` block.
-func isDeclarationExported(nameNode *ast.Node, exportedViaBlock map[string]bool) bool {
-	node := nameNode.Parent
-	if node == nil {
-		return false
-	}
-	// For variable declarations, walk up: VarDecl → VDL → VarStatement
-	if ast.IsVariableDeclaration(node) {
-		node = node.Parent // VariableDeclarationList
-		if node != nil {
-			node = node.Parent // VariableStatement
-		}
-	}
-	if node == nil {
-		return false
-	}
-	if node.ModifierFlags()&ast.ModifierFlagsExport != 0 {
-		return true
-	}
-	// `export { name }` re-exports module-scope bindings only, so consult the
-	// name-keyed map just for top-level declarations; nested locals merely
-	// sharing the name must not be treated as exported.
-	if ast.IsIdentifier(nameNode) && node.Parent != nil && node.Parent.Kind == ast.KindSourceFile {
-		return exportedViaBlock[nameNode.AsIdentifier().Text]
-	}
-	return false
 }
 
 // detectTypeModifiers mirrors upstream isCorrectType: strip null/undefined,
@@ -1840,31 +1779,6 @@ func detectTypeModifiers(ctx rule.RuleContext, node *ast.Node) TypeModifier {
 	}
 
 	return result
-}
-
-func isExportedViaParent(node *ast.Node, exportedViaBlock map[string]bool) bool {
-	if node.Parent == nil {
-		return false
-	}
-	stmt := node
-	parent := node.Parent
-	if ast.IsVariableDeclarationList(parent) {
-		stmt = parent.Parent
-		parent = parent.Parent
-	}
-	if parent != nil && parent.ModifierFlags()&ast.ModifierFlagsExport != 0 {
-		return true
-	}
-	// `export { name }` re-exports module-scope bindings only, so consult the
-	// name-keyed map just for top-level declarations; nested locals merely
-	// sharing the name must not inherit the exported modifier.
-	if stmt == nil || stmt.Parent == nil || stmt.Parent.Kind != ast.KindSourceFile {
-		return false
-	}
-	if nameNode := node.Name(); nameNode != nil && ast.IsIdentifier(nameNode) {
-		return exportedViaBlock[nameNode.AsIdentifier().Text]
-	}
-	return false
 }
 
 func buildExportedViaBlockMap(sourceFile *ast.SourceFile) map[string]bool {

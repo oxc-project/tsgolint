@@ -16,6 +16,12 @@ func TrimNodeTextRange(sourceFile *ast.SourceFile, node *ast.Node) core.TextRang
 	return scanner.GetRangeOfTokenAtPosition(sourceFile, node.Pos()).WithEnd(node.End())
 }
 
+// RequiresQuoting mirrors upstream typescript-eslint's requiresQuoting: a
+// member name needs quotes when it is not valid identifier text.
+func RequiresQuoting(text string) bool {
+	return !scanner.IsIdentifierText(text, core.LanguageVariantStandard)
+}
+
 func GetCommentsInRange(sourceFile *ast.SourceFile, inRange core.TextRange) iter.Seq[ast.CommentRange] {
 	nodeFactory := ast.NewNodeFactory(ast.NodeFactoryHooks{})
 
