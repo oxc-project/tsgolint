@@ -1007,3 +1007,21 @@ Message: Promise-returning function provided to property where a void return was
      |                ~~~~~~~~~~~~~~~
    5 | };
 ---
+
+[TestNoMisusedPromisesRule/invalid-90 - 1]
+Diagnostic 1: voidReturnArgument (4:11 - 4:18)
+Message: Promise returned in function argument where a void return was expected.
+   3 | function f<T extends () => Promise<void>>(t: T) {
+   4 |   takesCb({ ...t });
+     |           ~~~~~~~~
+   5 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-91 - 1]
+Diagnostic 1: voidReturnVariable (3:26 - 3:33)
+Message: Promise-returning function provided to variable where a void return was expected.
+   2 | function f<T extends () => Promise<void>>(t: T) {
+   3 |   const cb: () => void = { ...t };
+     |                          ~~~~~~~~
+   4 | }
+---

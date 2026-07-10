@@ -118,7 +118,7 @@ var NoMisusedPromisesRule = rule.Rule{
 		}
 
 		// A syntactic check for whether an expression could possibly evaluate to a
-		// value with call signatures. Literals, templates, and array/object literals
+		// value with call signatures. Literals, templates, and array literals
 		// can never be callable, so `returnsThenable` is always false for them and
 		// the type queries guarding it can be skipped entirely.
 		// This is a perf optimization to help avoid requesting types where possible.
@@ -133,9 +133,16 @@ var NoMisusedPromisesRule = rule.Rule{
 				ast.KindFalseKeyword,
 				ast.KindNullKeyword,
 				ast.KindRegularExpressionLiteral,
-				ast.KindArrayLiteralExpression,
-				ast.KindObjectLiteralExpression:
+				ast.KindArrayLiteralExpression:
 				return false
+			case ast.KindObjectLiteralExpression:
+				// Spreading a generic value keeps its type (e.g. `{ ...t }` where
+				// `T extends () => Promise<void>` has type `T`), which can be
+				// callable, so only spread-free object literals are known to be
+				// never-callable.
+				return slices.ContainsFunc(node.AsObjectLiteralExpression().Properties.Nodes, func(property *ast.Node) bool {
+					return property.Kind == ast.KindSpreadAssignment
+				})
 			default:
 				return true
 			}

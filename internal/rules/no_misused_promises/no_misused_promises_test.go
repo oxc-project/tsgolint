@@ -2681,5 +2681,32 @@ const obj: O = {
 				},
 			},
 		},
+		{
+			Code: `
+declare function takesCb(cb: () => void): void;
+function f<T extends () => Promise<void>>(t: T) {
+  takesCb({ ...t });
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "voidReturnArgument",
+					Line:      4,
+				},
+			},
+		},
+		{
+			Code: `
+function f<T extends () => Promise<void>>(t: T) {
+  const cb: () => void = { ...t };
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "voidReturnVariable",
+					Line:      3,
+				},
+			},
+		},
 	})
 }
