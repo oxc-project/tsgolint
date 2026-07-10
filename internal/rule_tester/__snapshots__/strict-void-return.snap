@@ -1215,3 +1215,21 @@ Message: Value returned in a context where a void return is expected.
      |                    ~~~~~~
    5 |       
 ---
+
+[TestStrictVoidReturnRule/invalid-110 - 1]
+Diagnostic 1: nonVoidFunc (4:7 - 4:14)
+Message: Value-returning function used in a context where a void function is expected.
+   3 | function bar<T extends () => number>(t: T) {
+   4 |   foo({ ...t });
+     |       ~~~~~~~~
+   5 | }
+---
+
+[TestStrictVoidReturnRule/invalid-111 - 1]
+Diagnostic 1: nonVoidFunc (3:26 - 3:33)
+Message: Value-returning function used in a context where a void function is expected.
+   2 | function bar<T extends () => number>(t: T) {
+   3 |   const cb: () => void = { ...t };
+     |                          ~~~~~~~~
+   4 | }
+---
