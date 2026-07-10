@@ -470,7 +470,7 @@ func normalizeOptions(rawOptions []NamingConventionOption) selectorGroups {
 		for _, sel := range selectors {
 			expandedSelectors := expandSelector(sel)
 			for _, expandedSel := range expandedSelectors {
-				weight := calculateWeight(expandedSel, sel, modifiers, types, filter)
+				weight := calculateWeight(sel, modifiers, types, filter)
 				all = append(all, normalizedSelector{
 					selector:           expandedSel,
 					modifiers:          modifiers,
@@ -689,7 +689,7 @@ func isGroupMetaSelector(sel Selector) bool {
 // calculateWeight determines the specificity of a selector configuration.
 // Higher weight = more specific = should be checked first.
 // Specificity tiers: default(0) < group meta(1) < sub-group meta(2) < individual(3) < modifiers < type modifiers < filter
-func calculateWeight(expandedSel Selector, originalSel Selector, modifiers Modifier, types TypeModifier, filter *normalizedFilter) int {
+func calculateWeight(originalSel Selector, modifiers Modifier, types TypeModifier, filter *normalizedFilter) int {
 	weight := 0
 
 	// Four tiers of selector specificity at bits 0-1:
@@ -1163,7 +1163,7 @@ var NamingConventionRule = rule.Rule{
 
 		// Class declarations
 		listeners[ast.KindClassDeclaration] = func(node *ast.Node) {
-			modifiers := detectClassModifiers(node, ctx, exportedViaBlock)
+			modifiers := detectClassModifiers(node, exportedViaBlock)
 			if nameNode := node.Name(); nameNode != nil {
 				modifiers |= unusedModifier(nameNode)
 			}
@@ -1172,12 +1172,12 @@ var NamingConventionRule = rule.Rule{
 
 		// Class expressions
 		listeners[ast.KindClassExpression] = func(node *ast.Node) {
-			processNode(node, SelectorClass, detectClassModifiers(node, ctx, exportedViaBlock))
+			processNode(node, SelectorClass, detectClassModifiers(node, exportedViaBlock))
 		}
 
 		// Interface declarations
 		listeners[ast.KindInterfaceDeclaration] = func(node *ast.Node) {
-			modifiers := detectExportedModifier(node, ctx, exportedViaBlock)
+			modifiers := detectExportedModifier(node, exportedViaBlock)
 			if nameNode := node.Name(); nameNode != nil {
 				modifiers |= unusedModifier(nameNode)
 			}
@@ -1186,7 +1186,7 @@ var NamingConventionRule = rule.Rule{
 
 		// Type alias declarations
 		listeners[ast.KindTypeAliasDeclaration] = func(node *ast.Node) {
-			modifiers := detectExportedModifier(node, ctx, exportedViaBlock)
+			modifiers := detectExportedModifier(node, exportedViaBlock)
 			if nameNode := node.Name(); nameNode != nil {
 				modifiers |= unusedModifier(nameNode)
 			}
@@ -1195,7 +1195,7 @@ var NamingConventionRule = rule.Rule{
 
 		// Enum declarations
 		listeners[ast.KindEnumDeclaration] = func(node *ast.Node) {
-			modifiers := detectExportedModifier(node, ctx, exportedViaBlock)
+			modifiers := detectExportedModifier(node, exportedViaBlock)
 			if node.ModifierFlags()&ast.ModifierFlagsConst != 0 {
 				modifiers |= ModifierConst
 			}
@@ -1330,7 +1330,6 @@ var NamingConventionRule = rule.Rule{
 				modifiers |= ModifierRequiresQuotes
 				isStringLiteralName = true
 			} else if ast.IsNumericLiteral(nameNode) {
-				modifiers |= ModifierRequiresQuotes
 				return
 			} else {
 				name = nameNode.Text()
@@ -1638,7 +1637,7 @@ func detectParameterPropertyModifiers(node *ast.Node) Modifier {
 	return modifiers
 }
 
-func detectClassModifiers(node *ast.Node, ctx rule.RuleContext, exportedViaBlock map[string]bool) Modifier {
+func detectClassModifiers(node *ast.Node, exportedViaBlock map[string]bool) Modifier {
 	var modifiers Modifier
 	flags := node.ModifierFlags()
 
@@ -1655,7 +1654,7 @@ func detectClassModifiers(node *ast.Node, ctx rule.RuleContext, exportedViaBlock
 	return modifiers
 }
 
-func detectExportedModifier(node *ast.Node, ctx rule.RuleContext, exportedViaBlock map[string]bool) Modifier {
+func detectExportedModifier(node *ast.Node, exportedViaBlock map[string]bool) Modifier {
 	var modifiers Modifier
 
 	if node.ModifierFlags()&ast.ModifierFlagsExport != 0 {
