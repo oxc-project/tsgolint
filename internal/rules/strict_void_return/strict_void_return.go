@@ -75,6 +75,30 @@ var StrictVoidReturnRule = rule.Rule{
 			return utils.IsTypeFlagSet(t, checker.TypeFlagsVoid)
 		}
 
+		// A syntactic check for whether an expression could possibly evaluate to a
+		// value with call signatures. Literals, templates, and array/object literals
+		// can never be callable, so `reportIfNonVoidFunction` can never report them
+		// and the type queries leading up to it can be skipped entirely.
+		// This is a perf optimization to help avoid requesting types where possible.
+		couldBeFunctionLikeValue := func(node *ast.Node) bool {
+			switch node.Kind {
+			case ast.KindStringLiteral,
+				ast.KindNoSubstitutionTemplateLiteral,
+				ast.KindTemplateExpression,
+				ast.KindNumericLiteral,
+				ast.KindBigIntLiteral,
+				ast.KindTrueKeyword,
+				ast.KindFalseKeyword,
+				ast.KindNullKeyword,
+				ast.KindRegularExpressionLiteral,
+				ast.KindArrayLiteralExpression,
+				ast.KindObjectLiteralExpression:
+				return false
+			default:
+				return true
+			}
+		}
+
 		var reportIfNonVoidFunction func(funcNode *ast.Node)
 		reportIfNonVoidFunction = func(funcNode *ast.Node) {
 			actualType := checker.Checker_getApparentType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(funcNode))
@@ -139,6 +163,9 @@ var StrictVoidReturnRule = rule.Rule{
 		}
 
 		checkExpressionNode := func(node *ast.Node) bool {
+			if !couldBeFunctionLikeValue(node) {
+				return false
+			}
 			expectedType := checker.Checker_getContextualType(ctx.TypeChecker, node, checker.ContextFlagsNone)
 			if expectedType != nil && isVoidReturningFunctionType(expectedType) {
 				reportIfNonVoidFunction(node)
@@ -148,6 +175,13 @@ var StrictVoidReturnRule = rule.Rule{
 		}
 
 		checkFunctionCallNode := func(callNode *ast.Expression) {
+			args := callNode.Arguments()
+			// Only function-valued arguments can ever be reported, so skip the
+			// callee/parameter type resolution when no argument could be one.
+			if !slices.ContainsFunc(args, couldBeFunctionLikeValue) {
+				return
+			}
+
 			funcType := ctx.TypeChecker.GetTypeAtLocation(callNode.Expression())
 			signatures := utils.Flatten(utils.Map(utils.UnionTypeParts(funcType), func(typePart *checker.Type) []*checker.Signature {
 				if ast.IsCallExpression(callNode) {
@@ -156,8 +190,8 @@ var StrictVoidReturnRule = rule.Rule{
 				return utils.GetConstructSignatures(ctx.TypeChecker, typePart)
 			}))
 
-			for argIdx, argNode := range callNode.Arguments() {
-				if argNode.Kind == ast.KindSpreadElement {
+			for argIdx, argNode := range args {
+				if argNode.Kind == ast.KindSpreadElement || !couldBeFunctionLikeValue(argNode) {
 					continue
 				}
 
