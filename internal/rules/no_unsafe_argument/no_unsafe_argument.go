@@ -2,6 +2,7 @@ package no_unsafe_argument
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -58,47 +59,26 @@ func newFunctionSignature(
 		return nil
 	}
 
-	paramTypes := []*checker.Type{}
-	var restT restType
-
 	parameters := checker.Signature_parameters(signature)
+	var restParam *ast.Symbol
 
 	for i, param := range parameters {
-		t := typeChecker.GetTypeOfSymbolAtLocation(param, node)
-
 		if param.Declarations != nil && len(param.Declarations) != 0 {
-			decl := param.Declarations[0]
-			if utils.IsRestParameterDeclaration(decl) {
+			if utils.IsRestParameterDeclaration(param.Declarations[0]) {
 				// is a rest param
-				if checker.Checker_isArrayType(typeChecker, t) {
-					restT = restType{
-						Type:  checker.Checker_getTypeArguments(typeChecker, t)[0],
-						Index: i,
-						Kind:  restTypeKindArray,
-					}
-				} else if checker.IsTupleType(t) {
-					restT = restType{
-						Index:         i,
-						Kind:          restTypeKindTuple,
-						TypeArguments: checker.Checker_getTypeArguments(typeChecker, t),
-					}
-				} else {
-					restT = restType{
-						Type:  t,
-						Index: i,
-						Kind:  restTypeKindOther,
-					}
-				}
+				restParam = param
+				parameters = parameters[:i]
 				break
 			}
 		}
-
-		paramTypes = append(paramTypes, t)
 	}
 
 	return &functionSignature{
-		paramTypes: paramTypes,
-		restType:   &restT,
+		typeChecker: typeChecker,
+		node:        node,
+		parameters:  parameters,
+		paramTypes:  make([]*checker.Type, len(parameters)),
+		restParam:   restParam,
 	}
 }
 
@@ -106,7 +86,13 @@ type functionSignature struct {
 	hasConsumedArguments bool
 	parameterTypeIndex   int
 
+	typeChecker *checker.Checker
+	node        *ast.Node
+	// parameters holds the non-rest parameters; paramTypes caches their types,
+	// resolved lazily so that skipped argument positions never request them.
+	parameters []*ast.Symbol
 	paramTypes []*checker.Type
+	restParam  *ast.Symbol
 	restType   *restType
 }
 
@@ -114,18 +100,43 @@ func (s *functionSignature) consumeRemainingArguments() {
 	s.hasConsumedArguments = true
 }
 
+// skipParameter advances past the parameter position of an argument that
+// doesn't need checking, without resolving the parameter's type.
+func (s *functionSignature) skipParameter() {
+	s.parameterTypeIndex += 1
+}
+
+func (s *functionSignature) getRestType() *restType {
+	if s.restType != nil {
+		return s.restType
+	}
+	restT := restType{Index: len(s.parameters), Kind: restTypeKindOther}
+	if s.restParam != nil {
+		t := s.typeChecker.GetTypeOfSymbolAtLocation(s.restParam, s.node)
+		if checker.Checker_isArrayType(s.typeChecker, t) {
+			restT.Kind = restTypeKindArray
+			restT.Type = checker.Checker_getTypeArguments(s.typeChecker, t)[0]
+		} else if checker.IsTupleType(t) {
+			restT.Kind = restTypeKindTuple
+			restT.TypeArguments = checker.Checker_getTypeArguments(s.typeChecker, t)
+		} else {
+			restT.Type = t
+		}
+	}
+	s.restType = &restT
+	return s.restType
+}
+
 func (s *functionSignature) getNextParameterType() *checker.Type {
 	index := s.parameterTypeIndex
 	s.parameterTypeIndex += 1
 
 	if index >= len(s.paramTypes) || s.hasConsumedArguments {
-		if s.restType == nil {
-			return nil
-		}
+		restType := s.getRestType()
 
-		switch s.restType.Kind {
+		switch restType.Kind {
 		case restTypeKindTuple:
-			typeArguments := s.restType.TypeArguments
+			typeArguments := restType.TypeArguments
 			if len(typeArguments) == 0 {
 				return nil
 			}
@@ -137,17 +148,52 @@ func (s *functionSignature) getNextParameterType() *checker.Type {
 				return typeArguments[len(typeArguments)-1]
 			}
 
-			typeIndex := index - s.restType.Index
+			typeIndex := index - restType.Index
 			if typeIndex >= len(typeArguments) {
 				return typeArguments[len(typeArguments)-1]
 			}
 
 			return typeArguments[typeIndex]
 		case restTypeKindArray, restTypeKindOther:
-			return s.restType.Type
+			return restType.Type
 		}
 	}
+	if s.paramTypes[index] == nil {
+		s.paramTypes[index] = s.typeChecker.GetTypeOfSymbolAtLocation(s.parameters[index], s.node)
+	}
 	return s.paramTypes[index]
+}
+
+// argumentCanBeUnsafe reports whether an argument expression could have a type
+// that IsUnsafeAssignment flags: `any`, or a generic type reference with unsafe
+// type arguments. Literals and template strings have literal/primitive types,
+// and function/object-literal expressions have anonymous object types — never
+// `any` and never a type reference — so resolving their type can be skipped.
+// Array literals CAN be unsafe (their type is the generic Array<T> reference,
+// e.g. `foo([anyValue])`), so they are not skipped.
+func argumentCanBeUnsafe(node *ast.Node) bool {
+	switch node.Kind {
+	case ast.KindStringLiteral,
+		ast.KindNoSubstitutionTemplateLiteral,
+		ast.KindTemplateExpression,
+		ast.KindNumericLiteral,
+		ast.KindBigIntLiteral,
+		ast.KindTrueKeyword,
+		ast.KindFalseKeyword,
+		ast.KindNullKeyword,
+		ast.KindRegularExpressionLiteral,
+		ast.KindArrowFunction,
+		ast.KindFunctionExpression:
+		return false
+	case ast.KindObjectLiteralExpression:
+		// Spreading an `any` value makes the whole object literal `any`
+		// (e.g. `foo({ ...anyValue })`), so only spread-free literals are safe.
+		return slices.ContainsFunc(node.AsObjectLiteralExpression().Properties.Nodes, func(property *ast.Node) bool {
+			return property.Kind == ast.KindSpreadAssignment
+		})
+	default:
+		return true
+	}
 }
 
 var NoUnsafeArgumentRule = rule.Rule{
@@ -182,7 +228,9 @@ var NoUnsafeArgumentRule = rule.Rule{
 			callee *ast.Expression,
 			node *ast.Node,
 		) {
-			if len(args) == 0 {
+			// A report requires at least one argument whose type could be unsafe;
+			// skip the callee/signature type queries when none qualifies.
+			if !slices.ContainsFunc(args, argumentCanBeUnsafe) {
 				return
 			}
 
@@ -198,7 +246,7 @@ var NoUnsafeArgumentRule = rule.Rule{
 
 			if ast.IsTaggedTemplateExpression(node) {
 				// Consumes the first parameter (TemplateStringsArray) of the function called with TaggedTemplateExpression.
-				signature.getNextParameterType()
+				signature.skipParameter()
 			}
 
 			for _, argument := range args {
@@ -247,6 +295,11 @@ var NoUnsafeArgumentRule = rule.Rule{
 					}
 
 				default:
+					if !argumentCanBeUnsafe(argument) {
+						signature.skipParameter()
+						continue
+					}
+
 					parameterType := signature.getNextParameterType()
 					if parameterType == nil {
 						continue
