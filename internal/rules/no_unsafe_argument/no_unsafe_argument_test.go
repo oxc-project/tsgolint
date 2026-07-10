@@ -445,5 +445,20 @@ foo` + "`" + `${arg}` + "`" + `;
 				},
 			},
 		},
+		{
+			Code: `
+declare function foo(arg: { x: number }): void;
+declare const anyValue: any;
+foo({ ...anyValue });
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unsafeArgument",
+					Line:      4,
+					Column:    5,
+					EndColumn: 20,
+				},
+			},
+		},
 	})
 }
