@@ -39,6 +39,9 @@ func BenchmarkNoMisusedPromises(b *testing.B) {
 		dir = fixtureDir
 	}
 	tsconfigPath := filepath.Join(dir, "tsconfig.json")
+	if tc := os.Getenv("NMP_TSCONFIG"); tc != "" {
+		tsconfigPath = tc
+	}
 
 	// NMP_OPTS is a JSON object of rule options (empty/unset = rule defaults).
 	// Used to measure the cost of individual config options empirically.
@@ -65,12 +68,19 @@ func BenchmarkNoMisusedPromises(b *testing.B) {
 	buildRun := func() func() int64 {
 		fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 		host := utils.CreateCompilerHost(dir, fs)
+		// Ignore tsconfig diagnostics, matching the real CLI (main.go discards
+		// them): real-world tsconfigs routinely surface benign config diagnostics
+		// (unknown options for the TS version, extends quirks) yet lint fine.
 		program, diags, err := utils.CreateProgram(false, fs, dir, tsconfigPath, host, false)
 		if err != nil {
 			b.Fatal("failed to create program:", err)
 		}
-		if len(diags) > 0 {
-			b.Fatal("tsconfig diagnostics:", diags[0].Description)
+		if program == nil {
+			msg := "program is nil"
+			if len(diags) > 0 {
+				msg = diags[0].Description + ": " + diags[0].Help
+			}
+			b.Fatal("no program: ", msg)
 		}
 		var files []*ast.SourceFile
 		prefix := string(tspath.ToPath("", dir, fs.UseCaseSensitiveFileNames()).EnsureTrailingDirectorySeparator())
