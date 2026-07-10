@@ -14,9 +14,11 @@ import (
 // Source: https://github.com/typescript-eslint/typescript-eslint/blob/main/packages/eslint-plugin/tests/rules/naming-convention/cases/createTestCases.ts
 //
 // Where upstream asserts on error `data` (name/type/formats/...), this port
-// asserts the exact rendered message instead. Snapshots are skipped for the
-// generated invalid cases: they would add several megabytes of generated
-// snapshot entries while asserting nothing the message assertions don't.
+// asserts the exact rendered message plus the reported line/column range
+// (computed from the template, see placeholderRange). Snapshots are skipped
+// for the generated invalid cases: they would add several megabytes of
+// generated snapshot entries while asserting nothing the message and
+// position assertions don't.
 
 type formatNames struct {
 	format  string
@@ -167,6 +169,33 @@ func createValidTestCases(cases []testCaseSpec) []rule_tester.ValidTestCase {
 	return newCases
 }
 
+// placeholderRange computes the 1-based UTF-16 column range the diagnostic
+// must cover in a single-line template: the substituted name itself, plus the
+// surrounding quotes for a string-literal name (`"%"`) or the leading hash
+// for a private identifier (`#%`). Templates and test names are all ASCII,
+// so byte offsets equal UTF-16 columns. The one template with two
+// placeholders (a type parameter and a reference to it) reports on the
+// first, so the first `%` is always the reported declaration name.
+func placeholderRange(template, preparedName string) (column, endColumn int) {
+	idx := strings.Index(template, "%")
+	if idx < 0 {
+		panic("template has no % placeholder: " + template)
+	}
+	start := idx
+	span := len(preparedName)
+	if idx > 0 {
+		switch template[idx-1] {
+		case '"':
+			start--
+			span += 2
+		case '#':
+			start--
+			span++
+		}
+	}
+	return start + 1, start + 1 + span
+}
+
 // metaSelectors mirrors upstream: for meta selectors the reported node type
 // varies per matched node, so no message is asserted (snapshot-free either way).
 var metaSelectors = map[string]bool{
@@ -204,9 +233,19 @@ func createInvalidTestCases(cases []testCaseSpec) []rule_tester.InvalidTestCase 
 						message = ""
 					}
 					errors := make([]rule_tester.InvalidTestCaseError, 0, len(test.code)*len(selectors))
-					for range test.code {
+					for lineIdx, tmpl := range test.code {
+						// The options comment is line 1, templates follow.
+						line := lineIdx + 2
+						column, endColumn := placeholderRange(tmpl, preparedName)
 						for range selectors {
-							errors = append(errors, rule_tester.InvalidTestCaseError{MessageId: messageId, Message: message})
+							errors = append(errors, rule_tester.InvalidTestCaseError{
+								MessageId: messageId,
+								Message:   message,
+								Line:      line,
+								Column:    column,
+								EndLine:   line,
+								EndColumn: endColumn,
+							})
 						}
 					}
 

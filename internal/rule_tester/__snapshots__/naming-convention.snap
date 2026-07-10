@@ -1062,3 +1062,10 @@ Message: Classic Accessor name `Foo` must match one of the following formats: ca
    1 | const o = { get Foo() { return 1; } };
      |                 ~~~
 ---
+
+[TestNamingConventionUpstreamParity/invalid-14 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
+Message: Variable name `𞤀abc` must match one of the following formats: camelCase
+   1 | const 𞤀abc = 1;
+     |       ~~~~~
+---

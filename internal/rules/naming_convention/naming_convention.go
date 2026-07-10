@@ -365,6 +365,13 @@ func checkFormat(format PredefinedFormat, name string) bool {
 // The checkers mirror upstream format.ts: an empty name is valid, only the
 // first character's case-fold is inspected (so `$`, digits, and caseless
 // scripts pass), and underscores are the only forbidden interior characters.
+//
+// Known divergence: upstream inspects the first UTF-16 code unit (name[0]),
+// so a name starting with an astral-plane cased letter (e.g. Adlam capital
+// U+1E900) sees only a lone surrogate, which case-folds to itself and passes
+// every case check. This port inspects the full first rune and enforces its
+// actual case — deliberately kept, as upstream's behavior is a surrogate
+// artifact rather than intent.
 
 func isCamelCase(name string) bool {
 	if name == "" {
@@ -1014,8 +1021,14 @@ var NamingConventionRule = rule.Rule{
 			checker.Checker_checkSourceFile(ctx.TypeChecker, context.Background(), ctx.SourceFile, true)
 		}
 
-		// Build a map of names exported via `export { ... }` blocks
-		exportedViaBlock := buildExportedViaBlockMap(ctx.SourceFile)
+		// Names exported via `export { ... }` blocks only matter when a
+		// selector uses the exported modifier or when the unused check needs
+		// to exempt exported symbols; otherwise skip the statement scan (reads
+		// of the nil map just return false).
+		var exportedViaBlock map[string]bool
+		if needsUnusedCheck || hasModifierInSelectors(groups, ModifierExported) {
+			exportedViaBlock = buildExportedViaBlockMap(ctx.SourceFile)
+		}
 
 		report := func(node *ast.Node, name string, nodeSelector Selector, nodeModifiers Modifier) {
 			var nodeTypes TypeModifier

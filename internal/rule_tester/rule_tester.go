@@ -64,7 +64,8 @@ type InvalidTestCase struct {
 	Files    map[string]string
 	// SkipSnapshot disables the diagnostics snapshot for this case. Intended
 	// for large generated test suites where per-case snapshots would bloat
-	// the snapshot file; such cases should assert messages directly instead.
+	// the snapshot file; such cases should assert messages and positions
+	// directly instead.
 	SkipSnapshot bool
 }
 

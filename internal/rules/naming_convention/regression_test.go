@@ -22,6 +22,11 @@ func TestNamingConventionUpstreamParity(t *testing.T) {
 		{Code: "const $data = 1;"},
 		{Code: "class $Foo {}"},
 		{Code: "const 名前 = 1;"},
+		// Deliberate divergence from upstream: astral-plane cased letters are
+		// case-checked as full runes (upstream sees a lone surrogate that
+		// case-folds to itself and passes everything). Lowercase Adlam passes
+		// camelCase...
+		{Code: "const \U0001E922abc = 1;"},
 		{
 			Code:    "const NAME$ = 1;",
 			Options: []NamingConventionOption{{Selector: "variable", Format: &[]string{"UPPER_CASE"}}},
@@ -288,6 +293,17 @@ func TestNamingConventionUpstreamParity(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "doesNotMatchFormat", Message: "Classic Accessor name `Foo` must match one of the following formats: camelCase"},
+			},
+		},
+		// ...and capital Adlam fails it (upstream would pass both; see the
+		// format checkers' divergence note).
+		{
+			Code: "const \U0001E900abc = 1;",
+			Options: []NamingConventionOption{
+				{Selector: "variable", Format: &[]string{"camelCase"}},
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "doesNotMatchFormat", Message: "Variable name `\U0001E900abc` must match one of the following formats: camelCase"},
 			},
 		},
 	}
