@@ -958,6 +958,13 @@ Message: Import name `foo` must match one of the following formats: PascalCase
      |                  ~~~
 ---
 
+[TestNamingConventionTypeParameterScope/invalid-0 - 1]
+Diagnostic 1: missingUnderscore (1:20 - 1:20)
+Message: Type Parameter name `T` must have one leading underscore(s).
+   1 | export type Unused<T> = string;
+     |                    ~
+---
+
 [TestNamingConventionUpstreamParity/invalid-0 - 1]
 Diagnostic 1: doesNotMatchFormat (1:12 - 1:16)
 Message: Type Property name `123` must match one of the following formats: snake_case

@@ -2285,3 +2285,60 @@ func TestNamingConvention(t *testing.T) {
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, validCases, invalidCases)
 }
+
+// TestNamingConventionTypeParameterScope guards the selector boundary for the
+// `typeParameter` selector. Upstream only matches
+// `TSTypeParameterDeclaration > TSTypeParameter`, i.e. type parameters that are
+// members of a declaration's type parameter list. The TS compiler AST also
+// emits a KindTypeParameter node for the key of a mapped type (`{ [K in ...] }`)
+// and for the parameter of an `infer` type; those must NOT be linted as type
+// parameters. This was found running the rule against a real codebase, where
+// mapped-type keys and `infer` parameters were spuriously reported.
+func TestNamingConventionTypeParameterScope(t *testing.T) {
+	t.Parallel()
+
+	options := []NamingConventionOption{
+		{
+			Selector:          []string{"typeParameter", "typeLike", "typeAlias"},
+			Modifiers:         []string{"unused"},
+			Format:            &[]string{"PascalCase"},
+			LeadingUnderscore: strPtr("require"),
+		},
+		{
+			Selector:          []string{"typeLike", "typeAlias", "typeParameter"},
+			Format:            &[]string{"PascalCase"},
+			LeadingUnderscore: strPtr("allow"),
+		},
+	}
+
+	validCases := []rule_tester.ValidTestCase{
+		// Mapped-type key: not a declaration-list type parameter, so its
+		// lowercase name and lack of leading underscore must be ignored.
+		{
+			Code:    `export type Mapped<T> = { [k in keyof T]: number };`,
+			Options: options,
+		},
+		// `infer` type parameter: likewise not linted.
+		{
+			Code:    `export type ElementType<T> = T extends (infer u)[] ? u : never;`,
+			Options: options,
+		},
+	}
+
+	invalidCases := []rule_tester.InvalidTestCase{
+		// A genuine declaration-list type parameter that is unused still
+		// requires a leading underscore, proving the listener still fires.
+		{
+			Code: `export type Unused<T> = string;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingUnderscore",
+					Message:   "Type Parameter name `T` must have one leading underscore(s).",
+				},
+			},
+			Options: options,
+		},
+	}
+
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, validCases, invalidCases)
+}

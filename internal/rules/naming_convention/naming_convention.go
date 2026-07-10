@@ -1218,6 +1218,17 @@ var NamingConventionRule = rule.Rule{
 
 		// Type parameters
 		listeners[ast.KindTypeParameter] = func(node *ast.Node) {
+			// Upstream only selects `TSTypeParameterDeclaration > TSTypeParameter`,
+			// i.e. type parameters that are members of a declaration's type
+			// parameter list. The TS compiler AST also produces a KindTypeParameter
+			// for the key of a mapped type (`{ [K in ...] }`) and the parameter of
+			// an `infer` type, which upstream never visits, so skip those.
+			if parent := node.Parent; parent != nil {
+				switch parent.Kind {
+				case ast.KindMappedType, ast.KindInferType:
+					return
+				}
+			}
 			var modifiers Modifier
 			if nameNode := node.Name(); nameNode != nil {
 				modifiers = unusedModifier(nameNode)
