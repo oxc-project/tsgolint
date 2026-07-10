@@ -1,1422 +1,959 @@
 
-[TestNamingConventionAbstractClassInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:16 - 2:24)
-Message: class name `some_name` must match one of the following formats: UPPER_CASE
+[TestNamingConvention/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:9)
+Message: Variable name `x_x` must match one of the following formats: camelCase, UPPER_CASE
+   1 | const x_x = 1;
+     |       ~~~
+---
+
+[TestNamingConvention/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:9)
+Message: Variable name `x_x` must match one of the following formats: camelCase, UPPER_CASE
+   1 | const x_x = 1;
+     |       ~~~
+---
+
+[TestNamingConvention/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (2:15 - 2:27)
+Message: Variable name `child_process` must match one of the following formats: camelCase
    1 | 
-   2 | abstract class some_name {}
-     |                ~~~~~~~~~
-   3 | class IgnoredDueToModifier {}
+   2 |         const child_process = require('child_process');
+     |               ~~~~~~~~~~~~~
+   3 |       
 ---
 
-[TestNamingConventionAccessorPrivateStaticInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:22 - 3:30)
-Message: classicAccessor name `some_name` must match one of the following formats: UPPER_CASE
-   2 | class Ignored {
-   3 |   private static get some_name() {}
-     |                      ~~~~~~~~~
-   4 |   get IgnoredDueToModifiers() {}
+[TestNamingConvention/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormatTrimmed (2:23 - 2:37)
+Message: Variable name `any_camelCase01` trimmed as `camelCase01` must match one of the following formats: UPPER_CASE
+   1 | 
+   2 |         declare const any_camelCase01: any;
+     |                       ~~~~~~~~~~~~~~~
+   3 |         declare const any_camelCase02: any | null;
+
+Diagnostic 2: doesNotMatchFormatTrimmed (3:23 - 3:37)
+Message: Variable name `any_camelCase02` trimmed as `camelCase02` must match one of the following formats: UPPER_CASE
+   2 |         declare const any_camelCase01: any;
+   3 |         declare const any_camelCase02: any | null;
+     |                       ~~~~~~~~~~~~~~~
+   4 |         declare const any_camelCase03: any | null | undefined;
+
+Diagnostic 3: doesNotMatchFormatTrimmed (4:23 - 4:37)
+Message: Variable name `any_camelCase03` trimmed as `camelCase03` must match one of the following formats: UPPER_CASE
+   3 |         declare const any_camelCase02: any | null;
+   4 |         declare const any_camelCase03: any | null | undefined;
+     |                       ~~~~~~~~~~~~~~~
+   5 |         declare const string_camelCase01: string;
+
+Diagnostic 4: doesNotMatchFormatTrimmed (5:23 - 5:40)
+Message: Variable name `string_camelCase01` trimmed as `camelCase01` must match one of the following formats: snake_case
+   4 |         declare const any_camelCase03: any | null | undefined;
+   5 |         declare const string_camelCase01: string;
+     |                       ~~~~~~~~~~~~~~~~~~
+   6 |         declare const string_camelCase02: string | null;
+
+Diagnostic 5: doesNotMatchFormatTrimmed (6:23 - 6:40)
+Message: Variable name `string_camelCase02` trimmed as `camelCase02` must match one of the following formats: snake_case
+   5 |         declare const string_camelCase01: string;
+   6 |         declare const string_camelCase02: string | null;
+     |                       ~~~~~~~~~~~~~~~~~~
+   7 |         declare const string_camelCase03: string | null | undefined;
+
+Diagnostic 6: doesNotMatchFormatTrimmed (7:23 - 7:40)
+Message: Variable name `string_camelCase03` trimmed as `camelCase03` must match one of the following formats: snake_case
+   6 |         declare const string_camelCase02: string | null;
+   7 |         declare const string_camelCase03: string | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~
+   8 |         declare const string_camelCase04: 'a' | null | undefined;
+
+Diagnostic 7: doesNotMatchFormatTrimmed (8:23 - 8:40)
+Message: Variable name `string_camelCase04` trimmed as `camelCase04` must match one of the following formats: snake_case
+   7 |         declare const string_camelCase03: string | null | undefined;
+   8 |         declare const string_camelCase04: 'a' | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~
+   9 |         declare const string_camelCase05: string | 'a' | null | undefined;
+
+Diagnostic 8: doesNotMatchFormatTrimmed (9:23 - 9:40)
+Message: Variable name `string_camelCase05` trimmed as `camelCase05` must match one of the following formats: snake_case
+   8 |         declare const string_camelCase04: 'a' | null | undefined;
+   9 |         declare const string_camelCase05: string | 'a' | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~
+  10 |         declare const number_camelCase06: number;
+
+Diagnostic 9: doesNotMatchFormatTrimmed (10:23 - 10:40)
+Message: Variable name `number_camelCase06` trimmed as `camelCase06` must match one of the following formats: snake_case
+   9 |         declare const string_camelCase05: string | 'a' | null | undefined;
+  10 |         declare const number_camelCase06: number;
+     |                       ~~~~~~~~~~~~~~~~~~
+  11 |         declare const number_camelCase07: number | null;
+
+Diagnostic 10: doesNotMatchFormatTrimmed (11:23 - 11:40)
+Message: Variable name `number_camelCase07` trimmed as `camelCase07` must match one of the following formats: snake_case
+  10 |         declare const number_camelCase06: number;
+  11 |         declare const number_camelCase07: number | null;
+     |                       ~~~~~~~~~~~~~~~~~~
+  12 |         declare const number_camelCase08: number | null | undefined;
+
+Diagnostic 11: doesNotMatchFormatTrimmed (12:23 - 12:40)
+Message: Variable name `number_camelCase08` trimmed as `camelCase08` must match one of the following formats: snake_case
+  11 |         declare const number_camelCase07: number | null;
+  12 |         declare const number_camelCase08: number | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~
+  13 |         declare const number_camelCase09: 1 | null | undefined;
+
+Diagnostic 12: doesNotMatchFormatTrimmed (13:23 - 13:40)
+Message: Variable name `number_camelCase09` trimmed as `camelCase09` must match one of the following formats: snake_case
+  12 |         declare const number_camelCase08: number | null | undefined;
+  13 |         declare const number_camelCase09: 1 | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~
+  14 |         declare const number_camelCase10: number | 2 | null | undefined;
+
+Diagnostic 13: doesNotMatchFormatTrimmed (14:23 - 14:40)
+Message: Variable name `number_camelCase10` trimmed as `camelCase10` must match one of the following formats: snake_case
+  13 |         declare const number_camelCase09: 1 | null | undefined;
+  14 |         declare const number_camelCase10: number | 2 | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~
+  15 |         declare const boolean_camelCase11: boolean;
+
+Diagnostic 14: doesNotMatchFormatTrimmed (15:23 - 15:41)
+Message: Variable name `boolean_camelCase11` trimmed as `camelCase11` must match one of the following formats: snake_case
+  14 |         declare const number_camelCase10: number | 2 | null | undefined;
+  15 |         declare const boolean_camelCase11: boolean;
+     |                       ~~~~~~~~~~~~~~~~~~~
+  16 |         declare const boolean_camelCase12: boolean | null;
+
+Diagnostic 15: doesNotMatchFormatTrimmed (16:23 - 16:41)
+Message: Variable name `boolean_camelCase12` trimmed as `camelCase12` must match one of the following formats: snake_case
+  15 |         declare const boolean_camelCase11: boolean;
+  16 |         declare const boolean_camelCase12: boolean | null;
+     |                       ~~~~~~~~~~~~~~~~~~~
+  17 |         declare const boolean_camelCase13: boolean | null | undefined;
+
+Diagnostic 16: doesNotMatchFormatTrimmed (17:23 - 17:41)
+Message: Variable name `boolean_camelCase13` trimmed as `camelCase13` must match one of the following formats: snake_case
+  16 |         declare const boolean_camelCase12: boolean | null;
+  17 |         declare const boolean_camelCase13: boolean | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~~
+  18 |         declare const boolean_camelCase14: true | null | undefined;
+
+Diagnostic 17: doesNotMatchFormatTrimmed (18:23 - 18:41)
+Message: Variable name `boolean_camelCase14` trimmed as `camelCase14` must match one of the following formats: snake_case
+  17 |         declare const boolean_camelCase13: boolean | null | undefined;
+  18 |         declare const boolean_camelCase14: true | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~~
+  19 |         declare const boolean_camelCase15: false | null | undefined;
+
+Diagnostic 18: doesNotMatchFormatTrimmed (19:23 - 19:41)
+Message: Variable name `boolean_camelCase15` trimmed as `camelCase15` must match one of the following formats: snake_case
+  18 |         declare const boolean_camelCase14: true | null | undefined;
+  19 |         declare const boolean_camelCase15: false | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~~
+  20 |         declare const boolean_camelCase16: true | false | null | undefined;
+
+Diagnostic 19: doesNotMatchFormatTrimmed (20:23 - 20:41)
+Message: Variable name `boolean_camelCase16` trimmed as `camelCase16` must match one of the following formats: snake_case
+  19 |         declare const boolean_camelCase15: false | null | undefined;
+  20 |         declare const boolean_camelCase16: true | false | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~~
+  21 |       
 ---
 
-[TestNamingConventionAllFormats/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `snake_case` must match one of the following formats: camelCase
-   1 | const snake_case = 1;
-     |       ~~~~~~~~~~
+[TestNamingConvention/invalid-4 - 1]
+Diagnostic 1: doesNotMatchFormatTrimmed (2:23 - 2:41)
+Message: Variable name `function_camelCase1` trimmed as `camelCase1` must match one of the following formats: snake_case
+   1 | 
+   2 |         declare const function_camelCase1: () => void;
+     |                       ~~~~~~~~~~~~~~~~~~~
+   3 |         declare const function_camelCase2: (() => void) | null;
+
+Diagnostic 2: doesNotMatchFormatTrimmed (3:23 - 3:41)
+Message: Variable name `function_camelCase2` trimmed as `camelCase2` must match one of the following formats: snake_case
+   2 |         declare const function_camelCase1: () => void;
+   3 |         declare const function_camelCase2: (() => void) | null;
+     |                       ~~~~~~~~~~~~~~~~~~~
+   4 |         declare const function_camelCase3: (() => void) | null | undefined;
+
+Diagnostic 3: doesNotMatchFormatTrimmed (4:23 - 4:41)
+Message: Variable name `function_camelCase3` trimmed as `camelCase3` must match one of the following formats: snake_case
+   3 |         declare const function_camelCase2: (() => void) | null;
+   4 |         declare const function_camelCase3: (() => void) | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~~~~
+   5 |         declare const function_camelCase4:
+
+Diagnostic 4: doesNotMatchFormatTrimmed (5:23 - 5:41)
+Message: Variable name `function_camelCase4` trimmed as `camelCase4` must match one of the following formats: snake_case
+   4 |         declare const function_camelCase3: (() => void) | null | undefined;
+   5 |         declare const function_camelCase4:
+     |                       ~~~~~~~~~~~~~~~~~~~
+   6 |           | (() => void)
 ---
 
-[TestNamingConventionAllFormats/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `UPPER_CASE` must match one of the following formats: camelCase
-   1 | const UPPER_CASE = 1;
-     |       ~~~~~~~~~~
+[TestNamingConvention/invalid-5 - 1]
+Diagnostic 1: doesNotMatchFormatTrimmed (2:23 - 2:38)
+Message: Variable name `array_camelCase1` trimmed as `camelCase1` must match one of the following formats: snake_case
+   1 | 
+   2 |         declare const array_camelCase1: Array<number>;
+     |                       ~~~~~~~~~~~~~~~~
+   3 |         declare const array_camelCase2: ReadonlyArray<number> | null;
+
+Diagnostic 2: doesNotMatchFormatTrimmed (3:23 - 3:38)
+Message: Variable name `array_camelCase2` trimmed as `camelCase2` must match one of the following formats: snake_case
+   2 |         declare const array_camelCase1: Array<number>;
+   3 |         declare const array_camelCase2: ReadonlyArray<number> | null;
+     |                       ~~~~~~~~~~~~~~~~
+   4 |         declare const array_camelCase3: number[] | null | undefined;
+
+Diagnostic 3: doesNotMatchFormatTrimmed (4:23 - 4:38)
+Message: Variable name `array_camelCase3` trimmed as `camelCase3` must match one of the following formats: snake_case
+   3 |         declare const array_camelCase2: ReadonlyArray<number> | null;
+   4 |         declare const array_camelCase3: number[] | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~
+   5 |         declare const array_camelCase4: readonly number[] | null | undefined;
+
+Diagnostic 4: doesNotMatchFormatTrimmed (5:23 - 5:38)
+Message: Variable name `array_camelCase4` trimmed as `camelCase4` must match one of the following formats: snake_case
+   4 |         declare const array_camelCase3: number[] | null | undefined;
+   5 |         declare const array_camelCase4: readonly number[] | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~
+   6 |         declare const array_camelCase5:
+
+Diagnostic 5: doesNotMatchFormatTrimmed (6:23 - 6:38)
+Message: Variable name `array_camelCase5` trimmed as `camelCase5` must match one of the following formats: snake_case
+   5 |         declare const array_camelCase4: readonly number[] | null | undefined;
+   6 |         declare const array_camelCase5:
+     |                       ~~~~~~~~~~~~~~~~
+   7 |           | number[]
+
+Diagnostic 6: doesNotMatchFormatTrimmed (11:23 - 11:38)
+Message: Variable name `array_camelCase6` trimmed as `camelCase6` must match one of the following formats: snake_case
+  10 |           | undefined;
+  11 |         declare const array_camelCase6: [] | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~
+  12 |         declare const array_camelCase7: [number] | null | undefined;
+
+Diagnostic 7: doesNotMatchFormatTrimmed (12:23 - 12:38)
+Message: Variable name `array_camelCase7` trimmed as `camelCase7` must match one of the following formats: snake_case
+  11 |         declare const array_camelCase6: [] | null | undefined;
+  12 |         declare const array_camelCase7: [number] | null | undefined;
+     |                       ~~~~~~~~~~~~~~~~
+  13 |         declare const array_camelCase8:
+
+Diagnostic 8: doesNotMatchFormatTrimmed (13:23 - 13:38)
+Message: Variable name `array_camelCase8` trimmed as `camelCase8` must match one of the following formats: snake_case
+  12 |         declare const array_camelCase7: [number] | null | undefined;
+  13 |         declare const array_camelCase8:
+     |                       ~~~~~~~~~~~~~~~~
+  14 |           | readonly number[]
 ---
 
-[TestNamingConventionAllFormats/invalid-2 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:22)
-Message: variable name `StrictPascalCase` must match one of the following formats: camelCase
-   1 | const StrictPascalCase = 1;
-     |       ~~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-3 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:23)
-Message: variable name `camelCaseUNSTRICT` must match one of the following formats: strictCamelCase
-   1 | const camelCaseUNSTRICT = 1;
-     |       ~~~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-4 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `UPPER` must match one of the following formats: strictCamelCase
-   1 | const UPPER = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-5 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `snake_case` must match one of the following formats: PascalCase
-   1 | const snake_case = 1;
-     |       ~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-6 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:21)
-Message: variable name `strictCamelCase` must match one of the following formats: PascalCase
-   1 | const strictCamelCase = 1;
-     |       ~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-7 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:24)
-Message: variable name `PascalCaseUNSTRICT` must match one of the following formats: StrictPascalCase
-   1 | const PascalCaseUNSTRICT = 1;
-     |       ~~~~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-8 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `UPPER` must match one of the following formats: StrictPascalCase
-   1 | const UPPER = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-9 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `UPPER_CASE` must match one of the following formats: snake_case
-   1 | const UPPER_CASE = 1;
-     |       ~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-10 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:21)
-Message: variable name `strictCamelCase` must match one of the following formats: snake_case
-   1 | const strictCamelCase = 1;
-     |       ~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-11 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:22)
-Message: variable name `StrictPascalCase` must match one of the following formats: snake_case
-   1 | const StrictPascalCase = 1;
-     |       ~~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-12 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `lower` must match one of the following formats: UPPER_CASE
-   1 | const lower = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-13 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `snake_case` must match one of the following formats: UPPER_CASE
-   1 | const snake_case = 1;
-     |       ~~~~~~~~~~
----
-
-[TestNamingConventionAllFormats/invalid-14 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:21)
-Message: variable name `strictCamelCase` must match one of the following formats: UPPER_CASE
-   1 | const strictCamelCase = 1;
-     |       ~~~~~~~~~~~~~~~
----
-
-[TestNamingConventionArraySelectorFormatErrors/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:5 - 1:14)
-Message: variable name `unused_foo` must match one of the following formats: camelCase
-   1 | let unused_foo = 'a';
-     |     ~~~~~~~~~~
----
-
-[TestNamingConventionArraySelectorFormatErrors/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormatTrimmed (1:7 - 1:17)
-Message: variable name `_unused_foo` trimmed as `unused_foo` must match one of the following formats: camelCase
-   1 | const _unused_foo = 1;
-     |       ~~~~~~~~~~~
----
-
-[TestNamingConventionArraySelectorFormatErrors/invalid-2 - 1]
-Diagnostic 1: doesNotMatchFormat (1:10 - 1:16)
-Message: function name `foo_bar` must match one of the following formats: camelCase
-   1 | function foo_bar() {}
-     |          ~~~~~~~
----
-
-[TestNamingConventionAsyncClassMethodsComprehensive/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (9:16 - 9:23)
-Message: classMethod name `asyncBar` must match one of the following formats: snake_case
-   8 |   }
-   9 |   public async asyncBar() {
-     |                ~~~~~~~~
-  10 |     return 42;
-
-Diagnostic 2: doesNotMatchFormat (12:10 - 12:18)
-Message: classMethod name `AsyncBar2` must match one of the following formats: snake_case
-  11 |   }
-  12 |   public AsyncBar2 = async () => {
-     |          ~~~~~~~~~
-  13 |     return 42;
-
-Diagnostic 3: doesNotMatchFormat (15:10 - 15:18)
-Message: classMethod name `AsyncBar3` must match one of the following formats: snake_case
-  14 |   };
-  15 |   public AsyncBar3 = async function () {
-     |          ~~~~~~~~~
-  16 |     return 42;
-
-Diagnostic 4: doesNotMatchFormat (22:25 - 22:33)
-Message: classMethod name `ASYNC_BAR` must match one of the following formats: snake_case
-  21 |   public abstract async async_bar(): number;
-  22 |   public abstract async ASYNC_BAR(): number;
-     |                         ~~~~~~~~~
-  23 | }
----
-
-[TestNamingConventionAsyncFunctionDeclarations/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (7:16 - 7:24)
-Message: function name `asyncBar2` must match one of the following formats: snake_case
-   6 | const async_bar1 = async () => {};
-   7 | async function asyncBar2() {}
-     |                ~~~~~~~~~
-   8 | const async_bar3 = async function async_bar4() {};
-
-Diagnostic 2: doesNotMatchFormat (10:35 - 10:44)
-Message: function name `ASYNC_BAR4` must match one of the following formats: snake_case
-   9 | async function async_bar2() {}
-  10 | const async_bar3 = async function ASYNC_BAR4() {};
-     |                                   ~~~~~~~~~~
-  11 | 
----
-
-[TestNamingConventionAsyncObjectLiteralMethodsComprehensive/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (9:9 - 9:16)
-Message: objectLiteralMethod name `AsyncBar` must match one of the following formats: snake_case
-   8 |   },
-   9 |   async AsyncBar() {
-     |         ~~~~~~~~
-  10 |     return 42;
-
-Diagnostic 2: doesNotMatchFormat (12:3 - 12:11)
-Message: objectLiteralMethod name `AsyncBar2` must match one of the following formats: snake_case
-  11 |   },
-  12 |   AsyncBar2: async () => {
-     |   ~~~~~~~~~
-  13 |     return 42;
-
-Diagnostic 3: doesNotMatchFormat (15:3 - 15:11)
-Message: objectLiteralMethod name `AsyncBar3` must match one of the following formats: snake_case
-  14 |   },
-  15 |   AsyncBar3: async function () {
-     |   ~~~~~~~~~
-  16 |     return 42;
----
-
-[TestNamingConventionAsyncVariableLike/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (6:7 - 6:15)
-Message: variable name `AsyncBar1` must match one of the following formats: snake_case
-   5 | 
-   6 | const AsyncBar1 = async () => {};
-     |       ~~~~~~~~~
-   7 | const async_bar1 = async () => {};
-
-Diagnostic 2: doesNotMatchFormat (10:7 - 10:15)
-Message: variable name `asyncBar5` must match one of the following formats: snake_case
-   9 | async function async_bar2() {}
-  10 | const asyncBar5 = async function async_bar6() {};
-     |       ~~~~~~~~~
-  11 | 
----
-
-[TestNamingConventionClassMethodStaticInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:18 - 3:26)
-Message: classMethod name `some_name` must match one of the following formats: UPPER_CASE
-   2 | class Ignored {
-   3 |   private static some_name() {}
-     |                  ~~~~~~~~~
-   4 |   IgnoredDueToModifiers() {}
----
-
-[TestNamingConventionClassMethods/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:20)
-Message: classMethod name `MyMethod` must match one of the following formats: camelCase
-   1 | class Foo { MyMethod() {} }
-     |             ~~~~~~~~
----
-
-[TestNamingConventionClassProperties/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:18)
-Message: classProperty name `MyProp` must match one of the following formats: camelCase
-   1 | class Foo { MyProp = 1; }
-     |             ~~~~~~
----
-
-[TestNamingConventionClassProperties/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:22)
-Message: classProperty name `UPPER_CASE` must match one of the following formats: camelCase
-   1 | class Foo { UPPER_CASE = 1; }
+[TestNamingConvention/invalid-6 - 1]
+Diagnostic 1: satisfyCustom (2:13 - 2:22)
+Message: Variable name `unused_foo` must not match the RegExp: /^unused_\w/u
+   1 | 
+   2 |         let unused_foo = 'a';
      |             ~~~~~~~~~~
+   3 |       
 ---
 
-[TestNamingConventionClasses/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
-Message: class name `myClass` must match one of the following formats: PascalCase
-   1 | class myClass {}
-     |       ~~~~~~~
----
-
-[TestNamingConventionClasses/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: class name `snake_case` must match one of the following formats: PascalCase
-   1 | class snake_case {}
-     |       ~~~~~~~~~~
----
-
-[TestNamingConventionConstEnum/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:12 - 2:23)
-Message: enum name `notUpperCase` must match one of the following formats: UPPER_CASE
+[TestNamingConvention/invalid-7 - 1]
+Diagnostic 1: satisfyCustom (2:15 - 2:25)
+Message: Variable name `_unused_foo` must not match the RegExp: /^unused_\w/u
    1 | 
-   2 | const enum notUpperCase {}
-     |            ~~~~~~~~~~~~
-   3 | 
+   2 |         const _unused_foo = 1;
+     |               ~~~~~~~~~~~
+   3 |       
 ---
 
-[TestNamingConventionCustomRegex/invalid-0 - 1]
-Diagnostic 1: satisfyCustom (1:7 - 1:11)
-Message: variable name `myVar` must match the RegExp `^x`.
-   1 | const myVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionCustomRegex/invalid-1 - 1]
-Diagnostic 1: satisfyCustom (1:7 - 1:18)
-Message: variable name `unused_myVar` must not match the RegExp `^unused_`.
-   1 | const unused_myVar = 1;
-     |       ~~~~~~~~~~~~
----
-
-[TestNamingConventionCustomRegexMultipleSelectors/invalid-0 - 1]
-Diagnostic 1: satisfyCustom (1:11 - 1:14)
-Message: interface name `IFoo` must not match the RegExp `^I[A-Z]`.
-   1 | interface IFoo {}
-     |           ~~~~
----
-
-[TestNamingConventionCustomRegexMultipleSelectors/invalid-1 - 1]
-Diagnostic 1: satisfyCustom (1:7 - 1:10)
-Message: class name `IBar` must not match the RegExp `^I[A-Z]`.
-   1 | class IBar {}
-     |       ~~~~
----
-
-[TestNamingConventionCustomRegexTypeLike/invalid-0 - 1]
-Diagnostic 1: satisfyCustom (1:11 - 1:14)
-Message: interface name `IFoo` must not match the RegExp `^I[A-Z]`.
-   1 | interface IFoo {}
-     |           ~~~~
----
-
-[TestNamingConventionCustomRegexTypeLike/invalid-1 - 1]
-Diagnostic 1: satisfyCustom (1:7 - 1:10)
-Message: class name `IBar` must not match the RegExp `^I[A-Z]`.
-   1 | class IBar {}
-     |       ~~~~
----
-
-[TestNamingConventionCustomRegexTypeLike/invalid-2 - 1]
-Diagnostic 1: satisfyCustom (1:10 - 1:15)
-Message: function name `fooBar` must match the RegExp `function`.
-   1 | function fooBar() {}
-     |          ~~~~~~
----
-
-[TestNamingConventionCustomRegexUnused/invalid-0 - 1]
-Diagnostic 1: satisfyCustom (1:5 - 1:14)
-Message: variable name `unused_foo` must not match the RegExp `^unused_\w`.
-   1 | let unused_foo = 'a';
-     |     ~~~~~~~~~~
----
-
-[TestNamingConventionCustomRegexUnused/invalid-1 - 1]
-Diagnostic 1: satisfyCustom (1:7 - 1:17)
-Message: variable name `unused_foo` must not match the RegExp `^unused_\w`.
-   1 | const _unused_foo = 1;
-     |       ~~~~~~~~~~~
----
-
-[TestNamingConventionDeclareClassParameter/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:7 - 3:9)
-Message: parameter name `Baz` must match one of the following formats: camelCase
-   2 | declare class Foo {
-   3 |   Bar(Baz: string): void;
-     |       ~~~
-   4 | }
----
-
-[TestNamingConventionDefault/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `MyVar` must match one of the following formats: camelCase, UPPER_CASE
-   1 | const MyVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionDefault/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:10 - 1:15)
-Message: function name `MyFunc` must match one of the following formats: camelCase
-   1 | function MyFunc() {}
-     |          ~~~~~~
----
-
-[TestNamingConventionDefault/invalid-2 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
-Message: class name `myClass` must match one of the following formats: PascalCase
-   1 | class myClass {}
-     |       ~~~~~~~
----
-
-[TestNamingConventionDefault/invalid-3 - 1]
-Diagnostic 1: doesNotMatchFormat (1:11 - 1:21)
-Message: interface name `myInterface` must match one of the following formats: PascalCase
-   1 | interface myInterface {}
-     |           ~~~~~~~~~~~
----
-
-[TestNamingConventionDefault/invalid-4 - 1]
-Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
-Message: typeAlias name `my_type` must match one of the following formats: PascalCase
-   1 | type my_type = {};
-     |      ~~~~~~~
----
-
-[TestNamingConventionDefault/invalid-5 - 1]
-Diagnostic 1: doesNotMatchFormat (1:6 - 1:11)
-Message: enum name `myEnum` must match one of the following formats: PascalCase
-   1 | enum myEnum {}
-     |      ~~~~~~
----
-
-[TestNamingConventionDefaultSnakeCase/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:9)
-Message: variable name `x_x` must match one of the following formats: camelCase, UPPER_CASE
-   1 | const x_x = 1;
-     |       ~~~
----
-
-[TestNamingConventionDefaultSnakeCase/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:9)
-Message: variable name `x_x` must match one of the following formats: camelCase, UPPER_CASE
-   1 | const x_x = 1;
-     |       ~~~
----
-
-[TestNamingConventionDestructuredParameterInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:5 - 3:9)
-Message: parameter name `aName` must match one of the following formats: UPPER_CASE
-   2 | export function Foo(
-   3 |   { aName },
-     |     ~~~~~
-   4 |   { anotherName = 1 },
-
-Diagnostic 2: doesNotMatchFormat (4:5 - 4:15)
-Message: parameter name `anotherName` must match one of the following formats: UPPER_CASE
-   3 |   { aName },
-   4 |   { anotherName = 1 },
-     |     ~~~~~~~~~~~
-   5 |   { ignored: IgnoredDueToModifiers1 },
----
-
-[TestNamingConventionDestructuredVariableInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:9 - 2:18)
-Message: variable name `some_name1` must match one of the following formats: UPPER_CASE
+[TestNamingConvention/invalid-8 - 1]
+Diagnostic 1: satisfyCustom (2:19 - 2:22)
+Message: Interface name `IFoo` must not match the RegExp: /^I[A-Z]/u
    1 | 
-   2 | const { some_name1 } = {};
-     |         ~~~~~~~~~~
-   3 | const { some_name2 = 2 } = {};
-
-Diagnostic 2: doesNotMatchFormat (3:9 - 3:18)
-Message: variable name `some_name2` must match one of the following formats: UPPER_CASE
-   2 | const { some_name1 } = {};
-   3 | const { some_name2 = 2 } = {};
-     |         ~~~~~~~~~~
-   4 | const { ignored: IgnoredDueToModifiers1 } = {};
+   2 |         interface IFoo {}
+     |                   ~~~~
+   3 |       
 ---
 
-[TestNamingConventionEnumMemberPublicModifier/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:15 - 1:22)
-Message: enumMember name `myMember` must match one of the following formats: UPPER_CASE
-   1 | enum MyEnum { myMember = 1 }
-     |               ~~~~~~~~
----
-
-[TestNamingConventionEnumMembers/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:15 - 1:22)
-Message: enumMember name `myMember` must match one of the following formats: UPPER_CASE
-   1 | enum MyEnum { myMember = 1 }
-     |               ~~~~~~~~
----
-
-[TestNamingConventionEnums/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:6 - 1:11)
-Message: enum name `myEnum` must match one of the following formats: PascalCase
-   1 | enum myEnum {}
-     |      ~~~~~~
----
-
-[TestNamingConventionExported/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:14 - 2:25)
-Message: variable name `camelCaseVar` must match one of the following formats: PascalCase
+[TestNamingConvention/invalid-9 - 1]
+Diagnostic 1: satisfyCustom (2:15 - 2:18)
+Message: Class name `IBar` must not match the RegExp: /^I[A-Z]/u
    1 | 
-   2 | export const camelCaseVar = 1;
-     |              ~~~~~~~~~~~~
-   3 | 
+   2 |         class IBar {}
+     |               ~~~~
+   3 |       
 ---
 
-[TestNamingConventionExportedComprehensive/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:14 - 2:26)
-Message: variable name `PascalCaseVar` must match one of the following formats: camelCase
+[TestNamingConvention/invalid-10 - 1]
+Diagnostic 1: satisfyCustom (2:18 - 2:23)
+Message: Function name `fooBar` must match the RegExp: /function/u
    1 | 
-   2 | export const PascalCaseVar = 1;
-     |              ~~~~~~~~~~~~~
-   3 | export enum PascalCaseEnum {}
-
-Diagnostic 2: doesNotMatchFormat (3:13 - 3:26)
-Message: enum name `PascalCaseEnum` must match one of the following formats: camelCase
-   2 | export const PascalCaseVar = 1;
-   3 | export enum PascalCaseEnum {}
-     |             ~~~~~~~~~~~~~~
-   4 | export class PascalCaseClass {}
-
-Diagnostic 3: doesNotMatchFormat (4:14 - 4:28)
-Message: class name `PascalCaseClass` must match one of the following formats: camelCase
-   3 | export enum PascalCaseEnum {}
-   4 | export class PascalCaseClass {}
-     |              ~~~~~~~~~~~~~~~
-   5 | export function PascalCaseFunction() {}
-
-Diagnostic 4: doesNotMatchFormat (5:17 - 5:34)
-Message: function name `PascalCaseFunction` must match one of the following formats: camelCase
-   4 | export class PascalCaseClass {}
-   5 | export function PascalCaseFunction() {}
-     |                 ~~~~~~~~~~~~~~~~~~
-   6 | export interface PascalCaseInterface {}
-
-Diagnostic 5: doesNotMatchFormat (6:18 - 6:36)
-Message: interface name `PascalCaseInterface` must match one of the following formats: camelCase
-   5 | export function PascalCaseFunction() {}
-   6 | export interface PascalCaseInterface {}
-     |                  ~~~~~~~~~~~~~~~~~~~
-   7 | export type PascalCaseType = {};
-
-Diagnostic 6: doesNotMatchFormat (7:13 - 7:26)
-Message: typeAlias name `PascalCaseType` must match one of the following formats: camelCase
-   6 | export interface PascalCaseInterface {}
-   7 | export type PascalCaseType = {};
-     |             ~~~~~~~~~~~~~~
-   8 | 
+   2 |         function fooBar() {}
+     |                  ~~~~~~
+   3 |       
 ---
 
-[TestNamingConventionExportedComprehensive/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (2:7 - 2:19)
-Message: variable name `PascalCaseVar` must match one of the following formats: camelCase
+[TestNamingConvention/invalid-11 - 1]
+Diagnostic 1: doesNotMatchFormat (2:13 - 2:22)
+Message: Variable name `unused_foo` must match one of the following formats: camelCase
    1 | 
-   2 | const PascalCaseVar = 1;
-     |       ~~~~~~~~~~~~~
-   3 | enum PascalCaseEnum {}
-
-Diagnostic 2: doesNotMatchFormat (3:6 - 3:19)
-Message: enum name `PascalCaseEnum` must match one of the following formats: camelCase
-   2 | const PascalCaseVar = 1;
-   3 | enum PascalCaseEnum {}
-     |      ~~~~~~~~~~~~~~
-   4 | class PascalCaseClass {}
-
-Diagnostic 3: doesNotMatchFormat (4:7 - 4:21)
-Message: class name `PascalCaseClass` must match one of the following formats: camelCase
-   3 | enum PascalCaseEnum {}
-   4 | class PascalCaseClass {}
-     |       ~~~~~~~~~~~~~~~
-   5 | function PascalCaseFunction() {}
-
-Diagnostic 4: doesNotMatchFormat (5:10 - 5:27)
-Message: function name `PascalCaseFunction` must match one of the following formats: camelCase
-   4 | class PascalCaseClass {}
-   5 | function PascalCaseFunction() {}
-     |          ~~~~~~~~~~~~~~~~~~
-   6 | interface PascalCaseInterface {}
-
-Diagnostic 5: doesNotMatchFormat (6:11 - 6:29)
-Message: interface name `PascalCaseInterface` must match one of the following formats: camelCase
-   5 | function PascalCaseFunction() {}
-   6 | interface PascalCaseInterface {}
-     |           ~~~~~~~~~~~~~~~~~~~
-   7 | type PascalCaseType = {};
-
-Diagnostic 6: doesNotMatchFormat (7:6 - 7:19)
-Message: typeAlias name `PascalCaseType` must match one of the following formats: camelCase
-   6 | interface PascalCaseInterface {}
-   7 | type PascalCaseType = {};
-     |      ~~~~~~~~~~~~~~
-   8 | export {
+   2 |         let unused_foo = 'a';
+     |             ~~~~~~~~~~
+   3 |       
 ---
 
-[TestNamingConventionFilter/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `myVar` must match one of the following formats: PascalCase
-   1 | const myVar = 1;
-     |       ~~~~~
+[TestNamingConvention/invalid-12 - 1]
+Diagnostic 1: doesNotMatchFormatTrimmed (2:15 - 2:25)
+Message: Variable name `_unused_foo` trimmed as `unused_foo` must match one of the following formats: camelCase
+   1 | 
+   2 |         const _unused_foo = 1;
+     |               ~~~~~~~~~~~
+   3 |       
 ---
 
-[TestNamingConventionFilterExcludePattern/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:15 - 1:29)
-Message: objectLiteralProperty name `Property Name` must match one of the following formats: strictCamelCase
-   1 | const foo = { 'Property Name': 'asdf' };
+[TestNamingConvention/invalid-13 - 1]
+Diagnostic 1: doesNotMatchFormat (2:18 - 2:24)
+Message: Function name `foo_bar` must match one of the following formats: camelCase
+   1 | 
+   2 |         function foo_bar() {}
+     |                  ~~~~~~~
+   3 |       
+---
+
+[TestNamingConvention/invalid-14 - 1]
+Diagnostic 1: satisfyCustom (2:19 - 2:22)
+Message: Interface name `IFoo` must not match the RegExp: /^I[A-Z]/u
+   1 | 
+   2 |         interface IFoo {}
+     |                   ~~~~
+   3 |       
+---
+
+[TestNamingConvention/invalid-15 - 1]
+Diagnostic 1: satisfyCustom (2:15 - 2:18)
+Message: Class name `IBar` must not match the RegExp: /^I[A-Z]/u
+   1 | 
+   2 |         class IBar {}
+     |               ~~~~
+   3 |       
+---
+
+[TestNamingConvention/invalid-16 - 1]
+Diagnostic 1: doesNotMatchFormat (3:11 - 3:25)
+Message: Object Literal Property name `Property Name` must match one of the following formats: strictCamelCase
+   2 |         const foo = {
+   3 |           'Property Name': 'asdf',
+     |           ~~~~~~~~~~~~~~~
+   4 |         };
+---
+
+[TestNamingConvention/invalid-17 - 1]
+Diagnostic 1: doesNotMatchFormatTrimmed (2:15 - 2:23)
+Message: Variable name `myfoo_bar` trimmed as `foo_bar` must match one of the following formats: PascalCase
+   1 | 
+   2 |         const myfoo_bar = 'abcs';
+     |               ~~~~~~~~~
+   3 |         function fun(myfoo: string) {}
+
+Diagnostic 2: doesNotMatchFormatTrimmed (3:22 - 3:26)
+Message: Parameter name `myfoo` trimmed as `foo` must match one of the following formats: PascalCase
+   2 |         const myfoo_bar = 'abcs';
+   3 |         function fun(myfoo: string) {}
+     |                      ~~~~~
+   4 |         class foo {
+
+Diagnostic 3: doesNotMatchFormatTrimmed (5:11 - 5:15)
+Message: Class Property name `Myfoo` trimmed as `foo` must match one of the following formats: PascalCase
+   4 |         class foo {
+   5 |           Myfoo: string;
+     |           ~~~~~
+   6 |         }
+---
+
+[TestNamingConvention/invalid-18 - 1]
+Diagnostic 1: doesNotMatchFormat (3:28 - 3:33)
+Message: Class Property name `fooBar` must match one of the following formats: PascalCase
+   2 |         class foo {
+   3 |           private readonly fooBar: boolean;
+     |                            ~~~~~~
+   4 |         }
+---
+
+[TestNamingConvention/invalid-19 - 1]
+Diagnostic 1: doesNotMatchFormatTrimmed (2:18 - 2:27)
+Message: Function name `my_foo_bar` trimmed as `_foo_bar` must match one of the following formats: PascalCase
+   1 | 
+   2 |         function my_foo_bar() {}
+     |                  ~~~~~~~~~~
+   3 |       
+---
+
+[TestNamingConvention/invalid-20 - 1]
+Diagnostic 1: doesNotMatchFormat (3:18 - 3:30)
+Message: Class Property name `otherConstant` must match one of the following formats: PascalCase
+   2 |         class SomeClass {
+   3 |           static otherConstant = 'hello';
+     |                  ~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestNamingConvention/invalid-21 - 1]
+Diagnostic 1: doesNotMatchFormat (3:15 - 3:17)
+Message: Parameter name `Baz` must match one of the following formats: camelCase
+   2 |         declare class Foo {
+   3 |           Bar(Baz: string): void;
+     |               ~~~
+   4 |         }
+---
+
+[TestNamingConvention/invalid-22 - 1]
+Diagnostic 1: doesNotMatchFormat (2:22 - 2:34)
+Message: Variable name `PascalCaseVar` must match one of the following formats: camelCase
+   1 | 
+   2 |         export const PascalCaseVar = 1;
+     |                      ~~~~~~~~~~~~~
+   3 |         export enum PascalCaseEnum {}
+
+Diagnostic 2: doesNotMatchFormat (3:21 - 3:34)
+Message: Enum name `PascalCaseEnum` must match one of the following formats: camelCase
+   2 |         export const PascalCaseVar = 1;
+   3 |         export enum PascalCaseEnum {}
+     |                     ~~~~~~~~~~~~~~
+   4 |         export class PascalCaseClass {}
+
+Diagnostic 3: doesNotMatchFormat (4:22 - 4:36)
+Message: Class name `PascalCaseClass` must match one of the following formats: camelCase
+   3 |         export enum PascalCaseEnum {}
+   4 |         export class PascalCaseClass {}
+     |                      ~~~~~~~~~~~~~~~
+   5 |         export function PascalCaseFunction() {}
+
+Diagnostic 4: doesNotMatchFormat (5:25 - 5:42)
+Message: Function name `PascalCaseFunction` must match one of the following formats: camelCase
+   4 |         export class PascalCaseClass {}
+   5 |         export function PascalCaseFunction() {}
+     |                         ~~~~~~~~~~~~~~~~~~
+   6 |         export interface PascalCaseInterface {}
+
+Diagnostic 5: doesNotMatchFormat (6:26 - 6:44)
+Message: Interface name `PascalCaseInterface` must match one of the following formats: camelCase
+   5 |         export function PascalCaseFunction() {}
+   6 |         export interface PascalCaseInterface {}
+     |                          ~~~~~~~~~~~~~~~~~~~
+   7 |         export type PascalCaseType = {};
+
+Diagnostic 6: doesNotMatchFormat (7:21 - 7:34)
+Message: Type Alias name `PascalCaseType` must match one of the following formats: camelCase
+   6 |         export interface PascalCaseInterface {}
+   7 |         export type PascalCaseType = {};
+     |                     ~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNamingConvention/invalid-23 - 1]
+Diagnostic 1: doesNotMatchFormat (2:15 - 2:27)
+Message: Variable name `PascalCaseVar` must match one of the following formats: camelCase
+   1 | 
+   2 |         const PascalCaseVar = 1;
+     |               ~~~~~~~~~~~~~
+   3 |         enum PascalCaseEnum {}
+
+Diagnostic 2: doesNotMatchFormat (3:14 - 3:27)
+Message: Enum name `PascalCaseEnum` must match one of the following formats: camelCase
+   2 |         const PascalCaseVar = 1;
+   3 |         enum PascalCaseEnum {}
+     |              ~~~~~~~~~~~~~~
+   4 |         class PascalCaseClass {}
+
+Diagnostic 3: doesNotMatchFormat (4:15 - 4:29)
+Message: Class name `PascalCaseClass` must match one of the following formats: camelCase
+   3 |         enum PascalCaseEnum {}
+   4 |         class PascalCaseClass {}
      |               ~~~~~~~~~~~~~~~
+   5 |         function PascalCaseFunction() {}
+
+Diagnostic 4: doesNotMatchFormat (5:18 - 5:35)
+Message: Function name `PascalCaseFunction` must match one of the following formats: camelCase
+   4 |         class PascalCaseClass {}
+   5 |         function PascalCaseFunction() {}
+     |                  ~~~~~~~~~~~~~~~~~~
+   6 |         interface PascalCaseInterface {}
+
+Diagnostic 5: doesNotMatchFormat (6:19 - 6:37)
+Message: Interface name `PascalCaseInterface` must match one of the following formats: camelCase
+   5 |         function PascalCaseFunction() {}
+   6 |         interface PascalCaseInterface {}
+     |                   ~~~~~~~~~~~~~~~~~~~
+   7 |         type PascalCaseType = {};
+
+Diagnostic 6: doesNotMatchFormat (7:14 - 7:27)
+Message: Type Alias name `PascalCaseType` must match one of the following formats: camelCase
+   6 |         interface PascalCaseInterface {}
+   7 |         type PascalCaseType = {};
+     |              ~~~~~~~~~~~~~~
+   8 |         export {
 ---
 
-[TestNamingConventionFilterMatchTrue/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:19)
-Message: variable name `child_process` must match one of the following formats: camelCase
-   1 | const child_process = require('child_process');
-     |       ~~~~~~~~~~~~~
----
-
-[TestNamingConventionFunctionValuedPropertyAsMethod/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:20)
-Message: classMethod name `myMethod` must match one of the following formats: PascalCase
-   1 | class Foo { myMethod = () => {}; }
-     |             ~~~~~~~~
----
-
-[TestNamingConventionFunctionValuedPropertyAsMethod/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:18)
-Message: classProperty name `MyProp` must match one of the following formats: camelCase
-   1 | class Foo { MyProp = 1; }
-     |             ~~~~~~
----
-
-[TestNamingConventionFunctions/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:10 - 1:15)
-Message: function name `MyFunc` must match one of the following formats: camelCase
-   1 | function MyFunc() {}
-     |          ~~~~~~
----
-
-[TestNamingConventionFunctions/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:10 - 1:19)
-Message: function name `UPPER_CASE` must match one of the following formats: camelCase
-   1 | function UPPER_CASE() {}
-     |          ~~~~~~~~~~
----
-
-[TestNamingConventionGetSetAccessors/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:17 - 1:22)
-Message: classicAccessor name `MyProp` must match one of the following formats: camelCase
-   1 | class Foo { get MyProp() { return 1; } }
-     |                 ~~~~~~
----
-
-[TestNamingConventionGlobalModifier/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:7 - 2:19)
-Message: variable name `PascalCaseVar` must match one of the following formats: camelCase
+[TestNamingConvention/invalid-24 - 1]
+Diagnostic 1: doesNotMatchFormat (2:15 - 2:27)
+Message: Variable name `PascalCaseVar` must match one of the following formats: camelCase
    1 | 
-   2 | const PascalCaseVar = 1;
-     |       ~~~~~~~~~~~~~
-   3 | function PascalCaseFunction() {}
+   2 |         const PascalCaseVar = 1;
+     |               ~~~~~~~~~~~~~
+   3 |         function PascalCaseFunction() {}
 
-Diagnostic 2: doesNotMatchFormat (3:10 - 3:27)
-Message: function name `PascalCaseFunction` must match one of the following formats: camelCase
-   2 | const PascalCaseVar = 1;
-   3 | function PascalCaseFunction() {}
-     |          ~~~~~~~~~~~~~~~~~~
-   4 | declare function PascalCaseDeclaredFunction();
+Diagnostic 2: doesNotMatchFormat (3:18 - 3:35)
+Message: Function name `PascalCaseFunction` must match one of the following formats: camelCase
+   2 |         const PascalCaseVar = 1;
+   3 |         function PascalCaseFunction() {}
+     |                  ~~~~~~~~~~~~~~~~~~
+   4 |         declare function PascalCaseDeclaredFunction();
 
-Diagnostic 3: doesNotMatchFormat (4:18 - 4:43)
-Message: function name `PascalCaseDeclaredFunction` must match one of the following formats: camelCase
-   3 | function PascalCaseFunction() {}
-   4 | declare function PascalCaseDeclaredFunction();
-     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   5 | 
+Diagnostic 3: doesNotMatchFormat (4:26 - 4:51)
+Message: Function name `PascalCaseDeclaredFunction` must match one of the following formats: camelCase
+   3 |         function PascalCaseFunction() {}
+   4 |         declare function PascalCaseDeclaredFunction();
+     |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
 ---
 
-[TestNamingConventionHashPrivateComprehensiveInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (4:11 - 4:29)
-Message: classProperty name `first_private_field` must match one of the following formats: camelCase
-   3 |   private firstPrivateField = 1;
-   4 |   private first_private_field = 1;
+[TestNamingConvention/invalid-25 - 1]
+Diagnostic 1: doesNotMatchFormat (2:17 - 2:26)
+Message: Variable name `some_name1` must match one of the following formats: UPPER_CASE
+   1 | 
+   2 |         const { some_name1 } = {};
+     |                 ~~~~~~~~~~
+   3 |         const { some_name2 = 2 } = {};
+
+Diagnostic 2: doesNotMatchFormat (3:17 - 3:26)
+Message: Variable name `some_name2` must match one of the following formats: UPPER_CASE
+   2 |         const { some_name1 } = {};
+   3 |         const { some_name2 = 2 } = {};
+     |                 ~~~~~~~~~~
+   4 |         const { ignored: IgnoredDueToModifiers1 } = {};
+---
+
+[TestNamingConvention/invalid-26 - 1]
+Diagnostic 1: doesNotMatchFormat (3:13 - 3:17)
+Message: Parameter name `aName` must match one of the following formats: UPPER_CASE
+   2 |         export function Foo(
+   3 |           { aName },
+     |             ~~~~~
+   4 |           { anotherName = 1 },
+
+Diagnostic 2: doesNotMatchFormat (4:13 - 4:23)
+Message: Parameter name `anotherName` must match one of the following formats: UPPER_CASE
+   3 |           { aName },
+   4 |           { anotherName = 1 },
+     |             ~~~~~~~~~~~
+   5 |           { ignored: IgnoredDueToModifiers1 },
+---
+
+[TestNamingConvention/invalid-27 - 1]
+Diagnostic 1: doesNotMatchFormat (3:44 - 3:52)
+Message: Class Property name `some_name` must match one of the following formats: UPPER_CASE
+   2 |         class Ignored {
+   3 |           private static abstract readonly some_name;
+     |                                            ~~~~~~~~~
+   4 |           IgnoredDueToModifiers = 1;
+---
+
+[TestNamingConvention/invalid-28 - 1]
+Diagnostic 1: doesNotMatchFormat (4:30 - 4:38)
+Message: Parameter Property name `some_name` must match one of the following formats: UPPER_CASE
+   3 |           constructor(
+   4 |             private readonly some_name,
+     |                              ~~~~~~~~~
+   5 |             IgnoredDueToModifiers,
+---
+
+[TestNamingConvention/invalid-29 - 1]
+Diagnostic 1: doesNotMatchFormat (3:26 - 3:34)
+Message: Class Method name `some_name` must match one of the following formats: UPPER_CASE
+   2 |         class Ignored {
+   3 |           private static some_name() {}
+     |                          ~~~~~~~~~
+   4 |           IgnoredDueToModifiers() {}
+---
+
+[TestNamingConvention/invalid-30 - 1]
+Diagnostic 1: doesNotMatchFormat (3:30 - 3:38)
+Message: Classic Accessor name `some_name` must match one of the following formats: UPPER_CASE
+   2 |         class Ignored {
+   3 |           private static get some_name() {}
+     |                              ~~~~~~~~~
+   4 |           get IgnoredDueToModifiers() {}
+---
+
+[TestNamingConvention/invalid-31 - 1]
+Diagnostic 1: doesNotMatchFormat (2:24 - 2:32)
+Message: Class name `some_name` must match one of the following formats: UPPER_CASE
+   1 | 
+   2 |         abstract class some_name {}
+     |                        ~~~~~~~~~
+   3 |         class IgnoredDueToModifier {}
+---
+
+[TestNamingConvention/invalid-32 - 1]
+Diagnostic 1: doesNotMatchFormat (2:15 - 2:23)
+Message: Variable name `UnusedVar` must match one of the following formats: snake_case
+   1 | 
+   2 |         const UnusedVar = 1;
+     |               ~~~~~~~~~
+   3 |         function UnusedFunc(
+
+Diagnostic 2: doesNotMatchFormat (3:18 - 3:27)
+Message: Function name `UnusedFunc` must match one of the following formats: snake_case
+   2 |         const UnusedVar = 1;
+   3 |         function UnusedFunc(
+     |                  ~~~~~~~~~~
+   4 |           // this line is intentionally broken out
+
+Diagnostic 3: doesNotMatchFormat (5:11 - 5:21)
+Message: Parameter name `UnusedParam` must match one of the following formats: snake_case
+   4 |           // this line is intentionally broken out
+   5 |           UnusedParam: string,
+     |           ~~~~~~~~~~~
+   6 |         ) {}
+
+Diagnostic 4: doesNotMatchFormat (7:15 - 7:25)
+Message: Class name `UnusedClass` must match one of the following formats: snake_case
+   6 |         ) {}
+   7 |         class UnusedClass {}
+     |               ~~~~~~~~~~~
+   8 |         interface UnusedInterface {}
+
+Diagnostic 5: doesNotMatchFormat (8:19 - 8:33)
+Message: Interface name `UnusedInterface` must match one of the following formats: snake_case
+   7 |         class UnusedClass {}
+   8 |         interface UnusedInterface {}
+     |                   ~~~~~~~~~~~~~~~
+   9 |         type UnusedType<
+
+Diagnostic 6: doesNotMatchFormat (9:14 - 9:23)
+Message: Type Alias name `UnusedType` must match one of the following formats: snake_case
+   8 |         interface UnusedInterface {}
+   9 |         type UnusedType<
+     |              ~~~~~~~~~~
+  10 |           // this line is intentionally broken out
+
+Diagnostic 7: doesNotMatchFormat (11:11 - 11:25)
+Message: Type Parameter name `UnusedTypeParam` must match one of the following formats: snake_case
+  10 |           // this line is intentionally broken out
+  11 |           UnusedTypeParam,
+     |           ~~~~~~~~~~~~~~~
+  12 |         > = {};
+---
+
+[TestNamingConvention/invalid-33 - 1]
+Diagnostic 1: doesNotMatchFormat (3:11 - 3:15)
+Message: Object Literal Property name `a a` must match one of the following formats: PascalCase
+   2 |         const ignored1 = {
+   3 |           'a a': 1,
+     |           ~~~~~
+   4 |           'b b'() {},
+
+Diagnostic 2: doesNotMatchFormat (4:11 - 4:15)
+Message: Object Literal Method name `b b` must match one of the following formats: PascalCase
+   3 |           'a a': 1,
+   4 |           'b b'() {},
+     |           ~~~~~
+   5 |           get 'c c'() {
+
+Diagnostic 3: doesNotMatchFormat (5:15 - 5:19)
+Message: Classic Accessor name `c c` must match one of the following formats: PascalCase
+   4 |           'b b'() {},
+   5 |           get 'c c'() {
+     |               ~~~~~
+   6 |             return 1;
+
+Diagnostic 4: doesNotMatchFormat (8:15 - 8:19)
+Message: Classic Accessor name `d d` must match one of the following formats: PascalCase
+   7 |           },
+   8 |           set 'd d'(value: string) {},
+     |               ~~~~~
+   9 |         };
+
+Diagnostic 5: doesNotMatchFormat (11:11 - 11:15)
+Message: Class Property name `a a` must match one of the following formats: PascalCase
+  10 |         class ignored2 {
+  11 |           'a a' = 1;
+     |           ~~~~~
+  12 |           'b b'() {}
+
+Diagnostic 6: doesNotMatchFormat (12:11 - 12:15)
+Message: Class Method name `b b` must match one of the following formats: PascalCase
+  11 |           'a a' = 1;
+  12 |           'b b'() {}
+     |           ~~~~~
+  13 |           get 'c c'() {
+
+Diagnostic 7: doesNotMatchFormat (13:15 - 13:19)
+Message: Classic Accessor name `c c` must match one of the following formats: PascalCase
+  12 |           'b b'() {}
+  13 |           get 'c c'() {
+     |               ~~~~~
+  14 |             return 1;
+
+Diagnostic 8: doesNotMatchFormat (16:15 - 16:19)
+Message: Classic Accessor name `d d` must match one of the following formats: PascalCase
+  15 |           }
+  16 |           set 'd d'(value: string) {}
+     |               ~~~~~
+  17 |         }
+
+Diagnostic 9: doesNotMatchFormat (19:11 - 19:15)
+Message: Type Property name `a a` must match one of the following formats: PascalCase
+  18 |         interface ignored3 {
+  19 |           'a a': 1;
+     |           ~~~~~
+  20 |           'b b'(): void;
+
+Diagnostic 10: doesNotMatchFormat (20:11 - 20:15)
+Message: Type Method name `b b` must match one of the following formats: PascalCase
+  19 |           'a a': 1;
+  20 |           'b b'(): void;
+     |           ~~~~~
+  21 |         }
+
+Diagnostic 11: doesNotMatchFormat (23:11 - 23:15)
+Message: Type Property name `a a` must match one of the following formats: PascalCase
+  22 |         type ignored4 = {
+  23 |           'a a': 1;
+     |           ~~~~~
+  24 |           'b b'(): void;
+
+Diagnostic 12: doesNotMatchFormat (24:11 - 24:15)
+Message: Type Method name `b b` must match one of the following formats: PascalCase
+  23 |           'a a': 1;
+  24 |           'b b'(): void;
+     |           ~~~~~
+  25 |         };
+
+Diagnostic 13: doesNotMatchFormat (27:11 - 27:15)
+Message: Enum Member name `a a` must match one of the following formats: PascalCase
+  26 |         enum ignored5 {
+  27 |           'a a',
+     |           ~~~~~
+  28 |         }
+---
+
+[TestNamingConvention/invalid-34 - 1]
+Diagnostic 1: doesNotMatchFormat (3:11 - 3:23)
+Message: Type Property name `foo     Bar` must match one of the following formats: camelCase
+   2 |         type Foo = {
+   3 |           'foo     Bar': string;
+     |           ~~~~~~~~~~~~~
+   4 |           '': string;
+
+Diagnostic 2: doesNotMatchFormat (4:11 - 4:12)
+Message: Type Property name `` must match one of the following formats: camelCase
+   3 |           'foo     Bar': string;
+   4 |           '': string;
+     |           ~~
+   5 |           '0': string;
+
+Diagnostic 3: doesNotMatchFormat (5:11 - 5:13)
+Message: Type Property name `0` must match one of the following formats: camelCase
+   4 |           '': string;
+   5 |           '0': string;
+     |           ~~~
+   6 |           'foo': string;
+
+Diagnostic 4: doesNotMatchFormat (7:11 - 7:19)
+Message: Type Property name `foo-bar` must match one of the following formats: camelCase
+   6 |           'foo': string;
+   7 |           'foo-bar': string;
+     |           ~~~~~~~~~
+   8 |           '#foo-bar': string;
+
+Diagnostic 5: doesNotMatchFormat (8:11 - 8:20)
+Message: Type Property name `#foo-bar` must match one of the following formats: camelCase
+   7 |           'foo-bar': string;
+   8 |           '#foo-bar': string;
+     |           ~~~~~~~~~~
+   9 |         };
+
+Diagnostic 6: doesNotMatchFormat (12:11 - 12:23)
+Message: Type Property name `boo-----foo` must match one of the following formats: camelCase
+  11 |         interface Bar {
+  12 |           'boo-----foo': string;
+     |           ~~~~~~~~~~~~~
+  13 |         }
+---
+
+[TestNamingConvention/invalid-35 - 1]
+Diagnostic 1: doesNotMatchFormat (10:24 - 10:31)
+Message: Class Method name `asyncBar` must match one of the following formats: snake_case
+   9 |           // ❌ error
+  10 |           public async asyncBar() {
+     |                        ~~~~~~~~
+  11 |             return 42;
+
+Diagnostic 2: doesNotMatchFormat (14:18 - 14:26)
+Message: Class Method name `AsyncBar2` must match one of the following formats: snake_case
+  13 |           // ❌ error
+  14 |           public AsyncBar2 = async () => {
+     |                  ~~~~~~~~~
+  15 |             return 42;
+
+Diagnostic 3: doesNotMatchFormat (18:18 - 18:26)
+Message: Class Method name `AsyncBar3` must match one of the following formats: snake_case
+  17 |           // ❌ error
+  18 |           public AsyncBar3 = async function () {
+     |                  ~~~~~~~~~
+  19 |             return 42;
+
+Diagnostic 4: doesNotMatchFormat (26:33 - 26:41)
+Message: Class Method name `ASYNC_BAR` must match one of the following formats: snake_case
+  25 |           // ❌ error
+  26 |           public abstract async ASYNC_BAR(): number;
+     |                                 ~~~~~~~~~
+  27 |         }
+---
+
+[TestNamingConvention/invalid-36 - 1]
+Diagnostic 1: doesNotMatchFormat (10:17 - 10:24)
+Message: Object Literal Method name `AsyncBar` must match one of the following formats: snake_case
+   9 |           // ❌ error
+  10 |           async AsyncBar() {
+     |                 ~~~~~~~~
+  11 |             return 42;
+
+Diagnostic 2: doesNotMatchFormat (14:11 - 14:19)
+Message: Object Literal Method name `AsyncBar2` must match one of the following formats: snake_case
+  13 |           // ❌ error
+  14 |           AsyncBar2: async () => {
+     |           ~~~~~~~~~
+  15 |             return 42;
+
+Diagnostic 3: doesNotMatchFormat (18:11 - 18:19)
+Message: Object Literal Method name `AsyncBar3` must match one of the following formats: snake_case
+  17 |           // ❌ error
+  18 |           AsyncBar3: async function () {
+     |           ~~~~~~~~~
+  19 |             return 42;
+---
+
+[TestNamingConvention/invalid-37 - 1]
+Diagnostic 1: doesNotMatchFormat (7:15 - 7:23)
+Message: Variable name `AsyncBar1` must match one of the following formats: snake_case
+   6 |         // ❌ error
+   7 |         const AsyncBar1 = async () => {};
+     |               ~~~~~~~~~
+   8 |         const async_bar1 = async () => {};
+
+Diagnostic 2: doesNotMatchFormat (12:15 - 12:23)
+Message: Variable name `asyncBar5` must match one of the following formats: snake_case
+  11 |         // ❌ error
+  12 |         const asyncBar5 = async function async_bar6() {};
+     |               ~~~~~~~~~
+  13 |       
+---
+
+[TestNamingConvention/invalid-38 - 1]
+Diagnostic 1: doesNotMatchFormat (8:24 - 8:32)
+Message: Function name `asyncBar2` must match one of the following formats: snake_case
+   7 |         // ❌ error
+   8 |         async function asyncBar2() {}
+     |                        ~~~~~~~~~
+   9 |         const async_bar3 = async function async_bar4() {};
+
+Diagnostic 2: doesNotMatchFormat (12:43 - 12:52)
+Message: Function name `ASYNC_BAR4` must match one of the following formats: snake_case
+  11 |         // ❌ error
+  12 |         const async_bar3 = async function ASYNC_BAR4() {};
+     |                                           ~~~~~~~~~~
+  13 |       
+---
+
+[TestNamingConvention/invalid-39 - 1]
+Diagnostic 1: doesNotMatchFormat (6:27 - 6:47)
+Message: Class Property name `someAttributeOverride` must match one of the following formats: snake_case
+   5 |           // ❌ error
+   6 |           public override someAttributeOverride = 1;
+     |                           ~~~~~~~~~~~~~~~~~~~~~
+   7 |         }
+---
+
+[TestNamingConvention/invalid-40 - 1]
+Diagnostic 1: doesNotMatchFormat (7:27 - 7:44)
+Message: Class Method name `someMethodOverride` must match one of the following formats: snake_case
+   6 |           // ❌ error
+   7 |           public override someMethodOverride() {
+     |                           ~~~~~~~~~~~~~~~~~~
+   8 |             return 42;
+---
+
+[TestNamingConvention/invalid-41 - 1]
+Diagnostic 1: doesNotMatchFormat (6:31 - 6:48)
+Message: Classic Accessor name `someGetterOverride` must match one of the following formats: snake_case
+   5 |           // ❌ error
+   6 |           public override get someGetterOverride(): string;
+     |                               ~~~~~~~~~~~~~~~~~~
+   7 |           public set someSetter(val: string);
+
+Diagnostic 2: doesNotMatchFormat (10:31 - 10:48)
+Message: Classic Accessor name `someSetterOverride` must match one of the following formats: snake_case
+   9 |           // ❌ error
+  10 |           public override set someSetterOverride(val: string);
+     |                               ~~~~~~~~~~~~~~~~~~
+  11 |         }
+---
+
+[TestNamingConvention/invalid-42 - 1]
+Diagnostic 1: doesNotMatchFormat (5:19 - 5:37)
+Message: Class Property name `first_private_field` must match one of the following formats: camelCase
+   4 |           // ❌ error
+   5 |           private first_private_field = 1;
+     |                   ~~~~~~~~~~~~~~~~~~~
+   6 |           // ❌ error
+
+Diagnostic 2: doesNotMatchFormat (7:11 - 7:29)
+Message: Class Property name `secondPrivateField` must match one of the following formats: snake_case
+   6 |           // ❌ error
+   7 |           #secondPrivateField = 1;
      |           ~~~~~~~~~~~~~~~~~~~
-   5 |   #secondPrivateField = 1;
-
-Diagnostic 2: doesNotMatchFormat (5:3 - 5:21)
-Message: classProperty name `secondPrivateField` must match one of the following formats: snake_case
-   4 |   private first_private_field = 1;
-   5 |   #secondPrivateField = 1;
-     |   ~~~~~~~~~~~~~~~~~~~
-   6 |   #second_private_field = 1;
+   8 |           #second_private_field = 1;
 ---
 
-[TestNamingConventionHashPrivateComprehensiveInvalid/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (4:11 - 4:30)
-Message: classMethod name `first_private_method` must match one of the following formats: camelCase
-   3 |   private firstPrivateMethod() {}
-   4 |   private first_private_method() {}
+[TestNamingConvention/invalid-43 - 1]
+Diagnostic 1: doesNotMatchFormat (5:19 - 5:38)
+Message: Class Method name `first_private_method` must match one of the following formats: camelCase
+   4 |           // ❌ error
+   5 |           private first_private_method() {}
+     |                   ~~~~~~~~~~~~~~~~~~~~
+   6 |           // ❌ error
+
+Diagnostic 2: doesNotMatchFormat (7:11 - 7:30)
+Message: Class Method name `secondPrivateMethod` must match one of the following formats: snake_case
+   6 |           // ❌ error
+   7 |           #secondPrivateMethod() {}
      |           ~~~~~~~~~~~~~~~~~~~~
-   5 |   #secondPrivateMethod() {}
-
-Diagnostic 2: doesNotMatchFormat (5:3 - 5:22)
-Message: classMethod name `secondPrivateMethod` must match one of the following formats: snake_case
-   4 |   private first_private_method() {}
-   5 |   #secondPrivateMethod() {}
-     |   ~~~~~~~~~~~~~~~~~~~~
-   6 |   #second_private_method() {}
+   8 |           #second_private_method() {}
 ---
 
-[TestNamingConventionImportEmoji/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:18 - 1:20)
-Message: import name `foo` must match one of the following formats: PascalCase
-   1 | import { "🍎" as foo } from 'foo_bar';
-     |                  ~~~
----
-
-[TestNamingConventionImportModifiers/invalid-0 - 1]
+[TestNamingConvention/invalid-44 - 1]
 Diagnostic 1: doesNotMatchFormat (1:13 - 1:18)
-Message: import name `fooBar` must match one of the following formats: PascalCase
+Message: Import name `fooBar` must match one of the following formats: PascalCase
    1 | import * as fooBar from 'foo_bar';
      |             ~~~~~~
 ---
 
-[TestNamingConventionImportModifiers/invalid-1 - 1]
+[TestNamingConvention/invalid-45 - 1]
 Diagnostic 1: doesNotMatchFormat (1:8 - 1:13)
-Message: import name `FooBar` must match one of the following formats: camelCase
+Message: Import name `FooBar` must match one of the following formats: camelCase
    1 | import FooBar from 'foo_bar';
      |        ~~~~~~
 ---
 
-[TestNamingConventionImportModifiers/invalid-2 - 1]
+[TestNamingConvention/invalid-46 - 1]
 Diagnostic 1: doesNotMatchFormat (1:21 - 1:27)
-Message: import name `foo_bar` must match one of the following formats: camelCase
+Message: Import name `foo_bar` must match one of the following formats: camelCase
    1 | import { default as foo_bar } from 'foo_bar';
      |                     ~~~~~~~
 ---
 
-[TestNamingConventionImports/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:19)
-Message: import name `foo_bar` must match one of the following formats: PascalCase
-   1 | import * as foo_bar from 'module';
-     |             ~~~~~~~
----
-
-[TestNamingConventionInterfaces/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:11 - 1:21)
-Message: interface name `myInterface` must match one of the following formats: PascalCase
-   1 | interface myInterface {}
-     |           ~~~~~~~~~~~
----
-
-[TestNamingConventionLeadingUnderscore/invalid-0 - 1]
-Diagnostic 1: unexpectedUnderscore (1:7 - 1:12)
-Message: variable name `_myVar` must not have a leading underscore.
-   1 | const _myVar = 1;
-     |       ~~~~~~
----
-
-[TestNamingConventionLeadingUnderscore/invalid-1 - 1]
-Diagnostic 1: missingUnderscore (1:7 - 1:11)
-Message: variable name `myVar` must have a leading underscore.
-   1 | const myVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionLeadingUnderscore/invalid-2 - 1]
-Diagnostic 1: missingUnderscore (1:7 - 1:12)
-Message: variable name `_myVar` must have a leading double underscore.
-   1 | const _myVar = 1;
-     |       ~~~~~~
----
-
-[TestNamingConventionMetaSelectors/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
-Message: class name `myClass` must match one of the following formats: PascalCase
-   1 | class myClass {}
-     |       ~~~~~~~
----
-
-[TestNamingConventionMetaSelectors/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:11 - 1:21)
-Message: interface name `myInterface` must match one of the following formats: PascalCase
-   1 | interface myInterface {}
-     |           ~~~~~~~~~~~
----
-
-[TestNamingConventionMetaSelectors/invalid-2 - 1]
-Diagnostic 1: doesNotMatchFormat (1:6 - 1:11)
-Message: typeAlias name `myType` must match one of the following formats: PascalCase
-   1 | type myType = {};
-     |      ~~~~~~
----
-
-[TestNamingConventionMetaSelectors/invalid-3 - 1]
-Diagnostic 1: doesNotMatchFormat (1:6 - 1:11)
-Message: enum name `myEnum` must match one of the following formats: PascalCase
-   1 | enum myEnum {}
-     |      ~~~~~~
----
-
-[TestNamingConventionMethodSignature/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:17 - 1:24)
-Message: typeMethod name `myMethod` must match one of the following formats: PascalCase
-   1 | interface Foo { myMethod(): void; }
-     |                 ~~~~~~~~
----
-
-[TestNamingConventionModifiers/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:10 - 3:15)
-Message: classProperty name `myProp` must match one of the following formats: UPPER_CASE
-   2 | class MyClass {
-   3 |   static myProp = 1;
-     |          ~~~~~~
-   4 | }
----
-
-[TestNamingConventionMultipleFormats/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `MyVar` must match one of the following formats: camelCase, UPPER_CASE
-   1 | const MyVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionMultipleSelectorArray/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:11)
-Message: variable name `myVar` must match one of the following formats: snake_case
-   1 | const myVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionMultipleSelectorArray/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:10 - 1:15)
-Message: function name `myFunc` must match one of the following formats: snake_case
-   1 | function myFunc() {}
-     |          ~~~~~~
----
-
-[TestNamingConventionNullFormat/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:10 - 1:15)
-Message: function name `myFunc` must match one of the following formats: PascalCase
-   1 | function myFunc() {}
-     |          ~~~~~~
----
-
-[TestNamingConventionObjectLiteralFunctionValuedPropertyAsMethod/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:15 - 1:22)
-Message: objectLiteralMethod name `myMethod` must match one of the following formats: PascalCase
-   1 | const obj = { myMethod: () => {} };
-     |               ~~~~~~~~
----
-
-[TestNamingConventionObjectLiteralMethods/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:15 - 1:22)
-Message: objectLiteralMethod name `MyMethod` must match one of the following formats: camelCase
-   1 | const obj = { MyMethod() {} };
-     |               ~~~~~~~~
----
-
-[TestNamingConventionObjectLiteralProperties/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:15 - 1:21)
-Message: objectLiteralProperty name `MY_PROP` must match one of the following formats: camelCase
-   1 | const obj = { MY_PROP: 1 };
-     |               ~~~~~~~
----
-
-[TestNamingConventionOverrideComprehensive/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (5:19 - 5:39)
-Message: classProperty name `someAttributeOverride` must match one of the following formats: snake_case
-   4 |   public override some_attribute_override = 1;
-   5 |   public override someAttributeOverride = 1;
-     |                   ~~~~~~~~~~~~~~~~~~~~~
-   6 | }
----
-
-[TestNamingConventionOverrideComprehensive/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (6:19 - 6:36)
-Message: classMethod name `someMethodOverride` must match one of the following formats: snake_case
-   5 |   }
-   6 |   public override someMethodOverride() {
-     |                   ~~~~~~~~~~~~~~~~~~
-   7 |     return 42;
----
-
-[TestNamingConventionOverrideComprehensive/invalid-2 - 1]
-Diagnostic 1: doesNotMatchFormat (5:23 - 5:40)
-Message: classicAccessor name `someGetterOverride` must match one of the following formats: snake_case
-   4 |   public override get some_getter_override(): string;
-   5 |   public override get someGetterOverride(): string;
-     |                       ~~~~~~~~~~~~~~~~~~
-   6 |   public set someSetter(val: string);
-
-Diagnostic 2: doesNotMatchFormat (8:23 - 8:40)
-Message: classicAccessor name `someSetterOverride` must match one of the following formats: snake_case
-   7 |   public override set some_setter_override(val: string);
-   8 |   public override set someSetterOverride(val: string);
-     |                       ~~~~~~~~~~~~~~~~~~
-   9 | }
----
-
-[TestNamingConventionParameterPropertyReadonlyInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (4:22 - 4:30)
-Message: parameterProperty name `some_name` must match one of the following formats: UPPER_CASE
-   3 |   constructor(
-   4 |     private readonly some_name,
-     |                      ~~~~~~~~~
-   5 |     IgnoredDueToModifiers,
----
-
-[TestNamingConventionParameters/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:13 - 1:19)
-Message: parameter name `MyParam` must match one of the following formats: camelCase
-   1 | function fn(MyParam: string) {}
-     |             ~~~~~~~
----
-
-[TestNamingConventionPrefixSuffix/invalid-0 - 1]
-Diagnostic 1: missingAffix (1:7 - 1:13)
-Message: variable name `Enabled` must have one of the following prefixes: `is`, `has`
-   1 | const Enabled = true;
-     |       ~~~~~~~
----
-
-[TestNamingConventionPrefixSuffix/invalid-1 - 1]
-Diagnostic 1: missingAffix (1:7 - 1:11)
-Message: variable name `myVar` must have one of the following suffixes: `Type`, `Interface`
-   1 | const myVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionPrivateReadonlyFormat/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:30 - 1:35)
-Message: classProperty name `fooBar` must match one of the following formats: PascalCase
-   1 | class foo { private readonly fooBar: boolean; }
-     |                              ~~~~~~
----
-
-[TestNamingConventionPropertyVsVariableSelector/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:10 - 3:22)
-Message: classProperty name `otherConstant` must match one of the following formats: PascalCase
-   2 | class SomeClass {
-   3 |   static otherConstant = 'hello';
-     |          ~~~~~~~~~~~~~
-   4 | }
----
-
-[TestNamingConventionQuotedPropertyDefault/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:3 - 3:15)
-Message: typeProperty name `foo     Bar` must match one of the following formats: camelCase
-   2 | type Foo = {
-   3 |   'foo     Bar': string;
-     |   ~~~~~~~~~~~~~
-   4 |   '': string;
-
-Diagnostic 2: doesNotMatchFormat (4:3 - 4:4)
-Message: typeProperty name `` must match one of the following formats: camelCase
-   3 |   'foo     Bar': string;
-   4 |   '': string;
-     |   ~~
-   5 |   '0': string;
-
-Diagnostic 3: doesNotMatchFormat (5:3 - 5:5)
-Message: typeProperty name `0` must match one of the following formats: camelCase
-   4 |   '': string;
-   5 |   '0': string;
-     |   ~~~
-   6 |   'foo': string;
-
-Diagnostic 4: doesNotMatchFormat (7:3 - 7:11)
-Message: typeProperty name `foo-bar` must match one of the following formats: camelCase
-   6 |   'foo': string;
-   7 |   'foo-bar': string;
-     |   ~~~~~~~~~
-   8 |   '#foo-bar': string;
-
-Diagnostic 5: doesNotMatchFormat (8:3 - 8:12)
-Message: typeProperty name `#foo-bar` must match one of the following formats: camelCase
-   7 |   'foo-bar': string;
-   8 |   '#foo-bar': string;
-     |   ~~~~~~~~~~
-   9 | };
-
-Diagnostic 6: doesNotMatchFormat (11:3 - 11:15)
-Message: typeProperty name `boo-----foo` must match one of the following formats: camelCase
-  10 | interface Bar {
-  11 |   'boo-----foo': string;
-     |   ~~~~~~~~~~~~~
-  12 | }
----
-
-[TestNamingConventionRequiresQuotesEnforced/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:3 - 3:7)
-Message: objectLiteralProperty name `a a` must match one of the following formats: PascalCase
-   2 | const ignored1 = {
-   3 |   'a a': 1,
-     |   ~~~~~
-   4 |   'b b'() {},
-
-Diagnostic 2: doesNotMatchFormat (4:3 - 4:7)
-Message: objectLiteralMethod name `b b` must match one of the following formats: PascalCase
-   3 |   'a a': 1,
-   4 |   'b b'() {},
-     |   ~~~~~
-   5 |   get 'c c'() {
-
-Diagnostic 3: doesNotMatchFormat (5:7 - 5:11)
-Message: classicAccessor name `c c` must match one of the following formats: PascalCase
-   4 |   'b b'() {},
-   5 |   get 'c c'() {
-     |       ~~~~~
-   6 |     return 1;
-
-Diagnostic 4: doesNotMatchFormat (8:7 - 8:11)
-Message: classicAccessor name `d d` must match one of the following formats: PascalCase
-   7 |   },
-   8 |   set 'd d'(value: string) {},
-     |       ~~~~~
-   9 | };
-
-Diagnostic 5: doesNotMatchFormat (11:3 - 11:7)
-Message: classProperty name `a a` must match one of the following formats: PascalCase
-  10 | class ignored2 {
-  11 |   'a a' = 1;
-     |   ~~~~~
-  12 |   'b b'() {}
-
-Diagnostic 6: doesNotMatchFormat (12:3 - 12:7)
-Message: classMethod name `b b` must match one of the following formats: PascalCase
-  11 |   'a a' = 1;
-  12 |   'b b'() {}
-     |   ~~~~~
-  13 |   get 'c c'() {
-
-Diagnostic 7: doesNotMatchFormat (13:7 - 13:11)
-Message: classicAccessor name `c c` must match one of the following formats: PascalCase
-  12 |   'b b'() {}
-  13 |   get 'c c'() {
-     |       ~~~~~
-  14 |     return 1;
-
-Diagnostic 8: doesNotMatchFormat (16:7 - 16:11)
-Message: classicAccessor name `d d` must match one of the following formats: PascalCase
-  15 |   }
-  16 |   set 'd d'(value: string) {}
-     |       ~~~~~
-  17 | }
-
-Diagnostic 9: doesNotMatchFormat (19:3 - 19:7)
-Message: typeProperty name `a a` must match one of the following formats: PascalCase
-  18 | interface ignored3 {
-  19 |   'a a': 1;
-     |   ~~~~~
-  20 |   'b b'(): void;
-
-Diagnostic 10: doesNotMatchFormat (20:3 - 20:7)
-Message: typeMethod name `b b` must match one of the following formats: PascalCase
-  19 |   'a a': 1;
-  20 |   'b b'(): void;
-     |   ~~~~~
-  21 | }
-
-Diagnostic 11: doesNotMatchFormat (23:3 - 23:7)
-Message: typeProperty name `a a` must match one of the following formats: PascalCase
-  22 | type ignored4 = {
-  23 |   'a a': 1;
-     |   ~~~~~
-  24 |   'b b'(): void;
-
-Diagnostic 12: doesNotMatchFormat (24:3 - 24:7)
-Message: typeMethod name `b b` must match one of the following formats: PascalCase
-  23 |   'a a': 1;
-  24 |   'b b'(): void;
-     |   ~~~~~
-  25 | };
-
-Diagnostic 13: doesNotMatchFormat (27:3 - 27:7)
-Message: enumMember name `a a` must match one of the following formats: PascalCase
-  26 | enum ignored5 {
-  27 |   'a a',
-     |   ~~~~~
-  28 | }
----
-
-[TestNamingConventionStaticReadonlyInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (3:36 - 3:44)
-Message: classProperty name `some_name` must match one of the following formats: UPPER_CASE
-   2 | class Ignored {
-   3 |   private static abstract readonly some_name;
-     |                                    ~~~~~~~~~
-   4 |   IgnoredDueToModifiers = 1;
----
-
-[TestNamingConventionTrailingUnderscore/invalid-0 - 1]
-Diagnostic 1: unexpectedUnderscore (1:7 - 1:12)
-Message: variable name `myVar_` must not have a trailing underscore.
-   1 | const myVar_ = 1;
-     |       ~~~~~~
----
-
-[TestNamingConventionTrailingUnderscore/invalid-1 - 1]
-Diagnostic 1: missingUnderscore (1:7 - 1:11)
-Message: variable name `myVar` must have a trailing underscore.
-   1 | const myVar = 1;
-     |       ~~~~~
----
-
-[TestNamingConventionTypeAliases/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
-Message: typeAlias name `my_type` must match one of the following formats: PascalCase
-   1 | type my_type = {};
-     |      ~~~~~~~
----
-
-[TestNamingConventionTypeMethods/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:17 - 1:24)
-Message: typeMethod name `MyMethod` must match one of the following formats: camelCase
-   1 | interface Foo { MyMethod(): void; }
-     |                 ~~~~~~~~
----
-
-[TestNamingConventionTypeParameters/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:18 - 1:18)
-Message: typeParameter name `t` must match one of the following formats: PascalCase
-   1 | function ignored<t>(x: t) { return x; }
-     |                  ~
----
-
-[TestNamingConventionTypeProperties/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:17 - 1:23)
-Message: typeProperty name `MY_PROP` must match one of the following formats: camelCase
-   1 | interface Foo { MY_PROP: string; }
-     |                 ~~~~~~~
----
-
-[TestNamingConventionTypesArrayInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormatTrimmed (2:15 - 2:30)
-Message: variable name `array_camelCase1` trimmed as `camelCase1` must match one of the following formats: snake_case
-   1 | 
-   2 | declare const array_camelCase1: Array<number>;
-     |               ~~~~~~~~~~~~~~~~
-   3 | declare const array_camelCase2: ReadonlyArray<number> | null;
-
-Diagnostic 2: doesNotMatchFormatTrimmed (3:15 - 3:30)
-Message: variable name `array_camelCase2` trimmed as `camelCase2` must match one of the following formats: snake_case
-   2 | declare const array_camelCase1: Array<number>;
-   3 | declare const array_camelCase2: ReadonlyArray<number> | null;
-     |               ~~~~~~~~~~~~~~~~
-   4 | declare const array_camelCase3: number[] | null | undefined;
-
-Diagnostic 3: doesNotMatchFormatTrimmed (4:15 - 4:30)
-Message: variable name `array_camelCase3` trimmed as `camelCase3` must match one of the following formats: snake_case
-   3 | declare const array_camelCase2: ReadonlyArray<number> | null;
-   4 | declare const array_camelCase3: number[] | null | undefined;
-     |               ~~~~~~~~~~~~~~~~
-   5 | declare const array_camelCase4: readonly number[] | null | undefined;
-
-Diagnostic 4: doesNotMatchFormatTrimmed (5:15 - 5:30)
-Message: variable name `array_camelCase4` trimmed as `camelCase4` must match one of the following formats: snake_case
-   4 | declare const array_camelCase3: number[] | null | undefined;
-   5 | declare const array_camelCase4: readonly number[] | null | undefined;
-     |               ~~~~~~~~~~~~~~~~
-   6 | declare const array_camelCase5:
-
-Diagnostic 5: doesNotMatchFormatTrimmed (6:15 - 6:30)
-Message: variable name `array_camelCase5` trimmed as `camelCase5` must match one of the following formats: snake_case
-   5 | declare const array_camelCase4: readonly number[] | null | undefined;
-   6 | declare const array_camelCase5:
-     |               ~~~~~~~~~~~~~~~~
-   7 |   | number[]
-
-Diagnostic 6: doesNotMatchFormatTrimmed (11:15 - 11:30)
-Message: variable name `array_camelCase6` trimmed as `camelCase6` must match one of the following formats: snake_case
-  10 |   | undefined;
-  11 | declare const array_camelCase6: [] | null | undefined;
-     |               ~~~~~~~~~~~~~~~~
-  12 | declare const array_camelCase7: [number] | null | undefined;
-
-Diagnostic 7: doesNotMatchFormatTrimmed (12:15 - 12:30)
-Message: variable name `array_camelCase7` trimmed as `camelCase7` must match one of the following formats: snake_case
-  11 | declare const array_camelCase6: [] | null | undefined;
-  12 | declare const array_camelCase7: [number] | null | undefined;
-     |               ~~~~~~~~~~~~~~~~
-  13 | declare const array_camelCase8:
-
-Diagnostic 8: doesNotMatchFormatTrimmed (13:15 - 13:30)
-Message: variable name `array_camelCase8` trimmed as `camelCase8` must match one of the following formats: snake_case
-  12 | declare const array_camelCase7: [number] | null | undefined;
-  13 | declare const array_camelCase8:
-     |               ~~~~~~~~~~~~~~~~
-  14 |   | readonly number[]
----
-
-[TestNamingConventionTypesFunctionInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormatTrimmed (2:15 - 2:33)
-Message: variable name `function_camelCase1` trimmed as `camelCase1` must match one of the following formats: snake_case
-   1 | 
-   2 | declare const function_camelCase1: () => void;
-     |               ~~~~~~~~~~~~~~~~~~~
-   3 | declare const function_camelCase2: (() => void) | null;
-
-Diagnostic 2: doesNotMatchFormatTrimmed (3:15 - 3:33)
-Message: variable name `function_camelCase2` trimmed as `camelCase2` must match one of the following formats: snake_case
-   2 | declare const function_camelCase1: () => void;
-   3 | declare const function_camelCase2: (() => void) | null;
-     |               ~~~~~~~~~~~~~~~~~~~
-   4 | declare const function_camelCase3: (() => void) | null | undefined;
-
-Diagnostic 3: doesNotMatchFormatTrimmed (4:15 - 4:33)
-Message: variable name `function_camelCase3` trimmed as `camelCase3` must match one of the following formats: snake_case
-   3 | declare const function_camelCase2: (() => void) | null;
-   4 | declare const function_camelCase3: (() => void) | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~~
-   5 | declare const function_camelCase4:
-
-Diagnostic 4: doesNotMatchFormatTrimmed (5:15 - 5:33)
-Message: variable name `function_camelCase4` trimmed as `camelCase4` must match one of the following formats: snake_case
-   4 | declare const function_camelCase3: (() => void) | null | undefined;
-   5 | declare const function_camelCase4:
-     |               ~~~~~~~~~~~~~~~~~~~
-   6 |   | (() => void)
----
-
-[TestNamingConventionTypesMultipleInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormatTrimmed (2:15 - 2:29)
-Message: variable name `any_camelCase01` trimmed as `camelCase01` must match one of the following formats: UPPER_CASE
-   1 | 
-   2 | declare const any_camelCase01: any;
-     |               ~~~~~~~~~~~~~~~
-   3 | declare const any_camelCase02: any | null;
-
-Diagnostic 2: doesNotMatchFormatTrimmed (3:15 - 3:29)
-Message: variable name `any_camelCase02` trimmed as `camelCase02` must match one of the following formats: UPPER_CASE
-   2 | declare const any_camelCase01: any;
-   3 | declare const any_camelCase02: any | null;
-     |               ~~~~~~~~~~~~~~~
-   4 | declare const any_camelCase03: any | null | undefined;
-
-Diagnostic 3: doesNotMatchFormatTrimmed (4:15 - 4:29)
-Message: variable name `any_camelCase03` trimmed as `camelCase03` must match one of the following formats: UPPER_CASE
-   3 | declare const any_camelCase02: any | null;
-   4 | declare const any_camelCase03: any | null | undefined;
-     |               ~~~~~~~~~~~~~~~
-   5 | declare const string_camelCase01: string;
-
-Diagnostic 4: doesNotMatchFormatTrimmed (5:15 - 5:32)
-Message: variable name `string_camelCase01` trimmed as `camelCase01` must match one of the following formats: snake_case
-   4 | declare const any_camelCase03: any | null | undefined;
-   5 | declare const string_camelCase01: string;
-     |               ~~~~~~~~~~~~~~~~~~
-   6 | declare const string_camelCase02: string | null;
-
-Diagnostic 5: doesNotMatchFormatTrimmed (6:15 - 6:32)
-Message: variable name `string_camelCase02` trimmed as `camelCase02` must match one of the following formats: snake_case
-   5 | declare const string_camelCase01: string;
-   6 | declare const string_camelCase02: string | null;
-     |               ~~~~~~~~~~~~~~~~~~
-   7 | declare const string_camelCase03: string | null | undefined;
-
-Diagnostic 6: doesNotMatchFormatTrimmed (7:15 - 7:32)
-Message: variable name `string_camelCase03` trimmed as `camelCase03` must match one of the following formats: snake_case
-   6 | declare const string_camelCase02: string | null;
-   7 | declare const string_camelCase03: string | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~
-   8 | declare const string_camelCase04: 'a' | null | undefined;
-
-Diagnostic 7: doesNotMatchFormatTrimmed (8:15 - 8:32)
-Message: variable name `string_camelCase04` trimmed as `camelCase04` must match one of the following formats: snake_case
-   7 | declare const string_camelCase03: string | null | undefined;
-   8 | declare const string_camelCase04: 'a' | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~
-   9 | declare const string_camelCase05: string | 'a' | null | undefined;
-
-Diagnostic 8: doesNotMatchFormatTrimmed (9:15 - 9:32)
-Message: variable name `string_camelCase05` trimmed as `camelCase05` must match one of the following formats: snake_case
-   8 | declare const string_camelCase04: 'a' | null | undefined;
-   9 | declare const string_camelCase05: string | 'a' | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~
-  10 | declare const number_camelCase06: number;
-
-Diagnostic 9: doesNotMatchFormatTrimmed (10:15 - 10:32)
-Message: variable name `number_camelCase06` trimmed as `camelCase06` must match one of the following formats: snake_case
-   9 | declare const string_camelCase05: string | 'a' | null | undefined;
-  10 | declare const number_camelCase06: number;
-     |               ~~~~~~~~~~~~~~~~~~
-  11 | declare const number_camelCase07: number | null;
-
-Diagnostic 10: doesNotMatchFormatTrimmed (11:15 - 11:32)
-Message: variable name `number_camelCase07` trimmed as `camelCase07` must match one of the following formats: snake_case
-  10 | declare const number_camelCase06: number;
-  11 | declare const number_camelCase07: number | null;
-     |               ~~~~~~~~~~~~~~~~~~
-  12 | declare const number_camelCase08: number | null | undefined;
-
-Diagnostic 11: doesNotMatchFormatTrimmed (12:15 - 12:32)
-Message: variable name `number_camelCase08` trimmed as `camelCase08` must match one of the following formats: snake_case
-  11 | declare const number_camelCase07: number | null;
-  12 | declare const number_camelCase08: number | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~
-  13 | declare const number_camelCase09: 1 | null | undefined;
-
-Diagnostic 12: doesNotMatchFormatTrimmed (13:15 - 13:32)
-Message: variable name `number_camelCase09` trimmed as `camelCase09` must match one of the following formats: snake_case
-  12 | declare const number_camelCase08: number | null | undefined;
-  13 | declare const number_camelCase09: 1 | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~
-  14 | declare const number_camelCase10: number | 2 | null | undefined;
-
-Diagnostic 13: doesNotMatchFormatTrimmed (14:15 - 14:32)
-Message: variable name `number_camelCase10` trimmed as `camelCase10` must match one of the following formats: snake_case
-  13 | declare const number_camelCase09: 1 | null | undefined;
-  14 | declare const number_camelCase10: number | 2 | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~
-  15 | declare const boolean_camelCase11: boolean;
-
-Diagnostic 14: doesNotMatchFormatTrimmed (15:15 - 15:33)
-Message: variable name `boolean_camelCase11` trimmed as `camelCase11` must match one of the following formats: snake_case
-  14 | declare const number_camelCase10: number | 2 | null | undefined;
-  15 | declare const boolean_camelCase11: boolean;
-     |               ~~~~~~~~~~~~~~~~~~~
-  16 | declare const boolean_camelCase12: boolean | null;
-
-Diagnostic 15: doesNotMatchFormatTrimmed (16:15 - 16:33)
-Message: variable name `boolean_camelCase12` trimmed as `camelCase12` must match one of the following formats: snake_case
-  15 | declare const boolean_camelCase11: boolean;
-  16 | declare const boolean_camelCase12: boolean | null;
-     |               ~~~~~~~~~~~~~~~~~~~
-  17 | declare const boolean_camelCase13: boolean | null | undefined;
-
-Diagnostic 16: doesNotMatchFormatTrimmed (17:15 - 17:33)
-Message: variable name `boolean_camelCase13` trimmed as `camelCase13` must match one of the following formats: snake_case
-  16 | declare const boolean_camelCase12: boolean | null;
-  17 | declare const boolean_camelCase13: boolean | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~~
-  18 | declare const boolean_camelCase14: true | null | undefined;
-
-Diagnostic 17: doesNotMatchFormatTrimmed (18:15 - 18:33)
-Message: variable name `boolean_camelCase14` trimmed as `camelCase14` must match one of the following formats: snake_case
-  17 | declare const boolean_camelCase13: boolean | null | undefined;
-  18 | declare const boolean_camelCase14: true | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~~
-  19 | declare const boolean_camelCase15: false | null | undefined;
-
-Diagnostic 18: doesNotMatchFormatTrimmed (19:15 - 19:33)
-Message: variable name `boolean_camelCase15` trimmed as `camelCase15` must match one of the following formats: snake_case
-  18 | declare const boolean_camelCase14: true | null | undefined;
-  19 | declare const boolean_camelCase15: false | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~~
-  20 | declare const boolean_camelCase16: true | false | null | undefined;
-
-Diagnostic 19: doesNotMatchFormatTrimmed (20:15 - 20:33)
-Message: variable name `boolean_camelCase16` trimmed as `camelCase16` must match one of the following formats: snake_case
-  19 | declare const boolean_camelCase15: false | null | undefined;
-  20 | declare const boolean_camelCase16: true | false | null | undefined;
-     |               ~~~~~~~~~~~~~~~~~~~
-  21 | 
----
-
-[TestNamingConventionTypesStringFunctionSelectorInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormatTrimmed (2:10 - 2:19)
-Message: function name `my_foo_bar` trimmed as `_foo_bar` must match one of the following formats: PascalCase
-   1 | 
-   2 | function my_foo_bar() {}
-     |          ~~~~~~~~~~
-   3 | 
----
-
-[TestNamingConventionTypesStringMultiSelectorInvalid/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormatTrimmed (2:7 - 2:15)
-Message: variable name `myfoo_bar` trimmed as `foo_bar` must match one of the following formats: PascalCase
-   1 | 
-   2 | const myfoo_bar = 'abcs';
-     |       ~~~~~~~~~
-   3 | function fun(myfoo: string) {}
-
-Diagnostic 2: doesNotMatchFormatTrimmed (3:14 - 3:18)
-Message: parameter name `myfoo` trimmed as `foo` must match one of the following formats: PascalCase
-   2 | const myfoo_bar = 'abcs';
-   3 | function fun(myfoo: string) {}
-     |              ~~~~~
-   4 | class foo {
-
-Diagnostic 3: doesNotMatchFormatTrimmed (5:3 - 5:7)
-Message: classProperty name `Myfoo` trimmed as `foo` must match one of the following formats: PascalCase
-   4 | class foo {
-   5 |   Myfoo: string;
-     |   ~~~~~
-   6 | }
----
-
-[TestNamingConventionUnusedModifier/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (2:7 - 2:15)
-Message: variable name `UnusedVar` must match one of the following formats: snake_case
-   1 | 
-   2 | const UnusedVar = 1;
-     |       ~~~~~~~~~
-   3 | function UnusedFunc(
-
-Diagnostic 2: doesNotMatchFormat (3:10 - 3:19)
-Message: function name `UnusedFunc` must match one of the following formats: snake_case
-   2 | const UnusedVar = 1;
-   3 | function UnusedFunc(
-     |          ~~~~~~~~~~
-   4 |   UnusedParam: string,
-
-Diagnostic 3: doesNotMatchFormat (4:3 - 4:13)
-Message: parameter name `UnusedParam` must match one of the following formats: snake_case
-   3 | function UnusedFunc(
-   4 |   UnusedParam: string,
-     |   ~~~~~~~~~~~
-   5 | ) {}
-
-Diagnostic 4: doesNotMatchFormat (6:7 - 6:17)
-Message: class name `UnusedClass` must match one of the following formats: snake_case
-   5 | ) {}
-   6 | class UnusedClass {}
-     |       ~~~~~~~~~~~
-   7 | interface UnusedInterface {}
-
-Diagnostic 5: doesNotMatchFormat (7:11 - 7:25)
-Message: interface name `UnusedInterface` must match one of the following formats: snake_case
-   6 | class UnusedClass {}
-   7 | interface UnusedInterface {}
-     |           ~~~~~~~~~~~~~~~
-   8 | type UnusedType<
-
-Diagnostic 6: doesNotMatchFormat (8:6 - 8:15)
-Message: typeAlias name `UnusedType` must match one of the following formats: snake_case
-   7 | interface UnusedInterface {}
-   8 | type UnusedType<
-     |      ~~~~~~~~~~
-   9 |   UnusedTypeParam,
-
-Diagnostic 7: doesNotMatchFormat (9:3 - 9:17)
-Message: typeParameter name `UnusedTypeParam` must match one of the following formats: snake_case
-   8 | type UnusedType<
-   9 |   UnusedTypeParam,
-     |   ~~~~~~~~~~~~~~~
-  10 | > = {};
----
-
-[TestNamingConventionVariables/invalid-0 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `snake_case` must match one of the following formats: camelCase
-   1 | const snake_case = 1;
-     |       ~~~~~~~~~~
----
-
-[TestNamingConventionVariables/invalid-1 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:16)
-Message: variable name `UPPER_CASE` must match one of the following formats: camelCase
-   1 | const UPPER_CASE = 1;
-     |       ~~~~~~~~~~
----
-
-[TestNamingConventionVariables/invalid-2 - 1]
-Diagnostic 1: doesNotMatchFormat (1:7 - 1:22)
-Message: variable name `StrictPascalCase` must match one of the following formats: camelCase
-   1 | const StrictPascalCase = 1;
-     |       ~~~~~~~~~~~~~~~~
+[TestNamingConvention/invalid-47 - 1]
+Diagnostic 1: doesNotMatchFormat (1:18 - 1:20)
+Message: Import name `foo` must match one of the following formats: PascalCase
+   1 | import { "🍎" as foo } from 'foo_bar';
+     |                  ~~~
 ---
