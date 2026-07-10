@@ -65,24 +65,30 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 				return nil
 			}
 
-			declarations := slices.Clone(symbol.Declarations)
+			// Only a symbol with merged declarations needs reordering so the
+			// type-context declaration is consulted first. The common case is a
+			// single declaration, where cloning and sorting would just allocate.
+			declarations := symbol.Declarations
+			if len(declarations) > 1 {
+				declarations = slices.Clone(declarations)
 
-			nodeInTypeContext := isInTypeContext(node)
-			slices.SortFunc(declarations, func(a *ast.Node, b *ast.Node) int {
-				if !nodeInTypeContext {
-					a, b = b, a
-				}
-				res := 0
+				nodeInTypeContext := isInTypeContext(node)
+				slices.SortFunc(declarations, func(a *ast.Node, b *ast.Node) int {
+					if !nodeInTypeContext {
+						a, b = b, a
+					}
+					res := 0
 
-				if isTypeContextDeclaration(a) {
-					res -= 1
-				}
-				if isTypeContextDeclaration(b) {
-					res += 1
-				}
+					if isTypeContextDeclaration(a) {
+						res -= 1
+					}
+					if isTypeContextDeclaration(b) {
+						res += 1
+					}
 
-				return res
-			})
+					return res
+				})
+			}
 
 			for _, decl := range declarations {
 				if ast.IsTypeAliasDeclaration(decl) || ast.IsInterfaceDeclaration(decl) || ast.IsClassLike(decl) {
