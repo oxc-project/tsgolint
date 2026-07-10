@@ -213,3 +213,12 @@ Message: Unsafe argument of type any assigned to a parameter of type T.
      |       ~~~
    6 |       
 ---
+
+[TestNoUnsafeArgumentRule/invalid-20 - 1]
+Diagnostic 1: unsafeArgument (4:5 - 4:19)
+Message: Unsafe argument of type any assigned to a parameter of type { x: number; }.
+   3 | declare const anyValue: any;
+   4 | foo({ ...anyValue });
+     |     ~~~~~~~~~~~~~~~
+   5 |       
+---
