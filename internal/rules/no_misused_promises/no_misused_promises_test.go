@@ -2708,5 +2708,67 @@ function f<T extends () => Promise<void>>(t: T) {
 				},
 			},
 		},
+		// Augmenting a global interface with a call signature makes literals of that
+		// kind callable, so they must still be checked.
+		{
+			Code: `
+interface String {
+  (): Promise<void>;
+}
+declare function takesCb(cb: () => void): void;
+takesCb('literal');
+takesCb(` + "`template`" + `);
+const cb: () => void = 'literal';
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "voidReturnArgument",
+					Line:      6,
+				},
+				{
+					MessageId: "voidReturnArgument",
+					Line:      7,
+				},
+				{
+					MessageId: "voidReturnVariable",
+					Line:      8,
+				},
+			},
+		},
+		{
+			Code: `
+interface Number {
+  (): Promise<void>;
+}
+declare function takesCb(cb: () => void): void;
+takesCb(123);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "voidReturnArgument",
+					Line:      6,
+				},
+			},
+		},
+		{
+			Code: `
+interface Array<T> {
+  (): Promise<void>;
+}
+declare function takesCb(cb: () => void): void;
+takesCb([1, 2]);
+const cb: () => void = [1, 2];
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "voidReturnArgument",
+					Line:      6,
+				},
+				{
+					MessageId: "voidReturnVariable",
+					Line:      7,
+				},
+			},
+		},
 	})
 }

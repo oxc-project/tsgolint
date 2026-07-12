@@ -1025,3 +1025,51 @@ Message: Promise-returning function provided to variable where a void return was
      |                          ~~~~~~~~
    4 | }
 ---
+
+[TestNoMisusedPromisesRule/invalid-92 - 1]
+Diagnostic 1: voidReturnArgument (6:9 - 6:17)
+Message: Promise returned in function argument where a void return was expected.
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb('literal');
+     |         ~~~~~~~~~
+   7 | takesCb(`template`);
+
+Diagnostic 2: voidReturnArgument (7:9 - 7:18)
+Message: Promise returned in function argument where a void return was expected.
+   6 | takesCb('literal');
+   7 | takesCb(`template`);
+     |         ~~~~~~~~~~
+   8 | const cb: () => void = 'literal';
+
+Diagnostic 3: voidReturnVariable (8:24 - 8:32)
+Message: Promise-returning function provided to variable where a void return was expected.
+   7 | takesCb(`template`);
+   8 | const cb: () => void = 'literal';
+     |                        ~~~~~~~~~
+   9 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-93 - 1]
+Diagnostic 1: voidReturnArgument (6:9 - 6:11)
+Message: Promise returned in function argument where a void return was expected.
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb(123);
+     |         ~~~
+   7 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-94 - 1]
+Diagnostic 1: voidReturnArgument (6:9 - 6:14)
+Message: Promise returned in function argument where a void return was expected.
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb([1, 2]);
+     |         ~~~~~~
+   7 | const cb: () => void = [1, 2];
+
+Diagnostic 2: voidReturnVariable (7:24 - 7:29)
+Message: Promise-returning function provided to variable where a void return was expected.
+   6 | takesCb([1, 2]);
+   7 | const cb: () => void = [1, 2];
+     |                        ~~~~~~
+   8 |       
+---

@@ -117,11 +117,35 @@ var NoMisusedPromisesRule = rule.Rule{
 			checksVoidReturnOpts = defaultChecksVoidReturnOpts()
 		}
 
-		// A syntactic check for whether an expression could possibly evaluate to a
-		// value with call signatures. Literals, templates, and array literals
-		// can never be callable, so `returnsThenable` is always false for them and
-		// the type queries guarding it can be skipped entirely.
-		// This is a perf optimization to help avoid requesting types where possible.
+		hasCallSignatures := func(node *ast.Node) bool {
+			t := checker.Checker_getApparentType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(node))
+			return utils.Some(utils.UnionTypeParts(t), func(t *checker.Type) bool {
+				return len(utils.GetCallSignatures(ctx.TypeChecker, t)) != 0
+			})
+		}
+
+		// Every `voidReturn` report requires the reported expression to have call
+		// signatures, so expressions that can't have any are skipped before the type
+		// queries that gate the report are ever made.
+		//
+		// Whether a literal has call signatures is a property of its kind rather than
+		// of the node: the apparent type of every string literal is the global
+		// `String`, of every array literal an `Array<T>`, and so on. Those globals
+		// normally have no call signatures, but interface augmentation (e.g.
+		// `interface String { (): Promise<void> }`) can give them some, so the answer
+		// is sampled from the checker on first use and cached per kind instead of
+		// being assumed. That costs at most one type query per literal kind per file,
+		// in exchange for skipping the queries on every literal that follows.
+		callableByLiteralKind := make(map[ast.Kind]bool, 8)
+		isCallableLiteralKind := func(node *ast.Node) bool {
+			callable, cached := callableByLiteralKind[node.Kind]
+			if !cached {
+				callable = hasCallSignatures(node)
+				callableByLiteralKind[node.Kind] = callable
+			}
+			return callable
+		}
+
 		couldBeFunctionLikeValue := func(node *ast.Node) bool {
 			switch node.Kind {
 			case ast.KindStringLiteral,
@@ -134,15 +158,19 @@ var NoMisusedPromisesRule = rule.Rule{
 				ast.KindNullKeyword,
 				ast.KindRegularExpressionLiteral,
 				ast.KindArrayLiteralExpression:
-				return false
+				return isCallableLiteralKind(node)
 			case ast.KindObjectLiteralExpression:
 				// Spreading a generic value keeps its type (e.g. `{ ...t }` where
-				// `T extends () => Promise<void>` has type `T`), which can be
-				// callable, so only spread-free object literals are known to be
-				// never-callable.
-				return slices.ContainsFunc(node.AsObjectLiteralExpression().Properties.Nodes, func(property *ast.Node) bool {
+				// `T extends () => Promise<void>` has type `T`), which can be callable.
+				// A spread-free object literal can't declare a call signature, so the
+				// only ones it can have are inherited from the global `Object`, which
+				// the per-kind sample covers.
+				if slices.ContainsFunc(node.AsObjectLiteralExpression().Properties.Nodes, func(property *ast.Node) bool {
 					return property.Kind == ast.KindSpreadAssignment
-				})
+				}) {
+					return true
+				}
+				return isCallableLiteralKind(node)
 			default:
 				return true
 			}
