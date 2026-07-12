@@ -244,12 +244,9 @@ var NoFloatingPromisesRule = rule.Rule{
 			if len(args.Nodes) <= index {
 				return false
 			}
-			for _, arg := range args.Nodes[:index+1] {
-				if ast.IsSpreadElement(arg) {
-					return false
-				}
-			}
-			return true
+			// A spread at or before the index makes the argument at that position
+			// unknowable.
+			return !utils.Some(args.Nodes[:index+1], ast.IsSpreadElement)
 		}
 
 		var isUnhandledPromise func(
