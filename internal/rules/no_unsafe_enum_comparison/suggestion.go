@@ -63,9 +63,6 @@ func enumMemberSuffixText(sourceFile *ast.SourceFile, member *ast.Node) string {
 
 func isQualifiedIdentifierText(value string) bool {
 	parts := strings.Split(value, ".")
-	if len(parts) == 0 {
-		return false
-	}
 	for _, part := range parts {
 		if !scanner.IsIdentifierText(part, core.LanguageVariantStandard) {
 			return false

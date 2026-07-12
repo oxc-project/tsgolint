@@ -228,7 +228,7 @@ var PreferIncludesRule = rule.Rule{
 		// Verifies that for every indexOf declaration, there exists an includes
 		// declaration on the same type with matching parameters
 		indexOfHasCompatibleIncludes := func(indexOfSymbol *ast.Symbol) bool {
-			if indexOfSymbol == nil || indexOfSymbol.Declarations == nil || len(indexOfSymbol.Declarations) == 0 {
+			if indexOfSymbol == nil || len(indexOfSymbol.Declarations) == 0 {
 				return false
 			}
 
@@ -324,10 +324,6 @@ var PreferIncludesRule = rule.Rule{
 		return rule.RuleListeners{
 			// Handle: /regex/.test(str) -> str.includes('literal')
 			ast.KindCallExpression: func(node *ast.Node) {
-				if node.Kind != ast.KindCallExpression {
-					return
-				}
-
 				callExpr := node.AsCallExpression()
 
 				// Check if it's a member access (e.g., /regex/.test or pattern.test)
@@ -375,14 +371,12 @@ var PreferIncludesRule = rule.Rule{
 				// Member access (.) has high precedence, so we only need parens for expressions
 				// that would parse incorrectly, like: a + b.includes() vs (a + b).includes()
 				// Safe types: literals, identifiers, member/element access, calls, already-parenthesized
-				needsParens := false
+				needsParens := true
 				switch argument.Kind {
 				case ast.KindIdentifier, ast.KindStringLiteral, ast.KindNumericLiteral,
 					ast.KindNoSubstitutionTemplateLiteral, ast.KindPropertyAccessExpression,
 					ast.KindCallExpression, ast.KindElementAccessExpression, ast.KindParenthesizedExpression:
 					needsParens = false
-				default:
-					needsParens = true
 				}
 
 				// Use TrimNodeTextRange to preserve leading whitespace
@@ -417,10 +411,6 @@ var PreferIncludesRule = rule.Rule{
 			},
 			// Handle: array.indexOf(item) !== -1 -> array.includes(item)
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				if node.Kind != ast.KindBinaryExpression {
-					return
-				}
-
 				binaryExpr := node.AsBinaryExpression()
 				left := binaryExpr.Left
 

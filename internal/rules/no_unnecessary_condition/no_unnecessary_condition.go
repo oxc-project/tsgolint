@@ -1183,25 +1183,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 							return
 						}
 					}
-				} else if isPropertyAccess(expression) || isElementAccess(expression) {
-					// Handle property/element access on call expression result
-					// e.g., foo?.().bar?.baz or foo?.bar?.().baz
-					var innerExpr *ast.Node
-					if isPropertyAccess(expression) {
-						innerExpr = expression.AsPropertyAccessExpression().Expression
-					} else {
-						innerExpr = expression.AsElementAccessExpression().Expression
-					}
-
-					// Check if the inner expression is a call expression
-					if innerExpr != nil && isCallExpr(innerExpr) {
-						exprType = getTypeFromCallProperty(innerExpr, expression)
-						if exprType == nil {
-							return
-						}
-					} else {
-						exprType = getResolvedType(expression)
-					}
 				} else {
 					exprType = getResolvedType(expression)
 				}

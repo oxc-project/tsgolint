@@ -103,16 +103,6 @@ func isNodeEqual(a, b *ast.Node) bool {
 	case ast.KindElementAccessExpression:
 		aElem := a.AsElementAccessExpression()
 		bElem := b.AsElementAccessExpression()
-		if aElem.ArgumentExpression == nil || bElem.ArgumentExpression == nil {
-			if aElem.ArgumentExpression != bElem.ArgumentExpression {
-				return false
-			}
-		}
-		if aElem.Expression == nil || bElem.Expression == nil {
-			if aElem.Expression != bElem.Expression {
-				return false
-			}
-		}
 		return isNodeEqual(aElem.ArgumentExpression, bElem.ArgumentExpression) && isNodeEqual(aElem.Expression, bElem.Expression)
 	case ast.KindNullKeyword:
 		return true

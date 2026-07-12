@@ -840,19 +840,6 @@ func (processor *chainProcessor) extractCallSignatures(node *ast.Node) map[strin
 	return signatures
 }
 
-func (processor *chainProcessor) validateChainRoot(node *ast.Node, operatorKind ast.Kind) (*ast.BinaryExpression, bool) {
-	binExpr := node.AsBinaryExpression()
-	if binExpr.OperatorToken.Kind != operatorKind {
-		return nil, false
-	}
-
-	if isInsideJSX(node) {
-		return nil, false
-	}
-
-	return binExpr, true
-}
-
 func (processor *chainProcessor) isChainAlreadySeen(node *ast.Node) bool {
 	r := processor.getNodeRange(node)
 	return processor.seenRanges[textRange{start: r.Pos(), end: r.End()}]
@@ -1583,12 +1570,11 @@ outer3:
 		}
 	}
 
-	if isAndChain && ast.IsBinaryExpression(unwrapped) {
+	if ast.IsBinaryExpression(unwrapped) {
 		binExpr := unwrapped.AsBinaryExpression()
-		op := binExpr.OperatorToken.Kind
 
 		// Relational operators (<, >, <=, >=, in, instanceof) should not participate in optional chaining.
-		switch op {
+		switch binExpr.OperatorToken.Kind {
 		case ast.KindLessThanToken,
 			ast.KindGreaterThanToken,
 			ast.KindLessThanEqualsToken,
@@ -1618,74 +1604,14 @@ outer3:
 			hasPropertyAccess = true
 		}
 
-		if !hasPropertyAccess {
-			return Operand{typ: OperandTypeInvalid, node: node}
-		}
-
-		return Operand{typ: OperandTypeComparison, node: node, comparedExpr: comparedExpr}
-	}
-
-	if !isAndChain && ast.IsBinaryExpression(unwrapped) {
-		binExpr := unwrapped.AsBinaryExpression()
-		op := binExpr.OperatorToken.Kind
-
-		// Relational operators (<, >, <=, >=, in, instanceof) should not participate in optional chaining.
-		switch op {
-		case ast.KindLessThanToken,
-			ast.KindGreaterThanToken,
-			ast.KindLessThanEqualsToken,
-			ast.KindGreaterThanEqualsToken,
-			ast.KindInKeyword,
-			ast.KindInstanceOfKeyword:
-			return Operand{typ: OperandTypeInvalid, node: node}
-		}
-
-		left := ast.SkipParentheses(binExpr.Left)
-		right := ast.SkipParentheses(binExpr.Right)
-		leftIsAccess := utils.IsAccessExpression(left)
-		rightIsAccess := utils.IsAccessExpression(right)
-
-		// If both sides are access expressions, we can't convert to optional
-		// chaining without changing when the other side is evaluated.
-		if leftIsAccess && rightIsAccess {
-			return Operand{typ: OperandTypeInvalid, node: node}
-		}
-
-		comparedExpr := left
-		hasPropertyAccess := leftIsAccess
-		if rightIsAccess {
-			comparedExpr = right
-			hasPropertyAccess = true
-		}
-		// OR chains can only safely extend through comparisons that actually inspect
+		// Chains can only safely extend through comparisons that actually inspect
 		// an access expression. Non-nullish identifier comparisons like `b === a`
 		// should not seed an optional-chain candidate such as `b === a || b.foo()`.
 		if !hasPropertyAccess {
 			return Operand{typ: OperandTypeInvalid, node: node}
 		}
+
 		return Operand{typ: OperandTypeComparison, node: node, comparedExpr: comparedExpr}
-	}
-
-	if isAndChain {
-		if ast.IsBinaryExpression(unwrapped) {
-			binExpr := unwrapped.AsBinaryExpression()
-			op := binExpr.OperatorToken.Kind
-
-			isComparison := op == ast.KindEqualsEqualsToken ||
-				op == ast.KindExclamationEqualsToken ||
-				op == ast.KindEqualsEqualsEqualsToken ||
-				op == ast.KindExclamationEqualsEqualsToken ||
-				op == ast.KindLessThanToken ||
-				op == ast.KindGreaterThanToken ||
-				op == ast.KindLessThanEqualsToken ||
-				op == ast.KindGreaterThanEqualsToken
-
-			if isComparison {
-				return Operand{typ: OperandTypeInvalid, node: node}
-			}
-		}
-
-		return Operand{typ: OperandTypePlain, node: node, comparedExpr: unwrapped}
 	}
 
 	return Operand{typ: OperandTypePlain, node: node, comparedExpr: unwrapped}
@@ -1794,8 +1720,7 @@ func (processor *chainProcessor) processChain(node *ast.Node, operatorKind ast.K
 		return
 	}
 
-	_, ok := processor.validateChainRoot(node, operatorKind)
-	if !ok {
+	if isInsideJSX(node) {
 		return
 	}
 
@@ -3689,11 +3614,6 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 
 func (processor *chainProcessor) handleEmptyObjectPattern(node *ast.Node) {
 	binExpr := node.AsBinaryExpression()
-	operator := binExpr.OperatorToken.Kind
-
-	if operator != ast.KindBarBarToken && operator != ast.KindQuestionQuestionToken {
-		return
-	}
 
 	rightNode := binExpr.Right
 	var objLit *ast.ObjectLiteralExpression

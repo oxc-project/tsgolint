@@ -164,10 +164,6 @@ var NoDeprecatedRule = rule.Rule{
 					return true, reason
 				}
 
-				if symbol.Flags&ast.SymbolFlagsAlias == 0 {
-					break
-				}
-
 				if checker.Checker_getDeclarationOfAliasSymbol(ctx.TypeChecker, symbol) == nil {
 					break
 				}
