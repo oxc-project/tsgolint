@@ -244,8 +244,6 @@ var NoFloatingPromisesRule = rule.Rule{
 			if len(args.Nodes) <= index {
 				return false
 			}
-			// A spread at or before the index makes the argument at that position
-			// unknowable.
 			return !utils.Some(args.Nodes[:index+1], ast.IsSpreadElement)
 		}
 
