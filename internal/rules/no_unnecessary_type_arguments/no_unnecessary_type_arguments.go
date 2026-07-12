@@ -248,9 +248,6 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			})
 		}
 
-		// Resolving type parameters is expensive, so only do it once we know the
-		// node has explicit type arguments — the overwhelmingly common case is
-		// that it doesn't.
 		checkTypeArgsAndParameters := func(node *ast.Node, arguments *ast.NodeList, nameNode *ast.Node) {
 			if arguments == nil || len(arguments.Nodes) == 0 {
 				return
