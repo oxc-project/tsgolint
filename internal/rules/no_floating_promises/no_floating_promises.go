@@ -117,18 +117,14 @@ var NoFloatingPromisesRule = rule.Rule{
 			return false
 		}
 
+		anySignature := func(signature *checker.Signature) bool { return true }
+
 		isFunctionParam := func(
 			param *ast.Symbol,
 			node *ast.Node,
 		) bool {
 			t := checker.Checker_getApparentType(ctx.TypeChecker, ctx.TypeChecker.GetTypeOfSymbolAtLocation(param, node))
-
-			for _, part := range utils.UnionTypeParts(t) {
-				if len(utils.GetCallSignatures(ctx.TypeChecker, part)) != 0 {
-					return true
-				}
-			}
-			return false
+			return hasMatchingSignature(t, anySignature)
 		}
 		isPromiseLike := func(node *ast.Node, t *checker.Type) bool {
 			if t == nil {
