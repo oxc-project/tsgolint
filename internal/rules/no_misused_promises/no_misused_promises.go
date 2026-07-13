@@ -595,9 +595,6 @@ var NoMisusedPromisesRule = rule.Rule{
 				)
 
 				if isVoidReturningFunctionType(node.Name(), contextualType) {
-					if ast.IsMethodDeclaration(node) {
-					}
-
 					if node.Type() != nil {
 						ctx.ReportNode(node.Type(), buildVoidReturnPropertyMessage())
 					} else {

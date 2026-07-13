@@ -166,9 +166,6 @@ var ConsistentTypeExportsRule = rule.Rule{
 			if exportDecl.IsTypeOnly || exportDecl.ModuleSpecifier == nil {
 				return
 			}
-			if exportDecl.ExportClause != nil && !ast.IsNamespaceExport(exportDecl.ExportClause.AsNode()) {
-				return
-			}
 
 			moduleSymbol := ctx.TypeChecker.GetSymbolAtLocation(exportDecl.ModuleSpecifier.AsNode())
 			if moduleSymbol == nil {
@@ -215,9 +212,6 @@ var ConsistentTypeExportsRule = rule.Rule{
 
 		analyzeNamedExport := func(node *ast.Node) *analyzedNamedExport {
 			exportDecl := node.AsExportDeclaration()
-			if exportDecl.ExportClause == nil || !ast.IsNamedExports(exportDecl.ExportClause.AsNode()) {
-				return nil
-			}
 			if exportDecl.IsTypeOnly {
 				return nil
 			}

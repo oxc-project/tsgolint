@@ -48,9 +48,6 @@ var NoArrayDeleteRule = rule.Rule{
 
 		return rule.RuleListeners{
 			ast.KindDeleteExpression: func(node *ast.Node) {
-				if node.Kind != ast.KindDeleteExpression {
-					return
-				}
 				deleteExpression := ast.SkipParentheses(node.AsDeleteExpression().Expression)
 
 				if !ast.IsElementAccessExpression(deleteExpression) {

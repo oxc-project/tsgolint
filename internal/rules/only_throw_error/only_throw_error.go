@@ -89,18 +89,16 @@ func isRethrownError(ctx rule.RuleContext, node *ast.Node) bool {
 
 	if methodName == "catch" {
 		// .catch(onRejected)
-		// First argument must be our arrow function and not preceded by spread
-		if len(args) >= 1 && args[0] == funcNode && !ast.IsSpreadElement(args[0]) {
+		// First argument must be our arrow function
+		if len(args) >= 1 && args[0] == funcNode {
 			isRejectionHandler = true
 		}
 	} else if methodName == "then" {
 		// .then(onFulfilled, onRejected)
-		// Second argument must be our arrow function
-		// Also check that neither first nor second argument is a spread element
-		if len(args) >= 2 && args[1] == funcNode {
-			if !ast.IsSpreadElement(args[0]) && !ast.IsSpreadElement(args[1]) {
-				isRejectionHandler = true
-			}
+		// Second argument must be our arrow function, and onFulfilled must not be
+		// a spread element (which would shift the argument positions).
+		if len(args) >= 2 && args[1] == funcNode && !ast.IsSpreadElement(args[0]) {
+			isRejectionHandler = true
 		}
 	}
 

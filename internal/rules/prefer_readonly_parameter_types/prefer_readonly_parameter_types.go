@@ -138,43 +138,41 @@ func isTypeReadonlyObject(
 	seenTypes map[*checker.Type]struct{},
 ) readonlyness {
 	properties := checker.Checker_getPropertiesOfType(typeChecker, t)
-	if len(properties) > 0 {
-		for _, property := range properties {
-			if opts.treatMethodsAsReadonly && property.Flags&ast.SymbolFlagsMethod != 0 {
-				continue
-			}
-
-			if propertyIsReadonly(typeChecker, property) {
-				continue
-			}
-
-			if propertyHasPrivateIdentifierName(property) {
-				continue
-			}
-			return readonlynessMutable
+	for _, property := range properties {
+		if opts.treatMethodsAsReadonly && property.Flags&ast.SymbolFlagsMethod != 0 {
+			continue
 		}
 
-		for _, property := range properties {
-			if property.Flags&ast.SymbolFlagsMethod != 0 {
-				continue
-			}
+		if propertyIsReadonly(typeChecker, property) {
+			continue
+		}
 
-			propertyType := checker.Checker_getTypeOfPropertyOfType(typeChecker, t, property.Name)
-			if propertyType == nil {
-				propertyType = checker.Checker_getTypeOfSymbol(typeChecker, property)
-			}
+		if propertyHasPrivateIdentifierName(property) {
+			continue
+		}
+		return readonlynessMutable
+	}
 
-			if propertyType == nil {
-				continue
-			}
+	for _, property := range properties {
+		if property.Flags&ast.SymbolFlagsMethod != 0 {
+			continue
+		}
 
-			if _, ok := seenTypes[propertyType]; ok {
-				continue
-			}
+		propertyType := checker.Checker_getTypeOfPropertyOfType(typeChecker, t, property.Name)
+		if propertyType == nil {
+			propertyType = checker.Checker_getTypeOfSymbol(typeChecker, property)
+		}
 
-			if isTypeReadonlyRecurser(program, typeChecker, propertyType, opts, seenTypes) == readonlynessMutable {
-				return readonlynessMutable
-			}
+		if propertyType == nil {
+			continue
+		}
+
+		if _, ok := seenTypes[propertyType]; ok {
+			continue
+		}
+
+		if isTypeReadonlyRecurser(program, typeChecker, propertyType, opts, seenTypes) == readonlynessMutable {
+			return readonlynessMutable
 		}
 	}
 
