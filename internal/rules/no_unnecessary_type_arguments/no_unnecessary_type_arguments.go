@@ -248,35 +248,44 @@ var NoUnnecessaryTypeArgumentsRule = rule.Rule{
 			})
 		}
 
+		checkTypeArgsAndParameters := func(node *ast.Node, arguments *ast.NodeList, nameNode *ast.Node) {
+			if arguments == nil || len(arguments.Nodes) == 0 {
+				return
+			}
+			checkArgsAndParameters(node, arguments, getTypeParametersFromType(node, nameNode))
+		}
+
+		checkCallArgsAndParameters := func(node *ast.Node, arguments *ast.NodeList) {
+			if arguments == nil || len(arguments.Nodes) == 0 {
+				return
+			}
+			checkArgsAndParameters(node, arguments, getTypeParametersFromCall(node))
+		}
+
 		return rule.RuleListeners{
 			ast.KindExpressionWithTypeArguments: func(node *ast.Node) {
 				expr := node.AsExpressionWithTypeArguments()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromType(node, expr.Expression))
+				checkTypeArgsAndParameters(node, expr.TypeArguments, expr.Expression)
 			},
 			ast.KindTypeReference: func(node *ast.Node) {
 				expr := node.AsTypeReferenceNode()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromType(node, expr.TypeName))
+				checkTypeArgsAndParameters(node, expr.TypeArguments, expr.TypeName)
 			},
 
 			ast.KindCallExpression: func(node *ast.Node) {
-				expr := node.AsCallExpression()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
+				checkCallArgsAndParameters(node, node.AsCallExpression().TypeArguments)
 			},
 			ast.KindNewExpression: func(node *ast.Node) {
-				expr := node.AsNewExpression()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
+				checkCallArgsAndParameters(node, node.AsNewExpression().TypeArguments)
 			},
 			ast.KindTaggedTemplateExpression: func(node *ast.Node) {
-				expr := node.AsTaggedTemplateExpression()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
+				checkCallArgsAndParameters(node, node.AsTaggedTemplateExpression().TypeArguments)
 			},
 			ast.KindJsxOpeningElement: func(node *ast.Node) {
-				expr := node.AsJsxOpeningElement()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
+				checkCallArgsAndParameters(node, node.AsJsxOpeningElement().TypeArguments)
 			},
 			ast.KindJsxSelfClosingElement: func(node *ast.Node) {
-				expr := node.AsJsxSelfClosingElement()
-				checkArgsAndParameters(node, expr.TypeArguments, getTypeParametersFromCall(node))
+				checkCallArgsAndParameters(node, node.AsJsxSelfClosingElement().TypeArguments)
 			},
 		}
 	},
