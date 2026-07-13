@@ -63,7 +63,7 @@ func newFunctionSignature(
 	var restParam *ast.Symbol
 
 	for i, param := range parameters {
-		if len(param.Declarations) != 0 && utils.IsRestParameterDeclaration(param.Declarations[0]) {
+		if param.Declarations != nil && len(param.Declarations) != 0 && utils.IsRestParameterDeclaration(param.Declarations[0]) {
 			// is a rest param
 			restParam = param
 			parameters = parameters[:i]
