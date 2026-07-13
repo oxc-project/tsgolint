@@ -197,6 +197,14 @@ const button = <Button<string> />;
 function f<T = number>() {}
 const g = f<number>;
     `},
+		// A defaulted type parameter only lives on the zero-argument overload, so
+		// a call that passes an argument resolves to the non-defaulted overload
+		// and must not be reported (mirrors React's useState<string>('')).
+		{Code: `
+declare function useThing<S>(initial: S): S;
+declare function useThing<S = undefined>(): S | undefined;
+useThing<string>('');
+    `},
 		{Code: `
 function f<T = number>() {}
 function takesFn(fn: () => void) {}
@@ -1029,6 +1037,28 @@ new C<string>('value');
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					Line:      5,
+					MessageId: "unnecessaryTypeParameter",
+				},
+			},
+		},
+		// The argument-taking overload itself carries the default, so a call that
+		// passes an argument still resolves to a defaulted type parameter. The
+		// gate must resolve (not skip) and report the redundant type argument.
+		{
+			Code: `
+declare function make<T = number>(x: T): void;
+declare function make(): void;
+make<number>(1);
+      `,
+			Output: []string{`
+declare function make<T = number>(x: T): void;
+declare function make(): void;
+make(1);
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Line:      4,
 					MessageId: "unnecessaryTypeParameter",
 				},
 			},

@@ -259,3 +259,12 @@ Message: This is the default value for this type parameter, so it can be omitted
      |               ~~~~~~~
    6 |       
 ---
+
+[TestNoUnnecessaryTypeArguments/invalid-29 - 1]
+Diagnostic 1: unnecessaryTypeParameter (4:6 - 4:11)
+Message: This is the default value for this type parameter, so it can be omitted.
+   3 | declare function make(): void;
+   4 | make<number>(1);
+     |      ~~~~~~
+   5 |       
+---
