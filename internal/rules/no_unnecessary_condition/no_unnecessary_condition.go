@@ -1936,12 +1936,10 @@ func normalizeAllowConstantLoopConditions(value any) string {
 // Used for array methods like:
 // - [1, 2, 3].filter(() => true) // always truthy, returns all elements
 // - [1, 2, 3].find(() => false)  // always falsy, returns undefined
+//
+// funcNode is the predicate argument, which need not be an inline function: a
+// reference to one (`[1, 2].filter(pred)`) is analyzed through its call signatures.
 func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeGuards bool) {
-	isFunction := funcNode.Kind&(ast.KindArrowFunction|ast.KindFunctionExpression|ast.KindFunctionDeclaration) != 0
-	if !isFunction {
-		return
-	}
-
 	funcType := ctx.TypeChecker.GetTypeAtLocation(funcNode)
 	signatures := ctx.TypeChecker.GetCallSignatures(funcType)
 

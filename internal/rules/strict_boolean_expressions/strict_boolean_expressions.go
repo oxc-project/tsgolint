@@ -157,8 +157,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 						if arg == nil {
 							return
 						}
-						isFunction := arg.Kind&(ast.KindArrowFunction|ast.KindFunctionExpression|ast.KindFunctionDeclaration) != 0
-						if isFunction && ast.GetFunctionFlags(arg)&ast.FunctionFlagsAsync != 0 {
+						if ast.GetFunctionFlags(arg)&ast.FunctionFlagsAsync != 0 {
 							ctx.ReportNode(arg, buildPredicateCannotBeAsyncMessage())
 							return
 						}
