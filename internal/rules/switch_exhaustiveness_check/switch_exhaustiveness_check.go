@@ -107,9 +107,7 @@ func getCommentDefaultCase(sourceFile *ast.SourceFile, node *ast.SwitchStatement
 
 func getSwitchMetadata(sourceFile *ast.SourceFile, typeChecker *checker.Checker, node *ast.SwitchStatement, commentPattern *regexp2.Regexp) *SwitchMetadata {
 	cases := node.CaseBlock.AsCaseBlock().Clauses.Nodes
-	defaultCaseIndex := slices.IndexFunc(cases, func(clause *ast.Node) bool {
-		return clause.Kind == ast.KindDefaultClause
-	})
+	defaultCaseIndex := slices.IndexFunc(cases, ast.IsDefaultClause)
 	var defaultCase *ast.CaseOrDefaultClause
 	if defaultCaseIndex > -1 {
 		defaultCase = cases[defaultCaseIndex].AsCaseOrDefaultClause()

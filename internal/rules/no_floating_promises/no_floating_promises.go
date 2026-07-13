@@ -122,7 +122,6 @@ var NoFloatingPromisesRule = rule.Rule{
 			node *ast.Node,
 		) bool {
 			t := checker.Checker_getApparentType(ctx.TypeChecker, ctx.TypeChecker.GetTypeOfSymbolAtLocation(param, node))
-
 			for _, part := range utils.UnionTypeParts(t) {
 				if len(utils.GetCallSignatures(ctx.TypeChecker, part)) != 0 {
 					return true
@@ -248,12 +247,7 @@ var NoFloatingPromisesRule = rule.Rule{
 			if len(args.Nodes) <= index {
 				return false
 			}
-			for _, arg := range args.Nodes[:index+1] {
-				if ast.IsSpreadElement(arg) {
-					return false
-				}
-			}
-			return true
+			return !utils.Some(args.Nodes[:index+1], ast.IsSpreadElement)
 		}
 
 		var isUnhandledPromise func(

@@ -63,13 +63,11 @@ func newFunctionSignature(
 	var restParam *ast.Symbol
 
 	for i, param := range parameters {
-		if param.Declarations != nil && len(param.Declarations) != 0 {
-			if utils.IsRestParameterDeclaration(param.Declarations[0]) {
-				// is a rest param
-				restParam = param
-				parameters = parameters[:i]
-				break
-			}
+		if param.Declarations != nil && len(param.Declarations) != 0 && utils.IsRestParameterDeclaration(param.Declarations[0]) {
+			// is a rest param
+			restParam = param
+			parameters = parameters[:i]
+			break
 		}
 	}
 
@@ -188,9 +186,7 @@ func argumentCanBeUnsafe(node *ast.Node) bool {
 	case ast.KindObjectLiteralExpression:
 		// Spreading an `any` value makes the whole object literal `any`
 		// (e.g. `foo({ ...anyValue })`), so only spread-free literals are safe.
-		return slices.ContainsFunc(node.AsObjectLiteralExpression().Properties.Nodes, func(property *ast.Node) bool {
-			return property.Kind == ast.KindSpreadAssignment
-		})
+		return utils.Some(node.AsObjectLiteralExpression().Properties.Nodes, ast.IsSpreadAssignment)
 	default:
 		return true
 	}
