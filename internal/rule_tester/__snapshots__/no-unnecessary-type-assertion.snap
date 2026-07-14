@@ -1638,3 +1638,18 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |                          ~~~~~~~~~~~~~~~~~~~~
    2 | void x;
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-121 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:9 - 3:21)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | declare function consume(value: unknown): void;
+   3 | consume(42 as unknown);
+     |         ~~~~~~~~~~~~~
+   4 | const value: unknown = 42 as unknown;
+
+Diagnostic 2: contextuallyUnnecessary (4:24 - 4:36)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | consume(42 as unknown);
+   4 | const value: unknown = 42 as unknown;
+     |                        ~~~~~~~~~~~~~
+---

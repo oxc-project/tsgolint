@@ -1094,6 +1094,25 @@ fn((null) as string | null);
 const value: undefined = (() => {})() as undefined;
     `,
 		},
+		{Code: `
+type RecursiveConditional<T> =
+  (value: T extends string ? any : number) => RecursiveConditional<string>;
+
+declare const callable: RecursiveConditional<number>;
+declare function consume(value: unknown): void;
+consume(callable as unknown);
+    `},
+		{Code: `
+type RecursiveCallable<Options = {}> =
+  & (<NewOptions = {}>(options: NewOptions) => RecursiveCallable<Options & NewOptions>)
+  & ((command: string) => void);
+
+declare const callable: RecursiveCallable;
+const value = callable as unknown;
+const contextualValue: unknown = callable as unknown;
+declare function consume(value: unknown): void;
+consume(callable as unknown);
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -3231,5 +3250,20 @@ fn((() => {})());`},
 					MessageId: "contextuallyUnnecessary",
 				},
 			},
-		}})
+		},
+		{
+			Code: `
+declare function consume(value: unknown): void;
+consume(42 as unknown);
+const value: unknown = 42 as unknown;`,
+			Output: []string{`
+declare function consume(value: unknown): void;
+consume(42);
+const value: unknown = 42;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "contextuallyUnnecessary"},
+				{MessageId: "contextuallyUnnecessary"},
+			},
+		},
+	})
 }

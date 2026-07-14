@@ -177,42 +177,56 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return checker.Checker_getTypeArguments(ctx.TypeChecker, t)
 		}
 
-		var typeContains func(t *checker.Type, predicate func(*checker.Type) bool, seen map[*checker.Type]struct{}) bool
-		typeContains = func(t *checker.Type, predicate func(*checker.Type) bool, seen map[*checker.Type]struct{}) bool {
+		var typeContains func(t *checker.Type, predicate func(*checker.Type) bool, seenTypes map[*checker.Type]struct{}, activeSignatures map[*checker.Signature]struct{}) bool
+		typeContains = func(t *checker.Type, predicate func(*checker.Type) bool, seenTypes map[*checker.Type]struct{}, activeSignatures map[*checker.Signature]struct{}) bool {
 			if t == nil {
 				return false
 			}
-			if _, ok := seen[t]; ok {
+			if _, ok := seenTypes[t]; ok {
 				return false
 			}
-			seen[t] = struct{}{}
+			seenTypes[t] = struct{}{}
 			if predicate(t) {
 				return true
 			}
 			for _, part := range utils.UnionTypeParts(t) {
-				if part != t && typeContains(part, predicate, seen) {
+				if part != t && typeContains(part, predicate, seenTypes, activeSignatures) {
 					return true
 				}
 			}
 			for _, part := range utils.IntersectionTypeParts(t) {
-				if part != t && typeContains(part, predicate, seen) {
+				if part != t && typeContains(part, predicate, seenTypes, activeSignatures) {
 					return true
 				}
 			}
 			for _, typeArgument := range getTypeArguments(t) {
-				if typeContains(typeArgument, predicate, seen) {
+				if typeContains(typeArgument, predicate, seenTypes, activeSignatures) {
 					return true
 				}
 			}
 			for _, sig := range utils.GetCallSignatures(ctx.TypeChecker, t) {
-				if typeContains(checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, sig), predicate, seen) {
+				// Generic signature instantiations can produce fresh recursive return
+				// types. If their shared original target is already active,
+				// conservatively assume the predicate could occur in the unseen cycle
+				// instead of making an unsafe autofix.
+				signatureIdentity := sig
+				for signatureIdentity.Target() != nil {
+					signatureIdentity = signatureIdentity.Target()
+				}
+				if _, ok := activeSignatures[signatureIdentity]; ok {
 					return true
 				}
+				activeSignatures[signatureIdentity] = struct{}{}
+
 				for _, param := range checker.Signature_parameters(sig) {
-					if typeContains(checker.Checker_getTypeOfSymbol(ctx.TypeChecker, param), predicate, seen) {
+					if typeContains(checker.Checker_getTypeOfSymbol(ctx.TypeChecker, param), predicate, seenTypes, activeSignatures) {
 						return true
 					}
 				}
+				if typeContains(checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, sig), predicate, seenTypes, activeSignatures) {
+					return true
+				}
+				delete(activeSignatures, signatureIdentity)
 			}
 			return false
 		}
@@ -220,13 +234,13 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 		containsAny := func(t *checker.Type) bool {
 			return typeContains(t, func(part *checker.Type) bool {
 				return utils.IsTypeFlagSet(part, checker.TypeFlagsAny)
-			}, map[*checker.Type]struct{}{})
+			}, map[*checker.Type]struct{}{}, map[*checker.Signature]struct{}{})
 		}
 
 		containsTypeVariable := func(t *checker.Type) bool {
 			return typeContains(t, func(part *checker.Type) bool {
 				return utils.IsTypeFlagSet(part, checker.TypeFlagsTypeVariable|checker.TypeFlagsIndex)
-			}, map[*checker.Type]struct{}{})
+			}, map[*checker.Type]struct{}{}, map[*checker.Signature]struct{}{})
 		}
 
 		hasIndexSignature := func(t *checker.Type) bool {
