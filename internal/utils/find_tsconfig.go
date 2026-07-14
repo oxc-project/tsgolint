@@ -33,20 +33,44 @@ func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
 	}
 }
 
+// toAbsolute resolves fileName against currentDirectory if it isn't already an
+// absolute (rooted) path. Unlike tspath.GetNormalizedAbsolutePath, this keeps
+// the platform's native path separators intact (filepath.Join on Windows keeps
+// `\`) instead of normalizing to `/` — ComputeConfigFileName's ancestor walk
+// only needs an absolute path, not a particular separator style, and callers
+// elsewhere in this package/its tests compare returned config paths against
+// filepath.Join-built strings, so switching separator style would just move
+// the bug from "panics on relative paths" to "returns paths in an unexpected
+// style" for existing consumers.
+func toAbsolute(fileName string, currentDirectory string) string {
+	if tspath.IsRootedDiskPath(fileName) {
+		return fileName
+	}
+	return filepath.Join(currentDirectory, fileName)
+}
+
 // Finds the tsconfig.json that governs the given file
 // Reference: `findOrCreateDefaultConfiguredProjectForOpenScriptInfo` typescript-go/internal/project/projectcollectionbuilder.go:629-671
 func (r *TsConfigResolver) FindTsconfigForFile(filePath string, skipSearchInDirectoryOfFile bool) (configPath string, found bool) {
-	configFileName := r.configFileRegistryBuilder.ComputeConfigFileName(filePath, skipSearchInDirectoryOfFile, nil)
+	// ComputeConfigFileName walks ancestor directories starting from filePath (via
+	// tspath.GetDirectoryPath + ForEachAncestorDirectory) and hands each candidate
+	// directly to fs.FileExists. It does NOT absolutize its input first, so a
+	// caller-supplied relative filePath produces relative candidate paths, which
+	// panic deep in typescript-go's vfs layer (RootLength/SplitPath assume an
+	// absolute path unconditionally). Resolve to absolute here, at the boundary
+	// where paths first enter tsgolint from the caller.
+	absoluteFilePath := toAbsolute(filePath, r.currentDirectory)
+	configFileName := r.configFileRegistryBuilder.ComputeConfigFileName(absoluteFilePath, skipSearchInDirectoryOfFile, nil)
 
 	if configFileName == "" {
 		return "", false
 	}
 
-	normalizedPath := tspath.ToPath(filePath, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
+	normalizedPath := tspath.ToPath(absoluteFilePath, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
 
 	// Search through the config and its references
 	// This corresponds to findOrCreateDefaultConfiguredProjectWorker
-	result := r.findConfigWithReferences(filePath, normalizedPath, configFileName, nil, nil)
+	result := r.findConfigWithReferences(absoluteFilePath, normalizedPath, configFileName, nil, nil)
 
 	if result.configFileName != "" {
 		return result.configFileName, true
@@ -215,7 +239,11 @@ type ResolutionResult struct {
 
 func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
 	for file := range in {
-		config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
+		// See the comment in FindTsconfigForFile: ComputeConfigFileName requires
+		// an absolute path, and `file` here comes straight from the caller-supplied
+		// file list (FindTsConfigParallel), which may be relative.
+		absoluteFile := toAbsolute(file, r.currentDirectory)
+		config := r.configFileRegistryBuilder.ComputeConfigFileName(absoluteFile, false, nil)
 		if config == "" {
 			out <- ResolutionResult{
 				file:   file,
@@ -224,10 +252,10 @@ func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
 			continue
 		}
 
-		fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
+		fileNormalized := tspath.ToPath(absoluteFile, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
 
 		// Search through the config and its references
-		result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
+		result := r.findConfigWithReferences(absoluteFile, fileNormalized, config, nil, nil)
 		out <- ResolutionResult{
 			config: result.configFileName,
 			file:   file,
