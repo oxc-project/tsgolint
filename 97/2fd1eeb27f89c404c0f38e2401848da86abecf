@@ -1,0 +1,19 @@
+internal/rules/no_unnecessary_type_assertion/no_unnecessary_type_assertion_test.go
+  s_0bb062bac4b26d::t_f9367a42352de8 1116-1183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "972fd1eeb27f89c404c0f38e2401848da86abecf",
+  "prompts": {},
+  "sessions": {
+    "s_0bb062bac4b26d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6a2d-ce06-7d03-a174-7d5b3ee4f301",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cclark@cloudflare.com>"
+    }
+  }
+}
