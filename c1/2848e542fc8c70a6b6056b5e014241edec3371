@@ -1,0 +1,23 @@
+internal/rule_tester/__snapshots__/no-unnecessary-type-assertion.snap
+  s_0bb062bac4b26d::t_a42b5207271491 1722-1730
+internal/rules/no_unnecessary_type_assertion/no_unnecessary_type_assertion.go
+  s_0bb062bac4b26d::t_87096480e0c08d 968-987,994
+internal/rules/no_unnecessary_type_assertion/no_unnecessary_type_assertion_test.go
+  s_0bb062bac4b26d::t_57849331b18a12 3464-3478
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c12848e542fc8c70a6b6056b5e014241edec3371",
+  "prompts": {},
+  "sessions": {
+    "s_0bb062bac4b26d": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6a2d-ce06-7d03-a174-7d5b3ee4f301",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cclark@cloudflare.com>"
+    }
+  }
+}
