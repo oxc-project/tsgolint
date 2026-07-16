@@ -1181,6 +1181,50 @@ const result = combine(...[[{ id: 0 } as Item], items]);
 result[0].id = 'x';
     `,
 		},
+		{
+			// https://github.com/oxc-project/tsgolint/issues/1047
+			Code: `
+type IAnyObject = Record<any, any>;
+
+const { isArray } = Array;
+
+const isPlainObject = <InferredType extends IAnyObject = IAnyObject>(
+  val: unknown,
+): val is InferredType => Object.prototype.toString.call(val) === '[object Object]';
+
+export const deepAssign = <
+  TargetObject extends IAnyObject,
+  MergedObject extends IAnyObject = TargetObject,
+  FinalObject extends Partial<TargetObject> & Partial<MergedObject> = TargetObject & MergedObject,
+>(
+  originObject: TargetObject,
+  ...overrideObjects: (MergedObject | null | undefined)[]
+): FinalObject => {
+  if (overrideObjects.length === 0) return originObject as unknown as FinalObject;
+
+  const assignObject = overrideObjects.shift();
+
+  if (assignObject) {
+    Object.entries(assignObject).forEach(([property, value]) => {
+      if (property === '__proto__' || property === 'constructor') return;
+      if (isPlainObject(originObject[property]) && isPlainObject(value)) {
+        deepAssign(originObject[property], value);
+      } else if (isArray(value)) {
+        (originObject as IAnyObject)[property] = [...(value as unknown[])];
+      } else if (isPlainObject(value)) {
+        (originObject as IAnyObject)[property] = {
+          ...value,
+        };
+      } else {
+        (originObject as IAnyObject)[property] = assignObject[property] as unknown;
+      }
+    });
+  }
+
+  return deepAssign(originObject, ...overrideObjects);
+};
+    `,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -3373,6 +3417,66 @@ f([1, 'x' as string], 1);`,
 			Output: []string{`
 declare function f<T>(pair: readonly [T, string], tag: T): void;
 f([1, 'x'], 1);`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+type AnyRecord = Record<any, any>;
+declare const value: AnyRecord;
+(value as AnyRecord)['property'] = 1;`,
+			Output: []string{`
+type AnyRecord = Record<any, any>;
+declare const value: AnyRecord;
+(value)['property'] = 1;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `
+function identity<T>(value: T): T {
+  return value as unknown as T;
+}`,
+			Output: []string{`
+function identity<T>(value: T): T {
+  return value;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `
+function upcast<T, U extends T>(value: U): T {
+  return value as unknown as T;
+}`,
+			Output: []string{`
+function upcast<T, U extends T>(value: U): T {
+  return value;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			Code: `
+function upcast<T, U extends T & { id: string }>(value: U): T {
+  return value as unknown as T;
+}`,
+			Output: []string{`
+function upcast<T, U extends T & { id: string }>(value: U): T {
+  return value;
+}`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",

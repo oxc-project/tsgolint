@@ -1685,3 +1685,46 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | f([1, 'x' as string], 1);
      |       ~~~~~~~~~~~~~
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-126 - 1]
+Diagnostic 1: unnecessaryAssertion (4:8 - 4:19)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   3 | declare const value: AnyRecord;
+   4 | (value as AnyRecord)['property'] = 1;
+     |        ~~~~~~~~~~~~
+  Label: This expression already has the type 'AnyRecord' (4:2 - 4:6)
+   3 | declare const value: AnyRecord;
+   4 | (value as AnyRecord)['property'] = 1;
+     |  ^^^^^ This expression already has the type 'AnyRecord'
+  Label: Casting it to 'AnyRecord' is unnecessary (4:8 - 4:19)
+   3 | declare const value: AnyRecord;
+   4 | (value as AnyRecord)['property'] = 1;
+     |        ^^^^^^^^^^^^ Casting it to 'AnyRecord' is unnecessary
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-127 - 1]
+Diagnostic 1: unnecessaryAssertion (3:10 - 3:30)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | function identity<T>(value: T): T {
+   3 |   return value as unknown as T;
+     |          ~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-128 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:10 - 3:30)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | function upcast<T, U extends T>(value: U): T {
+   3 |   return value as unknown as T;
+     |          ~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-129 - 1]
+Diagnostic 1: contextuallyUnnecessary (3:10 - 3:30)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   2 | function upcast<T, U extends T & { id: string }>(value: U): T {
+   3 |   return value as unknown as T;
+     |          ~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+---

@@ -339,9 +339,29 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return utils.IsTypeFlagSet(t, checker.TypeFlagsStringLiteral|checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral|checker.TypeFlagsBooleanLiteral)
 		}
 
+		isReceiverOfWriteAccess := func(node *ast.Node) bool {
+			current := node.Parent
+			for current != nil && ast.IsParenthesizedExpression(current) {
+				current = current.Parent
+			}
+			for current != nil && ast.IsAccessExpression(current) {
+				if ast.IsWriteAccess(current) {
+					return true
+				}
+				current = current.Parent
+				for current != nil && ast.IsParenthesizedExpression(current) {
+					current = current.Parent
+				}
+			}
+			return false
+		}
+
 		isTypeUnchanged := func(node *ast.Node, expression *ast.Node, uncast, cast *checker.Type) bool {
 			if uncast == cast {
 				return true
+			}
+			if utils.IsTypeParameter(uncast) && isReceiverOfWriteAccess(node) {
+				return false
 			}
 
 			typeNode := node.Type()
@@ -945,11 +965,38 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			originalExpr := getOriginalExpression(node)
 			originalType := ctx.TypeChecker.GetTypeAtLocation(originalExpr)
 			castType := ctx.TypeChecker.GetTypeAtLocation(node)
+			var isConstrainedTo func(source, target *checker.Type, seen map[*checker.Type]struct{}) bool
+			isConstrainedTo = func(source, target *checker.Type, seen map[*checker.Type]struct{}) bool {
+				if source == target {
+					return true
+				}
+				if source == nil {
+					return false
+				}
+				if _, ok := seen[source]; ok {
+					return false
+				}
+				seen[source] = struct{}{}
+
+				if utils.IsTypeParameter(source) {
+					return isConstrainedTo(ctx.TypeChecker.GetConstraintOfTypeParameter(source), target, seen)
+				}
+				if utils.IsIntersectionType(source) {
+					return slices.ContainsFunc(source.Types(), func(part *checker.Type) bool {
+						return isConstrainedTo(part, target, seen)
+					})
+				}
+				return false
+			}
+			differentUnrelatedTypeParameters := originalType != castType &&
+				utils.IsTypeParameter(originalType) &&
+				utils.IsTypeParameter(castType) &&
+				!isConstrainedTo(originalType, castType, map[*checker.Type]struct{}{})
 
 			messageId := ""
 			if isTypeUnchanged(node, innerExpression, originalType, castType) && !isTypeAny(castType) {
 				messageId = "unnecessaryAssertion"
-			} else if contextualType != nil {
+			} else if contextualType != nil && !differentUnrelatedTypeParameters {
 				intermediateType := ctx.TypeChecker.GetTypeAtLocation(innerExpression)
 				if (isTypeAny(intermediateType) || isTypeUnknown(intermediateType)) &&
 					checker.Checker_isTypeAssignableTo(ctx.TypeChecker, originalType, contextualType) {
