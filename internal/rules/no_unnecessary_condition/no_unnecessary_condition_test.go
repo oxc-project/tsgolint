@@ -1391,6 +1391,57 @@ assertSecond(...[], true);
 	if (typeof value === 'object' && value !== null) { console.log('foo'); }
 }`,
 		},
+		// Deferred conditional with a nullish branch, left unresolved on chains of
+		// length >= 3. The `?.` links are required, so none of these is reported.
+		{Code: `
+interface Box {
+  get<H = never>(name: string): [H] extends [never] ? Box | null : Box;
+}
+declare const b: Box;
+const r = b.get('a')?.get('b')?.get('c');
+`},
+		{Code: `
+interface BoxUndef {
+  get<H = never>(name: string): [H] extends [never] ? BoxUndef | undefined : BoxUndef;
+}
+declare const b: BoxUndef;
+const r = b.get('a')?.get('b')?.get('c');
+`},
+		{Code: `
+interface BoxExplicit {
+  get<H>(name: string): [H] extends [never] ? BoxExplicit | null : BoxExplicit;
+}
+declare const b: BoxExplicit;
+const r = b.get<never>('a')?.get<never>('b')?.get<never>('c');
+`},
+		{Code: `
+type Ret<H> = [H] extends [never] ? BoxAlias | null : BoxAlias;
+interface BoxAlias {
+  get<H = never>(name: string): Ret<H>;
+}
+declare const b: BoxAlias;
+const r = b.get('a')?.get('b')?.get('c');
+`},
+		// Deferred conditional nested as a union member (`X | (cond)`). The
+		// nullish branch must still be seen through the union.
+		{Code: `
+interface BoxUnion {
+  get<H = never>(name: string): BoxUnion | ([H] extends [never] ? null : BoxUnion);
+}
+declare const b: BoxUnion;
+const r = b.get('a')?.get('b')?.get('c');
+`},
+		// Deferred conditional reached through property access in a generic scope,
+		// where the type parameter keeps it unresolved. Exercises the nullish check
+		// in checkOptionalChain rather than the call-expression path.
+		{Code: `
+interface BoxGeneric<H> {
+  next: [H] extends [never] ? BoxGeneric<H> | null : BoxGeneric<H>;
+}
+function foo<T>(b: BoxGeneric<T>): unknown {
+  return b.next?.next?.next;
+}
+`},
 	}, []rule_tester.InvalidTestCase{
 		// Basic always truthy/falsy cases
 		{
@@ -2851,6 +2902,22 @@ if (true || false) {}
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "alwaysFalsy"},
 				{MessageId: "alwaysTruthy"},
+			},
+		},
+		// Precision guard: both branches non-nullish, so the `?.` links are
+		// unnecessary and must be reported. Appended last to keep index-keyed
+		// snapshots aligned.
+		{
+			Code: `
+interface Box {
+  get<H = never>(name: string): [H] extends [never] ? Box : Box;
+}
+declare const b: Box;
+const r = b.get('a')?.get('b')?.get('c');
+`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "neverOptionalChain"},
+				{MessageId: "neverOptionalChain"},
 			},
 		},
 	})
