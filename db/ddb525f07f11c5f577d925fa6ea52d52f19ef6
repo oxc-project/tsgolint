@@ -1,0 +1,23 @@
+internal/rule_tester/__snapshots__/no-floating-promises.snap
+  s_8f0d61316a881f::t_97cb076fd85077 2571-2592
+internal/rules/no_floating_promises/no_floating_promises.go
+  s_8f0d61316a881f::t_784133e653db9d 348-349,352-354
+internal/rules/no_floating_promises/no_floating_promises_test.go
+  s_8f0d61316a881f::t_a5bd002ba09e89 5711-5736
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "dbddb525f07f11c5f577d925fa6ea52d52f19ef6",
+  "prompts": {},
+  "sessions": {
+    "s_8f0d61316a881f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6af0-50ab-7272-ad21-e840f52a58af",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
