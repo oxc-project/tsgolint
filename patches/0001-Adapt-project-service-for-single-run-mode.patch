@@ -1,4 +1,4 @@
-From e7e1f52b878b9d5c3594c58b5bda0c00b0c9b5c7 Mon Sep 17 00:00:00 2001
+From d0564fdf0a8625823e413541b1335ba5358c6d44 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
 Subject: [PATCH 1/5] Adapt project service for single run mode

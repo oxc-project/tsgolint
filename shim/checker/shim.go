@@ -189,7 +189,6 @@ type extra_Checker struct {
   exactOptionalPropertyTypes bool
   canCollectSymbolAliasAccessibilityData bool
   wasCanceled bool
-  saveDeferredDiagnostics bool
   arrayVariances []checker.VarianceFlags
   globals ast.SymbolTable
   evaluate evaluator.Evaluator
@@ -251,6 +250,7 @@ type extra_Checker struct {
   arrayLiteralLinks core.LinkStore[*ast.Node, checker.ArrayLiteralLinks]
   switchStatementLinks core.LinkStore[*ast.Node, checker.SwitchStatementLinks]
   jsxElementLinks core.LinkStore[*ast.Node, checker.JsxElementLinks]
+  computedNameLinks core.LinkStore[*ast.Node, checker.ComputedNameNodeLinks]
   symbolReferenceLinks core.LinkStore[*ast.Symbol, checker.SymbolReferenceLinks]
   valueSymbolLinks core.LinkStore[*ast.Symbol, checker.ValueSymbolLinks]
   mappedSymbolLinks core.LinkStore[*ast.Symbol, checker.MappedSymbolLinks]
@@ -488,6 +488,7 @@ type CompositeSignature = checker.CompositeSignature
 type CompositeSymbolIdentity = checker.CompositeSymbolIdentity
 type CompositeTypeCacheIdentity = checker.CompositeTypeCacheIdentity
 type CompositeTypeMapper = checker.CompositeTypeMapper
+type ComputedNameNodeLinks = checker.ComputedNameNodeLinks
 type ConditionalRoot = checker.ConditionalRoot
 type ConditionalType = checker.ConditionalType
 type extra_ConditionalType struct {

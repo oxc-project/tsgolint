@@ -1,4 +1,4 @@
-From 1c4a3cce07a5348e98e6e082f0714940e2d630c3 Mon Sep 17 00:00:00 2001
+From 45c7d4d49697e3bd13eda59b0eac762674fdc997 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 17 Apr 2026 10:40:11 +0100
 Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
@@ -6,12 +6,12 @@ Subject: [PATCH 2/5] patch: expose more functions via the shim with type fixes
 ---
  internal/project/autoimport.go                |   4 +-
  internal/project/compilerhost.go              |   2 +-
- internal/project/configfileregistrybuilder.go |  70 +++++-----
- internal/project/overlayfs.go                 |  20 +--
- internal/project/projectcollectionbuilder.go  |  70 +++++-----
+ internal/project/configfileregistrybuilder.go |  70 ++++----
+ internal/project/overlayfs.go                 |  22 +--
+ internal/project/projectcollectionbuilder.go  |  70 ++++----
  internal/project/snapshot.go                  |   4 +-
- internal/project/snapshotfs.go                | 130 ++++++++++--------
- 7 files changed, 156 insertions(+), 144 deletions(-)
+ internal/project/snapshotfs.go                | 153 +++++++++++-------
+ 7 files changed, 178 insertions(+), 147 deletions(-)
 
 diff --git a/internal/project/autoimport.go b/internal/project/autoimport.go
 index 209487f22..8fb19b5ff 100644
@@ -317,10 +317,10 @@ index 1d62a1188..84a511167 100644
  		entry.DeleteIf(func(value *configFileEntry) bool {
  			return len(value.retainingProjects) == 0 && len(value.retainingOpenFiles) == 0 && len(value.retainingConfigs) == 0
 diff --git a/internal/project/overlayfs.go b/internal/project/overlayfs.go
-index 1b300a013..9cd5efea8 100644
+index 1b300a013..9a6cd0a63 100644
 --- a/internal/project/overlayfs.go
 +++ b/internal/project/overlayfs.go
-@@ -68,14 +68,14 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
+@@ -68,14 +68,16 @@ func (f *fileBase) ECMALineInfo() *sourcemap.ECMALineInfo {
  	return f.lineInfo
  }
  
@@ -333,12 +333,14 @@ index 1b300a013..9cd5efea8 100644
  
 -func newDiskFile(fileName string, content string) *diskFile {
 -	return &diskFile{
++type diskFile = DiskFile
++
 +func newDiskFile(fileName string, content string) *DiskFile {
 +	return &DiskFile{
  		fileBase: fileBase{
  			fileName: fileName,
  			content:  content,
-@@ -84,26 +84,26 @@ func newDiskFile(fileName string, content string) *diskFile {
+@@ -84,26 +86,26 @@ func newDiskFile(fileName string, content string) *diskFile {
  	}
  }
  
@@ -658,7 +660,7 @@ index 3355b6887..633409730 100644
  		return true
  	})
 diff --git a/internal/project/snapshot.go b/internal/project/snapshot.go
-index 61af433d3..35019fff4 100644
+index b49e5405d..6b8fc0dd4 100644
 --- a/internal/project/snapshot.go
 +++ b/internal/project/snapshot.go
 @@ -286,7 +286,7 @@ func (s *Snapshot) Clone(ctx context.Context, change SnapshotChange, overlays ma
@@ -680,10 +682,10 @@ index 61af433d3..35019fff4 100644
  					if project.host != nil && project.host.sourceFS.SeenFile(entry.Key()) {
  						return true
 diff --git a/internal/project/snapshotfs.go b/internal/project/snapshotfs.go
-index 0a9f391fa..8f113ef73 100644
+index 70bc4a932..b85483b36 100644
 --- a/internal/project/snapshotfs.go
 +++ b/internal/project/snapshotfs.go
-@@ -26,27 +26,27 @@ type FileSource interface {
+@@ -26,27 +26,29 @@ type FileSource interface {
  }
  
  var (
@@ -702,6 +704,8 @@ index 0a9f391fa..8f113ef73 100644
  }
  
 -func (s *realpathAliasSet) Add(path tspath.Path) {
++type realpathAliasSet = RealpathAliasSet
++
 +func (s *RealpathAliasSet) Add(path tspath.Path) {
  	s.mu.Lock()
  	defer s.mu.Unlock()
@@ -717,7 +721,7 @@ index 0a9f391fa..8f113ef73 100644
  	if s.paths.Len() > 0 {
  		clone.paths = *s.paths.Clone()
  	}
-@@ -58,13 +58,13 @@ type SnapshotFS struct {
+@@ -58,13 +60,13 @@ type SnapshotFS struct {
  	fs                 vfs.FS
  	overlays           map[tspath.Path]*Overlay
  	overlayDirectories map[tspath.Path]map[tspath.Path]string
@@ -733,7 +737,7 @@ index 0a9f391fa..8f113ef73 100644
  }
  
  type memoizedDiskFile func() FileHandle
-@@ -132,28 +132,28 @@ func (s *SnapshotFS) isFile(path tspath.Path) bool {
+@@ -132,28 +134,30 @@ func (s *SnapshotFS) isFile(path tspath.Path) bool {
  	return false
  }
  
@@ -753,6 +757,8 @@ index 0a9f391fa..8f113ef73 100644
  }
  
 -func newSnapshotFSBuilder(
++type snapshotFSBuilder = SnapshotFSBuilder
++
 +func NewSnapshotFSBuilder(
  	fs vfs.FS,
  	prevOverlays map[tspath.Path]*Overlay,
@@ -769,7 +775,7 @@ index 0a9f391fa..8f113ef73 100644
  	cachedFS := cachedvfs.From(fs)
  	cachedFS.Enable()
  
-@@ -180,7 +180,7 @@ func newSnapshotFSBuilder(
+@@ -180,7 +184,7 @@ func newSnapshotFSBuilder(
  		}
  	}
  
@@ -778,11 +784,24 @@ index 0a9f391fa..8f113ef73 100644
  		fs:                         cachedFS,
  		prevOverlays:               prevOverlays,
  		overlays:                   overlays,
-@@ -192,14 +192,14 @@ func newSnapshotFSBuilder(
+@@ -192,14 +196,27 @@ func newSnapshotFSBuilder(
  	}
  }
  
 -func (s *snapshotFSBuilder) FS() vfs.FS {
++func newSnapshotFSBuilder(
++	fs vfs.FS,
++	prevOverlays map[tspath.Path]*Overlay,
++	overlays map[tspath.Path]*Overlay,
++	diskFiles map[tspath.Path]*DiskFile,
++	diskDirectories map[tspath.Path]dirty.CloneableMap[tspath.Path, string],
++	nodeModulesRealpathAliases map[tspath.Path]*RealpathAliasSet,
++	positionEncoding lsproto.PositionEncodingKind,
++	toPath func(fileName string) tspath.Path,
++) *SnapshotFSBuilder {
++	return NewSnapshotFSBuilder(fs, prevOverlays, overlays, diskFiles, diskDirectories, nodeModulesRealpathAliases, positionEncoding, toPath)
++}
++
 +func (s *SnapshotFSBuilder) FS() vfs.FS {
  	return s.fs
  }
@@ -796,7 +815,7 @@ index 0a9f391fa..8f113ef73 100644
  
  	onAddedFile := func(path tspath.Path, fileName string) {
  		childPath := path
-@@ -240,14 +240,14 @@ func (s *snapshotFSBuilder) Finalize() (*SnapshotFS, bool) {
+@@ -240,14 +257,14 @@ func (s *snapshotFSBuilder) Finalize() (*SnapshotFS, bool) {
  		})
  	}
  
@@ -815,7 +834,7 @@ index 0a9f391fa..8f113ef73 100644
  			onAddedFile(key, value.FileName())
  		},
  	})
-@@ -263,8 +263,8 @@ func (s *snapshotFSBuilder) Finalize() (*SnapshotFS, bool) {
+@@ -263,8 +280,8 @@ func (s *snapshotFSBuilder) Finalize() (*SnapshotFS, bool) {
  			continue
  		}
  		if entry, ok := s.nodeModulesRealpathAliases.Load(deletedFile.realpathPath); ok {
@@ -826,7 +845,7 @@ index 0a9f391fa..8f113ef73 100644
  					aliasSet.paths.Delete(deletedPath)
  				})
  				if e.Value().paths.Len() == 0 {
-@@ -287,17 +287,17 @@ func (s *snapshotFSBuilder) Finalize() (*SnapshotFS, bool) {
+@@ -287,17 +304,17 @@ func (s *snapshotFSBuilder) Finalize() (*SnapshotFS, bool) {
  	}, changed || aliasesChanged
  }
  
@@ -847,7 +866,7 @@ index 0a9f391fa..8f113ef73 100644
  	if _, ok := s.overlays[path]; ok {
  		return true
  	}
-@@ -306,21 +306,24 @@ func (s *snapshotFSBuilder) FileExists(fileName string, path tspath.Path) bool {
+@@ -306,21 +323,24 @@ func (s *snapshotFSBuilder) FileExists(fileName string, path tspath.Path) bool {
  		if val == nil {
  			return false
  		}
@@ -876,7 +895,7 @@ index 0a9f391fa..8f113ef73 100644
  	entries := s.fs.GetAccessibleEntries(path)
  	p := s.toPath(path)
  	overlayDirectories, ok := s.overlayDirectories[p]
-@@ -341,8 +344,8 @@ func (s *snapshotFSBuilder) GetAccessibleEntries(path string) vfs.Entries {
+@@ -341,8 +361,8 @@ func (s *snapshotFSBuilder) GetAccessibleEntries(path string) vfs.Entries {
  	return *merged
  }
  
@@ -887,7 +906,7 @@ index 0a9f391fa..8f113ef73 100644
  	if entry != nil {
  		if !loaded && strings.Contains(string(path), "/node_modules/") {
  			s.recordRealpathAlias(entry, fileName, path)
-@@ -358,23 +361,23 @@ func (s *snapshotFSBuilder) getDiskFile(fileName string, path tspath.Path, force
+@@ -358,23 +378,23 @@ func (s *snapshotFSBuilder) getDiskFile(fileName string, path tspath.Path, force
  // recordRealpathAlias checks if fileName is accessed through a symlink and, if so,
  // records a mapping from the realpath-based key to the symlink-based key.
  // This is only called for files inside node_modules where symlinks are common.
@@ -917,7 +936,7 @@ index 0a9f391fa..8f113ef73 100644
  		if e.Value() != nil {
  			fileName = e.Value().fileName
  		}
-@@ -384,12 +387,12 @@ func (s *snapshotFSBuilder) reloadEntry(entry *dirty.SyncMapEntry[tspath.Path, *
+@@ -384,12 +404,12 @@ func (s *snapshotFSBuilder) reloadEntry(entry *dirty.SyncMapEntry[tspath.Path, *
  	}
  	// Read file outside the lock to avoid blocking other goroutines.
  	content, ok := s.fs.ReadFile(fileName)
@@ -932,7 +951,7 @@ index 0a9f391fa..8f113ef73 100644
  				file.content = content
  				file.hash = xxh3.HashString128(content)
  				file.needsReload = false
-@@ -404,9 +407,9 @@ func (s *snapshotFSBuilder) reloadEntry(entry *dirty.SyncMapEntry[tspath.Path, *
+@@ -404,9 +424,9 @@ func (s *snapshotFSBuilder) reloadEntry(entry *dirty.SyncMapEntry[tspath.Path, *
  	return entry.Value()
  }
  
@@ -944,7 +963,7 @@ index 0a9f391fa..8f113ef73 100644
  		if e.Value() != nil && !e.Value().MatchesDiskText() {
  			fileName = e.Value().fileName
  		}
-@@ -414,12 +417,12 @@ func (s *snapshotFSBuilder) reloadEntryIfNeeded(entry *dirty.SyncMapEntry[tspath
+@@ -414,12 +434,12 @@ func (s *snapshotFSBuilder) reloadEntryIfNeeded(entry *dirty.SyncMapEntry[tspath
  	if fileName != "" {
  		// Read file outside the lock to avoid blocking other goroutines.
  		content, ok := s.fs.ReadFile(fileName)
@@ -959,7 +978,7 @@ index 0a9f391fa..8f113ef73 100644
  					file.content = content
  					file.hash = xxh3.HashString128(content)
  					file.needsReload = false
-@@ -435,7 +438,7 @@ func (s *snapshotFSBuilder) reloadEntryIfNeeded(entry *dirty.SyncMapEntry[tspath
+@@ -435,7 +455,7 @@ func (s *snapshotFSBuilder) reloadEntryIfNeeded(entry *dirty.SyncMapEntry[tspath
  	return entry.Value()
  }
  
@@ -968,7 +987,7 @@ index 0a9f391fa..8f113ef73 100644
  	for uri := range change.Changed.Keys() {
  		path := s.toPath(uri.FileName())
  		if _, ok := s.diskFiles.Load(path); ok {
-@@ -457,19 +460,19 @@ func (s *snapshotFSBuilder) watchChangesOverlapCache(change FileChangeSummary) b
+@@ -457,19 +477,19 @@ func (s *snapshotFSBuilder) watchChangesOverlapCache(change FileChangeSummary) b
  	return false
  }
  
@@ -994,21 +1013,49 @@ index 0a9f391fa..8f113ef73 100644
  				file.needsReload = true
  			})
  		}
-@@ -477,11 +480,11 @@ func (s *snapshotFSBuilder) invalidateNodeModulesCache() {
+@@ -477,7 +497,7 @@ func (s *snapshotFSBuilder) invalidateNodeModulesCache() {
  	})
  }
  
--func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
-+func (s *SnapshotFSBuilder) markDirtyFiles(change FileChangeSummary) {
- 	for uri := range change.Changed.Keys() {
- 		path := s.toPath(uri.FileName())
- 		if entry, ok := s.diskFiles.Load(path); ok {
--			entry.Change(func(file *diskFile) {
-+			entry.Change(func(file *DiskFile) {
- 				file.needsReload = true
- 			})
+-func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) FileChangeSummary {
++func (s *SnapshotFSBuilder) markDirtyFiles(change FileChangeSummary) FileChangeSummary {
+ 	if change.Changed.Len() > 0 {
+ 		var filteredChanged collections.SyncSet[lsproto.DocumentUri]
+ 		wg := core.NewWorkGroup(false)
+@@ -514,14 +534,14 @@ func (s *snapshotFSBuilder) markDirtyFiles(change FileChangeSummary) FileChangeS
+ 	return change
+ }
+ 
+-func (s *snapshotFSBuilder) reloadEntryIfContentChanged(entry *dirty.SyncMapEntry[tspath.Path, *diskFile]) (changed bool) {
++func (s *SnapshotFSBuilder) reloadEntryIfContentChanged(entry *dirty.SyncMapEntry[tspath.Path, *DiskFile]) (changed bool) {
+ 	file := entry.Value()
+ 	if file == nil {
+ 		return true
+ 	}
+ 	content, ok := s.fs.ReadFile(file.fileName)
+ 	changed = true
+-	entry.Locked(func(e dirty.Value[*diskFile]) {
++	entry.Locked(func(e dirty.Value[*DiskFile]) {
+ 		cur := e.Value()
+ 		if cur == nil {
+ 			return
+@@ -533,13 +553,13 @@ func (s *snapshotFSBuilder) reloadEntryIfContentChanged(entry *dirty.SyncMapEntr
+ 		if content == cur.content {
+ 			changed = false
+ 			if !cur.MatchesDiskText() {
+-				e.Change(func(file *diskFile) {
++				e.Change(func(file *DiskFile) {
+ 					file.needsReload = false
+ 				})
+ 			}
+ 			return
  		}
-@@ -535,7 +538,7 @@ func (s *SnapshotFS) expandRealpathAliases(change FileChangeSummary) FileChangeS
+-		e.Change(func(file *diskFile) {
++		e.Change(func(file *DiskFile) {
+ 			file.content = content
+ 			file.hash = xxh3.HashString128(content)
+ 			file.needsReload = false
+@@ -589,7 +609,7 @@ func (s *SnapshotFS) expandRealpathAliases(change FileChangeSummary) FileChangeS
  // isRelevantFileName returns true if the given URI refers to a file that
  // could affect the project: it has a TypeScript-relevant extension, is a
  // dynamic (e.g. untitled) file, or is currently open as an overlay.
@@ -1017,7 +1064,7 @@ index 0a9f391fa..8f113ef73 100644
  	fileName := uri.FileName()
  	if tspath.IsDynamicFileName(fileName) {
  		return true
-@@ -559,7 +562,7 @@ func (s *snapshotFSBuilder) isRelevantFileName(uri lsproto.DocumentUri) bool {
+@@ -613,7 +633,7 @@ func (s *snapshotFSBuilder) isRelevantFileName(uri lsproto.DocumentUri) bool {
  // file deletion URIs using the cached directory structure, and filters out
  // watch events for paths that are neither known directories nor have relevant
  // file extensions.
@@ -1026,7 +1073,7 @@ index 0a9f391fa..8f113ef73 100644
  	if change.Deleted.Len() > 0 {
  		var filteredDeleted collections.Set[lsproto.DocumentUri]
  		for uri := range change.Deleted.Keys() {
-@@ -603,7 +606,7 @@ func isNodeModulesPath(path tspath.Path) bool {
+@@ -657,7 +677,7 @@ func isNodeModulesPath(path tspath.Path) bool {
  
  // collectFilesRecursive recursively collects all cached file URIs under the
  // given directory path using the diskDirectories and diskFiles maps.
@@ -1035,7 +1082,7 @@ index 0a9f391fa..8f113ef73 100644
  	dirEntry, ok := s.diskDirectories.Get(dirPath)
  	if !ok {
  		return
-@@ -618,7 +621,7 @@ func (s *snapshotFSBuilder) collectFilesRecursive(dirPath tspath.Path, files *co
+@@ -672,7 +692,7 @@ func (s *snapshotFSBuilder) collectFilesRecursive(dirPath tspath.Path, files *co
  	}
  }
  
@@ -1044,7 +1091,7 @@ index 0a9f391fa..8f113ef73 100644
  	if change.Opened != "" && !tspath.IsDynamicFileName(change.Opened.FileName()) {
  		path := s.toPath(change.Opened.FileName())
  		if entry, ok := s.diskFiles.Load(path); !ok || entry.Original() == nil {
-@@ -800,3 +803,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
+@@ -854,3 +874,12 @@ func readDirectoryIntoEntries[M ~map[tspath.Path]string](directories M, isFile f
  		}
  	}
  }
