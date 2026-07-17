@@ -1,0 +1,25 @@
+e2e/__snapshots__/snapshot.test.ts.snap
+  s_8f0d61316a881f::t_6c3f6d329ceb5b 878,889,4250,4261,4609,4620,4968,4979,5327,5338
+internal/rule_tester/__snapshots__/no-floating-promises.snap
+  s_8f0d61316a881f::t_c9471c30a00a99 48,53,55,58,221,226,228,231,300,305,307,310,409,414,416,419,680,685,687,690,806,811,813,816,1094,1099,1101,1104,1651,1656,1658,1661,1668,1675-1679,1684-1687,1692,1699-1705,1710-1715,1721,1730-1732,1739-1740,1746,1751,1753,1756,1763,1768,1770,1773,1780,1785,1787,1790,1797,1802,1804,1807,1814,1819,1821,1824,2154,2159,2161,2164,2301,2306,2308,2311,2522,2527,2529,2532,2539,2544,2546,2549
+internal/rules/no_floating_promises/no_floating_promises.go
+  s_8f0d61316a881f::t_44df80cc64e02d 348-351
+internal/rules/no_floating_promises/no_floating_promises_test.go
+  s_8f0d61316a881f::t_a75adccf05873b 4347-4349
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "83e427cc540b6580f6095f19a391a68d1984468f",
+  "prompts": {},
+  "sessions": {
+    "s_8f0d61316a881f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6af0-50ab-7272-ad21-e840f52a58af",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
