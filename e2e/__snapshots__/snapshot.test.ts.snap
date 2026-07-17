@@ -474,6 +474,15 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: undefined",
+        "range": {
+          "end": 255,
+          "pos": 245,
+        },
+      },
+    ],
     "message": {
       "description": "Unnecessary conditional, value is always falsy.",
       "id": "alwaysFalsy",
@@ -2201,13 +2210,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Type: Status.Open",
+        "range": {
+          "end": 228,
+          "pos": 217,
+        },
+      },
+      {
+        "label": "Type: Color.Red",
+        "range": {
+          "end": 242,
+          "pos": 233,
+        },
+      },
+    ],
     "message": {
       "description": "Unnecessary comparison between literal values.",
       "id": "comparisonBetweenLiteralTypes",
     },
     "range": {
-      "end": 242,
-      "pos": 217,
+      "end": 232,
+      "pos": 229,
     },
     "rule": "no-unnecessary-condition",
   },

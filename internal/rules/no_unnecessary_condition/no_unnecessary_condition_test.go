@@ -3,9 +3,40 @@ package no_unnecessary_condition
 import (
 	"testing"
 
+	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
+
+func TestDiagnosticRangesAndLabels(t *testing.T) {
+	t.Parallel()
+
+	primaryRange := core.NewTextRange(10, 3)
+	leftRange := core.NewTextRange(2, 1)
+	rightRange := core.NewTextRange(16, 9)
+	diagnostic := buildNoOverlapDiagnostic(primaryRange, "string", leftRange, "undefined", rightRange)
+
+	if diagnostic.Range.Pos() != primaryRange.Pos() || diagnostic.Range.End() != primaryRange.End() {
+		t.Fatalf("comparison primary range = %v, want %v", diagnostic.Range, primaryRange)
+	}
+	if len(diagnostic.LabeledRanges) != 2 {
+		t.Fatalf("comparison labels = %d, want 2", len(diagnostic.LabeledRanges))
+	}
+	if diagnostic.LabeledRanges[0].Label != "Type: string" || diagnostic.LabeledRanges[0].Range != leftRange {
+		t.Fatalf("left comparison label = %+v", diagnostic.LabeledRanges[0])
+	}
+	if diagnostic.LabeledRanges[1].Label != "Type: undefined" || diagnostic.LabeledRanges[1].Range != rightRange {
+		t.Fatalf("right comparison label = %+v", diagnostic.LabeledRanges[1])
+	}
+
+	typedDiagnostic := buildTypedValueDiagnostic(buildAlwaysTruthyMessage(), primaryRange, leftRange, "object")
+	if len(typedDiagnostic.LabeledRanges) != 1 || typedDiagnostic.LabeledRanges[0].Label != "Type: object" {
+		t.Fatalf("type labels = %+v", typedDiagnostic.LabeledRanges)
+	}
+	if noisyDiagnostic := buildTypedValueDiagnostic(buildAlwaysTruthyMessage(), primaryRange, leftRange, ""); len(noisyDiagnostic.LabeledRanges) != 0 {
+		t.Fatalf("self-explanatory value labels = %+v, want none", noisyDiagnostic.LabeledRanges)
+	}
+}
 
 func TestNoUnnecessaryConditionRule(t *testing.T) {
 	t.Parallel()
@@ -1581,7 +1612,7 @@ function test(a: 'a') {
   return a === 'a';
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 3, Column: 12, EndLine: 3, EndColumn: 15}},
 		},
 		{
 			Code: `
@@ -1597,7 +1628,7 @@ const y = 1;
 if (y === 0) {
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 3, Column: 7, EndLine: 3, EndColumn: 10}},
 		},
 		{
 			Code: `
@@ -1664,7 +1695,7 @@ const x = Foo.a;
 if (x === Foo.a) {
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes"}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 8, Column: 7, EndLine: 8, EndColumn: 10}},
 		},
 		{
 			Code: `
@@ -1753,7 +1784,7 @@ function test(a: string) {
 }
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "noOverlapBooleanExpression"},
+				{MessageId: "noOverlapBooleanExpression", Line: 3, Column: 16, EndLine: 3, EndColumn: 19},
 				{MessageId: "noOverlapBooleanExpression"},
 				{MessageId: "noOverlapBooleanExpression"},
 				{MessageId: "noOverlapBooleanExpression"},
@@ -1843,7 +1874,6 @@ function test<T extends object>(a: T) {
 				{MessageId: "noOverlapBooleanExpression"},
 			},
 		},
-
 		// Nullish coalescing operator - never nullish
 		{
 			Code: `
@@ -1942,7 +1972,7 @@ function nothing3(x: [string, string]) {
 }
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "alwaysTruthy"},
+				{MessageId: "alwaysTruthy", Line: 2, Column: 24, EndLine: 2, EndColumn: 28},
 				{MessageId: "alwaysFalsy"},
 				{MessageId: "alwaysFalsy"},
 				{MessageId: "alwaysFalsy"},
@@ -2174,7 +2204,7 @@ foo
 		},
 		{
 			Code:   "const foo = [1, 2, 3]?.[0];",
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain"}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain", Line: 1, Column: 22, EndLine: 1, EndColumn: 24}},
 		},
 		{
 			Code: `
@@ -2291,7 +2321,7 @@ declare const key: Key;
 
 foo?.[key]?.trim();
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain"}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain", Line: 7, Column: 11, EndLine: 7, EndColumn: 13}},
 		},
 		{
 			Code: `
@@ -2852,6 +2882,23 @@ if (true || false) {}
 				{MessageId: "alwaysFalsy"},
 				{MessageId: "alwaysTruthy"},
 			},
+		},
+		{
+			Code: `
+function test(value: string) {
+  switch (value) {
+    case undefined:
+      break;
+  }
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "noOverlapBooleanExpression",
+				Line:      4,
+				Column:    10,
+				EndLine:   4,
+				EndColumn: 19,
+			}},
 		},
 	})
 }

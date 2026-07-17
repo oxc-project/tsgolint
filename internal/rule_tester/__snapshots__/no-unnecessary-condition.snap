@@ -6,12 +6,22 @@ Message: Unnecessary conditional, value is always truthy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | const t2 = b1 || b2;
+  Label: Type: true (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: true
+   5 | const t2 = b1 || b2;
 
 Diagnostic 2: alwaysTruthy (5:12 - 5:13)
 Message: Unnecessary conditional, value is always truthy.
    4 | const t1 = b1 && b2;
    5 | const t2 = b1 || b2;
      |            ~~
+   6 | if (b1 && b2) {
+  Label: Type: true (5:12 - 5:13)
+   4 | const t1 = b1 && b2;
+   5 | const t2 = b1 || b2;
+     |            ^^ Type: true
    6 | if (b1 && b2) {
 
 Diagnostic 3: alwaysTruthy (6:5 - 6:6)
@@ -20,12 +30,22 @@ Message: Unnecessary conditional, value is always truthy.
    6 | if (b1 && b2) {
      |     ~~
    7 | }
+  Label: Type: true (6:5 - 6:6)
+   5 | const t2 = b1 || b2;
+   6 | if (b1 && b2) {
+     |     ^^ Type: true
+   7 | }
 
 Diagnostic 4: alwaysTruthy (8:11 - 8:12)
 Message: Unnecessary conditional, value is always truthy.
    7 | }
    8 | if (b2 && b1) {
      |           ~~
+   9 | }
+  Label: Type: true (8:11 - 8:12)
+   7 | }
+   8 | if (b2 && b1) {
+     |           ^^ Type: true
    9 | }
 
 Diagnostic 5: alwaysTruthy (10:8 - 10:9)
@@ -34,12 +54,22 @@ Message: Unnecessary conditional, value is always truthy.
   10 | while (b1 && b2) {}
      |        ~~
   11 | while (b2 && b1) {}
+  Label: Type: true (10:8 - 10:9)
+   9 | }
+  10 | while (b1 && b2) {}
+     |        ^^ Type: true
+  11 | while (b2 && b1) {}
 
 Diagnostic 6: alwaysTruthy (11:14 - 11:15)
 Message: Unnecessary conditional, value is always truthy.
   10 | while (b1 && b2) {}
   11 | while (b2 && b1) {}
      |              ~~
+  12 | for (let i = 0; b1 && b2; i++) {
+  Label: Type: true (11:14 - 11:15)
+  10 | while (b1 && b2) {}
+  11 | while (b2 && b1) {}
+     |              ^^ Type: true
   12 | for (let i = 0; b1 && b2; i++) {
 
 Diagnostic 7: alwaysTruthy (12:17 - 12:18)
@@ -48,12 +78,22 @@ Message: Unnecessary conditional, value is always truthy.
   12 | for (let i = 0; b1 && b2; i++) {
      |                 ~~
   13 |   break;
+  Label: Type: true (12:17 - 12:18)
+  11 | while (b2 && b1) {}
+  12 | for (let i = 0; b1 && b2; i++) {
+     |                 ^^ Type: true
+  13 |   break;
 
 Diagnostic 8: alwaysTruthy (15:12 - 15:13)
 Message: Unnecessary conditional, value is always truthy.
   14 | }
   15 | const t1 = b1 && b2 ? 'yes' : 'no';
      |            ~~
+  16 | const t1 = b2 && b1 ? 'yes' : 'no';
+  Label: Type: true (15:12 - 15:13)
+  14 | }
+  15 | const t1 = b1 && b2 ? 'yes' : 'no';
+     |            ^^ Type: true
   16 | const t1 = b2 && b1 ? 'yes' : 'no';
 
 Diagnostic 9: alwaysTruthy (16:18 - 16:19)
@@ -62,12 +102,27 @@ Message: Unnecessary conditional, value is always truthy.
   16 | const t1 = b2 && b1 ? 'yes' : 'no';
      |                  ~~
   17 | switch (b1) {
+  Label: Type: true (16:18 - 16:19)
+  15 | const t1 = b1 && b2 ? 'yes' : 'no';
+  16 | const t1 = b2 && b1 ? 'yes' : 'no';
+     |                  ^^ Type: true
+  17 | switch (b1) {
 
 Diagnostic 10: comparisonBetweenLiteralTypes (18:8 - 18:11)
 Message: Unnecessary comparison between literal values.
   17 | switch (b1) {
   18 |   case true:
      |        ~~~~
+  19 |   default:
+  Label: Type: true (17:9 - 17:10)
+  16 | const t1 = b2 && b1 ? 'yes' : 'no';
+  17 | switch (b1) {
+     |         ^^ Type: true
+  18 |   case true:
+  Label: Type: true (18:8 - 18:11)
+  17 | switch (b1) {
+  18 |   case true:
+     |        ^^^^ Type: true
   19 |   default:
 ---
 
@@ -78,6 +133,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: object (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: object
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-2 - 1]
@@ -86,6 +146,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: true | object (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: true | object
    5 | 
 ---
 
@@ -96,6 +161,11 @@ Message: Unnecessary conditional, value is always falsy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: "" | false (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: "" | false
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-4 - 1]
@@ -104,6 +174,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: "always truthy" (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: "always truthy"
    5 | 
 ---
 
@@ -114,6 +189,11 @@ Message: Unnecessary conditional, value is always falsy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: undefined (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: undefined
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-6 - 1]
@@ -122,6 +202,11 @@ Message: Unnecessary conditional, value is always falsy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: null (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: null
    5 | 
 ---
 
@@ -132,6 +217,11 @@ Message: Unnecessary conditional, value is always falsy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: void (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: void
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-8 - 1]
@@ -140,6 +230,11 @@ Message: Unnecessary conditional, value is `never`.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: never (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: never
    5 | 
 ---
 
@@ -150,6 +245,11 @@ Message: Unnecessary conditional, value is `never`.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: never (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: never
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-10 - 1]
@@ -158,6 +258,11 @@ Message: Unnecessary conditional, value is always falsy.
    2 | declare const falseyBigInt: 0n;
    3 | if (falseyBigInt) {
      |     ~~~~~~~~~~~~
+   4 | }
+  Label: Type: 0n (3:5 - 3:16)
+   2 | declare const falseyBigInt: 0n;
+   3 | if (falseyBigInt) {
+     |     ^^^^^^^^^^^^ Type: 0n
    4 | }
 ---
 
@@ -168,6 +273,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | if (posbigInt) {
      |     ~~~~~~~~~
    4 | }
+  Label: Type: 1n (3:5 - 3:13)
+   2 | declare const posbigInt: 1n;
+   3 | if (posbigInt) {
+     |     ^^^^^^^^^ Type: 1n
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-12 - 1]
@@ -176,6 +286,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 | declare const negBigInt: -2n;
    3 | if (negBigInt) {
      |     ~~~~~~~~~
+   4 | }
+  Label: Type: -2n (3:5 - 3:13)
+   2 | declare const negBigInt: -2n;
+   3 | if (negBigInt) {
+     |     ^^^^^^^^^ Type: -2n
    4 | }
 ---
 
@@ -209,6 +324,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 |   return t ? 'yes' : 'no';
      |          ~
    4 | }
+  Label: Type: object (3:10 - 3:10)
+   2 | function test<T extends object>(t: T) {
+   3 |   return t ? 'yes' : 'no';
+     |          ^ Type: object
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-15 - 1]
@@ -217,6 +337,11 @@ Message: Unnecessary conditional, value is always falsy.
    2 | function test<T extends false>(t: T) {
    3 |   return t ? 'yes' : 'no';
      |          ~
+   4 | }
+  Label: Type: false (3:10 - 3:10)
+   2 | function test<T extends false>(t: T) {
+   3 |   return t ? 'yes' : 'no';
+     |          ^ Type: false
    4 | }
 ---
 
@@ -227,191 +352,400 @@ Message: Unnecessary conditional, value is always truthy.
    3 |   return t ? 'yes' : 'no';
      |          ~
    4 | }
+  Label: Type: "a" | "b" (3:10 - 3:10)
+   2 | function test<T extends 'a' | 'b'>(t: T) {
+   3 |   return t ? 'yes' : 'no';
+     |          ^ Type: "a" | "b"
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-17 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (3:10 - 3:18)
+Diagnostic 1: comparisonBetweenLiteralTypes (3:12 - 3:14)
 Message: Unnecessary comparison between literal values.
    2 | function test(a: 'a') {
    3 |   return a === 'a';
-     |          ~~~~~~~~~
+     |            ~~~
+   4 | }
+  Label: Type: "a" (3:10 - 3:10)
+   2 | function test(a: 'a') {
+   3 |   return a === 'a';
+     |          ^ Type: "a"
+   4 | }
+  Label: Type: "a" (3:16 - 3:18)
+   2 | function test(a: 'a') {
+   3 |   return a === 'a';
+     |                ^^^ Type: "a"
    4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-18 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (4:1 - 4:5)
+Diagnostic 1: comparisonBetweenLiteralTypes (4:3 - 4:3)
 Message: Unnecessary comparison between literal values.
    3 | declare const b: '56';
    4 | a > b;
-     | ~~~~~
+     |   ~
+   5 |       
+  Label: Type: "34" (4:1 - 4:1)
+   3 | declare const b: '56';
+   4 | a > b;
+     | ^ Type: "34"
+   5 |       
+  Label: Type: "56" (4:5 - 4:5)
+   3 | declare const b: '56';
+   4 | a > b;
+     |     ^ Type: "56"
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-19 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:11)
+Diagnostic 1: comparisonBetweenLiteralTypes (3:7 - 3:9)
 Message: Unnecessary comparison between literal values.
    2 | const y = 1;
    3 | if (y === 0) {
-     |     ~~~~~~~
+     |       ~~~
+   4 | }
+  Label: Type: 1 (3:5 - 3:5)
+   2 | const y = 1;
+   3 | if (y === 0) {
+     |     ^ Type: 1
+   4 | }
+  Label: Type: 0 (3:11 - 3:11)
+   2 | const y = 1;
+   3 | if (y === 0) {
+     |           ^ Type: 0
    4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-20 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:12)
+Diagnostic 1: comparisonBetweenLiteralTypes (3:7 - 3:8)
 Message: Unnecessary comparison between literal values.
    2 | // @ts-expect-error
    3 | if (1 == '1') {
-     |     ~~~~~~~~
+     |       ~~
+   4 | }
+  Label: Type: 1 (3:5 - 3:5)
+   2 | // @ts-expect-error
+   3 | if (1 == '1') {
+     |     ^ Type: 1
+   4 | }
+  Label: Type: "1" (3:10 - 3:12)
+   2 | // @ts-expect-error
+   3 | if (1 == '1') {
+     |          ^^^ Type: "1"
    4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-21 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:9)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:5 - 2:5)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | 2.3 > 2.3;
-     | ~~~~~~~~~
+     |     ~
+   3 |       
+  Label: Type: 2.3 (2:1 - 2:3)
+   1 | 
+   2 | 2.3 > 2.3;
+     | ^^^ Type: 2.3
+   3 |       
+  Label: Type: 2.3 (2:7 - 2:9)
+   1 | 
+   2 | 2.3 > 2.3;
+     |       ^^^ Type: 2.3
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-22 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:10)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:5 - 2:6)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | 2.3 >= 2.3;
-     | ~~~~~~~~~~
+     |     ~~
+   3 |       
+  Label: Type: 2.3 (2:1 - 2:3)
+   1 | 
+   2 | 2.3 >= 2.3;
+     | ^^^ Type: 2.3
+   3 |       
+  Label: Type: 2.3 (2:8 - 2:10)
+   1 | 
+   2 | 2.3 >= 2.3;
+     |        ^^^ Type: 2.3
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-23 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:7)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:4 - 2:4)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | 2n < 2n;
-     | ~~~~~~~
+     |    ~
+   3 |       
+  Label: Type: 2n (2:1 - 2:2)
+   1 | 
+   2 | 2n < 2n;
+     | ^^ Type: 2n
+   3 |       
+  Label: Type: 2n (2:6 - 2:7)
+   1 | 
+   2 | 2n < 2n;
+     |      ^^ Type: 2n
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-24 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:8)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:4 - 2:5)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | 2n <= 2n;
-     | ~~~~~~~~
+     |    ~~
+   3 |       
+  Label: Type: 2n (2:1 - 2:2)
+   1 | 
+   2 | 2n <= 2n;
+     | ^^ Type: 2n
+   3 |       
+  Label: Type: 2n (2:7 - 2:8)
+   1 | 
+   2 | 2n <= 2n;
+     |       ^^ Type: 2n
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-25 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:10)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:5 - 2:7)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | -2n !== 2n;
-     | ~~~~~~~~~~
+     |     ~~~
+   3 |       
+  Label: Type: -2n (2:1 - 2:3)
+   1 | 
+   2 | -2n !== 2n;
+     | ^^^ Type: -2n
+   3 |       
+  Label: Type: 2n (2:9 - 2:10)
+   1 | 
+   2 | -2n !== 2n;
+     |         ^^ Type: 2n
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-26 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:12)
+Diagnostic 1: comparisonBetweenLiteralTypes (3:7 - 3:8)
 Message: Unnecessary comparison between literal values.
    2 | // @ts-expect-error
    3 | if (1 == '2') {
-     |     ~~~~~~~~
+     |       ~~
+   4 | }
+  Label: Type: 1 (3:5 - 3:5)
+   2 | // @ts-expect-error
+   3 | if (1 == '2') {
+     |     ^ Type: 1
+   4 | }
+  Label: Type: "2" (3:10 - 3:12)
+   2 | // @ts-expect-error
+   3 | if (1 == '2') {
+     |          ^^^ Type: "2"
    4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-27 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (3:5 - 3:12)
+Diagnostic 1: comparisonBetweenLiteralTypes (3:7 - 3:8)
 Message: Unnecessary comparison between literal values.
    2 | // @ts-expect-error
    3 | if (1 != '2') {
-     |     ~~~~~~~~
+     |       ~~
+   4 | }
+  Label: Type: 1 (3:5 - 3:5)
+   2 | // @ts-expect-error
+   3 | if (1 != '2') {
+     |     ^ Type: 1
+   4 | }
+  Label: Type: "2" (3:10 - 3:12)
+   2 | // @ts-expect-error
+   3 | if (1 != '2') {
+     |          ^^^ Type: "2"
    4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-28 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (8:5 - 8:15)
+Diagnostic 1: comparisonBetweenLiteralTypes (8:7 - 8:9)
 Message: Unnecessary comparison between literal values.
    7 | const x = Foo.a;
    8 | if (x === Foo.a) {
-     |     ~~~~~~~~~~~
+     |       ~~~
+   9 | }
+  Label: Type: Foo.a (8:5 - 8:5)
+   7 | const x = Foo.a;
+   8 | if (x === Foo.a) {
+     |     ^ Type: Foo.a
+   9 | }
+  Label: Type: Foo.a (8:11 - 8:15)
+   7 | const x = Foo.a;
+   8 | if (x === Foo.a) {
+     |           ^^^^^ Type: Foo.a
    9 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-29 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (8:5 - 8:11)
+Diagnostic 1: comparisonBetweenLiteralTypes (8:7 - 8:9)
 Message: Unnecessary comparison between literal values.
    7 | const x = Foo.a;
    8 | if (x === 1) {
-     |     ~~~~~~~
+     |       ~~~
+   9 | }
+  Label: Type: Foo.a (8:5 - 8:5)
+   7 | const x = Foo.a;
+   8 | if (x === 1) {
+     |     ^ Type: Foo.a
+   9 | }
+  Label: Type: 1 (8:11 - 8:11)
+   7 | const x = Foo.a;
+   8 | if (x === 1) {
+     |           ^ Type: 1
    9 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-30 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:27)
+Diagnostic 1: comparisonBetweenLiteralTypes (4:16 - 4:17)
 Message: Unnecessary comparison between literal values.
    3 |   if (a) {
    4 |   } else if (a == undefined) {
-     |              ~~~~~~~~~~~~~~
+     |                ~~
+   5 |   }
+  Label: Type: null (4:14 - 4:14)
+   3 |   if (a) {
+   4 |   } else if (a == undefined) {
+     |              ^ Type: null
+   5 |   }
+  Label: Type: undefined (4:19 - 4:27)
+   3 |   if (a) {
+   4 |   } else if (a == undefined) {
+     |                   ^^^^^^^^^ Type: undefined
    5 |   }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-31 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:28)
+Diagnostic 1: comparisonBetweenLiteralTypes (4:16 - 4:18)
 Message: Unnecessary comparison between literal values.
    3 |   if (a) {
    4 |   } else if (a === undefined) {
-     |              ~~~~~~~~~~~~~~~
+     |                ~~~
+   5 |   }
+  Label: Type: null (4:14 - 4:14)
+   3 |   if (a) {
+   4 |   } else if (a === undefined) {
+     |              ^ Type: null
+   5 |   }
+  Label: Type: undefined (4:20 - 4:28)
+   3 |   if (a) {
+   4 |   } else if (a === undefined) {
+     |                    ^^^^^^^^^ Type: undefined
    5 |   }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-32 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:27)
+Diagnostic 1: comparisonBetweenLiteralTypes (4:16 - 4:17)
 Message: Unnecessary comparison between literal values.
    3 |   if (a) {
    4 |   } else if (a != undefined) {
-     |              ~~~~~~~~~~~~~~
+     |                ~~
+   5 |   }
+  Label: Type: null (4:14 - 4:14)
+   3 |   if (a) {
+   4 |   } else if (a != undefined) {
+     |              ^ Type: null
+   5 |   }
+  Label: Type: undefined (4:19 - 4:27)
+   3 |   if (a) {
+   4 |   } else if (a != undefined) {
+     |                   ^^^^^^^^^ Type: undefined
    5 |   }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-33 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (4:14 - 4:28)
+Diagnostic 1: comparisonBetweenLiteralTypes (4:16 - 4:18)
 Message: Unnecessary comparison between literal values.
    3 |   if (a) {
    4 |   } else if (a !== undefined) {
-     |              ~~~~~~~~~~~~~~~
+     |                ~~~
+   5 |   }
+  Label: Type: null (4:14 - 4:14)
+   3 |   if (a) {
+   4 |   } else if (a !== undefined) {
+     |              ^ Type: null
+   5 |   }
+  Label: Type: undefined (4:20 - 4:28)
+   3 |   if (a) {
+   4 |   } else if (a !== undefined) {
+     |                    ^^^^^^^^^ Type: undefined
    5 |   }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-34 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:14)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:6 - 2:8)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | true === false;
-     | ~~~~~~~~~~~~~~
+     |      ~~~
+   3 |       
+  Label: Type: true (2:1 - 2:4)
+   1 | 
+   2 | true === false;
+     | ^^^^ Type: true
+   3 |       
+  Label: Type: false (2:10 - 2:14)
+   1 | 
+   2 | true === false;
+     |          ^^^^^ Type: false
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-35 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:13)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:6 - 2:8)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | true === true;
-     | ~~~~~~~~~~~~~
+     |      ~~~
+   3 |       
+  Label: Type: true (2:1 - 2:4)
+   1 | 
+   2 | true === true;
+     | ^^^^ Type: true
+   3 |       
+  Label: Type: true (2:10 - 2:13)
+   1 | 
+   2 | true === true;
+     |          ^^^^ Type: true
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-36 - 1]
-Diagnostic 1: comparisonBetweenLiteralTypes (2:1 - 2:18)
+Diagnostic 1: comparisonBetweenLiteralTypes (2:6 - 2:8)
 Message: Unnecessary comparison between literal values.
    1 | 
    2 | true === undefined;
-     | ~~~~~~~~~~~~~~~~~~
+     |      ~~~
+   3 |       
+  Label: Type: true (2:1 - 2:4)
+   1 | 
+   2 | true === undefined;
+     | ^^^^ Type: true
+   3 |       
+  Label: Type: undefined (2:10 - 2:18)
+   1 | 
+   2 | true === undefined;
+     |          ^^^^^^^^^ Type: undefined
    3 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-37 - 1]
-Diagnostic 1: noOverlapBooleanExpression
+Diagnostic 1: noOverlapBooleanExpression (3:16 - 3:18)
 Message: This condition will always return the same value since the types have no overlap.
+   2 | function test(a: string) {
+   3 |   const t1 = a === undefined;
+     |                ~~~
+   4 |   const t2 = undefined === a;
   Label: Type: string (3:14 - 3:14)
    2 | function test(a: string) {
    3 |   const t1 = a === undefined;
@@ -423,8 +757,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^^^^^^ Type: undefined
    4 |   const t2 = undefined === a;
 
-Diagnostic 2: noOverlapBooleanExpression
+Diagnostic 2: noOverlapBooleanExpression (4:24 - 4:26)
 Message: This condition will always return the same value since the types have no overlap.
+   3 |   const t1 = a === undefined;
+   4 |   const t2 = undefined === a;
+     |                        ~~~
+   5 |   const t3 = a !== undefined;
   Label: Type: undefined (4:14 - 4:22)
    3 |   const t1 = a === undefined;
    4 |   const t2 = undefined === a;
@@ -436,8 +774,12 @@ Message: This condition will always return the same value since the types have n
      |                            ^ Type: string
    5 |   const t3 = a !== undefined;
 
-Diagnostic 3: noOverlapBooleanExpression
+Diagnostic 3: noOverlapBooleanExpression (5:16 - 5:18)
 Message: This condition will always return the same value since the types have no overlap.
+   4 |   const t2 = undefined === a;
+   5 |   const t3 = a !== undefined;
+     |                ~~~
+   6 |   const t4 = undefined !== a;
   Label: Type: string (5:14 - 5:14)
    4 |   const t2 = undefined === a;
    5 |   const t3 = a !== undefined;
@@ -449,8 +791,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^^^^^^ Type: undefined
    6 |   const t4 = undefined !== a;
 
-Diagnostic 4: noOverlapBooleanExpression
+Diagnostic 4: noOverlapBooleanExpression (6:24 - 6:26)
 Message: This condition will always return the same value since the types have no overlap.
+   5 |   const t3 = a !== undefined;
+   6 |   const t4 = undefined !== a;
+     |                        ~~~
+   7 |   const t5 = a === null;
   Label: Type: undefined (6:14 - 6:22)
    5 |   const t3 = a !== undefined;
    6 |   const t4 = undefined !== a;
@@ -462,8 +808,12 @@ Message: This condition will always return the same value since the types have n
      |                            ^ Type: string
    7 |   const t5 = a === null;
 
-Diagnostic 5: noOverlapBooleanExpression
+Diagnostic 5: noOverlapBooleanExpression (7:16 - 7:18)
 Message: This condition will always return the same value since the types have no overlap.
+   6 |   const t4 = undefined !== a;
+   7 |   const t5 = a === null;
+     |                ~~~
+   8 |   const t6 = null === a;
   Label: Type: string (7:14 - 7:14)
    6 |   const t4 = undefined !== a;
    7 |   const t5 = a === null;
@@ -475,8 +825,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^ Type: null
    8 |   const t6 = null === a;
 
-Diagnostic 6: noOverlapBooleanExpression
+Diagnostic 6: noOverlapBooleanExpression (8:19 - 8:21)
 Message: This condition will always return the same value since the types have no overlap.
+   7 |   const t5 = a === null;
+   8 |   const t6 = null === a;
+     |                   ~~~
+   9 |   const t7 = a !== null;
   Label: Type: null (8:14 - 8:17)
    7 |   const t5 = a === null;
    8 |   const t6 = null === a;
@@ -488,8 +842,12 @@ Message: This condition will always return the same value since the types have n
      |                       ^ Type: string
    9 |   const t7 = a !== null;
 
-Diagnostic 7: noOverlapBooleanExpression
+Diagnostic 7: noOverlapBooleanExpression (9:16 - 9:18)
 Message: This condition will always return the same value since the types have no overlap.
+   8 |   const t6 = null === a;
+   9 |   const t7 = a !== null;
+     |                ~~~
+  10 |   const t8 = null !== a;
   Label: Type: string (9:14 - 9:14)
    8 |   const t6 = null === a;
    9 |   const t7 = a !== null;
@@ -501,8 +859,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^ Type: null
   10 |   const t8 = null !== a;
 
-Diagnostic 8: noOverlapBooleanExpression
+Diagnostic 8: noOverlapBooleanExpression (10:19 - 10:21)
 Message: This condition will always return the same value since the types have no overlap.
+   9 |   const t7 = a !== null;
+  10 |   const t8 = null !== a;
+     |                   ~~~
+  11 | }
   Label: Type: null (10:14 - 10:17)
    9 |   const t7 = a !== null;
   10 |   const t8 = null !== a;
@@ -516,8 +878,12 @@ Message: This condition will always return the same value since the types have n
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-38 - 1]
-Diagnostic 1: noOverlapBooleanExpression
+Diagnostic 1: noOverlapBooleanExpression (7:16 - 7:18)
 Message: This condition will always return the same value since the types have no overlap.
+   6 |   const t4 = undefined !== a;
+   7 |   const t5 = a === null;
+     |                ~~~
+   8 |   const t6 = null === a;
   Label: Type: string | undefined (7:14 - 7:14)
    6 |   const t4 = undefined !== a;
    7 |   const t5 = a === null;
@@ -529,8 +895,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^ Type: null
    8 |   const t6 = null === a;
 
-Diagnostic 2: noOverlapBooleanExpression
+Diagnostic 2: noOverlapBooleanExpression (8:19 - 8:21)
 Message: This condition will always return the same value since the types have no overlap.
+   7 |   const t5 = a === null;
+   8 |   const t6 = null === a;
+     |                   ~~~
+   9 |   const t7 = a !== null;
   Label: Type: null (8:14 - 8:17)
    7 |   const t5 = a === null;
    8 |   const t6 = null === a;
@@ -542,8 +912,12 @@ Message: This condition will always return the same value since the types have n
      |                       ^ Type: string | undefined
    9 |   const t7 = a !== null;
 
-Diagnostic 3: noOverlapBooleanExpression
+Diagnostic 3: noOverlapBooleanExpression (9:16 - 9:18)
 Message: This condition will always return the same value since the types have no overlap.
+   8 |   const t6 = null === a;
+   9 |   const t7 = a !== null;
+     |                ~~~
+  10 |   const t8 = null !== a;
   Label: Type: string | undefined (9:14 - 9:14)
    8 |   const t6 = null === a;
    9 |   const t7 = a !== null;
@@ -555,8 +929,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^ Type: null
   10 |   const t8 = null !== a;
 
-Diagnostic 4: noOverlapBooleanExpression
+Diagnostic 4: noOverlapBooleanExpression (10:19 - 10:21)
 Message: This condition will always return the same value since the types have no overlap.
+   9 |   const t7 = a !== null;
+  10 |   const t8 = null !== a;
+     |                   ~~~
+  11 | }
   Label: Type: null (10:14 - 10:17)
    9 |   const t7 = a !== null;
   10 |   const t8 = null !== a;
@@ -570,8 +948,12 @@ Message: This condition will always return the same value since the types have n
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-39 - 1]
-Diagnostic 1: noOverlapBooleanExpression
+Diagnostic 1: noOverlapBooleanExpression (3:16 - 3:18)
 Message: This condition will always return the same value since the types have no overlap.
+   2 | function test(a: null | string) {
+   3 |   const t1 = a === undefined;
+     |                ~~~
+   4 |   const t2 = undefined === a;
   Label: Type: string | null (3:14 - 3:14)
    2 | function test(a: null | string) {
    3 |   const t1 = a === undefined;
@@ -583,8 +965,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^^^^^^ Type: undefined
    4 |   const t2 = undefined === a;
 
-Diagnostic 2: noOverlapBooleanExpression
+Diagnostic 2: noOverlapBooleanExpression (4:24 - 4:26)
 Message: This condition will always return the same value since the types have no overlap.
+   3 |   const t1 = a === undefined;
+   4 |   const t2 = undefined === a;
+     |                        ~~~
+   5 |   const t3 = a !== undefined;
   Label: Type: undefined (4:14 - 4:22)
    3 |   const t1 = a === undefined;
    4 |   const t2 = undefined === a;
@@ -596,8 +982,12 @@ Message: This condition will always return the same value since the types have n
      |                            ^ Type: string | null
    5 |   const t3 = a !== undefined;
 
-Diagnostic 3: noOverlapBooleanExpression
+Diagnostic 3: noOverlapBooleanExpression (5:16 - 5:18)
 Message: This condition will always return the same value since the types have no overlap.
+   4 |   const t2 = undefined === a;
+   5 |   const t3 = a !== undefined;
+     |                ~~~
+   6 |   const t4 = undefined !== a;
   Label: Type: string | null (5:14 - 5:14)
    4 |   const t2 = undefined === a;
    5 |   const t3 = a !== undefined;
@@ -609,8 +999,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^^^^^^ Type: undefined
    6 |   const t4 = undefined !== a;
 
-Diagnostic 4: noOverlapBooleanExpression
+Diagnostic 4: noOverlapBooleanExpression (6:24 - 6:26)
 Message: This condition will always return the same value since the types have no overlap.
+   5 |   const t3 = a !== undefined;
+   6 |   const t4 = undefined !== a;
+     |                        ~~~
+   7 |   const t5 = a === null;
   Label: Type: undefined (6:14 - 6:22)
    5 |   const t3 = a !== undefined;
    6 |   const t4 = undefined !== a;
@@ -624,8 +1018,12 @@ Message: This condition will always return the same value since the types have n
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-40 - 1]
-Diagnostic 1: noOverlapBooleanExpression
+Diagnostic 1: noOverlapBooleanExpression (3:16 - 3:17)
 Message: This condition will always return the same value since the types have no overlap.
+   2 | function test<T extends object>(a: T) {
+   3 |   const t1 = a == null;
+     |                ~~
+   4 |   const t2 = null == a;
   Label: Type: object (3:14 - 3:14)
    2 | function test<T extends object>(a: T) {
    3 |   const t1 = a == null;
@@ -637,8 +1035,12 @@ Message: This condition will always return the same value since the types have n
      |                   ^^^^ Type: null
    4 |   const t2 = null == a;
 
-Diagnostic 2: noOverlapBooleanExpression
+Diagnostic 2: noOverlapBooleanExpression (4:19 - 4:20)
 Message: This condition will always return the same value since the types have no overlap.
+   3 |   const t1 = a == null;
+   4 |   const t2 = null == a;
+     |                   ~~
+   5 |   const t3 = a != null;
   Label: Type: null (4:14 - 4:17)
    3 |   const t1 = a == null;
    4 |   const t2 = null == a;
@@ -650,8 +1052,12 @@ Message: This condition will always return the same value since the types have n
      |                      ^ Type: object
    5 |   const t3 = a != null;
 
-Diagnostic 3: noOverlapBooleanExpression
+Diagnostic 3: noOverlapBooleanExpression (5:16 - 5:17)
 Message: This condition will always return the same value since the types have no overlap.
+   4 |   const t2 = null == a;
+   5 |   const t3 = a != null;
+     |                ~~
+   6 |   const t4 = null != a;
   Label: Type: object (5:14 - 5:14)
    4 |   const t2 = null == a;
    5 |   const t3 = a != null;
@@ -663,8 +1069,12 @@ Message: This condition will always return the same value since the types have n
      |                   ^^^^ Type: null
    6 |   const t4 = null != a;
 
-Diagnostic 4: noOverlapBooleanExpression
+Diagnostic 4: noOverlapBooleanExpression (6:19 - 6:20)
 Message: This condition will always return the same value since the types have no overlap.
+   5 |   const t3 = a != null;
+   6 |   const t4 = null != a;
+     |                   ~~
+   7 |   const t5 = a == undefined;
   Label: Type: null (6:14 - 6:17)
    5 |   const t3 = a != null;
    6 |   const t4 = null != a;
@@ -676,8 +1086,12 @@ Message: This condition will always return the same value since the types have n
      |                      ^ Type: object
    7 |   const t5 = a == undefined;
 
-Diagnostic 5: noOverlapBooleanExpression
+Diagnostic 5: noOverlapBooleanExpression (7:16 - 7:17)
 Message: This condition will always return the same value since the types have no overlap.
+   6 |   const t4 = null != a;
+   7 |   const t5 = a == undefined;
+     |                ~~
+   8 |   const t6 = undefined == a;
   Label: Type: object (7:14 - 7:14)
    6 |   const t4 = null != a;
    7 |   const t5 = a == undefined;
@@ -689,8 +1103,12 @@ Message: This condition will always return the same value since the types have n
      |                   ^^^^^^^^^ Type: undefined
    8 |   const t6 = undefined == a;
 
-Diagnostic 6: noOverlapBooleanExpression
+Diagnostic 6: noOverlapBooleanExpression (8:24 - 8:25)
 Message: This condition will always return the same value since the types have no overlap.
+   7 |   const t5 = a == undefined;
+   8 |   const t6 = undefined == a;
+     |                        ~~
+   9 |   const t7 = a != undefined;
   Label: Type: undefined (8:14 - 8:22)
    7 |   const t5 = a == undefined;
    8 |   const t6 = undefined == a;
@@ -702,8 +1120,12 @@ Message: This condition will always return the same value since the types have n
      |                           ^ Type: object
    9 |   const t7 = a != undefined;
 
-Diagnostic 7: noOverlapBooleanExpression
+Diagnostic 7: noOverlapBooleanExpression (9:16 - 9:17)
 Message: This condition will always return the same value since the types have no overlap.
+   8 |   const t6 = undefined == a;
+   9 |   const t7 = a != undefined;
+     |                ~~
+  10 |   const t8 = undefined != a;
   Label: Type: object (9:14 - 9:14)
    8 |   const t6 = undefined == a;
    9 |   const t7 = a != undefined;
@@ -715,8 +1137,12 @@ Message: This condition will always return the same value since the types have n
      |                   ^^^^^^^^^ Type: undefined
   10 |   const t8 = undefined != a;
 
-Diagnostic 8: noOverlapBooleanExpression
+Diagnostic 8: noOverlapBooleanExpression (10:24 - 10:25)
 Message: This condition will always return the same value since the types have no overlap.
+   9 |   const t7 = a != undefined;
+  10 |   const t8 = undefined != a;
+     |                        ~~
+  11 |   const t9 = a === null;
   Label: Type: undefined (10:14 - 10:22)
    9 |   const t7 = a != undefined;
   10 |   const t8 = undefined != a;
@@ -728,8 +1154,12 @@ Message: This condition will always return the same value since the types have n
      |                           ^ Type: object
   11 |   const t9 = a === null;
 
-Diagnostic 9: noOverlapBooleanExpression
+Diagnostic 9: noOverlapBooleanExpression (11:16 - 11:18)
 Message: This condition will always return the same value since the types have no overlap.
+  10 |   const t8 = undefined != a;
+  11 |   const t9 = a === null;
+     |                ~~~
+  12 |   const t10 = null === a;
   Label: Type: object (11:14 - 11:14)
   10 |   const t8 = undefined != a;
   11 |   const t9 = a === null;
@@ -741,8 +1171,12 @@ Message: This condition will always return the same value since the types have n
      |                    ^^^^ Type: null
   12 |   const t10 = null === a;
 
-Diagnostic 10: noOverlapBooleanExpression
+Diagnostic 10: noOverlapBooleanExpression (12:20 - 12:22)
 Message: This condition will always return the same value since the types have no overlap.
+  11 |   const t9 = a === null;
+  12 |   const t10 = null === a;
+     |                    ~~~
+  13 |   const t11 = a !== null;
   Label: Type: null (12:15 - 12:18)
   11 |   const t9 = a === null;
   12 |   const t10 = null === a;
@@ -754,8 +1188,12 @@ Message: This condition will always return the same value since the types have n
      |                        ^ Type: object
   13 |   const t11 = a !== null;
 
-Diagnostic 11: noOverlapBooleanExpression
+Diagnostic 11: noOverlapBooleanExpression (13:17 - 13:19)
 Message: This condition will always return the same value since the types have no overlap.
+  12 |   const t10 = null === a;
+  13 |   const t11 = a !== null;
+     |                 ~~~
+  14 |   const t12 = null !== a;
   Label: Type: object (13:15 - 13:15)
   12 |   const t10 = null === a;
   13 |   const t11 = a !== null;
@@ -767,8 +1205,12 @@ Message: This condition will always return the same value since the types have n
      |                     ^^^^ Type: null
   14 |   const t12 = null !== a;
 
-Diagnostic 12: noOverlapBooleanExpression
+Diagnostic 12: noOverlapBooleanExpression (14:20 - 14:22)
 Message: This condition will always return the same value since the types have no overlap.
+  13 |   const t11 = a !== null;
+  14 |   const t12 = null !== a;
+     |                    ~~~
+  15 |   const t13 = a === undefined;
   Label: Type: null (14:15 - 14:18)
   13 |   const t11 = a !== null;
   14 |   const t12 = null !== a;
@@ -780,8 +1222,12 @@ Message: This condition will always return the same value since the types have n
      |                        ^ Type: object
   15 |   const t13 = a === undefined;
 
-Diagnostic 13: noOverlapBooleanExpression
+Diagnostic 13: noOverlapBooleanExpression (15:17 - 15:19)
 Message: This condition will always return the same value since the types have no overlap.
+  14 |   const t12 = null !== a;
+  15 |   const t13 = a === undefined;
+     |                 ~~~
+  16 |   const t14 = undefined === a;
   Label: Type: object (15:15 - 15:15)
   14 |   const t12 = null !== a;
   15 |   const t13 = a === undefined;
@@ -793,8 +1239,12 @@ Message: This condition will always return the same value since the types have n
      |                     ^^^^^^^^^ Type: undefined
   16 |   const t14 = undefined === a;
 
-Diagnostic 14: noOverlapBooleanExpression
+Diagnostic 14: noOverlapBooleanExpression (16:25 - 16:27)
 Message: This condition will always return the same value since the types have no overlap.
+  15 |   const t13 = a === undefined;
+  16 |   const t14 = undefined === a;
+     |                         ~~~
+  17 |   const t15 = a !== undefined;
   Label: Type: undefined (16:15 - 16:23)
   15 |   const t13 = a === undefined;
   16 |   const t14 = undefined === a;
@@ -806,8 +1256,12 @@ Message: This condition will always return the same value since the types have n
      |                             ^ Type: object
   17 |   const t15 = a !== undefined;
 
-Diagnostic 15: noOverlapBooleanExpression
+Diagnostic 15: noOverlapBooleanExpression (17:17 - 17:19)
 Message: This condition will always return the same value since the types have no overlap.
+  16 |   const t14 = undefined === a;
+  17 |   const t15 = a !== undefined;
+     |                 ~~~
+  18 |   const t16 = undefined !== a;
   Label: Type: object (17:15 - 17:15)
   16 |   const t14 = undefined === a;
   17 |   const t15 = a !== undefined;
@@ -819,8 +1273,12 @@ Message: This condition will always return the same value since the types have n
      |                     ^^^^^^^^^ Type: undefined
   18 |   const t16 = undefined !== a;
 
-Diagnostic 16: noOverlapBooleanExpression
+Diagnostic 16: noOverlapBooleanExpression (18:25 - 18:27)
 Message: This condition will always return the same value since the types have no overlap.
+  17 |   const t15 = a !== undefined;
+  18 |   const t16 = undefined !== a;
+     |                         ~~~
+  19 | }
   Label: Type: undefined (18:15 - 18:23)
   17 |   const t15 = a !== undefined;
   18 |   const t16 = undefined !== a;
@@ -840,6 +1298,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 |   return a ?? 'default';
      |          ~
    4 | }
+  Label: Type: string (3:10 - 3:10)
+   2 | function test(a: string) {
+   3 |   return a ?? 'default';
+     |          ^ Type: string
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-42 - 1]
@@ -848,6 +1311,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    2 | function test(a: string | false) {
    3 |   return a ?? 'default';
      |          ~
+   4 | }
+  Label: Type: string | false (3:10 - 3:10)
+   2 | function test(a: string | false) {
+   3 |   return a ?? 'default';
+     |          ^ Type: string | false
    4 | }
 ---
 
@@ -858,6 +1326,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 |   return a ?? 'default';
      |          ~
    4 | }
+  Label: Type: string (3:10 - 3:10)
+   2 | function test<T extends string>(a: T) {
+   3 |   return a ?? 'default';
+     |          ^ Type: string
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-44 - 1]
@@ -866,6 +1339,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    2 | function test(a: { foo: string }[]) {
    3 |   return a[0].foo ?? 'default';
      |          ~~~~~~~~
+   4 | }
+  Label: Type: string (3:10 - 3:17)
+   2 | function test(a: { foo: string }[]) {
+   3 |   return a[0].foo ?? 'default';
+     |          ^^^^^^^^ Type: string
    4 | }
 ---
 
@@ -876,6 +1354,11 @@ Message: Unnecessary conditional, value is always nullish.
    3 |   return a ?? 'default';
      |          ~
    4 | }
+  Label: Type: null (3:10 - 3:10)
+   2 | function test(a: null) {
+   3 |   return a ?? 'default';
+     |          ^ Type: null
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-46 - 1]
@@ -884,6 +1367,11 @@ Message: Unnecessary conditional, value is always nullish.
    2 | function test(a: null[]) {
    3 |   return a[0] ?? 'default';
      |          ~~~~
+   4 | }
+  Label: Type: null (3:10 - 3:13)
+   2 | function test(a: null[]) {
+   3 |   return a[0] ?? 'default';
+     |          ^^^^ Type: null
    4 | }
 ---
 
@@ -894,6 +1382,11 @@ Message: Unnecessary conditional, value is always nullish.
    3 |   return a ?? 'default';
      |          ~
    4 | }
+  Label: Type: null (3:10 - 3:10)
+   2 | function test<T extends null>(a: T) {
+   3 |   return a ?? 'default';
+     |          ^ Type: null
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-48 - 1]
@@ -902,6 +1395,11 @@ Message: Unnecessary conditional, value is `never`.
    2 | function test(a: never) {
    3 |   return a ?? 'default';
      |          ~
+   4 | }
+  Label: Type: never (3:10 - 3:10)
+   2 | function test(a: never) {
+   3 |   return a ?? 'default';
+     |          ^ Type: never
    4 | }
 ---
 
@@ -912,46 +1410,60 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 |   num ?? 'default';
      |   ~~~
    4 | }
+  Label: Type: number (3:3 - 3:5)
+   2 | function test<T extends { foo: number }, K extends 'foo'>(num: T[K]) {
+   3 |   num ?? 'default';
+     |   ^^^ Type: number
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-50 - 1]
-Diagnostic 1: alwaysTruthy (2:18 - 2:27)
+Diagnostic 1: alwaysTruthy (2:24 - 2:27)
 Message: Unnecessary conditional, value is always truthy.
    1 | 
    2 | [1, 3, 5].filter(() => true);
-     |                  ~~~~~~~~~~
+     |                        ~~~~
    3 | [1, 2, 3].find(() => {
 
-Diagnostic 2: alwaysFalsy (3:16 - 5:1)
+Diagnostic 2: alwaysFalsy (3:22 - 5:1)
 Message: Unnecessary conditional, value is always falsy.
    2 | [1, 3, 5].filter(() => true);
    3 | [1, 2, 3].find(() => {
-     |                ~~~~~~~
+     |                      ~
    4 |   return false;
      | ~~~~~~~~~~~~~~~
    5 | });
      | ~
    6 | 
+  Label: Return type: false (3:22 - 5:1)
+   2 | [1, 3, 5].filter(() => true);
+   3 | [1, 2, 3].find(() => {
+     |                      ^ Return type: false
+   4 |   return false;
+     | ^^^^^^^^^^^^^^^ Return type: false
+   5 | });
+     | ^ Return type: false
+   6 | 
 
-Diagnostic 3: alwaysFalsy (9:19 - 9:29)
+Diagnostic 3: alwaysFalsy (9:25 - 9:29)
 Message: Unnecessary conditional, value is always falsy.
    8 | function nothing(x: string[]) {
    9 |   return x.filter(() => false);
-     |                   ~~~~~~~~~~~
+     |                         ~~~~~
   10 | }
 
-Diagnostic 4: alwaysFalsy (13:19 - 13:29)
+Diagnostic 4: alwaysFalsy (13:25 - 13:29)
 Message: Unnecessary conditional, value is always falsy.
   12 | function nothing2(x: readonly string[]) {
   13 |   return x.filter(() => false);
-     |                   ~~~~~~~~~~~
+     |                         ~~~~~
   14 | }
 
-Diagnostic 5: alwaysFalsy (17:19 - 17:29)
+Diagnostic 5: alwaysFalsy (17:25 - 17:29)
 Message: Unnecessary conditional, value is always falsy.
   16 | function nothing3(x: [string, string]) {
   17 |   return x.filter(() => false);
-     |                   ~~~~~~~~~~~
+     |                         ~~~~~
   18 | }
 ---
 
@@ -962,6 +1474,11 @@ Message: This callback should return a conditional, but return is always truthy.
    4 | [1, null].filter(test);
      |                  ~~~~
    5 |       
+  Label: Return type: true (4:18 - 4:21)
+   3 | 
+   4 | [1, null].filter(test);
+     |                  ^^^^ Return type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-52 - 1]
@@ -970,6 +1487,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 | declare const dict: Record<string, object>;
    3 | if (dict['mightNotExist']) {
      |     ~~~~~~~~~~~~~~~~~~~~~
+   4 | }
+  Label: Type: object (3:5 - 3:25)
+   2 | declare const dict: Record<string, object>;
+   3 | if (dict['mightNotExist']) {
+     |     ^^^^^^^^^^^^^^^^^^^^^ Type: object
    4 | }
 ---
 
@@ -980,12 +1502,22 @@ Message: Unnecessary conditional, value is always truthy.
    3 | if (x[0]) {
      |     ~~~~
    4 | }
+  Label: Type: { foo: string; } (3:5 - 3:8)
+   2 | const x = [{}] as [{ foo: string }];
+   3 | if (x[0]) {
+     |     ^^^^ Type: { foo: string; }
+   4 | }
 
-Diagnostic 2: neverOptionalChain (5:5 - 5:13)
+Diagnostic 2: neverOptionalChain (5:9 - 5:10)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | }
    5 | if (x[0]?.foo) {
-     |     ~~~~~~~~~
+     |         ~~
+   6 | }
+  Label: Type: { foo: string; } (5:5 - 5:8)
+   4 | }
+   5 | if (x[0]?.foo) {
+     |     ^^^^ Type: { foo: string; }
    6 | }
 ---
 
@@ -996,6 +1528,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | if (arr.filter) {
      |     ~~~~~~~~~~
    4 | }
+  Label: Type: { <S extends object>(predicate: (value: object, index: number, array: object[]) => value is S, thisArg?: any): S[]; (... (3:5 - 3:14)
+   2 | declare const arr: object[];
+   3 | if (arr.filter) {
+     |     ^^^^^^^^^^ Type: { <S extends object>(predicate: (value: object, index: number, array: object[]) => value is S, thisArg?: any): S[]; (...
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-55 - 1]
@@ -1005,6 +1542,11 @@ Message: This callback should return a conditional, but return is always truthy.
    6 | [1, 3, 5].filter(truthy);
      |                  ~~~~~~
    7 | [1, 2, 3].find(falsy);
+  Label: Return type: never[] (6:18 - 6:23)
+   5 | function falsy() {}
+   6 | [1, 3, 5].filter(truthy);
+     |                  ^^^^^^ Return type: never[]
+   7 | [1, 2, 3].find(falsy);
 
 Diagnostic 2: alwaysFalsyFunc (7:16 - 7:20)
 Message: This callback should return a conditional, but return is always falsy.
@@ -1012,12 +1554,22 @@ Message: This callback should return a conditional, but return is always falsy.
    7 | [1, 2, 3].find(falsy);
      |                ~~~~~
    8 | [1, 2, 3].findLastIndex(falsy);
+  Label: Return type: void (7:16 - 7:20)
+   6 | [1, 3, 5].filter(truthy);
+   7 | [1, 2, 3].find(falsy);
+     |                ^^^^^ Return type: void
+   8 | [1, 2, 3].findLastIndex(falsy);
 
 Diagnostic 3: alwaysFalsyFunc (8:25 - 8:29)
 Message: This callback should return a conditional, but return is always falsy.
    7 | [1, 2, 3].find(falsy);
    8 | [1, 2, 3].findLastIndex(falsy);
      |                         ~~~~~
+   9 |       
+  Label: Return type: void (8:25 - 8:29)
+   7 | [1, 2, 3].find(falsy);
+   8 | [1, 2, 3].findLastIndex(falsy);
+     |                         ^^^^^ Return type: void
    9 |       
 ---
 
@@ -1028,6 +1580,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | while (test) {}
      |        ~~~~
    5 |       
+  Label: Type: true (4:8 - 4:11)
+   3 | 
+   4 | while (test) {}
+     |        ^^^^ Type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-57 - 1]
@@ -1036,6 +1593,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | 
    4 | for (; test; ) {}
      |        ~~~~
+   5 |       
+  Label: Type: true (4:8 - 4:11)
+   3 | 
+   4 | for (; test; ) {}
+     |        ^^^^ Type: true
    5 |       
 ---
 
@@ -1046,6 +1608,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | do {} while (test);
      |              ~~~~
    5 |       
+  Label: Type: true (4:14 - 4:17)
+   3 | 
+   4 | do {} while (test);
+     |              ^^^^ Type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-59 - 1]
@@ -1054,6 +1621,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | 
    4 | while (test) {}
      |        ~~~~
+   5 |       
+  Label: Type: true (4:8 - 4:11)
+   3 | 
+   4 | while (test) {}
+     |        ^^^^ Type: true
    5 |       
 ---
 
@@ -1064,6 +1636,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | for (; test; ) {}
      |        ~~~~
    5 |       
+  Label: Type: true (4:8 - 4:11)
+   3 | 
+   4 | for (; test; ) {}
+     |        ^^^^ Type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-61 - 1]
@@ -1072,6 +1649,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | 
    4 | do {} while (test);
      |              ~~~~
+   5 |       
+  Label: Type: true (4:14 - 4:17)
+   3 | 
+   4 | do {} while (test);
+     |              ^^^^ Type: true
    5 |       
 ---
 
@@ -1082,6 +1664,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | while (test) {}
      |        ~~~~
    5 |       
+  Label: Type: true (4:8 - 4:11)
+   3 | 
+   4 | while (test) {}
+     |        ^^^^ Type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-63 - 1]
@@ -1090,6 +1677,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | 
    4 | while (test) {}
      |        ~~~~
+   5 |       
+  Label: Type: 1 (4:8 - 4:11)
+   3 | 
+   4 | while (test) {}
+     |        ^^^^ Type: 1
    5 |       
 ---
 
@@ -1100,6 +1692,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | for (; test; ) {}
      |        ~~~~
    5 |       
+  Label: Type: true (4:8 - 4:11)
+   3 | 
+   4 | for (; test; ) {}
+     |        ^^^^ Type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-65 - 1]
@@ -1109,6 +1706,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | do {} while (test);
      |              ~~~~
    5 |       
+  Label: Type: true (4:14 - 4:17)
+   3 | 
+   4 | do {} while (test);
+     |              ^^^^ Type: true
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-66 - 1]
@@ -1117,6 +1719,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | 
    4 | while ((shouldRun = true)) {}
      |        ~~~~~~~~~~~~~~~~~~
+   5 |       
+  Label: Type: true (4:9 - 4:24)
+   3 | 
+   4 | while ((shouldRun = true)) {}
+     |         ^^^^^^^^^^^^^^^^ Type: true
    5 |       
 ---
 
@@ -1139,304 +1746,470 @@ Message: Unnecessary conditional, value is always truthy.
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-69 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:8)
+Diagnostic 1: neverOptionalChain (3:4 - 3:5)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | let foo = { bar: true };
    3 | foo?.bar;
-     | ~~~~~~~~
+     |    ~~
+   4 | foo ?. bar;
+  Label: Type: { bar: boolean; } (3:1 - 3:3)
+   2 | let foo = { bar: true };
+   3 | foo?.bar;
+     | ^^^ Type: { bar: boolean; }
    4 | foo ?. bar;
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:10)
+Diagnostic 2: neverOptionalChain (4:5 - 4:6)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar;
    4 | foo ?. bar;
-     | ~~~~~~~~~~
+     |     ~~
+   5 | foo ?.
+  Label: Type: { bar: boolean; } (4:1 - 4:3)
+   3 | foo?.bar;
+   4 | foo ?. bar;
+     | ^^^ Type: { bar: boolean; }
    5 | foo ?.
 
-Diagnostic 3: neverOptionalChain (5:1 - 6:5)
+Diagnostic 3: neverOptionalChain (5:5 - 5:6)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | foo ?. bar;
    5 | foo ?.
-     | ~~~~~~
+     |     ~~
    6 |   bar;
-     | ~~~~~
-   7 | foo
+  Label: Type: { bar: boolean; } (5:1 - 5:3)
+   4 | foo ?. bar;
+   5 | foo ?.
+     | ^^^ Type: { bar: boolean; }
+   6 |   bar;
 
-Diagnostic 4: neverOptionalChain (7:1 - 8:8)
+Diagnostic 4: neverOptionalChain (8:3 - 8:4)
 Message: Unnecessary optional chain on a non-nullish value.
+   7 | foo
+   8 |   ?. bar;
+     |   ~~
+   9 |       
+  Label: Type: { bar: boolean; } (7:1 - 7:3)
    6 |   bar;
    7 | foo
-     | ~~~
+     | ^^^ Type: { bar: boolean; }
    8 |   ?. bar;
-     | ~~~~~~~~
-   9 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-70 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:7)
+Diagnostic 1: neverOptionalChain (3:4 - 3:5)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | let foo = () => {};
    3 | foo?.();
-     | ~~~~~~~
+     |    ~~
+   4 | foo ?. ();
+  Label: Type: () => void (3:1 - 3:3)
+   2 | let foo = () => {};
+   3 | foo?.();
+     | ^^^ Type: () => void
    4 | foo ?. ();
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:9)
+Diagnostic 2: neverOptionalChain (4:5 - 4:6)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.();
    4 | foo ?. ();
-     | ~~~~~~~~~
+     |     ~~
+   5 | foo ?.
+  Label: Type: () => void (4:1 - 4:3)
+   3 | foo?.();
+   4 | foo ?. ();
+     | ^^^ Type: () => void
    5 | foo ?.
 
-Diagnostic 3: neverOptionalChain (5:1 - 6:4)
+Diagnostic 3: neverOptionalChain (5:5 - 5:6)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | foo ?. ();
    5 | foo ?.
-     | ~~~~~~
+     |     ~~
    6 |   ();
-     | ~~~~
-   7 | foo
+  Label: Type: () => void (5:1 - 5:3)
+   4 | foo ?. ();
+   5 | foo ?.
+     | ^^^ Type: () => void
+   6 |   ();
 
-Diagnostic 4: neverOptionalChain (7:1 - 8:7)
+Diagnostic 4: neverOptionalChain (8:3 - 8:4)
 Message: Unnecessary optional chain on a non-nullish value.
+   7 | foo
+   8 |   ?. ();
+     |   ~~
+   9 |       
+  Label: Type: () => void (7:1 - 7:3)
    6 |   ();
    7 | foo
-     | ~~~
+     | ^^^ Type: () => void
    8 |   ?. ();
-     | ~~~~~~~
-   9 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-71 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:10)
+Diagnostic 1: neverOptionalChain (3:4 - 3:5)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | let foo = () => {};
    3 | foo?.(bar);
-     | ~~~~~~~~~~
+     |    ~~
+   4 | foo ?. (bar);
+  Label: Type: () => void (3:1 - 3:3)
+   2 | let foo = () => {};
+   3 | foo?.(bar);
+     | ^^^ Type: () => void
    4 | foo ?. (bar);
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:12)
+Diagnostic 2: neverOptionalChain (4:5 - 4:6)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.(bar);
    4 | foo ?. (bar);
-     | ~~~~~~~~~~~~
+     |     ~~
+   5 | foo ?.
+  Label: Type: () => void (4:1 - 4:3)
+   3 | foo?.(bar);
+   4 | foo ?. (bar);
+     | ^^^ Type: () => void
    5 | foo ?.
 
-Diagnostic 3: neverOptionalChain (5:1 - 6:7)
+Diagnostic 3: neverOptionalChain (5:5 - 5:6)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | foo ?. (bar);
    5 | foo ?.
-     | ~~~~~~
+     |     ~~
    6 |   (bar);
-     | ~~~~~~~
-   7 | foo
+  Label: Type: () => void (5:1 - 5:3)
+   4 | foo ?. (bar);
+   5 | foo ?.
+     | ^^^ Type: () => void
+   6 |   (bar);
 
-Diagnostic 4: neverOptionalChain (7:1 - 8:10)
+Diagnostic 4: neverOptionalChain (8:3 - 8:4)
 Message: Unnecessary optional chain on a non-nullish value.
+   7 | foo
+   8 |   ?. (bar);
+     |   ~~
+   9 |       
+  Label: Type: () => void (7:1 - 7:3)
    6 |   (bar);
    7 | foo
-     | ~~~
+     | ^^^ Type: () => void
    8 |   ?. (bar);
-     | ~~~~~~~~~~
-   9 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-72 - 1]
-Diagnostic 1: neverOptionalChain (1:13 - 1:26)
+Diagnostic 1: neverOptionalChain (1:22 - 1:23)
 Message: Unnecessary optional chain on a non-nullish value.
    1 | const foo = [1, 2, 3]?.[0];
-     |             ~~~~~~~~~~~~~~
+     |                      ~~
+  Label: Type: number[] (1:13 - 1:21)
+   1 | const foo = [1, 2, 3]?.[0];
+     |             ^^^^^^^^^ Type: number[]
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-73 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:4)
+Diagnostic 1: neverOptionalChain (3:2 - 3:3)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const x: { a?: { b: string } };
    3 | x?.a?.b;
-     | ~~~~
+     |  ~~
+   4 |       
+  Label: Type: { a?: { b: string; } | undefined; } (3:1 - 3:1)
+   2 | declare const x: { a?: { b: string } };
+   3 | x?.a?.b;
+     | ^ Type: { a?: { b: string; } | undefined; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-74 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:6)
+Diagnostic 1: neverOptionalChain (3:4 - 3:5)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const x: { a: { b?: { c: string } } };
    3 | x.a?.b?.c;
-     | ~~~~~~
+     |    ~~
+   4 |       
+  Label: Type: { b?: { c: string; } | undefined; } (3:1 - 3:3)
+   2 | declare const x: { a: { b?: { c: string } } };
+   3 | x.a?.b?.c;
+     | ^^^ Type: { b?: { c: string; } | undefined; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-75 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:4)
+Diagnostic 1: neverOptionalChain (3:2 - 3:3)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | let x: { a?: string };
    3 | x?.a;
-     | ~~~~
+     |  ~~
+   4 |       
+  Label: Type: { a?: string | undefined; } (3:1 - 3:1)
+   2 | let x: { a?: string };
+   3 | x?.a;
+     | ^ Type: { a?: string | undefined; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-76 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:13)
+Diagnostic 1: neverOptionalChain (3:9 - 3:10)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar: { baz: { c: string } } } | null;
    3 | foo?.bar?.baz;
-     | ~~~~~~~~~~~~~
+     |         ~~
+   4 |       
+  Label: Type: { baz: { c: string; }; } (3:1 - 3:8)
+   2 | declare const foo: { bar: { baz: { c: string } } } | null;
+   3 | foo?.bar?.baz;
+     | ^^^^^^^^ Type: { baz: { c: string; }; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-77 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:18)
+Diagnostic 1: neverOptionalChain (3:14 - 3:15)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar?: { baz: { qux: string } } } | null;
    3 | foo?.bar?.baz?.qux;
-     | ~~~~~~~~~~~~~~~~~~
+     |              ~~
+   4 |       
+  Label: Type: { qux: string; } (3:1 - 3:13)
+   2 | declare const foo: { bar?: { baz: { qux: string } } } | null;
+   3 | foo?.bar?.baz?.qux;
+     | ^^^^^^^^^^^^^ Type: { qux: string; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-78 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:18)
+Diagnostic 1: neverOptionalChain (3:14 - 3:15)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar: { baz: { qux?: () => {} } } } | null;
    3 | foo?.bar?.baz?.qux?.();
-     | ~~~~~~~~~~~~~~~~~~
+     |              ~~
+   4 |       
+  Label: Type: { qux?: (() => {}) | undefined; } (3:1 - 3:13)
+   2 | declare const foo: { bar: { baz: { qux?: () => {} } } } | null;
+   3 | foo?.bar?.baz?.qux?.();
+     | ^^^^^^^^^^^^^ Type: { qux?: (() => {}) | undefined; }
    4 |       
 
-Diagnostic 2: neverOptionalChain (3:1 - 3:13)
+Diagnostic 2: neverOptionalChain (3:9 - 3:10)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar: { baz: { qux?: () => {} } } } | null;
    3 | foo?.bar?.baz?.qux?.();
-     | ~~~~~~~~~~~~~
+     |         ~~
+   4 |       
+  Label: Type: { baz: { qux?: (() => {}) | undefined; }; } (3:1 - 3:8)
+   2 | declare const foo: { bar: { baz: { qux?: () => {} } } } | null;
+   3 | foo?.bar?.baz?.qux?.();
+     | ^^^^^^^^ Type: { baz: { qux?: (() => {}) | undefined; }; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-79 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:22)
+Diagnostic 1: neverOptionalChain (3:19 - 3:20)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar: { baz: { qux: () => {} } } } | null;
    3 | foo?.bar?.baz?.qux?.();
-     | ~~~~~~~~~~~~~~~~~~~~~~
+     |                   ~~
+   4 |       
+  Label: Type: () => {} (3:1 - 3:18)
+   2 | declare const foo: { bar: { baz: { qux: () => {} } } } | null;
+   3 | foo?.bar?.baz?.qux?.();
+     | ^^^^^^^^^^^^^^^^^^ Type: () => {}
    4 |       
 
-Diagnostic 2: neverOptionalChain (3:1 - 3:18)
+Diagnostic 2: neverOptionalChain (3:14 - 3:15)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar: { baz: { qux: () => {} } } } | null;
    3 | foo?.bar?.baz?.qux?.();
-     | ~~~~~~~~~~~~~~~~~~
+     |              ~~
+   4 |       
+  Label: Type: { qux: () => {}; } (3:1 - 3:13)
+   2 | declare const foo: { bar: { baz: { qux: () => {} } } } | null;
+   3 | foo?.bar?.baz?.qux?.();
+     | ^^^^^^^^^^^^^ Type: { qux: () => {}; }
    4 |       
 
-Diagnostic 3: neverOptionalChain (3:1 - 3:13)
+Diagnostic 3: neverOptionalChain (3:9 - 3:10)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const foo: { bar: { baz: { qux: () => {} } } } | null;
    3 | foo?.bar?.baz?.qux?.();
-     | ~~~~~~~~~~~~~
+     |         ~~
+   4 |       
+  Label: Type: { baz: { qux: () => {}; }; } (3:1 - 3:8)
+   2 | declare const foo: { bar: { baz: { qux: () => {} } } } | null;
+   3 | foo?.bar?.baz?.qux?.();
+     | ^^^^^^^^ Type: { baz: { qux: () => {}; }; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-80 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:25)
+Diagnostic 1: neverOptionalChain (4:22 - 4:23)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.().qux?.();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                      ~~
+   5 |       
+  Label: Type: () => {} (4:1 - 4:21)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.().qux?.();
+     | ^^^^^^^^^^^^^^^^^^^^^ Type: () => {}
    5 |       
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:17)
+Diagnostic 2: neverOptionalChain (4:14 - 4:15)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.().qux?.();
-     | ~~~~~~~~~~~~~~~~~
+     |              ~~
+   5 |       
+  Label: Type: baz (4:1 - 4:13)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.().qux?.();
+     | ^^^^^^^^^^^^^ Type: baz
    5 |       
 
-Diagnostic 3: neverOptionalChain (4:1 - 4:13)
+Diagnostic 3: neverOptionalChain (4:9 - 4:10)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.().qux?.();
-     | ~~~~~~~~~~~~~
+     |         ~~
+   5 |       
+  Label: Type: { baz: baz; } (4:1 - 4:8)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.().qux?.();
+     | ^^^^^^^^ Type: { baz: baz; }
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-81 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:25)
+Diagnostic 1: neverOptionalChain (4:22 - 4:23)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.().qux?.();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                      ~~
+   5 |       
+  Label: Type: () => {} (4:1 - 4:21)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.().qux?.();
+     | ^^^^^^^^^^^^^^^^^^^^^ Type: () => {}
    5 |       
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:13)
+Diagnostic 2: neverOptionalChain (4:9 - 4:10)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.().qux?.();
-     | ~~~~~~~~~~~~~
+     |         ~~
+   5 |       
+  Label: Type: { baz: baz; } (4:1 - 4:8)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.().qux?.();
+     | ^^^^^^^^ Type: { baz: baz; }
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-82 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:26)
+Diagnostic 1: neverOptionalChain (4:23 - 4:24)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.()?.qux?.();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                       ~~
+   5 |       
+  Label: Type: () => {} (4:1 - 4:22)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.()?.qux?.();
+     | ^^^^^^^^^^^^^^^^^^^^^^ Type: () => {}
    5 |       
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:13)
+Diagnostic 2: neverOptionalChain (4:9 - 4:10)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: { bar: { baz: baz } } | null;
    4 | foo?.bar?.baz?.()?.qux?.();
-     | ~~~~~~~~~~~~~
+     |         ~~
+   5 |       
+  Label: Type: { baz: baz; } (4:1 - 4:8)
+   3 | declare const foo: { bar: { baz: baz } } | null;
+   4 | foo?.bar?.baz?.()?.qux?.();
+     | ^^^^^^^^ Type: { baz: baz; }
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-83 - 1]
-Diagnostic 1: neverOptionalChain (5:1 - 5:18)
+Diagnostic 1: neverOptionalChain (5:14 - 5:15)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | declare const foo: { fooOrBar: Foo | Bar } | null;
    5 | foo?.fooOrBar?.baz?.qux;
-     | ~~~~~~~~~~~~~~~~~~
+     |              ~~
+   6 |       
+  Label: Type: Bar | Foo (5:1 - 5:13)
+   4 | declare const foo: { fooOrBar: Foo | Bar } | null;
+   5 | foo?.fooOrBar?.baz?.qux;
+     | ^^^^^^^^^^^^^ Type: Bar | Foo
    6 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-84 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:9)
+Diagnostic 1: neverOptionalChain (3:7 - 3:8)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const x: { a: { b: number } }[];
    3 | x[0].a?.b;
-     | ~~~~~~~~~
+     |       ~~
+   4 |       
+  Label: Type: { b: number; } (3:1 - 3:6)
+   2 | declare const x: { a: { b: number } }[];
+   3 | x[0].a?.b;
+     | ^^^^^^ Type: { b: number; }
    4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-85 - 1]
-Diagnostic 1: neverOptionalChain (7:1 - 7:16)
+Diagnostic 1: neverOptionalChain (7:11 - 7:12)
 Message: Unnecessary optional chain on a non-nullish value.
    6 | 
    7 | foo?.[key]?.trim();
-     | ~~~~~~~~~~~~~~~~
+     |           ~~
+   8 |       
+  Label: Type: "bar" | "foo" (7:1 - 7:10)
+   6 | 
+   7 | foo?.[key]?.trim();
+     | ^^^^^^^^^^ Type: "bar" | "foo"
    8 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-86 - 1]
-Diagnostic 1: neverOptionalChain (5:1 - 5:16)
+Diagnostic 1: neverOptionalChain (5:11 - 5:12)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | const key = 'bar';
    5 | foo?.[key]?.trim();
-     | ~~~~~~~~~~~~~~~~
+     |           ~~
+   6 |       
+  Label: Type: "bar" (5:1 - 5:10)
+   4 | const key = 'bar';
+   5 | foo?.[key]?.trim();
+     | ^^^^^^^^^^ Type: "bar"
    6 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-87 - 1]
-Diagnostic 1: neverOptionalChain (11:10 - 11:39)
+Diagnostic 1: neverOptionalChain (11:28 - 11:29)
 Message: Unnecessary optional chain on a non-nullish value.
   10 |   const key = 'bar';
   11 |   return outer.inner?.[key]?.charCodeAt(0);
-     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                            ~~
+  12 | }
+  Label: Type: "bar" (11:10 - 11:27)
+  10 |   const key = 'bar';
+  11 |   return outer.inner?.[key]?.charCodeAt(0);
+     |          ^^^^^^^^^^^^^^^^^^ Type: "bar"
   12 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-88 - 1]
-Diagnostic 1: neverOptionalChain (11:10 - 11:39)
+Diagnostic 1: neverOptionalChain (11:28 - 11:29)
 Message: Unnecessary optional chain on a non-nullish value.
   10 | function Foo(outer: Outer, key: Bar): number | undefined {
   11 |   return outer.inner?.[key]?.charCodeAt(0);
-     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                            ~~
+  12 | }
+  Label: Type: "bar" (11:10 - 11:27)
+  10 | function Foo(outer: Outer, key: Bar): number | undefined {
+  11 |   return outer.inner?.[key]?.charCodeAt(0);
+     |          ^^^^^^^^^^^^^^^^^^ Type: "bar"
   12 | }
 ---
 
@@ -1447,6 +2220,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 |   if (testVal ?? true) {
      |       ~~~~~~~~~~~~~~~
    4 |     console.log('test');
+  Label: Type: true (3:7 - 3:21)
+   2 | function test(testVal?: true) {
+   3 |   if (testVal ?? true) {
+     |       ^^^^^^^^^^^^^^^ Type: true
+   4 |     console.log('test');
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-90 - 1]
@@ -1455,6 +2233,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 | const a = null;
    3 | if (!a) {
      |     ~~
+   4 | }
+  Label: Type: null (3:6 - 3:6)
+   2 | const a = null;
+   3 | if (!a) {
+     |      ^ Type: null
    4 | }
 ---
 
@@ -1465,6 +2248,11 @@ Message: Unnecessary conditional, value is always falsy.
    3 | if (!a) {
      |     ~~
    4 | }
+  Label: Type: true (3:6 - 3:6)
+   2 | const a = true;
+   3 | if (!a) {
+     |      ^ Type: true
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-92 - 1]
@@ -1473,6 +2261,11 @@ Message: Unnecessary conditional, value is `never`.
    6 | let speech: never = sayHi();
    7 | if (!speech) {
      |     ~~~~~~~
+   8 | }
+  Label: Type: never (7:6 - 7:11)
+   6 | let speech: never = sayHi();
+   7 | if (!speech) {
+     |      ^^^^^^ Type: never
    8 | }
 ---
 
@@ -1486,14 +2279,24 @@ Message: Unnecessary conditional, value is always truthy.
    3 | if (x) {
      |     ~
    4 | }
+  Label: Type: string[] (3:5 - 3:5)
+   2 | declare const x: string[] | null;
+   3 | if (x) {
+     |     ^ Type: string[]
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-94 - 1]
-Diagnostic 1: neverOptionalChain (9:1 - 9:17)
+Diagnostic 1: neverOptionalChain (9:10 - 9:11)
 Message: Unnecessary optional chain on a non-nullish value.
    8 | declare const foo: OptionalFoo;
    9 | foo?.test?.length;
-     | ~~~~~~~~~~~~~~~~~
+     |          ~~
+  10 |       
+  Label: Type: string (9:1 - 9:9)
+   8 | declare const foo: OptionalFoo;
+   9 | foo?.test?.length;
+     | ^^^^^^^^^ Type: string
   10 |       
 ---
 
@@ -1504,6 +2307,11 @@ Message: Unnecessary conditional, value is always truthy.
    7 |   if (obj[key]) {
      |       ~~~~~~~~
    8 |     return obj[key];
+  Label: Type: 1 | 2 | 3 (7:7 - 7:14)
+   6 |   const k = obj[key];
+   7 |   if (obj[key]) {
+     |       ^^^^^^^^ Type: 1 | 2 | 3
+   8 |     return obj[key];
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-96 - 1]
@@ -1512,6 +2320,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 | function getElem(dict: Record<string, { foo: string }>, key: string) {
    3 |   if (dict[key]) {
      |       ~~~~~~~~~
+   4 |     return dict[key].foo;
+  Label: Type: { foo: string; } (3:7 - 3:15)
+   2 | function getElem(dict: Record<string, { foo: string }>, key: string) {
+   3 |   if (dict[key]) {
+     |       ^^^^^^^^^ Type: { foo: string; }
    4 |     return dict[key].foo;
 ---
 
@@ -1522,6 +2335,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo ??= 1;
      | ~~~
    4 |       
+  Label: Type: {} (3:1 - 3:3)
+   2 | declare let foo: {};
+   3 | foo ??= 1;
+     | ^^^ Type: {}
+   4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-98 - 1]
@@ -1530,6 +2348,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    2 | declare let foo: number;
    3 | foo ??= 1;
      | ~~~
+   4 |       
+  Label: Type: number (3:1 - 3:3)
+   2 | declare let foo: number;
+   3 | foo ??= 1;
+     | ^^^ Type: number
    4 |       
 ---
 
@@ -1540,6 +2363,11 @@ Message: Unnecessary conditional, value is always nullish.
    3 | foo ??= null;
      | ~~~
    4 |       
+  Label: Type: null (3:1 - 3:3)
+   2 | declare let foo: null;
+   3 | foo ??= null;
+     | ^^^ Type: null
+   4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-100 - 1]
@@ -1548,6 +2376,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 | declare let foo: {};
    3 | foo ||= 1;
      | ~~~
+   4 |       
+  Label: Type: {} (3:1 - 3:3)
+   2 | declare let foo: {};
+   3 | foo ||= 1;
+     | ^^^ Type: {}
    4 |       
 ---
 
@@ -1558,6 +2391,11 @@ Message: Unnecessary conditional, value is always falsy.
    3 | foo ||= null;
      | ~~~
    4 |       
+  Label: Type: null (3:1 - 3:3)
+   2 | declare let foo: null;
+   3 | foo ||= null;
+     | ^^^ Type: null
+   4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-102 - 1]
@@ -1566,6 +2404,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 | declare let foo: {};
    3 | foo &&= 1;
      | ~~~
+   4 |       
+  Label: Type: {} (3:1 - 3:3)
+   2 | declare let foo: {};
+   3 | foo &&= 1;
+     | ^^^ Type: {}
    4 |       
 ---
 
@@ -1576,6 +2419,11 @@ Message: Unnecessary conditional, value is always falsy.
    3 | foo &&= null;
      | ~~~
    4 |       
+  Label: Type: null (3:1 - 3:3)
+   2 | declare let foo: null;
+   3 | foo &&= null;
+     | ^^^ Type: null
+   4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-104 - 1]
@@ -1585,57 +2433,92 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo.bar ??= 1;
      | ~~~~~~~
    4 |       
+  Label: Type: number (3:1 - 3:7)
+   2 | declare const foo: { bar: number };
+   3 | foo.bar ??= 1;
+     | ^^^^^^^ Type: number
+   4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-105 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:25)
+Diagnostic 1: neverOptionalChain (4:11 - 4:12)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: Foo;
    4 | foo?.bar()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~
+     |           ~~
+   5 |       
+  Label: Type: number (4:1 - 4:10)
+   3 | declare const foo: Foo;
+   4 | foo?.bar()?.toExponential();
+     | ^^^^^^^^^^ Type: number
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-106 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:35)
+Diagnostic 1: neverOptionalChain (4:21 - 4:22)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: Foo;
    4 | foo?.bar?.baz()?.qux?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~
+   5 |       
+  Label: Type: number (4:1 - 4:20)
+   3 | declare const foo: Foo;
+   4 | foo?.bar?.baz()?.qux?.toExponential();
+     | ^^^^^^^^^^^^^^^^^^^^ Type: number
    5 |       
 
-Diagnostic 2: neverOptionalChain (4:1 - 4:20)
+Diagnostic 2: neverOptionalChain (4:16 - 4:17)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: Foo;
    4 | foo?.bar?.baz()?.qux?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~
+     |                ~~
+   5 |       
+  Label: Type: { qux: number; } (4:1 - 4:15)
+   3 | declare const foo: Foo;
+   4 | foo?.bar?.baz()?.qux?.toExponential();
+     | ^^^^^^^^^^^^^^^ Type: { qux: number; }
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-107 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:22)
+Diagnostic 1: neverOptionalChain (4:8 - 4:9)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: Foo;
    4 | foo?.()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~
+     |        ~~
+   5 |       
+  Label: Type: number (4:1 - 4:7)
+   3 | declare const foo: Foo;
+   4 | foo?.()?.toExponential();
+     | ^^^^^^^ Type: number
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-108 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:29)
+Diagnostic 1: neverOptionalChain (4:15 - 4:16)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: Foo;
    4 | foo?.['bar']()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~
+   5 |       
+  Label: Type: number (4:1 - 4:14)
+   3 | declare const foo: Foo;
+   4 | foo?.['bar']()?.toExponential();
+     | ^^^^^^^^^^^^^^ Type: number
    5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-109 - 1]
-Diagnostic 1: neverOptionalChain (4:1 - 4:31)
+Diagnostic 1: neverOptionalChain (4:17 - 4:18)
 Message: Unnecessary optional chain on a non-nullish value.
    3 | declare const foo: Foo;
    4 | foo?.['bar']?.()?.toExponential();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                 ~~
+   5 |       
+  Label: Type: number (4:1 - 4:16)
+   3 | declare const foo: Foo;
+   4 | foo?.['bar']?.()?.toExponential();
+     | ^^^^^^^^^^^^^^^^ Type: number
    5 |       
 ---
 
@@ -1645,6 +2528,11 @@ Message: Unnecessary conditional, value is always truthy.
    2 |         const a = true;
    3 |         if (!!a) {
      |             ~~~
+   4 |         }
+  Label: Type: true (3:15 - 3:15)
+   2 |         const a = true;
+   3 |         if (!!a) {
+     |               ^ Type: true
    4 |         }
 ---
 
@@ -1682,6 +2570,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | assert({});
      |        ~~
    4 |       
+  Label: Type: {} (3:8 - 3:9)
+   2 | declare function assert(x: unknown): asserts x;
+   3 | assert({});
+     |        ^^ Type: {}
+   4 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-115 - 1]
@@ -1690,6 +2583,11 @@ Message: Type predicate is unnecessary as the parameter type already satisfies t
    3 | declare const a: string;
    4 | assertsString(a);
      |               ~
+   5 |       
+  Label: Type string already satisfies predicate type string (4:15 - 4:15)
+   3 | declare const a: string;
+   4 | assertsString(a);
+     |               ^ Type string already satisfies predicate type string
    5 |       
 ---
 
@@ -1700,6 +2598,11 @@ Message: Type predicate is unnecessary as the parameter type already satisfies t
    4 | isString(a);
      |          ~
    5 |       
+  Label: Type string already satisfies predicate type string (4:10 - 4:10)
+   3 | declare const a: string;
+   4 | isString(a);
+     |          ^ Type string already satisfies predicate type string
+   5 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-117 - 1]
@@ -1708,6 +2611,11 @@ Message: Type predicate is unnecessary as the parameter type already satisfies t
    3 | declare const a: string;
    4 | isString('fa' + 'lafel');
      |          ~~~~~~~~~~~~~~
+   5 |       
+  Label: Type string already satisfies predicate type string (4:10 - 4:23)
+   3 | declare const a: string;
+   4 | isString('fa' + 'lafel');
+     |          ^^^^^^^^^^^^^^ Type string already satisfies predicate type string
    5 |       
 ---
 
@@ -1718,6 +2626,11 @@ Message: Unnecessary conditional, value is always falsy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: "" (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: ""
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-119 - 1]
@@ -1726,6 +2639,11 @@ Message: Unnecessary conditional, value is always falsy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: "" & { __brand: string; } (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: "" & { __brand: string; }
    5 | 
 ---
 
@@ -1736,6 +2654,11 @@ Message: Unnecessary conditional, value is always falsy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: ("" | false) & { __brand: string; } (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: ("" | false) & { __brand: string; }
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-121 - 1]
@@ -1744,6 +2667,11 @@ Message: Unnecessary conditional, value is always falsy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: { __brandA: string; } & "" (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: { __brandA: string; } & ""
    5 | 
 ---
 
@@ -1754,6 +2682,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: ("bar" | "foo") & { __brand: string; } (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: ("bar" | "foo") & { __brand: string; }
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-123 - 1]
@@ -1762,6 +2695,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: (123 | true) & { __brand: string; } (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: (123 | true) & { __brand: string; }
    5 | 
 ---
 
@@ -1772,6 +2710,11 @@ Message: Unnecessary conditional, value is always truthy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: ("foo" | 123) & { __brand: string; } (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: ("foo" | 123) & { __brand: string; }
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-125 - 1]
@@ -1780,6 +2723,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | declare const b2: boolean;
    4 | const t1 = b1 && b2;
      |            ~~
+   5 | 
+  Label: Type: { __brandA: string; } & "foo" (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: { __brandA: string; } & "foo"
    5 | 
 ---
 
@@ -1790,62 +2738,102 @@ Message: Unnecessary conditional, value is always truthy.
    4 | const t1 = b1 && b2;
      |            ~~
    5 | 
+  Label: Type: ({ __brandA: string; } & "foo") | ({ __brandB: string; } & 123) (4:12 - 4:13)
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && b2;
+     |            ^^ Type: ({ __brandA: string; } & "foo") | ({ __brandB: string; } & 123)
+   5 | 
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-127 - 1]
-Diagnostic 1: neverOptionalChain (12:1 - 12:9)
+Diagnostic 1: neverOptionalChain (12:7 - 12:8)
 Message: Unnecessary optional chain on a non-nullish value.
   11 | 
   12 | a.a?.a?.a;
-     | ~~~~~~~~~
+     |       ~~
+  13 |       
+  Label: Type: { a: 1; } (12:1 - 12:6)
+  11 | 
+  12 | a.a?.a?.a;
+     | ^^^^^^ Type: { a: 1; }
   13 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-128 - 1]
-Diagnostic 1: neverOptionalChain (21:1 - 21:16)
+Diagnostic 1: neverOptionalChain (21:10 - 21:11)
 Message: Unnecessary optional chain on a non-nullish value.
   20 | 
   21 | t.a?.a?.a?.value;
-     | ~~~~~~~~~~~~~~~~
+     |          ~~
+  22 |       
+  Label: Type: { value: "value"; } (21:1 - 21:9)
+  20 | 
+  21 | t.a?.a?.a?.value;
+     | ^^^^^^^^^ Type: { value: "value"; }
   22 |       
 
-Diagnostic 2: neverOptionalChain (21:1 - 21:9)
+Diagnostic 2: neverOptionalChain (21:7 - 21:8)
 Message: Unnecessary optional chain on a non-nullish value.
   20 | 
   21 | t.a?.a?.a?.value;
-     | ~~~~~~~~~
+     |       ~~
+  22 |       
+  Label: Type: { [name: Lowercase<string>]: { value: "value"; }; } (21:1 - 21:6)
+  20 | 
+  21 | t.a?.a?.a?.value;
+     | ^^^^^^ Type: { [name: Lowercase<string>]: { value: "value"; }; }
   22 |       
 
-Diagnostic 3: neverOptionalChain (21:1 - 21:6)
+Diagnostic 3: neverOptionalChain (21:4 - 21:5)
 Message: Unnecessary optional chain on a non-nullish value.
   20 | 
   21 | t.a?.a?.a?.value;
-     | ~~~~~~
+     |    ~~
+  22 |       
+  Label: Type: { [name: Lowercase<string>]: { [name: Lowercase<string>]: { value: "value"; }; }; } (21:1 - 21:3)
+  20 | 
+  21 | t.a?.a?.a?.value;
+     | ^^^ Type: { [name: Lowercase<string>]: { [name: Lowercase<string>]: { value: "value"; }; }; }
   22 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-129 - 1]
-Diagnostic 1: neverOptionalChain (5:3 - 5:12)
+Diagnostic 1: neverOptionalChain (5:10 - 5:11)
 Message: Unnecessary optional chain on a non-nullish value.
    4 | if (test[0]?.a) {
    5 |   test[0]?.a;
-     |   ~~~~~~~~~~
+     |          ~~
+   6 | }
+  Label: Type: { a?: string | undefined; } (5:3 - 5:9)
+   4 | if (test[0]?.a) {
+   5 |   test[0]?.a;
+     |   ^^^^^^^ Type: { a?: string | undefined; }
    6 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-130 - 1]
-Diagnostic 1: neverOptionalChain (3:1 - 3:17)
+Diagnostic 1: neverOptionalChain (3:15 - 3:16)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
    3 | arr2[42]?.x?.y?.z;
-     | ~~~~~~~~~~~~~~~~~
+     |               ~~
+   4 |       
+  Label: Type: { z: object; } (3:1 - 3:14)
+   2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
+   3 | arr2[42]?.x?.y?.z;
+     | ^^^^^^^^^^^^^^ Type: { z: object; }
    4 |       
 
-Diagnostic 2: neverOptionalChain (3:1 - 3:14)
+Diagnostic 2: neverOptionalChain (3:12 - 3:13)
 Message: Unnecessary optional chain on a non-nullish value.
    2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
    3 | arr2[42]?.x?.y?.z;
-     | ~~~~~~~~~~~~~~
+     |            ~~
+   4 |       
+  Label: Type: { y: { z: object; }; } (3:1 - 3:11)
+   2 | declare const arr2: Array<{ x: { y: { z: object } } }>;
+   3 | arr2[42]?.x?.y?.z;
+     | ^^^^^^^^^^^ Type: { y: { z: object; }; }
    4 |       
 ---
 
@@ -1856,6 +2844,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 |   arr[0] ?? 'foo';
      |   ~~~~~~
    6 | }
+  Label: Type: string (5:3 - 5:8)
+   4 | if (arr[0]) {
+   5 |   arr[0] ?? 'foo';
+     |   ^^^^^^ Type: string
+   6 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-132 - 1]
@@ -1864,6 +2857,11 @@ Message: Unnecessary conditional, value is always truthy.
    3 | 
    4 | if (arr[42] && arr[42]) {
      |                ~~~~~~~
+   5 | }
+  Label: Type: object (4:16 - 4:22)
+   3 | 
+   4 | if (arr[42] && arr[42]) {
+     |                ^^^^^^^ Type: object
    5 | }
 ---
 
@@ -1901,6 +2899,11 @@ Message: Unnecessary conditional, value is always nullish.
    3 |   num ?? 'default';
      |   ~~~
    4 | }
+  Label: Type: null (3:3 - 3:5)
+   2 | function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+   3 |   num ?? 'default';
+     |   ^^^ Type: null
+   4 | }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-137 - 1]
@@ -1909,6 +2912,11 @@ Message: Unnecessary conditional, value is always nullish.
    2 | function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
    3 |   num ??= null;
      |   ~~~
+   4 | }
+  Label: Type: null (3:3 - 3:5)
+   2 | function test<T extends { foo: null }, K extends 'foo'>(num: T[K]) {
+   3 |   num ??= null;
+     |   ^^^ Type: null
    4 | }
 ---
 
@@ -1919,6 +2927,11 @@ Message: Unnecessary conditional, value is always truthy.
    5 | assert(!!a);
      |        ~~~
    6 |       
+  Label: Type: true (5:10 - 5:10)
+   4 | 
+   5 | assert(!!a);
+     |          ^ Type: true
+   6 |       
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-139 - 1]
@@ -1927,6 +2940,11 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 |   method() {
    6 |     this.#value ??= 2;
      |     ~~~~~~~~~~~
+   7 |   }
+  Label: Type: number (6:5 - 6:15)
+   5 |   method() {
+   6 |     this.#value ??= 2;
+     |     ^^^^^^^^^^^ Type: number
    7 |   }
 ---
 
@@ -1960,4 +2978,23 @@ Message: Unnecessary conditional, value is always truthy.
    2 | if (true || false) {}
      |     ~~~~
    3 |       
+---
+
+[TestNoUnnecessaryConditionRule/invalid-142 - 1]
+Diagnostic 1: noOverlapBooleanExpression (4:10 - 4:18)
+Message: This condition will always return the same value since the types have no overlap.
+   3 |   switch (value) {
+   4 |     case undefined:
+     |          ~~~~~~~~~
+   5 |       break;
+  Label: Type: string (3:11 - 3:15)
+   2 | function test(value: string) {
+   3 |   switch (value) {
+     |           ^^^^^ Type: string
+   4 |     case undefined:
+  Label: Type: undefined (4:10 - 4:18)
+   3 |   switch (value) {
+   4 |     case undefined:
+     |          ^^^^^^^^^ Type: undefined
+   5 |       break;
 ---
