@@ -199,6 +199,54 @@ var NoFloatingPromisesRule = rule.Rule{
 			}
 			return false
 		}
+		var returnTypeNeedsCallInstantiation func(t *checker.Type) bool
+		returnTypeNeedsCallInstantiation = func(t *checker.Type) bool {
+			if t.Flags()&checker.TypeFlagsInstantiableNonPrimitive != 0 {
+				return true
+			}
+			if t.Flags()&checker.TypeFlagsUnionOrIntersection != 0 {
+				for _, part := range t.Types() {
+					if returnTypeNeedsCallInstantiation(part) {
+						return true
+					}
+				}
+			}
+
+			for _, typePart := range utils.UnionTypeParts(t) {
+				apparent := checker.Checker_getApparentType(ctx.TypeChecker, typePart)
+				if !checker.Checker_isArrayType(ctx.TypeChecker, apparent) && !checker.IsTupleType(apparent) {
+					continue
+				}
+				for _, typeArg := range checker.Checker_getTypeArguments(ctx.TypeChecker, apparent) {
+					if returnTypeNeedsCallInstantiation(typeArg) {
+						return true
+					}
+				}
+			}
+			return false
+		}
+		callReturnsKnownNonPromise := func(callExpr *ast.CallExpression) bool {
+			calleeType := ctx.TypeChecker.GetTypeAtLocation(callExpr.Expression)
+			signatures := utils.GetCallSignatures(ctx.TypeChecker, calleeType)
+			if len(signatures) == 0 {
+				return false
+			}
+
+			for _, signature := range signatures {
+				returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature)
+				if returnType == nil || returnType.Flags()&checker.TypeFlagsTypeParameter != 0 {
+					return false
+				}
+				if returnTypeNeedsCallInstantiation(returnType) {
+					return false
+				}
+				if isPromiseArray(callExpr.AsNode(), returnType) || isPromiseLike(callExpr.AsNode(), returnType) {
+					return false
+				}
+			}
+
+			return true
+		}
 
 		isKnownSafePromiseReturn := func(node *ast.Node) bool {
 			if len(opts.AllowForKnownSafeCalls) == 0 {
@@ -289,6 +337,10 @@ var NoFloatingPromisesRule = rule.Rule{
 
 			// Check the type. At this point it can't be unhandled if it isn't a promise
 			// or array thereof.
+
+			if ast.IsCallExpression(node) && callReturnsKnownNonPromise(node.AsCallExpression()) {
+				return false, false, false
+			}
 
 			t := ctx.TypeChecker.GetTypeAtLocation(node)
 			if isPromiseArray(node, t) {
