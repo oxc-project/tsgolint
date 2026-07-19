@@ -66,13 +66,11 @@ jobs:
           TSGOLINT_VERSION: ${{ inputs.version }}
         run: node ./tools/gen-npm-packages.mjs
 
-      - run: npm install -g npm@latest # For trusted publishing support
-
       - name: Publish
         run: |
           for package in npm/*; do
             pushd "$package"
-            npm publish --provenance --access public
+            pnpm publish --provenance --access public
             popd
           done
 
