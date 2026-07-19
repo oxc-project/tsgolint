@@ -1,6 +1,8 @@
 package no_floating_promises
 
 import (
+	"fmt"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/scanner"
@@ -250,22 +252,17 @@ var NoFloatingPromisesRule = rule.Rule{
 			return !utils.Some(args.Nodes[:index+1], ast.IsSpreadElement)
 		}
 
-		var isUnhandledPromise func(
-			node *ast.Node,
-		) (
-			bool, // isUnhandled
-			bool, // nonFunctionHandler
-			bool, // promiseArray
-		)
-		isUnhandledPromise = func(
-			node *ast.Node,
-		) (
-			bool, // isUnhandled
-			bool, // nonFunctionHandler
-			bool, // promiseArray
-		) {
+		type unhandledPromise struct {
+			node               *ast.Node
+			t                  *checker.Type
+			promiseArray       bool
+			nonFunctionHandler *ast.Node
+		}
+
+		var isUnhandledPromise func(node *ast.Node) *unhandledPromise
+		isUnhandledPromise = func(node *ast.Node) *unhandledPromise {
 			if ast.IsAssignmentExpression(node, false) {
-				return false, false, false
+				return nil
 			}
 
 			// First, check expressions whose resulting types may not be promise-like
@@ -274,9 +271,8 @@ var NoFloatingPromisesRule = rule.Rule{
 				// Any child in a comma expression could return a potentially unhandled
 				// promise, so we check them all regardless of whether the final returned
 				// value is promise-like.
-				isUnhandled, nonFunctionHandler, promiseArray := isUnhandledPromise(expr.Left)
-				if isUnhandled {
-					return isUnhandled, nonFunctionHandler, promiseArray
+				if result := isUnhandledPromise(expr.Left); result != nil {
+					return result
 				}
 				return isUnhandledPromise(expr.Right)
 			}
@@ -292,7 +288,7 @@ var NoFloatingPromisesRule = rule.Rule{
 
 			t := ctx.TypeChecker.GetTypeAtLocation(node)
 			if isPromiseArray(node, t) {
-				return true, false, true
+				return &unhandledPromise{node: node, t: t, promiseArray: true}
 			}
 
 			// await expression addresses promises, but not promise arrays.
@@ -301,11 +297,11 @@ var NoFloatingPromisesRule = rule.Rule{
 				// anyway checking the type of the expression, but, unfortunately TS
 				// reports the result of `await (promise as Promise<number> & number)`
 				// as `Promise<number> & number` instead of `number`.
-				return false, false, false
+				return nil
 			}
 
 			if !isPromiseLike(node, t) {
-				return false, false, false
+				return nil
 			}
 
 			if ast.IsCallExpression(node) {
@@ -322,55 +318,94 @@ var NoFloatingPromisesRule = rule.Rule{
 
 					if methodName == "catch" && len(callExpr.Arguments.Nodes) >= 1 {
 						if !isKnownArgumentAt(callExpr.Arguments, 0) {
-							return true, false, false
+							return &unhandledPromise{node: node, t: t}
 						}
 						if isValidRejectionHandler(callExpr.Arguments.Nodes[0]) {
-							return false, false, false
+							return nil
 						}
-						return true, true, false
+						return &unhandledPromise{
+							node:               node,
+							t:                  t,
+							nonFunctionHandler: callExpr.Arguments.Nodes[0],
+						}
 					}
 					if methodName == "then" && len(callExpr.Arguments.Nodes) >= 2 {
 						if !isKnownArgumentAt(callExpr.Arguments, 1) {
-							return true, false, false
+							return &unhandledPromise{node: node, t: t}
 						}
 						if isValidRejectionHandler(callExpr.Arguments.Nodes[1]) {
-							return false, false, false
+							return nil
 						}
-						return true, true, false
+						return &unhandledPromise{
+							node:               node,
+							t:                  t,
+							nonFunctionHandler: callExpr.Arguments.Nodes[1],
+						}
 					}
 					// `x.finally()` is transparent to resolution of the promise, so check `x`.
 					// ("object" in this context is the `x` in `x.finally()`)
 					if methodName == "finally" {
-						return isUnhandledPromise(callee.Expression())
+						result := isUnhandledPromise(callee.Expression())
+						if result == nil {
+							return nil
+						}
+						result.node = node
+						result.t = t
+						return result
 					}
 				}
 
 				// All other cases are unhandled.
-				return true, false, false
+				return &unhandledPromise{node: node, t: t}
 			}
 
 			if node.Kind == ast.KindConditionalExpression {
 				expr := node.AsConditionalExpression()
 				// We must be getting the promise-like value from one of the branches of the
 				// ternary. Check them directly.
-				isUnhandled, nonFunctionHandler, promiseArray := isUnhandledPromise(expr.WhenFalse)
-				if isUnhandled {
-					return isUnhandled, nonFunctionHandler, promiseArray
+				if result := isUnhandledPromise(expr.WhenFalse); result != nil {
+					return result
 				}
 				return isUnhandledPromise(expr.WhenTrue)
 			}
 
 			if ast.IsLogicalOrCoalescingBinaryExpression(node) {
 				expr := node.AsBinaryExpression()
-				isUnhandled, nonFunctionHandler, promiseArray := isUnhandledPromise(expr.Left)
-				if isUnhandled {
-					return isUnhandled, nonFunctionHandler, promiseArray
+				if result := isUnhandledPromise(expr.Left); result != nil {
+					return result
 				}
 				return isUnhandledPromise(expr.Right)
 			}
 
 			// Anything else is unhandled.
-			return true, false, false
+			return &unhandledPromise{node: node, t: t}
+		}
+
+		buildDiagnostic := func(result *unhandledPromise, msg rule.RuleMessage) rule.RuleDiagnostic {
+			diagnosticRange := utils.TrimNodeTextRange(ctx.SourceFile, result.node)
+			typeDescription := "This unhandled promise-like value"
+			if result.promiseArray {
+				typeDescription = "This array contains Promises and"
+			}
+			labels := []rule.RuleLabeledRange{{
+				Label: fmt.Sprintf("%s has type `%s`.", typeDescription, ctx.TypeChecker.TypeToString(result.t)),
+				Range: diagnosticRange,
+			}}
+			if result.nonFunctionHandler != nil {
+				handlerType := ctx.TypeChecker.GetTypeAtLocation(result.nonFunctionHandler)
+				labels = append(labels, rule.RuleLabeledRange{
+					Label: fmt.Sprintf(
+						"This rejection handler has type `%s`, which is not callable.",
+						ctx.TypeChecker.TypeToString(handlerType),
+					),
+					Range: utils.TrimNodeTextRange(ctx.SourceFile, result.nonFunctionHandler),
+				})
+			}
+			return rule.RuleDiagnostic{
+				Range:         diagnosticRange,
+				Message:       msg,
+				LabeledRanges: labels,
+			}
 		}
 
 		return rule.RuleListeners{
@@ -387,28 +422,28 @@ var NoFloatingPromisesRule = rule.Rule{
 					return
 				}
 
-				isUnhandled, nonFunctionHandler, promiseArray := isUnhandledPromise(expression)
+				result := isUnhandledPromise(expression)
 
-				if !isUnhandled {
+				if result == nil {
 					return
 				}
-				if promiseArray {
+				if result.promiseArray {
 					var msg rule.RuleMessage
 					if opts.IgnoreVoid {
 						msg = buildFloatingPromiseArrayVoidMessage()
 					} else {
 						msg = buildFloatingPromiseArrayMessage()
 					}
-					ctx.ReportNode(node, msg)
+					ctx.ReportDiagnostic(buildDiagnostic(result, msg))
 				} else if opts.IgnoreVoid {
 					var msg rule.RuleMessage
-					if nonFunctionHandler {
+					if result.nonFunctionHandler != nil {
 						msg = buildFloatingUselessRejectionHandlerVoidMessage()
 					} else {
 						msg = buildFloatingVoidMessage()
 					}
 
-					ctx.ReportNodeWithSuggestions(node, msg, func() []rule.RuleSuggestion {
+					ctx.ReportDiagnosticWithSuggestions(buildDiagnostic(result, msg), func() []rule.RuleSuggestion {
 						return []rule.RuleSuggestion{
 							{
 								Message: buildFloatingFixVoidMessage(),
@@ -430,12 +465,12 @@ var NoFloatingPromisesRule = rule.Rule{
 					})
 				} else {
 					var msg rule.RuleMessage
-					if nonFunctionHandler {
+					if result.nonFunctionHandler != nil {
 						msg = buildFloatingUselessRejectionHandlerMessage()
 					} else {
 						msg = buildFloatingMessage()
 					}
-					ctx.ReportNodeWithSuggestions(node, msg, func() []rule.RuleSuggestion {
+					ctx.ReportDiagnosticWithSuggestions(buildDiagnostic(result, msg), func() []rule.RuleSuggestion {
 						return []rule.RuleSuggestion{{
 							Message:  buildFloatingFixAwaitMessage(),
 							FixesArr: addAwait(expression, exprStatement),

@@ -706,13 +706,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<unknown>\`.",
+        "range": {
+          "end": 76,
+          "pos": 69,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 77,
+      "end": 76,
       "pos": 69,
     },
     "rule": "no-floating-promises",
@@ -752,13 +761,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<void>\`.",
+        "range": {
+          "end": 165,
+          "pos": 134,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 166,
+      "end": 165,
       "pos": 134,
     },
     "rule": "no-floating-promises",
@@ -798,13 +816,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 199,
+          "pos": 168,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 200,
+      "end": 199,
       "pos": 168,
     },
     "rule": "no-floating-promises",
@@ -844,13 +871,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 235,
+          "pos": 202,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 236,
+      "end": 235,
       "pos": 202,
     },
     "rule": "no-floating-promises",
@@ -890,13 +926,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This array contains Promises and has type \`Promise<number>[]\`.",
+        "range": {
+          "end": 271,
+          "pos": 238,
+        },
+      },
+    ],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
       "id": "floatingPromiseArrayVoid",
     },
     "range": {
-      "end": 272,
+      "end": 271,
       "pos": 238,
     },
     "rule": "no-floating-promises",
@@ -2807,13 +2852,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 92,
+          "pos": 69,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 93,
+      "end": 92,
       "pos": 69,
     },
     "rule": "no-floating-promises",
@@ -2853,13 +2907,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 138,
+          "pos": 120,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 139,
+      "end": 138,
       "pos": 120,
     },
     "rule": "no-floating-promises",
@@ -2899,13 +2962,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 186,
+          "pos": 166,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 187,
+      "end": 186,
       "pos": 166,
     },
     "rule": "no-floating-promises",
@@ -2945,13 +3017,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 251,
+          "pos": 215,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 252,
+      "end": 251,
       "pos": 215,
     },
     "rule": "no-floating-promises",
@@ -2991,13 +3072,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/prefer-promise-reject-errors/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 305,
+          "pos": 285,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 306,
+      "end": 305,
       "pos": 285,
     },
     "rule": "no-floating-promises",
@@ -3988,13 +4078,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<unknown>\`.",
+        "range": {
+          "end": 76,
+          "pos": 69,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 77,
+      "end": 76,
       "pos": 69,
     },
     "rule": "no-floating-promises",
@@ -4034,13 +4133,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<void>\`.",
+        "range": {
+          "end": 165,
+          "pos": 134,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 166,
+      "end": 165,
       "pos": 134,
     },
     "rule": "no-floating-promises",
@@ -4080,13 +4188,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 199,
+          "pos": 168,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 200,
+      "end": 199,
       "pos": 168,
     },
     "rule": "no-floating-promises",
@@ -4126,13 +4243,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 235,
+          "pos": 202,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 236,
+      "end": 235,
       "pos": 202,
     },
     "rule": "no-floating-promises",
@@ -4172,13 +4298,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/a.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This array contains Promises and has type \`Promise<number>[]\`.",
+        "range": {
+          "end": 271,
+          "pos": 238,
+        },
+      },
+    ],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
       "id": "floatingPromiseArrayVoid",
     },
     "range": {
-      "end": 272,
+      "end": 271,
       "pos": 238,
     },
     "rule": "no-floating-promises",
@@ -4302,13 +4437,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<unknown>\`.",
+        "range": {
+          "end": 76,
+          "pos": 69,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 77,
+      "end": 76,
       "pos": 69,
     },
     "rule": "no-floating-promises",
@@ -4348,13 +4492,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<void>\`.",
+        "range": {
+          "end": 165,
+          "pos": 134,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 166,
+      "end": 165,
       "pos": 134,
     },
     "rule": "no-floating-promises",
@@ -4394,13 +4547,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 199,
+          "pos": 168,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 200,
+      "end": 199,
       "pos": 168,
     },
     "rule": "no-floating-promises",
@@ -4440,13 +4602,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 235,
+          "pos": 202,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 236,
+      "end": 235,
       "pos": 202,
     },
     "rule": "no-floating-promises",
@@ -4486,13 +4657,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/b.mts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This array contains Promises and has type \`Promise<number>[]\`.",
+        "range": {
+          "end": 271,
+          "pos": 238,
+        },
+      },
+    ],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
       "id": "floatingPromiseArrayVoid",
     },
     "range": {
-      "end": 272,
+      "end": 271,
       "pos": 238,
     },
     "rule": "no-floating-promises",
@@ -4616,13 +4796,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<unknown>\`.",
+        "range": {
+          "end": 76,
+          "pos": 69,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 77,
+      "end": 76,
       "pos": 69,
     },
     "rule": "no-floating-promises",
@@ -4662,13 +4851,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<void>\`.",
+        "range": {
+          "end": 165,
+          "pos": 134,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 166,
+      "end": 165,
       "pos": 134,
     },
     "rule": "no-floating-promises",
@@ -4708,13 +4906,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 199,
+          "pos": 168,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 200,
+      "end": 199,
       "pos": 168,
     },
     "rule": "no-floating-promises",
@@ -4754,13 +4961,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 235,
+          "pos": 202,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 236,
+      "end": 235,
       "pos": 202,
     },
     "rule": "no-floating-promises",
@@ -4800,13 +5016,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/c.cts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This array contains Promises and has type \`Promise<number>[]\`.",
+        "range": {
+          "end": 271,
+          "pos": 238,
+        },
+      },
+    ],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
       "id": "floatingPromiseArrayVoid",
     },
     "range": {
-      "end": 272,
+      "end": 271,
       "pos": 238,
     },
     "rule": "no-floating-promises",
@@ -4930,13 +5155,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<unknown>\`.",
+        "range": {
+          "end": 76,
+          "pos": 69,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 77,
+      "end": 76,
       "pos": 69,
     },
     "rule": "no-floating-promises",
@@ -4976,13 +5210,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<void>\`.",
+        "range": {
+          "end": 165,
+          "pos": 134,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 166,
+      "end": 165,
       "pos": 134,
     },
     "rule": "no-floating-promises",
@@ -5022,13 +5265,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 199,
+          "pos": 168,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 200,
+      "end": 199,
       "pos": 168,
     },
     "rule": "no-floating-promises",
@@ -5068,13 +5320,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<never>\`.",
+        "range": {
+          "end": 235,
+          "pos": 202,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 236,
+      "end": 235,
       "pos": 202,
     },
     "rule": "no-floating-promises",
@@ -5114,13 +5375,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/src/d.tsx",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This array contains Promises and has type \`Promise<number>[]\`.",
+        "range": {
+          "end": 271,
+          "pos": 238,
+        },
+      },
+    ],
     "message": {
       "description": "An array of Promises may be unintentional.",
       "help": "Consider handling the promises' fulfillment or rejection with Promise.all or similar, or explicitly marking the expression as ignored with the \`void\` operator.",
       "id": "floatingPromiseArrayVoid",
     },
     "range": {
-      "end": 272,
+      "end": 271,
       "pos": 238,
     },
     "rule": "no-floating-promises",
@@ -5343,13 +5613,22 @@ exports[`TSGoLint E2E Snapshot Tests > should still report lint rule diagnostics
   {
     "file_path": "fixtures/with-invalid-tsconfig-option-and-lint-errors/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<string>\`.",
+        "range": {
+          "end": 50,
+          "pos": 26,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add void operator to ignore.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
       "id": "floatingVoid",
     },
     "range": {
-      "end": 51,
+      "end": 50,
       "pos": 26,
     },
     "rule": "no-floating-promises",
@@ -5364,14 +5643,23 @@ exports[`TSGoLint E2E Snapshot Tests > supports passing rule config 1`] = `
   {
     "file_path": "fixtures/basic/rules/no-floating-promises/void.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<string>\`.",
+        "range": {
+          "end": 75,
+          "pos": 59,
+        },
+      },
+    ],
     "message": {
       "description": "Promises must be awaited, add await operator.",
       "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler.",
       "id": "floating",
     },
     "range": {
-      "end": 76,
-      "pos": 54,
+      "end": 75,
+      "pos": 59,
     },
     "rule": "no-floating-promises",
   },
