@@ -1225,6 +1225,101 @@ export const deepAssign = <
 };
     `,
 		},
+		{
+			// https://github.com/oxc-project/tsgolint/issues/1094
+			Code: `
+type AccountId = string & { __brand: 'AccountId' };
+
+interface Req {
+  params: Record<string, string>;
+  query: Record<string, string>;
+  method: string;
+}
+
+declare const accountId: AccountId;
+
+export const req = {
+  params: { id: accountId } as any,
+  query: {},
+} as Req;
+    `,
+		},
+		{
+			Code: `
+enum Lang {
+  EN = 'en-US',
+  SV = 'sv-SE',
+}
+
+const LANGUAGE_NAMES: Record<Lang, string> = {
+  [Lang.EN]: 'English',
+  [Lang.SV]: 'Svenska',
+};
+
+export const options = Object.values(Lang)
+  .map(lang => ({
+    label: LANGUAGE_NAMES[lang],
+    value: lang as string,
+  }))
+  .concat([{ label: 'български език', value: 'bg-BG' }]);
+    `,
+		},
+		{
+			Code: `
+type AnyObject = Record<string, any>;
+
+declare function isEditArray(item: unknown): item is { type: string }[];
+
+export function getEdits(bucket: { data: unknown }): { type: string }[] {
+  const { data } = bucket;
+  if (!data) return [];
+
+  const { edits } = data as AnyObject;
+
+  if (!isEditArray(edits)) return [];
+  return edits;
+}
+    `,
+		},
+		{
+			Code: `
+enum AppTracker {
+  MOOD = 1,
+  ENERGY = 2,
+}
+
+export function categoryFor(tracker: string): string {
+  return AppTracker[Number(tracker) as AppTracker];
+}
+    `,
+			TSConfig: "./tsconfig.noUncheckedIndexedAccess.json",
+		},
+		{
+			Code: `
+enum GuideId {
+  MEASURE = 'measure',
+}
+
+interface Guide {
+  id: GuideId;
+  title: string;
+  thumbnailUrl: string;
+}
+
+interface GlossaryItem {
+  id: string;
+  title: string;
+}
+
+export const item: { content: Guide | GlossaryItem } = {
+  content: {
+    id: 'how-to-measure' as any,
+    title: 'How to measure',
+    thumbnailUrl: 'https://example.com/thumb.jpg',
+  },
+};
+    `,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",

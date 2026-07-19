@@ -356,11 +356,26 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return false
 		}
 
+		isElementAccessArgument := func(node *ast.Node) bool {
+			current := node
+			parent := current.Parent
+			for parent != nil && ast.IsParenthesizedExpression(parent) {
+				current = parent
+				parent = parent.Parent
+			}
+			return parent != nil &&
+				ast.IsElementAccessExpression(parent) &&
+				parent.AsElementAccessExpression().ArgumentExpression == current
+		}
+
 		isTypeUnchanged := func(node *ast.Node, expression *ast.Node, uncast, cast *checker.Type) bool {
 			if uncast == cast {
 				return true
 			}
 			if utils.IsTypeParameter(uncast) && isReceiverOfWriteAccess(node) {
+				return false
+			}
+			if compilerOptions.NoUncheckedIndexedAccess.IsTrue() && isElementAccessArgument(node) {
 				return false
 			}
 
@@ -376,7 +391,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			if (utils.IsTypeFlagSet(uncast, checker.TypeFlagsNonPrimitive) && !utils.IsTypeFlagSet(cast, checker.TypeFlagsNonPrimitive)) ||
-				(hasIndexSignature(uncast) && !hasIndexSignature(cast)) ||
+				(hasIndexSignature(uncast) != hasIndexSignature(cast)) ||
 				containsAny(uncast) ||
 				containsAny(cast) ||
 				(containsTypeVariable(cast) && !containsTypeVariable(uncast)) {
@@ -805,7 +820,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 			objectParent := objectExpr.Parent
 			return objectParent != nil &&
-				(ast.IsSatisfiesExpression(objectParent) ||
+				(ast.IsAsExpression(objectParent) ||
+					ast.IsTypeAssertion(objectParent) ||
+					ast.IsSatisfiesExpression(objectParent) ||
 					(ast.IsCallExpression(objectParent) && objectParent.Parent != nil && ast.IsSatisfiesExpression(objectParent.Parent)))
 		}
 
@@ -906,6 +923,23 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return false
 		}
 
+		isPropertyInInferredCallbackReturn := func(node *ast.Node) bool {
+			parent := node.Parent
+			if parent == nil || !ast.IsPropertyAssignment(parent) || parent.Initializer() != node {
+				return false
+			}
+			objectExpr := parent.Parent
+			if objectExpr == nil || !ast.IsObjectLiteralExpression(objectExpr) {
+				return false
+			}
+
+			callback := parentThroughParens(objectExpr)
+			return callback != nil &&
+				ast.IsArrowFunction(callback) &&
+				ast.SkipParentheses(callback.Body()) == objectExpr &&
+				isInGenericContext(node)
+		}
+
 		skipParentTypeForContextualAny := func(node *ast.Node) bool {
 			parent := parentThroughParens(node)
 			return parent != nil &&
@@ -919,7 +953,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 		shouldSkipContextualTypeFallback := func(node *ast.Node, castIsAny bool) bool {
 			parent := parentThroughParens(node)
 			if castIsAny {
-				return (parent != nil && ast.IsLogicalExpression(parent)) || isInGenericContext(node)
+				return (parent != nil && ast.IsLogicalExpression(parent)) ||
+					isInGenericContext(node) ||
+					isPropertyInProblematicContext(node)
 			}
 
 			if skipParentTypeForContextualAny(node) ||
@@ -927,6 +963,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
+				isPropertyInInferredCallbackReturn(node) ||
 				isAssignmentInNonStatementContext(node) ||
 				isRightHandSideOfLogicalAssignment(node) ||
 				isArgumentToOverloadedFunction(node) {
