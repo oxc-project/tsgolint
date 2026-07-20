@@ -325,8 +325,15 @@ var NoMisusedPromisesRule = rule.Rule{
 			if expression == nil {
 				return
 			}
+			// Check the cheaper `returnsThenable` before the expensive
+			// `getContextualType` — if the value isn't Promise-returning there's
+			// nothing to report, so the contextual type is never needed.
+			// See https://github.com/typescript-eslint/typescript-eslint/issues/6186
+			if !returnsThenable(expression) {
+				return
+			}
 			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, node.Initializer, checker.ContextFlagsNone)
-			if contextualType != nil && isVoidReturningFunctionType(node.Initializer, contextualType) && returnsThenable(expression) {
+			if contextualType != nil && isVoidReturningFunctionType(node.Initializer, contextualType) {
 				ctx.ReportNode(node.Initializer, buildVoidReturnAttributeMessage())
 			}
 		}
@@ -398,6 +405,7 @@ var NoMisusedPromisesRule = rule.Rule{
 			}
 			thenableReturnIndices := []int{}
 			voidReturnIndices := []int{}
+			numArgs := len(node.Arguments())
 			t := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
 
 			// We can't use checker.getResolvedSignature because it prefers an early '() => void' over a later '() => Promise<void>'
@@ -413,6 +421,14 @@ var NoMisusedPromisesRule = rule.Rule{
 				}
 				for _, signature := range signatures {
 					for index, parameter := range checker.Signature_parameters(signature) {
+						// Parameters beyond the number of supplied arguments can never
+						// be matched to an argument in checkArguments, so they can't
+						// produce a diagnostic. Since parameters are ordered with any
+						// rest parameter last (and a rest parameter at index >= numArgs
+						// spans zero arguments), we can stop scanning entirely here.
+						if index >= numArgs {
+							break
+						}
 						decl := parameter.ValueDeclaration
 						t := ctx.TypeChecker.GetTypeOfSymbolAtLocation(parameter, node.Expression())
 
@@ -424,7 +440,7 @@ var NoMisusedPromisesRule = rule.Rule{
 								// so that we'll handle it in the same way as a non-rest
 								// 'param: MaybeVoidFunction'
 								t = checker.Checker_getTypeArguments(ctx.TypeChecker, t)[0]
-								for i := index; i < len(node.Arguments()); i++ {
+								for i := index; i < numArgs; i++ {
 									checkThenableOrVoidArgument(
 										node,
 										t,
@@ -437,7 +453,7 @@ var NoMisusedPromisesRule = rule.Rule{
 								// Check each type in the tuple - for example, [boolean, () => void] would
 								// add the index of the second tuple parameter to 'voidReturnIndices'
 								typeArgs := checker.Checker_getTypeArguments(ctx.TypeChecker, t)
-								for i := index; i < len(node.Arguments()) && i-index < len(typeArgs); i++ {
+								for i := index; i < numArgs && i-index < len(typeArgs); i++ {
 									checkThenableOrVoidArgument(
 										node,
 										typeArgs[i-index],
@@ -473,17 +489,40 @@ var NoMisusedPromisesRule = rule.Rule{
 		checkArguments := func(
 			node *ast.Expression,
 		) {
+			arguments := node.Arguments()
+			// checkArguments only ever reports on an argument node, so a call with
+			// no arguments can never produce a diagnostic. Bail before resolving the
+			// callee type and its signatures — this fires on every zero-argument
+			// call/new expression (e.g. `foo()`, `new Foo()`), which are very common.
+			if len(arguments) == 0 {
+				return
+			}
+
+			// A diagnostic is only possible for an argument that is itself a
+			// Promise-returning function. Checking that (cheap: literals and other
+			// non-callable arguments resolve trivially) before running
+			// voidFunctionArguments lets us skip the expensive callee/parameter
+			// signature analysis (including getContextualTypeForArgumentAtIndex) for
+			// the overwhelming majority of calls, which pass no async callback.
+			// Same principle as typescript-eslint/typescript-eslint#6186.
+			var thenableArgIndices []int
+			for index, argument := range arguments {
+				if returnsThenable(argument) {
+					thenableArgIndices = append(thenableArgIndices, index)
+				}
+			}
+			if len(thenableArgIndices) == 0 {
+				return
+			}
+
 			voidArgs := voidFunctionArguments(node)
 			if len(voidArgs) == 0 {
 				return
 			}
 
-			for index, argument := range node.Arguments() {
-				if !slices.Contains(voidArgs, index) {
-					continue
-				}
-				if returnsThenable(argument) {
-					ctx.ReportNode(argument, buildVoidReturnArgumentMessage())
+			for _, index := range thenableArgIndices {
+				if slices.Contains(voidArgs, index) {
+					ctx.ReportNode(arguments[index], buildVoidReturnArgumentMessage())
 				}
 			}
 		}
@@ -496,11 +535,13 @@ var NoMisusedPromisesRule = rule.Rule{
 				return
 			}
 
-			heritageTypes := utils.Flatten(utils.Map(heritageClauses.Nodes, func(h *ast.Node) []*checker.Type {
-				return utils.Map(h.AsHeritageClause().Types.Nodes, func(n *ast.Node) *checker.Type {
-					return ctx.TypeChecker.GetTypeAtLocation(n)
-				})
-			}))
+			// Resolving the heritage clause types (one GetTypeAtLocation per
+			// extended/implemented type) is only needed once we actually find a
+			// Promise-returning member to check against them. Classes/interfaces
+			// whose members are all synchronous — the common case — never need it,
+			// so compute it lazily on first use.
+			var heritageTypes []*checker.Type
+			heritageResolved := false
 
 			for _, nodeMember := range node.Members() {
 				if nodeMember.Name() == nil {
@@ -520,6 +561,14 @@ var NoMisusedPromisesRule = rule.Rule{
 				if !returnsThenable(nodeMember) {
 					continue
 				}
+				if !heritageResolved {
+					heritageTypes = utils.Flatten(utils.Map(heritageClauses.Nodes, func(h *ast.Node) []*checker.Type {
+						return utils.Map(h.AsHeritageClause().Types.Nodes, func(n *ast.Node) *checker.Type {
+							return ctx.TypeChecker.GetTypeAtLocation(n)
+						})
+					}))
+					heritageResolved = true
+				}
 				for _, heritageType := range heritageTypes {
 					checkHeritageTypeForMemberReturningVoid(
 						nodeMember,
@@ -533,12 +582,17 @@ var NoMisusedPromisesRule = rule.Rule{
 		checkProperty := func(node *ast.Node) {
 			if ast.IsPropertyAssignment(node) {
 				property := node.AsPropertyAssignment()
+				// Check the cheaper `returnsThenable` before the expensive
+				// `getContextualType`. See checkJSXAttribute above.
+				if !returnsThenable(property.Initializer) {
+					return
+				}
 				contextualType := checker.Checker_getContextualType(ctx.TypeChecker, property.Initializer, checker.ContextFlagsNone)
 
 				if contextualType != nil && isVoidReturningFunctionType(
 					property.Initializer,
 					contextualType,
-				) && returnsThenable(property.Initializer) {
+				) {
 					if ast.IsFunctionLike(property.Initializer) {
 						returnType := property.Initializer.Type()
 						if returnType != nil {
@@ -555,10 +609,14 @@ var NoMisusedPromisesRule = rule.Rule{
 					}
 				}
 			} else if ast.IsShorthandPropertyAssignment(node) {
+				// Check the cheaper `returnsThenable` before the expensive
+				// `getContextualType`. See checkJSXAttribute above.
+				if !returnsThenable(node.Name()) {
+					return
+				}
 				contextualType := checker.Checker_getContextualType(ctx.TypeChecker, node.Name(), checker.ContextFlagsNone)
 				if contextualType != nil &&
-					isVoidReturningFunctionType(node.Name(), contextualType) &&
-					returnsThenable(node.Name()) {
+					isVoidReturningFunctionType(node.Name(), contextualType) {
 					ctx.ReportNode(node.Name(), buildVoidReturnPropertyMessage())
 				}
 			} else if ast.IsMethodDeclaration(node) {
@@ -688,12 +746,17 @@ var NoMisusedPromisesRule = rule.Rule{
 				return
 			}
 
+			// Check the cheaper `returnsThenable` before the expensive
+			// `getContextualType`. See checkJSXAttribute above.
+			if !returnsThenable(node.Expression) {
+				return
+			}
 			contextualType := checker.Checker_getContextualType(ctx.TypeChecker, node.Expression, checker.ContextFlagsNone)
 			if contextualType != nil &&
 				isVoidReturningFunctionType(
 					node.Expression,
 					contextualType,
-				) && returnsThenable(node.Expression) {
+				) {
 				ctx.ReportNode(node.Expression, buildVoidReturnReturnValueMessage())
 			}
 		}
