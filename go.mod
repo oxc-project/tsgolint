@@ -51,7 +51,7 @@ require (
 )
 
 require (
-	github.com/dlclark/regexp2/v2 v2.5.0
+	github.com/dlclark/regexp2/v2 v2.5.2
 	github.com/go-json-experiment/json v0.0.0-20260623181947-01eb4420fa68
 	golang.org/x/text v0.40.0
 )
