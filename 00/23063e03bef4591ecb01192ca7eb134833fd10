@@ -1,0 +1,21 @@
+benchmarks/eslint.config.mjs
+  s_f21752c1b24469::t_168c5b4ec25b8d 57-59,63,74-75,77,80-81,92-95,97-98,100,102,110-111
+benchmarks/setup.sh
+  s_f21752c1b24469::t_3e60a3b876d687 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "0023063e03bef4591ecb01192ca7eb134833fd10",
+  "prompts": {},
+  "sessions": {
+    "s_f21752c1b24469": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f7f49-16fb-72d3-bef2-798a52a8b019",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
