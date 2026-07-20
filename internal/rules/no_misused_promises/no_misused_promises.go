@@ -117,6 +117,57 @@ var NoMisusedPromisesRule = rule.Rule{
 			checksVoidReturnOpts = defaultChecksVoidReturnOpts()
 		}
 
+		typeHasCallSignatures := func(t *checker.Type) bool {
+			return utils.Some(utils.UnionTypeParts(t), func(t *checker.Type) bool {
+				return len(utils.GetCallSignatures(ctx.TypeChecker, t)) != 0
+			})
+		}
+
+		// Every `voidReturn` report requires the reported expression to have call
+		// signatures, so expressions that can't have any are skipped before the type
+		// queries gating the report are ever made.
+		//
+		// For a literal, having call signatures is a property of its kind rather than
+		// of the node: the apparent type of every string literal is the global
+		// `String`, of every array literal an `Array<T>`, and so on. Those globals
+		// normally have none, but interface augmentation
+		// (`interface String { (): Promise<void> }`) can give them some, so the answer
+		// is sampled from the checker once per kind rather than assumed.
+		callableByLiteralKind := make(map[ast.Kind]bool, 8)
+		couldBeFunctionLikeValue := func(node *ast.Node) bool {
+			switch node.Kind {
+			case ast.KindStringLiteral,
+				ast.KindNoSubstitutionTemplateLiteral,
+				ast.KindTemplateExpression,
+				ast.KindNumericLiteral,
+				ast.KindBigIntLiteral,
+				ast.KindTrueKeyword,
+				ast.KindFalseKeyword,
+				ast.KindNullKeyword,
+				ast.KindRegularExpressionLiteral,
+				ast.KindArrayLiteralExpression:
+			case ast.KindObjectLiteralExpression:
+				// Spreading a generic value keeps its type (e.g. `{ ...t }` where
+				// `T extends () => Promise<void>` has type `T`), which can be callable.
+				// A spread-free object literal declares no call signatures of its own,
+				// so the only ones it can have come from the global `Object`, which the
+				// per-kind sample below covers.
+				if utils.Some(node.AsObjectLiteralExpression().Properties.Nodes, ast.IsSpreadAssignment) {
+					return true
+				}
+			default:
+				return true
+			}
+
+			callable, sampled := callableByLiteralKind[node.Kind]
+			if !sampled {
+				t := checker.Checker_getApparentType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(node))
+				callable = typeHasCallSignatures(t)
+				callableByLiteralKind[node.Kind] = callable
+			}
+			return callable
+		}
+
 		anySignatureIsThenableType := func(
 			node *ast.Node,
 			t *checker.Type,
@@ -161,9 +212,7 @@ var NoMisusedPromisesRule = rule.Rule{
 			if t == nil {
 				return false
 			}
-			return utils.Some(utils.UnionTypeParts(t), func(t *checker.Type) bool {
-				return len(utils.GetCallSignatures(ctx.TypeChecker, t)) != 0
-			})
+			return typeHasCallSignatures(t)
 		}
 
 		// Variation on the thenable check which requires all forms of the type (read:
@@ -391,11 +440,7 @@ var NoMisusedPromisesRule = rule.Rule{
 		voidFunctionArguments := func(
 			node *ast.Expression,
 		) []int {
-			// 'new' can be used without any arguments, as in 'let b = new Object;'
-			// In this case, there are no argument positions to check, so return early.
-			if node.Arguments() == nil {
-				return []int{}
-			}
+			args := node.Arguments()
 			thenableReturnIndices := []int{}
 			voidReturnIndices := []int{}
 			t := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
@@ -413,18 +458,41 @@ var NoMisusedPromisesRule = rule.Rule{
 				}
 				for _, signature := range signatures {
 					for index, parameter := range checker.Signature_parameters(signature) {
+						// Parameters are in declaration order, so once one has no argument
+						// at its position, neither does any that follows.
+						if index >= len(args) {
+							break
+						}
+
 						decl := parameter.ValueDeclaration
+						isRestParameter := decl != nil && utils.IsRestParameterDeclaration(decl)
+
+						// A parameter position can only produce a report if an argument it
+						// covers could be a thenable-returning function, so skip resolving
+						// the parameter type otherwise. A rest parameter covers every
+						// remaining argument.
+						covered := args[index : index+1]
+						if isRestParameter {
+							covered = args[index:]
+						}
+						if !slices.ContainsFunc(covered, couldBeFunctionLikeValue) {
+							continue
+						}
+
 						t := ctx.TypeChecker.GetTypeOfSymbolAtLocation(parameter, node.Expression())
 
 						// If this is a array 'rest' parameter, check all of the argument indices
 						// from the current argument to the end.
-						if decl != nil && utils.IsRestParameterDeclaration(decl) {
+						if isRestParameter {
 							if checker.Checker_isArrayType(ctx.TypeChecker, t) {
 								// Unwrap 'Array<MaybeVoidFunction>' to 'MaybeVoidFunction',
 								// so that we'll handle it in the same way as a non-rest
 								// 'param: MaybeVoidFunction'
 								t = checker.Checker_getTypeArguments(ctx.TypeChecker, t)[0]
-								for i := index; i < len(node.Arguments()); i++ {
+								for i := index; i < len(args); i++ {
+									if !couldBeFunctionLikeValue(args[i]) {
+										continue
+									}
 									checkThenableOrVoidArgument(
 										node,
 										t,
@@ -437,7 +505,10 @@ var NoMisusedPromisesRule = rule.Rule{
 								// Check each type in the tuple - for example, [boolean, () => void] would
 								// add the index of the second tuple parameter to 'voidReturnIndices'
 								typeArgs := checker.Checker_getTypeArguments(ctx.TypeChecker, t)
-								for i := index; i < len(node.Arguments()) && i-index < len(typeArgs); i++ {
+								for i := index; i < len(args) && i-index < len(typeArgs); i++ {
+									if !couldBeFunctionLikeValue(args[i]) {
+										continue
+									}
 									checkThenableOrVoidArgument(
 										node,
 										typeArgs[i-index],
@@ -473,6 +544,13 @@ var NoMisusedPromisesRule = rule.Rule{
 		checkArguments := func(
 			node *ast.Expression,
 		) {
+			// A report requires an argument that could be a thenable-returning
+			// function; skip the callee/parameter type queries when no argument
+			// qualifies (e.g. zero arguments, or all-literal arguments).
+			if !slices.ContainsFunc(node.Arguments(), couldBeFunctionLikeValue) {
+				return
+			}
+
 			voidArgs := voidFunctionArguments(node)
 			if len(voidArgs) == 0 {
 				return
@@ -533,6 +611,9 @@ var NoMisusedPromisesRule = rule.Rule{
 		checkProperty := func(node *ast.Node) {
 			if ast.IsPropertyAssignment(node) {
 				property := node.AsPropertyAssignment()
+				if !couldBeFunctionLikeValue(property.Initializer) {
+					return
+				}
 				contextualType := checker.Checker_getContextualType(ctx.TypeChecker, property.Initializer, checker.ContextFlagsNone)
 
 				if contextualType != nil && isVoidReturningFunctionType(
@@ -671,7 +752,7 @@ var NoMisusedPromisesRule = rule.Rule{
 		}
 
 		checkReturnStatement := func(node *ast.ReturnStatement) {
-			if node.Expression == nil {
+			if node.Expression == nil || !couldBeFunctionLikeValue(node.Expression) {
 				return
 			}
 
@@ -699,6 +780,9 @@ var NoMisusedPromisesRule = rule.Rule{
 		}
 
 		checkAssignment := func(node *ast.BinaryExpression) {
+			if !couldBeFunctionLikeValue(node.Right) {
+				return
+			}
 			varType := ctx.TypeChecker.GetTypeAtLocation(node.Left)
 			if !isVoidReturningFunctionType(node.Left, varType) {
 				return
@@ -711,7 +795,8 @@ var NoMisusedPromisesRule = rule.Rule{
 
 		checkVariableDeclaration := func(node *ast.VariableDeclaration) {
 			if node.Initializer == nil ||
-				node.Type == nil {
+				node.Type == nil ||
+				!couldBeFunctionLikeValue(node.Initializer) {
 				return
 			}
 
