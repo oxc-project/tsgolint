@@ -1,0 +1,19 @@
+.github/workflows/release.yml
+  s_1c11b6ab4f9734::t_d9908baf9c93eb 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "82ca86335e009c77ddee89229f7d10b82381cb3e",
+  "prompts": {},
+  "sessions": {
+    "s_1c11b6ab4f9734": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f84c8-bb66-7023-ade5-d8e68c4f53e4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
