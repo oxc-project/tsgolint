@@ -6,6 +6,11 @@ Message: Expected non-Promise value in a boolean conditional.
    2 | if (Promise.resolve()) {
      |     ~~~~~~~~~~~~~~~~~
    3 | }
+  Label: This expression has type `Promise<void>`. (2:5 - 2:21)
+   1 | 
+   2 | if (Promise.resolve()) {
+     |     ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   3 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-1 - 1]
@@ -15,12 +20,22 @@ Message: Expected non-Promise value in a boolean conditional.
    2 | if (Promise.resolve()) {
      |     ~~~~~~~~~~~~~~~~~
    3 | } else if (Promise.resolve()) {
+  Label: This expression has type `Promise<void>`. (2:5 - 2:21)
+   1 | 
+   2 | if (Promise.resolve()) {
+     |     ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   3 | } else if (Promise.resolve()) {
 
 Diagnostic 2: conditional (3:12 - 3:28)
 Message: Expected non-Promise value in a boolean conditional.
    2 | if (Promise.resolve()) {
    3 | } else if (Promise.resolve()) {
      |            ~~~~~~~~~~~~~~~~~
+   4 | } else {
+  Label: This expression has type `Promise<void>`. (3:12 - 3:28)
+   2 | if (Promise.resolve()) {
+   3 | } else if (Promise.resolve()) {
+     |            ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
    4 | } else {
 ---
 
@@ -29,6 +44,9 @@ Diagnostic 1: conditional (1:13 - 1:29)
 Message: Expected non-Promise value in a boolean conditional.
    1 | for (let i; Promise.resolve(); i++) {}
      |             ~~~~~~~~~~~~~~~~~
+  Label: This expression has type `Promise<void>`. (1:13 - 1:29)
+   1 | for (let i; Promise.resolve(); i++) {}
+     |             ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
 ---
 
 [TestNoMisusedPromisesRule/invalid-3 - 1]
@@ -36,6 +54,9 @@ Diagnostic 1: conditional (1:14 - 1:30)
 Message: Expected non-Promise value in a boolean conditional.
    1 | do {} while (Promise.resolve());
      |              ~~~~~~~~~~~~~~~~~
+  Label: This expression has type `Promise<void>`. (1:14 - 1:30)
+   1 | do {} while (Promise.resolve());
+     |              ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
 ---
 
 [TestNoMisusedPromisesRule/invalid-4 - 1]
@@ -43,6 +64,9 @@ Diagnostic 1: conditional (1:8 - 1:24)
 Message: Expected non-Promise value in a boolean conditional.
    1 | while (Promise.resolve()) {}
      |        ~~~~~~~~~~~~~~~~~
+  Label: This expression has type `Promise<void>`. (1:8 - 1:24)
+   1 | while (Promise.resolve()) {}
+     |        ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
 ---
 
 [TestNoMisusedPromisesRule/invalid-5 - 1]
@@ -50,6 +74,9 @@ Diagnostic 1: conditional (1:1 - 1:17)
 Message: Expected non-Promise value in a boolean conditional.
    1 | Promise.resolve() ? 123 : 456;
      | ~~~~~~~~~~~~~~~~~
+  Label: This expression has type `Promise<void>`. (1:1 - 1:17)
+   1 | Promise.resolve() ? 123 : 456;
+     | ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
 ---
 
 [TestNoMisusedPromisesRule/invalid-6 - 1]
@@ -59,6 +86,11 @@ Message: Expected non-Promise value in a boolean conditional.
    2 | if (!Promise.resolve()) {
      |      ~~~~~~~~~~~~~~~~~
    3 | }
+  Label: This expression has type `Promise<void>`. (2:6 - 2:22)
+   1 | 
+   2 | if (!Promise.resolve()) {
+     |      ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   3 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-7 - 1]
@@ -66,107 +98,132 @@ Diagnostic 1: conditional (1:1 - 1:17)
 Message: Expected non-Promise value in a boolean conditional.
    1 | Promise.resolve() || false;
      | ~~~~~~~~~~~~~~~~~
+  Label: This expression has type `Promise<void>`. (1:1 - 1:17)
+   1 | Promise.resolve() || false;
+     | ^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
 ---
 
 [TestNoMisusedPromisesRule/invalid-8 - 1]
-Diagnostic 1: voidReturnArgument (2:47 - 4:1)
+Diagnostic 1: voidReturnArgument (2:57 - 2:58)
 Message: Promise returned in function argument where a void return was expected.
    1 | 
    2 | [Promise.resolve(), Promise.reject()].forEach(async val => {
-     |                                               ~~~~~~~~~~~~~~
+     |                                                         ~~
    3 |   await val;
-     | ~~~~~~~~~~~~
-   4 | });
-     | ~
-   5 |       
+  Label: This callback has type `(val: Promise<void>) => Promise<void>`. (2:57 - 2:58)
+   1 | 
+   2 | [Promise.resolve(), Promise.reject()].forEach(async val => {
+     |                                                         ^^ This callback has type `(val: Promise<void>) => Promise<void>`.
+   3 |   await val;
 ---
 
 [TestNoMisusedPromisesRule/invalid-9 - 1]
-Diagnostic 1: voidReturnArgument (2:13 - 5:1)
+Diagnostic 1: voidReturnArgument (2:37 - 2:38)
 Message: Promise returned in function argument where a void return was expected.
    1 | 
    2 | new Promise(async (resolve, reject) => {
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                     ~~
    3 |   await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 |   resolve();
-     | ~~~~~~~~~~~~
-   5 | });
-     | ~
-   6 |       
+  Label: This callback has type `(resolve: (value: unknown) => void, reject: (reason?: any) => void) => Promise<void>`. (2:37 - 2:38)
+   1 | 
+   2 | new Promise(async (resolve, reject) => {
+     |                                     ^^ This callback has type `(resolve: (value: unknown) => void, reject: (reason?: any) => void) => Promise<void>`.
+   3 |   await Promise.resolve();
 ---
 
 [TestNoMisusedPromisesRule/invalid-10 - 1]
-Diagnostic 1: voidReturnArgument (6:23 - 8:1)
+Diagnostic 1: voidReturnArgument (6:40 - 6:41)
 Message: Promise returned in function argument where a void return was expected.
    5 | 
    6 | fnWithCallback('val', async (err, res) => {
-     |                       ~~~~~~~~~~~~~~~~~~~~~
+     |                                        ~~
    7 |   await res;
-     | ~~~~~~~~~~~~
-   8 | });
-     | ~
-   9 |       
+  Label: This callback has type `(err: any, res: string) => Promise<void>`. (6:40 - 6:41)
+   5 | 
+   6 | fnWithCallback('val', async (err, res) => {
+     |                                        ^^ This callback has type `(err: any, res: string) => Promise<void>`.
+   7 |   await res;
+  Label: This context accepts a `void`-returning callback through type `(err: any, res: string) => void`. (2:42 - 2:72)
+   1 | 
+   2 | const fnWithCallback = (arg: string, cb: (err: any, res: string) => void) => {
+     |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `(err: any, res: string) => void`.
+   3 |   cb(null, arg);
 ---
 
 [TestNoMisusedPromisesRule/invalid-11 - 1]
-Diagnostic 1: voidReturnArgument (6:23 - 6:56)
+Diagnostic 1: voidReturnArgument (6:34 - 6:35)
 Message: Promise returned in function argument where a void return was expected.
    5 | 
    6 | fnWithCallback('val', (err, res) => Promise.resolve(res));
-     |                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                  ~~
    7 |       
+  Label: This callback has type `(err: any, res: string) => Promise<string>`. (6:34 - 6:35)
+   5 | 
+   6 | fnWithCallback('val', (err, res) => Promise.resolve(res));
+     |                                  ^^ This callback has type `(err: any, res: string) => Promise<string>`.
+   7 |       
+  Label: This context accepts a `void`-returning callback through type `(err: any, res: string) => void`. (2:42 - 2:72)
+   1 | 
+   2 | const fnWithCallback = (arg: string, cb: (err: any, res: string) => void) => {
+     |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `(err: any, res: string) => void`.
+   3 |   cb(null, arg);
 ---
 
 [TestNoMisusedPromisesRule/invalid-12 - 1]
-Diagnostic 1: voidReturnArgument (6:23 - 12:1)
+Diagnostic 1: voidReturnArgument (6:34 - 6:35)
 Message: Promise returned in function argument where a void return was expected.
    5 | 
    6 | fnWithCallback('val', (err, res) => {
-     |                       ~~~~~~~~~~~~~~~
+     |                                  ~~
    7 |   if (err) {
-     | ~~~~~~~~~~~~
-   8 |     return 'abc';
-     | ~~~~~~~~~~~~~~~~~
-   9 |   } else {
-     | ~~~~~~~~~~
-  10 |     return Promise.resolve(res);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  11 |   }
-     | ~~~
-  12 | });
-     | ~
-  13 |       
+  Label: This callback has type `(err: any, res: string) => "abc" | Promise<string>`. (6:34 - 6:35)
+   5 | 
+   6 | fnWithCallback('val', (err, res) => {
+     |                                  ^^ This callback has type `(err: any, res: string) => "abc" | Promise<string>`.
+   7 |   if (err) {
+  Label: This context accepts a `void`-returning callback through type `(err: any, res: string) => void`. (2:42 - 2:72)
+   1 | 
+   2 | const fnWithCallback = (arg: string, cb: (err: any, res: string) => void) => {
+     |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `(err: any, res: string) => void`.
+   3 |   cb(null, arg);
 ---
 
 [TestNoMisusedPromisesRule/invalid-13 - 1]
-Diagnostic 1: voidReturnArgument (8:25 - 8:58)
+Diagnostic 1: voidReturnArgument (8:36 - 8:37)
 Message: Promise returned in function argument where a void return was expected.
    7 | 
    8 | fnWithCallback?.('val', (err, res) => Promise.resolve(res));
-     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                    ~~
    9 |       
+  Label: This callback has type `(err: any, res: string) => Promise<string>`. (8:36 - 8:37)
+   7 | 
+   8 | fnWithCallback?.('val', (err, res) => Promise.resolve(res));
+     |                                    ^^ This callback has type `(err: any, res: string) => Promise<string>`.
+   9 |       
+  Label: This context accepts a `void`-returning callback through type `(err: any, res: string) => void`. (3:24 - 3:54)
+   2 | const fnWithCallback:
+   3 |   | ((arg: string, cb: (err: any, res: string) => void) => void)
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `(err: any, res: string) => void`.
+   4 |   | null = (arg, cb) => {
 ---
 
 [TestNoMisusedPromisesRule/invalid-14 - 1]
-Diagnostic 1: voidReturnArgument (8:23 - 14:1)
+Diagnostic 1: voidReturnArgument (8:34 - 8:35)
 Message: Promise returned in function argument where a void return was expected.
    7 | 
    8 | fnWithCallback('val', (err, res) => {
-     |                       ~~~~~~~~~~~~~~~
+     |                                  ~~
    9 |   if (err) {
-     | ~~~~~~~~~~~~
-  10 |     return 'abc';
-     | ~~~~~~~~~~~~~~~~~
-  11 |   } else {
-     | ~~~~~~~~~~
-  12 |     return Promise.resolve(res);
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  13 |   }
-     | ~~~
-  14 | });
-     | ~
-  15 |       
+  Label: This callback has type `(err: any, res: string) => "abc" | Promise<string>`. (8:34 - 8:35)
+   7 | 
+   8 | fnWithCallback('val', (err, res) => {
+     |                                  ^^ This callback has type `(err: any, res: string) => "abc" | Promise<string>`.
+   9 |   if (err) {
+  Label: This context accepts a `void`-returning callback through type `(err: any, res: string) => void`. (3:24 - 3:54)
+   2 | const fnWithCallback:
+   3 |   | ((arg: string, cb: (err: any, res: string) => void) => void)
+     |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `(err: any, res: string) => void`.
+   4 |   | null = (arg, cb) => {
 ---
 
 [TestNoMisusedPromisesRule/invalid-15 - 1]
@@ -175,6 +232,11 @@ Message: Expected non-Promise value in a boolean conditional.
    2 | function test(bool: boolean, p: Promise<void>) {
    3 |   if (bool || p) {
      |               ~
+   4 |   }
+  Label: This expression has type `Promise<void>`. (3:15 - 3:15)
+   2 | function test(bool: boolean, p: Promise<void>) {
+   3 |   if (bool || p) {
+     |               ^ This expression has type `Promise<void>`.
    4 |   }
 ---
 
@@ -185,6 +247,11 @@ Message: Expected non-Promise value in a boolean conditional.
    3 |   if (bool && p) {
      |               ~
    4 |   }
+  Label: This expression has type `Promise<void>`. (3:15 - 3:15)
+   2 | function test(bool: boolean, p: Promise<void>) {
+   3 |   if (bool && p) {
+     |               ^ This expression has type `Promise<void>`.
+   4 |   }
 ---
 
 [TestNoMisusedPromisesRule/invalid-17 - 1]
@@ -193,6 +260,11 @@ Message: Expected non-Promise value in a boolean conditional.
    2 | function test(a: any, p: Promise<void>) {
    3 |   if (a ?? p) {
      |            ~
+   4 |   }
+  Label: This expression has type `Promise<void>`. (3:12 - 3:12)
+   2 | function test(a: any, p: Promise<void>) {
+   3 |   if (a ?? p) {
+     |            ^ This expression has type `Promise<void>`.
    4 |   }
 ---
 
@@ -203,83 +275,142 @@ Message: Expected non-Promise value in a boolean conditional.
    3 |   if (p ?? Promise.reject()) {
      |            ~~~~~~~~~~~~~~~~
    4 |   }
+  Label: This expression has type `Promise<void>`. (3:12 - 3:27)
+   2 | function test(p: Promise<void> | undefined) {
+   3 |   if (p ?? Promise.reject()) {
+     |            ^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   4 |   }
 ---
 
 [TestNoMisusedPromisesRule/invalid-19 - 1]
-Diagnostic 1: voidReturnVariable (3:5 - 5:1)
+Diagnostic 1: voidReturnVariable (3:14 - 3:15)
 Message: Promise-returning function provided to variable where a void return was expected.
    2 | let f: () => void;
    3 | f = async () => {
-     |     ~~~~~~~~~~~~~
+     |              ~~
    4 |   return 3;
-     | ~~~~~~~~~~~
-   5 | };
-     | ~
-   6 |       
+  Label: This callback has type `() => Promise<number>`. (3:14 - 3:15)
+   2 | let f: () => void;
+   3 | f = async () => {
+     |              ^^ This callback has type `() => Promise<number>`.
+   4 |   return 3;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:8 - 2:17)
+   1 | 
+   2 | let f: () => void;
+     |        ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | f = async () => {
 ---
 
 [TestNoMisusedPromisesRule/invalid-20 - 1]
-Diagnostic 1: voidReturnVariable (3:5 - 5:1)
+Diagnostic 1: voidReturnVariable (3:14 - 3:15)
 Message: Promise-returning function provided to variable where a void return was expected.
    2 | let f: () => void;
    3 | f = async () => {
-     |     ~~~~~~~~~~~~~
+     |              ~~
    4 |   return 3;
-     | ~~~~~~~~~~~
-   5 | };
-     | ~
-   6 |       
+  Label: This callback has type `() => Promise<number>`. (3:14 - 3:15)
+   2 | let f: () => void;
+   3 | f = async () => {
+     |              ^^ This callback has type `() => Promise<number>`.
+   4 |   return 3;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:8 - 2:17)
+   1 | 
+   2 | let f: () => void;
+     |        ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | f = async () => {
 ---
 
 [TestNoMisusedPromisesRule/invalid-21 - 1]
-Diagnostic 1: voidReturnVariable (2:23 - 4:1)
+Diagnostic 1: voidReturnVariable (2:32 - 2:33)
 Message: Promise-returning function provided to variable where a void return was expected.
    1 | 
    2 | const f: () => void = async () => {
-     |                       ~~~~~~~~~~~~~
+     |                                ~~
    3 |   return 0;
-     | ~~~~~~~~~~~
-   4 | };
-     | ~
-   5 | const g = async () => 1,
+  Label: This callback has type `() => Promise<number>`. (2:32 - 2:33)
+   1 | 
+   2 | const f: () => void = async () => {
+     |                                ^^ This callback has type `() => Promise<number>`.
+   3 |   return 0;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:10 - 2:19)
+   1 | 
+   2 | const f: () => void = async () => {
+     |          ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 |   return 0;
 
-Diagnostic 2: voidReturnVariable (6:19 - 6:32)
+Diagnostic 2: voidReturnVariable (6:28 - 6:29)
 Message: Promise-returning function provided to variable where a void return was expected.
    5 | const g = async () => 1,
    6 |   h: () => void = async () => {};
-     |                   ~~~~~~~~~~~~~~
+     |                            ~~
+   7 |       
+  Label: This callback has type `() => Promise<void>`. (6:28 - 6:29)
+   5 | const g = async () => 1,
+   6 |   h: () => void = async () => {};
+     |                            ^^ This callback has type `() => Promise<void>`.
+   7 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (6:6 - 6:15)
+   5 | const g = async () => 1,
+   6 |   h: () => void = async () => {};
+     |      ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
    7 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-22 - 1]
-Diagnostic 1: voidReturnVariable (5:9 - 7:1)
+Diagnostic 1: voidReturnVariable (5:18 - 5:19)
 Message: Promise-returning function provided to variable where a void return was expected.
    4 | } = {};
    5 | obj.f = async () => {
-     |         ~~~~~~~~~~~~~
+     |                  ~~
    6 |   return 0;
-     | ~~~~~~~~~~~
-   7 | };
-     | ~
-   8 |       
+  Label: This callback has type `() => Promise<number>`. (5:18 - 5:19)
+   4 | } = {};
+   5 | obj.f = async () => {
+     |                  ^^ This callback has type `() => Promise<number>`.
+   6 |   return 0;
+  Label: This context accepts a `void`-returning callback through type `(() => void) | undefined`. (3:7 - 3:16)
+   2 | const obj: {
+   3 |   f?: () => void;
+     |       ^^^^^^^^^^ This context accepts a `void`-returning callback through type `(() => void) | undefined`.
+   4 | } = {};
 ---
 
 [TestNoMisusedPromisesRule/invalid-23 - 1]
-Diagnostic 1: voidReturnProperty (4:6 - 4:22)
+Diagnostic 1: voidReturnProperty (4:15 - 4:16)
 Message: Promise-returning function provided to property where a void return was expected.
    3 | const obj: O = {
    4 |   f: async () => 'foo',
-     |      ~~~~~~~~~~~~~~~~~
+     |               ~~
    5 | };
+  Label: This callback has type `() => Promise<string>`. (4:15 - 4:16)
+   3 | const obj: O = {
+   4 |   f: async () => 'foo',
+     |               ^^ This callback has type `() => Promise<string>`.
+   5 | };
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | const obj: O = {
 ---
 
 [TestNoMisusedPromisesRule/invalid-24 - 1]
-Diagnostic 1: voidReturnProperty (4:6 - 4:22)
+Diagnostic 1: voidReturnProperty (4:15 - 4:16)
 Message: Promise-returning function provided to property where a void return was expected.
    3 | const obj: O = {
    4 |   f: async () => 'foo',
-     |      ~~~~~~~~~~~~~~~~~
+     |               ~~
    5 | };
+  Label: This callback has type `() => Promise<string>`. (4:15 - 4:16)
+   3 | const obj: O = {
+   4 |   f: async () => 'foo',
+     |               ^^ This callback has type `() => Promise<string>`.
+   5 | };
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | const obj: O = {
 ---
 
 [TestNoMisusedPromisesRule/invalid-25 - 1]
@@ -289,39 +420,71 @@ Message: Promise-returning function provided to property where a void return was
    5 |   f,
      |   ~
    6 | };
+  Label: This callback has type `() => Promise<number>`. (5:3 - 5:3)
+   4 | const obj: O = {
+   5 |   f,
+     |   ^ This callback has type `() => Promise<number>`.
+   6 | };
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | const f = async () => 0;
 ---
 
 [TestNoMisusedPromisesRule/invalid-26 - 1]
-Diagnostic 1: voidReturnProperty (4:3 - 6:3)
+Diagnostic 1: voidReturnProperty (4:3 - 4:9)
 Message: Promise-returning function provided to property where a void return was expected.
    3 | const obj: O = {
    4 |   async f() {
-     |   ~~~~~~~~~~~
+     |   ~~~~~~~
    5 |     return 0;
-     | ~~~~~~~~~~~~~
-   6 |   },
-     | ~~~
-   7 | };
+  Label: This callback has type `() => Promise<number>`. (4:3 - 4:9)
+   3 | const obj: O = {
+   4 |   async f() {
+     |   ^^^^^^^ This callback has type `() => Promise<number>`.
+   5 |     return 0;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | const obj: O = {
 ---
 
 [TestNoMisusedPromisesRule/invalid-27 - 1]
-Diagnostic 1: voidReturnProperty (6:5 - 8:5)
+Diagnostic 1: voidReturnProperty (6:5 - 6:11)
 Message: Promise-returning function provided to property where a void return was expected.
    5 |   return {
    6 |     async f() {
-     |     ~~~~~~~~~~~
+     |     ~~~~~~~
    7 |       return 123;
-     | ~~~~~~~~~~~~~~~~~
-   8 |     },
-     | ~~~~~
-   9 |     g: async () => 0,
+  Label: This callback has type `() => Promise<number>`. (6:5 - 6:11)
+   5 |   return {
+   6 |     async f() {
+     |     ^^^^^^^ This callback has type `() => Promise<number>`.
+   7 |       return 123;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void; g: () => void; h: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | function f(): O {
 
-Diagnostic 2: voidReturnProperty (9:8 - 9:20)
+Diagnostic 2: voidReturnProperty (9:17 - 9:18)
 Message: Promise-returning function provided to property where a void return was expected.
    8 |     },
    9 |     g: async () => 0,
-     |        ~~~~~~~~~~~~~
+     |                 ~~
   10 |     h,
+  Label: This callback has type `() => Promise<number>`. (9:17 - 9:18)
+   8 |     },
+   9 |     g: async () => 0,
+     |                 ^^ This callback has type `() => Promise<number>`.
+  10 |     h,
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:30 - 2:39)
+   1 | 
+   2 | type O = { f: () => void; g: () => void; h: () => void };
+     |                              ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | function f(): O {
 
 Diagnostic 3: voidReturnProperty (10:5 - 10:5)
 Message: Promise-returning function provided to property where a void return was expected.
@@ -329,218 +492,438 @@ Message: Promise-returning function provided to property where a void return was
   10 |     h,
      |     ~
   11 |   };
+  Label: This callback has type `() => Promise<number>`. (10:5 - 10:5)
+   9 |     g: async () => 0,
+  10 |     h,
+     |     ^ This callback has type `() => Promise<number>`.
+  11 |   };
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:45 - 2:54)
+   1 | 
+   2 | type O = { f: () => void; g: () => void; h: () => void };
+     |                                             ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | function f(): O {
 ---
 
 [TestNoMisusedPromisesRule/invalid-28 - 1]
-Diagnostic 1: voidReturnReturnValue (3:10 - 3:22)
+Diagnostic 1: voidReturnReturnValue (3:19 - 3:20)
 Message: Promise-returning function provided to return value where a void return was expected.
    2 | function f(): () => void {
    3 |   return async () => 0;
-     |          ~~~~~~~~~~~~~
+     |                   ~~
    4 | }
+  Label: This callback has type `() => Promise<number>`. (3:19 - 3:20)
+   2 | function f(): () => void {
+   3 |   return async () => 0;
+     |                   ^^ This callback has type `() => Promise<number>`.
+   4 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | function f(): () => void {
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 |   return async () => 0;
 ---
 
 [TestNoMisusedPromisesRule/invalid-29 - 1]
-Diagnostic 1: voidReturnReturnValue (3:10 - 3:22)
+Diagnostic 1: voidReturnReturnValue (3:19 - 3:20)
 Message: Promise-returning function provided to return value where a void return was expected.
    2 | function f(): () => void {
    3 |   return async () => 0;
-     |          ~~~~~~~~~~~~~
+     |                   ~~
    4 | }
+  Label: This callback has type `() => Promise<number>`. (3:19 - 3:20)
+   2 | function f(): () => void {
+   3 |   return async () => 0;
+     |                   ^^ This callback has type `() => Promise<number>`.
+   4 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | function f(): () => void {
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 |   return async () => 0;
 ---
 
 [TestNoMisusedPromisesRule/invalid-30 - 1]
-Diagnostic 1: voidReturnAttribute (6:17 - 6:31)
+Diagnostic 1: voidReturnAttribute (6:27 - 6:28)
 Message: Promise-returning function provided to attribute where a void return was expected.
    5 | const Component = (obj: O) => null;
    6 | <Component func={async () => 0} />;
-     |                 ~~~~~~~~~~~~~~~
+     |                           ~~
    7 |       
+  Label: This callback has type `() => Promise<number>`. (6:27 - 6:28)
+   5 | const Component = (obj: O) => null;
+   6 | <Component func={async () => 0} />;
+     |                           ^^ This callback has type `() => Promise<number>`.
+   7 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:9 - 3:18)
+   2 | type O = {
+   3 |   func: () => void;
+     |         ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-32 - 1]
-Diagnostic 1: voidReturnAttribute (7:17 - 7:19)
+Diagnostic 1: voidReturnAttribute (7:18 - 7:18)
 Message: Promise-returning function provided to attribute where a void return was expected.
    6 | const Component = (obj: O) => null;
    7 | <Component func={g} />;
-     |                 ~~~
+     |                  ~
    8 |       
+  Label: This callback has type `() => Promise<string>`. (7:18 - 7:18)
+   6 | const Component = (obj: O) => null;
+   7 | <Component func={g} />;
+     |                  ^ This callback has type `() => Promise<string>`.
+   8 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:9 - 3:18)
+   2 | type O = {
+   3 |   func: () => void;
+     |         ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-33 - 1]
-Diagnostic 1: voidReturnArgument (9:8 - 9:21)
+Diagnostic 1: voidReturnArgument (9:17 - 9:18)
 Message: Promise returned in function argument where a void return was expected.
    8 | 
    9 | it('', async () => {});
-     |        ~~~~~~~~~~~~~~
+     |                 ~~
   10 |       
+  Label: This callback has type `() => Promise<void>`. (9:17 - 9:18)
+   8 | 
+   9 | it('', async () => {});
+     |                 ^^ This callback has type `() => Promise<void>`.
+  10 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (4:28 - 4:37)
+   3 |   (name: string, callback: () => number): void;
+   4 |   (name: string, callback: () => void): void;
+     |                            ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   5 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-34 - 1]
-Diagnostic 1: voidReturnArgument (11:8 - 11:21)
+Diagnostic 1: voidReturnArgument (11:17 - 11:18)
 Message: Promise returned in function argument where a void return was expected.
   10 | 
   11 | it('', async () => {});
-     |        ~~~~~~~~~~~~~~
+     |                 ~~
   12 |       
+  Label: This callback has type `() => Promise<void>`. (11:17 - 11:18)
+  10 | 
+  11 | it('', async () => {});
+     |                 ^^ This callback has type `() => Promise<void>`.
+  12 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (6:28 - 6:37)
+   5 | interface ItLike {
+   6 |   (name: string, callback: () => void): void;
+     |                            ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   7 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-35 - 1]
-Diagnostic 1: voidReturnArgument (11:8 - 11:21)
+Diagnostic 1: voidReturnArgument (11:17 - 11:18)
 Message: Promise returned in function argument where a void return was expected.
   10 | 
   11 | it('', async () => {});
-     |        ~~~~~~~~~~~~~~
+     |                 ~~
   12 |       
+  Label: This callback has type `() => Promise<void>`. (11:17 - 11:18)
+  10 | 
+  11 | it('', async () => {});
+     |                 ^^ This callback has type `() => Promise<void>`.
+  12 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:28 - 3:37)
+   2 | interface ItLike {
+   3 |   (name: string, callback: () => void): void;
+     |                            ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-36 - 1]
-Diagnostic 1: spread (2:18 - 2:45)
+Diagnostic 1: spread (2:15 - 2:17)
 Message: Expected a non-Promise value to be spread in an object.
    1 | 
    2 | console.log({ ...Promise.resolve({ key: 42 }) });
-     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~
+   3 |       
+  Label: This expression has type `Promise<{ key: number; }>`. (2:18 - 2:45)
+   1 | 
+   2 | console.log({ ...Promise.resolve({ key: 42 }) });
+     |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<{ key: number; }>`.
    3 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-37 - 1]
-Diagnostic 1: spread (6:6 - 6:14)
+Diagnostic 1: spread (6:3 - 6:5)
 Message: Expected a non-Promise value to be spread in an object.
    5 |   someData: 42,
    6 |   ...getData(),
-     |      ~~~~~~~~~
+     |   ~~~
+   7 | });
+  Label: This expression has type `Promise<{ key: number; }>`. (6:6 - 6:14)
+   5 |   someData: 42,
+   6 |   ...getData(),
+     |      ^^^^^^^^^ This expression has type `Promise<{ key: number; }>`.
    7 | });
 ---
 
 [TestNoMisusedPromisesRule/invalid-38 - 1]
-Diagnostic 1: spread (4:18 - 4:60)
+Diagnostic 1: spread (4:15 - 4:17)
 Message: Expected a non-Promise value to be spread in an object.
    3 | 
    4 | console.log({ ...(condition && Promise.resolve({ key: 42 })) });
-     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~
+   5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
+  Label: This expression has type `false | Promise<{ key: number; }>`. (4:19 - 4:59)
+   3 | 
+   4 | console.log({ ...(condition && Promise.resolve({ key: 42 })) });
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `false | Promise<{ key: number; }>`.
    5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
 
-Diagnostic 2: spread (5:18 - 5:60)
+Diagnostic 2: spread (5:15 - 5:17)
 Message: Expected a non-Promise value to be spread in an object.
    4 | console.log({ ...(condition && Promise.resolve({ key: 42 })) });
    5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
-     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~
+   6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
+  Label: This expression has type `true | Promise<{ key: number; }>`. (5:19 - 5:59)
+   4 | console.log({ ...(condition && Promise.resolve({ key: 42 })) });
+   5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `true | Promise<{ key: number; }>`.
    6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
 
-Diagnostic 3: spread (6:18 - 6:64)
+Diagnostic 3: spread (6:15 - 6:17)
 Message: Expected a non-Promise value to be spread in an object.
    5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
    6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
-     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~
+   7 | console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
+  Label: This expression has type `Promise<{ key: number; }> | {}`. (6:19 - 6:63)
+   5 | console.log({ ...(condition || Promise.resolve({ key: 42 })) });
+   6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<{ key: number; }> | {}`.
    7 | console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
 
-Diagnostic 4: spread (7:18 - 7:64)
+Diagnostic 4: spread (7:15 - 7:17)
 Message: Expected a non-Promise value to be spread in an object.
    6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
    7 | console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
-     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~
+   8 |       
+  Label: This expression has type `Promise<{ key: number; }> | {}`. (7:19 - 7:63)
+   6 | console.log({ ...(condition ? {} : Promise.resolve({ key: 42 })) });
+   7 | console.log({ ...(condition ? Promise.resolve({ key: 42 }) : {}) });
+     |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<{ key: number; }> | {}`.
    8 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-39 - 1]
-Diagnostic 1: voidReturnArgument (6:3 - 6:29)
+Diagnostic 1: voidReturnArgument (6:6 - 6:7)
 Message: Promise returned in function argument where a void return was expected.
    5 |   true,
    6 |   () => Promise.resolve(true),
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |      ~~
    7 |   () => Promise.resolve(null),
+  Label: This callback has type `() => Promise<boolean>`. (6:6 - 6:7)
+   5 |   true,
+   6 |   () => Promise.resolve(true),
+     |      ^^ This callback has type `() => Promise<boolean>`.
+   7 |   () => Promise.resolve(null),
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:53 - 2:69)
+   1 | 
+   2 | function restPromises(first: Boolean, ...callbacks: Array<() => void>): void {}
+     |                                                     ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | 
 
-Diagnostic 2: voidReturnArgument (7:3 - 7:29)
+Diagnostic 2: voidReturnArgument (7:6 - 7:7)
 Message: Promise returned in function argument where a void return was expected.
    6 |   () => Promise.resolve(true),
    7 |   () => Promise.resolve(null),
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |      ~~
    8 |   () => true,
+  Label: This callback has type `() => Promise<null>`. (7:6 - 7:7)
+   6 |   () => Promise.resolve(true),
+   7 |   () => Promise.resolve(null),
+     |      ^^ This callback has type `() => Promise<null>`.
+   8 |   () => true,
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:53 - 2:69)
+   1 | 
+   2 | function restPromises(first: Boolean, ...callbacks: Array<() => void>): void {}
+     |                                                     ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | 
 
-Diagnostic 3: voidReturnArgument (9:3 - 9:32)
+Diagnostic 3: voidReturnArgument (9:6 - 9:7)
 Message: Promise returned in function argument where a void return was expected.
    8 |   () => true,
    9 |   () => Promise.resolve('Hello'),
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |      ~~
   10 | );
+  Label: This callback has type `() => Promise<string>`. (9:6 - 9:7)
+   8 |   () => true,
+   9 |   () => Promise.resolve('Hello'),
+     |      ^^ This callback has type `() => Promise<string>`.
+  10 | );
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:53 - 2:69)
+   1 | 
+   2 | function restPromises(first: Boolean, ...callbacks: Array<() => void>): void {}
+     |                                                     ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | 
 ---
 
 [TestNoMisusedPromisesRule/invalid-40 - 1]
-Diagnostic 1: voidReturnArgument (5:29 - 5:55)
+Diagnostic 1: voidReturnArgument (5:32 - 5:33)
 Message: Promise returned in function argument where a void return was expected.
    4 | function restUnion(first: string, ...callbacks: Array<MyUnion>): void {}
    5 | restUnion('Testing', false, () => Promise.resolve(true));
-     |                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                ~~
    6 |       
+  Label: This callback has type `() => Promise<boolean>`. (5:32 - 5:33)
+   4 | function restUnion(first: string, ...callbacks: Array<MyUnion>): void {}
+   5 | restUnion('Testing', false, () => Promise.resolve(true));
+     |                                ^^ This callback has type `() => Promise<boolean>`.
+   6 |       
+  Label: This context accepts a `void`-returning callback through type `MyUnion`. (4:49 - 4:62)
+   3 | 
+   4 | function restUnion(first: string, ...callbacks: Array<MyUnion>): void {}
+     |                                                 ^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `MyUnion`.
+   5 | restUnion('Testing', false, () => Promise.resolve(true));
 ---
 
 [TestNoMisusedPromisesRule/invalid-41 - 1]
-Diagnostic 1: voidReturnArgument (3:27 - 3:50)
+Diagnostic 1: voidReturnArgument (3:30 - 3:31)
 Message: Promise returned in function argument where a void return was expected.
    2 | function restTupleOne(first: string, ...callbacks: [() => void]): void {}
    3 | restTupleOne('My string', () => Promise.resolve(1));
-     |                           ~~~~~~~~~~~~~~~~~~~~~~~~
+     |                              ~~
    4 |       
+  Label: This callback has type `() => Promise<number>`. (3:30 - 3:31)
+   2 | function restTupleOne(first: string, ...callbacks: [() => void]): void {}
+   3 | restTupleOne('My string', () => Promise.resolve(1));
+     |                              ^^ This callback has type `() => Promise<number>`.
+   4 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:52 - 2:63)
+   1 | 
+   2 | function restTupleOne(first: string, ...callbacks: [() => void]): void {}
+     |                                                    ^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | restTupleOne('My string', () => Promise.resolve(1));
 ---
 
 [TestNoMisusedPromisesRule/invalid-42 - 1]
-Diagnostic 1: voidReturnArgument (7:31 - 7:57)
+Diagnostic 1: voidReturnArgument (7:34 - 7:35)
 Message: Promise returned in function argument where a void return was expected.
    6 | 
    7 | restTupleTwo(true, undefined, () => Promise.resolve(true), undefined);
-     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                                  ~~
    8 |       
+  Label: This callback has type `() => Promise<boolean>`. (7:34 - 7:35)
+   6 | 
+   7 | restTupleTwo(true, undefined, () => Promise.resolve(true), undefined);
+     |                                  ^^ This callback has type `() => Promise<boolean>`.
+   8 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (4:17 - 4:50)
+   3 |   first: boolean,
+   4 |   ...callbacks: [undefined, () => void, undefined]
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   5 | ): void {}
 ---
 
 [TestNoMisusedPromisesRule/invalid-43 - 1]
-Diagnostic 1: voidReturnArgument (9:3 - 9:29)
+Diagnostic 1: voidReturnArgument (9:6 - 9:7)
 Message: Promise returned in function argument where a void return was expected.
    8 |   1,
    9 |   () => Promise.resolve(true),
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |      ~~
   10 |   false,
+  Label: This callback has type `() => Promise<boolean>`. (9:6 - 9:7)
+   8 |   1,
+   9 |   () => Promise.resolve(true),
+     |      ^^ This callback has type `() => Promise<boolean>`.
+  10 |   false,
+  Label: This context accepts a `void`-returning callback through type `() => void`. (4:17 - 4:61)
+   3 |   first: number,
+   4 |   ...callbacks: [() => void, boolean, () => void, () => void]
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   5 | ): void;
 
-Diagnostic 2: voidReturnArgument (12:3 - 12:26)
+Diagnostic 2: voidReturnArgument (12:6 - 12:7)
 Message: Promise returned in function argument where a void return was expected.
   11 |   () => {},
   12 |   () => Promise.resolve(1),
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~
+     |      ~~
   13 | );
+  Label: This callback has type `() => Promise<number>`. (12:6 - 12:7)
+  11 |   () => {},
+  12 |   () => Promise.resolve(1),
+     |      ^^ This callback has type `() => Promise<number>`.
+  13 | );
+  Label: This context accepts a `void`-returning callback through type `() => void`. (4:17 - 4:61)
+   3 |   first: number,
+   4 |   ...callbacks: [() => void, boolean, () => void, () => void]
+     |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   5 | ): void;
 ---
 
 [TestNoMisusedPromisesRule/invalid-44 - 1]
-Diagnostic 1: voidReturnArgument (11:3 - 11:29)
+Diagnostic 1: voidReturnArgument (11:6 - 11:7)
 Message: Promise returned in function argument where a void return was expected.
   10 |   () => {},
   11 |   () => Promise.resolve(true),
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |      ~~
   12 | );
+  Label: This callback has type `() => Promise<boolean>`. (11:6 - 11:7)
+  10 |   () => {},
+  11 |   () => Promise.resolve(true),
+     |      ^^ This callback has type `() => Promise<boolean>`.
+  12 | );
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:39 - 3:55)
+   2 | class TakesVoidCb {
+   3 |   constructor(first: string, ...args: Array<() => void>);
+     |                                       ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-45 - 1]
-Diagnostic 1: voidReturnArgument (7:17 - 7:40)
+Diagnostic 1: voidReturnArgument (7:20 - 7:21)
 Message: Promise returned in function argument where a void return was expected.
    6 | restTuple();
    7 | restTuple(true, () => Promise.resolve(1));
-     |                 ~~~~~~~~~~~~~~~~~~~~~~~~
+     |                    ~~
    8 |       
+  Label: This callback has type `() => Promise<number>`. (7:20 - 7:21)
+   6 | restTuple();
+   7 | restTuple(true, () => Promise.resolve(1));
+     |                    ^^ This callback has type `() => Promise<number>`.
+   8 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:29 - 3:49)
+   2 | function restTuple(...args: []): void;
+   3 | function restTuple(...args: [boolean, () => void]): void;
+     |                             ^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | function restTuple(..._args: any[]): void {}
 ---
 
 [TestNoMisusedPromisesRule/invalid-46 - 1]
-Diagnostic 1: voidReturnProperty (5:26 - 5:39)
+Diagnostic 1: voidReturnProperty (5:35 - 5:36)
 Message: Promise-returning function provided to property where a void return was expected.
    4 | const test: ReturnsRecord = () => {
    5 |   return { asynchronous: async () => {} };
-     |                          ~~~~~~~~~~~~~~
+     |                                   ~~
+   6 | };
+  Label: This callback has type `() => Promise<void>`. (5:35 - 5:36)
+   4 | const test: ReturnsRecord = () => {
+   5 |   return { asynchronous: async () => {} };
+     |                                   ^^ This callback has type `() => Promise<void>`.
    6 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-47 - 1]
-Diagnostic 1: voidReturnVariable (3:22 - 3:35)
+Diagnostic 1: voidReturnVariable (3:31 - 3:32)
 Message: Promise-returning function provided to variable where a void return was expected.
    2 | let value: Record<string, () => void>;
    3 | value.asynchronous = async () => {};
-     |                      ~~~~~~~~~~~~~~
+     |                               ~~
+   4 |       
+  Label: This callback has type `() => Promise<void>`. (3:31 - 3:32)
+   2 | let value: Record<string, () => void>;
+   3 | value.asynchronous = async () => {};
+     |                               ^^ This callback has type `() => Promise<void>`.
    4 |       
 ---
 
@@ -551,6 +934,11 @@ Message: Promise-returning function provided to property where a void return was
    7 |   return { asynchronous };
      |            ~~~~~~~~~~~~
    8 | };
+  Label: This callback has type `() => Promise<void>`. (7:12 - 7:23)
+   6 | const test: ReturnsRecord = () => {
+   7 |   return { asynchronous };
+     |            ^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-49 - 1]
@@ -560,6 +948,16 @@ Message: Promise returned in function argument where a void return was expected.
    4 | foo(bar);
      |     ~~~
    5 |       
+  Label: This expression has type `(() => Promise<void>) | undefined`. (4:5 - 4:7)
+   3 | declare const bar: undefined | (() => Promise<void>);
+   4 | foo(bar);
+     |     ^^^ This expression has type `(() => Promise<void>) | undefined`.
+   5 |       
+  Label: This context accepts a `void`-returning callback through type `(() => void) | undefined`. (2:26 - 2:49)
+   1 | 
+   2 | declare function foo(cb: undefined | (() => void));
+     |                          ^^^^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `(() => void) | undefined`.
+   3 | declare const bar: undefined | (() => Promise<void>);
 ---
 
 [TestNoMisusedPromisesRule/invalid-50 - 1]
@@ -569,6 +967,16 @@ Message: Promise returned in function argument where a void return was expected.
    4 | foo(bar);
      |     ~~~
    5 |       
+  Label: This callback has type `string & (() => Promise<void>)`. (4:5 - 4:7)
+   3 | declare const bar: string & (() => Promise<void>);
+   4 | foo(bar);
+     |     ^^^ This callback has type `string & (() => Promise<void>)`.
+   5 |       
+  Label: This context accepts a `void`-returning callback through type `string & (() => void)`. (2:26 - 2:46)
+   1 | 
+   2 | declare function foo(cb: string & (() => void));
+     |                          ^^^^^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `string & (() => void)`.
+   3 | declare const bar: string & (() => Promise<void>);
 ---
 
 [TestNoMisusedPromisesRule/invalid-51 - 1]
@@ -578,6 +986,16 @@ Message: Promise returned in function argument where a void return was expected.
    7 | consume(...cbs);
      |         ~~~~~~
    8 |       
+  Label: This callback has type `() => Promise<boolean>`. (7:9 - 7:14)
+   6 | ];
+   7 | consume(...cbs);
+     |         ^^^^^^ This callback has type `() => Promise<boolean>`.
+   8 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:33 - 2:49)
+   1 | 
+   2 | function consume(..._callbacks: Array<() => void>): void {}
+     |                                 ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | let cbs: Array<() => Promise<boolean>> = [
 ---
 
 [TestNoMisusedPromisesRule/invalid-52 - 1]
@@ -587,6 +1005,16 @@ Message: Promise returned in function argument where a void return was expected.
    4 | consume(...cbs);
      |         ~~~~~~
    5 |       
+  Label: This callback has type `(() => Promise<boolean>) | (() => Promise<boolean>)`. (4:9 - 4:14)
+   3 | let cbs = [() => Promise.resolve(true), () => Promise.resolve(true)] as const;
+   4 | consume(...cbs);
+     |         ^^^^^^ This callback has type `(() => Promise<boolean>) | (() => Promise<boolean>)`.
+   5 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:33 - 2:49)
+   1 | 
+   2 | function consume(..._callbacks: Array<() => void>): void {}
+     |                                 ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | let cbs = [() => Promise.resolve(true), () => Promise.resolve(true)] as const;
 ---
 
 [TestNoMisusedPromisesRule/invalid-53 - 1]
@@ -596,90 +1024,168 @@ Message: Promise returned in function argument where a void return was expected.
    4 | consume(...cbs);
      |         ~~~~~~
    5 |       
+  Label: This callback has type `() => Promise<boolean>`. (4:9 - 4:14)
+   3 | let cbs = [() => Promise.resolve(true), () => Promise.resolve(true)];
+   4 | consume(...cbs);
+     |         ^^^^^^ This callback has type `() => Promise<boolean>`.
+   5 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:33 - 2:49)
+   1 | 
+   2 | function consume(..._callbacks: Array<() => void>): void {}
+     |                                 ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | let cbs = [() => Promise.resolve(true), () => Promise.resolve(true)];
 ---
 
 [TestNoMisusedPromisesRule/invalid-54 - 1]
-Diagnostic 1: voidReturnInheritedMethod (9:3 - 11:3)
+Diagnostic 1: voidReturnInheritedMethod (9:21 - 9:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
    8 | class MySubclassExtendsMyClass extends MyClass {
    9 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
   10 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  11 |   }
-     | ~~~
-  12 | }
+  Label: This callback has type `() => Promise<void>`. (9:21 - 9:33)
+   8 | class MySubclassExtendsMyClass extends MyClass {
+   9 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  10 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | class MyClass {
+   3 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-55 - 1]
-Diagnostic 1: voidReturnInheritedMethod (9:3 - 9:37)
+Diagnostic 1: voidReturnInheritedMethod (9:24 - 9:36)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
    8 | abstract class MyAbstractClassExtendsMyClass extends MyClass {
    9 |   abstract setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                        ~~~~~~~~~~~~~
   10 | }
+  Label: This callback has type `() => Promise<void>`. (9:24 - 9:36)
+   8 | abstract class MyAbstractClassExtendsMyClass extends MyClass {
+   9 |   abstract setThing(): Promise<void>;
+     |                        ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  10 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | class MyClass {
+   3 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-56 - 1]
-Diagnostic 1: voidReturnInheritedMethod (9:3 - 9:28)
+Diagnostic 1: voidReturnInheritedMethod (9:15 - 9:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
    8 | interface MyInterfaceExtendsMyClass extends MyClass {
    9 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   10 | }
+  Label: This callback has type `() => Promise<void>`. (9:15 - 9:27)
+   8 | interface MyInterfaceExtendsMyClass extends MyClass {
+   9 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  10 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | class MyClass {
+   3 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-57 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 9:3)
+Diagnostic 1: voidReturnInheritedMethod (7:21 - 7:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyAbstractClass'.
    6 | class MySubclassExtendsMyAbstractClass extends MyAbstractClass {
    7 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
    8 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   }
-     | ~~~
-  10 | }
+  Label: This callback has type `() => Promise<void>`. (7:21 - 7:33)
+   6 | class MySubclassExtendsMyAbstractClass extends MyAbstractClass {
+   7 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:24 - 3:27)
+   2 | abstract class MyAbstractClass {
+   3 |   abstract setThing(): void;
+     |                        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-58 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:37)
+Diagnostic 1: voidReturnInheritedMethod (7:24 - 7:36)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyAbstractClass'.
    6 | abstract class MyAbstractSubclassExtendsMyAbstractClass extends MyAbstractClass {
    7 |   abstract setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                        ~~~~~~~~~~~~~
    8 | }
+  Label: This callback has type `() => Promise<void>`. (7:24 - 7:36)
+   6 | abstract class MyAbstractSubclassExtendsMyAbstractClass extends MyAbstractClass {
+   7 |   abstract setThing(): Promise<void>;
+     |                        ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:24 - 3:27)
+   2 | abstract class MyAbstractClass {
+   3 |   abstract setThing(): void;
+     |                        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-59 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:28)
+Diagnostic 1: voidReturnInheritedMethod (7:15 - 7:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyAbstractClass'.
    6 | interface MyInterfaceExtendsMyAbstractClass extends MyAbstractClass {
    7 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
    8 | }
+  Label: This callback has type `() => Promise<void>`. (7:15 - 7:27)
+   6 | interface MyInterfaceExtendsMyAbstractClass extends MyAbstractClass {
+   7 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:24 - 3:27)
+   2 | abstract class MyAbstractClass {
+   3 |   abstract setThing(): void;
+     |                        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-60 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 9:3)
+Diagnostic 1: voidReturnInheritedMethod (7:21 - 7:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
    6 | class MyInterfaceSubclass implements MyInterface {
    7 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
    8 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   }
-     | ~~~
-  10 | }
+  Label: This callback has type `() => Promise<void>`. (7:21 - 7:33)
+   6 | class MyInterfaceSubclass implements MyInterface {
+   7 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | interface MyInterface {
+   3 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-61 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:37)
+Diagnostic 1: voidReturnInheritedMethod (7:24 - 7:36)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
    6 | abstract class MyAbstractClassImplementsMyInterface implements MyInterface {
    7 |   abstract setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                        ~~~~~~~~~~~~~
    8 | }
+  Label: This callback has type `() => Promise<void>`. (7:24 - 7:36)
+   6 | abstract class MyAbstractClassImplementsMyInterface implements MyInterface {
+   7 |   abstract setThing(): Promise<void>;
+     |                        ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | interface MyInterface {
+   3 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-62 - 1]
@@ -693,6 +1199,20 @@ Message: Promise-returning method provided where a void return was expected by e
   11 |   };
      | ~~~~
   12 | }
+  Label: This callback has type `() => Promise<void>`. (9:3 - 11:4)
+   8 | class MySubclassExtendsMyClass extends MyClass {
+   9 |   accessor setThing = async (): Promise<void> => {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  10 |     await Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  11 |   };
+     | ^^^^ This callback has type `() => Promise<void>`.
+  12 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:12 - 3:19)
+   2 | class MyClass {
+   3 |   accessor setThing = (): void => {
+     |            ^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-63 - 1]
@@ -702,146 +1222,276 @@ Message: Promise-returning method provided where a void return was expected by e
    7 |   abstract accessor setThing: () => Promise<void>;
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    8 | }
+  Label: This callback has type `() => Promise<void>`. (7:3 - 7:50)
+   6 | abstract class MySubclassExtendsMyClass extends MyClass {
+   7 |   abstract accessor setThing: () => Promise<void>;
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:31 - 3:40)
+   2 | abstract class MyClass {
+   3 |   abstract accessor setThing: () => void;
+     |                               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-64 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:28)
+Diagnostic 1: voidReturnInheritedMethod (7:15 - 7:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
    6 | interface MySubInterface extends MyInterface {
    7 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
    8 | }
+  Label: This callback has type `() => Promise<void>`. (7:15 - 7:27)
+   6 | interface MySubInterface extends MyInterface {
+   7 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | interface MyInterface {
+   3 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-65 - 1]
-Diagnostic 1: voidReturnInheritedMethod (6:3 - 8:3)
+Diagnostic 1: voidReturnInheritedMethod (6:21 - 6:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyTypeIntersection'.
    5 |   thing = 1;
    6 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
    7 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   8 |   }
-     | ~~~
-   9 | }
+  Label: This callback has type `() => Promise<void>`. (6:21 - 6:33)
+   5 |   thing = 1;
+   6 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   7 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:41 - 2:44)
+   1 | 
+   2 | type MyTypeIntersection = { setThing(): void } & { thing: number };
+     |                                         ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | 
 ---
 
 [TestNoMisusedPromisesRule/invalid-66 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 7:28)
+Diagnostic 1: voidReturnInheritedMethod (7:15 - 7:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type '{ setThing(): void; }'.
    6 | interface MyAsyncInterface extends MyGenericType<false> {
    7 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
    8 | }
+  Label: This callback has type `() => Promise<void>`. (7:15 - 7:27)
+   6 | interface MyAsyncInterface extends MyGenericType<false> {
+   7 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (4:19 - 4:22)
+   3 |   ? { setThing(): Promise<void> }
+   4 |   : { setThing(): void };
+     |                   ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   5 | 
 ---
 
 [TestNoMisusedPromisesRule/invalid-67 - 1]
-Diagnostic 1: voidReturnInheritedMethod (11:3 - 11:28)
+Diagnostic 1: voidReturnInheritedMethod (11:15 - 11:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
   10 | interface MyThirdInterface extends MyInterface, MyOtherInterface {
   11 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   12 | }
+  Label: This callback has type `() => Promise<void>`. (11:15 - 11:27)
+  10 | interface MyThirdInterface extends MyInterface, MyOtherInterface {
+  11 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  12 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | interface MyInterface {
+   3 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 
-Diagnostic 2: voidReturnInheritedMethod (11:3 - 11:28)
+Diagnostic 2: voidReturnInheritedMethod (11:15 - 11:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyOtherInterface'.
   10 | interface MyThirdInterface extends MyInterface, MyOtherInterface {
   11 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   12 | }
+  Label: This callback has type `() => Promise<void>`. (11:15 - 11:27)
+  10 | interface MyThirdInterface extends MyInterface, MyOtherInterface {
+  11 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  12 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (7:15 - 7:18)
+   6 | interface MyOtherInterface {
+   7 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   8 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-68 - 1]
-Diagnostic 1: voidReturnInheritedMethod (15:3 - 15:28)
+Diagnostic 1: voidReturnInheritedMethod (15:15 - 15:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
   14 | interface MyInterface extends MyClass, MyOtherClass {
   15 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   16 | }
+  Label: This callback has type `() => Promise<void>`. (15:15 - 15:27)
+  14 | interface MyInterface extends MyClass, MyOtherClass {
+  15 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  16 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | class MyClass {
+   3 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 
-Diagnostic 2: voidReturnInheritedMethod (15:3 - 15:28)
+Diagnostic 2: voidReturnInheritedMethod (15:15 - 15:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyOtherClass'.
   14 | interface MyInterface extends MyClass, MyOtherClass {
   15 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   16 | }
+  Label: This callback has type `() => Promise<void>`. (15:15 - 15:27)
+  14 | interface MyInterface extends MyClass, MyOtherClass {
+  15 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  16 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (9:15 - 9:18)
+   8 | class MyOtherClass {
+   9 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+  10 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-69 - 1]
-Diagnostic 1: voidReturnInheritedMethod (17:3 - 19:3)
+Diagnostic 1: voidReturnInheritedMethod (17:21 - 17:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClass'.
   16 | class MySubclass extends MyClass implements MyAsyncInterface, MySyncInterface {
   17 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
   18 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  19 |   }
-     | ~~~
-  20 | }
+  Label: This callback has type `() => Promise<void>`. (17:21 - 17:33)
+  16 | class MySubclass extends MyClass implements MyAsyncInterface, MySyncInterface {
+  17 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  18 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (11:15 - 11:18)
+  10 | class MyClass {
+  11 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+  12 |     return;
 
-Diagnostic 2: voidReturnInheritedMethod (17:3 - 19:3)
+Diagnostic 2: voidReturnInheritedMethod (17:21 - 17:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MySyncInterface'.
   16 | class MySubclass extends MyClass implements MyAsyncInterface, MySyncInterface {
   17 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
   18 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  19 |   }
-     | ~~~
-  20 | }
+  Label: This callback has type `() => Promise<void>`. (17:21 - 17:33)
+  16 | class MySubclass extends MyClass implements MyAsyncInterface, MySyncInterface {
+  17 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  18 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (7:15 - 7:18)
+   6 | interface MySyncInterface {
+   7 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   8 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-70 - 1]
-Diagnostic 1: voidReturnInheritedMethod (7:3 - 9:3)
+Diagnostic 1: voidReturnInheritedMethod (7:15 - 7:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyInterface'.
    6 | const MyClassExpressionExtendsMyClass = class implements MyInterface {
    7 |   setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
    8 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   9 |   }
-     | ~~~
-  10 | };
+  Label: This callback has type `() => Promise<void>`. (7:15 - 7:27)
+   6 | const MyClassExpressionExtendsMyClass = class implements MyInterface {
+   7 |   setThing(): Promise<void> {
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   8 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | interface MyInterface {
+   3 |   setThing(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-71 - 1]
-Diagnostic 1: voidReturnInheritedMethod (9:3 - 11:3)
+Diagnostic 1: voidReturnInheritedMethod (9:21 - 9:33)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyClassExpression'.
    8 | class MyClassExtendsMyClassExpression extends MyClassExpression {
    9 |   async setThing(): Promise<void> {
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                     ~~~~~~~~~~~~~
   10 |     await Promise.resolve();
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  11 |   }
-     | ~~~
-  12 | }
+  Label: This callback has type `() => Promise<void>`. (9:21 - 9:33)
+   8 | class MyClassExtendsMyClassExpression extends MyClassExpression {
+   9 |   async setThing(): Promise<void> {
+     |                     ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  10 |     await Promise.resolve();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | const MyClassExpression = class {
+   3 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-72 - 1]
-Diagnostic 1: voidReturnInheritedMethod (10:3 - 10:28)
+Diagnostic 1: voidReturnInheritedMethod (10:15 - 10:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'typeof MyClassExpression'.
    9 | interface MyInterfaceExtendsMyClassExpression extends MyClassExpressionType {
   10 |   setThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   11 | }
+  Label: This callback has type `() => Promise<void>`. (10:15 - 10:27)
+   9 | interface MyInterfaceExtendsMyClassExpression extends MyClassExpressionType {
+  10 |   setThing(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  11 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:15 - 3:18)
+   2 | const MyClassExpression = class {
+   3 |   setThing(): void {
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |     return;
 ---
 
 [TestNoMisusedPromisesRule/invalid-73 - 1]
-Diagnostic 1: voidReturnInheritedMethod (16:3 - 16:28)
+Diagnostic 1: voidReturnInheritedMethod (16:15 - 16:27)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MySyncInterface'.
   15 |   [key: number]: () => Promise<void>;
   16 |   myMethod(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~~~~~~~~~~~~
   17 | }
+  Label: This callback has type `() => Promise<void>`. (16:15 - 16:27)
+  15 |   [key: number]: () => Promise<void>;
+  16 |   myMethod(): Promise<void>;
+     |               ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  17 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (8:15 - 8:18)
+   7 |   [key: number]: () => void;
+   8 |   myMethod(): void;
+     |               ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   9 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-74 - 1]
-Diagnostic 1: voidReturnInheritedMethod (29:3 - 29:31)
+Diagnostic 1: voidReturnInheritedMethod (29:18 - 29:30)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyMethods'.
   28 |   [key: number]: () => void;
   29 |   doSyncThing(): Promise<void>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                  ~~~~~~~~~~~~~
   30 |   doAsyncThing(): Promise<void>;
+  Label: This callback has type `() => Promise<void>`. (29:18 - 29:30)
+  28 |   [key: number]: () => void;
+  29 |   doSyncThing(): Promise<void>;
+     |                  ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  30 |   doAsyncThing(): Promise<void>;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (18:18 - 18:21)
+  17 | interface MyMethods {
+  18 |   doSyncThing(): void;
+     |                  ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+  19 |   doOtherSyncThing(): void;
 
 Diagnostic 2: voidReturnInheritedMethod (31:3 - 31:42)
 Message: Promise-returning method provided where a void return was expected by extended/implemented type 'MyMethods'.
@@ -849,6 +1499,16 @@ Message: Promise-returning method provided where a void return was expected by e
   31 |   syncMethodProperty: () => Promise<void>;
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   32 | }
+  Label: This callback has type `() => Promise<void>`. (31:3 - 31:42)
+  30 |   doAsyncThing(): Promise<void>;
+  31 |   syncMethodProperty: () => Promise<void>;
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+  32 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (20:23 - 20:32)
+  19 |   doOtherSyncThing(): void;
+  20 |   syncMethodProperty: () => void;
+     |                       ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+  21 | }
 ---
 
 [TestNoMisusedPromisesRule/invalid-75 - 1]
@@ -858,105 +1518,201 @@ Message: Expected a non-Promise value to be returned.
    3 | [0, 1, 2].filter(isTruthy);
      |                  ~~~~~~~~
    4 |       
+  Label: This callback has type `(value: unknown) => Promise<boolean>`. (3:18 - 3:25)
+   2 | declare function isTruthy(value: unknown): Promise<boolean>;
+   3 | [0, 1, 2].filter(isTruthy);
+     |                  ^^^^^^^^ This callback has type `(value: unknown) => Promise<boolean>`.
+   4 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-76 - 1]
-Diagnostic 1: predicate (3:13 - 3:39)
+Diagnostic 1: predicate (3:16 - 3:17)
 Message: Expected a non-Promise value to be returned.
    2 | const array: number[] = [];
    3 | array.every(() => Promise.resolve(true));
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                ~~
+   4 |       
+  Label: This callback has type `() => Promise<boolean>`. (3:16 - 3:17)
+   2 | const array: number[] = [];
+   3 | array.every(() => Promise.resolve(true));
+     |                ^^ This callback has type `() => Promise<boolean>`.
    4 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-77 - 1]
-Diagnostic 1: predicate (3:13 - 3:39)
+Diagnostic 1: predicate (3:16 - 3:17)
 Message: Expected a non-Promise value to be returned.
    2 | const array: (string[] & { foo: 'bar' }) | (number[] & { bar: 'foo' }) = [];
    3 | array.every(() => Promise.resolve(true));
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |                ~~
+   4 |       
+  Label: This callback has type `() => Promise<boolean>`. (3:16 - 3:17)
+   2 | const array: (string[] & { foo: 'bar' }) | (number[] & { bar: 'foo' }) = [];
+   3 | array.every(() => Promise.resolve(true));
+     |                ^^ This callback has type `() => Promise<boolean>`.
    4 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-78 - 1]
-Diagnostic 1: predicate (3:12 - 3:39)
+Diagnostic 1: predicate (3:15 - 3:16)
 Message: Expected a non-Promise value to be returned.
    2 | const tuple: [number, number, number] = [1, 2, 3];
    3 | tuple.find(() => Promise.resolve(false));
-     |            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |               ~~
+   4 |       
+  Label: This callback has type `() => Promise<boolean>`. (3:15 - 3:16)
+   2 | const tuple: [number, number, number] = [1, 2, 3];
+   3 | tuple.find(() => Promise.resolve(false));
+     |               ^^ This callback has type `() => Promise<boolean>`.
    4 |       
 ---
 
 [TestNoMisusedPromisesRule/invalid-79 - 1]
-Diagnostic 1: voidReturnArgument (7:26 - 7:39)
+Diagnostic 1: voidReturnArgument (7:35 - 7:36)
 Message: Promise returned in function argument where a void return was expected.
    6 | declare const useCallbackReturningVoid: typeof useCallback<ReturnsVoid>;
    7 | useCallbackReturningVoid(async () => {});
-     |                          ~~~~~~~~~~~~~~
+     |                                   ~~
    8 |       
+  Label: This callback has type `() => Promise<void>`. (7:35 - 7:36)
+   6 | declare const useCallbackReturningVoid: typeof useCallback<ReturnsVoid>;
+   7 | useCallbackReturningVoid(async () => {});
+     |                                   ^^ This callback has type `() => Promise<void>`.
+   8 |       
+  Label: This context accepts a `void`-returning callback through type `ReturnsVoid`. (4:7 - 4:7)
+   3 | declare const useCallback: <T extends (...args: unknown[]) => unknown>(
+   4 |   fn: T,
+     |       ^ This context accepts a `void`-returning callback through type `ReturnsVoid`.
+   5 | ) => T;
 ---
 
 [TestNoMisusedPromisesRule/invalid-80 - 1]
-Diagnostic 1: voidReturnArgument (6:26 - 6:39)
+Diagnostic 1: voidReturnArgument (6:35 - 6:36)
 Message: Promise returned in function argument where a void return was expected.
    5 | ) => T;
    6 | useCallback<ReturnsVoid>(async () => {});
-     |                          ~~~~~~~~~~~~~~
+     |                                   ~~
    7 |       
+  Label: This callback has type `() => Promise<void>`. (6:35 - 6:36)
+   5 | ) => T;
+   6 | useCallback<ReturnsVoid>(async () => {});
+     |                                   ^^ This callback has type `() => Promise<void>`.
+   7 |       
+  Label: This context accepts a `void`-returning callback through type `ReturnsVoid`. (4:7 - 4:7)
+   3 | declare const useCallback: <T extends (...args: unknown[]) => unknown>(
+   4 |   fn: T,
+     |       ^ This context accepts a `void`-returning callback through type `ReturnsVoid`.
+   5 | ) => T;
 ---
 
 [TestNoMisusedPromisesRule/invalid-81 - 1]
-Diagnostic 1: voidReturnArgument (8:5 - 8:18)
+Diagnostic 1: voidReturnArgument (8:14 - 8:15)
 Message: Promise returned in function argument where a void return was expected.
    7 | 
    8 | foo(async () => {});
-     |     ~~~~~~~~~~~~~~
+     |              ~~
    9 |       
+  Label: This callback has type `() => Promise<void>`. (8:14 - 8:15)
+   7 | 
+   8 | foo(async () => {});
+     |              ^^ This callback has type `() => Promise<void>`.
+   9 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:14 - 3:20)
+   2 | interface Foo<T> {
+   3 |   (callback: () => T): void;
+     |              ^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 |   (callback: () => number): void;
 ---
 
 [TestNoMisusedPromisesRule/invalid-82 - 1]
-Diagnostic 1: voidReturnArgument (6:3 - 6:16)
+Diagnostic 1: voidReturnArgument (6:12 - 6:13)
 Message: Promise returned in function argument where a void return was expected.
    5 | tupleFn<() => void>(
    6 |   async () => {},
-     |   ~~~~~~~~~~~~~~
+     |            ~~
    7 |   'foo',
+  Label: This callback has type `() => Promise<void>`. (6:12 - 6:13)
+   5 | tupleFn<() => void>(
+   6 |   async () => {},
+     |            ^^ This callback has type `() => Promise<void>`.
+   7 |   'foo',
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:11 - 3:24)
+   2 | declare function tupleFn<T extends (...args: unknown[]) => unknown>(
+   3 |   ...fns: [T, string, T]
+     |           ^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | ): void;
 
-Diagnostic 2: voidReturnArgument (8:3 - 8:16)
+Diagnostic 2: voidReturnArgument (8:12 - 8:13)
 Message: Promise returned in function argument where a void return was expected.
    7 |   'foo',
    8 |   async () => {},
-     |   ~~~~~~~~~~~~~~
+     |            ~~
    9 | );
+  Label: This callback has type `() => Promise<void>`. (8:12 - 8:13)
+   7 |   'foo',
+   8 |   async () => {},
+     |            ^^ This callback has type `() => Promise<void>`.
+   9 | );
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:11 - 3:24)
+   2 | declare function tupleFn<T extends (...args: unknown[]) => unknown>(
+   3 |   ...fns: [T, string, T]
+     |           ^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | ): void;
 ---
 
 [TestNoMisusedPromisesRule/invalid-83 - 1]
-Diagnostic 1: voidReturnArgument (6:3 - 6:16)
+Diagnostic 1: voidReturnArgument (6:12 - 6:13)
 Message: Promise returned in function argument where a void return was expected.
    5 | arrayFn<() => void>(
    6 |   async () => {},
-     |   ~~~~~~~~~~~~~~
+     |            ~~
    7 |   'foo',
+  Label: This callback has type `() => Promise<void>`. (6:12 - 6:13)
+   5 | arrayFn<() => void>(
+   6 |   async () => {},
+     |            ^^ This callback has type `() => Promise<void>`.
+   7 |   'foo',
+  Label: This context accepts a `void`-returning callback through type `string | (() => void)`. (3:11 - 3:24)
+   2 | declare function arrayFn<T extends (...args: unknown[]) => unknown>(
+   3 |   ...fns: (T | string)[]
+     |           ^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `string | (() => void)`.
+   4 | ): void;
 
-Diagnostic 2: voidReturnArgument (8:3 - 8:16)
+Diagnostic 2: voidReturnArgument (8:12 - 8:13)
 Message: Promise returned in function argument where a void return was expected.
    7 |   'foo',
    8 |   async () => {},
-     |   ~~~~~~~~~~~~~~
+     |            ~~
    9 | );
+  Label: This callback has type `() => Promise<void>`. (8:12 - 8:13)
+   7 |   'foo',
+   8 |   async () => {},
+     |            ^^ This callback has type `() => Promise<void>`.
+   9 | );
+  Label: This context accepts a `void`-returning callback through type `string | (() => void)`. (3:11 - 3:24)
+   2 | declare function arrayFn<T extends (...args: unknown[]) => unknown>(
+   3 |   ...fns: (T | string)[]
+     |           ^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `string | (() => void)`.
+   4 | ): void;
 ---
 
 [TestNoMisusedPromisesRule/invalid-84 - 1]
-Diagnostic 1: voidReturnProperty (7:3 - 9:3)
+Diagnostic 1: voidReturnProperty (7:3 - 7:9)
 Message: Promise-returning function provided to property where a void return was expected.
    6 | const o: HasVoidMethod = {
    7 |   async f() {
-     |   ~~~~~~~~~~~
+     |   ~~~~~~~
    8 |     return 3;
-     | ~~~~~~~~~~~~~
-   9 |   },
-     | ~~~
-  10 | };
+  Label: This callback has type `() => Promise<number>`. (7:3 - 7:9)
+   6 | const o: HasVoidMethod = {
+   7 |   async f() {
+     |   ^^^^^^^ This callback has type `() => Promise<number>`.
+   8 |     return 3;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:8 - 3:11)
+   2 | type HasVoidMethod = {
+   3 |   f(): void;
+     |        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-85 - 1]
@@ -966,19 +1722,35 @@ Message: Promise-returning function provided to property where a void return was
    7 |   async f(): Promise<number> {
      |              ~~~~~~~~~~~~~~~
    8 |     return 3;
+  Label: This callback has type `() => Promise<number>`. (7:14 - 7:28)
+   6 | const o: HasVoidMethod = {
+   7 |   async f(): Promise<number> {
+     |              ^^^^^^^^^^^^^^^ This callback has type `() => Promise<number>`.
+   8 |     return 3;
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:8 - 3:11)
+   2 | type HasVoidMethod = {
+   3 |   f(): void;
+     |        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-86 - 1]
-Diagnostic 1: voidReturnProperty (6:3 - 8:3)
+Diagnostic 1: voidReturnProperty (6:3 - 6:3)
 Message: Promise-returning function provided to property where a void return was expected.
    5 | const obj: HasVoidMethod = {
    6 |   f() {
-     |   ~~~~~
+     |   ~
    7 |     return Promise.resolve('foo');
-     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   8 |   },
-     | ~~~
-   9 | };
+  Label: This callback has type `() => Promise<string>`. (6:3 - 6:3)
+   5 | const obj: HasVoidMethod = {
+   6 |   f() {
+     |   ^ This callback has type `() => Promise<string>`.
+   7 |     return Promise.resolve('foo');
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:8 - 3:11)
+   2 | type HasVoidMethod = {
+   3 |   f(): void;
+     |        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-87 - 1]
@@ -988,6 +1760,16 @@ Message: Promise-returning function provided to property where a void return was
    6 |   f(): Promise<void> {
      |        ~~~~~~~~~~~~~
    7 |     throw new Error();
+  Label: This callback has type `() => Promise<void>`. (6:8 - 6:20)
+   5 | const obj: HasVoidMethod = {
+   6 |   f(): Promise<void> {
+     |        ^^^^^^^^^^^^^ This callback has type `() => Promise<void>`.
+   7 |     throw new Error();
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:8 - 3:11)
+   2 | type HasVoidMethod = {
+   3 |   f(): void;
+     |        ^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | };
 ---
 
 [TestNoMisusedPromisesRule/invalid-88 - 1]
@@ -997,6 +1779,16 @@ Message: Promise-returning function provided to property where a void return was
    5 |   f: asyncFunction,
      |      ~~~~~~~~~~~~~
    6 | };
+  Label: This callback has type `() => Promise<string>`. (5:6 - 5:18)
+   4 | const obj: O = {
+   5 |   f: asyncFunction,
+     |      ^^^^^^^^^^^^^ This callback has type `() => Promise<string>`.
+   6 | };
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | const asyncFunction = async () => 'foo';
 ---
 
 [TestNoMisusedPromisesRule/invalid-89 - 1]
@@ -1006,4 +1798,50 @@ Message: Promise-returning function provided to property where a void return was
    4 |   f: async (): Promise<string> => 'foo',
      |                ~~~~~~~~~~~~~~~
    5 | };
+  Label: This callback has type `() => Promise<string>`. (4:16 - 4:30)
+   3 | const obj: O = {
+   4 |   f: async (): Promise<string> => 'foo',
+     |                ^^^^^^^^^^^^^^^ This callback has type `() => Promise<string>`.
+   5 | };
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:15 - 2:24)
+   1 | 
+   2 | type O = { f: () => void };
+     |               ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | const obj: O = {
+---
+
+[TestNoMisusedPromisesRule/invalid-90 - 1]
+Diagnostic 1: voidReturnArgument (3:13 - 3:14)
+Message: Promise returned in function argument where a void return was expected.
+   2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
+   3 | on(async () => {}, async () => {});
+     |             ~~
+   4 |       
+  Label: This callback has type `() => Promise<void>`. (3:13 - 3:14)
+   2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
+   3 | on(async () => {}, async () => {});
+     |             ^^ This callback has type `() => Promise<void>`.
+   4 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:47 - 2:63)
+   1 | 
+   2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
+     |                                               ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | on(async () => {}, async () => {});
+
+Diagnostic 2: voidReturnArgument (3:29 - 3:30)
+Message: Promise returned in function argument where a void return was expected.
+   2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
+   3 | on(async () => {}, async () => {});
+     |                             ~~
+   4 |       
+  Label: This callback has type `() => Promise<void>`. (3:29 - 3:30)
+   2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
+   3 | on(async () => {}, async () => {});
+     |                             ^^ This callback has type `() => Promise<void>`.
+   4 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:47 - 2:63)
+   1 | 
+   2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
+     |                                               ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | on(async () => {}, async () => {});
 ---

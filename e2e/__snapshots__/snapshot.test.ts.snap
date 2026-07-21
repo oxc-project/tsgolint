@@ -1216,13 +1216,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-misused-spread/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This expression has type \`Promise<number>\`.",
+        "range": {
+          "end": 74,
+          "pos": 67,
+        },
+      },
+    ],
     "message": {
       "description": "Expected a non-Promise value to be spread in an object.",
       "id": "spread",
     },
     "range": {
-      "end": 74,
-      "pos": 67,
+      "end": 67,
+      "pos": 64,
     },
     "rule": "no-misused-promises",
   },

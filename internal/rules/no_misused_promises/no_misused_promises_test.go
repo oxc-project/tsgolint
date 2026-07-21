@@ -1091,6 +1091,9 @@ if (Promise.resolve()) {
 				{
 					MessageId: "conditional",
 					Line:      2,
+					Column:    5,
+					EndLine:   2,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -1179,6 +1182,9 @@ if (!Promise.resolve()) {
 				{
 					MessageId: "voidReturnArgument",
 					Line:      2,
+					Column:    57,
+					EndLine:   2,
+					EndColumn: 59,
 				},
 			},
 		},
@@ -1210,6 +1216,9 @@ fnWithCallback('val', async (err, res) => {
 				{
 					MessageId: "voidReturnArgument",
 					Line:      6,
+					Column:    40,
+					EndLine:   6,
+					EndColumn: 42,
 				},
 			},
 		},
@@ -1419,11 +1428,10 @@ const obj: O = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 4,
-					// Column: 3,
-					// EndLine: 4,
-					// EndColumn: 12,
+					Line:      4,
+					Column:    15,
+					EndLine:   4,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -1438,11 +1446,10 @@ const obj: O = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 4,
-					// Column: 3,
-					// EndLine: 4,
-					// EndColumn: 12,
+					Line:      4,
+					Column:    15,
+					EndLine:   4,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -1473,11 +1480,10 @@ const obj: O = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 4,
-					// Column: 3,
-					// EndLine: 4,
-					// EndColumn: 10,
+					Line:      4,
+					Column:    3,
+					EndLine:   4,
+					EndColumn: 10,
 				},
 			},
 		},
@@ -1498,19 +1504,17 @@ function f(): O {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 6,
-					// Column: 5,
-					// EndLine: 6,
-					// EndColumn: 12,
+					Line:      6,
+					Column:    5,
+					EndLine:   6,
+					EndColumn: 12,
 				},
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 9,
-					// Column: 5,
-					// EndLine: 9,
-					// EndColumn: 14,
+					Line:      9,
+					Column:    17,
+					EndLine:   9,
+					EndColumn: 19,
 				},
 				{
 					MessageId: "voidReturnProperty",
@@ -1531,6 +1535,9 @@ function f(): () => void {
 				{
 					MessageId: "voidReturnReturnValue",
 					Line:      3,
+					Column:    19,
+					EndLine:   3,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -1561,6 +1568,9 @@ const Component = (obj: O) => null;
 				{
 					MessageId: "voidReturnAttribute",
 					Line:      6,
+					Column:    27,
+					EndLine:   6,
+					EndColumn: 29,
 				},
 			},
 		},
@@ -1666,6 +1676,9 @@ console.log({ ...Promise.resolve({ key: 42 }) });
 				{
 					MessageId: "spread",
 					Line:      2,
+					Column:    15,
+					EndLine:   2,
+					EndColumn: 18,
 				},
 			},
 		},
@@ -1856,11 +1869,10 @@ const test: ReturnsRecord = () => {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 5,
-					// Column: 12,
-					// EndLine: 5,
-					// EndColumn: 32,
+					Line:      5,
+					Column:    35,
+					EndLine:   5,
+					EndColumn: 37,
 				},
 			},
 		},
@@ -2426,6 +2438,9 @@ declare function isTruthy(value: unknown): Promise<boolean>;
 				{
 					MessageId: "predicate",
 					Line:      3,
+					Column:    18,
+					EndLine:   3,
+					EndColumn: 26,
 				},
 			},
 		},
@@ -2438,6 +2453,9 @@ array.every(() => Promise.resolve(true));
 				{
 					MessageId: "predicate",
 					Line:      3,
+					Column:    16,
+					EndLine:   3,
+					EndColumn: 18,
 				},
 			},
 		},
@@ -2573,11 +2591,10 @@ const o: HasVoidMethod = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 7,
-					// Column: 3,
-					// EndLine: 7,
-					// EndColumn: 10,
+					Line:      7,
+					Column:    3,
+					EndLine:   7,
+					EndColumn: 10,
 				},
 			},
 		},
@@ -2617,11 +2634,10 @@ const obj: HasVoidMethod = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "voidReturnProperty",
-					// TODO(port): implement getFunctionHeadLoc
-					// Line: 6,
-					// Column: 3,
-					// EndLine: 6,
-					// EndColumn: 4,
+					Line:      6,
+					Column:    3,
+					EndLine:   6,
+					EndColumn: 4,
 				},
 			},
 		},
@@ -2679,6 +2695,16 @@ const obj: O = {
 					EndLine:   4,
 					EndColumn: 31,
 				},
+			},
+		},
+		{
+			Code: `
+declare function on(this: void, ...callbacks: Array<() => void>): void;
+on(async () => {}, async () => {});
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "voidReturnArgument", Line: 3},
+				{MessageId: "voidReturnArgument", Line: 3},
 			},
 		},
 	})
