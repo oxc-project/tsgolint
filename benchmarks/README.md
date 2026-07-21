@@ -7,14 +7,16 @@
 
 ## Results
 
-> On AMD Ryzen 7 5800H (8 cores, 16 threads)
+> Measured July 20, 2026 on Apple M4 Pro (12 cores: 8 performance, 4 efficiency)
+
+TypeORM and Vue were benchmarked with equivalent TypeScript 7-compatible configurations: TypeORM's removed `downlevelIteration` option was omitted and Node 16 module resolution was used, while Vue's removed `baseUrl` option was omitted and its path targets were made explicitly relative. The same adjusted configurations were used by both linters.
 
 | Repository                                                      | ESLint + typescript-eslint | tsgolint | Speedup |
 | --------------------------------------------------------------- | -------------------------- | -------- | ------- |
-| [microsoft/vscode](https://github.com/microsoft/vscode)         | 167.8s                     | 4.89s    | **34x** |
-| [microsoft/typescript](https://github.com/microsoft/typescript) | 47.4s                      | 2.10s    | **23x** |
-| [typeorm/typeorm](https://github.com/typeorm/typeorm)           | 27.3s                      | 0.93s    | **29x** |
-| [vuejs/core](https://github.com/vuejs/core)                     | 20.7s                      | 0.95s    | **22x** |
+| [microsoft/vscode](https://github.com/microsoft/vscode)         | 83.2s                      | 6.96s    | **12x** |
+| [microsoft/typescript](https://github.com/microsoft/typescript) | 27.2s                      | 1.94s    | **14x** |
+| [typeorm/typeorm](https://github.com/typeorm/typeorm)           | 13.2s                      | 0.75s    | **18x** |
+| [vuejs/core](https://github.com/vuejs/core)                     | 12.3s                      | 0.95s    | **13x** |
 
 <details>
 
@@ -25,18 +27,18 @@
 
 ```plaintext
 Benchmark 1: eslint
-  Time (mean ± σ):     167.840 s ±  1.233 s    [User: 211.852 s, System: 10.952 s]
-  Range (min … max):   164.816 s … 169.410 s    10 runs
+  Time (mean ± σ):     83.239 s ±  2.889 s    [User: 109.053 s, System: 5.656 s]
+  Range (min … max):   79.239 s … 87.427 s    10 runs
 
   Warning: Ignoring non-zero exit code.
 
 Benchmark 2: tsgolint
-  Time (mean ± σ):      4.897 s ±  0.153 s    [User: 64.479 s, System: 4.911 s]
-  Range (min … max):    4.736 s …  5.183 s    10 runs
+  Time (mean ± σ):      6.964 s ±  0.241 s    [User: 32.351 s, System: 1.517 s]
+  Range (min … max):    6.821 s …  7.593 s    10 runs
 
 Summary
   tsgolint ran
-   34.27 ± 1.10 times faster than eslint
+   11.95 ± 0.59 times faster than eslint
 ```
 
 | microsoft/typescript |
@@ -44,18 +46,18 @@ Summary
 
 ```plaintext
 Benchmark 1: eslint
-  Time (mean ± σ):     47.465 s ±  0.669 s    [User: 70.492 s, System: 4.250 s]
-  Range (min … max):   46.636 s … 48.685 s    10 runs
+  Time (mean ± σ):     27.170 s ±  0.971 s    [User: 38.137 s, System: 1.305 s]
+  Range (min … max):   26.383 s … 29.403 s    10 runs
 
   Warning: Ignoring non-zero exit code.
 
 Benchmark 2: tsgolint
-  Time (mean ± σ):      2.100 s ±  0.023 s    [User: 18.254 s, System: 1.448 s]
-  Range (min … max):    2.068 s …  2.138 s    10 runs
+  Time (mean ± σ):      1.942 s ±  0.034 s    [User: 9.884 s, System: 0.513 s]
+  Range (min … max):    1.911 s …  2.007 s    10 runs
 
 Summary
   tsgolint ran
-   22.60 ± 0.40 times faster than eslint
+   13.99 ± 0.56 times faster than eslint
 ```
 
 | typeorm/typeorm |
@@ -63,18 +65,18 @@ Summary
 
 ```plaintext
 Benchmark 1: eslint
-  Time (mean ± σ):     27.294 s ±  0.504 s    [User: 42.467 s, System: 2.522 s]
-  Range (min … max):   26.614 s … 28.522 s    10 runs
+  Time (mean ± σ):     13.168 s ±  0.419 s    [User: 19.208 s, System: 1.057 s]
+  Range (min … max):   12.746 s … 13.862 s    10 runs
 
   Warning: Ignoring non-zero exit code.
 
 Benchmark 2: tsgolint
-  Time (mean ± σ):     930.0 ms ±   5.2 ms    [User: 9575.1 ms, System: 1041.6 ms]
-  Range (min … max):   921.4 ms … 941.6 ms    10 runs
+  Time (mean ± σ):     748.9 ms ±  14.0 ms    [User: 3366.7 ms, System: 440.8 ms]
+  Range (min … max):   723.2 ms … 773.0 ms    10 runs
 
 Summary
   tsgolint ran
-   29.35 ± 0.57 times faster than eslint
+   17.58 ± 0.65 times faster than eslint
 ```
 
 | vuejs/core |
@@ -82,18 +84,18 @@ Summary
 
 ```plaintext
 Benchmark 1: eslint
-  Time (mean ± σ):     20.680 s ±  0.364 s    [User: 35.617 s, System: 2.117 s]
-  Range (min … max):   20.412 s … 21.604 s    10 runs
+  Time (mean ± σ):     12.302 s ±  0.791 s    [User: 22.701 s, System: 0.620 s]
+  Range (min … max):   11.394 s … 14.198 s    10 runs
 
   Warning: Ignoring non-zero exit code.
 
 Benchmark 2: tsgolint
-  Time (mean ± σ):     955.5 ms ±  31.4 ms    [User: 11528.6 ms, System: 1001.1 ms]
-  Range (min … max):   909.7 ms … 993.4 ms    10 runs
+  Time (mean ± σ):     952.4 ms ±  53.1 ms    [User: 4270.1 ms, System: 247.8 ms]
+  Range (min … max):   866.4 ms … 1038.5 ms    10 runs
 
 Summary
   tsgolint ran
-   21.64 ± 0.81 times faster than eslint
+   12.92 ± 1.10 times faster than eslint
 ```
 
 </details>
