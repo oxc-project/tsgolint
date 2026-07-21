@@ -67,6 +67,10 @@ await Promise.all([
           JSON.stringify(
             {
               ...commonPackageJson,
+              publishConfig: {
+                ...commonPackageJson.publishConfig,
+                executableFiles: [binaryName],
+              },
               name: npmPackageName,
               preferUnplugged: true,
               files: [binaryName],
