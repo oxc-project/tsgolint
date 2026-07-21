@@ -1,0 +1,19 @@
+tools/gen-npm-packages.mjs
+  s_1c11b6ab4f9734::t_460473bc79f9b5 70-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "1113daa746700460400e7ecd05559937f14e0fa8",
+  "prompts": {},
+  "sessions": {
+    "s_1c11b6ab4f9734": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f84c8-bb66-7023-ade5-d8e68c4f53e4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
