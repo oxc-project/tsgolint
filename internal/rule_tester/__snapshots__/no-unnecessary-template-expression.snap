@@ -1051,3 +1051,26 @@ Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'abc' || 'def'}`[0];
      |  ~~~~~~~~~~~~~~~~~
 ---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-121 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:24 - 1:46)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | const value = "foo" + `${cond ? "bar" : "baz"}`;
+     |                        ~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-122 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:2 - 2:12)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | declare const a: string;
+   2 | `${a || 'b'}` ?? 'c';
+     |  ~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-123 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:9 - 2:19)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | declare const b: string;
+   2 | 'a' ?? `${b && 'c'}`;
+     |         ~~~~~~~~~~~
+---

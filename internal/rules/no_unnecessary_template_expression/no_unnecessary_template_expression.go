@@ -110,9 +110,15 @@ var NoUnnecessaryTemplateExpressionRule = rule.Rule{
 
 		reportSingleInterpolation := func(template *ast.Node, interpolation *ast.Node, spanLiteral *ast.Node) {
 			text := nodeText(interpolation)
-			isMemberReceiver := ast.IsPropertyAccessExpression(template.Parent) && template.Parent.AsPropertyAccessExpression().Expression == template ||
-				ast.IsElementAccessExpression(template.Parent) && template.Parent.AsElementAccessExpression().Expression == template
-			if isMemberReceiver && ast.GetExpressionPrecedence(interpolation) < ast.OperatorPrecedenceMember {
+			parentIsNullishCoalescing := ast.IsBinaryExpression(template.Parent) &&
+				template.Parent.AsBinaryExpression().OperatorToken.Kind == ast.KindQuestionQuestionToken
+			interpolationIsLogical := ast.IsBinaryExpression(interpolation) &&
+				(interpolation.AsBinaryExpression().OperatorToken.Kind == ast.KindBarBarToken ||
+					interpolation.AsBinaryExpression().OperatorToken.Kind == ast.KindAmpersandAmpersandToken)
+			needsParentheses := parentIsNullishCoalescing && interpolationIsLogical ||
+				ast.IsExpression(template.Parent) &&
+					ast.GetExpressionPrecedence(interpolation) <= ast.GetExpressionPrecedence(template.Parent)
+			if needsParentheses {
 				text = "(" + text + ")"
 			}
 

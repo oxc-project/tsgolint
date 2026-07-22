@@ -1666,5 +1666,32 @@ type Bar = Foo;
 				},
 			},
 		},
+		{
+			Code:   `const value = "foo" + ` + "`" + `${cond ? "bar" : "baz"}` + "`" + `;`,
+			Output: []string{`const value = "foo" + (cond ? "bar" : "baz");`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noUnnecessaryTemplateExpression",
+				},
+			},
+		},
+		{
+			Code:   "declare const a: string;\n`${a || 'b'}` ?? 'c';",
+			Output: []string{"declare const a: string;\n(a || 'b') ?? 'c';"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noUnnecessaryTemplateExpression",
+				},
+			},
+		},
+		{
+			Code:   "declare const b: string;\n'a' ?? `${b && 'c'}`;",
+			Output: []string{"declare const b: string;\n'a' ?? (b && 'c');"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noUnnecessaryTemplateExpression",
+				},
+			},
+		},
 	})
 }
