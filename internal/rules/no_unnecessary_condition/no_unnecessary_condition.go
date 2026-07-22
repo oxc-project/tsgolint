@@ -1378,7 +1378,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 
 				propSymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
-				if propSymbol == nil && noUncheckedIndexedAccess {
+				if propSymbol == nil && nameNode.Kind != ast.KindPrivateIdentifier && noUncheckedIndexedAccess {
 					indexType := ctx.TypeChecker.GetStringIndexType(baseType)
 					if indexType == nil {
 						apparentType := checker.Checker_getApparentType(ctx.TypeChecker, baseType)

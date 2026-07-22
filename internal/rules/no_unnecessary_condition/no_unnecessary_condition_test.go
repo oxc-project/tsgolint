@@ -2866,6 +2866,7 @@ assert(!!a);
 		{
 			Code: `
 class Foo {
+  [key: string]: unknown;
   #value = 1;
 
   method() {
@@ -2873,7 +2874,8 @@ class Foo {
   }
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
 		},
 		{
 			Code: `
