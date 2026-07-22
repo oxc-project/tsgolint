@@ -1377,9 +1377,22 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					return false
 				}
 
-				propSymbol := ctx.TypeChecker.GetSymbolAtLocation(nameNode)
+				propSymbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
+				if propSymbol == nil && noUncheckedIndexedAccess {
+					indexType := ctx.TypeChecker.GetStringIndexType(baseType)
+					if indexType == nil {
+						apparentType := checker.Checker_getApparentType(ctx.TypeChecker, baseType)
+						if apparentType != nil {
+							indexType = ctx.TypeChecker.GetStringIndexType(apparentType)
+						}
+					}
+					if indexType != nil {
+						return true
+					}
+				}
+
 				if propSymbol == nil {
-					propSymbol = checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, propName)
+					propSymbol = ctx.TypeChecker.GetSymbolAtLocation(nameNode)
 				}
 				if propSymbol == nil {
 					for _, prop := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, baseType) {

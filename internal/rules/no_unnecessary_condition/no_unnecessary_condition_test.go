@@ -1309,6 +1309,16 @@ function repro5WithNoUncheckedIndexedAccess() {
     `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 		},
+		{
+			Code: `
+type ProviderOptions = Record<string, Record<string, unknown>>;
+
+function withNullishAssignment(opts: ProviderOptions): Record<string, unknown> {
+  return opts.perplexity ??= {};
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 		{Code: `
 type Result<T> = T extends null
   ? string | null
