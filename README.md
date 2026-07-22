@@ -134,16 +134,23 @@ See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 
 ## Status
 
-`tsgolint` is under active development.
+`tsgolint` is stable and powers Oxlint's type-aware linting mode. See the [Type-Aware Linting Stable announcement](https://oxc.rs/blog/2026-07-22-type-aware-linting-stable) for details about the stable release.
 
-The core architecture is stable and already powers Oxlint's type-aware linting mode. Current development focuses on expanding rule coverage and ecosystem integration:
+### Versioning
+
+`tsgolint` is built directly on TypeScript 7, so its versions track the TypeScript release they support. For example, in `v7.0.2001`:
+
+- `7.0.2` is the TypeScript version
+- `001` is the `tsgolint` patch version
+
+A fix released against the same TypeScript version increments the patch suffix, so the next release would be `v7.0.2002`. When the supported TypeScript version changes, the TypeScript portion changes and the patch suffix resets.
+
+Current development focuses on expanding rule coverage and ecosystem integration:
 
 - additional `typescript-eslint` rule support
 - editor integration improvements
 - configuration and rule customization
 - performance improvements for large monorepos
-
-Because `tsgolint` relies on `typescript-go`, its long-term stability evolves alongside TypeScript itself.
 
 > [!NOTE]
 > We are not currently accepting PRs for new rules beyond what `typescript-eslint` supports, so that we can focus our limited engineering capacity on the items listed above.
