@@ -1,0 +1,23 @@
+internal/rule_tester/__snapshots__/no-unnecessary-condition.snap
+  s_ae7b7c3170fe8a::t_69a6d9ec18f04c 2938,2940-2941,2943-2946,2948
+internal/rules/no_unnecessary_condition/no_unnecessary_condition.go
+  s_ae7b7c3170fe8a::t_8c4fccf2553eaa 1381
+internal/rules/no_unnecessary_condition/no_unnecessary_condition_test.go
+  s_ae7b7c3170fe8a::t_9faaef2c1477ee 2869,2877-2878
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "a1d636a25347a80879709c23b3dc62d01c5c4d07",
+  "prompts": {},
+  "sessions": {
+    "s_ae7b7c3170fe8a": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f8907-f214-7493-9962-f94e6f8dd613",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
