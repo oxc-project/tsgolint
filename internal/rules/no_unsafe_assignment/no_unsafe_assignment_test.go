@@ -4,9 +4,55 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
+
+func TestDiagnosticRelationships(t *testing.T) {
+	t.Parallel()
+
+	primaryRange := core.NewTextRange(10, 11)
+	senderRange := core.NewTextRange(20, 30)
+	receiverRange := core.NewTextRange(1, 8)
+	message := rule.RuleMessage{Id: "test", Description: "test"}
+
+	assignment := buildAssignmentDiagnostic(primaryRange, senderRange, receiverRange, "Set<any>", "Set<string>", message)
+	if assignment.Range != primaryRange {
+		t.Fatalf("assignment range = %v, want %v", assignment.Range, primaryRange)
+	}
+	if len(assignment.LabeledRanges) != 2 {
+		t.Fatalf("assignment labels = %d, want 2", len(assignment.LabeledRanges))
+	}
+	if assignment.LabeledRanges[0].Range != senderRange || assignment.LabeledRanges[0].Label != "Assigned value has type `Set<any>`." {
+		t.Fatalf("sender label = %+v", assignment.LabeledRanges[0])
+	}
+	if assignment.LabeledRanges[1].Range != receiverRange || assignment.LabeledRanges[1].Label != "Target expects type `Set<string>`." {
+		t.Fatalf("receiver label = %+v", assignment.LabeledRanges[1])
+	}
+
+	thisAssignment := buildThisAssignmentDiagnostic(primaryRange, senderRange, receiverRange, "any", "number", message)
+	if thisAssignment.LabeledRanges[0].Label != "`this` has type `any`." || thisAssignment.LabeledRanges[0].Range != senderRange {
+		t.Fatalf("this label = %+v", thisAssignment.LabeledRanges[0])
+	}
+
+	destructure := buildDestructureDiagnostic(receiverRange, senderRange, "[any]", "any", message)
+	if destructure.Range != receiverRange || len(destructure.LabeledRanges) != 2 {
+		t.Fatalf("destructure diagnostic = %+v", destructure)
+	}
+	if destructure.LabeledRanges[0].Label != "Destructured source provides type `[any]`." || destructure.LabeledRanges[0].Range != senderRange {
+		t.Fatalf("destructure source label = %+v", destructure.LabeledRanges[0])
+	}
+	if destructure.LabeledRanges[1].Label != "This binding receives type `any`." || destructure.LabeledRanges[1].Range != receiverRange {
+		t.Fatalf("destructure binding label = %+v", destructure.LabeledRanges[1])
+	}
+
+	spread := buildArraySpreadDiagnostic(primaryRange, senderRange, "any[]", message)
+	if spread.Range != primaryRange || len(spread.LabeledRanges) != 1 || spread.LabeledRanges[0].Range != senderRange || spread.LabeledRanges[0].Label != "Spread value has type `any[]`." {
+		t.Fatalf("spread diagnostic = %+v", spread)
+	}
+}
 
 func assignmentTest(
 	tests []struct {
@@ -159,6 +205,8 @@ a+= foo;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "anyAssignment",
+					Column:    9,
+					EndColumn: 10,
 				},
 			},
 		},
@@ -261,6 +309,9 @@ value = spooky;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "anyAssignment",
+					Line:      4,
+					Column:    7,
+					EndColumn: 8,
 				},
 			},
 		},
@@ -289,6 +340,8 @@ const [x] = [] as any[];
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unsafeAssignment",
+					Column:    22,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -338,8 +391,8 @@ const [x] = [] as any[];
 					{
 						MessageId: "unsafeAssignment",
 						Line:      1,
-						Column:    1,
-						EndColumn: 23,
+						Column:    11,
+						EndColumn: 12,
 					},
 				},
 			},
@@ -350,6 +403,9 @@ const x = [...(1 as any)];
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "unsafeArraySpread",
+						Line:      2,
+						Column:    12,
+						EndColumn: 15,
 					},
 				},
 			},
@@ -360,6 +416,9 @@ const x = [...([] as any[])];
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "unsafeArraySpread",
+						Line:      2,
+						Column:    12,
+						EndColumn: 15,
 					},
 				},
 			},
@@ -382,8 +441,8 @@ const x = [...([] as any[])];
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "anyAssignment",
-						Column:    13,
-						EndColumn: 24,
+						Column:    14,
+						EndColumn: 15,
 					},
 				},
 			},
@@ -392,8 +451,8 @@ const x = [...([] as any[])];
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "anyAssignment",
-						Column:    18,
-						EndColumn: 29,
+						Column:    19,
+						EndColumn: 20,
 					},
 				},
 			},
@@ -402,8 +461,8 @@ const x = [...([] as any[])];
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "unsafeAssignment",
-						Column:    43,
-						EndColumn: 70,
+						Column:    44,
+						EndColumn: 45,
 					},
 				},
 			},
@@ -412,8 +471,8 @@ const x = [...([] as any[])];
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "anyAssignment",
-						Column:    7,
-						EndColumn: 28,
+						Column:    9,
+						EndColumn: 10,
 					},
 				},
 			},
@@ -428,8 +487,8 @@ declare function Foo(props: Props): never;
 					{
 						MessageId: "anyAssignment",
 						Line:      4,
-						Column:    9,
-						EndColumn: 17,
+						Column:    7,
+						EndColumn: 8,
 					},
 				},
 			},
@@ -443,8 +502,8 @@ function foo() {
 					{
 						MessageId: "anyAssignmentThis",
 						Line:      3,
-						Column:    9,
-						EndColumn: 19,
+						Column:    13,
+						EndColumn: 14,
 					},
 				},
 			},
@@ -457,8 +516,8 @@ const test: T = ['string', []] as any;
 					{
 						MessageId: "anyAssignment",
 						Line:      3,
-						Column:    7,
-						EndColumn: 38,
+						Column:    15,
+						EndColumn: 16,
 					},
 				},
 			},
@@ -495,8 +554,8 @@ class Foo {
 					{
 						MessageId: "anyAssignment",
 						Line:      9,
-						Column:    5,
-						EndColumn: 54,
+						Column:    33,
+						EndColumn: 34,
 					},
 				},
 			},
@@ -510,8 +569,8 @@ foo = { bar: 2 } as any;
 					{
 						MessageId: "anyAssignment",
 						Line:      4,
-						Column:    1,
-						EndColumn: 24,
+						Column:    5,
+						EndColumn: 6,
 					},
 				},
 			},

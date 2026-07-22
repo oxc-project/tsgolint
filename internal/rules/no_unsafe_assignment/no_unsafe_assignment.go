@@ -5,6 +5,8 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -47,11 +49,131 @@ func buildUnsafeArraySpreadMessage(sender *checker.Type) rule.RuleMessage {
 		Description: fmt.Sprintf("Unsafe spread of an %v value in an array.", formatSenderType(sender)),
 	}
 }
-func buildUnsafeAssignmentMessage(typeChecker *checker.Checker, sender, receiver *checker.Type) rule.RuleMessage {
+func buildUnsafeAssignmentMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeAssignment",
-		Description: fmt.Sprintf("Unsafe assignment of type %v to a variable of type %v.", typeChecker.TypeToString(sender), typeChecker.TypeToString(receiver)),
+		Description: "Unsafe assignment between incompatible types.",
 	}
+}
+
+func buildAssignmentDiagnostic(
+	primaryRange core.TextRange,
+	senderRange core.TextRange,
+	receiverRange core.TextRange,
+	senderType string,
+	receiverType string,
+	message rule.RuleMessage,
+) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range:   primaryRange,
+		Message: message,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Assigned value has type `%s`.", senderType),
+				Range: senderRange,
+			},
+			{
+				Label: fmt.Sprintf("Target expects type `%s`.", receiverType),
+				Range: receiverRange,
+			},
+		},
+	}
+}
+
+func buildThisAssignmentDiagnostic(
+	primaryRange core.TextRange,
+	thisRange core.TextRange,
+	receiverRange core.TextRange,
+	thisType string,
+	receiverType string,
+	message rule.RuleMessage,
+) rule.RuleDiagnostic {
+	diagnostic := buildAssignmentDiagnostic(
+		primaryRange,
+		thisRange,
+		receiverRange,
+		thisType,
+		receiverType,
+		message,
+	)
+	diagnostic.LabeledRanges[0].Label = fmt.Sprintf("`this` has type `%s`.", thisType)
+	return diagnostic
+}
+
+func buildDestructureDiagnostic(
+	receiverRange core.TextRange,
+	senderRange core.TextRange,
+	senderType string,
+	unsafeType string,
+	message rule.RuleMessage,
+) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range:   receiverRange,
+		Message: message,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Destructured source provides type `%s`.", senderType),
+				Range: senderRange,
+			},
+			{
+				Label: fmt.Sprintf("This binding receives type `%s`.", unsafeType),
+				Range: receiverRange,
+			},
+		},
+	}
+}
+
+func buildArraySpreadDiagnostic(
+	spreadRange core.TextRange,
+	valueRange core.TextRange,
+	valueType string,
+	message rule.RuleMessage,
+) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range:   spreadRange,
+		Message: message,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Spread value has type `%s`.", valueType),
+				Range: valueRange,
+			},
+		},
+	}
+}
+
+func diagnosticTypeText(typeChecker *checker.Checker, t *checker.Type) string {
+	if utils.IsIntrinsicErrorType(t) {
+		return "error"
+	}
+	return typeChecker.TypeToString(t)
+}
+
+func assignmentRelationRange(sourceFile *ast.SourceFile, receiverNode, senderNode *ast.Node) core.TextRange {
+	s := scanner.GetScannerForSourceFile(sourceFile, receiverNode.End())
+	var colonRange core.TextRange
+	for s.Token() != ast.KindEndOfFile && s.TokenRange().Pos() < senderNode.End() {
+		switch s.Token() {
+		case ast.KindEqualsToken:
+			return s.TokenRange()
+		case ast.KindColonToken:
+			colonRange = s.TokenRange()
+		}
+		if s.TokenRange().Pos() >= senderNode.Pos() {
+			break
+		}
+		s.Scan()
+	}
+	if colonRange != (core.TextRange{}) {
+		return colonRange
+	}
+	return utils.TrimNodeTextRange(sourceFile, receiverNode)
+}
+
+func localTargetRange(sourceFile *ast.SourceFile, receiverNode, typeAnnotationNode *ast.Node) core.TextRange {
+	if typeAnnotationNode != nil && ast.GetSourceFileOfNode(typeAnnotationNode) == sourceFile {
+		return utils.TrimNodeTextRange(sourceFile, typeAnnotationNode)
+	}
+	return utils.TrimNodeTextRange(sourceFile, receiverNode)
 }
 
 type comparisonType uint8
@@ -102,6 +224,16 @@ var NoUnsafeAssignmentRule = rule.Rule{
 			compilerOptions.NoImplicitThis,
 		)
 
+		reportDestructure := func(receiverNode, senderNode *ast.Node, senderType *checker.Type, unsafeType string, message rule.RuleMessage) {
+			ctx.ReportDiagnostic(buildDestructureDiagnostic(
+				utils.TrimNodeTextRange(ctx.SourceFile, receiverNode),
+				utils.TrimNodeTextRange(ctx.SourceFile, senderNode),
+				diagnosticTypeText(ctx.TypeChecker, senderType),
+				unsafeType,
+				message,
+			))
+		}
+
 		var checkArrayDestructure func(
 			receiverNode *ast.Node,
 			senderType *checker.Type,
@@ -147,7 +279,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				// check for the any type first so we can handle {x: {y: z}} = {x: any}
 				if utils.IsTypeAnyType(senderType) {
 					// TODO(port): why object reported with "array" message?
-					ctx.ReportNode(propertyValue, buildUnsafeArrayPatternFromTupleMessage(senderType))
+					reportDestructure(propertyValue, senderNode, senderType, diagnosticTypeText(ctx.TypeChecker, senderType), buildUnsafeArrayPatternFromTupleMessage(senderType))
 					return true
 				} else if ast.IsArrayBindingPattern(propertyValue) || ast.IsArrayLiteralExpression(propertyValue) {
 					return checkArrayDestructure(
@@ -222,7 +354,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 			// any array
 			// const [x] = ([] as any[]);
 			if utils.IsTypeAnyArrayType(senderType, ctx.TypeChecker) {
-				ctx.ReportNode(receiverNode, buildUnsafeArrayPatternMessage(senderType))
+				reportDestructure(receiverNode, senderNode, senderType, "any", buildUnsafeArrayPatternMessage(senderType))
 				return false
 			}
 
@@ -243,7 +375,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 				// check for the any type first so we can handle [[[x]]] = [any]
 				if utils.IsTypeAnyType(senderType) {
-					ctx.ReportNode(receiverElement, buildUnsafeArrayPatternFromTupleMessage(senderType))
+					reportDestructure(receiverElement, senderNode, senderType, diagnosticTypeText(ctx.TypeChecker, senderType), buildUnsafeArrayPatternFromTupleMessage(senderType))
 					return true
 				} else if ast.IsArrayBindingPattern(receiverElement) || ast.IsArrayLiteralExpression(receiverElement) {
 					return checkArrayDestructure(
@@ -312,7 +444,8 @@ var NoUnsafeAssignmentRule = rule.Rule{
 		checkAssignment := func(
 			receiverNode *ast.Node,
 			senderNode *ast.Node,
-			reportingNode *ast.Node,
+			typeAnnotationNode *ast.Node,
+			primaryRange core.TextRange,
 			compType comparisonType,
 		) bool {
 			// Fast path: return early when we know that the sender definitely cannot have an `any` type,
@@ -325,6 +458,9 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 			getReceiverType := func() *checker.Type {
 				if compType == comparisonTypeContextual {
+					if receiverType := utils.GetContextualType(ctx.TypeChecker, senderNode); receiverType != nil {
+						return receiverType
+					}
 					if receiverType := utils.GetContextualType(ctx.TypeChecker, receiverNode); receiverType != nil {
 						return receiverType
 					}
@@ -334,6 +470,15 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 			if utils.IsTypeAnyType(senderType) {
 				receiverType := getReceiverType()
+				receiverRange := localTargetRange(ctx.SourceFile, receiverNode, typeAnnotationNode)
+				setInferredTargetLabel := func(diagnostic *rule.RuleDiagnostic) {
+					if compType == comparisonTypeNone {
+						diagnostic.LabeledRanges[1].Label = fmt.Sprintf(
+							"Target is inferred as `%s`.",
+							diagnosticTypeText(ctx.TypeChecker, receiverType),
+						)
+					}
+				}
 
 				// handle cases when we assign any ==> unknown.
 				if utils.IsTypeUnknownType(receiverType) {
@@ -343,13 +488,34 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				if !isNoImplicitThis {
 					// `var foo = this`
 					thisExpression := utils.GetThisExpression(senderNode)
-					if thisExpression != nil && utils.IsTypeAnyType(utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, thisExpression)) {
-						ctx.ReportNode(reportingNode, buildAnyAssignmentThisMessage(senderType))
-						return true
+					if thisExpression != nil {
+						thisType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, thisExpression)
+						if utils.IsTypeAnyType(thisType) {
+							diagnostic := buildThisAssignmentDiagnostic(
+								primaryRange,
+								utils.TrimNodeTextRange(ctx.SourceFile, thisExpression),
+								receiverRange,
+								diagnosticTypeText(ctx.TypeChecker, thisType),
+								diagnosticTypeText(ctx.TypeChecker, receiverType),
+								buildAnyAssignmentThisMessage(senderType),
+							)
+							setInferredTargetLabel(&diagnostic)
+							ctx.ReportDiagnostic(diagnostic)
+							return true
+						}
 					}
 				}
 
-				ctx.ReportNode(reportingNode, buildAnyAssignmentMessage(senderType))
+				diagnostic := buildAssignmentDiagnostic(
+					primaryRange,
+					utils.TrimNodeTextRange(ctx.SourceFile, senderNode),
+					receiverRange,
+					diagnosticTypeText(ctx.TypeChecker, senderType),
+					diagnosticTypeText(ctx.TypeChecker, receiverType),
+					buildAnyAssignmentMessage(senderType),
+				)
+				setInferredTargetLabel(&diagnostic)
+				ctx.ReportDiagnostic(diagnostic)
 				return true
 			}
 
@@ -372,7 +538,14 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				return false
 			}
 
-			ctx.ReportNode(reportingNode, buildUnsafeAssignmentMessage(ctx.TypeChecker, sender, receiver))
+			ctx.ReportDiagnostic(buildAssignmentDiagnostic(
+				primaryRange,
+				utils.TrimNodeTextRange(ctx.SourceFile, senderNode),
+				localTargetRange(ctx.SourceFile, receiverNode, typeAnnotationNode),
+				diagnosticTypeText(ctx.TypeChecker, sender),
+				diagnosticTypeText(ctx.TypeChecker, receiver),
+				buildUnsafeAssignmentMessage(),
+			))
 			return true
 		}
 
@@ -387,14 +560,15 @@ var NoUnsafeAssignmentRule = rule.Rule{
 			return comparisonTypeNone
 		}
 
-		checkAssignmentFull := func(id *ast.Node, init *ast.Node, node *ast.Node) {
+		checkAssignmentFull := func(id *ast.Node, init *ast.Node, typeAnnotationNode *ast.Node, primaryRange core.TextRange) {
 			if id == nil || init == nil {
 				return
 			}
 			didReport := checkAssignment(
 				id,
 				init,
-				node,
+				typeAnnotationNode,
+				primaryRange,
 				// the variable already has some form of a type to compare against
 				comparisonTypeBasic,
 			)
@@ -414,7 +588,13 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				if initializer == nil {
 					return
 				}
-				checkAssignment(node.Name(), initializer, node, getComparisonType(node))
+				checkAssignment(
+					node.Name(),
+					initializer,
+					node.Type(),
+					assignmentRelationRange(ctx.SourceFile, node.Name(), initializer),
+					getComparisonType(node),
+				)
 			},
 
 			// ESTree AssignmentExpression, AssignmentPattern
@@ -424,21 +604,32 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				}
 
 				expr := node.AsBinaryExpression()
-				checkAssignmentFull(expr.Left, expr.Right, node)
+				checkAssignmentFull(
+					expr.Left,
+					expr.Right,
+					nil,
+					utils.TrimNodeTextRange(ctx.SourceFile, expr.OperatorToken),
+				)
 			},
 
 			// ESTree AssignmentPattern
 			ast.KindBindingElement: func(node *ast.Node) {
-				checkAssignmentFull(node.Name(), node.Initializer(), node)
+				if initializer := node.Initializer(); initializer != nil {
+					checkAssignmentFull(node.Name(), initializer, node.Type(), assignmentRelationRange(ctx.SourceFile, node.Name(), initializer))
+				}
 			},
 			// ESTree AssignmentPattern
 			ast.KindParameter: func(node *ast.Node) {
-				checkAssignmentFull(node.Name(), node.Initializer(), node)
+				if initializer := node.Initializer(); initializer != nil {
+					checkAssignmentFull(node.Name(), initializer, node.Type(), assignmentRelationRange(ctx.SourceFile, node.Name(), initializer))
+				}
 			},
 			// ESTree AssignmentPattern
 			ast.KindShorthandPropertyAssignment: func(node *ast.Node) {
 				assignment := node.AsShorthandPropertyAssignment()
-				checkAssignmentFull(assignment.Name(), assignment.ObjectAssignmentInitializer, node)
+				if initializer := assignment.ObjectAssignmentInitializer; initializer != nil {
+					checkAssignmentFull(assignment.Name(), initializer, nil, assignmentRelationRange(ctx.SourceFile, assignment.Name(), initializer))
+				}
 			},
 
 			ast.KindVariableDeclaration: func(node *ast.Node) {
@@ -451,7 +642,8 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				didReport := checkAssignment(
 					id,
 					init,
-					node,
+					node.Type(),
+					assignmentRelationRange(ctx.SourceFile, id, init),
 					getComparisonType(node),
 				)
 
@@ -486,7 +678,13 @@ var NoUnsafeAssignmentRule = rule.Rule{
 						return
 					}
 
-					checkAssignment(node.Name(), init, node, comparisonTypeContextual)
+					checkAssignment(
+						node.Name(),
+						init,
+						nil,
+						assignmentRelationRange(ctx.SourceFile, node.Name(), init),
+						comparisonTypeContextual,
+					)
 				}
 			},
 
@@ -498,7 +696,13 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 					restType := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
 					if utils.IsTypeAnyType(restType) || utils.IsTypeAnyArrayType(restType, ctx.TypeChecker) {
-						ctx.ReportNode(node, buildUnsafeArraySpreadMessage(restType))
+						nodeRange := utils.TrimNodeTextRange(ctx.SourceFile, node)
+						ctx.ReportDiagnostic(buildArraySpreadDiagnostic(
+							core.NewTextRange(nodeRange.Pos(), nodeRange.Pos()+3),
+							utils.TrimNodeTextRange(ctx.SourceFile, node.Expression()),
+							diagnosticTypeText(ctx.TypeChecker, restType),
+							buildUnsafeArraySpreadMessage(restType),
+						))
 					}
 				}
 			},
@@ -514,7 +718,13 @@ var NoUnsafeAssignmentRule = rule.Rule{
 					return
 				}
 
-				checkAssignment(node.Name(), expr, expr, comparisonTypeContextual)
+				checkAssignment(
+					node.Name(),
+					expr,
+					nil,
+					assignmentRelationRange(ctx.SourceFile, node.Name(), expr),
+					comparisonTypeContextual,
+				)
 			},
 		}
 	},

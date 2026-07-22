@@ -496,13 +496,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`error\`.",
+        "range": {
+          "end": 215,
+          "pos": 185,
+        },
+      },
+      {
+        "label": "Target is inferred as \`error\`.",
+        "range": {
+          "end": 182,
+          "pos": 176,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an error typed value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 215,
-      "pos": 176,
+      "end": 184,
+      "pos": 183,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2108,52 +2124,116 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 119,
+          "pos": 111,
+        },
+      },
+      {
+        "label": "Target expects type \`string\`.",
+        "range": {
+          "end": 108,
+          "pos": 102,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 119,
-      "pos": 97,
+      "end": 110,
+      "pos": 109,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 174,
+          "pos": 166,
+        },
+      },
+      {
+        "label": "Target expects type \`number\`.",
+        "range": {
+          "end": 163,
+          "pos": 160,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 174,
-      "pos": 160,
+      "end": 165,
+      "pos": 164,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 235,
+          "pos": 220,
+        },
+      },
+      {
+        "label": "Target expects type \`any\`.",
+        "range": {
+          "end": 218,
+          "pos": 214,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 235,
-      "pos": 214,
+      "end": 219,
+      "pos": 218,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 180,
+          "pos": 163,
+        },
+      },
+      {
+        "label": "Target is inferred as \`any\`.",
+        "range": {
+          "end": 160,
+          "pos": 154,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 180,
-      "pos": 154,
+      "end": 162,
+      "pos": 161,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2352,13 +2432,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 266,
+          "pos": 249,
+        },
+      },
+      {
+        "label": "Target is inferred as \`any\`.",
+        "range": {
+          "end": 246,
+          "pos": 240,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 266,
-      "pos": 240,
+      "end": 248,
+      "pos": 247,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2469,26 +2565,58 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 120,
+          "pos": 108,
+        },
+      },
+      {
+        "label": "Target is inferred as \`any\`.",
+        "range": {
+          "end": 105,
+          "pos": 102,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 120,
-      "pos": 102,
+      "end": 107,
+      "pos": 106,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 289,
+          "pos": 277,
+        },
+      },
+      {
+        "label": "Target is inferred as \`any\`.",
+        "range": {
+          "end": 274,
+          "pos": 265,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 289,
-      "pos": 265,
+      "end": 276,
+      "pos": 275,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -3643,13 +3771,29 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Assigned value has type \`any\`.",
+        "range": {
+          "end": 16,
+          "pos": 10,
+        },
+      },
+      {
+        "label": "Target is inferred as \`any\`.",
+        "range": {
+          "end": 7,
+          "pos": 4,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 16,
-      "pos": 4,
+      "end": 9,
+      "pos": 8,
     },
     "rule": "no-unsafe-assignment",
   },
