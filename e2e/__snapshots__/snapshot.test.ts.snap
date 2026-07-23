@@ -1366,6 +1366,84 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
     "kind": 0,
     "message": {
+      "description": "Enum Member name \`Open\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 75,
+      "pos": 71,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Closed\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 89,
+      "pos": 83,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Up\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 126,
+      "pos": 124,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Down\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 141,
+      "pos": 137,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Left\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 153,
+      "pos": 149,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Right\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 171,
+      "pos": 166,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-mixed-enums/index.ts",
+    "kind": 0,
+    "message": {
       "description": "Mixing number and string enums can be confusing.",
       "id": "mixed",
     },
@@ -2360,6 +2438,58 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
     ],
+    "message": {
+      "description": "Enum Member name \`Open\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 86,
+      "pos": 82,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Closed\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 105,
+      "pos": 99,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Red\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 139,
+      "pos": 136,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "Enum Member name \`Blue\` must match one of the following formats: camelCase",
+      "id": "doesNotMatchFormat",
+    },
+    "range": {
+      "end": 155,
+      "pos": 151,
+    },
+    "rule": "naming-convention",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
+    "kind": 0,
     "message": {
       "description": "Unnecessary comparison between literal values.",
       "id": "comparisonBetweenLiteralTypes",
