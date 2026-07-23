@@ -5,6 +5,8 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -29,6 +31,40 @@ func buildUnsafeReturnThisMessage(t string) rule.RuleMessage {
 	}
 }
 
+func buildUnsafeReturnDiagnostic(
+	message rule.RuleMessage,
+	primaryRange core.TextRange,
+	returnedRange core.TextRange,
+	returnedType string,
+	expectedRange *core.TextRange,
+	expectedType string,
+) rule.RuleDiagnostic {
+	diagnostic := rule.RuleDiagnostic{
+		Range:   primaryRange,
+		Message: message,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Returned expression has type `%s`.", returnedType),
+				Range: returnedRange,
+			},
+		},
+	}
+	if expectedRange != nil {
+		diagnostic.LabeledRanges = append(diagnostic.LabeledRanges, rule.RuleLabeledRange{
+			Label: fmt.Sprintf("Function expects return type `%s`.", expectedType),
+			Range: *expectedRange,
+		})
+	}
+	return diagnostic
+}
+
+func renderReturnType(typeChecker *checker.Checker, t *checker.Type) string {
+	if utils.IsIntrinsicErrorType(t) {
+		return "error"
+	}
+	return typeChecker.TypeToString(t)
+}
+
 var NoUnsafeReturnRule = rule.Rule{
 	Name: "no-unsafe-return",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -40,7 +76,7 @@ var NoUnsafeReturnRule = rule.Rule{
 
 		checkReturn := func(
 			returnNode *ast.Node,
-			reportingNode *ast.Node,
+			primaryRange core.TextRange,
 		) {
 			t := ctx.TypeChecker.GetTypeAtLocation(returnNode)
 
@@ -63,13 +99,43 @@ var NoUnsafeReturnRule = rule.Rule{
 			// const foo1: () => Set<string> = () => new Set<any>();
 			// the return type of the arrow function is Set<any> even though the variable is typed as Set<string>
 			var functionType *checker.Type
+			usesContextualType := false
 			if ast.IsFunctionExpression(functionNode) || ast.IsArrowFunction(functionNode) {
 				functionType = utils.GetContextualType(ctx.TypeChecker, functionNode)
+				usesContextualType = functionType != nil
 			}
 			if functionType == nil {
 				functionType = ctx.TypeChecker.GetTypeAtLocation(functionNode)
 			}
 			callSignatures := utils.CollectAllCallSignatures(ctx.TypeChecker, functionType)
+			var expectedRange *core.TextRange
+			var expectedType string
+			if returnTypeNode := functionNode.Type(); returnTypeNode != nil {
+				r := utils.TrimNodeTextRange(ctx.SourceFile, returnTypeNode)
+				expectedRange = &r
+				expectedType = renderReturnType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(returnTypeNode))
+			} else if usesContextualType {
+				for _, signature := range callSignatures {
+					declaration := checker.Signature_declaration(signature)
+					if declaration == nil || declaration.Type() == nil || ast.GetSourceFileOfNode(declaration) != ctx.SourceFile {
+						continue
+					}
+					r := utils.TrimNodeTextRange(ctx.SourceFile, declaration.Type())
+					expectedRange = &r
+					expectedType = renderReturnType(ctx.TypeChecker, checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature))
+					break
+				}
+			}
+			report := func(message rule.RuleMessage) {
+				ctx.ReportDiagnostic(buildUnsafeReturnDiagnostic(
+					message,
+					primaryRange,
+					utils.TrimNodeTextRange(ctx.SourceFile, returnNode),
+					renderReturnType(ctx.TypeChecker, returnNodeType),
+					expectedRange,
+					expectedType,
+				))
+			}
 			// If there is an explicit type annotation *and* that type matches the actual
 			// function return type, we shouldn't complain (it's intentional, even if unsafe)
 			if functionNode.Type() != nil {
@@ -133,12 +199,12 @@ var NoUnsafeReturnRule = rule.Rule{
 					// `return this`
 					thisExpression := utils.GetThisExpression(returnNode)
 					if thisExpression != nil && utils.IsTypeAnyType(utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, thisExpression)) {
-						ctx.ReportNode(reportingNode, buildUnsafeReturnThisMessage(typeString))
+						report(buildUnsafeReturnThisMessage(typeString))
 						return
 					}
 				}
 				// If the function return type was not unknown/unknown[], mark usage as unsafeReturn.
-				ctx.ReportNode(reportingNode, buildUnsafeReturnMessage(typeString))
+				report(buildUnsafeReturnMessage(typeString))
 				return
 			}
 
@@ -160,14 +226,14 @@ var NoUnsafeReturnRule = rule.Rule{
 				return
 			}
 
-			ctx.ReportNode(reportingNode, buildUnsafeReturnAssignmentMessage(ctx.TypeChecker.TypeToString(sender), ctx.TypeChecker.TypeToString(receiver)))
+			report(buildUnsafeReturnAssignmentMessage(ctx.TypeChecker.TypeToString(sender), ctx.TypeChecker.TypeToString(receiver)))
 		}
 
 		return rule.RuleListeners{
 			ast.KindArrowFunction: func(node *ast.Node) {
 				body := node.Body()
 				if !ast.IsBlock(body) {
-					checkReturn(body, body)
+					checkReturn(body, utils.TrimNodeTextRange(ctx.SourceFile, node.AsArrowFunction().EqualsGreaterThanToken))
 				}
 			},
 			ast.KindReturnStatement: func(node *ast.Node) {
@@ -176,7 +242,7 @@ var NoUnsafeReturnRule = rule.Rule{
 					return
 				}
 
-				checkReturn(argument, node)
+				checkReturn(argument, scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos()))
 			},
 		}
 	},

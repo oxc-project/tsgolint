@@ -2526,12 +2526,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Returned expression has type \`any\`.",
+        "range": {
+          "end": 135,
+          "pos": 127,
+        },
+      },
+      {
+        "label": "Function expects return type \`string\`.",
+        "range": {
+          "end": 115,
+          "pos": 109,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 136,
+      "end": 126,
       "pos": 120,
     },
     "rule": "no-unsafe-return",
@@ -2539,25 +2555,57 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Returned expression has type \`any\`.",
+        "range": {
+          "end": 197,
+          "pos": 189,
+        },
+      },
+      {
+        "label": "Function expects return type \`number\`.",
+        "range": {
+          "end": 185,
+          "pos": 179,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 197,
-      "pos": 189,
+      "end": 188,
+      "pos": 186,
     },
     "rule": "no-unsafe-return",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Returned expression has type \`any\`.",
+        "range": {
+          "end": 290,
+          "pos": 282,
+        },
+      },
+      {
+        "label": "Function expects return type \`{ name: string; age: number; }\`.",
+        "range": {
+          "end": 270,
+          "pos": 241,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 291,
+      "end": 281,
       "pos": 275,
     },
     "rule": "no-unsafe-return",
@@ -2636,12 +2684,21 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Returned expression has type \`any\`.",
+        "range": {
+          "end": 332,
+          "pos": 310,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 333,
+      "end": 309,
       "pos": 303,
     },
     "rule": "no-unsafe-return",

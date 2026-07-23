@@ -1,307 +1,567 @@
 
 [TestNoUnsafeReturnRule/invalid-0 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:18)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any`.
    2 | function foo() {
    3 |   return 1 as any;
-     |   ~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `any`. (3:10 - 3:17)
+   2 | function foo() {
+   3 |   return 1 as any;
+     |          ^^^^^^^^ Returned expression has type `any`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-1 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:29)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any`.
    2 | function foo() {
    3 |   return Object.create(null);
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `any`. (3:10 - 3:28)
+   2 | function foo() {
+   3 |   return Object.create(null);
+     |          ^^^^^^^^^^^^^^^^^^^ Returned expression has type `any`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-2 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:18)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any`.
    2 | const foo = () => {
    3 |   return 1 as any;
-     |   ~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | };
+  Label: Returned expression has type `any`. (3:10 - 3:17)
+   2 | const foo = () => {
+   3 |   return 1 as any;
+     |          ^^^^^^^^ Returned expression has type `any`.
    4 | };
 ---
 
 [TestNoUnsafeReturnRule/invalid-3 - 1]
-Diagnostic 1: unsafeReturn (1:19 - 1:37)
+Diagnostic 1: unsafeReturn (1:16 - 1:17)
 Message: Unsafe return of a value of type `any`.
    1 | const foo = () => Object.create(null);
-     |                   ~~~~~~~~~~~~~~~~~~~
+     |                ~~
+  Label: Returned expression has type `any`. (1:19 - 1:37)
+   1 | const foo = () => Object.create(null);
+     |                   ^^^^^^^^^^^^^^^^^^^ Returned expression has type `any`.
 ---
 
 [TestNoUnsafeReturnRule/invalid-4 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:21)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any[]`.
    2 | function foo() {
    3 |   return [] as any[];
-     |   ~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `any[]`. (3:10 - 3:20)
+   2 | function foo() {
+   3 |   return [] as any[];
+     |          ^^^^^^^^^^^ Returned expression has type `any[]`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-5 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:26)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any[]`.
    2 | function foo() {
    3 |   return [] as Array<any>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `any[]`. (3:10 - 3:25)
+   2 | function foo() {
+   3 |   return [] as Array<any>;
+     |          ^^^^^^^^^^^^^^^^ Returned expression has type `any[]`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-6 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:30)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any[]`.
    2 | function foo() {
    3 |   return [] as readonly any[];
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `readonly any[]`. (3:10 - 3:29)
+   2 | function foo() {
+   3 |   return [] as readonly any[];
+     |          ^^^^^^^^^^^^^^^^^^^^ Returned expression has type `readonly any[]`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-7 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:31)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any[]`.
    2 | function foo() {
    3 |   return [] as Readonly<any[]>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `readonly any[]`. (3:10 - 3:30)
+   2 | function foo() {
+   3 |   return [] as Readonly<any[]>;
+     |          ^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `readonly any[]`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-8 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:21)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any[]`.
    2 | const foo = () => {
    3 |   return [] as any[];
-     |   ~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | };
+  Label: Returned expression has type `any[]`. (3:10 - 3:20)
+   2 | const foo = () => {
+   3 |   return [] as any[];
+     |          ^^^^^^^^^^^ Returned expression has type `any[]`.
    4 | };
 ---
 
 [TestNoUnsafeReturnRule/invalid-9 - 1]
-Diagnostic 1: unsafeReturn (1:19 - 1:29)
+Diagnostic 1: unsafeReturn (1:16 - 1:17)
 Message: Unsafe return of a value of type `any[]`.
    1 | const foo = () => [] as any[];
-     |                   ~~~~~~~~~~~
+     |                ~~
+  Label: Returned expression has type `any[]`. (1:19 - 1:29)
+   1 | const foo = () => [] as any[];
+     |                   ^^^^^^^^^^^ Returned expression has type `any[]`.
 ---
 
 [TestNoUnsafeReturnRule/invalid-10 - 1]
-Diagnostic 1: unsafeReturnAssignment (3:3 - 3:24)
+Diagnostic 1: unsafeReturnAssignment (3:3 - 3:8)
 Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
    2 | function foo(): Set<string> {
    3 |   return new Set<any>();
-     |   ~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Set<any>`. (3:10 - 3:23)
+   2 | function foo(): Set<string> {
+   3 |   return new Set<any>();
+     |          ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
+   4 | }
+  Label: Function expects return type `Set<string>`. (2:17 - 2:27)
+   1 | 
+   2 | function foo(): Set<string> {
+     |                 ^^^^^^^^^^^ Function expects return type `Set<string>`.
+   3 |   return new Set<any>();
 ---
 
 [TestNoUnsafeReturnRule/invalid-11 - 1]
-Diagnostic 1: unsafeReturnAssignment (3:3 - 3:32)
+Diagnostic 1: unsafeReturnAssignment (3:3 - 3:8)
 Message: Unsafe return of type `Map<string, any>` from function with return type `Map<string, string>`.
    2 | function foo(): Map<string, string> {
    3 |   return new Map<string, any>();
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Map<string, any>`. (3:10 - 3:31)
+   2 | function foo(): Map<string, string> {
+   3 |   return new Map<string, any>();
+     |          ^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Map<string, any>`.
+   4 | }
+  Label: Function expects return type `Map<string, string>`. (2:17 - 2:35)
+   1 | 
+   2 | function foo(): Map<string, string> {
+     |                 ^^^^^^^^^^^^^^^^^^^ Function expects return type `Map<string, string>`.
+   3 |   return new Map<string, any>();
 ---
 
 [TestNoUnsafeReturnRule/invalid-12 - 1]
-Diagnostic 1: unsafeReturnAssignment (3:3 - 3:26)
+Diagnostic 1: unsafeReturnAssignment (3:3 - 3:8)
 Message: Unsafe return of type `Set<any[]>` from function with return type `Set<string[]>`.
    2 | function foo(): Set<string[]> {
    3 |   return new Set<any[]>();
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Set<any[]>`. (3:10 - 3:25)
+   2 | function foo(): Set<string[]> {
+   3 |   return new Set<any[]>();
+     |          ^^^^^^^^^^^^^^^^ Returned expression has type `Set<any[]>`.
+   4 | }
+  Label: Function expects return type `Set<string[]>`. (2:17 - 2:29)
+   1 | 
+   2 | function foo(): Set<string[]> {
+     |                 ^^^^^^^^^^^^^ Function expects return type `Set<string[]>`.
+   3 |   return new Set<any[]>();
 ---
 
 [TestNoUnsafeReturnRule/invalid-13 - 1]
-Diagnostic 1: unsafeReturnAssignment (3:3 - 3:34)
+Diagnostic 1: unsafeReturnAssignment (3:3 - 3:8)
 Message: Unsafe return of type `Set<Set<Set<any>>>` from function with return type `Set<Set<Set<string>>>`.
    2 | function foo(): Set<Set<Set<string>>> {
    3 |   return new Set<Set<Set<any>>>();
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Set<Set<Set<any>>>`. (3:10 - 3:33)
+   2 | function foo(): Set<Set<Set<string>>> {
+   3 |   return new Set<Set<Set<any>>>();
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Set<Set<Set<any>>>`.
+   4 | }
+  Label: Function expects return type `Set<Set<Set<string>>>`. (2:17 - 2:37)
+   1 | 
+   2 | function foo(): Set<Set<Set<string>>> {
+     |                 ^^^^^^^^^^^^^^^^^^^^^ Function expects return type `Set<Set<Set<string>>>`.
+   3 |   return new Set<Set<Set<any>>>();
 ---
 
 [TestNoUnsafeReturnRule/invalid-14 - 1]
-Diagnostic 1: unsafeReturnAssignment (3:24 - 3:37)
+Diagnostic 1: unsafeReturnAssignment (3:21 - 3:22)
 Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
    2 | type Fn = () => Set<string>;
    3 | const foo1: Fn = () => new Set<any>();
-     |                        ~~~~~~~~~~~~~~
+     |                     ~~
    4 | const foo2: Fn = function test() {
+  Label: Returned expression has type `Set<any>`. (3:24 - 3:37)
+   2 | type Fn = () => Set<string>;
+   3 | const foo1: Fn = () => new Set<any>();
+     |                        ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
+   4 | const foo2: Fn = function test() {
+  Label: Function expects return type `Set<string>`. (2:17 - 2:27)
+   1 | 
+   2 | type Fn = () => Set<string>;
+     |                 ^^^^^^^^^^^ Function expects return type `Set<string>`.
+   3 | const foo1: Fn = () => new Set<any>();
 
-Diagnostic 2: unsafeReturnAssignment (5:3 - 5:24)
+Diagnostic 2: unsafeReturnAssignment (5:3 - 5:8)
 Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
    4 | const foo2: Fn = function test() {
    5 |   return new Set<any>();
-     |   ~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    6 | };
+  Label: Returned expression has type `Set<any>`. (5:10 - 5:23)
+   4 | const foo2: Fn = function test() {
+   5 |   return new Set<any>();
+     |          ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
+   6 | };
+  Label: Function expects return type `Set<string>`. (2:17 - 2:27)
+   1 | 
+   2 | type Fn = () => Set<string>;
+     |                 ^^^^^^^^^^^ Function expects return type `Set<string>`.
+   3 | const foo1: Fn = () => new Set<any>();
 ---
 
 [TestNoUnsafeReturnRule/invalid-15 - 1]
-Diagnostic 1: unsafeReturnAssignment (4:16 - 4:29)
+Diagnostic 1: unsafeReturnAssignment (4:13 - 4:14)
 Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
    3 | function receiver(arg: Fn) {}
    4 | receiver(() => new Set<any>());
-     |                ~~~~~~~~~~~~~~
+     |             ~~
    5 | receiver(function test() {
+  Label: Returned expression has type `Set<any>`. (4:16 - 4:29)
+   3 | function receiver(arg: Fn) {}
+   4 | receiver(() => new Set<any>());
+     |                ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
+   5 | receiver(function test() {
+  Label: Function expects return type `Set<string>`. (2:17 - 2:27)
+   1 | 
+   2 | type Fn = () => Set<string>;
+     |                 ^^^^^^^^^^^ Function expects return type `Set<string>`.
+   3 | function receiver(arg: Fn) {}
 
-Diagnostic 2: unsafeReturnAssignment (6:3 - 6:24)
+Diagnostic 2: unsafeReturnAssignment (6:3 - 6:8)
 Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
    5 | receiver(function test() {
    6 |   return new Set<any>();
-     |   ~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    7 | });
+  Label: Returned expression has type `Set<any>`. (6:10 - 6:23)
+   5 | receiver(function test() {
+   6 |   return new Set<any>();
+     |          ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
+   7 | });
+  Label: Function expects return type `Set<string>`. (2:17 - 2:27)
+   1 | 
+   2 | type Fn = () => Set<string>;
+     |                 ^^^^^^^^^^^ Function expects return type `Set<string>`.
+   3 | function receiver(arg: Fn) {}
 ---
 
 [TestNoUnsafeReturnRule/invalid-16 - 1]
-Diagnostic 1: unsafeReturnThis (3:3 - 3:14)
+Diagnostic 1: unsafeReturnThis (3:3 - 3:8)
 Message: Unsafe return of a value of type ``any``. `this` is typed as `any`.
 Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    2 | function foo() {
    3 |   return this;
-     |   ~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `any`. (3:10 - 3:13)
+   2 | function foo() {
+   3 |   return this;
+     |          ^^^^ Returned expression has type `any`.
    4 | }
 
-Diagnostic 2: unsafeReturnThis (7:16 - 7:19)
+Diagnostic 2: unsafeReturnThis (7:13 - 7:14)
 Message: Unsafe return of a value of type ``any``. `this` is typed as `any`.
 Help: You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.
    6 | function bar() {
    7 |   return () => this;
-     |                ~~~~
+     |             ~~
+   8 | }
+  Label: Returned expression has type `any`. (7:16 - 7:19)
+   6 | function bar() {
+   7 |   return () => this;
+     |                ^^^^ Returned expression has type `any`.
    8 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-17 - 1]
-Diagnostic 1: unsafeReturn (3:11 - 3:22)
+Diagnostic 1: unsafeReturn (3:8 - 3:9)
 Message: Unsafe return of a value of type `any`.
    2 | declare function foo(arg: null | (() => any)): void;
    3 | foo(() => 'foo' as any);
-     |           ~~~~~~~~~~~~
+     |        ~~
    4 |       
+  Label: Returned expression has type `any`. (3:11 - 3:22)
+   2 | declare function foo(arg: null | (() => any)): void;
+   3 | foo(() => 'foo' as any);
+     |           ^^^^^^^^^^^^ Returned expression has type `any`.
+   4 |       
+  Label: Function expects return type `any`. (2:41 - 2:43)
+   1 | 
+   2 | declare function foo(arg: null | (() => any)): void;
+     |                                         ^^^ Function expects return type `any`.
+   3 | foo(() => 'foo' as any);
 ---
 
 [TestNoUnsafeReturnRule/invalid-18 - 1]
-Diagnostic 1: unsafeReturn (5:3 - 5:15)
+Diagnostic 1: unsafeReturn (5:3 - 5:8)
 Message: Unsafe return of a value of type error.
    4 | function example() {
    5 |   return value;
-     |   ~~~~~~~~~~~~~
+     |   ~~~~~~
+   6 | }
+  Label: Returned expression has type `error`. (5:10 - 5:14)
+   4 | function example() {
+   5 |   return value;
+     |          ^^^^^ Returned expression has type `error`.
    6 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-19 - 1]
-Diagnostic 1: unsafeReturn (4:3 - 4:15)
+Diagnostic 1: unsafeReturn (4:3 - 4:8)
 Message: Unsafe return of a value of type `any`.
    3 | async function foo() {
    4 |   return value;
-     |   ~~~~~~~~~~~~~
+     |   ~~~~~~
+   5 | }
+  Label: Returned expression has type `any`. (4:10 - 4:14)
+   3 | async function foo() {
+   4 |   return value;
+     |          ^^^^^ Returned expression has type `any`.
    5 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-20 - 1]
-Diagnostic 1: unsafeReturn (4:3 - 4:15)
+Diagnostic 1: unsafeReturn (4:3 - 4:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    3 | async function foo(): Promise<number> {
    4 |   return value;
-     |   ~~~~~~~~~~~~~
+     |   ~~~~~~
    5 | }
+  Label: Returned expression has type `Promise<any>`. (4:10 - 4:14)
+   3 | async function foo(): Promise<number> {
+   4 |   return value;
+     |          ^^^^^ Returned expression has type `Promise<any>`.
+   5 | }
+  Label: Function expects return type `Promise<number>`. (3:23 - 3:37)
+   2 | declare const value: Promise<any>;
+   3 | async function foo(): Promise<number> {
+     |                       ^^^^^^^^^^^^^^^ Function expects return type `Promise<number>`.
+   4 |   return value;
 ---
 
 [TestNoUnsafeReturnRule/invalid-21 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:29)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo(arg: number) {
    3 |   return arg as Promise<any>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `Promise<any>`. (3:10 - 3:28)
+   2 | async function foo(arg: number) {
+   3 |   return arg as Promise<any>;
+     |          ^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<any>`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-22 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:19)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any`.
    2 | function foo(): Promise<any> {
    3 |   return {} as any;
-     |   ~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `any`. (3:10 - 3:18)
+   2 | function foo(): Promise<any> {
+   3 |   return {} as any;
+     |          ^^^^^^^^^ Returned expression has type `any`.
+   4 | }
+  Label: Function expects return type `Promise<any>`. (2:17 - 2:28)
+   1 | 
+   2 | function foo(): Promise<any> {
+     |                 ^^^^^^^^^^^^ Function expects return type `Promise<any>`.
+   3 |   return {} as any;
 ---
 
 [TestNoUnsafeReturnRule/invalid-23 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:19)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `any`.
    2 | function foo(): Promise<object> {
    3 |   return {} as any;
-     |   ~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `any`. (3:10 - 3:18)
+   2 | function foo(): Promise<object> {
+   3 |   return {} as any;
+     |          ^^^^^^^^^ Returned expression has type `any`.
+   4 | }
+  Label: Function expects return type `Promise<object>`. (2:17 - 2:31)
+   1 | 
+   2 | function foo(): Promise<object> {
+     |                 ^^^^^^^^^^^^^^^ Function expects return type `Promise<object>`.
+   3 |   return {} as any;
 ---
 
 [TestNoUnsafeReturnRule/invalid-24 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:34)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo(): Promise<object> {
    3 |   return Promise.resolve<any>({});
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Promise<any>`. (3:10 - 3:33)
+   2 | async function foo(): Promise<object> {
+   3 |   return Promise.resolve<any>({});
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<any>`.
+   4 | }
+  Label: Function expects return type `Promise<object>`. (2:23 - 2:37)
+   1 | 
+   2 | async function foo(): Promise<object> {
+     |                       ^^^^^^^^^^^^^^^ Function expects return type `Promise<object>`.
+   3 |   return Promise.resolve<any>({});
 ---
 
 [TestNoUnsafeReturnRule/invalid-25 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:68)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo(): Promise<object> {
    3 |   return Promise.resolve<Promise<Promise<any>>>({} as Promise<any>);
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Promise<any>`. (3:10 - 3:67)
+   2 | async function foo(): Promise<object> {
+   3 |   return Promise.resolve<Promise<Promise<any>>>({} as Promise<any>);
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<any>`.
+   4 | }
+  Label: Function expects return type `Promise<object>`. (2:23 - 2:37)
+   1 | 
+   2 | async function foo(): Promise<object> {
+     |                       ^^^^^^^^^^^^^^^ Function expects return type `Promise<object>`.
+   3 |   return Promise.resolve<Promise<Promise<any>>>({} as Promise<any>);
 ---
 
 [TestNoUnsafeReturnRule/invalid-26 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:55)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo(): Promise<object> {
    3 |   return {} as Promise<Promise<Promise<Promise<any>>>>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
    4 | }
+  Label: Returned expression has type `Promise<Promise<Promise<Promise<any>>>>`. (3:10 - 3:54)
+   2 | async function foo(): Promise<object> {
+   3 |   return {} as Promise<Promise<Promise<Promise<any>>>>;
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<Promise<Promise<Promise<any>>>>`.
+   4 | }
+  Label: Function expects return type `Promise<object>`. (2:23 - 2:37)
+   1 | 
+   2 | async function foo(): Promise<object> {
+     |                       ^^^^^^^^^^^^^^^ Function expects return type `Promise<object>`.
+   3 |   return {} as Promise<Promise<Promise<Promise<any>>>>;
 ---
 
 [TestNoUnsafeReturnRule/invalid-27 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:55)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo() {
    3 |   return {} as Promise<Promise<Promise<Promise<any>>>>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `Promise<Promise<Promise<Promise<any>>>>`. (3:10 - 3:54)
+   2 | async function foo() {
+   3 |   return {} as Promise<Promise<Promise<Promise<any>>>>;
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<Promise<Promise<Promise<any>>>>`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-28 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:46)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo() {
    3 |   return {} as Promise<any> | Promise<object>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `Promise<any> | Promise<object>`. (3:10 - 3:45)
+   2 | async function foo() {
+   3 |   return {} as Promise<any> | Promise<object>;
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<any> | Promise<object>`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-29 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:37)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo() {
    3 |   return {} as Promise<any | object>;
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `Promise<any>`. (3:10 - 3:36)
+   2 | async function foo() {
+   3 |   return {} as Promise<any | object>;
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<any>`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-30 - 1]
-Diagnostic 1: unsafeReturn (3:3 - 3:49)
+Diagnostic 1: unsafeReturn (3:3 - 3:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    2 | async function foo() {
    3 |   return {} as Promise<any> & { __brand: 'any' };
-     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     |   ~~~~~~
+   4 | }
+  Label: Returned expression has type `Promise<any> & { __brand: "any"; }`. (3:10 - 3:48)
+   2 | async function foo() {
+   3 |   return {} as Promise<any> & { __brand: 'any' };
+     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Returned expression has type `Promise<any> & { __brand: "any"; }`.
    4 | }
 ---
 
 [TestNoUnsafeReturnRule/invalid-31 - 1]
-Diagnostic 1: unsafeReturn (8:3 - 8:15)
+Diagnostic 1: unsafeReturn (8:3 - 8:8)
 Message: Unsafe return of a value of type `Promise<any>`.
    7 | async function foo() {
    8 |   return value;
-     |   ~~~~~~~~~~~~~
+     |   ~~~~~~
    9 | }
+  Label: Returned expression has type `Alias<number>`. (8:10 - 8:14)
+   7 | async function foo() {
+   8 |   return value;
+     |          ^^^^^ Returned expression has type `Alias<number>`.
+   9 | }
+---
+
+[TestNoUnsafeReturnRule/invalid-32 - 1]
+Diagnostic 1: unsafeReturnAssignment (3:20 - 3:21)
+Message: Unsafe return of type `Set<any>` from function with return type `Set<string>`.
+   2 | import type { Fn } from 'return-types';
+   3 | const foo: Fn = () => new Set<any>();
+     |                    ~~
+   4 |       
+  Label: Returned expression has type `Set<any>`. (3:23 - 3:36)
+   2 | import type { Fn } from 'return-types';
+   3 | const foo: Fn = () => new Set<any>();
+     |                       ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
+   4 |       
 ---
