@@ -44,6 +44,11 @@ jobs:
     permissions:
       contents: write # for softprops/action-gh-release
       id-token: write # for `pnpm publish --provenance`
+    env:
+      # Mapped here so the Authenticode signing steps below can be gated on the
+      # presence of the secret via the `env` context (the `secrets` context is
+      # not available in step `if:` conditions).
+      SIGNPATH_API_TOKEN: ${{ secrets.SIGNPATH_API_TOKEN }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -60,6 +65,32 @@ jobs:
 
       - name: chmod +x
         run: find build -type f -name tsgolint -exec chmod +x {} \;
+
+      # Authenticode-sign the Windows binaries so Microsoft Defender's ASR rule
+      # "Block executable files ... unless they meet a prevalence, age, or
+      # trusted list criteria" stops blocking tsgolint.exe on managed machines
+      # (#876). Skipped until the SIGNPATH_* secret/vars are provisioned (see PR).
+      - name: Sign Windows amd64 binary
+        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        uses: ./.github/actions/sign-windows-binary
+        with:
+          goarch: amd64
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
+
+      - name: Sign Windows arm64 binary
+        if: ${{ env.SIGNPATH_API_TOKEN != '' }}
+        uses: ./.github/actions/sign-windows-binary
+        with:
+          goarch: arm64
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          artifact-configuration-slug: ${{ vars.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
 
       - name: Generate npm packages
         env:
