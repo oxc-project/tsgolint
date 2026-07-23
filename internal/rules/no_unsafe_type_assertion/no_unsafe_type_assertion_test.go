@@ -48,7 +48,7 @@ a as string;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 12,
 				},
@@ -63,7 +63,7 @@ a satisfies string as string;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    20,
 					EndLine:   3,
 					EndColumn: 29,
 				},
@@ -80,7 +80,7 @@ declare const a: string | number;
 					Line:      3,
 					Column:    1,
 					EndLine:   3,
-					EndColumn: 10,
+					EndColumn: 9,
 				},
 			},
 		},
@@ -93,7 +93,7 @@ a as string | boolean;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 22,
 				},
@@ -108,14 +108,14 @@ a as 'foo' as 'bar';
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    12,
 					EndLine:   3,
 					EndColumn: 20,
 				},
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 11,
 				},
@@ -131,7 +131,7 @@ function foo<T extends boolean>(a: T) {
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    10,
+					Column:    12,
 					EndLine:   3,
 					EndColumn: 19,
 				},
@@ -146,7 +146,7 @@ a as Omit<Required<Readonly<{ hello: 'world'; foo: 'bar' }>>, 'foo'>;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 69,
 				},
@@ -161,7 +161,7 @@ const bar = foo as number[];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    13,
+					Column:    17,
 					EndLine:   3,
 					EndColumn: 28,
 				},
@@ -190,7 +190,7 @@ _any_ as string;
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    7,
 					EndLine:   3,
 					EndColumn: 16,
 				},
@@ -205,7 +205,7 @@ _unknown_ as any;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    11,
 					EndLine:   3,
 					EndColumn: 17,
 				},
@@ -220,7 +220,7 @@ _any_ as Function;
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    7,
 					EndLine:   3,
 					EndColumn: 18,
 				},
@@ -235,7 +235,7 @@ _any_ as never;
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    7,
 					EndLine:   3,
 					EndColumn: 15,
 				},
@@ -249,7 +249,7 @@ _any_ as never;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      2,
-					Column:    1,
+					Column:    7,
 					EndLine:   2,
 					EndColumn: 13,
 				},
@@ -263,7 +263,7 @@ const bar = foo as number;
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    17,
 					EndLine:   2,
 					EndColumn: 26,
 				},
@@ -277,7 +277,7 @@ const bar = 'foo' as errorType;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      2,
-					Column:    13,
+					Column:    19,
 					EndLine:   2,
 					EndColumn: 31,
 				},
@@ -306,7 +306,7 @@ _never_ as any;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    9,
 					EndLine:   3,
 					EndColumn: 15,
 				},
@@ -321,7 +321,7 @@ _string_ as never;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    10,
 					EndLine:   3,
 					EndColumn: 18,
 				},
@@ -350,7 +350,7 @@ _function_ as () => void;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    12,
 					EndLine:   3,
 					EndColumn: 25,
 				},
@@ -365,7 +365,7 @@ _function_ as any;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    12,
 					EndLine:   3,
 					EndColumn: 18,
 				},
@@ -380,7 +380,7 @@ _function_ as never;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    12,
 					EndLine:   3,
 					EndColumn: 20,
 				},
@@ -425,7 +425,7 @@ var foo = {} as {
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      2,
-					Column:    11,
+					Column:    14,
 					EndLine:   5,
 					EndColumn: 2,
 				},
@@ -440,7 +440,7 @@ a satisfies Record<string, string> as { hello: string; world: string };
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    36,
 					EndLine:   3,
 					EndColumn: 71,
 				},
@@ -455,7 +455,7 @@ a as { hello: string };
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 23,
 				},
@@ -488,7 +488,7 @@ a as string[];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -503,7 +503,7 @@ a as number[];
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -518,7 +518,7 @@ a as any[];
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 11,
 				},
@@ -533,7 +533,7 @@ a as number[];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -548,7 +548,7 @@ a as never[];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 13,
 				},
@@ -585,7 +585,7 @@ a as [string];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -600,7 +600,7 @@ a as [string, string];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 22,
 				},
@@ -615,7 +615,7 @@ a as [string, number];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 22,
 				},
@@ -630,7 +630,7 @@ a as [string];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -645,7 +645,7 @@ a as [number];
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -660,7 +660,7 @@ a as [number, number];
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 22,
 				},
@@ -675,7 +675,7 @@ a as [any];
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 11,
 				},
@@ -690,7 +690,7 @@ a as [number];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -705,7 +705,7 @@ a as [never];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 13,
 				},
@@ -720,7 +720,7 @@ a as [Promise<string>];
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 23,
 				},
@@ -757,7 +757,7 @@ a as Promise<string>;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 21,
 				},
@@ -772,7 +772,7 @@ a as Promise<number>;
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 21,
 				},
@@ -787,7 +787,7 @@ a as Promise<any>;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 18,
 				},
@@ -802,7 +802,7 @@ a as Promise<any[]>;
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 20,
 				},
@@ -817,7 +817,7 @@ a as Promise<number>;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 21,
 				},
@@ -832,7 +832,7 @@ a as Promise<never>;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    1,
+					Column:    3,
 					EndLine:   3,
 					EndColumn: 20,
 				},
@@ -894,7 +894,7 @@ a as Bar;
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      9,
-					Column:    1,
+					Column:    3,
 					EndLine:   9,
 					EndColumn: 9,
 				},
@@ -946,7 +946,7 @@ function func<T extends Obj>() {
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      4,
-					Column:    17,
+					Column:    31,
 					EndLine:   4,
 					EndColumn: 35,
 				},
@@ -964,7 +964,7 @@ function func<T extends Obj>() {
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      5,
-					Column:    17,
+					Column:    19,
 					EndLine:   5,
 					EndColumn: 23,
 				},
@@ -983,7 +983,7 @@ export function myfunc<CustomObjectT extends string>(
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      5,
-					Column:    27,
+					Column:    33,
 					EndLine:   5,
 					EndColumn: 49,
 				},
@@ -999,7 +999,7 @@ function unknownConstraint<T extends unknown>(x: T, y: string) {
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 9,
 				},
@@ -1015,7 +1015,7 @@ function unconstrained<T>(x: T, y: string) {
 				{
 					MessageId: "unsafeToUnconstrainedTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 9,
 				},
@@ -1033,7 +1033,7 @@ function anyConstraint<T extends any>(x: T, y: string) {
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      5,
-					Column:    3,
+					Column:    5,
 					EndLine:   5,
 					EndColumn: 9,
 				},
@@ -1052,7 +1052,7 @@ function constraintWiderThanUncastType<T extends string | number>(
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      6,
-					Column:    3,
+					Column:    5,
 					EndLine:   6,
 					EndColumn: 9,
 				},
@@ -1068,7 +1068,7 @@ function constraintEqualUncastType<T extends string>(x: T, y: string) {
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 9,
 				},
@@ -1087,7 +1087,7 @@ function constraintNarrowerThanUncastType<T extends string>(
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      6,
-					Column:    3,
+					Column:    5,
 					EndLine:   6,
 					EndColumn: 9,
 				},
@@ -1103,7 +1103,7 @@ function assertFromAny<T extends string | number>(x: T, y: any) {
 				{
 					MessageId: "unsafeOfAnyTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 9,
 				},
@@ -1122,7 +1122,7 @@ function parameterExtendsOtherParameter<T extends string | number, V extends T>(
 				{
 					MessageId: "unsafeTypeAssertionAssignableToConstraint",
 					Line:      6,
-					Column:    3,
+					Column:    5,
 					EndLine:   6,
 					EndColumn: 9,
 				},
@@ -1138,7 +1138,7 @@ function parameterExtendsUnconstrainedParameter<T, V extends T>(x: T, y: V) {
 				{
 					MessageId: "unsafeToUnconstrainedTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 9,
 				},
@@ -1154,7 +1154,7 @@ function twoUnconstrained<T, V>(x: T, y: V) {
 				{
 					MessageId: "unsafeToUnconstrainedTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 9,
 				},
@@ -1170,7 +1170,7 @@ function toNarrower<T>(x: T, y: string) {
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 14,
 				},
@@ -1186,7 +1186,7 @@ function unconstrainedToAny<T>(x: T) {
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 11,
 				},
@@ -1202,7 +1202,7 @@ function stringToAny<T extends string>(x: T) {
 				{
 					MessageId: "unsafeToAnyTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 11,
 				},
@@ -1218,7 +1218,7 @@ function stringToNarrower<T extends string>(x: T) {
 				{
 					MessageId: "unsafeTypeAssertion",
 					Line:      3,
-					Column:    3,
+					Column:    5,
 					EndLine:   3,
 					EndColumn: 17,
 				},
