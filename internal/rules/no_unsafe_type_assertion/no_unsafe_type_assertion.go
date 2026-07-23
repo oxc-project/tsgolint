@@ -5,6 +5,8 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -51,6 +53,51 @@ func isObjectLiteralType(t *checker.Type) bool {
 	return utils.IsObjectType(t) && checker.Type_objectFlags(t)&checker.ObjectFlagsObjectLiteral != 0
 }
 
+func getAssertionRange(sourceFile *ast.SourceFile, node, expression, typeAnnotation *ast.Node) core.TextRange {
+	if ast.IsAsExpression(node) {
+		asKeywordRange := scanner.GetScannerForSourceFile(sourceFile, expression.End()).TokenRange()
+		return asKeywordRange.WithEnd(typeAnnotation.End())
+	}
+
+	s := scanner.GetScannerForSourceFile(sourceFile, node.Pos())
+	openingAngleBracket := s.TokenRange()
+	s.ResetPos(typeAnnotation.End())
+	s.Scan()
+	closingAngleBracket := s.TokenRange()
+	return openingAngleBracket.WithEnd(closingAngleBracket.End())
+}
+
+func typeLabel(typeChecker *checker.Checker, t *checker.Type) string {
+	if utils.IsIntrinsicErrorType(t) {
+		return "error"
+	}
+	return typeChecker.TypeToString(t)
+}
+
+func buildUnsafeTypeAssertionDiagnostic(
+	assertionRange core.TextRange,
+	expressionRange core.TextRange,
+	typeAnnotationRange core.TextRange,
+	originalType string,
+	assertedType string,
+	message rule.RuleMessage,
+) rule.RuleDiagnostic {
+	return rule.RuleDiagnostic{
+		Range:   assertionRange,
+		Message: message,
+		LabeledRanges: []rule.RuleLabeledRange{
+			{
+				Label: fmt.Sprintf("Original expression has type `%s`.", originalType),
+				Range: expressionRange,
+			},
+			{
+				Label: fmt.Sprintf("Asserted type is `%s`.", assertedType),
+				Range: typeAnnotationRange,
+			},
+		},
+	}
+}
+
 var NoUnsafeTypeAssertionRule = rule.Rule{
 	Name: "no-unsafe-type-assertion",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -59,6 +106,16 @@ var NoUnsafeTypeAssertionRule = rule.Rule{
 			typeAnnotation := node.Type()
 			expressionType := ctx.TypeChecker.GetTypeAtLocation(expression)
 			assertedType := ctx.TypeChecker.GetTypeAtLocation(typeAnnotation)
+			report := func(message rule.RuleMessage) {
+				ctx.ReportDiagnostic(buildUnsafeTypeAssertionDiagnostic(
+					getAssertionRange(ctx.SourceFile, node, expression, typeAnnotation),
+					utils.TrimNodeTextRange(ctx.SourceFile, expression),
+					utils.TrimNodeTextRange(ctx.SourceFile, typeAnnotation),
+					typeLabel(ctx.TypeChecker, expressionType),
+					typeLabel(ctx.TypeChecker, assertedType),
+					message,
+				))
+			}
 
 			if expressionType == assertedType {
 				return
@@ -66,19 +123,19 @@ var NoUnsafeTypeAssertionRule = rule.Rule{
 
 			// handle cases when asserting unknown ==> any.
 			if utils.IsTypeAnyType(assertedType) && utils.IsTypeUnknownType(expressionType) {
-				ctx.ReportNode(node, buildUnsafeToAnyTypeAssertionMessage("`any`"))
+				report(buildUnsafeToAnyTypeAssertionMessage("`any`"))
 				return
 			}
 
 			_, sender, isUnsafeExpressionAny := utils.IsUnsafeAssignment(expressionType, assertedType, ctx.TypeChecker, expression)
 			if isUnsafeExpressionAny {
-				ctx.ReportNode(node, buildUnsafeOfAnyTypeAssertionMessage(getAnyTypeName(sender)))
+				report(buildUnsafeOfAnyTypeAssertionMessage(getAnyTypeName(sender)))
 				return
 			}
 
 			_, sender, isUnsafeAssertedAny := utils.IsUnsafeAssignment(assertedType, expressionType, ctx.TypeChecker, typeAnnotation)
 			if isUnsafeAssertedAny {
-				ctx.ReportNode(node, buildUnsafeToAnyTypeAssertionMessage(getAnyTypeName(sender)))
+				report(buildUnsafeToAnyTypeAssertionMessage(getAnyTypeName(sender)))
 				return
 			}
 
@@ -98,19 +155,19 @@ var NoUnsafeTypeAssertionRule = rule.Rule{
 				assertedTypeConstraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, assertedType)
 				if assertedTypeConstraint == nil {
 					// asserting to an unconstrained type parameter is unsafe
-					ctx.ReportNode(node, buildUnsafeToUnconstrainedTypeAssertionMessage(ctx.TypeChecker.TypeToString(assertedType)))
+					report(buildUnsafeToUnconstrainedTypeAssertionMessage(ctx.TypeChecker.TypeToString(assertedType)))
 					return
 				}
 
 				// special case message if the original type is assignable to the
 				// constraint of the target type parameter
 				if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, expressionWidenedType, assertedTypeConstraint) {
-					ctx.ReportNode(node, buildUnsafeTypeAssertionAssignableToConstraintMessage(ctx.TypeChecker.TypeToString(assertedType)))
+					report(buildUnsafeTypeAssertionAssignableToConstraintMessage(ctx.TypeChecker.TypeToString(assertedType)))
 					return
 				}
 			}
 
-			ctx.ReportNode(node, buildUnsafeTypeAssertionMessage(ctx.TypeChecker.TypeToString(assertedType)))
+			report(buildUnsafeTypeAssertionMessage(ctx.TypeChecker.TypeToString(assertedType)))
 		}
 
 		return rule.RuleListeners{
