@@ -2935,17 +2935,17 @@ Message: Unnecessary conditional, value is always truthy.
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-139 - 1]
-Diagnostic 1: neverNullish (6:5 - 6:15)
+Diagnostic 1: neverNullish (7:5 - 7:15)
 Message: Unnecessary optional chain on a non-nullish value.
-   5 |   method() {
-   6 |     this.#value ??= 2;
+   6 |   method() {
+   7 |     this.#value ??= 2;
      |     ~~~~~~~~~~~
-   7 |   }
-  Label: Type: number (6:5 - 6:15)
-   5 |   method() {
-   6 |     this.#value ??= 2;
+   8 |   }
+  Label: Type: number (7:5 - 7:15)
+   6 |   method() {
+   7 |     this.#value ??= 2;
      |     ^^^^^^^^^^^ Type: number
-   7 |   }
+   8 |   }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-140 - 1]
