@@ -253,7 +253,11 @@ func runHeadless(args []string) int {
 
 	baseFS := osvfs.FS()
 	if len(payload.SourceOverrides) > 0 {
-		baseFS = newOverlayFS(baseFS, payload.SourceOverrides)
+		overrides := make(map[string]string, len(payload.SourceOverrides))
+		for path, content := range payload.SourceOverrides {
+			overrides[tspath.ResolvePath(cwd, path)] = content
+		}
+		baseFS = newOverlayFS(baseFS, overrides)
 	}
 	fs := bundled.WrapFS(cachedvfs.From(baseFS))
 
@@ -276,10 +280,12 @@ func runHeadless(args []string) int {
 	fileConfigs := make(map[string][]headlessRule, totalFileCount)
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
-			normalized := tspath.NormalizeSlashes(filePath)
-			normalizedFiles = append(normalizedFiles, normalized)
+			// Payload paths may be relative (e.g. `oxlint --no-ignore src`);
+			// the VFS panics on non-absolute paths, so resolve against cwd.
+			resolved := tspath.ResolvePath(cwd, filePath)
+			normalizedFiles = append(normalizedFiles, resolved)
 
-			fileConfigs[normalized] = config.Rules
+			fileConfigs[resolved] = config.Rules
 		}
 	}
 

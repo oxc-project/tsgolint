@@ -347,6 +347,28 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     },
   );
 
+  it('should not panic when file paths are relative to the working directory (issue #1114)', async () => {
+    // Regression test for https://github.com/oxc-project/tsgolint/issues/1114
+    // `oxlint --type-aware --no-ignore src` passes relative paths through to
+    // tsgolint, which crashed with:
+    // "panic: vfs: path \"src/tsconfig.json\" is not absolute"
+    const relativePath = 'basic/rules/no-floating-promises/index.ts';
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      input: generateConfig([relativePath], ['no-floating-promises']),
+      cwd: FIXTURES_DIR,
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    const diagnostics = parseHeadlessOutput(output);
+
+    expect(diagnostics.length).toBeGreaterThan(0);
+    for (const diagnostic of diagnostics) {
+      expect((diagnostic as RuleDiagnostic).rule).toBe('no-floating-promises');
+      expect(diagnostic.file_path).toBe('fixtures/basic/rules/no-floating-promises/index.ts');
+    }
+  });
+
   it('should correctly evaluate project references', async () => {
     const testFiles = await getTestFiles('project-references');
     expect(testFiles.length).toBeGreaterThan(0);
