@@ -6,9 +6,6 @@
     "benchmarks/Containerfile",
     "shim/**/go.mod"
   ],
-  "git-submodules": {
-    "enabled": true
-  },
   "packageRules": [
     {
       "groupName": "gomod",
@@ -16,13 +13,6 @@
       "automerge": true,
       "automergeSchedule": ["at any time"],
       "schedule": ["before 9am on monday"]
-    },
-    {
-      "matchManagers": ["git-submodules"],
-      "matchDepNames": ["typescript-go"],
-      "automerge": false,
-      "updateNotScheduled": false,
-      "schedule": ["* 7 * * 5"]
     }
   ]
 }
