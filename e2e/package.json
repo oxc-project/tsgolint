@@ -10,7 +10,7 @@
   "devDependencies": {
     "@types/node": "^24.3.1",
     "fast-glob": "^3.3.3",
-    "typescript": "^6.0.0",
+    "typescript": "^7.0.0",
     "vitest": "^4.1.1"
   }
 }
