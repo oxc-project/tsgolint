@@ -1,0 +1,19 @@
+e2e/pnpm-lock.yaml
+  s_972e0a80244039::t_1d8ef088f865c9 18-19,175-294,555-557,765-824,1057-1078
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f7789a417082ffd52f3212b83db45f1cb67a25b4",
+  "prompts": {},
+  "sessions": {
+    "s_972e0a80244039": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fa33c-3a0d-7611-935b-fb66cdaebabc",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
