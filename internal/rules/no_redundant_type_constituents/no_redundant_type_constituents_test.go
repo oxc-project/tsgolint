@@ -167,7 +167,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    19,
+					Column:    10,
+					EndColumn: 16,
 				},
 			},
 		},
@@ -179,7 +180,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    22,
+					Column:    18,
+					EndColumn: 19,
 				},
 			},
 		},
@@ -188,7 +190,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    10,
+					Column:    16,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -200,7 +203,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    18,
+					Column:    22,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -251,7 +255,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    19,
+					Column:    10,
+					EndColumn: 16,
 				},
 			},
 		},
@@ -260,7 +265,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    10,
+					Column:    20,
+					EndColumn: 26,
 				},
 			},
 		},
@@ -269,7 +275,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "errorTypeOverrides",
-					Column:    19,
+					Column:    30,
+					EndColumn: 31,
 				},
 			},
 		},
@@ -503,7 +510,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    19,
+					Column:    10,
+					EndColumn: 16,
 				},
 			},
 		},
@@ -512,7 +520,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    10,
+					Column:    16,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -521,7 +530,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "errorTypeOverrides",
-					Column:    19,
+					Column:    30,
+					EndColumn: 31,
 				},
 			},
 		},
@@ -530,7 +540,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    19,
+					Column:    10,
+					EndColumn: 16,
 				},
 			},
 		},
@@ -542,7 +553,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    18,
+					Column:    22,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -551,7 +563,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "overrides",
-					Column:    10,
+					Column:    18,
+					EndColumn: 24,
 				},
 			},
 		},
@@ -629,7 +642,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "primitiveOverridden",
-					Column:    18,
+					Column:    22,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -642,11 +656,25 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "primitiveOverridden",
-					Column:    18,
+					Column:    35,
+					EndColumn: 41,
 				},
 				{
 					MessageId: "primitiveOverridden",
-					Column:    22,
+					Column:    26,
+					EndColumn: 32,
+				},
+			},
+		},
+		{
+			// Only the numeric member of this constituent is redundant. The string
+			// member must not be included in the redundant-type label.
+			Code: "type T = (2 | 'other') | number;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "literalOverridden",
+					Column:    10,
+					EndColumn: 23,
 				},
 			},
 		},

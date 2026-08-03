@@ -57,6 +57,11 @@ type seenUnionPart struct {
 	typeNode *ast.Node
 }
 
+type seenTypePart struct {
+	part     typeFlagsWithNodeOrType
+	typeNode *ast.Node
+}
+
 func (t *typeFlagsWithNodeOrType) ToString(typeChecker *checker.Checker) string {
 	if t.node != nil {
 		switch t.node.Kind {
@@ -170,8 +175,90 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 			return res
 		}
 
-		checkIntersectionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node) bool {
+		typePartsToString := func(typeParts []typeFlagsWithNodeOrType) string {
+			return strings.Join(utils.Map(typeParts, func(t typeFlagsWithNodeOrType) string {
+				return t.ToString(ctx.TypeChecker)
+			}), " | ")
+		}
+		renderTypeParts := func(typeParts []typeFlagsWithNodeOrType) string {
+			return strings.Join(utils.Map(typeParts, func(typePart typeFlagsWithNodeOrType) string {
+				if typePart.node != nil {
+					return ctx.TypeChecker.TypeToString(ctx.TypeChecker.GetTypeAtLocation(typePart.node))
+				}
+				return ctx.TypeChecker.TypeToString(typePart.t)
+			}), " | ")
+		}
+
+		typeNodeToString := func(typeNode *ast.Node) string {
+			if typeNode == nil {
+				return ""
+			}
+			return typePartsToString(getTypeNodeTypePartFlags(typeNode))
+		}
+
+		firstOtherTypeNode := func(typeNodes []*ast.Node, typeNode *ast.Node) *ast.Node {
+			for _, candidate := range typeNodes {
+				if candidate != typeNode {
+					return candidate
+				}
+			}
+			return nil
+		}
+
+		renderTypeNode := func(typeNode *ast.Node, fallback string) string {
+			if typeNode == nil {
+				return fallback
+			}
+			rendered := renderTypeParts(getTypeNodeTypePartFlags(typeNode))
+			if rendered == "" {
+				return fallback
+			}
+			return rendered
+		}
+
+		reportRelation := func(
+			message rule.RuleMessage,
+			redundantNode *ast.Node,
+			redundantType string,
+			overridingNode *ast.Node,
+			overridingType string,
+		) {
+			// Some error and aliased types do not have a distinct local syntax node for
+			// both sides of the relationship. Keep the diagnostic useful in those
+			// cases, but only attach labels to ranges that are actually available.
+			primaryNode := redundantNode
+			if primaryNode == nil {
+				primaryNode = overridingNode
+			}
+			if primaryNode == nil {
+				return
+			}
+
+			labels := make([]rule.RuleLabeledRange, 0, 2)
+			if redundantNode != nil {
+				labels = append(labels, rule.RuleLabeledRange{
+					Label: fmt.Sprintf("Redundant type: `%s`", redundantType),
+					Range: utils.TrimNodeTextRange(ctx.SourceFile, redundantNode),
+				})
+			}
+			if overridingNode != nil {
+				labels = append(labels, rule.RuleLabeledRange{
+					Label: fmt.Sprintf("Overriding type: `%s`", overridingType),
+					Range: utils.TrimNodeTextRange(ctx.SourceFile, overridingNode),
+				})
+			}
+
+			ctx.ReportDiagnostic(rule.RuleDiagnostic{
+				Range:         utils.TrimNodeTextRange(ctx.SourceFile, primaryNode),
+				Message:       message,
+				LabeledRanges: labels,
+			})
+		}
+
+		checkIntersectionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node, typeNodes []*ast.Node) bool {
 			var message rule.RuleMessage
+			var redundantNode, overridingNode *ast.Node
+			var redundantType, overridingType string
 
 			switch typePart.flags {
 			case checker.TypeFlagsAny:
@@ -181,24 +268,37 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				} else {
 					message = buildErrorTypeOverridesMessage(typeName, "intersection")
 				}
+				redundantNode = firstOtherTypeNode(typeNodes, typeNode)
+				redundantType = renderTypeNode(redundantNode, typeNodeToString(redundantNode))
+				overridingNode = typeNode
+				overridingType = renderTypeNode(overridingNode, typeName)
 			case checker.TypeFlagsNever:
-				message = buildOverridesMessage(typePart.ToString(ctx.TypeChecker), "intersection")
+				typeName := typePart.ToString(ctx.TypeChecker)
+				message = buildOverridesMessage(typeName, "intersection")
+				redundantNode = firstOtherTypeNode(typeNodes, typeNode)
+				redundantType = renderTypeNode(redundantNode, typeNodeToString(redundantNode))
+				overridingNode = typeNode
+				overridingType = renderTypeNode(overridingNode, typeName)
 			case checker.TypeFlagsUnknown:
-				message = buildOverriddenMessage(typePart.ToString(ctx.TypeChecker), "intersection")
+				redundantNode = typeNode
+				redundantType = renderTypeNode(redundantNode, typePart.ToString(ctx.TypeChecker))
+				overridingNode = firstOtherTypeNode(typeNodes, typeNode)
+				overridingType = renderTypeNode(overridingNode, typeNodeToString(overridingNode))
+				message = buildOverriddenMessage(redundantType, "intersection")
 			default:
 				return false
 			}
 
-			ctx.ReportNode(typeNode, message)
+			reportRelation(message, redundantNode, redundantType, overridingNode, overridingType)
 			return true
 		}
 
 		return rule.RuleListeners{
 			ast.KindIntersectionType: func(node *ast.Node) {
-				seenBigIntLiteralTypes := []typeFlagsWithNodeOrType{}
-				seenBooleanLiteralTypes := []typeFlagsWithNodeOrType{}
-				seenNumberLiteralTypes := []typeFlagsWithNodeOrType{}
-				seenStringLiteralTypes := []typeFlagsWithNodeOrType{}
+				seenBigIntLiteralTypes := []seenTypePart{}
+				seenBooleanLiteralTypes := []seenTypePart{}
+				seenNumberLiteralTypes := []seenTypePart{}
+				seenStringLiteralTypes := []seenTypePart{}
 
 				seenBigIntPrimitiveTypes := []*ast.Node{}
 				seenBooleanPrimitiveTypes := []*ast.Node{}
@@ -207,7 +307,8 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 
 				seenUnionTypes := []seenUnionPart{}
 
-				for _, typeNode := range node.AsIntersectionTypeNode().Types.Nodes {
+				typeNodes := node.AsIntersectionTypeNode().Types.Nodes
+				for _, typeNode := range typeNodes {
 					typePartFlags := getTypeNodeTypePartFlags(typeNode)
 
 					// if any typeNode is TSTypeReference and typePartFlags have more than 1 element, than the referenced type is definitely a union.
@@ -219,7 +320,7 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 					}
 
 					for _, typePart := range typePartFlags {
-						if checkIntersectionBottomAndTopTypes(typePart, typeNode) {
+						if checkIntersectionBottomAndTopTypes(typePart, typeNode, typeNodes) {
 							continue
 						}
 
@@ -227,13 +328,13 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						if len(seenUnionTypes) == 0 {
 							switch typePart.flags {
 							case checker.TypeFlagsBigIntLiteral:
-								seenBigIntLiteralTypes = append(seenBigIntLiteralTypes, typePart)
+								seenBigIntLiteralTypes = append(seenBigIntLiteralTypes, seenTypePart{typePart, typeNode})
 							case checker.TypeFlagsBooleanLiteral:
-								seenBooleanLiteralTypes = append(seenBooleanLiteralTypes, typePart)
+								seenBooleanLiteralTypes = append(seenBooleanLiteralTypes, seenTypePart{typePart, typeNode})
 							case checker.TypeFlagsNumberLiteral:
-								seenNumberLiteralTypes = append(seenNumberLiteralTypes, typePart)
+								seenNumberLiteralTypes = append(seenNumberLiteralTypes, seenTypePart{typePart, typeNode})
 							case checker.TypeFlagsStringLiteral, checker.TypeFlagsTemplateLiteral:
-								seenStringLiteralTypes = append(seenStringLiteralTypes, typePart)
+								seenStringLiteralTypes = append(seenStringLiteralTypes, seenTypePart{typePart, typeNode})
 							}
 						}
 
@@ -259,22 +360,26 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				 * This function checks if all the union members of `F` are assignable to the other member of `I`. If every member is assignable, then its reported else not.
 				 */
 				if len(seenUnionTypes) > 0 && (len(seenBigIntPrimitiveTypes) > 0 || len(seenBooleanPrimitiveTypes) > 0 || len(seenNumberPrimitiveTypes) > 0 || len(seenStringPrimitiveTypes) > 0) {
-					var typeValuesLiteral string
-
 					for _, unionType := range seenUnionTypes {
 						var primitiveName string
+						var primitiveNode *ast.Node
 						for _, typeValue := range unionType.flags {
 							switch {
 							case typeValue.flags == checker.TypeFlagsBigIntLiteral && len(seenBigIntPrimitiveTypes) > 0:
 								primitiveName = "bigint"
+								primitiveNode = seenBigIntPrimitiveTypes[0]
 							case typeValue.flags == checker.TypeFlagsBooleanLiteral && len(seenBooleanPrimitiveTypes) > 0:
 								primitiveName = "boolean"
+								primitiveNode = seenBooleanPrimitiveTypes[0]
 							case typeValue.flags == checker.TypeFlagsNumberLiteral && len(seenNumberPrimitiveTypes) > 0:
 								primitiveName = "number"
+								primitiveNode = seenNumberPrimitiveTypes[0]
 							case (typeValue.flags == checker.TypeFlagsStringLiteral || typeValue.flags == checker.TypeFlagsTemplateLiteral) && len(seenStringPrimitiveTypes) > 0:
 								primitiveName = "string"
+								primitiveNode = seenStringPrimitiveTypes[0]
 							default:
 								primitiveName = ""
+								primitiveNode = nil
 							}
 							if len(primitiveName) == 0 {
 								break
@@ -285,27 +390,39 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 							continue
 						}
 
-						if len(typeValuesLiteral) == 0 {
-							typeValuesLiteral = strings.Join(utils.Map(unionType.flags, func(t typeFlagsWithNodeOrType) string {
-								return t.ToString(ctx.TypeChecker)
-							}), " | ")
-						}
-						ctx.ReportNode(unionType.typeNode, buildPrimitiveOverriddenMessage(primitiveName, typeValuesLiteral))
+						typeValuesLiteral := typePartsToString(unionType.flags)
+						renderedTypeValuesLiteral := renderTypeParts(unionType.flags)
+						reportRelation(
+							buildPrimitiveOverriddenMessage(typeValuesLiteral, primitiveName),
+							primitiveNode,
+							primitiveName,
+							unionType.typeNode,
+							renderedTypeValuesLiteral,
+						)
 					}
 				}
 				if len(seenUnionTypes) > 0 {
 					return
 				}
 
-				checkLiteralTypeOverridesPrimitive := func(literalTypes []typeFlagsWithNodeOrType, primitiveTypes []*ast.Node, primitiveName string) {
+				checkLiteralTypeOverridesPrimitive := func(literalTypes []seenTypePart, primitiveTypes []*ast.Node, primitiveName string) {
 					if len(literalTypes) == 0 {
 						return
 					}
-					typeValuesLiteral := strings.Join(utils.Map(literalTypes, func(t typeFlagsWithNodeOrType) string {
-						return t.ToString(ctx.TypeChecker)
+					typeValuesLiteral := strings.Join(utils.Map(literalTypes, func(t seenTypePart) string {
+						return t.part.ToString(ctx.TypeChecker)
+					}), " | ")
+					renderedTypeValuesLiteral := strings.Join(utils.Map(literalTypes, func(t seenTypePart) string {
+						return renderTypeParts([]typeFlagsWithNodeOrType{t.part})
 					}), " | ")
 					for _, typeNode := range primitiveTypes {
-						ctx.ReportNode(typeNode, buildPrimitiveOverriddenMessage(typeValuesLiteral, primitiveName))
+						reportRelation(
+							buildPrimitiveOverriddenMessage(typeValuesLiteral, primitiveName),
+							typeNode,
+							primitiveName,
+							literalTypes[0].typeNode,
+							renderedTypeValuesLiteral,
+						)
 					}
 				}
 
@@ -324,9 +441,16 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				overriddenStringTypeNodes := map[*ast.Node][]typeFlagsWithNodeOrType{}
 
 				seenPrimitiveTypeFlags := checker.TypeFlagsNone
+				seenBigIntPrimitiveTypeNodes := []*ast.Node{}
+				seenBooleanPrimitiveTypeNodes := []*ast.Node{}
+				seenNumberPrimitiveTypeNodes := []*ast.Node{}
+				seenStringPrimitiveTypeNodes := []*ast.Node{}
 
+				typeNodes := node.AsUnionTypeNode().Types.Nodes
 				checkUnionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node) bool {
 					var message rule.RuleMessage
+					var redundantNode, overridingNode *ast.Node
+					var redundantType, overridingType string
 
 					switch typePart.flags {
 					case checker.TypeFlagsAny:
@@ -336,22 +460,35 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						} else {
 							message = buildErrorTypeOverridesMessage(typeName, "union")
 						}
+						redundantNode = firstOtherTypeNode(typeNodes, typeNode)
+						redundantType = renderTypeNode(redundantNode, typeNodeToString(redundantNode))
+						overridingNode = typeNode
+						overridingType = renderTypeNode(overridingNode, typeName)
 					case checker.TypeFlagsUnknown:
-						message = buildOverridesMessage(typePart.ToString(ctx.TypeChecker), "union")
+						typeName := typePart.ToString(ctx.TypeChecker)
+						message = buildOverridesMessage(typeName, "union")
+						redundantNode = firstOtherTypeNode(typeNodes, typeNode)
+						redundantType = renderTypeNode(redundantNode, typeNodeToString(redundantNode))
+						overridingNode = typeNode
+						overridingType = renderTypeNode(overridingNode, typeName)
 					case checker.TypeFlagsNever:
 						if isNodeInsideReturnType(node) {
 							return false
 						}
+						redundantNode = typeNode
+						redundantType = renderTypeNode(redundantNode, "never")
+						overridingNode = firstOtherTypeNode(typeNodes, typeNode)
+						overridingType = renderTypeNode(overridingNode, typeNodeToString(overridingNode))
 						message = buildOverriddenMessage("never", "union")
 					default:
 						return false
 					}
 
-					ctx.ReportNode(typeNode, message)
+					reportRelation(message, redundantNode, redundantType, overridingNode, overridingType)
 					return true
 				}
 
-				for _, typeNode := range node.AsUnionTypeNode().Types.Nodes {
+				for _, typeNode := range typeNodes {
 					typePartFlags := getTypeNodeTypePartFlags(typeNode)
 
 					for _, typePart := range typePartFlags {
@@ -374,6 +511,21 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						}
 
 						seenPrimitiveTypeFlags |= typePart.flags & (checker.TypeFlagsBigInt | checker.TypeFlagsBoolean | checker.TypeFlagsNumber | checker.TypeFlagsString)
+						// Aliases of primitive types can carry additional checker flags, so use
+						// bit tests here rather than requiring an exact flag match. The alias
+						// reference is still a precise local range for the overriding label.
+						if typePart.flags&checker.TypeFlagsBigInt != 0 {
+							seenBigIntPrimitiveTypeNodes = append(seenBigIntPrimitiveTypeNodes, typeNode)
+						}
+						if typePart.flags&checker.TypeFlagsBoolean != 0 {
+							seenBooleanPrimitiveTypeNodes = append(seenBooleanPrimitiveTypeNodes, typeNode)
+						}
+						if typePart.flags&checker.TypeFlagsNumber != 0 {
+							seenNumberPrimitiveTypeNodes = append(seenNumberPrimitiveTypeNodes, typeNode)
+						}
+						if typePart.flags&checker.TypeFlagsString != 0 {
+							seenStringPrimitiveTypeNodes = append(seenStringPrimitiveTypeNodes, typeNode)
+						}
 					}
 				}
 
@@ -381,23 +533,34 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				// group those literals by their primitive type,
 				// then report each primitive type with all its literals
 
-				checkOverriddenTypes := func(primitiveFlag checker.TypeFlags, overriddenNodes map[*ast.Node][]typeFlagsWithNodeOrType, primitiveName string) {
+				checkOverriddenTypes := func(primitiveFlag checker.TypeFlags, overriddenNodes map[*ast.Node][]typeFlagsWithNodeOrType, primitiveNodes []*ast.Node, primitiveName string) {
 					if seenPrimitiveTypeFlags&primitiveFlag == 0 {
 						return
 					}
 
 					for typeNode, typeFlags := range overriddenNodes {
-						ctx.ReportNode(typeNode, buildLiteralOverriddenMessage(strings.Join(utils.Map(typeFlags, func(t typeFlagsWithNodeOrType) string {
+						typeValuesLiteral := strings.Join(utils.Map(typeFlags, func(t typeFlagsWithNodeOrType) string {
 							return t.ToString(ctx.TypeChecker)
-						}), " | "), primitiveName))
-
+						}), " | ")
+						renderedTypeValuesLiteral := renderTypeParts(typeFlags)
+						var primitiveNode *ast.Node
+						if len(primitiveNodes) > 0 {
+							primitiveNode = primitiveNodes[0]
+						}
+						reportRelation(
+							buildLiteralOverriddenMessage(typeValuesLiteral, primitiveName),
+							typeNode,
+							renderedTypeValuesLiteral,
+							primitiveNode,
+							primitiveName,
+						)
 					}
 				}
 
-				checkOverriddenTypes(checker.TypeFlagsBigInt, overriddenBigIntTypeNodes, "bigint")
-				checkOverriddenTypes(checker.TypeFlagsBoolean, overriddenBooleanTypeNodes, "boolean")
-				checkOverriddenTypes(checker.TypeFlagsNumber, overriddenNumberTypeNodes, "number")
-				checkOverriddenTypes(checker.TypeFlagsString, overriddenStringTypeNodes, "string")
+				checkOverriddenTypes(checker.TypeFlagsBigInt, overriddenBigIntTypeNodes, seenBigIntPrimitiveTypeNodes, "bigint")
+				checkOverriddenTypes(checker.TypeFlagsBoolean, overriddenBooleanTypeNodes, seenBooleanPrimitiveTypeNodes, "boolean")
+				checkOverriddenTypes(checker.TypeFlagsNumber, overriddenNumberTypeNodes, seenNumberPrimitiveTypeNodes, "number")
+				checkOverriddenTypes(checker.TypeFlagsString, overriddenStringTypeNodes, seenStringPrimitiveTypeNodes, "string")
 			},
 		}
 	},
