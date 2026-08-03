@@ -2316,7 +2316,10 @@ func (processor *chainProcessor) hasIncompleteNullishCheck(chain []Operand) bool
 	return false
 }
 
-func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, lastOp Operand) bool {
+// trailingComparison returns the operator and the compared-against value of
+// the chain's trailing comparison, or a nil value when the chain doesn't end
+// in one.
+func (processor *chainProcessor) trailingComparison(chain []Operand, lastOp Operand) (ast.Kind, *ast.Node) {
 	isTrailingComparison := lastOp.typ == OperandTypeComparison
 	if !isTrailingComparison && len(chain) >= 2 &&
 		(lastOp.typ == OperandTypeNotStrictEqualNull ||
@@ -2332,35 +2335,81 @@ func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, las
 		}
 	}
 
-	if isTrailingComparison && lastOp.node != nil {
-		unwrappedNode := ast.SkipParentheses(lastOp.node)
-		if ast.IsBinaryExpression(unwrappedNode) {
-			binExpr := unwrappedNode.AsBinaryExpression()
-			op := binExpr.OperatorToken.Kind
-			left := ast.SkipParentheses(binExpr.Left)
-			right := ast.SkipParentheses(binExpr.Right)
-
-			var value *ast.Node
-			switch {
-			case lastOp.comparedExpr != nil && areNodesStructurallyEqual(lastOp.comparedExpr, left):
-				value = right
-			case lastOp.comparedExpr != nil && areNodesStructurallyEqual(lastOp.comparedExpr, right):
-				value = left
-			case utils.IsAccessExpression(left):
-				value = right
-			case utils.IsAccessExpression(right):
-				value = left
-			}
-
-			if value != nil &&
-				!processor.isSafeTrailingComparisonValue(op, value) &&
-				!processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-				return true
-			}
-		}
+	if !isTrailingComparison || lastOp.node == nil {
+		return ast.KindUnknown, nil
 	}
 
-	return false
+	unwrappedNode := ast.SkipParentheses(lastOp.node)
+	if !ast.IsBinaryExpression(unwrappedNode) {
+		return ast.KindUnknown, nil
+	}
+
+	binExpr := unwrappedNode.AsBinaryExpression()
+	left := ast.SkipParentheses(binExpr.Left)
+	right := ast.SkipParentheses(binExpr.Right)
+
+	var value *ast.Node
+	switch {
+	case lastOp.comparedExpr != nil && areNodesStructurallyEqual(lastOp.comparedExpr, left):
+		value = right
+	case lastOp.comparedExpr != nil && areNodesStructurallyEqual(lastOp.comparedExpr, right):
+		value = left
+	case utils.IsAccessExpression(left):
+		value = right
+	case utils.IsAccessExpression(right):
+		value = left
+	}
+
+	return binExpr.OperatorToken.Kind, value
+}
+
+func (processor *chainProcessor) isUnsafeTrailingComparison(chain []Operand, lastOp Operand) bool {
+	op, value := processor.trailingComparison(chain, lastOp)
+	return value != nil &&
+		!processor.isSafeTrailingComparisonValue(op, value) &&
+		!processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing
+}
+
+// An OR chain is true wherever it short-circuits, and the optional chain that
+// replaces it yields `undefined` there. So the trailing comparison has to be
+// true for `undefined` as well: replacing `a == null || a.b == null` with
+// `a?.b == null` keeps its meaning, but replacing `a == null || a.b === null`
+// with `a?.b === null` turns the short-circuit branch from true into false.
+// This mirrors isUnsafeTrailingComparison, which asks the opposite question
+// for AND chains.
+func (processor *chainProcessor) isUnsafeOrChainTrailingComparison(chain []Operand, lastOp Operand) bool {
+	op, value := processor.trailingComparison(chain, lastOp)
+	return value != nil &&
+		!processor.isSafeOrChainTrailingComparisonValue(op, value) &&
+		!processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing
+}
+
+// Reports whether `undefined <operator> value` evaluates to true.
+func (processor *chainProcessor) isSafeOrChainTrailingComparisonValue(operator ast.Kind, value *ast.Node) bool {
+	if value == nil {
+		return false
+	}
+
+	info := processor.getTypeInfo(value)
+
+	switch operator {
+	case ast.KindEqualsEqualsToken:
+		return info.IsAlwaysNullishLike()
+	case ast.KindEqualsEqualsEqualsToken:
+		return info.IsAlwaysUndefinedLike()
+	case ast.KindExclamationEqualsToken:
+		return !info.CanBeNullishLike()
+	case ast.KindExclamationEqualsEqualsToken:
+		return !info.CanBeUndefinedLike()
+	case ast.KindLessThanToken,
+		ast.KindGreaterThanToken,
+		ast.KindLessThanEqualsToken,
+		ast.KindGreaterThanEqualsToken:
+		// Every relational comparison against `undefined` is false.
+		return false
+	default:
+		return true
+	}
 }
 
 func (processor *chainProcessor) isSafeTrailingComparisonValue(operator ast.Kind, value *ast.Node) bool {
@@ -3591,6 +3640,9 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 		}
 		if !strictCheckRequiresSuggestion {
 			strictCheckRequiresSuggestion = processor.hasShorterUndefinedCheckBeforeStrictNullComparison(chain)
+		}
+		if !strictCheckRequiresSuggestion {
+			strictCheckRequiresSuggestion = processor.isUnsafeOrChainTrailingComparison(chain, chain[len(chain)-1])
 		}
 		if !strictCheckRequiresSuggestion {
 			useSuggestion = false
