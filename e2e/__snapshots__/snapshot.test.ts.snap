@@ -2034,26 +2034,58 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`string\`.",
+        "range": {
+          "end": 127,
+          "pos": 122,
+        },
+      },
+      {
+        "label": "Asserted type is \`any\`.",
+        "range": {
+          "end": 134,
+          "pos": 131,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 134,
-      "pos": 122,
+      "pos": 128,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`any\`.",
+        "range": {
+          "end": 134,
+          "pos": 122,
+        },
+      },
+      {
+        "label": "Asserted type is \`T\`.",
+        "range": {
+          "end": 139,
+          "pos": 138,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
       "end": 139,
-      "pos": 122,
+      "pos": 135,
     },
     "rule": "no-unsafe-type-assertion",
   },
@@ -2706,52 +2738,116 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`unknown\`.",
+        "range": {
+          "end": 113,
+          "pos": 108,
+        },
+      },
+      {
+        "label": "Asserted type is \`any\`.",
+        "range": {
+          "end": 120,
+          "pos": 117,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 120,
-      "pos": 108,
+      "pos": 114,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`unknown\`.",
+        "range": {
+          "end": 165,
+          "pos": 160,
+        },
+      },
+      {
+        "label": "Asserted type is \`any\`.",
+        "range": {
+          "end": 172,
+          "pos": 169,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 172,
-      "pos": 160,
+      "pos": 166,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`any\`.",
+        "range": {
+          "end": 172,
+          "pos": 160,
+        },
+      },
+      {
+        "label": "Asserted type is \`string\`.",
+        "range": {
+          "end": 182,
+          "pos": 176,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
       "end": 182,
-      "pos": 160,
+      "pos": 173,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`unknown\`.",
+        "range": {
+          "end": 282,
+          "pos": 277,
+        },
+      },
+      {
+        "label": "Asserted type is \`any\`.",
+        "range": {
+          "end": 289,
+          "pos": 286,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 289,
-      "pos": 277,
+      "pos": 283,
     },
     "rule": "no-unsafe-type-assertion",
   },
@@ -2844,26 +2940,58 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`string | null\`.",
+        "range": {
+          "end": 191,
+          "pos": 186,
+        },
+      },
+      {
+        "label": "Asserted type is \`string\`.",
+        "range": {
+          "end": 201,
+          "pos": 195,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe type assertion: type 'string' is more narrow than the original type.",
       "id": "unsafeTypeAssertion",
     },
     "range": {
       "end": 201,
-      "pos": 186,
+      "pos": 192,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Original expression has type \`number | undefined\`.",
+        "range": {
+          "end": 266,
+          "pos": 261,
+        },
+      },
+      {
+        "label": "Asserted type is \`number\`.",
+        "range": {
+          "end": 276,
+          "pos": 270,
+        },
+      },
+    ],
     "message": {
       "description": "Unsafe type assertion: type 'number' is more narrow than the original type.",
       "id": "unsafeTypeAssertion",
     },
     "range": {
       "end": 276,
-      "pos": 261,
+      "pos": 267,
     },
     "rule": "no-unsafe-type-assertion",
   },
