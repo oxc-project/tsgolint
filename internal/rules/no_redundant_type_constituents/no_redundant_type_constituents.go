@@ -62,6 +62,11 @@ type seenTypePart struct {
 	typeNode *ast.Node
 }
 
+type labeledTypePart struct {
+	node     *ast.Node
+	typeName string
+}
+
 func (t *typeFlagsWithNodeOrType) ToString(typeChecker *checker.Checker) string {
 	if t.node != nil {
 		switch t.node.Kind {
@@ -102,6 +107,9 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 		var getTypeNodeTypePartFlags func(node *ast.Node) []typeFlagsWithNodeOrType
 		getTypeNodeTypePartFlags = func(node *ast.Node) []typeFlagsWithNodeOrType {
 			node = ast.SkipParentheses(node)
+			for node.Kind == ast.KindParenthesizedType {
+				node = node.AsParenthesizedTypeNode().Type
+			}
 
 			flags := checker.TypeFlagsNone
 			switch node.Kind {
@@ -216,35 +224,42 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 			return rendered
 		}
 
-		reportRelation := func(
+		reportRelations := func(
 			message rule.RuleMessage,
-			redundantNode *ast.Node,
-			redundantType string,
-			overridingNode *ast.Node,
-			overridingType string,
+			primaryNode *ast.Node,
+			redundantParts []labeledTypePart,
+			overridingParts []labeledTypePart,
 		) {
 			// Some error and aliased types do not have a distinct local syntax node for
 			// both sides of the relationship. Keep the diagnostic useful in those
 			// cases, but only attach labels to ranges that are actually available.
-			primaryNode := redundantNode
-			if primaryNode == nil {
-				primaryNode = overridingNode
+			if primaryNode == nil && len(redundantParts) > 0 {
+				primaryNode = redundantParts[0].node
+			}
+			if primaryNode == nil && len(overridingParts) > 0 {
+				primaryNode = overridingParts[0].node
 			}
 			if primaryNode == nil {
 				return
 			}
 
-			labels := make([]rule.RuleLabeledRange, 0, 2)
-			if redundantNode != nil {
+			labels := make([]rule.RuleLabeledRange, 0, len(redundantParts)+len(overridingParts))
+			for _, part := range redundantParts {
+				if part.node == nil {
+					continue
+				}
 				labels = append(labels, rule.RuleLabeledRange{
-					Label: fmt.Sprintf("Redundant type: `%s`", redundantType),
-					Range: utils.TrimNodeTextRange(ctx.SourceFile, redundantNode),
+					Label: fmt.Sprintf("Redundant type: `%s`", part.typeName),
+					Range: utils.TrimNodeTextRange(ctx.SourceFile, part.node),
 				})
 			}
-			if overridingNode != nil {
+			for _, part := range overridingParts {
+				if part.node == nil {
+					continue
+				}
 				labels = append(labels, rule.RuleLabeledRange{
-					Label: fmt.Sprintf("Overriding type: `%s`", overridingType),
-					Range: utils.TrimNodeTextRange(ctx.SourceFile, overridingNode),
+					Label: fmt.Sprintf("Overriding type: `%s`", part.typeName),
+					Range: utils.TrimNodeTextRange(ctx.SourceFile, part.node),
 				})
 			}
 
@@ -253,6 +268,20 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				Message:       message,
 				LabeledRanges: labels,
 			})
+		}
+		reportRelation := func(
+			message rule.RuleMessage,
+			redundantNode *ast.Node,
+			redundantType string,
+			overridingNode *ast.Node,
+			overridingType string,
+		) {
+			reportRelations(
+				message,
+				redundantNode,
+				[]labeledTypePart{{node: redundantNode, typeName: redundantType}},
+				[]labeledTypePart{{node: overridingNode, typeName: overridingType}},
+			)
 		}
 
 		checkIntersectionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node, typeNodes []*ast.Node) bool {
@@ -412,16 +441,18 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 					typeValuesLiteral := strings.Join(utils.Map(literalTypes, func(t seenTypePart) string {
 						return t.part.ToString(ctx.TypeChecker)
 					}), " | ")
-					renderedTypeValuesLiteral := strings.Join(utils.Map(literalTypes, func(t seenTypePart) string {
-						return renderTypeParts([]typeFlagsWithNodeOrType{t.part})
-					}), " | ")
+					overridingParts := utils.Map(literalTypes, func(t seenTypePart) labeledTypePart {
+						return labeledTypePart{
+							node:     t.typeNode,
+							typeName: renderTypeParts([]typeFlagsWithNodeOrType{t.part}),
+						}
+					})
 					for _, typeNode := range primitiveTypes {
-						reportRelation(
+						reportRelations(
 							buildPrimitiveOverriddenMessage(typeValuesLiteral, primitiveName),
 							typeNode,
-							primitiveName,
-							literalTypes[0].typeNode,
-							renderedTypeValuesLiteral,
+							[]labeledTypePart{{node: typeNode, typeName: primitiveName}},
+							overridingParts,
 						)
 					}
 				}
@@ -542,17 +573,25 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						typeValuesLiteral := strings.Join(utils.Map(typeFlags, func(t typeFlagsWithNodeOrType) string {
 							return t.ToString(ctx.TypeChecker)
 						}), " | ")
-						renderedTypeValuesLiteral := renderTypeParts(typeFlags)
+						redundantParts := utils.Map(typeFlags, func(t typeFlagsWithNodeOrType) labeledTypePart {
+							redundantNode := t.node
+							if redundantNode == nil {
+								redundantNode = typeNode
+							}
+							return labeledTypePart{
+								node:     redundantNode,
+								typeName: renderTypeParts([]typeFlagsWithNodeOrType{t}),
+							}
+						})
 						var primitiveNode *ast.Node
 						if len(primitiveNodes) > 0 {
 							primitiveNode = primitiveNodes[0]
 						}
-						reportRelation(
+						reportRelations(
 							buildLiteralOverriddenMessage(typeValuesLiteral, primitiveName),
 							typeNode,
-							renderedTypeValuesLiteral,
-							primitiveNode,
-							primitiveName,
+							redundantParts,
+							[]labeledTypePart{{node: primitiveNode, typeName: primitiveName}},
 						)
 					}
 				}

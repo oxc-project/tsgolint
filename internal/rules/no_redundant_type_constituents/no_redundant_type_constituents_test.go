@@ -678,5 +678,16 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				},
 			},
 		},
+		{
+			// Each literal that overrides the primitive needs its own labeled range.
+			Code: "type T = 0 & 1 & number;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "primitiveOverridden",
+					Column:    18,
+					EndColumn: 24,
+				},
+			},
+		},
 	})
 }

@@ -653,6 +653,22 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Redundant type: \`A\`",
+        "range": {
+          "end": 104,
+          "pos": 103,
+        },
+      },
+      {
+        "label": "Overriding type: \`A\`",
+        "range": {
+          "end": 108,
+          "pos": 107,
+        },
+      },
+    ],
     "message": {
       "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
       "id": "errorTypeOverrides",
@@ -666,6 +682,51 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Redundant type: \`A\`",
+        "range": {
+          "end": 104,
+          "pos": 103,
+        },
+      },
+      {
+        "label": "Overriding type: \`B\`",
+        "range": {
+          "end": 112,
+          "pos": 111,
+        },
+      },
+    ],
+    "message": {
+      "description": "'B' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
+      "id": "errorTypeOverrides",
+    },
+    "range": {
+      "end": 104,
+      "pos": 103,
+    },
+    "rule": "no-redundant-type-constituents",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
+    "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Redundant type: \`A\`",
+        "range": {
+          "end": 108,
+          "pos": 107,
+        },
+      },
+      {
+        "label": "Overriding type: \`A\`",
+        "range": {
+          "end": 104,
+          "pos": 103,
+        },
+      },
+    ],
     "message": {
       "description": "'A' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
       "id": "errorTypeOverrides",
@@ -673,19 +734,6 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "range": {
       "end": 108,
       "pos": 107,
-    },
-    "rule": "no-redundant-type-constituents",
-  },
-  {
-    "file_path": "fixtures/basic/rules/no-duplicate-type-constituents/index.ts",
-    "kind": 0,
-    "message": {
-      "description": "'B' is an 'error' type that acts as 'any' and overrides all other types in this union type.",
-      "id": "errorTypeOverrides",
-    },
-    "range": {
-      "end": 112,
-      "pos": 111,
     },
     "rule": "no-redundant-type-constituents",
   },
@@ -1391,32 +1439,80 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Redundant type: \`string\`",
+        "range": {
+          "end": 121,
+          "pos": 115,
+        },
+      },
+      {
+        "label": "Overriding type: \`unknown\`",
+        "range": {
+          "end": 131,
+          "pos": 124,
+        },
+      },
+    ],
     "message": {
       "description": "'unknown' overrides all other types in this union type.",
       "id": "overrides",
     },
     "range": {
-      "end": 131,
-      "pos": 124,
+      "end": 121,
+      "pos": 115,
     },
     "rule": "no-redundant-type-constituents",
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Redundant type: \`string\`",
+        "range": {
+          "end": 180,
+          "pos": 174,
+        },
+      },
+      {
+        "label": "Overriding type: \`any\`",
+        "range": {
+          "end": 186,
+          "pos": 183,
+        },
+      },
+    ],
     "message": {
       "description": "'any' overrides all other types in this union type.",
       "id": "overrides",
     },
     "range": {
-      "end": 186,
-      "pos": 183,
+      "end": 180,
+      "pos": 174,
     },
     "rule": "no-redundant-type-constituents",
   },
   {
     "file_path": "fixtures/basic/rules/no-redundant-type-constituents/index.ts",
     "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "Redundant type: \`never\`",
+        "range": {
+          "end": 245,
+          "pos": 240,
+        },
+      },
+      {
+        "label": "Overriding type: \`string\`",
+        "range": {
+          "end": 237,
+          "pos": 231,
+        },
+      },
+    ],
     "message": {
       "description": "'never' is overridden by other types in this union type.",
       "id": "overridden",
