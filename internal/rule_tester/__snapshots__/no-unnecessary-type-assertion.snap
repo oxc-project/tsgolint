@@ -1728,3 +1728,22 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |          ~~~~~~~~~~~~~~~~~~~~~
    4 | }
 ---
+
+[TestNoUnnecessaryTypeAssertion/invalid-130 - 1]
+Diagnostic 1: unnecessaryAssertion (5:39 - 5:47)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | declare function get<T extends Base = Base>(text: string): T;
+   5 | const b = (get('x') as Derived).value as string;
+     |                                       ~~~~~~~~~
+   6 | export { b };
+  Label: This expression already has the type 'string' (5:11 - 5:37)
+   4 | declare function get<T extends Base = Base>(text: string): T;
+   5 | const b = (get('x') as Derived).value as string;
+     |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^ This expression already has the type 'string'
+   6 | export { b };
+  Label: Casting it to 'string' is unnecessary (5:39 - 5:47)
+   4 | declare function get<T extends Base = Base>(text: string): T;
+   5 | const b = (get('x') as Derived).value as string;
+     |                                       ^^^^^^^^^ Casting it to 'string' is unnecessary
+   6 | export { b };
+---
