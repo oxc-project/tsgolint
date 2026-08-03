@@ -1,0 +1,25 @@
+e2e/__snapshots__/snapshot.test.ts.snap
+  s_8f0d61316a881f::t_a60e8c4f052f2d 656-671,685-700,702,706-707,714-729,731,735-736,1442-1457,1463-1464,1471-1486,1492-1493,1500-1515
+internal/rule_tester/__snapshots__/no-redundant-type-constituents.snap
+  s_8f0d61316a881f::t_850144bebc8f5a 187,189-192,200,203-206,208,216,221-231,234,248-254,256,267,269-272,280,283-286,288-291,302-305,307,418,421-424,426,782,784,789-804
+internal/rules/no_redundant_type_constituents/no_redundant_type_constituents.go
+  s_8f0d61316a881f::t_e82fc45edefd88 65-69,110-112,227,229-231,236-240,246-250,252-253,256-259,261-262,272-285,444-449,451,454-455,576-585,590,593-594
+internal/rules/no_redundant_type_constituents/no_redundant_type_constituents_test.go
+  s_8f0d61316a881f::t_1cca56cbd8b515 681-691
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "957544bcd416156ce8a5ec4bd87f16d8ece23e15",
+  "prompts": {},
+  "sessions": {
+    "s_8f0d61316a881f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6af0-50ab-7272-ad21-e840f52a58af",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
