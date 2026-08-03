@@ -2707,5 +2707,25 @@ on(async () => {}, async () => {});
 				{MessageId: "voidReturnArgument", Line: 3},
 			},
 		},
+		// A getter whose type comes from its paired setter has no contextual type
+		// of its own; the void expectation must not be resolved from it.
+		{
+			Code: `
+class C {
+  private _handler: ((x: number) => Promise<void>) | undefined;
+
+  set handler(handler: undefined | ((x: number) => void)) {
+    this._handler = handler as ((x: number) => Promise<void>) | undefined;
+  }
+
+  get handler() {
+    return this._handler;
+  }
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "voidReturnReturnValue", Line: 10},
+			},
+		},
 	})
 }

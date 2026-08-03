@@ -1845,3 +1845,17 @@ Message: Promise returned in function argument where a void return was expected.
      |                                               ^^^^^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
    3 | on(async () => {}, async () => {});
 ---
+
+[TestNoMisusedPromisesRule/invalid-91 - 1]
+Diagnostic 1: voidReturnReturnValue (10:12 - 10:24)
+Message: Promise-returning function provided to return value where a void return was expected.
+   9 |   get handler() {
+  10 |     return this._handler;
+     |            ~~~~~~~~~~~~~
+  11 |   }
+  Label: This expression has type `((x: number) => Promise<void>) | undefined`. (10:12 - 10:24)
+   9 |   get handler() {
+  10 |     return this._handler;
+     |            ^^^^^^^^^^^^^ This expression has type `((x: number) => Promise<void>) | undefined`.
+  11 |   }
+---

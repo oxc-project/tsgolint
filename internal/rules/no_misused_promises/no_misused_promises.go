@@ -834,12 +834,13 @@ var NoMisusedPromisesRule = rule.Rule{
 				if functionNode != nil && functionNode.Type() != nil {
 					expectation = &voidExpectation{declaration: functionNode, t: contextualType}
 				} else if functionNode != nil {
-					functionType := checker.Checker_getContextualType(ctx.TypeChecker, functionNode, checker.ContextFlagsNone)
-					for _, signature := range utils.GetCallSignatures(ctx.TypeChecker, functionType) {
-						declaration := checker.Signature_declaration(signature)
-						if declaration != nil && ast.GetSourceFileOfNode(declaration) == ctx.SourceFile {
-							expectation = &voidExpectation{declaration: declaration, t: contextualType}
-							break
+					// The enclosing function may have no contextual type of its own, e.g. a
+					// getter whose type comes from its paired setter's parameter.
+					if functionType := checker.Checker_getContextualType(ctx.TypeChecker, functionNode, checker.ContextFlagsNone); functionType != nil {
+						for _, signature := range utils.GetCallSignatures(ctx.TypeChecker, functionType) {
+							if expectation = localExpectationForDeclaration(checker.Signature_declaration(signature), contextualType); expectation != nil {
+								break
+							}
 						}
 					}
 				}
