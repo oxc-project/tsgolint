@@ -1,0 +1,31 @@
+internal/rules/prefer_readonly_parameter_types/prefer_readonly_parameter_types.go
+  s_e55d9836dacea7::t_16a5d1c49213f1 105-110,159-164
+internal/rules/prefer_readonly_parameter_types/prefer_readonly_parameter_types_test.go
+  s_e55d9836dacea7::t_073b56786ab1c5 59,149
+internal/rule_tester/__snapshots__/prefer-readonly-parameter-types.snap
+  s_0d664729df3af2::t_08ed10f8b2782c 384-391
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c33b84bfc54e2e7cac0c3353bcd8ebd8836cbf2a",
+  "prompts": {},
+  "sessions": {
+    "s_0d664729df3af2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fc6b1-eb8e-7143-931b-a27461d89920",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    },
+    "s_e55d9836dacea7": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fc6a9-2065-7631-ba77-77ac77530cb0",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
