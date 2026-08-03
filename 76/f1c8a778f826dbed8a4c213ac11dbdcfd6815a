@@ -1,0 +1,21 @@
+internal/rules/prefer_readonly_parameter_types/prefer_readonly_parameter_types.go
+  s_0d664729df3af2::t_a2ab05c6e1dfcc 173-176
+internal/rules/prefer_readonly_parameter_types/prefer_readonly_parameter_types_test.go
+  s_0d664729df3af2::t_353c90ba1d0490 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "76f1c8a778f826dbed8a4c213ac11dbdcfd6815a",
+  "prompts": {},
+  "sessions": {
+    "s_0d664729df3af2": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fc6b1-eb8e-7143-931b-a27461d89920",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
