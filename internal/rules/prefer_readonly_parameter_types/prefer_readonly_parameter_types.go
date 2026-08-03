@@ -102,6 +102,12 @@ func propertyHasPrivateIdentifierName(property *ast.Symbol) bool {
 	return false
 }
 
+func propertyIsPrivateMappedProperty(property *ast.Symbol) bool {
+	return property != nil &&
+		property.CheckFlags&ast.CheckFlagsMapped != 0 &&
+		checker.GetDeclarationModifierFlagsFromSymbol(property)&ast.ModifierFlagsPrivate != 0
+}
+
 func propertyIsReadonly(typeChecker *checker.Checker, property *ast.Symbol) bool {
 	if property == nil {
 		return false
@@ -150,11 +156,25 @@ func isTypeReadonlyObject(
 		if propertyHasPrivateIdentifierName(property) {
 			continue
 		}
+
+		// `private` class properties are not exposed by a mapped type such as
+		// `Readonly<T>`, so their original declaration's mutability is irrelevant.
+		if propertyIsPrivateMappedProperty(property) {
+			continue
+		}
 		return readonlynessMutable
 	}
 
 	for _, property := range properties {
 		if property.Flags&ast.SymbolFlagsMethod != 0 {
+			continue
+		}
+
+		if propertyHasPrivateIdentifierName(property) {
+			continue
+		}
+
+		if propertyIsPrivateMappedProperty(property) {
 			continue
 		}
 

@@ -381,3 +381,11 @@ Message: Parameter should be a readonly type.
      |                       ~~~
    4 |       
 ---
+
+[TestPreferReadonlyParameterTypesRule/invalid-42 - 1]
+Diagnostic 1: shouldBeReadonly (2:12 - 2:32)
+Message: Parameter should be a readonly type.
+   1 | class PrivateMutable { private values = new Map<string, unknown>(); }
+   2 | function f(value: PrivateMutable): void {}
+     |            ~~~~~~~~~~~~~~~~~~~~~
+---
