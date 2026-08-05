@@ -713,5 +713,13 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				{MessageId: "overridden"},
 			},
 		},
+		{
+			// The overriding label must point at the nested top type, not its group.
+			Code: "type T = (number | any) | string;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "overrides"},
+				{MessageId: "overrides"},
+			},
+		},
 	})
 }

@@ -866,3 +866,27 @@ Message: 'unknown' is overridden by other types in this intersection type.
    1 | type T = number & string & unknown;
      |                   ^^^^^^ Overriding type: `string`
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-55 - 1]
+Diagnostic 1: overrides (1:27 - 1:32)
+Message: 'any' overrides all other types in this union type.
+   1 | type T = (number | any) | string;
+     |                           ~~~~~~
+  Label: Redundant type: `string` (1:27 - 1:32)
+   1 | type T = (number | any) | string;
+     |                           ^^^^^^ Redundant type: `string`
+  Label: Overriding type: `any` (1:20 - 1:22)
+   1 | type T = (number | any) | string;
+     |                    ^^^ Overriding type: `any`
+
+Diagnostic 2: overrides (1:11 - 1:16)
+Message: 'any' overrides all other types in this union type.
+   1 | type T = (number | any) | string;
+     |           ~~~~~~
+  Label: Redundant type: `number` (1:11 - 1:16)
+   1 | type T = (number | any) | string;
+     |           ^^^^^^ Redundant type: `number`
+  Label: Overriding type: `any` (1:20 - 1:22)
+   1 | type T = (number | any) | string;
+     |                    ^^^ Overriding type: `any`
+---

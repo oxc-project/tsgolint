@@ -296,6 +296,10 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 		checkIntersectionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node, typeNodes []*ast.Node) bool {
 			var message rule.RuleMessage
 			var redundantParts, overridingParts []labeledTypePart
+			matchedNode := typePart.node
+			if matchedNode == nil {
+				matchedNode = typeNode
+			}
 
 			switch typePart.flags {
 			case checker.TypeFlagsAny:
@@ -306,15 +310,15 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 					message = buildErrorTypeOverridesMessage(typeName, "intersection")
 				}
 				redundantParts = labeledTypeNodes(otherTypeNodes(typeNodes, typeNode))
-				overridingParts = []labeledTypePart{{node: typeNode, typeName: renderTypeNode(typeNode, typeName)}}
+				overridingParts = []labeledTypePart{{node: matchedNode, typeName: renderTypeNode(matchedNode, typeName)}}
 			case checker.TypeFlagsNever:
 				typeName := typePart.ToString(ctx.TypeChecker)
 				message = buildOverridesMessage(typeName, "intersection")
 				redundantParts = labeledTypeNodes(otherTypeNodes(typeNodes, typeNode))
-				overridingParts = []labeledTypePart{{node: typeNode, typeName: renderTypeNode(typeNode, typeName)}}
+				overridingParts = []labeledTypePart{{node: matchedNode, typeName: renderTypeNode(matchedNode, typeName)}}
 			case checker.TypeFlagsUnknown:
-				redundantType := renderTypeNode(typeNode, typePart.ToString(ctx.TypeChecker))
-				redundantParts = []labeledTypePart{{node: typeNode, typeName: redundantType}}
+				redundantType := renderTypeNode(matchedNode, typePart.ToString(ctx.TypeChecker))
+				redundantParts = []labeledTypePart{{node: matchedNode, typeName: redundantType}}
 				overridingParts = labeledTypeNodes(otherTypeNodes(typeNodes, typeNode))
 				message = buildOverriddenMessage(redundantType, "intersection")
 			default:
@@ -484,6 +488,10 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				checkUnionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node) bool {
 					var message rule.RuleMessage
 					var redundantParts, overridingParts []labeledTypePart
+					matchedNode := typePart.node
+					if matchedNode == nil {
+						matchedNode = typeNode
+					}
 
 					switch typePart.flags {
 					case checker.TypeFlagsAny:
@@ -494,17 +502,17 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 							message = buildErrorTypeOverridesMessage(typeName, "union")
 						}
 						redundantParts = labeledTypeNodes(otherTypeNodes(typeNodes, typeNode))
-						overridingParts = []labeledTypePart{{node: typeNode, typeName: renderTypeNode(typeNode, typeName)}}
+						overridingParts = []labeledTypePart{{node: matchedNode, typeName: renderTypeNode(matchedNode, typeName)}}
 					case checker.TypeFlagsUnknown:
 						typeName := typePart.ToString(ctx.TypeChecker)
 						message = buildOverridesMessage(typeName, "union")
 						redundantParts = labeledTypeNodes(otherTypeNodes(typeNodes, typeNode))
-						overridingParts = []labeledTypePart{{node: typeNode, typeName: renderTypeNode(typeNode, typeName)}}
+						overridingParts = []labeledTypePart{{node: matchedNode, typeName: renderTypeNode(matchedNode, typeName)}}
 					case checker.TypeFlagsNever:
 						if isNodeInsideReturnType(node) {
 							return false
 						}
-						redundantParts = []labeledTypePart{{node: typeNode, typeName: renderTypeNode(typeNode, "never")}}
+						redundantParts = []labeledTypePart{{node: matchedNode, typeName: renderTypeNode(matchedNode, "never")}}
 						overridingParts = labeledTypeNodes(otherTypeNodes(typeNodes, typeNode))
 						message = buildOverriddenMessage("never", "union")
 					default:
