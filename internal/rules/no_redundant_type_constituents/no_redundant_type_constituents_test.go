@@ -728,5 +728,16 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				{MessageId: "literalOverridden"},
 			},
 		},
+		{
+			// Checker-derived union parts should fall back to their alias subnode,
+			// not the entire parenthesized constituent.
+			Code: `
+        type B = 0 | 'other';
+        type T = (2 | B) | number;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "literalOverridden"},
+			},
+		},
 	})
 }

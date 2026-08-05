@@ -48,8 +48,9 @@ func isNodeInsideReturnType(node *ast.Node) bool {
 type typeFlagsWithNodeOrType struct {
 	flags checker.TypeFlags
 	// either node or t must be non-nil
-	node *ast.Node
-	t    *checker.Type
+	node       *ast.Node
+	sourceNode *ast.Node
+	t          *checker.Type
 }
 
 type seenUnionPart struct {
@@ -191,8 +192,9 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 			res := make([]typeFlagsWithNodeOrType, len(typeParts))
 			for i, part := range typeParts {
 				res[i] = typeFlagsWithNodeOrType{
-					flags: checker.Type_flags(part),
-					t:     part,
+					flags:      checker.Type_flags(part),
+					sourceNode: node,
+					t:          part,
 				}
 			}
 			return res
@@ -594,6 +596,9 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						}), " | ")
 						redundantParts := utils.Map(typeFlags, func(t typeFlagsWithNodeOrType) labeledTypePart {
 							redundantNode := t.node
+							if redundantNode == nil {
+								redundantNode = t.sourceNode
+							}
 							if redundantNode == nil {
 								redundantNode = typeNode
 							}
