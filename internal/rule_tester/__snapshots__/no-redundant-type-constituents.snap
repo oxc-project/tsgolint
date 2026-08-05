@@ -927,3 +927,27 @@ Message: 2 | 0 is overridden by number in this union type.
      |                            ^^^^^^ Overriding type: `number`
    4 |       
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-58 - 1]
+Diagnostic 1: primitiveOverridden (3:28 - 3:33)
+Message: number is overridden by the 0 | 1 in this intersection type.
+   2 |         type N = number;
+   3 |         type T = (0 | 1) & number & N;
+     |                            ~~~~~~
+   4 |       
+  Label: Redundant type: `number` (3:28 - 3:33)
+   2 |         type N = number;
+   3 |         type T = (0 | 1) & number & N;
+     |                            ^^^^^^ Redundant type: `number`
+   4 |       
+  Label: Redundant type: `number` (3:37 - 3:37)
+   2 |         type N = number;
+   3 |         type T = (0 | 1) & number & N;
+     |                                     ^ Redundant type: `number`
+   4 |       
+  Label: Overriding type: `0 | 1` (3:18 - 3:24)
+   2 |         type N = number;
+   3 |         type T = (0 | 1) & number & N;
+     |                  ^^^^^^^ Overriding type: `0 | 1`
+   4 |       
+---

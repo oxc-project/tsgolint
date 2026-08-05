@@ -295,21 +295,6 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				LabeledRanges: labels,
 			})
 		}
-		reportRelation := func(
-			message rule.RuleMessage,
-			redundantNode *ast.Node,
-			redundantType string,
-			overridingNode *ast.Node,
-			overridingType string,
-		) {
-			reportRelations(
-				message,
-				redundantNode,
-				[]labeledTypePart{{node: redundantNode, typeName: redundantType}},
-				[]labeledTypePart{{node: overridingNode, typeName: overridingType}},
-			)
-		}
-
 		checkIntersectionBottomAndTopTypes := func(typePart typeFlagsWithNodeOrType, typeNode *ast.Node, typeNodes []*ast.Node) bool {
 			var message rule.RuleMessage
 			var redundantParts, overridingParts []labeledTypePart
@@ -415,24 +400,24 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				if len(seenUnionTypes) > 0 && (len(seenBigIntPrimitiveTypes) > 0 || len(seenBooleanPrimitiveTypes) > 0 || len(seenNumberPrimitiveTypes) > 0 || len(seenStringPrimitiveTypes) > 0) {
 					for _, unionType := range seenUnionTypes {
 						var primitiveName string
-						var primitiveNode *ast.Node
+						var primitiveNodes []*ast.Node
 						for _, typeValue := range unionType.flags {
 							switch {
 							case typeValue.flags == checker.TypeFlagsBigIntLiteral && len(seenBigIntPrimitiveTypes) > 0:
 								primitiveName = "bigint"
-								primitiveNode = seenBigIntPrimitiveTypes[0]
+								primitiveNodes = seenBigIntPrimitiveTypes
 							case typeValue.flags == checker.TypeFlagsBooleanLiteral && len(seenBooleanPrimitiveTypes) > 0:
 								primitiveName = "boolean"
-								primitiveNode = seenBooleanPrimitiveTypes[0]
+								primitiveNodes = seenBooleanPrimitiveTypes
 							case typeValue.flags == checker.TypeFlagsNumberLiteral && len(seenNumberPrimitiveTypes) > 0:
 								primitiveName = "number"
-								primitiveNode = seenNumberPrimitiveTypes[0]
+								primitiveNodes = seenNumberPrimitiveTypes
 							case (typeValue.flags == checker.TypeFlagsStringLiteral || typeValue.flags == checker.TypeFlagsTemplateLiteral) && len(seenStringPrimitiveTypes) > 0:
 								primitiveName = "string"
-								primitiveNode = seenStringPrimitiveTypes[0]
+								primitiveNodes = seenStringPrimitiveTypes
 							default:
 								primitiveName = ""
-								primitiveNode = nil
+								primitiveNodes = nil
 							}
 							if len(primitiveName) == 0 {
 								break
@@ -445,12 +430,17 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 
 						typeValuesLiteral := typePartsToString(unionType.flags)
 						renderedTypeValuesLiteral := renderTypeParts(unionType.flags)
-						reportRelation(
+						redundantParts := utils.Map(primitiveNodes, func(primitiveNode *ast.Node) labeledTypePart {
+							return labeledTypePart{
+								node:     primitiveNode,
+								typeName: renderTypeNode(primitiveNode, primitiveName),
+							}
+						})
+						reportRelations(
 							buildPrimitiveOverriddenMessage(typeValuesLiteral, primitiveName),
-							primitiveNode,
-							primitiveName,
-							unionType.typeNode,
-							renderedTypeValuesLiteral,
+							primitiveNodes[0],
+							redundantParts,
+							[]labeledTypePart{{node: unionType.typeNode, typeName: renderedTypeValuesLiteral}},
 						)
 					}
 				}
