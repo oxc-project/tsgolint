@@ -418,9 +418,9 @@ Diagnostic 1: literalOverridden (1:10 - 1:19)
 Message: -1n | 1n is overridden by bigint in this union type.
    1 | type T = (-1n | 1n) | bigint;
      |          ~~~~~~~~~~
-  Label: Redundant type: `-1n` (1:10 - 1:19)
+  Label: Redundant type: `-1n` (1:11 - 1:13)
    1 | type T = (-1n | 1n) | bigint;
-     |          ^^^^^^^^^^ Redundant type: `-1n`
+     |           ^^^ Redundant type: `-1n`
   Label: Redundant type: `1n` (1:17 - 1:18)
    1 | type T = (-1n | 1n) | bigint;
      |                 ^^ Redundant type: `1n`
@@ -889,4 +889,17 @@ Message: 'any' overrides all other types in this union type.
   Label: Overriding type: `any` (1:20 - 1:22)
    1 | type T = (number | any) | string;
      |                    ^^^ Overriding type: `any`
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-56 - 1]
+Diagnostic 1: literalOverridden (1:10 - 1:23)
+Message: -1 is overridden by number in this union type.
+   1 | type T = (-1 | 'other') | number;
+     |          ~~~~~~~~~~~~~~
+  Label: Redundant type: `-1` (1:11 - 1:12)
+   1 | type T = (-1 | 'other') | number;
+     |           ^^ Redundant type: `-1`
+  Label: Overriding type: `number` (1:27 - 1:32)
+   1 | type T = (-1 | 'other') | number;
+     |                           ^^^^^^ Overriding type: `number`
 ---

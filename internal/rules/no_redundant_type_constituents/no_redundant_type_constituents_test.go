@@ -721,5 +721,12 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				{MessageId: "overrides"},
 			},
 		},
+		{
+			// Preserve the signed literal node when only part of a group is redundant.
+			Code: "type T = (-1 | 'other') | number;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "literalOverridden"},
+			},
+		},
 	})
 }

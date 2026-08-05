@@ -89,6 +89,8 @@ func (t *typeFlagsWithNodeOrType) ToString(typeChecker *checker.Checker) string 
 				return "template literal type"
 			case ast.KindStringLiteral, ast.KindNumericLiteral, ast.KindBigIntLiteral:
 				return literal.Text()
+			case ast.KindPrefixUnaryExpression:
+				return typeChecker.TypeToString(typeChecker.GetTypeAtLocation(t.node))
 			}
 		}
 		return "literal type"
@@ -152,6 +154,19 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 					return []typeFlagsWithNodeOrType{{
 						flags: flags,
 						node:  node,
+					}}
+				}
+
+				// Signed numeric and bigint literal types are represented by prefix
+				// unary expressions. Preserve their syntax node while taking the literal
+				// flags from the checker so diagnostics can label only the signed token.
+				t := ctx.TypeChecker.GetTypeAtLocation(node)
+				flags = checker.Type_flags(t)
+				if flags&(checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral) != 0 {
+					return []typeFlagsWithNodeOrType{{
+						flags: flags,
+						node:  node,
+						t:     t,
 					}}
 				}
 			}
