@@ -5471,3 +5471,13 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 | 
 ---
+
+[TestPreferOptionalChainRule/invalid-610 - 1]
+Diagnostic 1: preferOptionalChain (3:1 - 3:35)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 | declare const item: { value: string | null | undefined } | undefined;
+   3 | item == null || item.value === null;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---

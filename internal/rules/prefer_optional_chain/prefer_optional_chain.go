@@ -3599,8 +3599,9 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 
 	// For strict null/undefined checks on types that only have one of them,
 	// use suggestion because optional chaining checks for BOTH.
+	incompleteStrictCheck := false
+	unsafeRewrite := false
 	if useSuggestion && hasTrailingComparison {
-		strictCheckRequiresSuggestion := false
 		if len(chain) > 0 && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 			analysis := analyzeNullishChecks(chain, true)
 
@@ -3634,22 +3635,22 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 					}
 				}
 				if hasAnyNullableType && allTypesMatchCheck {
-					strictCheckRequiresSuggestion = true
+					incompleteStrictCheck = true
 				}
 			}
 		}
-		if !strictCheckRequiresSuggestion {
-			strictCheckRequiresSuggestion = processor.hasShorterUndefinedCheckBeforeStrictNullComparison(chain)
-		}
-		if !strictCheckRequiresSuggestion {
-			strictCheckRequiresSuggestion = processor.isUnsafeOrChainTrailingComparison(chain, chain[len(chain)-1])
-		}
-		if !strictCheckRequiresSuggestion {
+		unsafeRewrite = processor.hasShorterUndefinedCheckBeforeStrictNullComparison(chain) ||
+			processor.isUnsafeOrChainTrailingComparison(chain, chain[len(chain)-1])
+		if !incompleteStrictCheck && !unsafeRewrite {
 			useSuggestion = false
 		}
 	}
 
-	if useSuggestion && len(chain) > 0 {
+	// A compared type that already includes both null and undefined (or is
+	// any/unknown) is narrowed identically by the optional chain, which answers
+	// the incomplete-check concern above but says nothing about rewrites that
+	// change behavior for other reasons.
+	if useSuggestion && !unsafeRewrite && len(chain) > 0 {
 		for _, op := range chain {
 			if op.comparedExpr != nil {
 				info := processor.getTypeInfo(op.comparedExpr)
