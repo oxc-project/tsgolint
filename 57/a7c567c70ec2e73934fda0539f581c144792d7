@@ -1,0 +1,23 @@
+internal/rule_tester/__snapshots__/no-redundant-type-constituents.snap
+  s_8f0d61316a881f::t_886c460b1b96c5 869-892
+internal/rules/no_redundant_type_constituents/no_redundant_type_constituents.go
+  s_8f0d61316a881f::t_5dd313f0efd729 299-302,313,318,320-321,491-494,505,510,515
+internal/rules/no_redundant_type_constituents/no_redundant_type_constituents_test.go
+  s_8f0d61316a881f::t_1a9eafec2be4e6 716-723
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "57a7c567c70ec2e73934fda0539f581c144792d7",
+  "prompts": {},
+  "sessions": {
+    "s_8f0d61316a881f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f6af0-50ab-7272-ad21-e840f52a58af",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
