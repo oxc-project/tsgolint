@@ -689,5 +689,29 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				},
 			},
 		},
+		{
+			Code: "type T = number | string | any;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "overrides"},
+			},
+		},
+		{
+			Code: "type T = number | string | never;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "overridden"},
+			},
+		},
+		{
+			Code: "type T = number & string & never;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "overrides"},
+			},
+		},
+		{
+			Code: "type T = number & string & unknown;",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "overridden"},
+			},
+		},
 	})
 }

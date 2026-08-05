@@ -802,3 +802,67 @@ Message: number is overridden by the 0 | 1 in this intersection type.
    1 | type T = 0 & 1 & number;
      |              ^ Overriding type: `1`
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-51 - 1]
+Diagnostic 1: overrides (1:10 - 1:15)
+Message: 'any' overrides all other types in this union type.
+   1 | type T = number | string | any;
+     |          ~~~~~~
+  Label: Redundant type: `number` (1:10 - 1:15)
+   1 | type T = number | string | any;
+     |          ^^^^^^ Redundant type: `number`
+  Label: Redundant type: `string` (1:19 - 1:24)
+   1 | type T = number | string | any;
+     |                   ^^^^^^ Redundant type: `string`
+  Label: Overriding type: `any` (1:28 - 1:30)
+   1 | type T = number | string | any;
+     |                            ^^^ Overriding type: `any`
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-52 - 1]
+Diagnostic 1: overridden (1:28 - 1:32)
+Message: 'never' is overridden by other types in this union type.
+   1 | type T = number | string | never;
+     |                            ~~~~~
+  Label: Redundant type: `never` (1:28 - 1:32)
+   1 | type T = number | string | never;
+     |                            ^^^^^ Redundant type: `never`
+  Label: Overriding type: `number` (1:10 - 1:15)
+   1 | type T = number | string | never;
+     |          ^^^^^^ Overriding type: `number`
+  Label: Overriding type: `string` (1:19 - 1:24)
+   1 | type T = number | string | never;
+     |                   ^^^^^^ Overriding type: `string`
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-53 - 1]
+Diagnostic 1: overrides (1:10 - 1:15)
+Message: 'never' overrides all other types in this intersection type.
+   1 | type T = number & string & never;
+     |          ~~~~~~
+  Label: Redundant type: `number` (1:10 - 1:15)
+   1 | type T = number & string & never;
+     |          ^^^^^^ Redundant type: `number`
+  Label: Redundant type: `string` (1:19 - 1:24)
+   1 | type T = number & string & never;
+     |                   ^^^^^^ Redundant type: `string`
+  Label: Overriding type: `never` (1:28 - 1:32)
+   1 | type T = number & string & never;
+     |                            ^^^^^ Overriding type: `never`
+---
+
+[TestNoRedundantTypeConstituentsRule/invalid-54 - 1]
+Diagnostic 1: overridden (1:28 - 1:34)
+Message: 'unknown' is overridden by other types in this intersection type.
+   1 | type T = number & string & unknown;
+     |                            ~~~~~~~
+  Label: Redundant type: `unknown` (1:28 - 1:34)
+   1 | type T = number & string & unknown;
+     |                            ^^^^^^^ Redundant type: `unknown`
+  Label: Overriding type: `number` (1:10 - 1:15)
+   1 | type T = number & string & unknown;
+     |          ^^^^^^ Overriding type: `number`
+  Label: Overriding type: `string` (1:19 - 1:24)
+   1 | type T = number & string & unknown;
+     |                   ^^^^^^ Overriding type: `string`
+---

@@ -662,6 +662,13 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
       {
+        "label": "Redundant type: \`B\`",
+        "range": {
+          "end": 112,
+          "pos": 111,
+        },
+      },
+      {
         "label": "Overriding type: \`A\`",
         "range": {
           "end": 108,
@@ -691,6 +698,13 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         },
       },
       {
+        "label": "Redundant type: \`A\`",
+        "range": {
+          "end": 108,
+          "pos": 107,
+        },
+      },
+      {
         "label": "Overriding type: \`B\`",
         "range": {
           "end": 112,
@@ -717,6 +731,13 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "range": {
           "end": 108,
           "pos": 107,
+        },
+      },
+      {
+        "label": "Redundant type: \`B\`",
+        "range": {
+          "end": 112,
+          "pos": 111,
         },
       },
       {
