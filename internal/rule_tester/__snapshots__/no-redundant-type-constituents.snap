@@ -1000,3 +1000,16 @@ Message: 'any' overrides all other types in this union type.
      |                            ^ Overriding type: `any`
    4 |       
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-61 - 1]
+Diagnostic 1: primitiveOverridden (1:11 - 1:16)
+Message: number is overridden by the 0 | 1 in this intersection type.
+   1 | type T = (number | string) & (0 | 1);
+     |           ~~~~~~
+  Label: Redundant type: `number` (1:11 - 1:16)
+   1 | type T = (number | string) & (0 | 1);
+     |           ^^^^^^ Redundant type: `number`
+  Label: Overriding type: `0 | 1` (1:30 - 1:36)
+   1 | type T = (number | string) & (0 | 1);
+     |                              ^^^^^^^ Overriding type: `0 | 1`
+---

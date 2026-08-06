@@ -379,15 +379,22 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 							}
 						}
 
+						matchedPrimitiveNode := typePart.node
+						if matchedPrimitiveNode == nil {
+							matchedPrimitiveNode = typePart.sourceNode
+						}
+						if matchedPrimitiveNode == nil {
+							matchedPrimitiveNode = typeNode
+						}
 						switch typePart.flags {
 						case checker.TypeFlagsBigInt:
-							seenBigIntPrimitiveTypes = append(seenBigIntPrimitiveTypes, typeNode)
+							seenBigIntPrimitiveTypes = append(seenBigIntPrimitiveTypes, matchedPrimitiveNode)
 						case checker.TypeFlagsBoolean:
-							seenBooleanPrimitiveTypes = append(seenBooleanPrimitiveTypes, typeNode)
+							seenBooleanPrimitiveTypes = append(seenBooleanPrimitiveTypes, matchedPrimitiveNode)
 						case checker.TypeFlagsNumber:
-							seenNumberPrimitiveTypes = append(seenNumberPrimitiveTypes, typeNode)
+							seenNumberPrimitiveTypes = append(seenNumberPrimitiveTypes, matchedPrimitiveNode)
 						case checker.TypeFlagsString:
-							seenStringPrimitiveTypes = append(seenStringPrimitiveTypes, typeNode)
+							seenStringPrimitiveTypes = append(seenStringPrimitiveTypes, matchedPrimitiveNode)
 						}
 					}
 				}
