@@ -749,5 +749,12 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				{MessageId: "primitiveOverridden"},
 			},
 		},
+		{
+			// The primitive label must point at the matching nested member, not its group.
+			Code: "type T = 0 | (number | string);",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "literalOverridden"},
+			},
+		},
 	})
 }

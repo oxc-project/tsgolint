@@ -951,3 +951,16 @@ Message: number is overridden by the 0 | 1 in this intersection type.
      |                  ^^^^^^^ Overriding type: `0 | 1`
    4 |       
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-59 - 1]
+Diagnostic 1: literalOverridden (1:10 - 1:10)
+Message: 0 is overridden by number in this union type.
+   1 | type T = 0 | (number | string);
+     |          ~
+  Label: Redundant type: `0` (1:10 - 1:10)
+   1 | type T = 0 | (number | string);
+     |          ^ Redundant type: `0`
+  Label: Overriding type: `number` (1:15 - 1:20)
+   1 | type T = 0 | (number | string);
+     |               ^^^^^^ Overriding type: `number`
+---

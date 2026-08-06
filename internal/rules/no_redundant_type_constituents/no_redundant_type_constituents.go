@@ -556,17 +556,24 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 						// Aliases of primitive types can carry additional checker flags, so use
 						// bit tests here rather than requiring an exact flag match. The alias
 						// reference is still a precise local range for the overriding label.
+						matchedPrimitiveNode := typePart.node
+						if matchedPrimitiveNode == nil {
+							matchedPrimitiveNode = typePart.sourceNode
+						}
+						if matchedPrimitiveNode == nil {
+							matchedPrimitiveNode = typeNode
+						}
 						if typePart.flags&checker.TypeFlagsBigInt != 0 {
-							seenBigIntPrimitiveTypeNodes = append(seenBigIntPrimitiveTypeNodes, typeNode)
+							seenBigIntPrimitiveTypeNodes = append(seenBigIntPrimitiveTypeNodes, matchedPrimitiveNode)
 						}
 						if typePart.flags&checker.TypeFlagsBoolean != 0 {
-							seenBooleanPrimitiveTypeNodes = append(seenBooleanPrimitiveTypeNodes, typeNode)
+							seenBooleanPrimitiveTypeNodes = append(seenBooleanPrimitiveTypeNodes, matchedPrimitiveNode)
 						}
 						if typePart.flags&checker.TypeFlagsNumber != 0 {
-							seenNumberPrimitiveTypeNodes = append(seenNumberPrimitiveTypeNodes, typeNode)
+							seenNumberPrimitiveTypeNodes = append(seenNumberPrimitiveTypeNodes, matchedPrimitiveNode)
 						}
 						if typePart.flags&checker.TypeFlagsString != 0 {
-							seenStringPrimitiveTypeNodes = append(seenStringPrimitiveTypeNodes, typeNode)
+							seenStringPrimitiveTypeNodes = append(seenStringPrimitiveTypeNodes, matchedPrimitiveNode)
 						}
 					}
 				}
