@@ -1013,3 +1013,27 @@ Message: number is overridden by the 0 | 1 in this intersection type.
    1 | type T = (number | string) & (0 | 1);
      |                              ^^^^^^^ Overriding type: `0 | 1`
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-62 - 1]
+Diagnostic 1: literalOverridden (3:18 - 3:18)
+Message: 0 is overridden by number in this union type.
+   2 |         type N = number;
+   3 |         type T = 0 | number | N;
+     |                  ~
+   4 |       
+  Label: Redundant type: `0` (3:18 - 3:18)
+   2 |         type N = number;
+   3 |         type T = 0 | number | N;
+     |                  ^ Redundant type: `0`
+   4 |       
+  Label: Overriding type: `number` (3:22 - 3:27)
+   2 |         type N = number;
+   3 |         type T = 0 | number | N;
+     |                      ^^^^^^ Overriding type: `number`
+   4 |       
+  Label: Overriding type: `number` (3:31 - 3:31)
+   2 |         type N = number;
+   3 |         type T = 0 | number | N;
+     |                               ^ Overriding type: `number`
+   4 |       
+---

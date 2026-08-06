@@ -774,5 +774,15 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				{MessageId: "primitiveOverridden"},
 			},
 		},
+		{
+			// Every matching primitive constituent overrides the literal.
+			Code: `
+        type N = number;
+        type T = 0 | number | N;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "literalOverridden"},
+			},
+		},
 	})
 }

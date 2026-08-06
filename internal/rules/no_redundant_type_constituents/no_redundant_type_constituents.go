@@ -617,15 +617,17 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 								typeName: renderTypeParts([]typeFlagsWithNodeOrType{t}),
 							}
 						})
-						var primitiveNode *ast.Node
-						if len(primitiveNodes) > 0 {
-							primitiveNode = primitiveNodes[0]
-						}
+						overridingParts := utils.Map(primitiveNodes, func(primitiveNode *ast.Node) labeledTypePart {
+							return labeledTypePart{
+								node:     primitiveNode,
+								typeName: renderTypeNode(primitiveNode, primitiveName),
+							}
+						})
 						reportRelations(
 							buildLiteralOverriddenMessage(typeValuesLiteral, primitiveName),
 							typeNode,
 							redundantParts,
-							[]labeledTypePart{{node: primitiveNode, typeName: primitiveName}},
+							overridingParts,
 						)
 					}
 				}
