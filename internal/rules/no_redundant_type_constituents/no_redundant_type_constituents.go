@@ -300,6 +300,9 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 			var redundantParts, overridingParts []labeledTypePart
 			matchedNode := typePart.node
 			if matchedNode == nil {
+				matchedNode = typePart.sourceNode
+			}
+			if matchedNode == nil {
 				matchedNode = typeNode
 			}
 
@@ -496,6 +499,9 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 					var message rule.RuleMessage
 					var redundantParts, overridingParts []labeledTypePart
 					matchedNode := typePart.node
+					if matchedNode == nil {
+						matchedNode = typePart.sourceNode
+					}
 					if matchedNode == nil {
 						matchedNode = typeNode
 					}

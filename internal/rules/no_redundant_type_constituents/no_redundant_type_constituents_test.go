@@ -756,5 +756,16 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 				{MessageId: "literalOverridden"},
 			},
 		},
+		{
+			// Checker-derived top types should label their alias subnode, not its group.
+			Code: `
+        type A = any;
+        type T = (number | A) | string;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "overrides"},
+				{MessageId: "overrides"},
+			},
+		},
 	})
 }

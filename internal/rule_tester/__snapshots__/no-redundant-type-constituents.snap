@@ -964,3 +964,39 @@ Message: 0 is overridden by number in this union type.
    1 | type T = 0 | (number | string);
      |               ^^^^^^ Overriding type: `number`
 ---
+
+[TestNoRedundantTypeConstituentsRule/invalid-60 - 1]
+Diagnostic 1: overrides (3:33 - 3:38)
+Message: 'any' overrides all other types in this union type.
+   2 |         type A = any;
+   3 |         type T = (number | A) | string;
+     |                                 ~~~~~~
+   4 |       
+  Label: Redundant type: `string` (3:33 - 3:38)
+   2 |         type A = any;
+   3 |         type T = (number | A) | string;
+     |                                 ^^^^^^ Redundant type: `string`
+   4 |       
+  Label: Overriding type: `any` (3:28 - 3:28)
+   2 |         type A = any;
+   3 |         type T = (number | A) | string;
+     |                            ^ Overriding type: `any`
+   4 |       
+
+Diagnostic 2: overrides (3:19 - 3:24)
+Message: 'any' overrides all other types in this union type.
+   2 |         type A = any;
+   3 |         type T = (number | A) | string;
+     |                   ~~~~~~
+   4 |       
+  Label: Redundant type: `number` (3:19 - 3:24)
+   2 |         type A = any;
+   3 |         type T = (number | A) | string;
+     |                   ^^^^^^ Redundant type: `number`
+   4 |       
+  Label: Overriding type: `any` (3:28 - 3:28)
+   2 |         type A = any;
+   3 |         type T = (number | A) | string;
+     |                            ^ Overriding type: `any`
+   4 |       
+---
