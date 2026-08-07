@@ -478,6 +478,10 @@ func collectTypeParameterUsageCounts(
 			return
 		}
 
+		// Tuple types like `[K, V]` and generic type references like `Map<K, V>`.
+		// This is terminal even when there are no type arguments to visit: it has
+		// to run before the object type catch-all below so that we never descend
+		// into every property of a generic interface or class.
 		if checker.Type_flags(typeNode)&checker.TypeFlagsObject != 0 && checker.Type_objectFlags(typeNode)&checker.ObjectFlagsReference != 0 {
 			typeArguments := checker.Checker_getTypeArguments(ctx.TypeChecker, typeNode)
 			if len(typeArguments) != 0 {
@@ -497,8 +501,8 @@ func collectTypeParameterUsageCounts(
 					}
 					visitType(typeArgument, thisAssumeMultipleUses, isReturnType)
 				}
-				return
 			}
+			return
 		}
 
 		if checker.Type_flags(typeNode)&checker.TypeFlagsTemplateLiteral != 0 {
