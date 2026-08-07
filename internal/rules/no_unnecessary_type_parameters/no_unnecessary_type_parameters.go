@@ -330,6 +330,7 @@ func collectTypeParameterUsageCounts(
 	fromClass bool,
 ) int {
 	typeUsages := make(map[*checker.Type]int)
+	visitedSymbolLists := make(map[**ast.Symbol]struct{})
 	visitedConstraints := make(map[*ast.Node]bool)
 	visitedDefault := false
 	functionLikeType := false
@@ -377,7 +378,19 @@ func collectTypeParameterUsageCounts(
 		}
 	}
 
+	// The checker caches the property slice on a type's resolved members, so the
+	// address of its first element identifies the list the same way upstream's
+	// `visitedSymbolLists` uses array identity.
 	visitSymbolsList = func(symbols []*ast.Symbol, assumeMultipleUses bool) {
+		if len(symbols) == 0 {
+			return
+		}
+		listKey := &symbols[0]
+		if _, visited := visitedSymbolLists[listKey]; visited {
+			return
+		}
+		visitedSymbolLists[listKey] = struct{}{}
+
 		for _, symbol := range symbols {
 			if remainingTargets == 0 {
 				return
