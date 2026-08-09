@@ -121,3 +121,67 @@ Message: Function 'foo' expected no return value.
      |           ~~~~~~~~~~~~~~~~~~
    8 |         }
 ---
+
+[TestConsistentReturnRule/invalid-12 - 1]
+Diagnostic 1: missingReturnValue (3:9 - 6:9)
+Message: Function 'foo' expected a return value.
+   2 |         declare function log(msg: string): void;
+   3 |         function foo(flag: boolean): number {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           if (flag) { return 42; }
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           log("no return");
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |         }
+     | ~~~~~~~~~
+---
+
+[TestConsistentReturnRule/invalid-13 - 1]
+Diagnostic 1: missingReturnValue (3:9 - 7:9)
+Message: Function 'foo' expected a return value.
+   2 |         declare function abort(): never;
+   3 |         function foo(flag: boolean): number {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           if (flag) { return 42; }
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           if (Math.random() > 0.5) { abort(); }
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |           else { console.log("continue"); }
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         }
+     | ~~~~~~~~~
+---
+
+[TestConsistentReturnRule/invalid-14 - 1]
+Diagnostic 1: missingReturnValue (3:9 - 9:9)
+Message: Function 'foo' expected a return value.
+   2 |         declare function processExit(code?: number): never;
+   3 |         function foo(flag: boolean): number {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           try {
+     | ~~~~~~~~~~~~~~~
+   5 |             if (flag) return 1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |           } catch {
+     | ~~~~~~~~~~~~~~~~~~~
+   7 |             processExit(1);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |           }
+     | ~~~~~~~~~~~
+   9 |         }
+     | ~~~~~~~~~
+---
+
+[TestConsistentReturnRule/invalid-15 - 1]
+Diagnostic 1: missingReturnValue (4:9 - 7:9)
+Message: Function 'foo' expected a return value.
+   3 |         declare function log(msg: string): void;
+   4 |         function foo(flag: boolean): number {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           if (flag) return 1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |           try { log("x"); } catch { abort(); }
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         }
+     | ~~~~~~~~~
+---

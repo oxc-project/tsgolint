@@ -176,6 +176,49 @@ func TestConsistentReturnRule(t *testing.T) {
           return;
         }
       `, Options: rule_tester.OptionsFromJSON[ConsistentReturnOptions](`{"treatUndefinedAsUnspecified":true}`)},
+		{Code: `
+        declare function processExit(code?: number): never;
+        function readPackageLock(): unknown {
+          try {
+            return JSON.parse("{}");
+          } catch (error) {
+            console.error(error);
+            processExit(1);
+          }
+        }
+      `},
+		{Code: `
+        declare function abort(): never;
+        function foo(flag: boolean): number {
+          if (flag) { return 42; }
+          abort();
+        }
+      `},
+		{Code: `
+        declare function abort(): never;
+        function foo(flag: boolean): number {
+          if (flag) { return 42; }
+          if (Math.random() > 0.5) { abort(); } else { abort(); }
+        }
+      `},
+		{Code: `
+        declare function abort(): never;
+        function foo(flag: boolean): number {
+          if (flag) { return 42; }
+          {
+            console.log("aborting");
+            abort();
+          }
+        }
+      `},
+		{Code: `
+        declare function abort(): never;
+        declare function log(): void;
+        function foo(flag: boolean): number {
+          if (flag) { return 42; }
+          try { log(); } finally { abort(); }
+        }
+      `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -404,6 +447,79 @@ func TestConsistentReturnRule(t *testing.T) {
 				},
 			},
 			Options: rule_tester.OptionsFromJSON[ConsistentReturnOptions](`{"treatUndefinedAsUnspecified":true}`),
+		},
+		{
+			Code: `
+        declare function log(msg: string): void;
+        function foo(flag: boolean): number {
+          if (flag) { return 42; }
+          log("no return");
+        }`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingReturnValue",
+					Line:      3,
+					Column:    9,
+					EndLine:   6,
+					EndColumn: 10,
+				},
+			},
+		},
+		{
+			Code: `
+        declare function abort(): never;
+        function foo(flag: boolean): number {
+          if (flag) { return 42; }
+          if (Math.random() > 0.5) { abort(); }
+          else { console.log("continue"); }
+        }`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingReturnValue",
+					Line:      3,
+					Column:    9,
+					EndLine:   7,
+					EndColumn: 10,
+				},
+			},
+		},
+		{
+			Code: `
+        declare function processExit(code?: number): never;
+        function foo(flag: boolean): number {
+          try {
+            if (flag) return 1;
+          } catch {
+            processExit(1);
+          }
+        }`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingReturnValue",
+					Line:      3,
+					Column:    9,
+					EndLine:   9,
+					EndColumn: 10,
+				},
+			},
+		},
+		{
+			Code: `
+        declare function abort(): never;
+        declare function log(msg: string): void;
+        function foo(flag: boolean): number {
+          if (flag) return 1;
+          try { log("x"); } catch { abort(); }
+        }`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "missingReturnValue",
+					Line:      4,
+					Column:    9,
+					EndLine:   7,
+					EndColumn: 10,
+				},
+			},
 		},
 	})
 }
