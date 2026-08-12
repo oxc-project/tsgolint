@@ -25,7 +25,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup Node.js
-        uses: oxc-project/setup-node@3dcec485ad31d30d15b1bd177eaeddf0db86320e # v1.3.2
+        uses: oxc-project/setup-node@d59b270414aa7d0eed947eed4eb5b0b8a675f01d # v1.4.0
 
       - name: Install Go
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
