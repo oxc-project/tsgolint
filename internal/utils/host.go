@@ -1,15 +1,16 @@
 package utils
 
 import (
-	"github.com/microsoft/typescript-go/shim/ast"
-	"github.com/microsoft/typescript-go/shim/compiler"
-	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/TypeScript/tsc/shim/ast"
+	"github.com/microsoft/TypeScript/tsc/shim/compiler"
+	"github.com/microsoft/TypeScript/tsc/shim/contentmapper"
+	"github.com/microsoft/TypeScript/tsc/shim/core"
 
-	"github.com/microsoft/typescript-go/shim/parser"
-	"github.com/microsoft/typescript-go/shim/tsoptions"
-	"github.com/microsoft/typescript-go/shim/tspath"
-	"github.com/microsoft/typescript-go/shim/vfs"
-	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
+	"github.com/microsoft/TypeScript/tsc/shim/parser"
+	"github.com/microsoft/TypeScript/tsc/shim/tsoptions"
+	"github.com/microsoft/TypeScript/tsc/shim/tspath"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs/cachedvfs"
 	"github.com/typescript-eslint/tsgolint/internal/collections"
 )
 
@@ -105,6 +106,14 @@ func (h *compilerHost) GetSourceFile(opts ast.SourceFileParseOptions) *ast.Sourc
 	sourceFile := parser.ParseSourceFile(opts, text, scriptKind)
 	result, _ := sourceFileCache.LoadOrStore(key, sourceFile)
 	return result
+}
+
+func (h *compilerHost) GetContentMappedSourceFiles(ast.SourceFileParseOptions, *contentmapper.Mapper) (contentmapper.SourceFiles, error) {
+	return contentmapper.SourceFiles{}, contentmapper.ErrProjectUnavailable
+}
+
+func (h *compilerHost) ContentMapperProject() contentmapper.Project {
+	return nil
 }
 
 func (h *compilerHost) GetResolvedProjectReference(fileName string, path tspath.Path) *tsoptions.ParsedCommandLine {

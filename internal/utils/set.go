@@ -1,4 +1,4 @@
-// Source: github.com/microsoft/typescript-go - internal/core/set.go
+// Source: github.com/microsoft/TypeScript/tsc - internal/core/set.go
 
 package utils
 

@@ -2,5 +2,5 @@ go 1.26
 
 use (
 	.
-	./typescript-go
+	./typescript/tsc
 )

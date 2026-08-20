@@ -3,7 +3,7 @@
 
 package vfs
 
-import "github.com/microsoft/typescript-go/internal/vfs"
+import "github.com/microsoft/TypeScript/tsc/internal/vfs"
 
 type DirEntry = vfs.DirEntry
 type Entries = vfs.Entries

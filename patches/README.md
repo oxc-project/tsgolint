@@ -7,10 +7,9 @@ associating them with checkers. Program order is unchanged, and single-checker
 pools skip sorting. All other values retain the original assignment. See the
 [checker scheduling options](https://github.com/oxc-project/tsgolint/pull/1240).
 
-These patches do not change the behavior of typescript-go.
-The main purpose of the patches is to tune tsgo performance a bit.
+These patches adapt the native TypeScript compiler for TSGolint and tune tsgo performance.
 
-Module resolution caching is tracked [here](https://github.com/microsoft/typescript-go/issues/673).
+Module resolution caching is tracked in the former staging repository [here](https://github.com/microsoft/typescript-go/issues/673).
 
 TODO: propose upstreaming other patches
 

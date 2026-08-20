@@ -1,10 +1,10 @@
 # Shim Generator
 
-Shims expose internal typescript-go APIs to tsgolint. Each internal package used by tsgolint has a corresponding Go module under [`shim/`](../../shim/).
+Shims expose internal native TypeScript APIs to tsgolint. Each internal package used by tsgolint has a corresponding Go module under [`shim/`](../../shim/).
 
 ## Shim Go Module
 
-To expose another package, create a module named `github.com/microsoft/typescript-go/shim/<package>` in `shim/<package>/`, following an existing module's `go.mod`.
+To expose another package, create a module named `github.com/microsoft/TypeScript/tsc/shim/<package>` in `shim/<package>/`, following an existing module's `go.mod`.
 
 Add the package name to `packagesToShim` in [`main.go`](./main.go).
 
