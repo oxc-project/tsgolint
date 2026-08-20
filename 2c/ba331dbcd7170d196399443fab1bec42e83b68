@@ -1,0 +1,363 @@
+.github/actions/setup/action.yml
+  s_58493bfa5324ac::t_501439f17e227a 24,27,31,35
+.github/workflows/update-typescript.yml
+  s_58493bfa5324ac::t_6b17d58567ae91 1,8,10,45,47,59
+.gitmodules
+  s_58493bfa5324ac::t_6f37ab96de37c7 1-4
+AGENTS.md
+  s_50c3041d2175a4::t_4c60ad77bcb0d9 3,5,9,13-15,20-21,25,27,30,35,47-49,52,73,172,175,211,241,274,284
+CONTRIBUTING.md
+  s_58493bfa5324ac::t_b893097f9119a5 285,304,426
+dprint.json
+  s_58493bfa5324ac::t_1de9562183a4e6 11
+go.work
+  s_58493bfa5324ac::t_c33b268cf94e04 5
+internal/utils/bfs.go
+  s_50c3041d2175a4::t_4b854166bd18b7 1
+internal/utils/find_tsconfig.go
+  s_50c3041d2175a4::t_3c9519e58f4f8b 10-14,37,58,63,68,269
+internal/utils/utils.go
+  s_50c3041d2175a4::t_07a0bcf62df86f 9-12,78,95,112,124,129,139,167
+justfile
+  s_58493bfa5324ac::t_28bcddaa8b0621 16-17,24,26,56
+tools/update-typescript-shims.sh
+  s_58493bfa5324ac::t_cf207f72cb5a2a 3,8
+typescript
+  s_50c3041d2175a4::t_0b780c67fc0d57 1
+.agents/skills/tsgolint-update-typescript-go/SKILL.md
+  s_4fbf284ab582ed::t_28df3da9a1006c 3,6,8,16,20,23,25,30,34,50,69,91,93
+ARCHITECTURE.md
+  s_50c3041d2175a4::t_0eee3a68f05d93 3,28,83,86,95,121
+README.md
+  s_50c3041d2175a4::t_bee4742c238252 16,73,122,240
+THIRD-PARTY-LICENSE
+  s_50c3041d2175a4::t_a74f91106a8fe5 2
+cmd/tsgolint/headless.go
+  s_50c3041d2175a4::t_c89620d90534e0 17-22
+cmd/tsgolint/headless_bench_test.go
+  s_50c3041d2175a4::t_2113a89db3821d 11-17
+cmd/tsgolint/main.go
+  s_50c3041d2175a4::t_607dc2621ae4a7 84-89
+cmd/tsgolint/overlayfs.go
+  s_50c3041d2175a4::t_e5494f9e665eb1 6
+cmd/tsgolint/overlayfs_test.go
+  s_50c3041d2175a4::t_55f59b2284431e 6
+go.mod
+  s_4fbf284ab582ed::t_2b20efa3c8f0a1 6-21,25-39,46,50,52-53
+go.sum
+  s_50c3041d2175a4::t_6466aa8e9e6048 1-4,13-14,21-30
+go.work.sum
+  s_4fbf284ab582ed::t_452a01034a7f4d 16,39,51,67,71,77
+internal/diagnostic/diagnostic.go
+  s_50c3041d2175a4::t_8e7985d0021d5a 3
+internal/linter/linter.go
+  s_50c3041d2175a4::t_1b718d1644f7e9 16-22
+internal/linter/linter_test.go
+  s_50c3041d2175a4::t_7fab89f401903f 8-12
+internal/rule/rule.go
+  s_50c3041d2175a4::t_abee4085f7742b 4-7
+internal/rule_tester/rule_tester.go
+  s_50c3041d2175a4::t_b34229ec1474b3 11-16
+internal/rule_tester/snapshot.go
+  s_50c3041d2175a4::t_3b2e72a48cb7c9 14-16
+internal/rules/await_thenable/await_thenable.go
+  s_50c3041d2175a4::t_af0eeb009c722b 6-9
+internal/rules/consistent_return/consistent_return.go
+  s_50c3041d2175a4::t_b34c45c1245ac8 7-8
+internal/rules/consistent_type_exports/consistent_type_exports.go
+  s_50c3041d2175a4::t_e867d79239193c 8-11
+internal/rules/dot_notation/dot_notation.go
+  s_50c3041d2175a4::t_44b23c1216b952 10-13
+internal/rules/no_array_delete/no_array_delete.go
+  s_50c3041d2175a4::t_12a6d9ce928daa 4-6
+internal/rules/no_base_to_string/no_base_to_string.go
+  s_50c3041d2175a4::t_8c5ec58f80fa1a 7-9
+internal/rules/no_confusing_void_expression/no_confusing_void_expression.go
+  s_50c3041d2175a4::t_4719f85e069dc3 4-6
+internal/rules/no_deprecated/no_deprecated.go
+  s_50c3041d2175a4::t_2bc26c6da00879 7-8
+internal/rules/no_duplicate_type_constituents/no_duplicate_type_constituents.go
+  s_50c3041d2175a4::t_e012e718a97626 6-9
+internal/rules/no_floating_promises/no_floating_promises.go
+  s_50c3041d2175a4::t_e4f730054a6f27 6-8
+internal/rules/no_for_in_array/no_for_in_array.go
+  s_50c3041d2175a4::t_7db668de7959d1 4-5
+internal/rules/no_implied_eval/no_implied_eval.go
+  s_50c3041d2175a4::t_ff0d16384f25ec 6-7
+internal/rules/no_meaningless_void_operator/no_meaningless_void_operator.go
+  s_50c3041d2175a4::t_5d62507a343827 6-7
+internal/rules/no_misused_promises/no_misused_promises.go
+  s_50c3041d2175a4::t_b2e0ccc177f659 8-10
+internal/rules/no_misused_spread/no_misused_spread.go
+  s_50c3041d2175a4::t_ee7b1217b756a0 4-7
+internal/rules/no_mixed_enums/no_mixed_enums.go
+  s_50c3041d2175a4::t_b8c235aaee3829 4-5
+internal/rules/no_redundant_type_constituents/no_redundant_type_constituents.go
+  s_50c3041d2175a4::t_b2fcf193853805 7-8
+internal/rules/no_unnecessary_boolean_literal_compare/no_unnecessary_boolean_literal_compare.go
+  s_50c3041d2175a4::t_66a57aedee1d7b 4-6
+internal/rules/no_unnecessary_condition/no_unnecessary_condition.go
+  s_50c3041d2175a4::t_8a5d369727865c 23-25
+internal/rules/no_unnecessary_condition/no_unnecessary_condition_test.go
+  s_50c3041d2175a4::t_c728e5ef93b391 6
+internal/rules/no_unnecessary_qualifier/no_unnecessary_qualifier.go
+  s_50c3041d2175a4::t_d9788e6a9e25b7 7-8
+internal/rules/no_unnecessary_template_expression/no_unnecessary_template_expression.go
+  s_50c3041d2175a4::t_e018ada38a10ef 6-9
+internal/rules/no_unnecessary_type_arguments/no_unnecessary_type_arguments.go
+  s_50c3041d2175a4::t_40618b4699241f 6-9
+internal/rules/no_unnecessary_type_assertion/no_unnecessary_type_assertion.go
+  s_50c3041d2175a4::t_17aa5ee654ac89 8-11
+internal/rules/no_unnecessary_type_conversion/no_unnecessary_type_conversion.go
+  s_50c3041d2175a4::t_0bac4689a9b107 9-11
+internal/rules/no_unnecessary_type_parameters/no_unnecessary_type_parameters.go
+  s_50c3041d2175a4::t_5eb0b3ad4f7ec3 8-11
+internal/rules/no_unsafe_argument/no_unsafe_argument.go
+  s_50c3041d2175a4::t_fe8988fcf7039c 7-8
+internal/rules/no_unsafe_assignment/no_unsafe_assignment.go
+  s_50c3041d2175a4::t_70bfcdf223a424 6-9
+internal/rules/no_unsafe_assignment/no_unsafe_assignment_test.go
+  s_50c3041d2175a4::t_a8d571e1f6050f 7
+internal/rules/no_unsafe_call/no_unsafe_call.go
+  s_50c3041d2175a4::t_ec1b9daf74454d 6-7
+internal/rules/no_unsafe_enum_comparison/no_unsafe_enum_comparison.go
+  s_50c3041d2175a4::t_3a9dd5aa75bda1 6-7
+internal/rules/no_unsafe_enum_comparison/static_value.go
+  s_50c3041d2175a4::t_bf3313787e4e95 4-5
+internal/rules/no_unsafe_enum_comparison/suggestion.go
+  s_50c3041d2175a4::t_f183e8c938bb3b 6-10
+internal/rules/no_unsafe_member_access/no_unsafe_member_access.go
+  s_50c3041d2175a4::t_c69bce49372b94 6-7
+internal/rules/no_unsafe_return/no_unsafe_return.go
+  s_50c3041d2175a4::t_ae464a36b557ff 6-9
+internal/rules/no_unsafe_return/no_unsafe_return_test.go
+  s_50c3041d2175a4::t_8622b9c5337f8a 6
+internal/rules/no_unsafe_type_assertion/no_unsafe_type_assertion.go
+  s_50c3041d2175a4::t_e4dbbac7753235 6-9
+internal/rules/no_unsafe_unary_minus/no_unsafe_unary_minus.go
+  s_50c3041d2175a4::t_17a5c0d23dfe86 6-7
+internal/rules/no_useless_default_assignment/no_useless_default_assignment.go
+  s_50c3041d2175a4::t_4ba4eb892e26e0 7-9
+internal/rules/non_nullable_type_assertion_style/non_nullable_type_assertion_style.go
+  s_50c3041d2175a4::t_1fec619ccc65bd 4-6
+internal/rules/only_throw_error/only_throw_error.go
+  s_50c3041d2175a4::t_a5add68bded8bb 4-5
+internal/rules/prefer_find/prefer_find.go
+  s_50c3041d2175a4::t_00aef4610a0120 11-13
+internal/rules/prefer_includes/prefer_includes.go
+  s_50c3041d2175a4::t_cb1225e704ca50 8-10
+internal/rules/prefer_nullish_coalescing/prefer_nullish_coalescing.go
+  s_50c3041d2175a4::t_731898f28070cf 6-8
+internal/rules/prefer_optional_chain/prefer_optional_chain.go
+  s_50c3041d2175a4::t_ae8e8e73d85bc2 6-8
+internal/rules/prefer_promise_reject_errors/prefer_promise_reject_errors.go
+  s_50c3041d2175a4::t_1c43f04dd6135d 4-5
+internal/rules/prefer_readonly/prefer_readonly.go
+  s_50c3041d2175a4::t_c7991bbd0953af 6-8
+internal/rules/prefer_readonly_parameter_types/prefer_readonly_parameter_types.go
+  s_50c3041d2175a4::t_d1f889aad8e4cb 4-6
+internal/rules/prefer_reduce_type_parameter/prefer_reduce_type_parameter.go
+  s_50c3041d2175a4::t_b0e030894bbf34 4-5
+internal/rules/prefer_regexp_exec/prefer_regexp_exec.go
+  s_50c3041d2175a4::t_4ca1d1a8bee1d8 7-8
+internal/rules/prefer_return_this_type/prefer_return_this_type.go
+  s_50c3041d2175a4::t_2e3c48db44f544 4-5
+internal/rules/prefer_string_starts_ends_with/prefer_string_starts_ends_with.go
+  s_50c3041d2175a4::t_a86b4b1505d4b7 10-12
+internal/rules/promise_function_async/promise_function_async.go
+  s_50c3041d2175a4::t_2ffec9f1c68ad5 4-5
+internal/rules/related_getter_setter_pairs/related_getter_setter_pairs.go
+  s_50c3041d2175a4::t_0ac42cc8ba51d4 4-5
+internal/rules/require_array_sort_compare/require_array_sort_compare.go
+  s_50c3041d2175a4::t_3c5ad030d2d6d3 4-5
+internal/rules/require_await/require_await.go
+  s_50c3041d2175a4::t_a9ab2e53638249 4-7
+internal/rules/restrict_plus_operands/restrict_plus_operands.go
+  s_50c3041d2175a4::t_2b294648051a2a 7-9
+internal/rules/restrict_template_expressions/restrict_template_expressions.go
+  s_50c3041d2175a4::t_b48fe857b43f61 6-8
+internal/rules/return_await/return_await.go
+  s_50c3041d2175a4::t_57aa55b7f15b0e 4-5
+internal/rules/strict_boolean_expressions/strict_boolean_expressions.go
+  s_50c3041d2175a4::t_2d81863aec7262 4-6
+internal/rules/strict_void_return/strict_void_return.go
+  s_50c3041d2175a4::t_7e0210015dac26 6-7
+internal/rules/switch_exhaustiveness_check/switch_exhaustiveness_check.go
+  s_50c3041d2175a4::t_57ee5917c48272 9-12
+internal/rules/unbound_method/unbound_method.go
+  s_50c3041d2175a4::t_da02917d0c3c45 4-5
+internal/rules/use_unknown_in_catch_callback_variable/use_unknown_in_catch_callback_variable.go
+  s_50c3041d2175a4::t_5b32f206748ac4 6-7
+internal/utils/base_type_utils.go
+  s_50c3041d2175a4::t_276273b39a9929 4
+internal/utils/builtin_symbol_likes.go
+  s_50c3041d2175a4::t_ffadeef787eb4c 4-8
+internal/utils/builtin_symbol_likes_test.go
+  s_50c3041d2175a4::t_46cc64e1db7299 6-9
+internal/utils/create_program.go
+  s_50c3041d2175a4::t_46f47004891c73 8-13,123
+internal/utils/diagnostic_helpers.go
+  s_50c3041d2175a4::t_e3ef49825c48f2 4
+internal/utils/find_tsconfig_test.go
+  s_50c3041d2175a4::t_62bc8e68592705 8
+internal/utils/host.go
+  s_50c3041d2175a4::t_472a42953a2274 4-13,111-118
+internal/utils/overlay_vfs.go
+  s_50c3041d2175a4::t_e05ad36a1914ff 8-11
+internal/utils/set.go
+  s_50c3041d2175a4::t_0501fb8bde1102 1
+internal/utils/ts_api_utils.go
+  s_50c3041d2175a4::t_87cb64574a57f3 4-6
+internal/utils/ts_eslint.go
+  s_50c3041d2175a4::t_5c10b4811b0360 6-10
+internal/utils/type_matches_specifier.go
+  s_50c3041d2175a4::t_204b848f261e2e 10-13
+patches/0001-Adapt-project-service-for-single-run-mode.patch
+  s_50c3041d2175a4::t_55ec6001930604 1,7,10-13,22
+patches/0002-patch-expose-more-functions-via-the-shim-with-type-f.patch
+  s_50c3041d2175a4::t_78a36c05f894b3 1,7-14,16-19,38-42,51-55,74-75,96,105,109-124,146,150-152,155-156,164,173,181-182,190-191,200,209,218,227,242,251-252,260,269,278,287,296,305,326,332,335-339,357,391-396,412-413,420-421,427,436,438,445,454,463,472,483,492,501,510,519,528,545,561,570,579,588,597,606,615,624,633,646,655,669,678-684,691,700-703,754,774-780,797,806,824,843,854,875,904,915,945,960,972,987,996,1022,1026-1031,1033-1036,1038,1040,1044-1045,1049,1058,1067
+patches/0003-fix-early-return-from-invalid-tsconfig-for-better-er.patch
+  s_50c3041d2175a4::t_3a93891b8cf116 1,7,10-14
+patches/0004-fix-collections-avoid-internal-json-import-in-ordere.patch
+  s_50c3041d2175a4::t_b83853c4181ad3 1,8,11-14,19
+patches/0005-perf-vfs-cache-ReadFile-results-in-cachedvfs.patch
+  s_50c3041d2175a4::t_2a2673bf90d224 1,7,10-13
+patches/README.md
+  s_50c3041d2175a4::t_d9a789cead917b 3,5
+shim/ast/go.mod
+  s_4fbf284ab582ed::t_222b6bf766df0a 1,5
+shim/ast/go.sum
+  s_50c3041d2175a4::t_cd7d7e26d6d7f5 7-8
+shim/ast/helpers.go
+  s_50c3041d2175a4::t_5cf8d3303542d9 9-10,14
+shim/ast/shim.go
+  s_50c3041d2175a4::t_c2425041ac0269 6-10,78,80,82,84,86,126,133,139,143,152,154,158,174,176,179,194,196,198,200,202,204,206,220,227,229,235,237,239,254,266,269,271,276,278,280-281,304,306,308,334,336,338,340,342,344,346,348,350,352,354,356,358,360,362,364,366,368,370,372,374,376,378-380,382,384,386,388,390,392,394-398,400,402-404,406,408,410,412,414,416,418,420,422,424,426,428,430,432,434,436,438,440,442,444,446,448,450,452,454,456,458,460,462,464,466,468,470,472,474,476,478,480,482,484,486,488,490,492,494,496,498,500,502,504,506,509,511,513,515,517,519,521,523,525,528-529,550,560,593,595,597,599,601,603,605,607,609,611,613,615,617,619,621,623,625,627,629,631,633,635,637,639,641,643,645,647,649,651,653,655,657,659,661,663,665,667,669,671,673,675,677,679,681,683,685,687,689,691,693,695,697,699,701,703,705,707,709,711,713,715,717,719,721,723,725,727,729,731,733,735,737,739,741,743,745,747,749,751,753,755,757,759,761,763,765,767,769,771,773,775,777,779,781,783,785,787,789,791,793,795,797,799,801,803,805,807,809,811,813,815,817,819,821,823,825,827,829,831,833,835,837,839,841,843,845,847,849,851,853,855,857,859,861,863,865,867,869,871,873,875,877,879,881,883,885,887,889,891,893,895,897,899,901,903,905,907,909,911,913,915,917,919,921,923,925,927,929,931,933,935,937,939,941,943,945,947,949,951,953,955,957,959,961,963,965,967,969,971,973,975,977,979,981,983,985,987,989,991,993,995,997,999,1001,1003,1005,1007,1009,1011,1013,1015,1017,1019,1021,1023,1025,1027,1029,1031,1033,1035,1037,1039,1041,1043,1045,1047,1049,1051,1053,1055,1057,1059,1061,1063,1065,1067,1069,1071,1073,1075,1077,1079,1081,1083,1085,1087,1089,1091,1093,1095,1097,1099,1101,1103,1105,1107,1109,1111,1113,1115,1117,1119,1121,1123,1125,1127,1129,1131,1133,1135,1137,1139,1141,1143,1145,1147,1149,1151,1153,1155,1157,1159,1161,1163,1165,1167,1169,1171,1173,1175,1177,1179,1181,1183,1185,1187,1189,1191,1193,1195-1197,1199,1201,1203,1205,1207,1209,1211,1213,1215,1217,1219,1221,1223,1225,1227,1229,1231,1233,1235,1237,1239,1241,1243,1245,1247,1249,1251,1253,1255,1257,1259,1261,1263,1265,1267,1269,1271,1273,1275,1277,1279,1281,1283,1285,1287,1289,1291,1293,1295,1297,1299,1301,1303,1305,1307,1309,1311,1313,1315,1317,1319,1321,1323,1325,1327,1329,1331,1333,1335,1337,1339,1341,1343,1345,1347,1349,1351,1353,1355,1357,1359,1361,1363,1365,1367,1369,1371,1373,1375,1377,1379,1381,1383,1385,1387,1389,1391,1393,1395,1397,1399,1401,1403,1405,1407,1409,1411,1413,1415,1417,1419,1421,1423,1425,1427,1429,1431,1433,1435,1437,1439,1441,1443,1445,1447,1449,1451,1453,1455,1457,1459,1461,1463,1465,1467,1469,1471,1473,1475,1477,1479,1481,1483,1485,1487,1489,1491,1493,1495,1497,1499,1501,1503,1505,1507,1509,1511,1513,1515,1517,1519,1521,1523,1525,1527,1529,1531,1533,1535,1537,2070-2073,2131,2134,2142,2171,2173,2175,2177,2181-2183,2185,2187,2189,2191,2196,2200,2248,2250,2253,2255,2257,2259,2261,2264,2352,2396,2403,2425,2427,2429,2431,2437,2440,2442,2444,2446,2597,2606,2636,2672,2674-2676,2678,2680,2745,2747,2749
+shim/bundled/go.mod
+  s_4fbf284ab582ed::t_d76fddcc85eaf8 1,5
+shim/bundled/go.sum
+  s_50c3041d2175a4::t_ce1f48375d1e9e 5-6
+shim/bundled/shim.go
+  s_50c3041d2175a4::t_07595e391a735b 6-7,11,14,16,18
+shim/checker/go.mod
+  s_4fbf284ab582ed::t_24a01e053646fd 1,5,8
+shim/checker/go.sum
+  s_50c3041d2175a4::t_0d2fd3047e5062 1-2,9-10
+shim/checker/shim.go
+  s_50c3041d2175a4::t_57da42677c5885 7-17,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,142,144,146,148,150,152,154,220,247,254,256,366,486,492,523,525,612,615,617,619,621,623,712,714,716,718,720,722,724,802-805,817,819,821,823,825,827,829,877-878,1006,1036,1319,1332,1340,1342
+shim/compiler/go.mod
+  s_4fbf284ab582ed::t_20ca4dcace3828 1,5,8
+shim/compiler/go.sum
+  s_50c3041d2175a4::t_05c3a106dafa04 1-2,9-10
+shim/compiler/shim.go
+  s_50c3041d2175a4::t_7af7ff26b48a6d 7-14,18,25,31,33-36,38-42,45,47,49,53
+shim/contentmapper/go.mod
+  s_50c3041d2175a4::t_55b4ff39ea4cac 1-15
+shim/contentmapper/go.sum
+  s_50c3041d2175a4::t_67408eb4a3762e 1-24
+shim/contentmapper/shim.go
+  s_50c3041d2175a4::t_ceaf093e553e5b 1-103
+shim/core/go.mod
+  s_4fbf284ab582ed::t_ac0f3b68b3237e 1,5
+shim/core/go.sum
+  s_50c3041d2175a4::t_3daff099ef3738 5-6
+shim/core/shim.go
+  s_50c3041d2175a4::t_40271500f8a284 7,11,13,16,26,28,31,33,37-38,40,42-44,46,48,50,52,94,100,102,104,107,109,117,124,126,154,157,167,170,173,177,179,196,198
+shim/jsnum/go.mod
+  s_4fbf284ab582ed::t_4d79cbb1bd00f4 1,5
+shim/jsnum/go.sum
+  s_50c3041d2175a4::t_99683e2ce475af 5-6
+shim/jsnum/shim.go
+  s_50c3041d2175a4::t_d5016be8cc173e 6,9,11,15,17,20,22
+shim/lsp/lsproto/go.mod
+  s_4fbf284ab582ed::t_ccc16714935420 1,5
+shim/lsp/lsproto/go.sum
+  s_50c3041d2175a4::t_6969c3470d6662 5-6
+shim/lsp/lsproto/shim.go
+  s_50c3041d2175a4::t_1d6b0fe6d7d0c7 7-8,182-184,186,241-242,254-255,278-281,428,451,631,737,739,741,757,964,999,1005-1006,1181-1187,1232
+shim/parser/go.mod
+  s_4fbf284ab582ed::t_dd67d196434ed4 1,5
+shim/parser/go.sum
+  s_50c3041d2175a4::t_fd23af6a25f1b1 1-2,9-10
+shim/parser/shim.go
+  s_50c3041d2175a4::t_c6d48f5494a410 6-8,11,48,50
+shim/project/go.mod
+  s_4fbf284ab582ed::t_1ab5e9f5c40982 1,6,11
+shim/project/go.sum
+  s_50c3041d2175a4::t_0619f84019ce0f 1-2,11-12
+shim/project/shim.go
+  s_50c3041d2175a4::t_16a91c36635633 6-17,28,30,32,34-36,39,59,61,63-65,67-69,71,73,75,77,79,81-82,117,121-122
+shim/scanner/go.mod
+  s_4fbf284ab582ed::t_b3866e49fc714e 1,5
+shim/scanner/go.sum
+  s_50c3041d2175a4::t_8bcbda664acc21 7-8
+shim/scanner/shim.go
+  s_50c3041d2175a4::t_c0c66536b259fd 6-8,12,14,16,18,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,90,92,95,97
+shim/tsoptions/go.mod
+  s_4fbf284ab582ed::t_945f7a479592c3 1,5,8
+shim/tsoptions/go.sum
+  s_50c3041d2175a4::t_ddbb1141aa11b4 1-2,9-10
+shim/tsoptions/shim.go
+  s_50c3041d2175a4::t_3cc0fcabd8dddd 6-12,31,33,35,39,41,43,45,47,52,54,56-58,60,62,64,66,68,70,72,78,80,85,87,89,92,94,97,99,101,103,105,107,109,113,116
+shim/tspath/go.mod
+  s_4fbf284ab582ed::t_9948b8a343ed60 1,5
+shim/tspath/go.sum
+  s_50c3041d2175a4::t_5df845cdcfa2d5 3-4
+shim/tspath/shim.go
+  s_50c3041d2175a4::t_b5f44f7d22e1c4 6,11,13,15,17,19,21,23,25,28,30,32,35,37,44,46,57,59,61,63,65,67,69,71,73,75,77-79,81,83,85,87,89,91,93,95,97,99,101,103,105,107,109,111,113,115,117,119,121,123,125,127,129,132,134,136-138,140,142,144,146,148,150,152,162,164,166-168,170
+shim/vfs/cachedvfs/go.mod
+  s_4fbf284ab582ed::t_2a7028a1dbbc24 1,5
+shim/vfs/cachedvfs/go.sum
+  s_50c3041d2175a4::t_474a5701f7cbcb 5-6
+shim/vfs/cachedvfs/shim.go
+  s_50c3041d2175a4::t_fb4bdb0915ca0d 6-7,11
+shim/vfs/go.mod
+  s_4fbf284ab582ed::t_08e840e3a47753 1,5
+shim/vfs/go.sum
+  s_50c3041d2175a4::t_f337a1bdd9d54e 5-6
+shim/vfs/osvfs/go.mod
+  s_4fbf284ab582ed::t_188db769ad2aa9 1,5
+shim/vfs/osvfs/go.sum
+  s_50c3041d2175a4::t_05505fca0849c9 5-6
+shim/vfs/osvfs/shim.go
+  s_50c3041d2175a4::t_0b904909086c7b 6-7,10,12
+shim/vfs/shim.go
+  s_50c3041d2175a4::t_04492e144a859a 6
+tools/gen-npm-packages.mjs
+  s_50c3041d2175a4::t_143fce3725f4b9 37
+tools/gen_shims/README.md
+  s_50c3041d2175a4::t_2c128021aff901 3,7
+tools/gen_shims/main.go
+  s_50c3041d2175a4::t_6f5c7668d0cc1c 21,54,308-315
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2cba331dbcd7170d196399443fab1bec42e83b68",
+  "prompts": {},
+  "sessions": {
+    "s_4fbf284ab582ed": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01e58-6ad5-7723-8e22-559d03dfc9d7",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    },
+    "s_50c3041d2175a4": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01df5-db60-7001-8ce8-4c2635b78937",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    },
+    "s_58493bfa5324ac": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01ac4-4d1b-7642-b86d-6773cf13abfd",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
