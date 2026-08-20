@@ -6,10 +6,10 @@ import (
 	"unicode"
 
 	"github.com/go-json-experiment/json"
-	"github.com/microsoft/typescript-go/shim/ast"
-	"github.com/microsoft/typescript-go/shim/checker"
-	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/scanner"
+	"github.com/microsoft/TypeScript/tsc/shim/ast"
+	"github.com/microsoft/TypeScript/tsc/shim/checker"
+	"github.com/microsoft/TypeScript/tsc/shim/core"
+	"github.com/microsoft/TypeScript/tsc/shim/scanner"
 )
 
 func TrimNodeTextRange(sourceFile *ast.SourceFile, node *ast.Node) core.TextRange {
@@ -77,7 +77,7 @@ func GetHeritageClauses(node *ast.Node) *ast.NodeList {
 	return nil
 }
 
-// Source: typescript-go/internal/core/core.go
+// Source: typescript/tsc/internal/core/core.go
 func Filter[T any](slice []T, f func(T) bool) []T {
 	for i, value := range slice {
 		if !f(value) {
@@ -94,7 +94,7 @@ func Filter[T any](slice []T, f func(T) bool) []T {
 	return slice
 }
 
-// Source: typescript-go/internal/core/core.go
+// Source: typescript/tsc/internal/core/core.go
 func FilterIndex[T any](slice []T, f func(T, int, []T) bool) []T {
 	for i, value := range slice {
 		if !f(value, i, slice) {
@@ -111,7 +111,7 @@ func FilterIndex[T any](slice []T, f func(T, int, []T) bool) []T {
 	return slice
 }
 
-// Source: typescript-go/internal/core/core.go
+// Source: typescript/tsc/internal/core/core.go
 func Map[T, U any](slice []T, f func(T) U) []U {
 	if len(slice) == 0 {
 		return nil
@@ -123,12 +123,12 @@ func Map[T, U any](slice []T, f func(T) U) []U {
 	return result
 }
 
-// Source: typescript-go/internal/core/core.go
+// Source: typescript/tsc/internal/core/core.go
 func Some[T any](slice []T, f func(T) bool) bool {
 	return slices.ContainsFunc(slice, f)
 }
 
-// Source: typescript-go/internal/core/core.go
+// Source: typescript/tsc/internal/core/core.go
 func Every[T any](slice []T, f func(T) bool) bool {
 	for _, value := range slice {
 		if !f(value) {
@@ -138,7 +138,7 @@ func Every[T any](slice []T, f func(T) bool) bool {
 	return true
 }
 
-// Source: typescript-go/internal/core/core.go
+// Source: typescript/tsc/internal/core/core.go
 func Flatten[T any](array [][]T) []T {
 	var result []T
 	for _, subArray := range array {
@@ -166,7 +166,7 @@ func FindModifier(node interface{ Modifiers() *ast.ModifierList }, modifier ast.
 	return nil
 }
 
-// Source: https://github.com/microsoft/typescript-go/blob/5652e65d5ae944375676d3955f9755e554576d41/internal/jsnum/string.go#L99
+// Source: https://github.com/microsoft/TypeScript/blob/main/tsc/internal/jsnum/string.go#L99
 func IsStrWhiteSpace(r rune) bool {
 	// This is different than stringutil.IsWhiteSpaceLike.
 

@@ -3,22 +3,22 @@
 
 package jsnum
 
-import "github.com/microsoft/typescript-go/internal/jsnum"
+import "github.com/microsoft/TypeScript/tsc/internal/jsnum"
 import _ "unsafe"
 
-//go:linkname FromString github.com/microsoft/typescript-go/internal/jsnum.FromString
+//go:linkname FromString github.com/microsoft/TypeScript/tsc/internal/jsnum.FromString
 func FromString(s string) jsnum.Number
-//go:linkname Inf github.com/microsoft/typescript-go/internal/jsnum.Inf
+//go:linkname Inf github.com/microsoft/TypeScript/tsc/internal/jsnum.Inf
 func Inf(sign int) jsnum.Number
 const MaxSafeInteger = jsnum.MaxSafeInteger
 const MinSafeInteger = jsnum.MinSafeInteger
-//go:linkname NaN github.com/microsoft/typescript-go/internal/jsnum.NaN
+//go:linkname NaN github.com/microsoft/TypeScript/tsc/internal/jsnum.NaN
 func NaN() jsnum.Number
-//go:linkname NewPseudoBigInt github.com/microsoft/typescript-go/internal/jsnum.NewPseudoBigInt
+//go:linkname NewPseudoBigInt github.com/microsoft/TypeScript/tsc/internal/jsnum.NewPseudoBigInt
 func NewPseudoBigInt(value string, negative bool) jsnum.PseudoBigInt
 type Number = jsnum.Number
-//go:linkname ParsePseudoBigInt github.com/microsoft/typescript-go/internal/jsnum.ParsePseudoBigInt
+//go:linkname ParsePseudoBigInt github.com/microsoft/TypeScript/tsc/internal/jsnum.ParsePseudoBigInt
 func ParsePseudoBigInt(stringValue string) string
-//go:linkname ParseValidBigInt github.com/microsoft/typescript-go/internal/jsnum.ParseValidBigInt
+//go:linkname ParseValidBigInt github.com/microsoft/TypeScript/tsc/internal/jsnum.ParseValidBigInt
 func ParseValidBigInt(text string) jsnum.PseudoBigInt
 type PseudoBigInt = jsnum.PseudoBigInt

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/project"
-	"github.com/microsoft/typescript-go/shim/tsoptions"
-	"github.com/microsoft/typescript-go/shim/tspath"
-	"github.com/microsoft/typescript-go/shim/vfs"
+	"github.com/microsoft/TypeScript/tsc/shim/core"
+	"github.com/microsoft/TypeScript/tsc/shim/project"
+	"github.com/microsoft/TypeScript/tsc/shim/tsoptions"
+	"github.com/microsoft/TypeScript/tsc/shim/tspath"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs"
 	"github.com/typescript-eslint/tsgolint/internal/collections"
 )
 
@@ -34,7 +34,7 @@ func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
 }
 
 // Finds the tsconfig.json that governs the given file
-// Reference: `findOrCreateDefaultConfiguredProjectForOpenScriptInfo` typescript-go/internal/project/projectcollectionbuilder.go:629-671
+// Reference: `findOrCreateDefaultConfiguredProjectForOpenScriptInfo` typescript/tsc/internal/project/projectcollectionbuilder.go:629-671
 func (r *TsConfigResolver) FindTsconfigForFile(filePath string, skipSearchInDirectoryOfFile bool) (configPath string, found bool) {
 	configFileName := r.configFileRegistryBuilder.ComputeConfigFileName(filePath, skipSearchInDirectoryOfFile, nil)
 
@@ -55,17 +55,17 @@ func (r *TsConfigResolver) FindTsconfigForFile(filePath string, skipSearchInDire
 	return "", false
 }
 
-// Reference: `searchResult`: typescript-go/internal/project/projectcollectionbuilder.go:461-465
+// Reference: `searchResult`: typescript/tsc/internal/project/projectcollectionbuilder.go:461-465
 type configSearchResult struct {
 	configFileName string
 }
 
-// Reference: `searchNode`: typescript-go/internal/project/projectcollectionbuilder.go:467-471
+// Reference: `searchNode`: typescript/tsc/internal/project/projectcollectionbuilder.go:467-471
 type searchNode struct {
 	configFileName string
 }
 
-// Reference: `findOrCreateDefaultConfiguredProjectWorker`: typescript-go/internal/project/projectcollectionbuilder.go:480-627
+// Reference: `findOrCreateDefaultConfiguredProjectWorker`: typescript/tsc/internal/project/projectcollectionbuilder.go:480-627
 func (r *TsConfigResolver) findConfigWithReferences(
 	fileName string,
 	path tspath.Path,
@@ -266,7 +266,7 @@ func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]s
 	return res
 }
 
-// Reference: `toPath`: typescript-go/internal/project/projectcollectionbuilder.go:687-689
+// Reference: `toPath`: typescript/tsc/internal/project/projectcollectionbuilder.go:687-689
 func (b *TsConfigResolver) toPath(fileName string) tspath.Path {
 	return tspath.ToPath(fileName, b.currentDirectory, b.fs.UseCaseSensitiveFileNames())
 }

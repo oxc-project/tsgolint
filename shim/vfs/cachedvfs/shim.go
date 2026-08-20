@@ -3,10 +3,10 @@
 
 package cachedvfs
 
-import "github.com/microsoft/typescript-go/internal/vfs"
-import "github.com/microsoft/typescript-go/internal/vfs/cachedvfs"
+import "github.com/microsoft/TypeScript/tsc/internal/vfs"
+import "github.com/microsoft/TypeScript/tsc/internal/vfs/cachedvfs"
 import _ "unsafe"
 
 type FS = cachedvfs.FS
-//go:linkname From github.com/microsoft/typescript-go/internal/vfs/cachedvfs.From
+//go:linkname From github.com/microsoft/TypeScript/tsc/internal/vfs/cachedvfs.From
 func From(fs vfs.FS) *cachedvfs.FS

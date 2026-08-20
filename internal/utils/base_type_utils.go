@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/microsoft/TypeScript/tsc/shim/checker"
 )
 
 func MatchesTypeOrBaseType(typeChecker *checker.Checker, t *checker.Type, predicate func(*checker.Type) bool) bool {
