@@ -1,6 +1,6 @@
 # Architecture
 
-**tsgolint** is a high-performance TypeScript linter powered by [typescript-go](https://github.com/microsoft/typescript-go) and designed for integration with [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+**tsgolint** is a high-performance TypeScript linter powered by the [native TypeScript compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) and designed for integration with [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
 
 ## Overview
 
@@ -25,7 +25,7 @@ This separation allows tsgolint to focus purely on type-aware analysis while Oxl
 
 ### TypeScript Integration
 
-tsgolint uses **typescript-go** for native performance:
+tsgolint uses TypeScript's **native Go compiler** for native performance:
 
 - **Direct AST**: No conversion overhead (TypeScript AST → rules)
 - **Native Speed**: Go implementation with full TypeScript compiler
@@ -67,7 +67,7 @@ The interfaces are defined in [`internal/rule/rule.go`](./internal/rule/rule.go)
 
 ### Why Go?
 
-- **Performance**: Native compilation and direct access to typescript-go; see the measured [benchmarks](./benchmarks/README.md)
+- **Performance**: Native compilation and direct access to the TypeScript compiler; see the measured [benchmarks](./benchmarks/README.md)
 - **Concurrency**: Excellent parallel processing primitives
 - **Type Safety**: Compile-time checks for Go types and interfaces
 
@@ -85,10 +85,10 @@ The interfaces are defined in [`internal/rule/rule.go`](./internal/rule/rule.go)
 
 ## TypeScript Shims
 
-tsgolint accesses typescript-go internals via Go's `linkname` directives:
+tsgolint accesses the native TypeScript compiler's internals via Go's `linkname` directives:
 
 ```
-Go Shims → typescript-go Internal APIs → TypeScript Compiler
+Go Shims → Native TypeScript Internal APIs → TypeScript Compiler
 ```
 
 **Components:**
@@ -97,9 +97,9 @@ Go Shims → typescript-go Internal APIs → TypeScript Compiler
 - `shim/checker`: Type checker interface
 - `shim/compiler`: Program creation and management
 
-The shims depend on internal APIs at the pinned typescript-go revision. Regenerate them with `just shim` when their configuration or the upstream APIs change. See [tools/gen_shims/README.md](./tools/gen_shims/README.md).
+The shims depend on internal APIs at the pinned native TypeScript revision. Regenerate them with `just shim` when their configuration or the upstream APIs change. See [tools/gen_shims/README.md](./tools/gen_shims/README.md).
 
-Local typescript-go adaptations are maintained in the [patch stack](./patches/README.md) and applied during `just init`.
+Local native TypeScript adaptations are maintained in the [patch stack](./patches/README.md) and applied during `just init`.
 
 ## Performance Architecture
 
@@ -118,12 +118,12 @@ Local typescript-go adaptations are maintained in the [patch stack](./patches/RE
 
 ## Maintenance Considerations
 
-- **Version Synchronization**: Keep the typescript-go revision, local patches, and generated shims in sync
+- **Version Synchronization**: Keep the native TypeScript revision, local patches, and generated shims in sync
 - **Concurrency**: Keep mutable rule state local to each rule invocation and use the checker provided by `RuleContext`
 - **Performance**: Profile changes to program creation, rule execution, and diagnostic reporting on representative projects
 
 ## References
 
-- [typescript-go](https://github.com/microsoft/typescript-go) - TypeScript compiler in Go
+- [TypeScript native compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) - TypeScript compiler in Go
 - [typescript-eslint](https://typescript-eslint.io/) - Rule compatibility reference
 - [Oxlint](https://oxc.rs/) - Frontend CLI integration

@@ -3,8 +3,8 @@ package main
 import (
 	"testing"
 
-	"github.com/microsoft/typescript-go/shim/vfs"
-	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs/osvfs"
 )
 
 type caseSensitivityFS struct {

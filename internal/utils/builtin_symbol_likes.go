@@ -1,11 +1,11 @@
 package utils
 
 import (
-	"github.com/microsoft/typescript-go/shim/ast"
-	"github.com/microsoft/typescript-go/shim/checker"
-	"github.com/microsoft/typescript-go/shim/compiler"
-	"github.com/microsoft/typescript-go/shim/tsoptions"
-	"github.com/microsoft/typescript-go/shim/tspath"
+	"github.com/microsoft/TypeScript/tsc/shim/ast"
+	"github.com/microsoft/TypeScript/tsc/shim/checker"
+	"github.com/microsoft/TypeScript/tsc/shim/compiler"
+	"github.com/microsoft/TypeScript/tsc/shim/tsoptions"
+	"github.com/microsoft/TypeScript/tsc/shim/tspath"
 )
 
 func ComparePaths(a string, b string, program *compiler.Program) int {
