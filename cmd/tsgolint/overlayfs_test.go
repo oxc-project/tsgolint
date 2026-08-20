@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs/osvfs"
 )
 
 func TestOverlayFS(t *testing.T) {

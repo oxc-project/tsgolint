@@ -3,7 +3,7 @@ package main
 import (
 	"time"
 
-	"github.com/microsoft/typescript-go/shim/vfs"
+	"github.com/microsoft/TypeScript/tsc/shim/vfs"
 )
 
 type overlayFS struct {

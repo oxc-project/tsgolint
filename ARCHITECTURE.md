@@ -1,6 +1,6 @@
 # Architecture
 
-**tsgolint** is a high-performance TypeScript linter powered by [typescript-go](https://github.com/microsoft/typescript-go) and designed for integration with [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
+**tsgolint** is a high-performance TypeScript linter powered by the [native TypeScript compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) and designed for integration with [Oxlint](https://oxc.rs/docs/guide/usage/linter.html).
 
 ## Overview
 
@@ -25,7 +25,7 @@ This separation allows tsgolint to focus purely on type-aware analysis while Oxl
 
 ### TypeScript Integration
 
-tsgolint uses **typescript-go** for native performance:
+tsgolint uses TypeScript's **native Go compiler** for native performance:
 
 - **Direct AST**: No conversion overhead (TypeScript AST → rules)
 - **Native Speed**: Go implementation with full TypeScript compiler
@@ -80,10 +80,10 @@ Each rule registers listeners for specific AST node types and uses the TypeScrip
 
 ## TypeScript Shims
 
-tsgolint accesses typescript-go internals via Go's `linkname` directives:
+tsgolint accesses the native TypeScript compiler's internals via Go's `linkname` directives:
 
 ```
-Go Shims → typescript-go Internal APIs → TypeScript Compiler
+Go Shims → Native TypeScript Internal APIs → TypeScript Compiler
 ```
 
 **Components:**
@@ -92,7 +92,7 @@ Go Shims → typescript-go Internal APIs → TypeScript Compiler
 - `shim/checker`: Type checker interface
 - `shim/compiler`: Program creation and management
 
-> **Note**: This approach is not recommended for production use. We're waiting for official typescript-go APIs.
+> **Note**: This approach is not recommended for production use. We're waiting for official native TypeScript APIs.
 
 ## Performance Architecture
 
@@ -118,6 +118,6 @@ Go Shims → typescript-go Internal APIs → TypeScript Compiler
 
 ## References
 
-- [typescript-go](https://github.com/microsoft/typescript-go) - TypeScript compiler in Go
+- [TypeScript native compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) - TypeScript compiler in Go
 - [typescript-eslint](https://typescript-eslint.io/) - Rule compatibility reference
 - [Oxlint](https://oxc.rs/) - Frontend CLI integration

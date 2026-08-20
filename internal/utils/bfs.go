@@ -1,4 +1,4 @@
-// NOTE: This is a direct copy of `typescript-go/internal/core/bfs.go`
+// NOTE: This is a direct copy of `typescript/tsc/internal/core/bfs.go`
 // The shim can't expose generic types yet, so we have to copy the code here.
 // https://github.com/golang/go/issues/60425
 package utils

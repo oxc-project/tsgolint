@@ -8,7 +8,7 @@
     "indentWidth": 2
   },
   "toml": {},
-  "excludes": ["e2e/fixtures/**", "pnpm-lock.yaml", "internal/rules/**", "typescript-go/**"],
+  "excludes": ["e2e/fixtures/**", "pnpm-lock.yaml", "internal/rules/**", "typescript/**"],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.96.1.wasm",
     "https://plugins.dprint.dev/json-0.23.0.wasm",

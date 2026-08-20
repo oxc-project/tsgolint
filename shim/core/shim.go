@@ -4,16 +4,16 @@
 package core
 
 import "context"
-import "github.com/microsoft/typescript-go/internal/core"
+import "github.com/microsoft/TypeScript/tsc/internal/core"
 import "iter"
 import _ "unsafe"
 
-//go:linkname ApplyBulkEdits github.com/microsoft/typescript-go/internal/core.ApplyBulkEdits
+//go:linkname ApplyBulkEdits github.com/microsoft/TypeScript/tsc/internal/core.ApplyBulkEdits
 func ApplyBulkEdits(text string, edits []core.TextChange) string
-//go:linkname ApplyDebugStackLimit github.com/microsoft/typescript-go/internal/core.ApplyDebugStackLimit
+//go:linkname ApplyDebugStackLimit github.com/microsoft/TypeScript/tsc/internal/core.ApplyDebugStackLimit
 func ApplyDebugStackLimit()
 type Arena[T any] = core.Arena[T]
-//go:linkname BoolToTristate github.com/microsoft/typescript-go/internal/core.BoolToTristate
+//go:linkname BoolToTristate github.com/microsoft/TypeScript/tsc/internal/core.BoolToTristate
 func BoolToTristate(b bool) core.Tristate
 type BreadthFirstSearchLevel[K comparable, N any] = core.BreadthFirstSearchLevel[K,N]
 type BreadthFirstSearchOptions[K comparable, N any] = core.BreadthFirstSearchOptions[K,N]
@@ -23,29 +23,33 @@ type CheckerLifetime = core.CheckerLifetime
 const CheckerLifetimeAPI = core.CheckerLifetimeAPI
 const CheckerLifetimeDiagnostics = core.CheckerLifetimeDiagnostics
 const CheckerLifetimeTemporary = core.CheckerLifetimeTemporary
-//go:linkname CompareBooleans github.com/microsoft/typescript-go/internal/core.CompareBooleans
+//go:linkname CompareBooleans github.com/microsoft/TypeScript/tsc/internal/core.CompareBooleans
 func CompareBooleans(a bool, b bool) int
-//go:linkname CompareTextRanges github.com/microsoft/typescript-go/internal/core.CompareTextRanges
+//go:linkname CompareTextRanges github.com/microsoft/TypeScript/tsc/internal/core.CompareTextRanges
 func CompareTextRanges(r1 core.TextRange, r2 core.TextRange) int
 type CompilerOptions = core.CompilerOptions
-//go:linkname ComputeECMALineStarts github.com/microsoft/typescript-go/internal/core.ComputeECMALineStarts
+//go:linkname ComputeECMALineStarts github.com/microsoft/TypeScript/tsc/internal/core.ComputeECMALineStarts
 func ComputeECMALineStarts(text string) core.ECMALineStarts
-//go:linkname ComputeECMALineStartsSeq github.com/microsoft/typescript-go/internal/core.ComputeECMALineStartsSeq
+//go:linkname ComputeECMALineStartsSeq github.com/microsoft/TypeScript/tsc/internal/core.ComputeECMALineStartsSeq
 func ComputeECMALineStartsSeq(text string) iter.Seq[core.TextPos]
 type ECMALineStarts = core.ECMALineStarts
 var EmptyCompilerOptions = core.EmptyCompilerOptions
+//go:linkname EnsureScriptKindFromFileName github.com/microsoft/TypeScript/tsc/internal/core.EnsureScriptKindFromFileName
+func EnsureScriptKindFromFileName(fileName string) core.ScriptKind
 var ExclusivelyPrefixedNodeCoreModules = core.ExclusivelyPrefixedNodeCoreModules
-//go:linkname GetCheckerLifetime github.com/microsoft/typescript-go/internal/core.GetCheckerLifetime
+//go:linkname GetCheckerLifetime github.com/microsoft/TypeScript/tsc/internal/core.GetCheckerLifetime
 func GetCheckerLifetime(ctx context.Context) core.CheckerLifetime
-//go:linkname GetNewLineKind github.com/microsoft/typescript-go/internal/core.GetNewLineKind
+//go:linkname GetDefaultExtensionForScriptKind github.com/microsoft/TypeScript/tsc/internal/core.GetDefaultExtensionForScriptKind
+func GetDefaultExtensionForScriptKind(scriptKind core.ScriptKind) string
+//go:linkname GetNewLineKind github.com/microsoft/TypeScript/tsc/internal/core.GetNewLineKind
 func GetNewLineKind(s string) core.NewLineKind
-//go:linkname GetRequestID github.com/microsoft/typescript-go/internal/core.GetRequestID
+//go:linkname GetRequestID github.com/microsoft/TypeScript/tsc/internal/core.GetRequestID
 func GetRequestID(ctx context.Context) string
-//go:linkname GetScriptKindFromFileName github.com/microsoft/typescript-go/internal/core.GetScriptKindFromFileName
+//go:linkname GetScriptKindFromFileName github.com/microsoft/TypeScript/tsc/internal/core.GetScriptKindFromFileName
 func GetScriptKindFromFileName(fileName string) core.ScriptKind
-//go:linkname GetSpellingSuggestionForStrings github.com/microsoft/typescript-go/internal/core.GetSpellingSuggestionForStrings
+//go:linkname GetSpellingSuggestionForStrings github.com/microsoft/TypeScript/tsc/internal/core.GetSpellingSuggestionForStrings
 func GetSpellingSuggestionForStrings(name string, candidates iter.Seq[string]) string
-//go:linkname IndexAfter github.com/microsoft/typescript-go/internal/core.IndexAfter
+//go:linkname IndexAfter github.com/microsoft/TypeScript/tsc/internal/core.IndexAfter
 func IndexAfter(s string, pattern string, startIndex int) int
 type JsxEmit = core.JsxEmit
 const JsxEmitNone = core.JsxEmitNone
@@ -87,22 +91,22 @@ const ModuleResolutionKindNode10 = core.ModuleResolutionKindNode10
 const ModuleResolutionKindNode16 = core.ModuleResolutionKindNode16
 const ModuleResolutionKindNodeNext = core.ModuleResolutionKindNodeNext
 const ModuleResolutionKindUnknown = core.ModuleResolutionKindUnknown
-//go:linkname NewLimitedSemaphore github.com/microsoft/typescript-go/internal/core.NewLimitedSemaphore
+//go:linkname NewLimitedSemaphore github.com/microsoft/TypeScript/tsc/internal/core.NewLimitedSemaphore
 func NewLimitedSemaphore(maxConcurrency int) *core.LimitedSemaphore
 type NewLineKind = core.NewLineKind
 const NewLineKindCRLF = core.NewLineKindCRLF
 const NewLineKindLF = core.NewLineKindLF
 const NewLineKindNone = core.NewLineKindNone
-//go:linkname NewTextRange github.com/microsoft/typescript-go/internal/core.NewTextRange
+//go:linkname NewTextRange github.com/microsoft/TypeScript/tsc/internal/core.NewTextRange
 func NewTextRange(pos int, end int) core.TextRange
-//go:linkname NewThrottleGroup github.com/microsoft/typescript-go/internal/core.NewThrottleGroup
+//go:linkname NewThrottleGroup github.com/microsoft/TypeScript/tsc/internal/core.NewThrottleGroup
 func NewThrottleGroup(ctx context.Context, semaphore chan struct{}) *core.ThrottleGroup
-//go:linkname NewWorkGroup github.com/microsoft/typescript-go/internal/core.NewWorkGroup
+//go:linkname NewWorkGroup github.com/microsoft/TypeScript/tsc/internal/core.NewWorkGroup
 func NewWorkGroup(singleThreaded bool) core.WorkGroup
 var NodeCoreModules = core.NodeCoreModules
-//go:linkname NonRelativeModuleNameForTypingCache github.com/microsoft/typescript-go/internal/core.NonRelativeModuleNameForTypingCache
+//go:linkname NonRelativeModuleNameForTypingCache github.com/microsoft/TypeScript/tsc/internal/core.NonRelativeModuleNameForTypingCache
 func NonRelativeModuleNameForTypingCache(moduleName string) string
-type ParsedOptions = core.ParsedOptions
+type PagedLinkStore[V any] = core.PagedLinkStore[V]
 type Pattern = core.Pattern
 type PollingKind = core.PollingKind
 const PollingKindDynamicPriority = core.PollingKindDynamicPriority
@@ -110,20 +114,18 @@ const PollingKindFixedChunkSize = core.PollingKindFixedChunkSize
 const PollingKindFixedInterval = core.PollingKindFixedInterval
 const PollingKindNone = core.PollingKindNone
 const PollingKindPriorityInterval = core.PollingKindPriorityInterval
-//go:linkname PositionToLineAndByteOffset github.com/microsoft/typescript-go/internal/core.PositionToLineAndByteOffset
+//go:linkname PositionToLineAndByteOffset github.com/microsoft/TypeScript/tsc/internal/core.PositionToLineAndByteOffset
 func PositionToLineAndByteOffset(position int, lineStarts []core.TextPos) (line int, byteOffset int)
 type ProjectReference = core.ProjectReference
 type ResolutionMode = core.ResolutionMode
 const ResolutionModeCommonJS = core.ResolutionModeCommonJS
 const ResolutionModeESM = core.ResolutionModeESM
 const ResolutionModeNone = core.ResolutionModeNone
-//go:linkname ResolveConfigFileNameOfProjectReference github.com/microsoft/typescript-go/internal/core.ResolveConfigFileNameOfProjectReference
+//go:linkname ResolveConfigFileNameOfProjectReference github.com/microsoft/TypeScript/tsc/internal/core.ResolveConfigFileNameOfProjectReference
 func ResolveConfigFileNameOfProjectReference(path string) string
-//go:linkname ResolveProjectReferencePath github.com/microsoft/typescript-go/internal/core.ResolveProjectReferencePath
+//go:linkname ResolveProjectReferencePath github.com/microsoft/TypeScript/tsc/internal/core.ResolveProjectReferencePath
 func ResolveProjectReferencePath(ref *core.ProjectReference) string
 type ScriptKind = core.ScriptKind
-const ScriptKindDeferred = core.ScriptKindDeferred
-const ScriptKindExternal = core.ScriptKindExternal
 const ScriptKindJS = core.ScriptKindJS
 const ScriptKindJSON = core.ScriptKindJSON
 const ScriptKindJSX = core.ScriptKindJSX
@@ -149,10 +151,10 @@ const ScriptTargetLatest = core.ScriptTargetLatest
 const ScriptTargetLatestStandard = core.ScriptTargetLatestStandard
 const ScriptTargetNone = core.ScriptTargetNone
 type Semaphore = core.Semaphore
-//go:linkname ShouldRewriteModuleSpecifier github.com/microsoft/typescript-go/internal/core.ShouldRewriteModuleSpecifier
+//go:linkname ShouldRewriteModuleSpecifier github.com/microsoft/TypeScript/tsc/internal/core.ShouldRewriteModuleSpecifier
 func ShouldRewriteModuleSpecifier(specifier string, compilerOptions *core.CompilerOptions) bool
 type Stack[T any] = core.Stack[T]
-//go:linkname StringifyJson github.com/microsoft/typescript-go/internal/core.StringifyJson
+//go:linkname StringifyJson github.com/microsoft/TypeScript/tsc/internal/core.StringifyJson
 func StringifyJson(input any, prefix string, indent string) (string, error)
 const TSFalse = core.TSFalse
 const TSTrue = core.TSTrue
@@ -162,19 +164,19 @@ type TextPos = core.TextPos
 type TextRange = core.TextRange
 type ThrottleGroup = core.ThrottleGroup
 type Tristate = core.Tristate
-//go:linkname TryParsePattern github.com/microsoft/typescript-go/internal/core.TryParsePattern
+//go:linkname TryParsePattern github.com/microsoft/TypeScript/tsc/internal/core.TryParsePattern
 func TryParsePattern(pattern string) core.Pattern
 type TypeAcquisition = core.TypeAcquisition
-//go:linkname UTF16Len github.com/microsoft/typescript-go/internal/core.UTF16Len
+//go:linkname UTF16Len github.com/microsoft/TypeScript/tsc/internal/core.UTF16Len
 func UTF16Len(s string) core.UTF16Offset
 type UTF16Offset = core.UTF16Offset
-//go:linkname UndefinedTextRange github.com/microsoft/typescript-go/internal/core.UndefinedTextRange
+//go:linkname UndefinedTextRange github.com/microsoft/TypeScript/tsc/internal/core.UndefinedTextRange
 func UndefinedTextRange() core.TextRange
 type UnlimitedSemaphore = core.UnlimitedSemaphore
 var UnprefixedNodeCoreModules = core.UnprefixedNodeCoreModules
-//go:linkname Version github.com/microsoft/typescript-go/internal/core.Version
+//go:linkname Version github.com/microsoft/TypeScript/tsc/internal/core.Version
 func Version() string
-//go:linkname VersionMajorMinor github.com/microsoft/typescript-go/internal/core.VersionMajorMinor
+//go:linkname VersionMajorMinor github.com/microsoft/TypeScript/tsc/internal/core.VersionMajorMinor
 func VersionMajorMinor() string
 type WatchDirectoryKind = core.WatchDirectoryKind
 const WatchDirectoryKindDynamicPriorityPolling = core.WatchDirectoryKindDynamicPriorityPolling
@@ -191,8 +193,8 @@ const WatchFileKindPriorityPollingInterval = core.WatchFileKindPriorityPollingIn
 const WatchFileKindUseFsEvents = core.WatchFileKindUseFsEvents
 const WatchFileKindUseFsEventsOnParentDirectory = core.WatchFileKindUseFsEventsOnParentDirectory
 type WatchOptions = core.WatchOptions
-//go:linkname WithCheckerLifetime github.com/microsoft/typescript-go/internal/core.WithCheckerLifetime
+//go:linkname WithCheckerLifetime github.com/microsoft/TypeScript/tsc/internal/core.WithCheckerLifetime
 func WithCheckerLifetime(ctx context.Context, lifetime core.CheckerLifetime) context.Context
-//go:linkname WithRequestID github.com/microsoft/typescript-go/internal/core.WithRequestID
+//go:linkname WithRequestID github.com/microsoft/TypeScript/tsc/internal/core.WithRequestID
 func WithRequestID(ctx context.Context, id string) context.Context
 type WorkGroup = core.WorkGroup

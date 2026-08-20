@@ -13,7 +13,7 @@
 
 High-performance **type-aware linting** for Oxlint.
 
-`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using [typescript-go](https://github.com/microsoft/typescript-go) for full compatibility with the TypeScript type system, and targets **TypeScript 7** (codenamed **Project Corsa**).
+`tsgolint` executes lint rules that require **TypeScript semantic analysis**, using the [native TypeScript compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) for full compatibility with the TypeScript type system, and targets **TypeScript 7** (codenamed **Project Corsa**).
 
 It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabling projects to run deeper semantic checks without sacrificing performance.
 
@@ -70,7 +70,7 @@ oxlint --type-aware --type-check
 ### What these flags do
 
 - `--type-aware`: enables `typescript/*` rules that require TypeScript semantic analysis via `tsgolint`
-- `--type-check`: includes type diagnostics from `typescript-go` in type-aware runs
+- `--type-check`: includes type diagnostics from the native TypeScript compiler in type-aware runs
 
 ### Configuration
 
@@ -119,7 +119,7 @@ This approach introduces several bottlenecks:
 - limited parallelism
 - high memory overhead on large repositories
 
-`tsgolint` takes a different approach: it runs directly on `typescript-go`, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
+`tsgolint` takes a different approach: it runs directly on TypeScript's native Go compiler, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
 
 Recent benchmark results (`eslint` + `typescript-eslint` vs `tsgolint`) show consistent large speedups:
 
@@ -237,7 +237,7 @@ Implemented 59/61.
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
 - [CONTRIBUTING.md](./CONTRIBUTING.md) - Development and contribution guidelines
 - [Benchmarks](./benchmarks/README.md) - Performance comparison data
-- [typescript-go](https://github.com/microsoft/typescript-go) - Underlying type-analysis backend
+- [TypeScript native compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) - Underlying type-analysis backend
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) - Frontend linter integration
 
 <!-- Badge definitions -->

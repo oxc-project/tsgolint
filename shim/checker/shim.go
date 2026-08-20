@@ -4,17 +4,17 @@
 package checker
 
 import "context"
-import "github.com/microsoft/typescript-go/internal/ast"
-import "github.com/microsoft/typescript-go/internal/checker"
-import "github.com/microsoft/typescript-go/internal/collections"
-import "github.com/microsoft/typescript-go/internal/core"
-import "github.com/microsoft/typescript-go/internal/diagnostics"
-import "github.com/microsoft/typescript-go/internal/evaluator"
-import "github.com/microsoft/typescript-go/internal/jsnum"
-import "github.com/microsoft/typescript-go/internal/nodebuilder"
-import "github.com/microsoft/typescript-go/internal/printer"
-import "github.com/microsoft/typescript-go/internal/scanner"
-import "github.com/microsoft/typescript-go/internal/tracing"
+import "github.com/microsoft/TypeScript/tsc/internal/ast"
+import "github.com/microsoft/TypeScript/tsc/internal/checker"
+import "github.com/microsoft/TypeScript/tsc/internal/collections"
+import "github.com/microsoft/TypeScript/tsc/internal/core"
+import "github.com/microsoft/TypeScript/tsc/internal/diagnostics"
+import "github.com/microsoft/TypeScript/tsc/internal/evaluator"
+import "github.com/microsoft/TypeScript/tsc/internal/jsnum"
+import "github.com/microsoft/TypeScript/tsc/internal/nodebuilder"
+import "github.com/microsoft/TypeScript/tsc/internal/printer"
+import "github.com/microsoft/TypeScript/tsc/internal/scanner"
+import "github.com/microsoft/TypeScript/tsc/internal/tracing"
 import "sync"
 import "unsafe"
 
@@ -79,79 +79,79 @@ const CheckModeSkipContextSensitive = checker.CheckModeSkipContextSensitive
 const CheckModeSkipGenericFunctions = checker.CheckModeSkipGenericFunctions
 const CheckModeTypeOnly = checker.CheckModeTypeOnly
 type Checker = checker.Checker
-//go:linkname Checker_getImmediateAliasedSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getImmediateAliasedSymbol
+//go:linkname Checker_getImmediateAliasedSymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getImmediateAliasedSymbol
 func Checker_getImmediateAliasedSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Symbol
-//go:linkname Checker_getContextFreeTypeOfExpression github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextFreeTypeOfExpression
+//go:linkname Checker_getContextFreeTypeOfExpression github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getContextFreeTypeOfExpression
 func Checker_getContextFreeTypeOfExpression(recv *checker.Checker, node *ast.Node) *checker.Type
-//go:linkname Checker_getResolvedSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getResolvedSignature
+//go:linkname Checker_getResolvedSignature github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getResolvedSignature
 func Checker_getResolvedSignature(recv *checker.Checker, node *ast.Node, candidatesOutArray *[]*checker.Signature, checkMode checker.CheckMode) *checker.Signature
-//go:linkname Checker_isReadonlySymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).isReadonlySymbol
+//go:linkname Checker_isReadonlySymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isReadonlySymbol
 func Checker_isReadonlySymbol(recv *checker.Checker, symbol *ast.Symbol) bool
-//go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
+//go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).IsDeprecatedDeclaration
 func Checker_IsDeprecatedDeclaration(recv *checker.Checker, declaration *ast.Node) bool
-//go:linkname Checker_isDeprecatedSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).isDeprecatedSymbol
+//go:linkname Checker_isDeprecatedSymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isDeprecatedSymbol
 func Checker_isDeprecatedSymbol(recv *checker.Checker, symbol *ast.Symbol) bool
-//go:linkname Checker_getDeclarationOfAliasSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getDeclarationOfAliasSymbol
+//go:linkname Checker_getDeclarationOfAliasSymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclarationOfAliasSymbol
 func Checker_getDeclarationOfAliasSymbol(recv *checker.Checker, symbol *ast.Symbol) *ast.Node
-//go:linkname Checker_getTypeOfSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfSymbol
+//go:linkname Checker_getTypeOfSymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfSymbol
 func Checker_getTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) *checker.Type
-//go:linkname Checker_getWidenedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getWidenedType
+//go:linkname Checker_getWidenedType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getWidenedType
 func Checker_getWidenedType(recv *checker.Checker, t *checker.Type) *checker.Type
-//go:linkname Checker_GetNonNullableType github.com/microsoft/typescript-go/internal/checker.(*Checker).GetNonNullableType
+//go:linkname Checker_GetNonNullableType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetNonNullableType
 func Checker_GetNonNullableType(recv *checker.Checker, t *checker.Type) *checker.Type
-//go:linkname Checker_IsNullableType github.com/microsoft/typescript-go/internal/checker.(*Checker).IsNullableType
+//go:linkname Checker_IsNullableType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).IsNullableType
 func Checker_IsNullableType(recv *checker.Checker, t *checker.Type) bool
-//go:linkname Checker_getPropertiesOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getPropertiesOfType
+//go:linkname Checker_getPropertiesOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getPropertiesOfType
 func Checker_getPropertiesOfType(recv *checker.Checker, t *checker.Type) []*ast.Symbol
-//go:linkname Checker_getPropertyOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getPropertyOfType
+//go:linkname Checker_getPropertyOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getPropertyOfType
 func Checker_getPropertyOfType(recv *checker.Checker, t *checker.Type, name string) *ast.Symbol
-//go:linkname Checker_getTypeOfPropertyOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfPropertyOfType
+//go:linkname Checker_getTypeOfPropertyOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeOfPropertyOfType
 func Checker_getTypeOfPropertyOfType(recv *checker.Checker, t *checker.Type, name string) *checker.Type
-//go:linkname Checker_getSignaturesOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getSignaturesOfType
+//go:linkname Checker_getSignaturesOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getSignaturesOfType
 func Checker_getSignaturesOfType(recv *checker.Checker, t *checker.Type, kind checker.SignatureKind) []*checker.Signature
-//go:linkname Checker_getIndexInfosOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getIndexInfosOfType
+//go:linkname Checker_getIndexInfosOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getIndexInfosOfType
 func Checker_getIndexInfosOfType(recv *checker.Checker, t *checker.Type) []*checker.IndexInfo
-//go:linkname Checker_getIndexTypeOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getIndexTypeOfType
+//go:linkname Checker_getIndexTypeOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getIndexTypeOfType
 func Checker_getIndexTypeOfType(recv *checker.Checker, t *checker.Type, keyType *checker.Type) *checker.Type
-//go:linkname Checker_getBaseTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseTypes
+//go:linkname Checker_getBaseTypes github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseTypes
 func Checker_getBaseTypes(recv *checker.Checker, t *checker.Type) []*checker.Type
-//go:linkname Checker_getReturnTypeOfSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getReturnTypeOfSignature
+//go:linkname Checker_getReturnTypeOfSignature github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getReturnTypeOfSignature
 func Checker_getReturnTypeOfSignature(recv *checker.Checker, sig *checker.Signature) *checker.Type
-//go:linkname Checker_getApparentType github.com/microsoft/typescript-go/internal/checker.(*Checker).getApparentType
+//go:linkname Checker_getApparentType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getApparentType
 func Checker_getApparentType(recv *checker.Checker, t *checker.Type) *checker.Type
-//go:linkname Checker_getTypeArguments github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeArguments
+//go:linkname Checker_getTypeArguments github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeArguments
 func Checker_getTypeArguments(recv *checker.Checker, t *checker.Type) []*checker.Type
-//go:linkname Checker_getTypeFromTypeNode github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeFromTypeNode
+//go:linkname Checker_getTypeFromTypeNode github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypeFromTypeNode
 func Checker_getTypeFromTypeNode(recv *checker.Checker, node *ast.Node) *checker.Type
-//go:linkname Checker_isArrayType github.com/microsoft/typescript-go/internal/checker.(*Checker).isArrayType
+//go:linkname Checker_isArrayType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isArrayType
 func Checker_isArrayType(recv *checker.Checker, t *checker.Type) bool
-//go:linkname Checker_isArrayOrTupleType github.com/microsoft/typescript-go/internal/checker.(*Checker).isArrayOrTupleType
+//go:linkname Checker_isArrayOrTupleType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isArrayOrTupleType
 func Checker_isArrayOrTupleType(recv *checker.Checker, t *checker.Type) bool
-//go:linkname Checker_getDeclaredTypeOfSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getDeclaredTypeOfSymbol
+//go:linkname Checker_getDeclaredTypeOfSymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getDeclaredTypeOfSymbol
 func Checker_getDeclaredTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) *checker.Type
-//go:linkname Checker_getBaseTypeOfLiteralType github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseTypeOfLiteralType
+//go:linkname Checker_getBaseTypeOfLiteralType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseTypeOfLiteralType
 func Checker_getBaseTypeOfLiteralType(recv *checker.Checker, t *checker.Type) *checker.Type
-//go:linkname Checker_getBaseConstraintOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseConstraintOfType
+//go:linkname Checker_getBaseConstraintOfType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getBaseConstraintOfType
 func Checker_getBaseConstraintOfType(recv *checker.Checker, t *checker.Type) *checker.Type
-//go:linkname Checker_getContextualType github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualType
+//go:linkname Checker_getContextualType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getContextualType
 func Checker_getContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
-//go:linkname Checker_getContextualTypeForArgumentAtIndex github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualTypeForArgumentAtIndex
+//go:linkname Checker_getContextualTypeForArgumentAtIndex github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getContextualTypeForArgumentAtIndex
 func Checker_getContextualTypeForArgumentAtIndex(recv *checker.Checker, callTarget *ast.Node, argIndex int) *checker.Type
-//go:linkname Checker_getApparentTypeOfContextualType github.com/microsoft/typescript-go/internal/checker.(*Checker).getApparentTypeOfContextualType
+//go:linkname Checker_getApparentTypeOfContextualType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getApparentTypeOfContextualType
 func Checker_getApparentTypeOfContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
-//go:linkname Checker_getAwaitedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getAwaitedType
+//go:linkname Checker_getAwaitedType github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getAwaitedType
 func Checker_getAwaitedType(recv *checker.Checker, t *checker.Type) *checker.Type
-//go:linkname Checker_getAccessedPropertyName github.com/microsoft/typescript-go/internal/checker.(*Checker).getAccessedPropertyName
+//go:linkname Checker_getAccessedPropertyName github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getAccessedPropertyName
 func Checker_getAccessedPropertyName(recv *checker.Checker, access *ast.Node) (string, bool)
-//go:linkname Checker_getPropertyNameForKnownSymbolName github.com/microsoft/typescript-go/internal/checker.(*Checker).getPropertyNameForKnownSymbolName
+//go:linkname Checker_getPropertyNameForKnownSymbolName github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getPropertyNameForKnownSymbolName
 func Checker_getPropertyNameForKnownSymbolName(recv *checker.Checker, symbolName string) string
-//go:linkname Checker_isTypeIdenticalTo github.com/microsoft/typescript-go/internal/checker.(*Checker).isTypeIdenticalTo
+//go:linkname Checker_isTypeIdenticalTo github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isTypeIdenticalTo
 func Checker_isTypeIdenticalTo(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
-//go:linkname Checker_isTypeAssignableTo github.com/microsoft/typescript-go/internal/checker.(*Checker).isTypeAssignableTo
+//go:linkname Checker_isTypeAssignableTo github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).isTypeAssignableTo
 func Checker_isTypeAssignableTo(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
-//go:linkname Checker_getTypePredicateOfSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypePredicateOfSignature
+//go:linkname Checker_getTypePredicateOfSignature github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).getTypePredicateOfSignature
 func Checker_getTypePredicateOfSignature(recv *checker.Checker, sig *checker.Signature) *checker.TypePredicate
-//go:linkname Checker_GetShorthandAssignmentValueSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).GetShorthandAssignmentValueSymbol
+//go:linkname Checker_GetShorthandAssignmentValueSymbol github.com/microsoft/TypeScript/tsc/internal/checker.(*Checker).GetShorthandAssignmentValueSymbol
 func Checker_GetShorthandAssignmentValueSymbol(recv *checker.Checker, location *ast.Node) *ast.Symbol
 type extra_Checker struct {
   id uint32
@@ -189,7 +189,6 @@ type extra_Checker struct {
   exactOptionalPropertyTypes bool
   canCollectSymbolAliasAccessibilityData bool
   wasCanceled bool
-  saveDeferredDiagnostics bool
   arrayVariances []checker.VarianceFlags
   globals ast.SymbolTable
   evaluate evaluator.Evaluator
@@ -218,6 +217,7 @@ type extra_Checker struct {
   reverseHomomorphicMappedCache map[checker.ReverseMappedTypeKey]*checker.Type
   iterationTypesCache map[checker.IterationTypesKey]checker.IterationTypes
   markerTypes collections.Set[*checker.Type]
+  resolvingExplicitTypeOfSymbol collections.Set[*ast.Symbol]
   undefinedSymbol *ast.Symbol
   argumentsSymbol *ast.Symbol
   requireSymbol *ast.Symbol
@@ -244,15 +244,16 @@ type extra_Checker struct {
   factory ast.NodeFactory
   nodeLinks core.LinkStore[*ast.Node, checker.NodeLinks]
   signatureLinks core.LinkStore[*ast.Node, checker.SignatureLinks]
-  symbolNodeLinks core.LinkStore[*ast.Node, checker.SymbolNodeLinks]
+  symbolNodeLinks struct{store core.PagedLinkStore[checker.SymbolNodeLinks]}
   typeNodeLinks core.LinkStore[*ast.Node, checker.TypeNodeLinks]
   enumMemberLinks core.LinkStore[*ast.Node, checker.EnumMemberLinks]
   assertionLinks core.LinkStore[*ast.Node, checker.AssertionLinks]
   arrayLiteralLinks core.LinkStore[*ast.Node, checker.ArrayLiteralLinks]
   switchStatementLinks core.LinkStore[*ast.Node, checker.SwitchStatementLinks]
   jsxElementLinks core.LinkStore[*ast.Node, checker.JsxElementLinks]
+  computedNameLinks core.LinkStore[*ast.Node, checker.ComputedNameNodeLinks]
   symbolReferenceLinks core.LinkStore[*ast.Symbol, checker.SymbolReferenceLinks]
-  valueSymbolLinks core.LinkStore[*ast.Symbol, checker.ValueSymbolLinks]
+  valueSymbolLinks struct{store core.PagedLinkStore[*checker.ValueSymbolLinks]; arena core.Arena[checker.ValueSymbolLinks]}
   mappedSymbolLinks core.LinkStore[*ast.Symbol, checker.MappedSymbolLinks]
   deferredSymbolLinks core.LinkStore[*ast.Symbol, checker.DeferredSymbolLinks]
   aliasSymbolLinks core.LinkStore[*ast.Symbol, checker.AliasSymbolLinks]
@@ -362,7 +363,7 @@ type extra_Checker struct {
   typeofType *checker.Type
   typeResolutions []checker.TypeResolution
   resolutionStart int
-  inVarianceComputation bool
+  varianceStack []checker.VarianceStackEntry
   apparentArgumentCount *int
   lastGetCombinedNodeFlagsNode *ast.Node
   lastGetCombinedNodeFlagsResult ast.NodeFlags
@@ -482,12 +483,13 @@ func Checker_booleanType(v *checker.Checker) *checker.Type {
 func Checker_globalRegExpType(v *checker.Checker) *checker.Type {
   return ((*extra_Checker)(unsafe.Pointer(v))).globalRegExpType
 }
-//go:linkname CompareTypes github.com/microsoft/typescript-go/internal/checker.CompareTypes
+//go:linkname CompareTypes github.com/microsoft/TypeScript/tsc/internal/checker.CompareTypes
 func CompareTypes(t1 *checker.Type, t2 *checker.Type) int
 type CompositeSignature = checker.CompositeSignature
 type CompositeSymbolIdentity = checker.CompositeSymbolIdentity
 type CompositeTypeCacheIdentity = checker.CompositeTypeCacheIdentity
 type CompositeTypeMapper = checker.CompositeTypeMapper
+type ComputedNameNodeLinks = checker.ComputedNameNodeLinks
 type ConditionalRoot = checker.ConditionalRoot
 type ConditionalType = checker.ConditionalType
 type extra_ConditionalType struct {
@@ -518,9 +520,9 @@ const ContextFlagsNone = checker.ContextFlagsNone
 const ContextFlagsSignature = checker.ContextFlagsSignature
 const ContextFlagsSkipBindingPatterns = checker.ContextFlagsSkipBindingPatterns
 type ContextualInfo = checker.ContextualInfo
-//go:linkname CreateModeMismatchDetails github.com/microsoft/typescript-go/internal/checker.CreateModeMismatchDetails
+//go:linkname CreateModeMismatchDetails github.com/microsoft/TypeScript/tsc/internal/checker.CreateModeMismatchDetails
 func CreateModeMismatchDetails(program checker.Program, file *ast.SourceFile) checker.DiagnosticDetails
-//go:linkname CreateModuleNotFoundChain github.com/microsoft/typescript-go/internal/checker.CreateModuleNotFoundChain
+//go:linkname CreateModuleNotFoundChain github.com/microsoft/TypeScript/tsc/internal/checker.CreateModuleNotFoundChain
 func CreateModuleNotFoundChain(program checker.Program, file *ast.SourceFile, moduleReference string, mode core.ResolutionMode, packageName string) checker.DiagnosticDetails
 type DeclarationFileLinks = checker.DeclarationFileLinks
 type DeclarationLinks = checker.DeclarationLinks
@@ -607,18 +609,18 @@ type FlowLoopInfo = checker.FlowLoopInfo
 type FlowLoopKey = checker.FlowLoopKey
 type FlowState = checker.FlowState
 type FlowType = checker.FlowType
-//go:linkname FormatTypeFlags github.com/microsoft/typescript-go/internal/checker.FormatTypeFlags
+//go:linkname FormatTypeFlags github.com/microsoft/TypeScript/tsc/internal/checker.FormatTypeFlags
 func FormatTypeFlags(flags checker.TypeFlags) []string
 type FunctionTypeMapper = checker.FunctionTypeMapper
-//go:linkname GetDeclarationModifierFlagsFromSymbol github.com/microsoft/typescript-go/internal/checker.GetDeclarationModifierFlagsFromSymbol
+//go:linkname GetDeclarationModifierFlagsFromSymbol github.com/microsoft/TypeScript/tsc/internal/checker.GetDeclarationModifierFlagsFromSymbol
 func GetDeclarationModifierFlagsFromSymbol(s *ast.Symbol) ast.ModifierFlags
-//go:linkname GetPropertyNameFromType github.com/microsoft/typescript-go/internal/checker.GetPropertyNameFromType
+//go:linkname GetPropertyNameFromType github.com/microsoft/TypeScript/tsc/internal/checker.GetPropertyNameFromType
 func GetPropertyNameFromType(t *checker.Type) string
-//go:linkname GetResolvedSignatureForSignatureHelp github.com/microsoft/typescript-go/internal/checker.GetResolvedSignatureForSignatureHelp
+//go:linkname GetResolvedSignatureForSignatureHelp github.com/microsoft/TypeScript/tsc/internal/checker.GetResolvedSignatureForSignatureHelp
 func GetResolvedSignatureForSignatureHelp(node *ast.Node, argumentCount int, c *checker.Checker) (*checker.Signature, []*checker.Signature)
-//go:linkname GetSetAccessorValueParameter github.com/microsoft/typescript-go/internal/checker.GetSetAccessorValueParameter
+//go:linkname GetSetAccessorValueParameter github.com/microsoft/TypeScript/tsc/internal/checker.GetSetAccessorValueParameter
 func GetSetAccessorValueParameter(accessor *ast.Node) *ast.Node
-//go:linkname GetSingleVariableOfVariableStatement github.com/microsoft/typescript-go/internal/checker.GetSingleVariableOfVariableStatement
+//go:linkname GetSingleVariableOfVariableStatement github.com/microsoft/TypeScript/tsc/internal/checker.GetSingleVariableOfVariableStatement
 func GetSingleVariableOfVariableStatement(node *ast.Node) *ast.Node
 type Host = checker.Host
 type IndexFlags = checker.IndexFlags
@@ -707,19 +709,19 @@ const IntrinsicTypeKindNoInfer = checker.IntrinsicTypeKindNoInfer
 const IntrinsicTypeKindUncapitalize = checker.IntrinsicTypeKindUncapitalize
 const IntrinsicTypeKindUnknown = checker.IntrinsicTypeKindUnknown
 const IntrinsicTypeKindUppercase = checker.IntrinsicTypeKindUppercase
-//go:linkname IsExternalModuleSymbol github.com/microsoft/typescript-go/internal/checker.IsExternalModuleSymbol
+//go:linkname IsExternalModuleSymbol github.com/microsoft/TypeScript/tsc/internal/checker.IsExternalModuleSymbol
 func IsExternalModuleSymbol(moduleSymbol *ast.Symbol) bool
-//go:linkname IsInTypeQuery github.com/microsoft/typescript-go/internal/checker.IsInTypeQuery
+//go:linkname IsInTypeQuery github.com/microsoft/TypeScript/tsc/internal/checker.IsInTypeQuery
 func IsInTypeQuery(node *ast.Node) bool
-//go:linkname IsKnownSymbol github.com/microsoft/typescript-go/internal/checker.IsKnownSymbol
+//go:linkname IsKnownSymbol github.com/microsoft/TypeScript/tsc/internal/checker.IsKnownSymbol
 func IsKnownSymbol(symbol *ast.Symbol) bool
-//go:linkname IsPrivateIdentifierSymbol github.com/microsoft/typescript-go/internal/checker.IsPrivateIdentifierSymbol
+//go:linkname IsPrivateIdentifierSymbol github.com/microsoft/TypeScript/tsc/internal/checker.IsPrivateIdentifierSymbol
 func IsPrivateIdentifierSymbol(symbol *ast.Symbol) bool
-//go:linkname IsTupleType github.com/microsoft/typescript-go/internal/checker.IsTupleType
+//go:linkname IsTupleType github.com/microsoft/TypeScript/tsc/internal/checker.IsTupleType
 func IsTupleType(t *checker.Type) bool
-//go:linkname IsTypeAny github.com/microsoft/typescript-go/internal/checker.IsTypeAny
+//go:linkname IsTypeAny github.com/microsoft/TypeScript/tsc/internal/checker.IsTypeAny
 func IsTypeAny(t *checker.Type) bool
-//go:linkname IsTypeUsableAsPropertyName github.com/microsoft/typescript-go/internal/checker.IsTypeUsableAsPropertyName
+//go:linkname IsTypeUsableAsPropertyName github.com/microsoft/TypeScript/tsc/internal/checker.IsTypeUsableAsPropertyName
 func IsTypeUsableAsPropertyName(t *checker.Type) bool
 type IterationTypeKind = checker.IterationTypeKind
 const IterationTypeKindNext = checker.IterationTypeKindNext
@@ -797,6 +799,10 @@ const MappedTypeNameTypeKindFiltering = checker.MappedTypeNameTypeKindFiltering
 const MappedTypeNameTypeKindNone = checker.MappedTypeNameTypeKindNone
 const MappedTypeNameTypeKindRemapping = checker.MappedTypeNameTypeKindRemapping
 type MarkedAssignmentSymbolLinks = checker.MarkedAssignmentSymbolLinks
+type MemberOverrideStatus = checker.MemberOverrideStatus
+const MemberOverrideStatusHasInvalidOverride = checker.MemberOverrideStatusHasInvalidOverride
+const MemberOverrideStatusNeedsOverride = checker.MemberOverrideStatusNeedsOverride
+const MemberOverrideStatusNone = checker.MemberOverrideStatusNone
 type MembersAndExportsLinks = checker.MembersAndExportsLinks
 type MembersOrExportsResolutionKind = checker.MembersOrExportsResolutionKind
 const MembersOrExportsResolutionKindResolvedExports = checker.MembersOrExportsResolutionKindResolvedExports
@@ -808,19 +814,19 @@ const MinArgumentCountFlagsStrongArityForUntypedJS = checker.MinArgumentCountFla
 const MinArgumentCountFlagsVoidIsNonOptional = checker.MinArgumentCountFlagsVoidIsNonOptional
 type ModuleSymbolLinks = checker.ModuleSymbolLinks
 type NarrowedTypeKey = checker.NarrowedTypeKey
-//go:linkname NewChecker github.com/microsoft/typescript-go/internal/checker.NewChecker
+//go:linkname NewChecker github.com/microsoft/TypeScript/tsc/internal/checker.NewChecker
 func NewChecker(program checker.Program, tracer *checker.Tracer) (*checker.Checker, *sync.Mutex)
-//go:linkname NewDiagnosticChainForNode github.com/microsoft/typescript-go/internal/checker.NewDiagnosticChainForNode
+//go:linkname NewDiagnosticChainForNode github.com/microsoft/TypeScript/tsc/internal/checker.NewDiagnosticChainForNode
 func NewDiagnosticChainForNode(chain *ast.Diagnostic, node *ast.Node, message *diagnostics.Message, args ...any) *ast.Diagnostic
-//go:linkname NewDiagnosticForNode github.com/microsoft/typescript-go/internal/checker.NewDiagnosticForNode
+//go:linkname NewDiagnosticForNode github.com/microsoft/TypeScript/tsc/internal/checker.NewDiagnosticForNode
 func NewDiagnosticForNode(node *ast.Node, message *diagnostics.Message, args ...any) *ast.Diagnostic
-//go:linkname NewNodeBuilder github.com/microsoft/typescript-go/internal/checker.NewNodeBuilder
+//go:linkname NewNodeBuilder github.com/microsoft/TypeScript/tsc/internal/checker.NewNodeBuilder
 func NewNodeBuilder(ch *checker.Checker, e *printer.EmitContext) *checker.NodeBuilder
-//go:linkname NewNodeBuilderEx github.com/microsoft/typescript-go/internal/checker.NewNodeBuilderEx
+//go:linkname NewNodeBuilderEx github.com/microsoft/TypeScript/tsc/internal/checker.NewNodeBuilderEx
 func NewNodeBuilderEx(ch *checker.Checker, e *printer.EmitContext, idToSymbol map[*ast.IdentifierNode]*ast.Symbol) *checker.NodeBuilder
-//go:linkname NewSymbolTrackerImpl github.com/microsoft/typescript-go/internal/checker.NewSymbolTrackerImpl
+//go:linkname NewSymbolTrackerImpl github.com/microsoft/TypeScript/tsc/internal/checker.NewSymbolTrackerImpl
 func NewSymbolTrackerImpl(context *checker.NodeBuilderContext, tracker nodebuilder.SymbolTracker) *checker.SymbolTrackerImpl
-//go:linkname NewTracer github.com/microsoft/typescript-go/internal/checker.NewTracer
+//go:linkname NewTracer github.com/microsoft/TypeScript/tsc/internal/checker.NewTracer
 func NewTracer(tr *tracing.Tracing, checkerIndex int) *checker.Tracer
 type NodeBuilder = checker.NodeBuilder
 type NodeBuilderContext = checker.NodeBuilderContext
@@ -868,6 +874,8 @@ const ObjectFlagsIsGenericType = checker.ObjectFlagsIsGenericType
 const ObjectFlagsIsGenericTypeComputed = checker.ObjectFlagsIsGenericTypeComputed
 const ObjectFlagsIsNeverIntersection = checker.ObjectFlagsIsNeverIntersection
 const ObjectFlagsIsNeverIntersectionComputed = checker.ObjectFlagsIsNeverIntersectionComputed
+const ObjectFlagsIsUniformEnum = checker.ObjectFlagsIsUniformEnum
+const ObjectFlagsIsUniformEnumComputed = checker.ObjectFlagsIsUniformEnumComputed
 const ObjectFlagsIsUnknownLikeUnion = checker.ObjectFlagsIsUnknownLikeUnion
 const ObjectFlagsIsUnknownLikeUnionComputed = checker.ObjectFlagsIsUnknownLikeUnionComputed
 const ObjectFlagsJSLiteral = checker.ObjectFlagsJSLiteral
@@ -930,7 +938,6 @@ const RelationComparisonResultOverflow = checker.RelationComparisonResultOverflo
 const RelationComparisonResultReportsMask = checker.RelationComparisonResultReportsMask
 const RelationComparisonResultReportsUnmeasurable = checker.RelationComparisonResultReportsUnmeasurable
 const RelationComparisonResultReportsUnreliable = checker.RelationComparisonResultReportsUnreliable
-const RelationComparisonResultStackDepthOverflow = checker.RelationComparisonResultStackDepthOverflow
 const RelationComparisonResultSucceeded = checker.RelationComparisonResultSucceeded
 type ReverseMappedSymbolLinks = checker.ReverseMappedSymbolLinks
 type ReverseMappedType = checker.ReverseMappedType
@@ -996,7 +1003,7 @@ const SignatureKindConstruct = checker.SignatureKindConstruct
 type SignatureLinks = checker.SignatureLinks
 type SignatureToSignatureDeclarationOptions = checker.SignatureToSignatureDeclarationOptions
 type SimpleTypeMapper = checker.SimpleTypeMapper
-//go:linkname SkipAlias github.com/microsoft/typescript-go/internal/checker.SkipAlias
+//go:linkname SkipAlias github.com/microsoft/TypeScript/tsc/internal/checker.SkipAlias
 func SkipAlias(symbol *ast.Symbol, checker *checker.Checker) *ast.Symbol
 type SourceFileLinks = checker.SourceFileLinks
 type SpreadLinks = checker.SpreadLinks
@@ -1026,7 +1033,7 @@ const TernaryTrue = checker.TernaryTrue
 const TernaryUnknown = checker.TernaryUnknown
 type Tracer = checker.Tracer
 type TrackedSymbolArgs = checker.TrackedSymbolArgs
-//go:linkname TryGetModuleSpecifierFromDeclaration github.com/microsoft/typescript-go/internal/checker.TryGetModuleSpecifierFromDeclaration
+//go:linkname TryGetModuleSpecifierFromDeclaration github.com/microsoft/TypeScript/tsc/internal/checker.TryGetModuleSpecifierFromDeclaration
 func TryGetModuleSpecifierFromDeclaration(node *ast.Node) *ast.Node
 type TupleElementInfo = checker.TupleElementInfo
 type TupleNormalizer = checker.TupleNormalizer
@@ -1309,7 +1316,7 @@ type UnusedKind = checker.UnusedKind
 const UnusedKindLocal = checker.UnusedKindLocal
 const UnusedKindParameter = checker.UnusedKindParameter
 type ValueSymbolLinks = checker.ValueSymbolLinks
-//go:linkname ValueToString github.com/microsoft/typescript-go/internal/checker.ValueToString
+//go:linkname ValueToString github.com/microsoft/TypeScript/tsc/internal/checker.ValueToString
 func ValueToString(value any) string
 type VarianceFlags = checker.VarianceFlags
 const VarianceFlagsAllowsStructuralFallback = checker.VarianceFlagsAllowsStructuralFallback
@@ -1322,6 +1329,7 @@ const VarianceFlagsUnmeasurable = checker.VarianceFlagsUnmeasurable
 const VarianceFlagsUnreliable = checker.VarianceFlagsUnreliable
 const VarianceFlagsVarianceMask = checker.VarianceFlagsVarianceMask
 type VarianceLinks = checker.VarianceLinks
+type VarianceStackEntry = checker.VarianceStackEntry
 type VerbosityContext = checker.VerbosityContext
 type WideningContext = checker.WideningContext
 type WideningKind = checker.WideningKind
@@ -1329,7 +1337,7 @@ const WideningKindFunctionReturn = checker.WideningKindFunctionReturn
 const WideningKindGeneratorNext = checker.WideningKindGeneratorNext
 const WideningKindGeneratorYield = checker.WideningKindGeneratorYield
 const WideningKindNormal = checker.WideningKindNormal
-//go:linkname GetMappedTypeModifiers github.com/microsoft/typescript-go/internal/checker.getMappedTypeModifiers
+//go:linkname GetMappedTypeModifiers github.com/microsoft/TypeScript/tsc/internal/checker.getMappedTypeModifiers
 func GetMappedTypeModifiers(t *checker.Type) checker.MappedTypeModifiers
-//go:linkname IsNonDeferredTypeReference github.com/microsoft/typescript-go/internal/checker.isNonDeferredTypeReference
+//go:linkname IsNonDeferredTypeReference github.com/microsoft/TypeScript/tsc/internal/checker.isNonDeferredTypeReference
 func IsNonDeferredTypeReference(t *checker.Type) bool
