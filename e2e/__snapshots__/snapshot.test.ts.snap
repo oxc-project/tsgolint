@@ -1110,7 +1110,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -1123,7 +1124,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -1136,7 +1138,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -1149,7 +1152,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
