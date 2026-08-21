@@ -1,0 +1,23 @@
+e2e/__snapshots__/snapshot.test.ts.snap
+  s_1127b64b4a71af::t_4a54292ee3f433 555-556
+internal/rule_tester/__snapshots__/strict-boolean-expressions.snap
+  s_1127b64b4a71af::t_2c2e9142075ed6 524-525,534-535,542-543,550-551,560-561,568-569,576-577,586-587,594-595,602-603,612-613,622-623,630-631,638-639,648-649,658-659,668-669,678-679,688-689,698-699,708-709,718-719,728-729,738-739,748-749,758-759,768-769,776-777,784-785,804-805,812-813,820-821,828-829,838-839,848-849,858-859,868-869,878-879,888-889,898-899,908-909,918-919,967-968,985-986,1030-1031,1098-1099,1117-1118,1127-1128,1137-1138,1147-1148,1157-1158,1167-1168,1199-1200
+internal/rules/strict_boolean_expressions/strict_boolean_expressions.go
+  s_1127b64b4a71af::t_9ead2a9886344d 49-50,57-58,65-66,73-74,81-82,89-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "ac5a301e32809d1e18b629cad8ccdc961427af30",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
