@@ -1,0 +1,19 @@
+internal/rules/no_useless_default_assignment/no_useless_default_assignment.go
+  s_1127b64b4a71af::t_2e0bf0b7cfa8c1 26-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "90e75c5a58a2d45fabd9f3483e17501fff40e649",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
