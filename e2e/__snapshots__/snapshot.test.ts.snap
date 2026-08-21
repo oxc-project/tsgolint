@@ -3554,7 +3554,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "Member 'value' is never reassigned; mark it as \`readonly\`.",
+      "description": "Member 'value' is never reassigned.",
+      "help": "Mark it as \`readonly\`.",
       "id": "preferReadonly",
     },
     "range": {

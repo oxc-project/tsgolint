@@ -1,7 +1,8 @@
 
 [TestPreferReadonlyRule/invalid-0 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:52)
-Message: Member 'incorrectlyModifiableStatic' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableStatic' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableStatic {
    3 |           private static incorrectlyModifiableStatic = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -10,7 +11,8 @@ Message: Member 'incorrectlyModifiableStatic' is never reassigned; mark it as `r
 
 [TestPreferReadonlyRule/invalid-1 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:45)
-Message: Member '#incorrectlyModifiableStatic' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiableStatic' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableStatic {
    3 |           static #incorrectlyModifiableStatic = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,7 +21,8 @@ Message: Member '#incorrectlyModifiableStatic' is never reassigned; mark it as `
 
 [TestPreferReadonlyRule/invalid-2 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:57)
-Message: Member 'incorrectlyModifiableStaticArrow' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableStaticArrow' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableStaticArrow {
    3 |           private static incorrectlyModifiableStaticArrow = () => 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -28,7 +31,8 @@ Message: Member 'incorrectlyModifiableStaticArrow' is never reassigned; mark it 
 
 [TestPreferReadonlyRule/invalid-3 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:50)
-Message: Member '#incorrectlyModifiableStaticArrow' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiableStaticArrow' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableStaticArrow {
    3 |           static #incorrectlyModifiableStaticArrow = () => 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,14 +41,16 @@ Message: Member '#incorrectlyModifiableStaticArrow' is never reassigned; mark it
 
 [TestPreferReadonlyRule/invalid-4 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:45)
-Message: Member 'incorrectlyModifiableInline' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableInline' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableInline {
    3 |           private incorrectlyModifiableInline = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 | 
 
 Diagnostic 2: preferReadonly (7:15 - 7:49)
-Message: Member 'incorrectlyModifiableInline' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableInline' is never reassigned.
+Help: Mark it as `readonly`.
    6 |             return class {
    7 |               private incorrectlyModifiableInline = 7;
      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -53,14 +59,16 @@ Message: Member 'incorrectlyModifiableInline' is never reassigned; mark it as `r
 
 [TestPreferReadonlyRule/invalid-5 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:38)
-Message: Member '#incorrectlyModifiableInline' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiableInline' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableInline {
    3 |           #incorrectlyModifiableInline = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 | 
 
 Diagnostic 2: preferReadonly (7:15 - 7:42)
-Message: Member '#incorrectlyModifiableInline' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiableInline' is never reassigned.
+Help: Mark it as `readonly`.
    6 |             return class {
    7 |               #incorrectlyModifiableInline = 7;
      |               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -69,7 +77,8 @@ Message: Member '#incorrectlyModifiableInline' is never reassigned; mark it as `
 
 [TestPreferReadonlyRule/invalid-6 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:46)
-Message: Member 'incorrectlyModifiableDelayed' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableDelayed' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableDelayed {
    3 |           private incorrectlyModifiableDelayed = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -78,7 +87,8 @@ Message: Member 'incorrectlyModifiableDelayed' is never reassigned; mark it as `
 
 [TestPreferReadonlyRule/invalid-7 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:39)
-Message: Member '#incorrectlyModifiableDelayed' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiableDelayed' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableDelayed {
    3 |           #incorrectlyModifiableDelayed = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,7 +97,8 @@ Message: Member '#incorrectlyModifiableDelayed' is never reassigned; mark it as 
 
 [TestPreferReadonlyRule/invalid-8 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:48)
-Message: Member 'childClassExpressionModifiable' is never reassigned; mark it as `readonly`.
+Message: Member 'childClassExpressionModifiable' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestChildClassExpressionModifiable {
    3 |           private childClassExpressionModifiable = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -96,7 +107,8 @@ Message: Member 'childClassExpressionModifiable' is never reassigned; mark it as
 
 [TestPreferReadonlyRule/invalid-9 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:41)
-Message: Member '#childClassExpressionModifiable' is never reassigned; mark it as `readonly`.
+Message: Member '#childClassExpressionModifiable' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestChildClassExpressionModifiable {
    3 |           #childClassExpressionModifiable = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -105,7 +117,8 @@ Message: Member '#childClassExpressionModifiable' is never reassigned; mark it a
 
 [TestPreferReadonlyRule/invalid-10 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:48)
-Message: Member 'incorrectlyModifiablePostMinus' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiablePostMinus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePostMinus {
    3 |           private incorrectlyModifiablePostMinus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,7 +127,8 @@ Message: Member 'incorrectlyModifiablePostMinus' is never reassigned; mark it as
 
 [TestPreferReadonlyRule/invalid-11 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:41)
-Message: Member '#incorrectlyModifiablePostMinus' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiablePostMinus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePostMinus {
    3 |           #incorrectlyModifiablePostMinus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,7 +137,8 @@ Message: Member '#incorrectlyModifiablePostMinus' is never reassigned; mark it a
 
 [TestPreferReadonlyRule/invalid-12 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:47)
-Message: Member 'incorrectlyModifiablePostPlus' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiablePostPlus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePostPlus {
    3 |           private incorrectlyModifiablePostPlus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -132,7 +147,8 @@ Message: Member 'incorrectlyModifiablePostPlus' is never reassigned; mark it as 
 
 [TestPreferReadonlyRule/invalid-13 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:40)
-Message: Member '#incorrectlyModifiablePostPlus' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiablePostPlus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePostPlus {
    3 |           #incorrectlyModifiablePostPlus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,7 +157,8 @@ Message: Member '#incorrectlyModifiablePostPlus' is never reassigned; mark it as
 
 [TestPreferReadonlyRule/invalid-14 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:47)
-Message: Member 'incorrectlyModifiablePreMinus' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiablePreMinus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePreMinus {
    3 |           private incorrectlyModifiablePreMinus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -150,7 +167,8 @@ Message: Member 'incorrectlyModifiablePreMinus' is never reassigned; mark it as 
 
 [TestPreferReadonlyRule/invalid-15 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:40)
-Message: Member '#incorrectlyModifiablePreMinus' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiablePreMinus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePreMinus {
    3 |           #incorrectlyModifiablePreMinus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -159,7 +177,8 @@ Message: Member '#incorrectlyModifiablePreMinus' is never reassigned; mark it as
 
 [TestPreferReadonlyRule/invalid-16 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:46)
-Message: Member 'incorrectlyModifiablePrePlus' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiablePrePlus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePrePlus {
    3 |           private incorrectlyModifiablePrePlus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -168,7 +187,8 @@ Message: Member 'incorrectlyModifiablePrePlus' is never reassigned; mark it as `
 
 [TestPreferReadonlyRule/invalid-17 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:39)
-Message: Member '#incorrectlyModifiablePrePlus' is never reassigned; mark it as `readonly`.
+Message: Member '#incorrectlyModifiablePrePlus' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiablePrePlus {
    3 |           #incorrectlyModifiablePrePlus = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -177,7 +197,8 @@ Message: Member '#incorrectlyModifiablePrePlus' is never reassigned; mark it as 
 
 [TestPreferReadonlyRule/invalid-18 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:42)
-Message: Member 'overlappingClassVariable' is never reassigned; mark it as `readonly`.
+Message: Member 'overlappingClassVariable' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestOverlappingClassVariable {
    3 |           private overlappingClassVariable = 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -186,7 +207,8 @@ Message: Member 'overlappingClassVariable' is never reassigned; mark it as `read
 
 [TestPreferReadonlyRule/invalid-19 - 1]
 Diagnostic 1: preferReadonly (3:30 - 3:67)
-Message: Member 'incorrectlyModifiableParameter' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableParameter' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestIncorrectlyModifiableParameter {
    3 |           public constructor(private incorrectlyModifiableParameter = 7) {}
      |                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -195,7 +217,8 @@ Message: Member 'incorrectlyModifiableParameter' is never reassigned; mark it as
 
 [TestPreferReadonlyRule/invalid-20 - 1]
 Diagnostic 1: preferReadonly (5:13 - 5:50)
-Message: Member 'incorrectlyModifiableParameter' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyModifiableParameter' is never reassigned.
+Help: Mark it as `readonly`.
    4 |             public ignore: boolean,
    5 |             private incorrectlyModifiableParameter = 7,
      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,7 +227,8 @@ Message: Member 'incorrectlyModifiableParameter' is never reassigned; mark it as
 
 [TestPreferReadonlyRule/invalid-21 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:41)
-Message: Member 'incorrectlyInlineLambda' is never reassigned; mark it as `readonly`.
+Message: Member 'incorrectlyInlineLambda' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class TestCorrectlyNonInlineLambdas {
    3 |           private incorrectlyInlineLambda = () => 7;
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -213,7 +237,8 @@ Message: Member 'incorrectlyInlineLambda' is never reassigned; mark it as `reado
 
 [TestPreferReadonlyRule/invalid-22 - 1]
 Diagnostic 1: preferReadonly (4:5 - 4:17)
-Message: Member '_name' is never reassigned; mark it as `readonly`.
+Message: Member '_name' is never reassigned.
+Help: Mark it as `readonly`.
    3 |   return class extends Base {
    4 |     private _name: string;
      |     ~~~~~~~~~~~~~
@@ -222,7 +247,8 @@ Message: Member '_name' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-23 - 1]
 Diagnostic 1: preferReadonly (4:5 - 4:9)
-Message: Member '#name' is never reassigned; mark it as `readonly`.
+Message: Member '#name' is never reassigned.
+Help: Mark it as `readonly`.
    3 |   return class extends Base {
    4 |     #name: string;
      |     ~~~~~
@@ -231,7 +257,8 @@ Message: Member '#name' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-24 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {
      |           ~~~~~~~~~~~~~~~
@@ -240,7 +267,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-25 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {
      |           ~~~~~~~~
@@ -249,7 +277,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-26 - 1]
 Diagnostic 1: preferReadonly (7:11 - 7:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    6 |         class Test {
    7 |           private testObj = new TestObject();
      |           ~~~~~~~~~~~~~~~
@@ -258,7 +287,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-27 - 1]
 Diagnostic 1: preferReadonly (7:11 - 7:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    6 |         class Test {
    7 |           #testObj = new TestObject();
      |           ~~~~~~~~
@@ -267,7 +297,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-28 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {
      |           ~~~~~~~~~~~~~~~
@@ -276,7 +307,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-29 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {
      |           ~~~~~~~~
@@ -285,7 +317,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-30 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -294,7 +327,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-31 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -303,7 +337,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-32 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -312,7 +347,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-33 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -321,7 +357,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-34 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -330,7 +367,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-35 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -339,7 +377,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-36 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -348,7 +387,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-37 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -357,7 +397,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-38 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -366,7 +407,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-39 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -375,7 +417,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-40 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -384,7 +427,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-41 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -393,7 +437,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-42 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -402,7 +447,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-43 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -411,7 +457,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-44 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:25)
-Message: Member 'testObj' is never reassigned; mark it as `readonly`.
+Message: Member 'testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private testObj = {};
      |           ~~~~~~~~~~~~~~~
@@ -420,7 +467,8 @@ Message: Member 'testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-45 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:18)
-Message: Member '#testObj' is never reassigned; mark it as `readonly`.
+Message: Member '#testObj' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           #testObj = {};
      |           ~~~~~~~~
@@ -429,7 +477,8 @@ Message: Member '#testObj' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-46 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop: number = 3;
      |           ~~~~~~~~~~~~
@@ -438,7 +487,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-47 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop: number = 3;
      |           ~~~~~~~~~~~~
@@ -447,7 +497,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-48 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop: number;
      |           ~~~~~~~~~~~~
@@ -456,7 +507,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-49 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = 'hello';
      |           ~~~~~~~~~~~~
@@ -465,7 +517,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-50 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = 'hello';
      |           ~~~~~~~~~~~~
@@ -474,7 +527,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-51 - 1]
 Diagnostic 1: preferReadonly (5:11 - 5:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    4 |         class Test {
    5 |           private prop = hello;
      |           ~~~~~~~~~~~~
@@ -483,7 +537,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-52 - 1]
 Diagnostic 1: preferReadonly (5:11 - 5:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    4 |         class Test {
    5 |           private prop = hello;
      |           ~~~~~~~~~~~~
@@ -492,7 +547,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-53 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = 10;
      |           ~~~~~~~~~~~~
@@ -501,7 +557,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-54 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = 10;
      |           ~~~~~~~~~~~~
@@ -510,7 +567,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-55 - 1]
 Diagnostic 1: preferReadonly (5:11 - 5:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    4 |         class Test {
    5 |           private prop = hello;
      |           ~~~~~~~~~~~~
@@ -519,7 +577,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-56 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = true;
      |           ~~~~~~~~~~~~
@@ -528,7 +587,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-57 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = true;
      |           ~~~~~~~~~~~~
@@ -537,7 +597,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-58 - 1]
 Diagnostic 1: preferReadonly (5:11 - 5:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    4 |         class Test {
    5 |           private prop = hello;
      |           ~~~~~~~~~~~~
@@ -546,7 +607,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-59 - 1]
 Diagnostic 1: preferReadonly (8:11 - 8:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    7 |         class Test {
    8 |           private prop = Foo.Bar;
      |           ~~~~~~~~~~~~
@@ -555,7 +617,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-60 - 1]
 Diagnostic 1: preferReadonly (8:11 - 8:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    7 |         class Test {
    8 |           private prop = Foo.Bar;
      |           ~~~~~~~~~~~~
@@ -564,7 +627,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-61 - 1]
 Diagnostic 1: preferReadonly (10:11 - 10:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    9 |         class Test {
   10 |           private prop = foo;
      |           ~~~~~~~~~~~~
@@ -573,7 +637,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-62 - 1]
 Diagnostic 1: preferReadonly (10:11 - 10:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    9 |         class Test {
   10 |           private prop = foo;
      |           ~~~~~~~~~~~~
@@ -582,7 +647,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-63 - 1]
 Diagnostic 1: preferReadonly (10:11 - 10:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    9 |         class Test {
   10 |           private prop = foo;
      |           ~~~~~~~~~~~~
@@ -591,7 +657,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-64 - 1]
 Diagnostic 1: preferReadonly (13:13 - 13:24)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
   12 |           class Test {
   13 |             private prop = bar;
      |             ~~~~~~~~~~~~
@@ -600,7 +667,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-65 - 1]
 Diagnostic 1: preferReadonly (13:13 - 13:24)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
   12 |           class Test {
   13 |             private prop = bar;
      |             ~~~~~~~~~~~~
@@ -609,7 +677,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-66 - 1]
 Diagnostic 1: preferReadonly (14:11 - 14:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
   13 |         class Test {
   14 |           private prop = bar;
      |           ~~~~~~~~~~~~
@@ -618,7 +687,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-67 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = { foo: 'bar' };
      |           ~~~~~~~~~~~~
@@ -627,7 +697,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-68 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = { foo: 'bar' };
      |           ~~~~~~~~~~~~
@@ -636,7 +707,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-69 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = [1, 2, 'three'];
      |           ~~~~~~~~~~~~
@@ -645,7 +717,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-70 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = [1, 2, 'three'];
      |           ~~~~~~~~~~~~
@@ -654,7 +727,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-71 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:26)
-Message: Member '_isValid' is never reassigned; mark it as `readonly`.
+Message: Member '_isValid' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class X {
    3 |           private _isValid = true;
      |           ~~~~~~~~~~~~~~~~
@@ -663,7 +737,8 @@ Message: Member '_isValid' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-72 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop: string = 'hello';
      |           ~~~~~~~~~~~~
@@ -672,7 +747,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-73 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop: string | number = 'hello';
      |           ~~~~~~~~~~~~
@@ -681,7 +757,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-74 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop: string;
      |           ~~~~~~~~~~~~
@@ -690,7 +767,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-75 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop;
      |           ~~~~~~~~~~~~
@@ -699,7 +777,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-76 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop;
      |           ~~~~~~~~~~~~
@@ -708,7 +787,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-77 - 1]
 Diagnostic 1: preferReadonly (5:11 - 5:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    4 |         class Test {
    5 |           private prop = hello;
      |           ~~~~~~~~~~~~
@@ -717,7 +797,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-78 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = null;
      |           ~~~~~~~~~~~~
@@ -726,7 +807,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-79 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = null;
      |           ~~~~~~~~~~~~
@@ -735,7 +817,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-80 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = 'hello' as string;
      |           ~~~~~~~~~~~~
@@ -744,7 +827,8 @@ Message: Member 'prop' is never reassigned; mark it as `readonly`.
 
 [TestPreferReadonlyRule/invalid-81 - 1]
 Diagnostic 1: preferReadonly (3:11 - 3:22)
-Message: Member 'prop' is never reassigned; mark it as `readonly`.
+Message: Member 'prop' is never reassigned.
+Help: Mark it as `readonly`.
    2 |         class Test {
    3 |           private prop = Promise.resolve('hello');
      |           ~~~~~~~~~~~~
