@@ -58,6 +58,22 @@ func buildUnnecessaryTypeAssertionDiagnostic(assertion core.TextRange, expressio
 	}
 }
 
+// collectIdentifierNames collects the name of every identifier in a type node so
+// that a type parameter can be looked up by name.
+func collectIdentifierNames(node *ast.Node, names map[string]struct{}) {
+	if node == nil {
+		return
+	}
+	if ast.IsIdentifier(node) {
+		names[node.Text()] = struct{}{}
+		return
+	}
+	node.ForEachChild(func(child *ast.Node) bool {
+		collectIdentifierNames(child, names)
+		return false
+	})
+}
+
 var NoUnnecessaryTypeAssertionRule = rule.Rule{
 	Name: "no-unnecessary-type-assertion",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -479,6 +495,63 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			return false
+		}
+
+		// A type parameter that appears in no parameter can only be inferred from the
+		// return position, or else fall back to its default. When such a call is the
+		// operand of a type assertion, the assertion is what the type argument gets
+		// inferred from, so the operand ends up with exactly the asserted type and the
+		// assertion looks like it changes nothing.
+		//
+		// It does: dropping the assertion makes the type argument fall back to its
+		// default, which usually stops the code from compiling. `getUncastType` asks for
+		// the context-free type to keep that inference out of the comparison, but the
+		// checker caches the resolved signature per node, so as soon as anything else has
+		// checked the call - reporting type errors alongside lint diagnostics does it for
+		// every call in the file - the context-free type is the contextual one.
+		//
+		// https://github.com/typescript-eslint/typescript-eslint/issues/6951
+		isTypeArgumentInferredFromAssertion := func(expression *ast.Node) bool {
+			call := ast.SkipParentheses(expression)
+			for ast.IsAwaitExpression(call) {
+				call = ast.SkipParentheses(call.Expression())
+			}
+			if !ast.IsCallExpression(call) && !ast.IsNewExpression(call) && !ast.IsTaggedTemplateExpression(call) {
+				return false
+			}
+			// Type arguments that are written out are not inferred from anything.
+			if call.TypeArgumentList() != nil {
+				return false
+			}
+
+			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, call, nil, checker.CheckModeNormal)
+			if signature == nil {
+				return false
+			}
+			declaration := checker.Signature_declaration(signature)
+			if declaration == nil || declaration.FunctionLikeData() == nil {
+				return false
+			}
+			typeParameters := declaration.TypeParameters()
+			if len(typeParameters) == 0 {
+				return false
+			}
+
+			namesUsedInParameters := make(map[string]struct{})
+			if parameters := declaration.ParameterList(); parameters != nil {
+				for _, parameter := range parameters.Nodes {
+					collectIdentifierNames(parameter.Type(), namesUsedInParameters)
+				}
+			}
+
+			return slices.ContainsFunc(typeParameters, func(typeParameter *ast.Node) bool {
+				name := typeParameter.Name()
+				if name == nil {
+					return false
+				}
+				_, used := namesUsedInParameters[name.Text()]
+				return !used
+			})
 		}
 
 		getUncastType := func(node *ast.Node) *checker.Type {
@@ -1106,6 +1179,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			if typeIsUnchanged && wouldSameTypeBeInferred {
+				if isTypeArgumentInferredFromAssertion(expression) {
+					return
+				}
 				reportUnnecessaryTypeAssertion(node, uncastType, castType)
 				return
 			}
