@@ -1,16 +1,16 @@
-From e7e1f52b878b9d5c3594c58b5bda0c00b0c9b5c7 Mon Sep 17 00:00:00 2001
+From ab7f71fcced7a59a30111046a15c56e6035b623b Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 14 Nov 2025 11:09:52 +0000
 Subject: [PATCH 1/5] Adapt project service for single run mode
 
 ---
- internal/project/project.go | 5 ++++-
+ tsc/internal/project/project.go | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/internal/project/project.go b/internal/project/project.go
-index 39c77aa78..01ec37142 100644
---- a/internal/project/project.go
-+++ b/internal/project/project.go
+diff --git a/tsc/internal/project/project.go b/tsc/internal/project/project.go
+index 8f64ee33032..f5d74af116d 100644
+--- a/tsc/internal/project/project.go
++++ b/tsc/internal/project/project.go
 @@ -3,6 +3,7 @@ package project
  import (
  	"context"
@@ -19,7 +19,7 @@ index 39c77aa78..01ec37142 100644
  	"slices"
  	"strings"
  	"sync"
-@@ -358,7 +359,9 @@ func (p *Project) CreateProgram() CreateProgramResult {
+@@ -376,7 +377,9 @@ func (p *Project) CreateProgram() CreateProgramResult {
  	// the same project never share a captured variable through a stale closure
  	// stored in the old program's options.
  	createCheckerPool := func(program *compiler.Program) compiler.CheckerPool {

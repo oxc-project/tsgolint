@@ -3,11 +3,11 @@
 
 package osvfs
 
-import "github.com/microsoft/typescript-go/internal/vfs"
-import _ "github.com/microsoft/typescript-go/internal/vfs/osvfs"
+import "github.com/microsoft/TypeScript/tsc/internal/vfs"
+import _ "github.com/microsoft/TypeScript/tsc/internal/vfs/osvfs"
 import _ "unsafe"
 
-//go:linkname FS github.com/microsoft/typescript-go/internal/vfs/osvfs.FS
+//go:linkname FS github.com/microsoft/TypeScript/tsc/internal/vfs/osvfs.FS
 func FS() vfs.FS
-//go:linkname GetGlobalTypingsCacheLocation github.com/microsoft/typescript-go/internal/vfs/osvfs.GetGlobalTypingsCacheLocation
+//go:linkname GetGlobalTypingsCacheLocation github.com/microsoft/TypeScript/tsc/internal/vfs/osvfs.GetGlobalTypingsCacheLocation
 func GetGlobalTypingsCacheLocation() string

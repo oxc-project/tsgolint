@@ -18,7 +18,7 @@ import (
 	"golang.org/x/tools/go/packages"
 )
 
-const tsgoInternalPrefix = "github.com/microsoft/typescript-go/internal/"
+const tsgoInternalPrefix = "github.com/microsoft/TypeScript/tsc/internal/"
 
 func signatureHasUnexportedType(t types.Signature) bool {
 	if params := t.Params(); params != nil {
@@ -51,6 +51,7 @@ func main() {
 		"bundled",
 		"checker",
 		"compiler",
+		"contentmapper",
 		"core",
 		"jsnum",
 		"lsp/lsproto",
@@ -302,6 +303,14 @@ func main() {
 							if !field.Embedded() {
 								shimBuilder.WriteString(field.Name())
 								shimBuilder.WriteByte(' ')
+							}
+
+							if named, ok := field.Type().(*types.Named); ok && !named.Obj().Exported() {
+								// A mirror cannot refer to an unexported named type from the
+								// source package. Its instantiated underlying type has the same
+								// layout and only needs to be structurally equivalent here.
+								shimBuilder.WriteString(types.TypeString(named.Underlying(), qualifierOnlyPackageName))
+								continue
 							}
 
 							ptrType, ok := field.Type().(*types.Pointer)

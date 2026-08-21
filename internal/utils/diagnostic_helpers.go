@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/microsoft/TypeScript/tsc/shim/ast"
 )
 
 // GetDiagnosticMessage returns the localized message for a diagnostic using the default locale (English).

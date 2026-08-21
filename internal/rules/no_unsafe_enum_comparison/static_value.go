@@ -1,8 +1,8 @@
 package no_unsafe_enum_comparison
 
 import (
-	"github.com/microsoft/typescript-go/shim/ast"
-	"github.com/microsoft/typescript-go/shim/jsnum"
+	"github.com/microsoft/TypeScript/tsc/shim/ast"
+	"github.com/microsoft/TypeScript/tsc/shim/jsnum"
 )
 
 type staticValueKind uint8

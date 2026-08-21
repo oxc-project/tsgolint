@@ -3,17 +3,17 @@
 
 package bundled
 
-import "github.com/microsoft/typescript-go/internal/bundled"
-import "github.com/microsoft/typescript-go/internal/vfs"
+import "github.com/microsoft/TypeScript/tsc/internal/bundled"
+import "github.com/microsoft/TypeScript/tsc/internal/vfs"
 import _ "unsafe"
 
 const Embedded = bundled.Embedded
-//go:linkname IsBundled github.com/microsoft/typescript-go/internal/bundled.IsBundled
+//go:linkname IsBundled github.com/microsoft/TypeScript/tsc/internal/bundled.IsBundled
 func IsBundled(path string) bool
 var LibNames = bundled.LibNames
-//go:linkname LibPath github.com/microsoft/typescript-go/internal/bundled.LibPath
+//go:linkname LibPath github.com/microsoft/TypeScript/tsc/internal/bundled.LibPath
 func LibPath() string
-//go:linkname TestingLibPath github.com/microsoft/typescript-go/internal/bundled.TestingLibPath
+//go:linkname TestingLibPath github.com/microsoft/TypeScript/tsc/internal/bundled.TestingLibPath
 func TestingLibPath() string
-//go:linkname WrapFS github.com/microsoft/typescript-go/internal/bundled.WrapFS
+//go:linkname WrapFS github.com/microsoft/TypeScript/tsc/internal/bundled.WrapFS
 func WrapFS(fs vfs.FS) vfs.FS

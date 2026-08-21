@@ -3,12 +3,12 @@
 
 package parser
 
-import "github.com/microsoft/typescript-go/internal/ast"
-import "github.com/microsoft/typescript-go/internal/core"
-import "github.com/microsoft/typescript-go/internal/parser"
+import "github.com/microsoft/TypeScript/tsc/internal/ast"
+import "github.com/microsoft/TypeScript/tsc/internal/core"
+import "github.com/microsoft/TypeScript/tsc/internal/parser"
 import _ "unsafe"
 
-//go:linkname GetJSDocCommentRanges github.com/microsoft/typescript-go/internal/parser.GetJSDocCommentRanges
+//go:linkname GetJSDocCommentRanges github.com/microsoft/TypeScript/tsc/internal/parser.GetJSDocCommentRanges
 func GetJSDocCommentRanges(f *ast.NodeFactory, commentRanges []ast.CommentRange, node *ast.Node, text string) []ast.CommentRange
 type JSDocInfo = parser.JSDocInfo
 const PCArgumentExpressions = parser.PCArgumentExpressions
@@ -45,9 +45,9 @@ const ParseFlagsJSDoc = parser.ParseFlagsJSDoc
 const ParseFlagsNone = parser.ParseFlagsNone
 const ParseFlagsType = parser.ParseFlagsType
 const ParseFlagsYield = parser.ParseFlagsYield
-//go:linkname ParseIsolatedEntityName github.com/microsoft/typescript-go/internal/parser.ParseIsolatedEntityName
+//go:linkname ParseIsolatedEntityName github.com/microsoft/TypeScript/tsc/internal/parser.ParseIsolatedEntityName
 func ParseIsolatedEntityName(text string) *ast.EntityName
-//go:linkname ParseSourceFile github.com/microsoft/typescript-go/internal/parser.ParseSourceFile
+//go:linkname ParseSourceFile github.com/microsoft/TypeScript/tsc/internal/parser.ParseSourceFile
 func ParseSourceFile(opts ast.SourceFileParseOptions, sourceText string, scriptKind core.ScriptKind) *ast.SourceFile
 type Parser = parser.Parser
 type ParserState = parser.ParserState
