@@ -552,7 +552,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
+      "description": "Unexpected any value in conditional.",
+      "help": "Use a more specific type to ensure type safety.",
       "id": "conditionErrorAny",
     },
     "range": {

@@ -46,42 +46,48 @@ func buildConditionErrorOtherMessage() rule.RuleMessage {
 func buildConditionErrorNullableBooleanMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorNullableBoolean",
-		Description: "Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.",
+		Description: "Unexpected nullable boolean value in conditional.",
+		Help:        "Handle the nullish case explicitly.",
 	}
 }
 
 func buildConditionErrorNullableObjectMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorNullableObject",
-		Description: "Unexpected nullable object value in conditional. Please handle the nullish case explicitly.",
+		Description: "Unexpected nullable object value in conditional.",
+		Help:        "Handle the nullish case explicitly.",
 	}
 }
 
 func buildConditionErrorNullableStringMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorNullableString",
-		Description: "Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.",
+		Description: "Unexpected nullable string value in conditional.",
+		Help:        "Handle the nullish and empty string cases explicitly.",
 	}
 }
 
 func buildConditionErrorNullableNumberMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorNullableNumber",
-		Description: "Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.",
+		Description: "Unexpected nullable number value in conditional.",
+		Help:        "Handle the nullish and zero cases explicitly.",
 	}
 }
 
 func buildConditionErrorNullableEnumMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorNullableEnum",
-		Description: "Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.",
+		Description: "Unexpected nullable enum value in conditional.",
+		Help:        "Handle the nullish and falsy enum cases explicitly.",
 	}
 }
 
 func buildConditionErrorAnyMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "conditionErrorAny",
-		Description: "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
+		Description: "Unexpected any value in conditional.",
+		Help:        "Use a more specific type to ensure type safety.",
 	}
 }
 
