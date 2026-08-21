@@ -1,0 +1,19 @@
+internal/rules/no_confusing_void_expression/no_confusing_void_expression.go
+  s_1127b64b4a71af::t_f8e0eb4667436e 34-35,41-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "e12f317a45fb3cb7a0c6951c1f81b983cf7e1580",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
