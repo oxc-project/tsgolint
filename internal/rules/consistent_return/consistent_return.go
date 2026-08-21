@@ -129,6 +129,71 @@ func getHasReturnValue(ctx rule.RuleContext, node *ast.ReturnStatement, treatUnd
 	return !utils.IsUndefinedLiteral(node.Expression)
 }
 
+func isNeverReturningCall(ctx rule.RuleContext, node *ast.Node) bool {
+	if !ast.IsCallExpression(node) {
+		return false
+	}
+	t := ctx.TypeChecker.GetTypeAtLocation(node)
+	return t != nil && utils.IsTypeFlagSet(t, checker.TypeFlagsNever)
+}
+
+// statementCannotCompleteNormally reports whether control cannot reach the
+// statement that follows node.
+func statementCannotCompleteNormally(ctx rule.RuleContext, node *ast.Node) bool {
+	if node == nil {
+		return false
+	}
+
+	if ast.IsReturnStatement(node) || ast.IsThrowStatement(node) {
+		return true
+	}
+	if ast.IsCallExpression(node) {
+		return isNeverReturningCall(ctx, node)
+	}
+	if ast.IsExpressionStatement(node) {
+		return statementCannotCompleteNormally(ctx, node.AsExpressionStatement().Expression)
+	}
+	if ast.IsLabeledStatement(node) {
+		return statementCannotCompleteNormally(ctx, node.AsLabeledStatement().Statement)
+	}
+	if ast.IsIfStatement(node) {
+		ifStmt := node.AsIfStatement()
+		return ifStmt.ElseStatement != nil &&
+			statementCannotCompleteNormally(ctx, ifStmt.ThenStatement) &&
+			statementCannotCompleteNormally(ctx, ifStmt.ElseStatement)
+	}
+	if ast.IsTryStatement(node) {
+		tryStmt := node.AsTryStatement()
+		if tryStmt.FinallyBlock != nil && statementCannotCompleteNormally(ctx, tryStmt.FinallyBlock) {
+			return true
+		}
+
+		tryAbrupt := statementCannotCompleteNormally(ctx, tryStmt.TryBlock)
+		if tryStmt.CatchClause == nil {
+			return tryAbrupt
+		}
+		return tryAbrupt && statementCannotCompleteNormally(ctx, tryStmt.CatchClause.AsCatchClause().Block)
+	}
+	if ast.IsBlock(node) {
+		statements := node.AsBlock().Statements
+		if statements == nil {
+			return false
+		}
+		for _, statement := range statements.Nodes {
+			if statementCannotCompleteNormally(ctx, statement) {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func implicitReturnBlocked(ctx rule.RuleContext, functionNode *ast.Node) bool {
+	body := functionNode.Body()
+	return body != nil && ast.IsBlock(body) && statementCannotCompleteNormally(ctx, body)
+}
+
 func reportMismatchedReturnStatement(ctx rule.RuleContext, node *ast.Node, currentFunction *functionState) {
 	switch currentFunction.messageId {
 	case "missingReturnValue":
@@ -170,7 +235,8 @@ var ConsistentReturnRule = rule.Rule{
 					currentFunction.hasReturn &&
 					currentFunction.hasReturnValue &&
 					currentFunction.node.Flags&ast.NodeFlagsHasImplicitReturn != 0 &&
-					!allowsVoidReturn(currentFunction) {
+					!allowsVoidReturn(currentFunction) &&
+					!implicitReturnBlocked(ctx, currentFunction.node) {
 					ctx.ReportNode(currentFunction.node, buildMissingReturnValueMessage(getFunctionNameWithKind(ctx.SourceFile, currentFunction.node)))
 				}
 				currentFunction = currentFunction.upper
