@@ -1,0 +1,21 @@
+internal/rule_tester/__snapshots__/consistent-type-exports.snap
+  s_1127b64b4a71af::t_847415168a7dde 4-5,12-13,53-54,81-82,116-117,126-127,136-137,166-167,206-207,216-217,226-227,236-237,246-247,256-257
+internal/rules/consistent_type_exports/consistent_type_exports.go
+  s_1127b64b4a71af::t_cbdf95bcff0893 19-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "6e7ccdd048081c5abac2b583a59731c85573121c",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
