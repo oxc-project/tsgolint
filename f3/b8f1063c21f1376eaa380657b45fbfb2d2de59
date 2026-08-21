@@ -1,0 +1,21 @@
+e2e/__snapshots__/snapshot.test.ts.snap
+  s_1127b64b4a71af::t_4fa86f09925ba9 3557-3558
+internal/rules/prefer_readonly/prefer_readonly.go
+  s_1127b64b4a71af::t_6ec542bdd1efe6 16-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f3b8f1063c21f1376eaa380657b45fbfb2d2de59",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
