@@ -1,0 +1,21 @@
+e2e/__snapshots__/snapshot.test.ts.snap
+  s_1127b64b4a71af::t_396c5f68eada65 2058-2059,2088-2089,2764-2765,2794-2795,2824-2825,2854-2855
+internal/rules/no_unsafe_type_assertion/no_unsafe_type_assertion.go
+  s_1127b64b4a71af::t_8ded0cbac7c3a2 17-18,24-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8ae7460b0b349bfe5ebaa83a2576f999fae3bdd9",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
