@@ -2055,7 +2055,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2084,7 +2085,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "description": "Unsafe assertion from \`any\` detected.",
+      "help": "Consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
@@ -2759,7 +2761,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2788,7 +2791,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2817,7 +2821,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "description": "Unsafe assertion from \`any\` detected.",
+      "help": "Consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
@@ -2846,7 +2851,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
