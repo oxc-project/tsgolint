@@ -1,0 +1,21 @@
+e2e/__snapshots__/snapshot.test.ts.snap
+  s_1127b64b4a71af::t_728f410d5a1da2 1113-1114,1127-1128,1141-1142,1155-1156
+internal/rules/no_implied_eval/no_implied_eval.go
+  s_1127b64b4a71af::t_9a4ec990679b2f 21-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "973a415d2c5c4a51c1fea3d40913d85e2d7bad80",
+  "prompts": {},
+  "sessions": {
+    "s_1127b64b4a71af": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a01f53-7b83-7be0-8f6d-5936910fd8c4",
+        "model": "unknown"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
