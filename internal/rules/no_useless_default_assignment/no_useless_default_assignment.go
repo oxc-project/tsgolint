@@ -23,7 +23,8 @@ func buildNoStrictNullCheckMessage() rule.RuleMessage {
 func buildPreferOptionalSyntaxMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "preferOptionalSyntax",
-		Description: "Using `= undefined` to make a parameter optional adds unnecessary runtime logic. Use the `?` optional syntax instead.",
+		Description: "Using `= undefined` to make a parameter optional adds unnecessary runtime logic.",
+		Help:        "Use the `?` optional syntax instead.",
 	}
 }
 
