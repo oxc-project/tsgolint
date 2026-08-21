@@ -82,11 +82,11 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/use_unknown_in_catch_callback_variable"
 
 	"github.com/microsoft/typescript-go/shim/ast"
-	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
+	"github.com/typescript-eslint/tsgolint/internal/bundled"
 )
 
 func recordTrace(traceOut string) (func(), error) {
