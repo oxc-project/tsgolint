@@ -225,7 +225,8 @@ Help: Remove the default assignment
 
 [TestNoUselessDefaultAssignmentRule/invalid-13 - 1]
 Diagnostic 1: preferOptionalSyntax (2:66 - 2:74)
-Message: Using `= undefined` to make a parameter optional adds unnecessary runtime logic. Use the `?` optional syntax instead.
+Message: Using `= undefined` to make a parameter optional adds unnecessary runtime logic.
+Help: Use the `?` optional syntax instead.
    1 | 
    2 |         function myFunction(p1: string, p2: number | undefined = undefined) {
      |                                                                  ~~~~~~~~~
@@ -234,7 +235,8 @@ Message: Using `= undefined` to make a parameter optional adds unnecessary runti
 
 [TestNoUselessDefaultAssignmentRule/invalid-14 - 1]
 Diagnostic 1: preferOptionalSyntax (4:104 - 4:112)
-Message: Using `= undefined` to make a parameter optional adds unnecessary runtime logic. Use the `?` optional syntax instead.
+Message: Using `= undefined` to make a parameter optional adds unnecessary runtime logic.
+Help: Use the `?` optional syntax instead.
    3 |         function f(
    4 |           /* comment */ x /* comment 2 */ : /* comment 3 */ SomeType /* comment 4 */ = /* comment 5 */ undefined,
      |                                                                                                        ~~~~~~~~~

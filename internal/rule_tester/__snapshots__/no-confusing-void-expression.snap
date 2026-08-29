@@ -173,7 +173,8 @@ Help: Add braces to the arrow function.
 
 [TestNoConfusingVoidExpression/invalid-18 - 1]
 Diagnostic 1: invalidVoidExprReturn (3:18 - 3:35)
-Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Move it before the `return` statement.
    2 |         function f() {
    3 |           return console.log('foo');
      |                  ~~~~~~~~~~~~~~~~~~
@@ -182,7 +183,8 @@ Message: Returning a void expression from a function is forbidden. Please move i
 
 [TestNoConfusingVoidExpression/invalid-19 - 1]
 Diagnostic 1: invalidVoidExprReturn (4:18 - 4:52)
-Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Move it before the `return` statement.
    3 |           console.log('foo')
    4 |           return ['bar', 'baz'].forEach(console.log)
      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -191,7 +193,8 @@ Message: Returning a void expression from a function is forbidden. Please move i
 
 [TestNoConfusingVoidExpression/invalid-20 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:18 - 4:35)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |           console.log('foo');
    4 |           return console.log('bar');
      |                  ~~~~~~~~~~~~~~~~~~
@@ -200,7 +203,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-21 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:18 - 4:52)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |           console.log('foo')
    4 |           return ['bar', 'baz'].forEach(console.log)
      |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -209,7 +213,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-22 - 1]
 Diagnostic 1: invalidVoidExprReturn (4:20 - 4:39)
-Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Move it before the `return` statement.
    3 |           if (cond) {
    4 |             return console.error('foo');
      |                    ~~~~~~~~~~~~~~~~~~~~
@@ -218,7 +223,8 @@ Message: Returning a void expression from a function is forbidden. Please move i
 
 [TestNoConfusingVoidExpression/invalid-23 - 1]
 Diagnostic 1: invalidVoidExprReturn (3:28 - 3:47)
-Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Move it before the `return` statement.
    2 |         const f = function () {
    3 |           if (cond) return console.error('foo');
      |                            ~~~~~~~~~~~~~~~~~~~~
@@ -227,7 +233,8 @@ Message: Returning a void expression from a function is forbidden. Please move i
 
 [TestNoConfusingVoidExpression/invalid-24 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:24 - 4:41)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |           let num = 1;
    4 |           return num ? console.log('foo') : num;
      |                        ~~~~~~~~~~~~~~~~~~
@@ -236,7 +243,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-25 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:26 - 4:43)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |           let undef = undefined;
    4 |           return undef ? console.log('foo') : undef;
      |                          ~~~~~~~~~~~~~~~~~~
@@ -245,7 +253,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-26 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:25 - 4:42)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |           let num = 1;
    4 |           return num || console.log('foo');
      |                         ~~~~~~~~~~~~~~~~~~
@@ -254,7 +263,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-27 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:25 - 4:42)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |           let bar = void 0;
    4 |           return bar || console.log('foo');
      |                         ~~~~~~~~~~~~~~~~~~
@@ -329,7 +339,8 @@ Message: Void expressions used inside another expression must be moved to its ow
 
 [TestNoConfusingVoidExpression/invalid-36 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:27)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    2 | function test() {
    3 |   return console.log('foo');
      |          ~~~~~~~~~~~~~~~~~~
@@ -346,7 +357,8 @@ Help: Add braces to the arrow function.
 
 [TestNoConfusingVoidExpression/invalid-38 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:27)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    2 | const test = () => {
    3 |   return console.log('foo');
      |          ~~~~~~~~~~~~~~~~~~
@@ -355,7 +367,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-39 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:12 - 4:24)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |   const bar = () => {
    4 |     return console.log();
      |            ~~~~~~~~~~~~~
@@ -424,7 +437,8 @@ Help: Add braces to the arrow function.
 
 [TestNoConfusingVoidExpression/invalid-46 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:22)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    2 | function test(): unknown {
    3 |   return console.log();
      |          ~~~~~~~~~~~~~
@@ -433,7 +447,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-47 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (3:10 - 3:22)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    2 | function test(): any {
    3 |   return console.log();
      |          ~~~~~~~~~~~~~
@@ -482,7 +497,8 @@ Help: Add braces to the arrow function.
 
 [TestNoConfusingVoidExpression/invalid-52 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (6:12 - 6:24)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    5 |   function bar() {
    6 |     return console.log();
      |            ~~~~~~~~~~~~~
@@ -491,7 +507,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-53 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (4:12 - 4:24)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    3 |   function bar() {
    4 |     return console.log();
      |            ~~~~~~~~~~~~~
@@ -500,7 +517,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-54 - 1]
 Diagnostic 1: invalidVoidExprReturn (2:8 - 2:25)
-Message: Returning a void expression from a function is forbidden. Please move it before the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Move it before the `return` statement.
    1 | 
    2 | return console.log('foo');
      |        ~~~~~~~~~~~~~~~~~~
@@ -509,7 +527,8 @@ Message: Returning a void expression from a function is forbidden. Please move i
 
 [TestNoConfusingVoidExpression/invalid-55 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (8:10 - 8:22)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    7 |   }
    8 |   return console.log();
      |          ~~~~~~~~~~~~~
@@ -518,7 +537,8 @@ Message: Returning a void expression from a function is forbidden. Please remove
 
 [TestNoConfusingVoidExpression/invalid-56 - 1]
 Diagnostic 1: invalidVoidExprReturnLast (8:10 - 8:22)
-Message: Returning a void expression from a function is forbidden. Please remove the `return` statement.
+Message: Returning a void expression from a function is forbidden.
+Help: Remove the `return` statement.
    7 |   }
    8 |   return console.log();
      |          ~~~~~~~~~~~~~

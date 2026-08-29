@@ -1,14 +1,16 @@
 
 [TestConsistentTypeExportsRule/invalid-0 - 1]
 Diagnostic 1: typeOverValue (1:1 - 1:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | export { Type1 } from './consistent-type-exports';
      | ~~~~~~
 ---
 
 [TestConsistentTypeExportsRule/invalid-1 - 1]
 Diagnostic 1: typeOverValue (1:1 - 1:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | export { Type1 as "🍎" } from './consistent-type-exports';
      | ~~~~~~
 ---
@@ -48,7 +50,8 @@ Message: Type exports Type1 and Type2 are not values and should be exported usin
 
 [TestConsistentTypeExportsRule/invalid-5 - 1]
 Diagnostic 1: typeOverValue (1:1 - 1:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | export { Type2 as Foo } from './consistent-type-exports';
      | ~~~~~~
 ---
@@ -75,7 +78,8 @@ Help: Try adding the `type` keyword: `type Type2 as Foo`
 
 [TestConsistentTypeExportsRule/invalid-8 - 1]
 Diagnostic 1: typeOverValue (3:1 - 3:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    2 | import { Type2 } from './consistent-type-exports';
    3 | export { Type2 };
      | ~~~~~~
@@ -109,7 +113,8 @@ Message: Type exports Alias and IFace are not values and should be exported usin
 
 [TestConsistentTypeExportsRule/invalid-11 - 1]
 Diagnostic 1: typeOverValue (6:1 - 6:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    5 | 
    6 | export { TypeNS };
      | ~~~~~~
@@ -118,7 +123,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-12 - 1]
 Diagnostic 1: typeOverValue (3:1 - 3:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    2 | type T = 1;
    3 | export { type T, T };
      | ~~~~~~
@@ -127,7 +133,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-13 - 1]
 Diagnostic 1: typeOverValue (3:1 - 3:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    2 | type T = 1;
    3 | export { type/* */T, type     /* */T, T };
      | ~~~~~~
@@ -156,7 +163,8 @@ Help: Try adding the `type` keyword: `type T`
 
 [TestConsistentTypeExportsRule/invalid-16 - 1]
 Diagnostic 1: typeOverValue (3:1 - 3:6)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    2 | type T = 1;
    3 | export { type T, T };
      | ~~~~~~
@@ -195,7 +203,8 @@ Message: Type exports Type1 and Type2 as Foo are not values and should be export
 
 [TestConsistentTypeExportsRule/invalid-19 - 1]
 Diagnostic 1: typeOverValue (2:9 - 2:14)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | 
    2 |         export * from './consistent-type-exports/type-only-exports';
      |         ~~~~~~
@@ -204,7 +213,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-20 - 1]
 Diagnostic 1: typeOverValue (2:25 - 2:30)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | 
    2 |         /* comment 1 */ export
      |                         ~~~~~~
@@ -213,7 +223,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-21 - 1]
 Diagnostic 1: typeOverValue (2:9 - 2:14)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | 
    2 |         export * from './consistent-type-exports/type-only-reexport';
      |         ~~~~~~
@@ -222,7 +233,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-22 - 1]
 Diagnostic 1: typeOverValue (2:9 - 2:14)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    1 | 
    2 |         export * as foo from './consistent-type-exports/type-only-reexport';
      |         ~~~~~~
@@ -231,7 +243,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-23 - 1]
 Diagnostic 1: typeOverValue (4:9 - 4:14)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    3 |         type Foo = 1;
    4 |         export { Foo };
      |         ~~~~~~
@@ -240,7 +253,8 @@ Message: All exports in the declaration are only used as types. Use `export type
 
 [TestConsistentTypeExportsRule/invalid-24 - 1]
 Diagnostic 1: typeOverValue (3:9 - 3:14)
-Message: All exports in the declaration are only used as types. Use `export type`.
+Message: All exports in the declaration are only used as types.
+Help: Use `export type`.
    2 |         import { type NAME as Foo } from './consistent-type-exports';
    3 |         export { Foo };
      |         ~~~~~~
