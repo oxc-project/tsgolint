@@ -168,8 +168,20 @@ func RunLinter(options RunLinterOptions) error {
 	}
 
 	{
+		// A file that belongs to no tsconfig goes into an inferred project, which has no content
+		// mappers, so its extension has to be one TypeScript itself can parse. Report the rest instead
+		// of handing them to the parser, which has no script kind for them.
+		inferredFiles := make([]string, 0, len(workload.UnmatchedFiles))
+		for _, f := range workload.UnmatchedFiles {
+			if core.GetScriptKindFromFileName(f) == core.ScriptKindUnknown {
+				onInternalDiagnostic(unsupportedFileExtensionDiagnostic(f))
+				continue
+			}
+			inferredFiles = append(inferredFiles, f)
+		}
+
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
-		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
+		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, inferredFiles)
 
 		if err != nil {
 			return err
@@ -181,8 +193,8 @@ func RunLinter(options RunLinterOptions) error {
 			}
 		}
 
-		files := make([]*ast.SourceFile, 0, len(workload.UnmatchedFiles))
-		for _, f := range workload.UnmatchedFiles {
+		files := make([]*ast.SourceFile, 0, len(inferredFiles))
+		for _, f := range inferredFiles {
 			sf := program.GetSourceFile(f)
 			if sf == nil {
 				panic(fmt.Sprintf("Expected file '%s' to be in inferred program", f))
@@ -209,6 +221,25 @@ func RunLinter(options RunLinterOptions) error {
 
 	return nil
 
+}
+
+// unsupportedFileExtensionDiagnostic reports a file tsgolint was asked to lint but cannot parse. It is
+// what a file with a languageOptions.parser override lands on when no content mapper claims its
+// extension: either the tsconfig that includes it declares no mapper for it, or the mapper it declares
+// failed to resolve, so the file was never registered and fell through to the inferred project.
+func unsupportedFileExtensionDiagnostic(fileName string) diagnostic.Internal {
+	extension := tspath.GetAnyExtensionFromPath(fileName, nil, false)
+	if extension == "" {
+		extension = "this file"
+	}
+	return diagnostic.Internal{
+		Range:       core.NewTextRange(0, 0),
+		Id:          "unsupported-file-extension",
+		Description: "Unsupported file extension",
+		Help: "tsgolint cannot type-check " + extension + " files on their own. Register a TypeScript " +
+			"content mapper for the extension in the \"contentMappers\" of the tsconfig that includes this file.",
+		FilePath: &fileName,
+	}
 }
 
 // ruleContextBuilder is a per-worker struct that provides the RuleContext
