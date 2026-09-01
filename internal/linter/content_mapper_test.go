@@ -4,6 +4,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"strings"
 	"sync"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/microsoft/TypeScript/tsc/shim/tspath"
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_condition"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unnecessary_type_assertion"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_unsafe_assignment"
@@ -154,4 +156,39 @@ func TestContentMapperOwnDiagnostics(t *testing.T) {
 	assert.Equal(t, internalDiags[0].Description, "test mapper syntax error")
 	original := sourceFile.OriginalText()
 	assert.Equal(t, original[internalDiags[0].Range.Pos():internalDiags[0].Range.End()], "@@mapper-error@@")
+}
+
+// TestUnmappedExtensionIsReported covers a file whose extension no content mapper claims — an oxlint
+// languageOptions.parser override pointing at a tsconfig that registers no mapper for it. It has to
+// land on a diagnostic; the parser has no script kind for the file and used to panic on it.
+func TestUnmappedExtensionIsReported(t *testing.T) {
+	rootDir := fixtures.GetRootDir()
+	mappedFile := tspath.ResolvePath(rootDir, "component.gts")
+
+	fs := utils.NewOverlayVFS(cachedBaseFS, map[string]string{
+		mappedFile: "const a = 1;\n<template>{{a}}</template>\n",
+	})
+
+	var mu sync.Mutex
+	var internalDiags []diagnostic.Internal
+	err := RunLinter(RunLinterOptions{
+		LogLevel:         utils.LogLevelNormal,
+		CurrentDirectory: rootDir,
+		FS:               fs,
+		Workload:         Workload{Programs: map[string][]string{}, UnmatchedFiles: []string{mappedFile}},
+		Workers:          1,
+		GetRulesForFile:  func(*ast.SourceFile) []ConfiguredRule { return nil },
+		OnRuleDiagnostic: func(rule.RuleDiagnostic) {},
+		OnInternalDiagnostic: func(d diagnostic.Internal) {
+			mu.Lock()
+			defer mu.Unlock()
+			internalDiags = append(internalDiags, d)
+		},
+	})
+	assert.NilError(t, err)
+
+	assert.Equal(t, len(internalDiags), 1)
+	assert.Equal(t, internalDiags[0].Id, "unsupported-file-extension")
+	assert.Equal(t, *internalDiags[0].FilePath, mappedFile)
+	assert.Assert(t, strings.Contains(internalDiags[0].Help, ".gts"), "help should name the extension: %v", internalDiags[0].Help)
 }
