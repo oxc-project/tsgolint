@@ -1,6 +1,8 @@
 package no_unnecessary_boolean_literal_compare
 
 import (
+	"strings"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
@@ -54,6 +56,35 @@ type booleanComparison struct {
 
 func isBooleanType(t *checker.Type) bool {
 	return utils.IsTypeFlagSet(t, checker.TypeFlagsBooleanLike)
+}
+
+func isConditionalTest(node *ast.Node) bool {
+	for parent := node.Parent; parent != nil; parent = node.Parent {
+		switch parent.Kind {
+		case ast.KindParenthesizedExpression:
+		case ast.KindBinaryExpression:
+			operator := parent.AsBinaryExpression().OperatorToken.Kind
+			if operator != ast.KindAmpersandAmpersandToken && operator != ast.KindBarBarToken {
+				return false
+			}
+		case ast.KindIfStatement:
+			return parent.AsIfStatement().Expression == node
+		case ast.KindWhileStatement:
+			return parent.AsWhileStatement().Expression == node
+		case ast.KindDoStatement:
+			return parent.AsDoStatement().Expression == node
+		case ast.KindForStatement:
+			return parent.AsForStatement().Condition == node
+		case ast.KindConditionalExpression:
+			return parent.AsConditionalExpression().Condition == node
+		case ast.KindPrefixUnaryExpression:
+			return parent.AsPrefixUnaryExpression().Operator == ast.KindExclamationToken
+		default:
+			return false
+		}
+		node = parent
+	}
+	return false
 }
 
 var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
@@ -169,6 +200,16 @@ var NoUnnecessaryBooleanLiteralCompareRule = rule.Rule{
 					mutatedNode := node
 					if isUnaryNegation {
 						mutatedNode = parent
+					}
+
+					if comparison.expressionIsNullableBoolean && comparison.literalBooleanInComparison &&
+						shouldNegate != isUnaryNegation && !isConditionalTest(mutatedNode) {
+						text := strings.TrimSpace(ctx.SourceFile.Text()[comparison.expression.Pos():comparison.expression.End()])
+						if !utils.IsStrongPrecedenceNode(comparison.expression) {
+							text = "(" + text + ")"
+						}
+						// Coercion preserves both the boolean result and TypeScript's narrowing.
+						return []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, mutatedNode, "(!!"+text+")")}
 					}
 
 					fixes := make([]rule.RuleFix, 0, 6)
