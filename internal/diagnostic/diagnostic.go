@@ -1,6 +1,6 @@
 package diagnostic
 
-import "github.com/microsoft/typescript-go/shim/core"
+import "github.com/microsoft/TypeScript/tsc/shim/core"
 
 type Internal struct {
 	Range       core.TextRange

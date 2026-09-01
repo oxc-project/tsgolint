@@ -1,10 +1,10 @@
 ## How shims work?
 
-For each internal typescript-go package that we want to use, shim module must be created.
+For each internal native TypeScript package that we want to use, a shim module must be created.
 
 ### Shim Go module
 
-Go module `module github.com/microsoft/typescript-go/shim/<package name>` must be initialized in the [shim/ directory](../../shim/).
+Go module `module github.com/microsoft/TypeScript/tsc/shim/<package name>` must be initialized in the [shim/ directory](../../shim/).
 
 Package name should be added to [`main.go`](./main.go) alongside the other packages.
 

@@ -1,38 +1,38 @@
 # AGENTS.md - AI Assistant Guide for TSGolint
 
-TSGolint is a static analysis tool, based on typescript-go, for implementing and running type aware linting rules on TypeScript code.
+TSGolint is a static analysis tool based on TypeScript's native Go compiler for implementing and running type-aware linting rules on TypeScript code.
 
-## ⚠️ CRITICAL: typescript-go Submodule Warning
+## ⚠️ CRITICAL: typescript Submodule Warning
 
 **DO NOT COMMIT SUBMODULE POINTER CHANGES**
 
-The `typescript-go/` directory is a Git submodule that references Microsoft's TypeScript Go port.
+The `typescript/` directory is a Git submodule that references the `microsoft/TypeScript` monorepo. The native Go compiler lives under `typescript/tsc/`.
 
 ### During Development
 
-- Changes ARE allowed to the typescript-go submodule for testing and development
-- You can freely modify and commit within the `typescript-go/` folder
-- Use normal git commands within the typescript-go directory as needed
+- Changes ARE allowed to the typescript submodule for testing and development
+- You can freely modify and commit within the `typescript/` folder
+- Use normal git commands within the typescript directory as needed
 
 ### Before Creating a TSGolint Commit
 
 - Check `git status` before committing.
-- **NEVER** stage or commit submodule pointer changes unless explicitly performing a `typescript-go` submodule update.
-- If you are performing a submodule update, make sure to stage and commit the new pointer to the upstream typescript-go commit. MAKE SURE this pointer DOES NOT include the additional patches.
+- **NEVER** stage or commit submodule pointer changes unless explicitly performing a `typescript` submodule update.
+- If you are performing a submodule update, make sure to stage and commit the new pointer to the upstream TypeScript commit. MAKE SURE this pointer DOES NOT include the additional patches.
 
 ### Creating Permanent Changes
 
-If you need to modify typescript-go functionality permanently:
+If you need to modify native TypeScript functionality permanently:
 
-1. Test your changes locally in the typescript-go directory
+1. Test your changes locally in the typescript directory
 2. Create a patch file in `patches/` using `git format-patch`
 3. Document the patch purpose in `patches/README.md`
-4. Reset the typescript-go submodule only after the patch has been created and the user has approved, or when the task explicitly requires the patch workflow
+4. Reset the typescript submodule only after the patch has been created and the user has approved, or when the task explicitly requires the patch workflow
 5. The patches are applied during project initialization (`just init`) using `git am --3way --no-gpg-sign ../patches/*.patch`
 
 ### Exposing New Functions
 
-When exposing new functions from typescript-go:
+When exposing new functions from TypeScript:
 
 1. Add the function to the appropriate shim configuration (e.g., `shim/*/extra-shim.json`)
 2. **IMPORTANT**: Regenerate the shim files by running:
@@ -44,12 +44,12 @@ When exposing new functions from typescript-go:
 
 ## Repository Structure
 
-- `typescript-go/` - **[SUBMODULE]** TypeScript Go port submodule (temporary local edits are OK for testing; never commit submodule pointer changes)
-- `patches/` - Patches applied to typescript-go during `just init`
-- `shim/` - **[GENERATED - DO NOT EDIT]** Generated Go bindings to typescript-go internals
+- `typescript/` - **[SUBMODULE]** `microsoft/TypeScript` monorepo (native Go compiler in `tsc/`; temporary local edits are OK for testing; never commit submodule pointer changes)
+- `patches/` - Patches applied to typescript during `just init`
+- `shim/` - **[GENERATED - DO NOT EDIT]** Generated Go bindings to native TypeScript internals
 - `cmd/` - CLI entry point and main application
 - `internal/` - Core linting logic and rule implementations
-  - `collections/` - Copied from `typescript-go/internal/collections` during `just init`
+  - `collections/` - Copied from `typescript/tsc/internal/collections` during `just init`
   - `linter/` - Linting engine and worker pool
   - `rule/` - Rule interface and context management
   - `rules/` - Individual rule implementations (50+ rules)
@@ -70,7 +70,7 @@ TSGolint serves as a type-aware linting backend for Oxlint:
 
 - **Oxlint** handles CLI, file discovery, and output formatting
 - **TSGolint** processes TypeScript files and returns diagnostics
-- Uses typescript-go for native-speed parsing and type checking
+- Uses TypeScript's native Go compiler for native-speed parsing and type checking
 - Implements 50+ type-aware rules from typescript-eslint
 
 ### 2. Performance Design
@@ -169,10 +169,10 @@ OXC_LOG=debug tsgolint
 
 ### DO NOT Modify
 
-- `typescript-go/*` - Submodule in this repo (do not commit direct submodule pointer updates; use `patches/*` for permanent changes)
+- `typescript/*` - Submodule in this repo (do not commit direct submodule pointer updates; use `patches/*` for permanent changes)
 - `shim/*` - Generated code (regenerate with tools)
 - `.gitmodules` - Submodule configuration
-- `internal/collections/*` - Synced from `typescript-go` by `just init`
+- `internal/collections/*` - Synced from `typescript` by `just init`
 
 ### Modify with Caution
 
@@ -208,7 +208,7 @@ When working on TSGolint:
 
 ## Common Pitfalls
 
-1. **Modifying typescript-go without patches**: Changes will be lost on submodule update
+1. **Modifying typescript without patches**: Changes will be lost on submodule update
 2. **Editing shims**: Manual edits will be overwritten on regeneration
 3. **Blocking workers**: Reduces parallelism and performance
 4. **AST assumptions**: TypeScript AST differs from ESTree
@@ -238,7 +238,7 @@ just ready
 # Regenerate shims
 just shim
 
-# Update typescript-go from upstream
+# Update typescript from upstream
 just pull
 
 # Run specific rule tests
@@ -271,7 +271,7 @@ The integration point is the headless mode in `cmd/tsgolint/headless.go` (with p
 
 ## Contributing Guidelines
 
-1. **Never commit `typescript-go` submodule pointer changes**
+1. **Never commit `typescript` submodule pointer changes**
 2. Follow existing code patterns
 3. Add comprehensive tests
 4. Document complex logic
@@ -281,6 +281,6 @@ The integration point is the headless mode in `cmd/tsgolint/headless.go` (with p
 ## Resources
 
 - [TypeScript-ESLint Rules](https://typescript-eslint.io/rules/) - Rule specifications
-- [typescript-go](https://github.com/microsoft/typescript-go) - TypeScript Go port
+- [TypeScript native compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) - TypeScript's Go compiler
 - [Oxlint](https://oxc.rs/docs/guide/usage/linter.html) - Frontend linter
 - [Architecture Doc](./ARCHITECTURE.md) - Detailed system design
