@@ -33,7 +33,13 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
 	}
 
-	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, &core.CompilerOptions{}, nil, host, nil)
+	// Content mappers are dropped (with a tsconfig error) unless runExternalCode is on; see
+	// ContentMappersEnabled for why tsgolint turns it on by default.
+	overrideOptions := &core.CompilerOptions{}
+	if ContentMappersEnabled() {
+		overrideOptions.RunExternalCode = core.TSTrue
+	}
+	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, overrideOptions, nil, host, nil)
 
 	if len(diagnostics) > 0 {
 		internalDiags := make([]diagnostic.Internal, len(diagnostics))
@@ -72,6 +78,8 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		}
 		return nil, internalDiags, nil
 	}
+
+	SetContentMapperProject(host, OpenContentMapperProject(configParseResult))
 
 	opts := compiler.ProgramOptions{
 		Config:                      configParseResult,

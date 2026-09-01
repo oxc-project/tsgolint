@@ -2,7 +2,9 @@
 internal/collections/
 e2e/node_modules/
 node_modules/
+# The content mapper test fixture resolves its mapper the way a real project does, through
+# node_modules; its (dependency-free) package is checked in.
+!internal/linter/testdata/contentmapper/node_modules/
 
 *.pprof
 *.out
-
