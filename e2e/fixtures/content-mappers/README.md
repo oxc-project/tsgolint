@@ -24,3 +24,17 @@ scaffolding.
 `counter.gts` carries a deliberate type error inside `<template>` (`{{this.cuont}}` against a class
 that declares `count`). The CLI does not report type errors, so check it through the headless
 interface with `report_semantic`; it should be reported as TS2551 over the `.gts` offsets of `cuont`.
+
+## Known wart: a broken mapper can report nothing useful
+
+When the `contentMappers` entry names a package that does not resolve, TypeScript drops the mapper and
+unregisters its extensions. The `.gts` files then match no tsconfig, so tsgolint builds no program for
+that config and its "could not be resolved" error never surfaces — all you get is the
+`unsupported-file-extension` diagnostic, which does not mention the mapper that was supposed to claim
+the file.
+
+Whether the real error appears depends on the **set of files being linted**, not on what the tsconfig
+contains: it surfaces only when some natively parseable file from the same tsconfig is also in the
+lint set, because that is what causes a program to be built. Linting a whole project usually includes
+one; linting a single `.gts` (an editor, or `oxlint path/to/component.gts`) does not, so the same
+broken config reports the mapper error in a project-wide run and stays silent in a single-file one.
