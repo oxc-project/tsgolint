@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2022",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "skipLibCheck": true
+  },
+  "contentMappers": [{ "package": "test-content-mapper", "extensions": [".ext"] }],
+  "include": ["src"]
+}

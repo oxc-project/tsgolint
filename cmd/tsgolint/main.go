@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
 	"github.com/typescript-eslint/tsgolint/internal/linter"
@@ -83,6 +84,7 @@ import (
 
 	"github.com/microsoft/TypeScript/tsc/shim/ast"
 	"github.com/microsoft/TypeScript/tsc/shim/bundled"
+	"github.com/microsoft/TypeScript/tsc/shim/core"
 	"github.com/microsoft/TypeScript/tsc/shim/scanner"
 	"github.com/microsoft/TypeScript/tsc/shim/tspath"
 	"github.com/microsoft/TypeScript/tsc/shim/vfs/cachedvfs"
@@ -231,21 +233,55 @@ func init() {
 
 const spaces = "                                                                                                    "
 
+// originalTextSource presents a content-mapped file's original text to the code frame printer.
+// Diagnostic ranges have already been mapped back by the linter, so they have to be rendered against
+// the file the user wrote rather than the mapper's virtual TypeScript.
+type originalTextSource struct {
+	text    string
+	lineMap []core.TextPos
+}
+
+func (s *originalTextSource) Text() string                { return s.text }
+func (s *originalTextSource) ECMALineMap() []core.TextPos { return s.lineMap }
+
+func diagnosticSource(file *ast.SourceFile) ast.SourceFileLike {
+	if !utils.IsContentMapped(file) {
+		return file
+	}
+	text := file.OriginalText()
+	return &originalTextSource{text: text, lineMap: core.ComputeECMALineStarts(text)}
+}
+
+// endLinePosition is scanner.GetECMAEndLinePosition against arbitrary text; the scanner's own version
+// only accepts a *ast.SourceFile.
+func endLinePosition(text string, lineMap []core.TextPos, line int) int {
+	pos := int(lineMap[line])
+	for {
+		ch, size := utf8.DecodeRuneInString(text[pos:])
+		if size == 0 || ch == '\n' || ch == '\r' || ch == '\u2028' || ch == '\u2029' {
+			return pos - 1
+		}
+		pos += size
+	}
+}
+
 func printDiagnostic(d rule.RuleDiagnostic, w *bufio.Writer, comparePathOptions tspath.ComparePathsOptions) {
 	diagnosticStart := d.Range.Pos()
 	diagnosticEnd := d.Range.End()
 
-	diagnosticStartLine, diagnosticStartColumn := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, diagnosticStart)
-	diagnosticEndline, _ := scanner.GetECMALineAndUTF16CharacterOfPosition(d.SourceFile, diagnosticEnd)
+	source := diagnosticSource(d.SourceFile)
 
-	lineMap := d.SourceFile.ECMALineMap()
-	text := d.SourceFile.Text()
+	diagnosticStartLine, diagnosticStartColumn := scanner.GetECMALineAndUTF16CharacterOfPosition(source, diagnosticStart)
+	diagnosticEndline, _ := scanner.GetECMALineAndUTF16CharacterOfPosition(source, diagnosticEnd)
+
+	lineMap := source.ECMALineMap()
+	text := source.Text()
 
 	codeboxStartLine := max(diagnosticStartLine-1, 0)
 	codeboxEndLine := min(diagnosticEndline+1, len(lineMap)-1)
 
-	codeboxStart := scanner.GetECMAPositionOfLineAndUTF16Character(d.SourceFile, codeboxStartLine, 0)
-	codeboxEnd := scanner.GetECMAEndLinePosition(d.SourceFile, codeboxEndLine) + 1
+	codeboxStart := int(lineMap[codeboxStartLine])
+	codeboxEnd := endLinePosition(text, lineMap, codeboxEndLine) + 1
 
 	w.Write([]byte{' ', 0x1b, '[', '7', 'm', 0x1b, '[', '1', 'm', 0x1b, '[', '3', '8', ';', '5', ';', '3', '7', 'm', ' '})
 	w.WriteString(d.RuleName)
@@ -472,6 +508,8 @@ func runMain() int {
 
 	enableVirtualTerminalProcessing()
 	timeBefore := time.Now()
+
+	defer utils.ShutdownContentMappers()
 
 	if done, err := recordTrace(traceOut); err != nil {
 		os.Stderr.WriteString(err.Error())

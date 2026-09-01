@@ -54,6 +54,7 @@ func main() {
 		"contentmapper",
 		"core",
 		"jsnum",
+		"locale",
 		"lsp/lsproto",
 		"parser",
 		"project",

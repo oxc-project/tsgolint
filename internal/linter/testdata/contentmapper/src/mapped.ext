@@ -1,0 +1,6 @@
+const always = { a: 1 };
+if (always) {
+}
+const n: number = 1;
+const m = n as number;
+export { m };

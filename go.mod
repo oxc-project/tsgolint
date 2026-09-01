@@ -10,6 +10,7 @@ replace (
 	github.com/microsoft/TypeScript/tsc/shim/contentmapper => ./shim/contentmapper
 	github.com/microsoft/TypeScript/tsc/shim/core => ./shim/core
 	github.com/microsoft/TypeScript/tsc/shim/jsnum => ./shim/jsnum
+	github.com/microsoft/TypeScript/tsc/shim/locale => ./shim/locale
 	github.com/microsoft/TypeScript/tsc/shim/lsp/lsproto => ./shim/lsp/lsproto
 	github.com/microsoft/TypeScript/tsc/shim/parser => ./shim/parser
 	github.com/microsoft/TypeScript/tsc/shim/project => ./shim/project
@@ -29,6 +30,7 @@ require (
 	github.com/microsoft/TypeScript/tsc/shim/contentmapper v0.0.0
 	github.com/microsoft/TypeScript/tsc/shim/core v0.0.0
 	github.com/microsoft/TypeScript/tsc/shim/jsnum v0.0.0
+	github.com/microsoft/TypeScript/tsc/shim/locale v0.0.0
 	github.com/microsoft/TypeScript/tsc/shim/parser v0.0.0
 	github.com/microsoft/TypeScript/tsc/shim/project v0.0.0
 	github.com/microsoft/TypeScript/tsc/shim/scanner v0.0.0

@@ -23,6 +23,7 @@ type compilerHost struct {
 	extendedConfigCache       tsoptions.ExtendedConfigCache
 	trace                     func(msg *ast.DiagnosticsMessage, args ...any)
 	resolvedProjectReferences collections.SyncMap[tspath.Path, *tsoptions.ParsedCommandLine]
+	contentMapperProject      contentmapper.Project
 }
 
 func NewCachedFSCompilerHost(
@@ -108,12 +109,32 @@ func (h *compilerHost) GetSourceFile(opts ast.SourceFileParseOptions) *ast.Sourc
 	return result
 }
 
-func (h *compilerHost) GetContentMappedSourceFiles(ast.SourceFileParseOptions, *contentmapper.Mapper) (contentmapper.SourceFiles, error) {
-	return contentmapper.SourceFiles{}, contentmapper.ErrProjectUnavailable
+func (h *compilerHost) GetContentMappedSourceFiles(parseOptions ast.SourceFileParseOptions, mapper *contentmapper.Mapper) (contentmapper.SourceFiles, error) {
+	if h.contentMapperProject == nil {
+		return contentmapper.SourceFiles{}, contentmapper.ErrProjectUnavailable
+	}
+	content, ok := h.FS().ReadFile(parseOptions.FileName)
+	if !ok {
+		return contentmapper.SourceFiles{}, nil
+	}
+	files, err := contentmapper.TransformAndParse(parseOptions, content, mapper, h.contentMapperProject)
+	if err == nil {
+		err = contentmapper.CheckSupplementalFileNameCollisions(files, h.FS().FileExists)
+	}
+	return files, err
 }
 
 func (h *compilerHost) ContentMapperProject() contentmapper.Project {
-	return nil
+	return h.contentMapperProject
+}
+
+// SetContentMapperProject installs the project-scoped mapper view. The project can only be opened once
+// the tsconfig has been parsed, which needs the host, so it is attached afterwards rather than passed to
+// the constructor as it is in tsc. It must be set before the program loads any file.
+func SetContentMapperProject(host compiler.CompilerHost, project contentmapper.Project) {
+	if h, ok := host.(*compilerHost); ok {
+		h.contentMapperProject = project
+	}
 }
 
 func (h *compilerHost) GetResolvedProjectReference(fileName string, path tspath.Path) *tsoptions.ParsedCommandLine {

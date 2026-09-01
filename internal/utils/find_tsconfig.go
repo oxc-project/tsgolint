@@ -29,6 +29,10 @@ func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
 			false,
 			project.TsGoLintNewSnapshotFSBuilder(fs, currentDirectory), &project.ConfigFileRegistry{}, project.NewExtendedConfigCache(), 0, &project.SessionOptions{
 				CurrentDirectory: currentDirectory,
+				// Content mappers register their extensions only when runExternalCode is on; without it the
+				// resolver would not see a .gts file among a config's file names and would route it to the
+				// inferred project. Matches the override CreateProgram applies.
+				RunExternalCode: ContentMappersEnabled(),
 			}, "", nil),
 	}
 }

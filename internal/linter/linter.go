@@ -229,7 +229,71 @@ type ruleContextBuilder struct {
 func (b *ruleContextBuilder) emitDiagnostic(d rule.RuleDiagnostic) {
 	d.RuleName = b.ruleName
 	d.SourceFile = b.file
+	if utils.IsContentMapped(b.file) && !mapContentMappedRuleDiagnostic(&d) {
+		return
+	}
 	b.onDiagnostic(d)
+}
+
+// mapContentMappedRuleDiagnostic rewrites a diagnostic reported against a content mapper's virtual
+// TypeScript so it points into the original file. It returns false when the diagnostic has no place in
+// the original file and should be dropped.
+//
+// Fixes and suggestions survive only where every range they touch maps verbatim; see
+// mapContentMappedFixes.
+func mapContentMappedRuleDiagnostic(d *rule.RuleDiagnostic) bool {
+	mapped, ok := utils.MapContentMappedLintRange(d.SourceFile, d.Range)
+	if !ok {
+		return false
+	}
+	d.Range = mapped
+	if d.FixesPtr != nil {
+		fixes, ok := mapContentMappedFixes(d.SourceFile, *d.FixesPtr)
+		if !ok {
+			fixes = nil
+		}
+		d.FixesPtr = &fixes
+	}
+	if d.Suggestions != nil {
+		suggestions := make([]rule.RuleSuggestion, 0, len(*d.Suggestions))
+		for _, suggestion := range *d.Suggestions {
+			fixes, ok := mapContentMappedFixes(d.SourceFile, suggestion.FixesArr)
+			if !ok {
+				continue
+			}
+			suggestion.FixesArr = fixes
+			suggestions = append(suggestions, suggestion)
+		}
+		d.Suggestions = &suggestions
+	}
+	if len(d.LabeledRanges) > 0 {
+		labeled := make([]rule.RuleLabeledRange, 0, len(d.LabeledRanges))
+		for _, labeledRange := range d.LabeledRanges {
+			if mapped, ok := utils.MapContentMappedLintRange(d.SourceFile, labeledRange.Range); ok {
+				labeledRange.Range = mapped
+				labeled = append(labeled, labeledRange)
+			}
+		}
+		d.LabeledRanges = labeled
+	}
+	return true
+}
+
+// mapContentMappedFixes rewrites an autofix's ranges into the original file. It returns false when any
+// range is not an exact verbatim mapping, in which case the whole fix has to be dropped: applying part
+// of a fix would be worse than applying none. In practice this keeps fixes for a mapped file's copied
+// script content and drops them for anything the mapper synthesized.
+func mapContentMappedFixes(file *ast.SourceFile, fixes []rule.RuleFix) ([]rule.RuleFix, bool) {
+	mapped := make([]rule.RuleFix, len(fixes))
+	for i, fix := range fixes {
+		r, ok := utils.MapContentMappedEditRange(file, fix.Range)
+		if !ok {
+			return nil, false
+		}
+		fix.Range = r
+		mapped[i] = fix
+	}
+	return mapped, true
 }
 
 func (b *ruleContextBuilder) reportDiagnosticWithFixes(d rule.RuleDiagnostic, fixesFn func() []rule.RuleFix) {
@@ -323,8 +387,12 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 			syntacticDiagnostics := program.GetSyntacticDiagnostics(ctx, file)
 			for _, d := range syntacticDiagnostics {
 				if d.File() != nil && d.File().FileName() == fileName {
+					loc, ok := utils.MapContentMappedDiagnosticRange(file, d)
+					if !ok {
+						continue
+					}
 					onInternalDiagnostic(diagnostic.Internal{
-						Range:       d.Loc(),
+						Range:       loc,
 						Id:          "TS" + strconv.Itoa(int(d.Code())),
 						Description: utils.GetDiagnosticMessage(d),
 						FilePath:    &fileName,
@@ -353,8 +421,12 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 
 			for _, d := range finalDiagnostics {
 				if d.File() != nil && d.File().FileName() == fileName {
+					loc, ok := utils.MapContentMappedDiagnosticRange(file, d)
+					if !ok {
+						continue
+					}
 					onInternalDiagnostic(diagnostic.Internal{
-						Range:       d.Loc(),
+						Range:       loc,
 						Id:          "TS" + strconv.Itoa(int(d.Code())),
 						Description: utils.GetDiagnosticMessage(d),
 						FilePath:    &fileName,

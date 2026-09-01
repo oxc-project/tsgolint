@@ -233,6 +233,8 @@ func runHeadless(args []string) int {
 		defer cleanup()
 	}
 
+	defer utils.ShutdownContentMappers()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
