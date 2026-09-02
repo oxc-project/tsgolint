@@ -13,10 +13,16 @@ lives in `internal/linter/content_mapper_test.go`, which drives a dependency-fre
 ```sh
 npm install                 # in this directory
 just build                  # in the repo root
-cd e2e/fixtures/content-mappers && ../../../tsgolint
+cd e2e/fixtures/content-mappers && ../../../tsgolint --runExternalCode
 ```
 
-Expected: two type-aware findings inside `<template>` in `widget.gts` (`no-unnecessary-condition` and
+`--runExternalCode` is required. It mirrors tsc's flag of the same name: a content mapper runs a
+process out of the project's `node_modules`, so the permission comes from whoever invoked tsgolint
+and never from the project's own tsconfig. Through the headless interface it is `run_external_code`
+in the payload. Without it, tsgolint reports TS100024, leaves the `.gts` files out of the program, and
+lints the rest of the project normally, which is what `tsc` does.
+
+Expected, with the flag: two type-aware findings inside `<template>` in `widget.gts` (`no-unnecessary-condition` and
 `strict-boolean-expressions` on `this.always`), one in the script section of `fixable.gts`
 (`no-unnecessary-type-assertion` on `n as number`), and nothing anchored on Glint's `__glintDSL__`
 scaffolding.

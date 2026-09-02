@@ -13,7 +13,7 @@ import (
 func TestFindTsconfigForFile(t *testing.T) {
 	rootDir := fixtures.GetRootDir()
 	fs := osvfs.FS()
-	resolver := NewTsConfigResolver(fs, rootDir)
+	resolver := NewTsConfigResolver(fs, rootDir, false)
 
 	expectedConfigPath := filepath.Join(rootDir, "tsconfig.json")
 
@@ -76,7 +76,7 @@ func TestFindTsconfigForFile(t *testing.T) {
 func TestFindTsConfigParallel(t *testing.T) {
 	rootDir := fixtures.GetRootDir()
 	fs := osvfs.FS()
-	resolver := NewTsConfigResolver(fs, rootDir)
+	resolver := NewTsConfigResolver(fs, rootDir, false)
 
 	expectedConfigPath := filepath.Join(rootDir, "tsconfig.json")
 
@@ -171,7 +171,7 @@ func TestFindTsConfigParallel_UsesAncestorConfigWhenNearestConfigExcludesFile(t 
 }
 `), 0o644))
 
-	resolver := NewTsConfigResolver(osvfs.FS(), rootDir)
+	resolver := NewTsConfigResolver(osvfs.FS(), rootDir, false)
 
 	config, found := resolver.FindTsconfigForFile(filePath, false)
 	assert.Equal(t, true, found)
@@ -186,7 +186,7 @@ func TestFindTsConfigParallel_UsesAncestorConfigWhenNearestConfigExcludesFile(t 
 func TestFindTsConfigParallel_Consistency(t *testing.T) {
 	rootDir := fixtures.GetRootDir()
 	fs := osvfs.FS()
-	resolver := NewTsConfigResolver(fs, rootDir)
+	resolver := NewTsConfigResolver(fs, rootDir, false)
 
 	testFiles := []string{
 		filepath.Join(rootDir, "file.ts"),
@@ -223,7 +223,7 @@ func TestFindTsConfigParallel_Consistency(t *testing.T) {
 func TestFindTsConfigParallel_Determinism(t *testing.T) {
 	rootDir := fixtures.GetRootDir()
 	fs := osvfs.FS()
-	resolver := NewTsConfigResolver(fs, rootDir)
+	resolver := NewTsConfigResolver(fs, rootDir, false)
 
 	testFiles := []string{
 		filepath.Join(rootDir, "file.ts"),

@@ -60,7 +60,11 @@ type RunLinterOptions struct {
 	Fixes                      Fixes
 	TypeErrors                 TypeErrors
 	SuppressProgramDiagnostics bool
-	TimingStore                *RuleTimingStore
+	// RunExternalCode grants configured content mappers permission to run their external processes.
+	// It mirrors tsc's command-line-only flag: it comes from whoever invoked tsgolint, never from a
+	// project's own tsconfig.
+	RunExternalCode bool
+	TimingStore     *RuleTimingStore
 }
 
 // This is same as `RunLinterOptions` but for a single program.
@@ -89,6 +93,7 @@ func RunLinter(options RunLinterOptions) error {
 	fixState := options.Fixes
 	typeErrors := options.TypeErrors
 	suppressProgramDiagnostics := options.SuppressProgramDiagnostics
+	runExternalCode := options.RunExternalCode
 	timingStore := options.TimingStore
 
 	idx := 0
@@ -100,16 +105,19 @@ func RunLinter(options RunLinterOptions) error {
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
-		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics)
+		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics, runExternalCode)
 
 		if err != nil {
 			return err
 		}
 
+		// Reported whether or not a program was built: a denied content mapper is surfaced alongside a
+		// program that lints everything the mappers did not claim.
+		for _, d := range diagnostics {
+			onInternalDiagnostic(d)
+		}
+
 		if program == nil {
-			for _, d := range diagnostics {
-				onInternalDiagnostic(d)
-			}
 			idx++
 			continue
 		}

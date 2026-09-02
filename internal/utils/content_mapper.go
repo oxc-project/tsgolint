@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"log"
-	"os"
 	"os/exec"
 	"sync"
 	"time"
@@ -14,16 +13,6 @@ import (
 	"github.com/microsoft/TypeScript/tsc/shim/locale"
 	"github.com/microsoft/TypeScript/tsc/shim/tsoptions"
 )
-
-// ContentMappersDisabledEnvVar turns content mappers off for a run. tsgolint enables
-// `runExternalCode` by default (see RunExternalCode in create_program.go); this is the escape hatch
-// for anyone who does not want a mapper's process spawned from their project's node_modules.
-const ContentMappersDisabledEnvVar = "OXLINT_TSGOLINT_DISABLE_CONTENT_MAPPERS"
-
-// ContentMappersEnabled reports whether configured content mappers may run.
-var ContentMappersEnabled = sync.OnceValue(func() bool {
-	return os.Getenv(ContentMappersDisabledEnvVar) != "true"
-})
 
 // spawnProcess launches a content mapper and adapts its stdio to an io.ReadWriteCloser (Read is its
 // stdout, Write is its stdin). Mirrors the tsc CLI's spawner.
@@ -107,11 +96,12 @@ func contentMapperLogger() contentmapper.Logger {
 }
 
 // OpenContentMapperProject returns the project-scoped mapper view for config, or nil when the config
-// declares no (usable) content mappers. The returned project stays open until ShutdownContentMappers:
-// tsgolint is a single-run process, and the program keeps loading mapped files lazily for as long as it
-// is being linted.
+// declares no content mappers. Callers reach it only once runExternalCode has been granted; a config
+// parsed without that permission has had its mappers dropped already. The returned project stays open
+// until ShutdownContentMappers: tsgolint is a single-run process, and the program keeps loading mapped
+// files lazily for as long as it is being linted.
 func OpenContentMapperProject(config *tsoptions.ParsedCommandLine) contentmapper.Project {
-	if config == nil || len(config.ContentMappers()) == 0 || !ContentMappersEnabled() {
+	if config == nil || len(config.ContentMappers()) == 0 {
 		return nil
 	}
 	contentMapperHost.mu.Lock()
