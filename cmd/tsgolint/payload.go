@@ -23,6 +23,9 @@ type headlessPayload struct {
 	SourceOverrides map[string]string `json:"source_overrides,omitempty"`
 	ReportSyntactic bool              `json:"report_syntactic,omitempty"`
 	ReportSemantic  bool              `json:"report_semantic,omitempty"`
+	// RunExternalCode lets configured content mappers launch their plugin processes. The caller should
+	// set it only for a workspace the user trusts. It mirrors tsc's --runExternalCode flag.
+	RunExternalCode bool `json:"run_external_code,omitempty"`
 }
 
 type headlessConfig struct {

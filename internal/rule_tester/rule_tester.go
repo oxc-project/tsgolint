@@ -90,7 +90,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 			tsconfigPath = tsconfigPathOverride
 		}
 
-		program, internalDiagnostics, err := utils.CreateProgram(true, fs, rootDir, tsconfigPath, host, false)
+		program, internalDiagnostics, err := utils.CreateProgram(true, fs, rootDir, tsconfigPath, host, false, false /*runExternalCode*/)
 		assert.NilError(t, err, "couldn't create program. code: "+code)
 		if len(internalDiagnostics) > 0 {
 			t.Fatalf("couldn't create program due to internal diagnostics: %+v", internalDiagnostics)

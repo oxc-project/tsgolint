@@ -30,9 +30,6 @@ func TestContentMappedDiagnostics(t *testing.T) {
 	if _, err := exec.LookPath("node"); err != nil {
 		t.Skip("node is required to run a content mapper")
 	}
-	if !utils.ContentMappersEnabled() {
-		t.Skip(utils.ContentMappersDisabledEnvVar + " is set")
-	}
 	t.Cleanup(utils.ShutdownContentMappers)
 
 	rootDir, err := filepath.Abs(filepath.Join("testdata", "contentmapper"))
@@ -41,7 +38,7 @@ func TestContentMappedDiagnostics(t *testing.T) {
 	mappedFile := tspath.ResolvePath(rootDir, "src/mapped.ext")
 
 	host := utils.CreateCompilerHost(rootDir, cachedBaseFS)
-	program, internalDiags, err := utils.CreateProgram(true, cachedBaseFS, rootDir, "tsconfig.json", host, false)
+	program, internalDiags, err := utils.CreateProgram(true, cachedBaseFS, rootDir, "tsconfig.json", host, false, true /*runExternalCode*/)
 	assert.NilError(t, err)
 	assert.Equal(t, len(internalDiags), 0, "unexpected program diagnostics: %v", internalDiags)
 
@@ -117,9 +114,6 @@ func TestContentMapperOwnDiagnostics(t *testing.T) {
 	if _, err := exec.LookPath("node"); err != nil {
 		t.Skip("node is required to run a content mapper")
 	}
-	if !utils.ContentMappersEnabled() {
-		t.Skip(utils.ContentMappersDisabledEnvVar + " is set")
-	}
 	t.Cleanup(utils.ShutdownContentMappers)
 
 	rootDir, err := filepath.Abs(filepath.Join("testdata", "contentmapper"))
@@ -128,7 +122,7 @@ func TestContentMapperOwnDiagnostics(t *testing.T) {
 	mappedFile := tspath.ResolvePath(rootDir, "src/mapper-diagnostic.ext")
 
 	host := utils.CreateCompilerHost(rootDir, cachedBaseFS)
-	program, _, err := utils.CreateProgram(true, cachedBaseFS, rootDir, "tsconfig.json", host, false)
+	program, _, err := utils.CreateProgram(true, cachedBaseFS, rootDir, "tsconfig.json", host, false, true /*runExternalCode*/)
 	assert.NilError(t, err)
 
 	sourceFile := program.GetSourceFile(mappedFile)
@@ -191,4 +185,31 @@ func TestUnmappedExtensionIsReported(t *testing.T) {
 	assert.Equal(t, internalDiags[0].Id, "unsupported-file-extension")
 	assert.Equal(t, *internalDiags[0].FilePath, mappedFile)
 	assert.Assert(t, strings.Contains(internalDiags[0].Help, ".gts"), "help should name the extension: %v", internalDiags[0].Help)
+}
+
+// TestContentMapperDeniedStillLintsRestOfProject covers the project being denied runExternalCode.
+// TypeScript reports TS100024, drops the mappers, leaves their extensions unregistered, and compiles
+// everything else; tsc does the same from the command line. tsgolint has to match that, or a project
+// loses its plain TypeScript coverage over a permission it never asked for.
+func TestContentMapperDeniedStillLintsRestOfProject(t *testing.T) {
+	rootDir, err := filepath.Abs(filepath.Join("testdata", "contentmapper"))
+	assert.NilError(t, err)
+	rootDir = tspath.NormalizePath(rootDir)
+	plainFile := tspath.ResolvePath(rootDir, "src/plain.ts")
+
+	host := utils.CreateCompilerHost(rootDir, cachedBaseFS)
+	program, internalDiags, err := utils.CreateProgram(true, cachedBaseFS, rootDir, "tsconfig.json", host, false, false /*runExternalCode*/)
+	assert.NilError(t, err)
+
+	assert.Assert(t, program != nil, "a denied content mapper must not cost the project its program")
+	assert.Equal(t, len(internalDiags), 1)
+	assert.Assert(t, strings.Contains(internalDiags[0].Help, "runExternalCode"),
+		"expected the permission diagnostic, got: %v", internalDiags[0].Help)
+
+	sourceFile := program.GetSourceFile(plainFile)
+	assert.Assert(t, sourceFile != nil, "the plain .ts file should still be in the program")
+	assert.Assert(t, !utils.IsContentMapped(sourceFile))
+
+	// The mapped file's extension is unregistered, so it is not part of the program at all.
+	assert.Assert(t, program.GetSourceFile(tspath.ResolvePath(rootDir, "src/mapped.ext")) == nil)
 }

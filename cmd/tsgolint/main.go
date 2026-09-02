@@ -471,10 +471,11 @@ func runMain() int {
 	flag.Usage = func() { fmt.Fprint(os.Stderr, usage) }
 
 	var (
-		help      bool
-		tsconfig  string
-		listFiles bool
-		debug     string
+		help            bool
+		tsconfig        string
+		listFiles       bool
+		debug           string
+		runExternalCode bool
 
 		traceOut       string
 		cpuprofOut     string
@@ -483,6 +484,7 @@ func runMain() int {
 
 	flag.StringVar(&tsconfig, "tsconfig", "", "which tsconfig to use")
 	flag.BoolVar(&listFiles, "list-files", false, "list matched files")
+	flag.BoolVar(&runExternalCode, "runExternalCode", false, "allow configured content mappers to run their external processes")
 	flag.StringVar(&debug, "debug", "", "enable debug output options")
 	flag.BoolVar(&help, "help", false, "show help")
 	flag.BoolVar(&help, "h", false, "show help")
@@ -557,7 +559,7 @@ func runMain() int {
 		UseCaseSensitiveFileNames: host.FS().UseCaseSensitiveFileNames(),
 	}
 
-	program, _, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host, false)
+	program, _, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host, false, runExternalCode)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating TS program: %v", err)
 		return 1

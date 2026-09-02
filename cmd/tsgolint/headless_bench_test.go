@@ -46,7 +46,7 @@ func setupBenchmarkEnv(b *testing.B, singleThreaded bool) benchmarkEnv {
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 	host := utils.CreateCompilerHost(dir, fs)
 
-	program, diags, err := utils.CreateProgram(singleThreaded, fs, dir, tsconfigPath, host, false)
+	program, diags, err := utils.CreateProgram(singleThreaded, fs, dir, tsconfigPath, host, false, false)
 	if err != nil {
 		b.Fatal("failed to create program:", err)
 	}
@@ -187,7 +187,7 @@ func BenchmarkE2E(b *testing.B) {
 	// returns the workload and FS needed by RunLinter.
 	buildWorkload := func() (linter.Workload, vfs.FS) {
 		fs := bundled.WrapFS(cachedvfs.From(baseFS))
-		resolver := utils.NewTsConfigResolver(fs, dir)
+		resolver := utils.NewTsConfigResolver(fs, dir, false)
 		result := resolver.FindTsConfigParallel(allFiles)
 
 		workload := linter.Workload{
