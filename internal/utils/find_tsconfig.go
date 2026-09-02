@@ -21,7 +21,10 @@ type TsConfigResolver struct {
 	configFileRegistryBuilder *project.ConfigFileRegistryBuilder
 }
 
-func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
+// NewTsConfigResolver builds the resolver that maps a file to the tsconfig governing it.
+// runExternalCode has to match what CreateProgram will be given: content mappers register their
+// extensions only when it is granted, and a mapped file is matched to its config by that registration.
+func NewTsConfigResolver(fs vfs.FS, currentDirectory string, runExternalCode bool) *TsConfigResolver {
 	return &TsConfigResolver{
 		fs:               fs,
 		currentDirectory: currentDirectory,
@@ -29,6 +32,7 @@ func NewTsConfigResolver(fs vfs.FS, currentDirectory string) *TsConfigResolver {
 			false,
 			project.TsGoLintNewSnapshotFSBuilder(fs, currentDirectory), &project.ConfigFileRegistry{}, project.NewExtendedConfigCache(), 0, &project.SessionOptions{
 				CurrentDirectory: currentDirectory,
+				RunExternalCode:  runExternalCode,
 			}, "", nil),
 	}
 }

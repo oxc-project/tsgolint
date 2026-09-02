@@ -60,7 +60,11 @@ type RunLinterOptions struct {
 	Fixes                      Fixes
 	TypeErrors                 TypeErrors
 	SuppressProgramDiagnostics bool
-	TimingStore                *RuleTimingStore
+	// RunExternalCode grants configured content mappers permission to run their external processes.
+	// It mirrors tsc's command-line-only flag: it comes from whoever invoked tsgolint, never from a
+	// project's own tsconfig.
+	RunExternalCode bool
+	TimingStore     *RuleTimingStore
 }
 
 // This is same as `RunLinterOptions` but for a single program.
@@ -89,6 +93,7 @@ func RunLinter(options RunLinterOptions) error {
 	fixState := options.Fixes
 	typeErrors := options.TypeErrors
 	suppressProgramDiagnostics := options.SuppressProgramDiagnostics
+	runExternalCode := options.RunExternalCode
 	timingStore := options.TimingStore
 
 	idx := 0
@@ -100,16 +105,19 @@ func RunLinter(options RunLinterOptions) error {
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
-		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics)
+		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics, runExternalCode)
 
 		if err != nil {
 			return err
 		}
 
+		// Reported whether or not a program was built: a denied content mapper is surfaced alongside a
+		// program that lints everything the mappers did not claim.
+		for _, d := range diagnostics {
+			onInternalDiagnostic(d)
+		}
+
 		if program == nil {
-			for _, d := range diagnostics {
-				onInternalDiagnostic(d)
-			}
 			idx++
 			continue
 		}
@@ -168,8 +176,20 @@ func RunLinter(options RunLinterOptions) error {
 	}
 
 	{
+		// A file that belongs to no tsconfig goes into an inferred project, which has no content
+		// mappers, so its extension has to be one TypeScript itself can parse. Report the rest instead
+		// of handing them to the parser, which has no script kind for them.
+		inferredFiles := make([]string, 0, len(workload.UnmatchedFiles))
+		for _, f := range workload.UnmatchedFiles {
+			if core.GetScriptKindFromFileName(f) == core.ScriptKindUnknown {
+				onInternalDiagnostic(unsupportedFileExtensionDiagnostic(f))
+				continue
+			}
+			inferredFiles = append(inferredFiles, f)
+		}
+
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
-		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, workload.UnmatchedFiles)
+		program, diagnostics, err := utils.CreateInferredProjectProgram(false, fs, currentDirectory, host, inferredFiles)
 
 		if err != nil {
 			return err
@@ -181,8 +201,8 @@ func RunLinter(options RunLinterOptions) error {
 			}
 		}
 
-		files := make([]*ast.SourceFile, 0, len(workload.UnmatchedFiles))
-		for _, f := range workload.UnmatchedFiles {
+		files := make([]*ast.SourceFile, 0, len(inferredFiles))
+		for _, f := range inferredFiles {
 			sf := program.GetSourceFile(f)
 			if sf == nil {
 				panic(fmt.Sprintf("Expected file '%s' to be in inferred program", f))
@@ -211,6 +231,25 @@ func RunLinter(options RunLinterOptions) error {
 
 }
 
+// unsupportedFileExtensionDiagnostic reports a file tsgolint was asked to lint but cannot parse. It is
+// what a file with a languageOptions.parser override lands on when no content mapper claims its
+// extension: either the tsconfig that includes it declares no mapper for it, or the mapper it declares
+// failed to resolve, so the file was never registered and fell through to the inferred project.
+func unsupportedFileExtensionDiagnostic(fileName string) diagnostic.Internal {
+	extension := tspath.GetAnyExtensionFromPath(fileName, nil, false)
+	if extension == "" {
+		extension = "this file"
+	}
+	return diagnostic.Internal{
+		Range:       core.NewTextRange(0, 0),
+		Id:          "unsupported-file-extension",
+		Description: "Unsupported file extension",
+		Help: "tsgolint cannot type-check " + extension + " files on their own. Register a TypeScript " +
+			"content mapper for the extension in the \"contentMappers\" of the tsconfig that includes this file.",
+		FilePath: &fileName,
+	}
+}
+
 // ruleContextBuilder is a per-worker struct that provides the RuleContext
 // reporting methods. Instead of allocating 8 new closures per file, per rule, a
 // single builder is created per worker goroutine and its mutable fields
@@ -229,7 +268,71 @@ type ruleContextBuilder struct {
 func (b *ruleContextBuilder) emitDiagnostic(d rule.RuleDiagnostic) {
 	d.RuleName = b.ruleName
 	d.SourceFile = b.file
+	if utils.IsContentMapped(b.file) && !mapContentMappedRuleDiagnostic(&d) {
+		return
+	}
 	b.onDiagnostic(d)
+}
+
+// mapContentMappedRuleDiagnostic rewrites a diagnostic reported against a content mapper's virtual
+// TypeScript so it points into the original file. It returns false when the diagnostic has no place in
+// the original file and should be dropped.
+//
+// Fixes and suggestions survive only where every range they touch maps verbatim; see
+// mapContentMappedFixes.
+func mapContentMappedRuleDiagnostic(d *rule.RuleDiagnostic) bool {
+	mapped, ok := utils.MapContentMappedLintRange(d.SourceFile, d.Range)
+	if !ok {
+		return false
+	}
+	d.Range = mapped
+	if d.FixesPtr != nil {
+		fixes, ok := mapContentMappedFixes(d.SourceFile, *d.FixesPtr)
+		if !ok {
+			fixes = nil
+		}
+		d.FixesPtr = &fixes
+	}
+	if d.Suggestions != nil {
+		suggestions := make([]rule.RuleSuggestion, 0, len(*d.Suggestions))
+		for _, suggestion := range *d.Suggestions {
+			fixes, ok := mapContentMappedFixes(d.SourceFile, suggestion.FixesArr)
+			if !ok {
+				continue
+			}
+			suggestion.FixesArr = fixes
+			suggestions = append(suggestions, suggestion)
+		}
+		d.Suggestions = &suggestions
+	}
+	if len(d.LabeledRanges) > 0 {
+		labeled := make([]rule.RuleLabeledRange, 0, len(d.LabeledRanges))
+		for _, labeledRange := range d.LabeledRanges {
+			if mapped, ok := utils.MapContentMappedLintRange(d.SourceFile, labeledRange.Range); ok {
+				labeledRange.Range = mapped
+				labeled = append(labeled, labeledRange)
+			}
+		}
+		d.LabeledRanges = labeled
+	}
+	return true
+}
+
+// mapContentMappedFixes rewrites an autofix's ranges into the original file. It returns false when any
+// range is not an exact verbatim mapping, in which case the whole fix has to be dropped: applying part
+// of a fix would be worse than applying none. In practice this keeps fixes for a mapped file's copied
+// script content and drops them for anything the mapper synthesized.
+func mapContentMappedFixes(file *ast.SourceFile, fixes []rule.RuleFix) ([]rule.RuleFix, bool) {
+	mapped := make([]rule.RuleFix, len(fixes))
+	for i, fix := range fixes {
+		r, ok := utils.MapContentMappedEditRange(file, fix.Range)
+		if !ok {
+			return nil, false
+		}
+		fix.Range = r
+		mapped[i] = fix
+	}
+	return mapped, true
 }
 
 func (b *ruleContextBuilder) reportDiagnosticWithFixes(d rule.RuleDiagnostic, fixesFn func() []rule.RuleFix) {
@@ -323,8 +426,12 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 			syntacticDiagnostics := program.GetSyntacticDiagnostics(ctx, file)
 			for _, d := range syntacticDiagnostics {
 				if d.File() != nil && d.File().FileName() == fileName {
+					loc, ok := utils.MapContentMappedDiagnosticRange(file, d)
+					if !ok {
+						continue
+					}
 					onInternalDiagnostic(diagnostic.Internal{
-						Range:       d.Loc(),
+						Range:       loc,
 						Id:          "TS" + strconv.Itoa(int(d.Code())),
 						Description: utils.GetDiagnosticMessage(d),
 						FilePath:    &fileName,
@@ -353,8 +460,12 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 
 			for _, d := range finalDiagnostics {
 				if d.File() != nil && d.File().FileName() == fileName {
+					loc, ok := utils.MapContentMappedDiagnosticRange(file, d)
+					if !ok {
+						continue
+					}
 					onInternalDiagnostic(diagnostic.Internal{
-						Range:       d.Loc(),
+						Range:       loc,
 						Id:          "TS" + strconv.Itoa(int(d.Code())),
 						Description: utils.GetDiagnosticMessage(d),
 						FilePath:    &fileName,

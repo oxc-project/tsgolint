@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/microsoft/TypeScript/tsc/shim/ast"
 	"github.com/microsoft/TypeScript/tsc/shim/bundled"
 	"github.com/microsoft/TypeScript/tsc/shim/compiler"
 	"github.com/microsoft/TypeScript/tsc/shim/core"
@@ -27,13 +28,26 @@ func enhanceHelpDiagnosticMessage(msg string) string {
 	return msg
 }
 
-func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost, suppressProgramDiagnostics bool) (*compiler.Program, []diagnostic.Internal, error) {
+// contentMapperPermissionErrorCode is TS100024, "Content mappers require the '--runExternalCode'
+// command line flag to be enabled". TypeScript reports it, drops the configured mappers, leaves their
+// extensions unregistered, and compiles the rest of the project; see the runExternalCode gate in
+// tsoptions/tsconfigparsing.go. tsgolint matches on the code because the diagnostics package has no shim.
+const contentMapperPermissionErrorCode = 100024
+
+// CreateProgram builds the program for a tsconfig. runExternalCode grants configured content mappers
+// permission to run, mirroring tsc's command-line-only flag of the same name: a project cannot grant it
+// to itself from its own tsconfig, so it has to come from whoever invoked tsgolint.
+func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost, suppressProgramDiagnostics bool, runExternalCode bool) (*compiler.Program, []diagnostic.Internal, error) {
 	resolvedConfigPath := tspath.ResolvePath(cwd, tsconfigPath)
 	if !fs.FileExists(resolvedConfigPath) {
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
 	}
 
-	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, &core.CompilerOptions{}, nil, host, nil)
+	overrideOptions := &core.CompilerOptions{}
+	if runExternalCode {
+		overrideOptions.RunExternalCode = core.TSTrue
+	}
+	configParseResult, diagnostics := tsoptions.GetParsedCommandLineOfConfigFile(tsconfigPath, overrideOptions, nil, host, nil)
 
 	if len(diagnostics) > 0 {
 		internalDiags := make([]diagnostic.Internal, len(diagnostics))
@@ -54,23 +68,28 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, internalDiags, nil
 	}
 
-	if len(configParseResult.Errors) > 0 && !suppressProgramDiagnostics {
-		internalDiags := make([]diagnostic.Internal, len(configParseResult.Errors))
-		for i, e := range configParseResult.Errors {
-			loc := e.Loc()
-			filePath := resolvedConfigPath
-			if e.File() != nil && e.File().FileName() != "" {
-				filePath = e.File().FileName()
-			}
-			internalDiags[i] = diagnostic.Internal{
-				Range:       core.NewTextRange(loc.Pos(), loc.End()),
-				Id:          "tsconfig-error",
-				Description: "Invalid tsconfig",
-				Help:        GetDiagnosticMessage(e),
-				FilePath:    &filePath,
-			}
+	// A denied content mapper is not a broken tsconfig: TypeScript drops the mappers and compiles
+	// everything else, so refusing to build the program here would cost the project its plain .ts
+	// coverage over a permission it never asked for.
+	var fatalConfigErrors, deniedMapperErrors []*ast.Diagnostic
+	for _, e := range configParseResult.Errors {
+		if e.Code() == contentMapperPermissionErrorCode {
+			deniedMapperErrors = append(deniedMapperErrors, e)
+			continue
 		}
-		return nil, internalDiags, nil
+		fatalConfigErrors = append(fatalConfigErrors, e)
+	}
+
+	if len(fatalConfigErrors) > 0 && !suppressProgramDiagnostics {
+		return nil, configErrorDiagnostics(fatalConfigErrors, resolvedConfigPath), nil
+	}
+	var deferredDiags []diagnostic.Internal
+	if !suppressProgramDiagnostics {
+		deferredDiags = configErrorDiagnostics(deniedMapperErrors, resolvedConfigPath)
+	}
+
+	if runExternalCode {
+		SetContentMapperProject(host, OpenContentMapperProject(configParseResult))
 	}
 
 	opts := compiler.ProgramOptions{
@@ -114,7 +133,26 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 
 	program.BindSourceFiles()
 
-	return program, nil, nil
+	return program, deferredDiags, nil
+}
+
+func configErrorDiagnostics(errors []*ast.Diagnostic, resolvedConfigPath string) []diagnostic.Internal {
+	internalDiags := make([]diagnostic.Internal, len(errors))
+	for i, e := range errors {
+		loc := e.Loc()
+		filePath := resolvedConfigPath
+		if e.File() != nil && e.File().FileName() != "" {
+			filePath = e.File().FileName()
+		}
+		internalDiags[i] = diagnostic.Internal{
+			Range:       core.NewTextRange(loc.Pos(), loc.End()),
+			Id:          "tsconfig-error",
+			Description: "Invalid tsconfig",
+			Help:        enhanceHelpDiagnosticMessage(GetDiagnosticMessage(e)),
+			FilePath:    &filePath,
+		}
+	}
+	return internalDiags
 }
 
 func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, host compiler.CompilerHost, fileNames []string) (*compiler.Program, []diagnostic.Internal, error) {

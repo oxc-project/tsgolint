@@ -233,6 +233,8 @@ func runHeadless(args []string) int {
 		defer cleanup()
 	}
 
+	defer utils.ShutdownContentMappers()
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		writeErrorMessage(fmt.Sprintf("error getting current directory: %v", err))
@@ -270,7 +272,7 @@ func runHeadless(args []string) int {
 		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
 	}
 
-	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
+	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd, payload.RunExternalCode)
 
 	normalizedFiles := make([]string, 0, totalFileCount)
 	fileConfigs := make(map[string][]headlessRule, totalFileCount)
@@ -446,6 +448,7 @@ func runHeadless(args []string) int {
 			ReportSemantic:  payload.ReportSemantic,
 		},
 		SuppressProgramDiagnostics: suppressProgramDiagnostics(),
+		RunExternalCode:            payload.RunExternalCode,
 		TimingStore:                timingStore,
 	})
 

@@ -1,0 +1,3 @@
+const before = 1;
+// @@mapper-error@@
+export { before };
