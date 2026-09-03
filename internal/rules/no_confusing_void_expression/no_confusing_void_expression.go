@@ -31,13 +31,15 @@ func buildInvalidVoidExprArrowWrapVoidMessage() rule.RuleMessage {
 func buildInvalidVoidExprReturnMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "invalidVoidExprReturn",
-		Description: "Returning a void expression from a function is forbidden. Please move it before the `return` statement.",
+		Description: "Returning a void expression from a function is forbidden.",
+		Help:        "Move it before the `return` statement.",
 	}
 }
 func buildInvalidVoidExprReturnLastMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "invalidVoidExprReturnLast",
-		Description: "Returning a void expression from a function is forbidden. Please remove the `return` statement.",
+		Description: "Returning a void expression from a function is forbidden.",
+		Help:        "Remove the `return` statement.",
 	}
 }
 func buildInvalidVoidExprReturnWrapVoidMessage() rule.RuleMessage {

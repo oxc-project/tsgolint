@@ -18,7 +18,8 @@ func buildNoFunctionConstructorMessage() rule.RuleMessage {
 func buildNoImpliedEvalErrorMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noImpliedEvalError",
-		Description: "Implied eval. Consider passing a function.",
+		Description: "Implied eval.",
+		Help:        "Consider passing a function.",
 	}
 }
 

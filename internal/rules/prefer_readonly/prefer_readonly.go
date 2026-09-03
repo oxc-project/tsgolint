@@ -13,7 +13,8 @@ import (
 func buildPreferReadonlyMessage(name string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "preferReadonly",
-		Description: fmt.Sprintf("Member '%s' is never reassigned; mark it as `readonly`.", name),
+		Description: fmt.Sprintf("Member '%s' is never reassigned.", name),
+		Help:        "Mark it as `readonly`.",
 	}
 }
 

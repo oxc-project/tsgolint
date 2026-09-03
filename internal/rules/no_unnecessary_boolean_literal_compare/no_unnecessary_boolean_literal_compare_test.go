@@ -615,5 +615,33 @@ function foo(): boolean {}
 				},
 			},
 		},
+		{
+			Code: `
+        function check(foo: boolean | null | undefined, func: (value?: true) => boolean): boolean {
+          if (func() || foo === true) {}
+          const conjunction = foo === true && func(foo);
+          const negated = !(foo !== true);
+          if ((foo === true) ?? func()) {}
+          return foo === true;
+        }
+      `,
+			Output: []string{`
+        function check(foo: boolean | null | undefined, func: (value?: true) => boolean): boolean {
+          if (func() ||  foo) {}
+          const conjunction = (!!foo) && func(foo);
+          const negated = (!!foo);
+          if (((!!foo)) ?? func()) {}
+          return (!!foo);
+        }
+      `},
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryBooleanLiteralCompareOptions](`{"allowComparingNullableBooleansToTrue": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "comparingNullableToTrueDirect"},
+				{MessageId: "comparingNullableToTrueDirect"},
+				{MessageId: "comparingNullableToTrueNegated"},
+				{MessageId: "comparingNullableToTrueDirect"},
+				{MessageId: "comparingNullableToTrueDirect"},
+			},
+		},
 	})
 }

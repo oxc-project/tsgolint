@@ -14,13 +14,15 @@ import (
 func buildUnsafeOfAnyTypeAssertionMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeOfAnyTypeAssertion",
-		Description: fmt.Sprintf("Unsafe assertion from %v detected: consider using type guards or a safer assertion.", t),
+		Description: fmt.Sprintf("Unsafe assertion from %v detected.", t),
+		Help:        "Consider using type guards or a safer assertion.",
 	}
 }
 func buildUnsafeToAnyTypeAssertionMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeToAnyTypeAssertion",
-		Description: fmt.Sprintf("Unsafe assertion to %v detected: consider using a more specific type to ensure safety.", t),
+		Description: fmt.Sprintf("Unsafe assertion to %v detected.", t),
+		Help:        "Consider using a more specific type to ensure safety.",
 	}
 }
 func buildUnsafeToUnconstrainedTypeAssertionMessage(t string) rule.RuleMessage {
