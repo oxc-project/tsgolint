@@ -16,7 +16,8 @@ import (
 func buildTypeOverValueMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "typeOverValue",
-		Description: "All exports in the declaration are only used as types. Use `export type`.",
+		Description: "All exports in the declaration are only used as types.",
+		Help:        "Use `export type`.",
 	}
 }
 

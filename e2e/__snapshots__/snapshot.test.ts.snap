@@ -552,7 +552,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
     "message": {
-      "description": "Unexpected any value in conditional. Use a more specific type to ensure type safety.",
+      "description": "Unexpected any value in conditional.",
+      "help": "Use a more specific type to ensure type safety.",
       "id": "conditionErrorAny",
     },
     "range": {
@@ -1110,7 +1111,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -1123,7 +1125,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -1136,7 +1139,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -1149,7 +1153,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {
-      "description": "Implied eval. Consider passing a function.",
+      "description": "Implied eval.",
+      "help": "Consider passing a function.",
       "id": "noImpliedEvalError",
     },
     "range": {
@@ -2051,7 +2056,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2080,7 +2086,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "description": "Unsafe assertion from \`any\` detected.",
+      "help": "Consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
@@ -2755,7 +2762,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2784,7 +2792,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -2813,7 +2822,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion from \`any\` detected: consider using type guards or a safer assertion.",
+      "description": "Unsafe assertion from \`any\` detected.",
+      "help": "Consider using type guards or a safer assertion.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
@@ -2842,7 +2852,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       },
     ],
     "message": {
-      "description": "Unsafe assertion to \`any\` detected: consider using a more specific type to ensure safety.",
+      "description": "Unsafe assertion to \`any\` detected.",
+      "help": "Consider using a more specific type to ensure safety.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
@@ -3544,7 +3555,8 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "Member 'value' is never reassigned; mark it as \`readonly\`.",
+      "description": "Member 'value' is never reassigned.",
+      "help": "Mark it as \`readonly\`.",
       "id": "preferReadonly",
     },
     "range": {
