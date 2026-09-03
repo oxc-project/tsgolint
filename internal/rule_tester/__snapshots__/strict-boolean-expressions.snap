@@ -521,7 +521,8 @@ Message: Unexpected value in conditional. A union of different types has inconsi
 
 [TestStrictBooleanExpressionsRule/invalid-48 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (3:5 - 3:5)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    2 | declare const x: boolean | null;
    3 | if (x) {
      |     ~
@@ -530,21 +531,24 @@ Message: Unexpected nullable boolean value in conditional. Please handle the nul
 
 [TestStrictBooleanExpressionsRule/invalid-49 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (1:19 - 1:19)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    1 | (x?: boolean) => !x;
      |                   ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-50 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (1:50 - 1:50)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    1 | <T extends boolean | null | undefined>(x: T) => (x ? 1 : 0);
      |                                                  ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-51 - 1]
 Diagnostic 1: conditionErrorNullableObject (3:5 - 3:5)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    2 | declare const x: object | null;
    3 | if (x) {
      |     ~
@@ -553,21 +557,24 @@ Message: Unexpected nullable object value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-52 - 1]
 Diagnostic 1: conditionErrorNullableObject (1:25 - 1:25)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    1 | (x?: { a: number }) => !x;
      |                         ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-53 - 1]
 Diagnostic 1: conditionErrorNullableObject (1:45 - 1:45)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    1 | <T extends {} | null | undefined>(x: T) => (x ? 1 : 0);
      |                                             ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-54 - 1]
 Diagnostic 1: conditionErrorNullableString (3:5 - 3:5)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    2 | declare const x: string | null;
    3 | if (x) {
      |     ~
@@ -576,21 +583,24 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-55 - 1]
 Diagnostic 1: conditionErrorNullableString (1:18 - 1:18)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    1 | (x?: string) => !x;
      |                  ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-56 - 1]
 Diagnostic 1: conditionErrorNullableString (1:49 - 1:49)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    1 | <T extends string | null | undefined>(x: T) => (x ? 1 : 0);
      |                                                 ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-57 - 1]
 Diagnostic 1: conditionErrorNullableString (3:8 - 3:8)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    2 | function foo(x: '' | 'bar' | null) {
    3 |   if (!x) {
      |        ~
@@ -599,7 +609,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-58 - 1]
 Diagnostic 1: conditionErrorNullableNumber (3:5 - 3:5)
-Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
+Message: Unexpected nullable number value in conditional.
+Help: Handle the nullish and zero cases explicitly.
    2 | declare const x: number | null;
    3 | if (x) {
      |     ~
@@ -608,21 +619,24 @@ Message: Unexpected nullable number value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-59 - 1]
 Diagnostic 1: conditionErrorNullableNumber (1:18 - 1:18)
-Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
+Message: Unexpected nullable number value in conditional.
+Help: Handle the nullish and zero cases explicitly.
    1 | (x?: number) => !x;
      |                  ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-60 - 1]
 Diagnostic 1: conditionErrorNullableNumber (1:49 - 1:49)
-Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
+Message: Unexpected nullable number value in conditional.
+Help: Handle the nullish and zero cases explicitly.
    1 | <T extends number | null | undefined>(x: T) => (x ? 1 : 0);
      |                                                 ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-61 - 1]
 Diagnostic 1: conditionErrorNullableNumber (3:8 - 3:8)
-Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
+Message: Unexpected nullable number value in conditional.
+Help: Handle the nullish and zero cases explicitly.
    2 | function foo(x: 0 | 1 | null) {
    3 |   if (!x) {
      |        ~
@@ -631,7 +645,8 @@ Message: Unexpected nullable number value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-62 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:13 - 7:19)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (theEnum) {
      |             ~~~~~~~
@@ -640,7 +655,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-63 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:14 - 7:20)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (!theEnum) {
      |              ~~~~~~~
@@ -649,7 +665,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-64 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:14 - 7:20)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (!theEnum) {
      |              ~~~~~~~
@@ -658,7 +675,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-65 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:14 - 7:20)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (!theEnum) {
      |              ~~~~~~~
@@ -667,7 +685,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-66 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:14 - 7:20)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (!theEnum) {
      |              ~~~~~~~
@@ -676,7 +695,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-67 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:14 - 7:20)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (!theEnum) {
      |              ~~~~~~~
@@ -685,7 +705,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-68 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:14 - 7:20)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 |         const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 |         if (!theEnum) {
      |              ~~~~~~~
@@ -694,7 +715,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-69 - 1]
 Diagnostic 1: conditionErrorNullableEnum (6:35 - 6:39)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    5 |         }
    6 |         (value?: ExampleEnum) => (value ? 1 : 0);
      |                                   ~~~~~
@@ -703,7 +725,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-70 - 1]
 Diagnostic 1: conditionErrorNullableEnum (6:36 - 6:40)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    5 |         }
    6 |         (value?: ExampleEnum) => (!value ? 1 : 0);
      |                                    ~~~~~
@@ -712,7 +735,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-71 - 1]
 Diagnostic 1: conditionErrorNullableEnum (6:36 - 6:40)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    5 |         }
    6 |         (value?: ExampleEnum) => (!value ? 1 : 0);
      |                                    ~~~~~
@@ -721,7 +745,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-72 - 1]
 Diagnostic 1: conditionErrorNullableEnum (6:36 - 6:40)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    5 |         }
    6 |         (value?: ExampleEnum) => (!value ? 1 : 0);
      |                                    ~~~~~
@@ -730,7 +755,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-73 - 1]
 Diagnostic 1: conditionErrorAny (2:5 - 2:5)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+Message: Unexpected any value in conditional.
+Help: Use a more specific type to ensure type safety.
    1 | 
    2 | if (x) {
      |     ~
@@ -739,21 +765,24 @@ Message: Unexpected any value in conditional. Use a more specific type to ensure
 
 [TestStrictBooleanExpressionsRule/invalid-74 - 1]
 Diagnostic 1: conditionErrorAny (1:7 - 1:7)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+Message: Unexpected any value in conditional.
+Help: Use a more specific type to ensure type safety.
    1 | x => !x;
      |       ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-75 - 1]
 Diagnostic 1: conditionErrorAny (1:27 - 1:27)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+Message: Unexpected any value in conditional.
+Help: Use a more specific type to ensure type safety.
    1 | <T extends any>(x: T) => (x ? 1 : 0);
      |                           ~
 ---
 
 [TestStrictBooleanExpressionsRule/invalid-76 - 1]
 Diagnostic 1: conditionErrorAny (1:16 - 1:16)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+Message: Unexpected any value in conditional.
+Help: Use a more specific type to ensure type safety.
    1 | <T,>(x: T) => (x ? 1 : 0);
      |                ~
 ---
@@ -772,28 +801,32 @@ Message: Unexpected object value in conditional. An object is always truthy.
 
 [TestStrictBooleanExpressionsRule/invalid-78 - 1]
 Diagnostic 1: conditionErrorNullableObject (3:10 - 3:12)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    2 |         declare const obj: { x: number } | null;
    3 |         !obj ? 1 : 0
      |          ~~~
    4 |         !obj
 
 Diagnostic 2: conditionErrorNullableObject (4:10 - 4:12)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    3 |         !obj ? 1 : 0
    4 |         !obj
      |          ~~~
    5 |         obj || 0
 
 Diagnostic 3: conditionErrorNullableObject (5:9 - 5:11)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    4 |         !obj
    5 |         obj || 0
      |         ~~~
    6 |         obj && 1 || 0
 
 Diagnostic 4: conditionErrorNullableObject (6:9 - 6:11)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    5 |         obj || 0
    6 |         obj && 1 || 0
      |         ~~~
@@ -802,7 +835,8 @@ Message: Unexpected nullable object value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-79 - 1]
 Diagnostic 1: conditionErrorNullableString (4:8 - 4:21)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    3 | declare const nullableString: string | null;
    4 | assert(nullableString);
      |        ~~~~~~~~~~~~~~
@@ -811,7 +845,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-80 - 1]
 Diagnostic 1: conditionErrorNullableString (4:13 - 4:26)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    3 | declare const nullableString: string | null;
    4 | assert(foo, nullableString);
      |             ~~~~~~~~~~~~~~
@@ -820,7 +855,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-81 - 1]
 Diagnostic 1: conditionErrorNullableString (5:13 - 5:26)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    4 | declare const nullableString: string | null;
    5 | assert(foo, nullableString);
      |             ~~~~~~~~~~~~~~
@@ -829,7 +865,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-82 - 1]
 Diagnostic 1: conditionErrorNullableString (4:13 - 4:26)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    3 | declare const nullableString: string | null;
    4 | assert(foo, nullableString);
      |             ~~~~~~~~~~~~~~
@@ -838,7 +875,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-83 - 1]
 Diagnostic 1: conditionErrorNullableString (10:12 - 10:22)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    9 | 
   10 | someAssert(maybeString);
      |            ~~~~~~~~~~~
@@ -847,7 +885,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-84 - 1]
 Diagnostic 1: conditionErrorNullableString (18:18 - 18:31)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
   17 | declare const nullableString: string | null;
   18 | assert(3 as any, nullableString);
      |                  ~~~~~~~~~~~~~~
@@ -856,7 +895,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-85 - 1]
 Diagnostic 1: conditionErrorNullableString (19:18 - 19:31)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
   18 | declare const nullableString: string | null;
   19 | assert(3 as any, nullableString, 'more', 'args', 'afterwards');
      |                  ~~~~~~~~~~~~~~
@@ -865,7 +905,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-86 - 1]
 Diagnostic 1: conditionErrorNullableString (6:13 - 6:26)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    5 | declare const boo: boolean;
    6 | assert(boo, nullableString);
      |             ~~~~~~~~~~~~~~
@@ -874,7 +915,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-87 - 1]
 Diagnostic 1: conditionErrorNullableString (8:8 - 8:21)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    7 | declare const nullableString: string | null;
    8 | assert(nullableString);
      |        ~~~~~~~~~~~~~~
@@ -922,7 +964,8 @@ Message: Unexpected nullish value in conditional. The expression is always falsy
 
 [TestStrictBooleanExpressionsRule/invalid-91 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (2:1 - 6:2)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    1 | 
    2 | ['one', 'two', ''].find(x => {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -939,7 +982,8 @@ Message: Unexpected nullable boolean value in conditional. Please handle the nul
 
 [TestStrictBooleanExpressionsRule/invalid-92 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (8:1 - 8:34)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    7 | 
    8 | ['one', 'two', ''].find(predicate);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -983,7 +1027,8 @@ Message: Unexpected value in conditional. A union of different types has inconsi
 
 [TestStrictBooleanExpressionsRule/invalid-96 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (2:1 - 4:2)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    1 | 
    2 | [1, null].every((x): boolean | undefined => {
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1050,7 +1095,8 @@ Message: Unexpected value in conditional. A union of different types has inconsi
 
 [TestStrictBooleanExpressionsRule/invalid-103 - 1]
 Diagnostic 1: conditionErrorAny (3:1 - 3:20)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+Message: Unexpected any value in conditional.
+Help: Use a more specific type to ensure type safety.
    2 | declare function foo<T>(x: number): T;
    3 | [1, null].every(foo);
      | ~~~~~~~~~~~~~~~~~~~~
@@ -1068,7 +1114,8 @@ Message: Unexpected number value in conditional. A number can be falsy (0, NaN) 
 
 [TestStrictBooleanExpressionsRule/invalid-105 - 1]
 Diagnostic 1: conditionErrorNullableString (3:1 - 3:39)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    2 | declare const nullOrString: string | null;
    3 | ['one', null].filter(x => nullOrString);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1077,7 +1124,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-106 - 1]
 Diagnostic 1: conditionErrorNullableString (3:28 - 3:39)
-Message: Unexpected nullable string value in conditional. Please handle the nullish and empty string cases explicitly.
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
    2 | declare const nullOrString: string | null;
    3 | ['one', null].filter(x => !nullOrString);
      |                            ~~~~~~~~~~~~
@@ -1086,7 +1134,8 @@ Message: Unexpected nullable string value in conditional. Please handle the null
 
 [TestStrictBooleanExpressionsRule/invalid-107 - 1]
 Diagnostic 1: conditionErrorAny (3:1 - 3:35)
-Message: Unexpected any value in conditional. Use a more specific type to ensure type safety.
+Message: Unexpected any value in conditional.
+Help: Use a more specific type to ensure type safety.
    2 | declare const anyValue: any;
    3 | ['one', null].filter(x => anyValue);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1095,7 +1144,8 @@ Message: Unexpected any value in conditional. Use a more specific type to ensure
 
 [TestStrictBooleanExpressionsRule/invalid-108 - 1]
 Diagnostic 1: conditionErrorNullableBoolean (3:1 - 3:39)
-Message: Unexpected nullable boolean value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
    2 | declare const nullOrBoolean: boolean | null;
    3 | [true, null].filter(x => nullOrBoolean);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1104,7 +1154,8 @@ Message: Unexpected nullable boolean value in conditional. Please handle the nul
 
 [TestStrictBooleanExpressionsRule/invalid-109 - 1]
 Diagnostic 1: conditionErrorNullableEnum (7:1 - 7:27)
-Message: Unexpected nullable enum value in conditional. Please handle the nullish and falsy enum cases explicitly.
+Message: Unexpected nullable enum value in conditional.
+Help: Handle the nullish and falsy enum cases explicitly.
    6 | const theEnum = Math.random() < 0.3 ? ExampleEnum.This : null;
    7 | [0, 1].filter(x => theEnum);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1113,7 +1164,8 @@ Message: Unexpected nullable enum value in conditional. Please handle the nullis
 
 [TestStrictBooleanExpressionsRule/invalid-110 - 1]
 Diagnostic 1: conditionErrorNullableNumber (3:1 - 3:35)
-Message: Unexpected nullable number value in conditional. Please handle the nullish and zero cases explicitly.
+Message: Unexpected nullable number value in conditional.
+Help: Handle the nullish and zero cases explicitly.
    2 | declare const nullOrNumber: number | null;
    3 | [0, null].filter(x => nullOrNumber);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1144,7 +1196,8 @@ Message: Unexpected object value in conditional. An object is always truthy.
 
 [TestStrictBooleanExpressionsRule/invalid-113 - 1]
 Diagnostic 1: conditionErrorNullableObject (3:1 - 3:42)
-Message: Unexpected nullable object value in conditional. Please handle the nullish case explicitly.
+Message: Unexpected nullable object value in conditional.
+Help: Handle the nullish case explicitly.
    2 | declare const nullOrObject: object | null;
    3 | [{ a: 0 }, null].filter(x => nullOrObject);
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
