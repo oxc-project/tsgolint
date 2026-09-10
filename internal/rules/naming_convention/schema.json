@@ -1,0 +1,184 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "naming_convention_options": {
+      "type": "array",
+      "description": "An array of naming convention selectors. Each selector describes a naming convention for a set of identifiers.",
+      "items": {
+        "$ref": "#/definitions/naming_convention_selector"
+      }
+    },
+    "naming_convention_selector": {
+      "type": "object",
+      "description": "A naming convention applied to the identifiers matched by `selector`, `modifiers`, `types` and `filter`.",
+      "properties": {
+        "selector": {
+          "description": "One selector, or an array of selectors, that this convention applies to.",
+          "oneOf": [
+            {
+              "$ref": "#/definitions/naming_convention_selector_name"
+            },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/naming_convention_selector_name"
+              }
+            }
+          ]
+        },
+        "format": {
+          "description": "The allowed formats for the identifier. `null` (or an empty array) disables the format check.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/naming_convention_format"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "custom": {
+          "$ref": "#/definitions/naming_convention_match_regex",
+          "description": "A custom regex that the identifier must (or must not) match."
+        },
+        "filter": {
+          "description": "Controls whether this convention applies to an identifier. A string is treated as `{ regex: string, match: true }`.",
+          "oneOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "$ref": "#/definitions/naming_convention_match_regex"
+            }
+          ]
+        },
+        "leadingUnderscore": {
+          "$ref": "#/definitions/naming_convention_underscore_option",
+          "description": "Whether leading underscores are allowed, forbidden or required."
+        },
+        "trailingUnderscore": {
+          "$ref": "#/definitions/naming_convention_underscore_option",
+          "description": "Whether trailing underscores are allowed, forbidden or required."
+        },
+        "prefix": {
+          "type": "array",
+          "description": "Prefixes, one of which the identifier must start with.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "suffix": {
+          "type": "array",
+          "description": "Suffixes, one of which the identifier must end with.",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "modifiers": {
+          "type": "array",
+          "description": "Modifiers that the identifier must have (all of them) for this convention to apply.",
+          "items": {
+            "$ref": "#/definitions/naming_convention_modifier"
+          }
+        },
+        "types": {
+          "type": "array",
+          "description": "Types, one of which the identifier must have, for this convention to apply. Requires type information.",
+          "items": {
+            "$ref": "#/definitions/naming_convention_type_modifier"
+          }
+        },
+        "failureMessage": {
+          "type": "string",
+          "description": "Unused. Accepted for compatibility with typescript-eslint."
+        }
+      },
+      "required": ["selector"]
+    },
+    "naming_convention_match_regex": {
+      "type": "object",
+      "properties": {
+        "match": {
+          "type": "boolean",
+          "description": "Whether the identifier must match (`true`) or must not match (`false`) the regex."
+        },
+        "regex": {
+          "type": "string",
+          "description": "The regular expression source."
+        }
+      },
+      "required": ["match", "regex"]
+    },
+    "naming_convention_format": {
+      "type": "string",
+      "enum": ["camelCase", "strictCamelCase", "PascalCase", "StrictPascalCase", "snake_case", "UPPER_CASE"]
+    },
+    "naming_convention_underscore_option": {
+      "type": "string",
+      "enum": ["forbid", "allow", "require", "requireDouble", "allowDouble", "allowSingleOrDouble"]
+    },
+    "naming_convention_modifier": {
+      "type": "string",
+      "enum": [
+        "const",
+        "readonly",
+        "static",
+        "public",
+        "protected",
+        "private",
+        "#private",
+        "abstract",
+        "destructured",
+        "global",
+        "exported",
+        "unused",
+        "requiresQuotes",
+        "override",
+        "async",
+        "default",
+        "namespace"
+      ]
+    },
+    "naming_convention_type_modifier": {
+      "type": "string",
+      "enum": ["boolean", "string", "number", "function", "array"]
+    },
+    "naming_convention_selector_name": {
+      "type": "string",
+      "enum": [
+        "default",
+        "variableLike",
+        "memberLike",
+        "typeLike",
+        "method",
+        "property",
+        "accessor",
+        "variable",
+        "function",
+        "parameter",
+        "parameterProperty",
+        "classicAccessor",
+        "enumMember",
+        "classMethod",
+        "objectLiteralMethod",
+        "typeMethod",
+        "classProperty",
+        "objectLiteralProperty",
+        "typeProperty",
+        "autoAccessor",
+        "class",
+        "interface",
+        "typeAlias",
+        "enum",
+        "typeParameter",
+        "import"
+      ]
+    }
+  }
+}

@@ -57,6 +57,7 @@ export default tseslint.config(
       '@typescript-eslint/consistent-return': 'error',
       '@typescript-eslint/consistent-type-exports': 'error',
       '@typescript-eslint/dot-notation': 'error',
+      '@typescript-eslint/naming-convention': 'error',
       '@typescript-eslint/no-array-delete': 'error',
       '@typescript-eslint/no-base-to-string': 'error',
       '@typescript-eslint/no-confusing-void-expression': 'error',
