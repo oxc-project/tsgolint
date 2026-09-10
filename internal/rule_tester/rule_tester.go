@@ -36,7 +36,9 @@ type ValidTestCase struct {
 }
 
 type InvalidTestCaseError struct {
-	MessageId   string
+	MessageId string
+	// Message optionally asserts the exact rendered message text.
+	Message     string
 	Line        int
 	Column      int
 	EndLine     int
@@ -60,6 +62,11 @@ type InvalidTestCase struct {
 	Options  any
 	Tsx      bool
 	Files    map[string]string
+	// SkipSnapshot disables the diagnostics snapshot for this case. Intended
+	// for large generated test suites where per-case snapshots would bloat
+	// the snapshot file; such cases should assert messages and positions
+	// directly instead.
+	SkipSnapshot bool
 }
 
 func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Rule, validTestCases []ValidTestCase, invalidTestCases []InvalidTestCase) {
@@ -196,7 +203,9 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 				outputs = append(outputs, fixedCode)
 			}
 
-			newSnapshotter(r.Name).MatchSnapshot(t, formatDiagnosticsSnapshot(testCase.Code, initialDiagnostics))
+			if !testCase.SkipSnapshot {
+				newSnapshotter(r.Name).MatchSnapshot(t, formatDiagnosticsSnapshot(testCase.Code, initialDiagnostics))
+			}
 
 			if len(testCase.Output) == len(outputs) {
 				for i, expected := range testCase.Output {
@@ -215,6 +224,10 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 
 				if expected.MessageId != diagnostic.Message.Id {
 					t.Errorf("Invalid message id %v. Expected %v", diagnostic.Message.Id, expected.MessageId)
+				}
+
+				if expected.Message != "" && expected.Message != diagnostic.Message.Description {
+					t.Errorf("Invalid message %q. Expected %q. Code:\n%v", diagnostic.Message.Description, expected.Message, testCase.Code)
 				}
 
 				lineIndex, columnIndex := scanner.GetECMALineAndUTF16CharacterOfPosition(diagnostic.SourceFile, diagnostic.Range.Pos())

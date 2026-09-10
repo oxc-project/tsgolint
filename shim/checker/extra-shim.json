@@ -42,7 +42,9 @@
       "IsNullableType",
       "getIndexInfosOfType",
       "isReadonlySymbol",
-      "getContextFreeTypeOfExpression"
+      "getContextFreeTypeOfExpression",
+      "isReferenced",
+      "checkSourceFile"
     ]
   },
   "ExtraFields": {
