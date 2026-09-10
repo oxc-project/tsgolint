@@ -1,0 +1,19 @@
+go.work.sum
+  s_ff4baa1de63581::t_78abdab222185a 7-8,39-40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3c5653f17be88299f095fdd862a446f7d69e4acc",
+  "prompts": {},
+  "sessions": {
+    "s_ff4baa1de63581": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a08a87-43d3-7313-8d6e-633864a6f7da",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "Cameron <cameron.clark@hey.com>"
+    }
+  }
+}
