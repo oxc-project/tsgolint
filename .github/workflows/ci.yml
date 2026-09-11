@@ -70,7 +70,7 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Build
-        run: go build -o tsgolint.exe ./cmd/tsgolint
+        run: just build
 
       - name: Run e2e tests
         run: |

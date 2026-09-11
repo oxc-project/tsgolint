@@ -15,6 +15,7 @@ init:
   git submodule update --init
   pushd typescript-go && git am --3way --no-gpg-sign ../patches/*.patch && popd
   mkdir -p internal/collections && find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
+  GOWORK=off go run -mod=readonly ./tools/gen_bundled_libs -input ./typescript-go/internal/bundled/libs -output ./internal/bundled/libs.zip
   pnpm install
   cd e2e && pnpm --ignore-workspace install && cd ..
 
@@ -24,20 +25,22 @@ init:
   pushd typescript-go; Get-ChildItem ../patches/*.patch | ForEach-Object { git am --3way --no-gpg-sign $_.FullName }; popd
   New-Item -ItemType Directory -Force -Path internal\collections
   Get-ChildItem -Path .\typescript-go\internal\collections\* -File | Where-Object { $_.Name -notlike '*_test.go' } | ForEach-Object { Copy-Item $_.FullName -Destination .\internal\collections\ }
+  $env:GOWORK="off"; go run -mod=readonly ./tools/gen_bundled_libs -input ./typescript-go/internal/bundled/libs -output ./internal/bundled/libs.zip
   pnpm install
   Set-Location e2e; pnpm --ignore-workspace install; Set-Location ..
 
+# The local bundled package replaces typescript-go's uncompressed embedded libraries.
 [unix]
 build:
-  go build -ldflags="-s -w" -trimpath -o tsgolint ./cmd/tsgolint
+  go build -tags=noembed -ldflags="-s -w" -trimpath -o tsgolint ./cmd/tsgolint
 
 [windows]
 build:
-  $env:GOOS="windows"; $env:GOARCH="amd64"; go build -ldflags="-s -w" -trimpath -o tsgolint.exe ./cmd/tsgolint
+  $env:GOOS="windows"; $env:GOARCH="amd64"; go build -tags=noembed -ldflags="-s -w" -trimpath -o tsgolint.exe ./cmd/tsgolint
 
 test: build
   cd e2e && pnpm --ignore-workspace run test --run && cd ..
-  go test ./internal/...
+  go test ./internal/... ./tools/gen_bundled_libs
 
 update-snaps:
   UPDATE_SNAPS=true go test ./internal/...
