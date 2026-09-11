@@ -330,6 +330,7 @@ func collectTypeParameterUsageCounts(
 	fromClass bool,
 ) int {
 	typeUsages := make(map[*checker.Type]int)
+	visitedSymbolLists := make(map[**ast.Symbol]struct{})
 	visitedConstraints := make(map[*ast.Node]bool)
 	visitedDefault := false
 	functionLikeType := false
@@ -377,7 +378,19 @@ func collectTypeParameterUsageCounts(
 		}
 	}
 
+	// The checker caches the property slice on a type's resolved members, so the
+	// address of its first element identifies the list the same way upstream's
+	// `visitedSymbolLists` uses array identity.
 	visitSymbolsList = func(symbols []*ast.Symbol, assumeMultipleUses bool) {
+		if len(symbols) == 0 {
+			return
+		}
+		listKey := &symbols[0]
+		if _, visited := visitedSymbolLists[listKey]; visited {
+			return
+		}
+		visitedSymbolLists[listKey] = struct{}{}
+
 		for _, symbol := range symbols {
 			if remainingTargets == 0 {
 				return
@@ -465,6 +478,10 @@ func collectTypeParameterUsageCounts(
 			return
 		}
 
+		// Tuple types like `[K, V]` and generic type references like `Map<K, V>`.
+		// This is terminal even when there are no type arguments to visit: it has
+		// to run before the object type catch-all below so that we never descend
+		// into every property of a generic interface or class.
 		if checker.Type_flags(typeNode)&checker.TypeFlagsObject != 0 && checker.Type_objectFlags(typeNode)&checker.ObjectFlagsReference != 0 {
 			typeArguments := checker.Checker_getTypeArguments(ctx.TypeChecker, typeNode)
 			if len(typeArguments) != 0 {
@@ -484,8 +501,8 @@ func collectTypeParameterUsageCounts(
 					}
 					visitType(typeArgument, thisAssumeMultipleUses, isReturnType)
 				}
-				return
 			}
+			return
 		}
 
 		if checker.Type_flags(typeNode)&checker.TypeFlagsTemplateLiteral != 0 {
