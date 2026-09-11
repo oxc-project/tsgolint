@@ -259,20 +259,19 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 				 * This function checks if all the union members of `F` are assignable to the other member of `I`. If every member is assignable, then its reported else not.
 				 */
 				if len(seenUnionTypes) > 0 && (len(seenBigIntPrimitiveTypes) > 0 || len(seenBooleanPrimitiveTypes) > 0 || len(seenNumberPrimitiveTypes) > 0 || len(seenStringPrimitiveTypes) > 0) {
-					var typeValuesLiteral string
-
 					for _, unionType := range seenUnionTypes {
 						var primitiveName string
+						var primitiveTypeNodes []*ast.Node
 						for _, typeValue := range unionType.flags {
 							switch {
 							case typeValue.flags == checker.TypeFlagsBigIntLiteral && len(seenBigIntPrimitiveTypes) > 0:
-								primitiveName = "bigint"
+								primitiveName, primitiveTypeNodes = "bigint", seenBigIntPrimitiveTypes
 							case typeValue.flags == checker.TypeFlagsBooleanLiteral && len(seenBooleanPrimitiveTypes) > 0:
-								primitiveName = "boolean"
+								primitiveName, primitiveTypeNodes = "boolean", seenBooleanPrimitiveTypes
 							case typeValue.flags == checker.TypeFlagsNumberLiteral && len(seenNumberPrimitiveTypes) > 0:
-								primitiveName = "number"
+								primitiveName, primitiveTypeNodes = "number", seenNumberPrimitiveTypes
 							case (typeValue.flags == checker.TypeFlagsStringLiteral || typeValue.flags == checker.TypeFlagsTemplateLiteral) && len(seenStringPrimitiveTypes) > 0:
-								primitiveName = "string"
+								primitiveName, primitiveTypeNodes = "string", seenStringPrimitiveTypes
 							default:
 								primitiveName = ""
 							}
@@ -285,12 +284,15 @@ var NoRedundantTypeConstituentsRule = rule.Rule{
 							continue
 						}
 
-						if len(typeValuesLiteral) == 0 {
-							typeValuesLiteral = strings.Join(utils.Map(unionType.flags, func(t typeFlagsWithNodeOrType) string {
-								return t.ToString(ctx.TypeChecker)
-							}), " | ")
+						// The primitive is the redundant constituent: every member of the union is
+						// assignable to it, so intersecting with it leaves the union unchanged.
+						// Report it, not the union, and describe it with this union's members.
+						typeValuesLiteral := strings.Join(utils.Map(unionType.flags, func(t typeFlagsWithNodeOrType) string {
+							return t.ToString(ctx.TypeChecker)
+						}), " | ")
+						for _, primitiveTypeNode := range primitiveTypeNodes {
+							ctx.ReportNode(primitiveTypeNode, buildPrimitiveOverriddenMessage(typeValuesLiteral, primitiveName))
 						}
-						ctx.ReportNode(unionType.typeNode, buildPrimitiveOverriddenMessage(primitiveName, typeValuesLiteral))
 					}
 				}
 				if len(seenUnionTypes) > 0 {
