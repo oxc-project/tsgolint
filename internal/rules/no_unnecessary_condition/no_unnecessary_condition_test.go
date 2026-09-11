@@ -1309,6 +1309,16 @@ function repro5WithNoUncheckedIndexedAccess() {
     `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 		},
+		{
+			Code: `
+type ProviderOptions = Record<string, Record<string, unknown>>;
+
+function withNullishAssignment(opts: ProviderOptions): Record<string, unknown> {
+  return opts.perplexity ??= {};
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 		{Code: `
 type Result<T> = T extends null
   ? string | null
@@ -2856,6 +2866,7 @@ assert(!!a);
 		{
 			Code: `
 class Foo {
+  [key: string]: unknown;
   #value = 1;
 
   method() {
@@ -2863,7 +2874,8 @@ class Foo {
   }
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
 		},
 		{
 			Code: `
