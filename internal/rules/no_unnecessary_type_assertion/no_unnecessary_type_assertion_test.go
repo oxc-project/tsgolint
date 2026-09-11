@@ -514,6 +514,23 @@ export async function main() {
   return { ...actual };
 }
 		`},
+		{
+			// https://github.com/typescript-eslint/typescript-eslint/issues/6951
+			// `T` can only be inferred from the return position, so it is inferred from
+			// the assertion itself. Dropping the assertion falls back to `T = Base`.
+			Code: `
+interface Base {
+  id: string;
+}
+interface Derived extends Base {
+  extra: number;
+}
+declare function query<T extends Base = Base>(key: string): T;
+export const run = (): number => {
+  const v = query('k') as Derived;
+  return v.extra;
+};
+		`},
 		{Code: `
 declare function load<T = unknown>(): Promise<Promise<T>>;
 
