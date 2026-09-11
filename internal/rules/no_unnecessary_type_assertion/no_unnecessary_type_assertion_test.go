@@ -506,6 +506,18 @@ declare const query: { <E extends Element = Element>(strings: TemplateStringsArr
 
 export const a = query` + "`" + `.foo` + "`" + ` as HTMLCanvasElement | null;
 		`},
+		{
+			// The assertion is the only thing pinning `T`, so it is never
+			// unnecessary. Checking the outer assertion first used to resolve
+			// `get('x')` contextually as `Derived` and cache that signature,
+			// making the inner one look like a no-op.
+			Code: `
+interface Base { id: string }
+interface Derived extends Base { value: string }
+declare function get<T extends Base = Base>(text: string): T;
+const a = (get('x') as Derived).value as unknown;
+export { a };
+		`},
 		{Code: `
 declare function load<T = unknown>(): Promise<T>;
 
@@ -3575,6 +3587,29 @@ function upcast<T, U extends T & { id: string }>(value: U): T {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+				},
+			},
+		},
+		{
+			// Only the outer assertion is redundant. Reporting the inner one too
+			// would delete what pins `T`, turning `.value` into an error.
+			Code: `
+interface Base { id: string }
+interface Derived extends Base { value: string }
+declare function get<T extends Base = Base>(text: string): T;
+const b = (get('x') as Derived).value as string;
+export { b };`,
+			Output: []string{`
+interface Base { id: string }
+interface Derived extends Base { value: string }
+declare function get<T extends Base = Base>(text: string): T;
+const b = (get('x') as Derived).value;
+export { b };`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      5,
+					Column:    39,
 				},
 			},
 		}})
