@@ -1111,6 +1111,13 @@ declare function consume(value: unknown): void;
 consume(callable as unknown);
     `},
 		{Code: `
+type RecursiveCallable<T> = (value: T) => RecursiveCallable<{ value: T }>;
+type Subscription = (callback: () => void) => { unsubscribe(): void };
+
+declare const callable: RecursiveCallable<any>;
+const subscription = callable as Subscription;
+    `},
+		{Code: `
 type RecursiveCallable<Options = {}> =
   & (<NewOptions = {}>(options: NewOptions) => RecursiveCallable<Options & NewOptions>)
   & ((command: string) => void);
