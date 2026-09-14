@@ -135,6 +135,50 @@ func TestRequireArraySortCompare(t *testing.T) {
 			Code:    `enum Fruit { Apple = 'apple', Banana = 'banana' }; declare const fruits: Fruit[]; fruits.sort();`,
 			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
+		// Tuples are not `Array` types, so they are not reported. Matches typescript-eslint's
+		// `isTypeArrayTypeOrUnionOfArrayTypes`, which requires `checker.isArrayType()`.
+		{
+			Code: `
+        function f(a: [string, number]) {
+          a.sort();
+        }
+      `,
+		},
+		{
+			Code: `
+        function f(a: [number, string]) {
+          a.sort();
+        }
+      `,
+		},
+		{
+			Code: `
+        function f(a: readonly [string, number]) {
+          a.sort();
+        }
+      `,
+		},
+		{
+			Code: `
+        function f(a: [string, ...number[]]) {
+          a.sort();
+        }
+      `,
+		},
+		{
+			Code: `
+        function f(a: [string, number?]) {
+          a.sort();
+        }
+      `,
+		},
+		{
+			Code: `
+        function f(a: [string, number] | number[]) {
+          a.sort();
+        }
+      `,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -336,6 +380,19 @@ func TestRequireArraySortCompare(t *testing.T) {
 		{
 			Code:    `declare const myArray: ("A" | "B" | 3)[]; myArray.sort();`,
 			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			// An array *of* tuples is still an array type and is reported.
+			Code: `
+        function f(a: Array<[string, number]>) {
+          a.sort();
+        }
+      `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "requireCompare",

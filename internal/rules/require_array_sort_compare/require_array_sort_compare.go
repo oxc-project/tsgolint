@@ -45,8 +45,11 @@ var RequireArraySortCompareRule = rule.Rule{
 					}
 				}
 
+				// Only `Array` types (and unions of them) are reported, matching
+				// typescript-eslint's `isTypeArrayTypeOrUnionOfArrayTypes`, which uses
+				// `checker.isArrayType()` and therefore excludes tuples.
 				if utils.Every(utils.UnionTypeParts(calleeObjType), func(t *checker.Type) bool {
-					return checker.Checker_isArrayOrTupleType(ctx.TypeChecker, t)
+					return checker.Checker_isArrayType(ctx.TypeChecker, t)
 				}) {
 					ctx.ReportNode(node, buildRequireCompareMessage())
 				}
