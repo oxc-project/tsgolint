@@ -391,10 +391,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			if (utils.IsTypeFlagSet(uncast, checker.TypeFlagsNonPrimitive) && !utils.IsTypeFlagSet(cast, checker.TypeFlagsNonPrimitive)) ||
-				(hasIndexSignature(uncast) != hasIndexSignature(cast)) ||
-				containsAny(uncast) ||
-				containsAny(cast) ||
-				(containsTypeVariable(cast) && !containsTypeVariable(uncast)) {
+				(hasIndexSignature(uncast) != hasIndexSignature(cast)) {
 				return false
 			}
 
@@ -430,12 +427,18 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return false
 			}
 
-			if !hasSameProperties(uncast, cast) || !haveSameTypeArguments(uncast, cast) {
+			// Check shape and assignability before recursively walking nested types. Assertions between
+			// incompatible callable types can otherwise traverse very large generic parameter graphs.
+			if !hasSameProperties(uncast, cast) ||
+				!haveSameTypeArguments(uncast, cast) ||
+				!checker.Checker_isTypeAssignableTo(ctx.TypeChecker, uncast, cast) ||
+				!checker.Checker_isTypeAssignableTo(ctx.TypeChecker, cast, uncast) {
 				return false
 			}
 
-			return checker.Checker_isTypeAssignableTo(ctx.TypeChecker, uncast, cast) &&
-				checker.Checker_isTypeAssignableTo(ctx.TypeChecker, cast, uncast)
+			return !containsAny(uncast) &&
+				!containsAny(cast) &&
+				!(containsTypeVariable(cast) && !containsTypeVariable(uncast))
 		}
 
 		isTypeAny := func(t *checker.Type) bool {
