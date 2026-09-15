@@ -135,8 +135,6 @@ func TestRequireArraySortCompare(t *testing.T) {
 			Code:    `enum Fruit { Apple = 'apple', Banana = 'banana' }; declare const fruits: Fruit[]; fruits.sort();`,
 			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
-		// Tuples are not `Array` types, so they are not reported. Matches typescript-eslint's
-		// `isTypeArrayTypeOrUnionOfArrayTypes`, which requires `checker.isArrayType()`.
 		{
 			Code: `
         function f(a: [string, number]) {
@@ -387,7 +385,6 @@ func TestRequireArraySortCompare(t *testing.T) {
 			},
 		},
 		{
-			// An array *of* tuples is still an array type and is reported.
 			Code: `
         function f(a: Array<[string, number]>) {
           a.sort();
