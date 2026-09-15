@@ -481,6 +481,17 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return false
 		}
 
+		// Returns the operand whose type has to be resolved without the
+		// assertion's contextual type, or nil when the assertion's operand
+		// can be typed normally.
+		contextFreeOperand := func(node *ast.Node) *ast.Node {
+			expression := ast.SkipParentheses(node.Expression())
+			if !isContextSensitiveCallLikeExpression(expression) {
+				return nil
+			}
+			return expression
+		}
+
 		getUncastType := func(node *ast.Node) *checker.Type {
 			expression := ast.SkipParentheses(node.Expression())
 
@@ -500,7 +511,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			// For call-like expressions, use the context-free expression type so
 			// contextual typing from the assertion itself doesn't leak into generic
 			// inference for the original expression.
-			if isContextSensitiveCallLikeExpression(expression) {
+			if contextFreeOperand(node) != nil {
 				if t := checker.Checker_getContextFreeTypeOfExpression(ctx.TypeChecker, expression); t != nil {
 					return t
 				}
@@ -1140,6 +1151,30 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 			reportDoubleAssertionIfUnnecessary(node, contextualType)
 		}
+
+		// `getContextFreeTypeOfExpression` is only context-free the first time
+		// a node is checked. Once a call's signature has been resolved with a
+		// contextual type the checker caches that instantiation and hands it to
+		// every later caller, contextual type suppressed or not. So anything
+		// that resolves an enclosing expression first — another rule, or this
+		// rule visiting an outer assertion — makes a generic call look like it
+		// already had the asserted type, and the assertion that pins the type
+		// parameter gets reported as a no-op. Resolve the operands here, while
+		// the cache is still clean: `Run` is called for every rule before the
+		// traversal starts, so this is the last point at which that holds.
+		// Deepest first, so a nested assertion is resolved before the one
+		// wrapping it.
+		var primeContextFreeTypes func(node *ast.Node) bool
+		primeContextFreeTypes = func(node *ast.Node) bool {
+			node.ForEachChild(primeContextFreeTypes)
+			if node.Kind == ast.KindAsExpression || node.Kind == ast.KindTypeAssertionExpression {
+				if expression := contextFreeOperand(node); expression != nil {
+					checker.Checker_getContextFreeTypeOfExpression(ctx.TypeChecker, expression)
+				}
+			}
+			return false
+		}
+		ctx.SourceFile.Node.ForEachChild(primeContextFreeTypes)
 
 		return rule.RuleListeners{
 			ast.KindAsExpression:            checkTypeAssertion,
