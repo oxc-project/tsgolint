@@ -149,3 +149,12 @@ Message: Require 'compare' argument.
    1 | declare const myArray: ("A" | "B" | 3)[]; myArray.sort();
      |                                           ~~~~~~~~~~~~~~
 ---
+
+[TestRequireArraySortCompare/invalid-17 - 1]
+Diagnostic 1: requireCompare (3:11 - 3:18)
+Message: Require 'compare' argument.
+   2 |         function f(a: Array<[string, number]>) {
+   3 |           a.sort();
+     |           ~~~~~~~~
+   4 |         }
+---
