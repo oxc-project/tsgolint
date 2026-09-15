@@ -19,6 +19,7 @@ const ALL_RULES = [
   'consistent-return',
   'consistent-type-exports',
   'dot-notation',
+  'naming-convention',
   'no-array-delete',
   'no-base-to-string',
   'no-confusing-void-expression',
