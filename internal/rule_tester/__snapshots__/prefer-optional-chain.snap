@@ -5423,3 +5423,24 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |   throw new Error('missing');
 ---
+
+[TestPreferOptionalChainRule/invalid-605 - 1]
+Diagnostic 1: preferOptionalChain (1:55 - 1:64)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const x: { y: false | string | null } | null; !x || !x.y;
+     |                                                       ~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-606 - 1]
+Diagnostic 1: preferOptionalChain (1:67 - 1:86)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const x: false | { y: { z: string } | undefined } | null; !x || !x.y || !x.y.z;
+     |                                                                   ~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-607 - 1]
+Diagnostic 1: preferOptionalChain (1:67 - 1:83)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const x: false | { y: { z: string } | undefined } | null; x && x.y && x.y.z;
+     |                                                                   ~~~~~~~~~~~~~~~~~
+---

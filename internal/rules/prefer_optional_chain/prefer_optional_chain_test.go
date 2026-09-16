@@ -4339,5 +4339,48 @@ if (!item?.myField) {
 		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 	})
 
+	for _, falsy := range []string{"false", "0", "0n", `""`} {
+		for _, options := range []PreferOptionalChainOptions{
+			{},
+			{AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing: true},
+		} {
+			validCases = append(validCases,
+				rule_tester.ValidTestCase{Code: `declare const x: ` + falsy + ` | { y: string } | null | undefined; x && x.y;`, Options: options},
+				rule_tester.ValidTestCase{Code: `declare const x: { y: ` + falsy + ` | { z: string } | null }; x.y && x.y.z;`, Options: options},
+				rule_tester.ValidTestCase{Code: `declare const x: ` + falsy + ` | { y: string } | null | undefined; !x || !x.y;`, Options: options},
+				rule_tester.ValidTestCase{Code: `declare const x: { y: ` + falsy + ` | { z: string } | null }; !x.y || !x.y.z;`, Options: options},
+			)
+		}
+	}
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code:   `declare const x: { y: false | string | null } | null; !x || !x.y;`,
+		Output: []string{`declare const x: { y: false | string | null } | null; !x?.y;`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
+	invalidCases = append(invalidCases,
+		rule_tester.InvalidTestCase{
+			Code:   `declare const x: false | { y: { z: string } | undefined } | null; !x || !x.y || !x.y.z;`,
+			Output: []string{`declare const x: false | { y: { z: string } | undefined } | null; !x || !x.y?.z;`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+		rule_tester.InvalidTestCase{
+			Code:   `declare const x: false | { y: { z: string } | undefined } | null; x && x.y && x.y.z;`,
+			Output: []string{`declare const x: false | { y: { z: string } | undefined } | null; x && x.y?.z;`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+	)
+
+	// https://github.com/oxc-project/tsgolint/issues/1182
+	validCases = append(validCases, rule_tester.ValidTestCase{Code: `
+          declare const flag: boolean;
+          declare const node: { querySelector(s: string): Element | null } | null;
+          function label(): string | false {
+            const el = flag && node?.querySelector('[data-x]');
+            if (!el || !el.textContent) return false;
+            return el.textContent.trim();
+          }
+        `})
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }

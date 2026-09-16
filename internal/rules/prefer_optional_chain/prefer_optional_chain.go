@@ -1100,6 +1100,29 @@ func (processor *chainProcessor) wouldChangeReturnType(node *ast.Node) bool {
 	return hasFalsyNonNullish && !info.HasExplicitNullish()
 }
 
+func (processor *chainProcessor) hasFalsyLiteralType(node *ast.Node) bool {
+	for _, unionPart := range processor.getTypeInfo(node).parts {
+		for _, part := range utils.IntersectionTypeParts(unionPart) {
+			switch {
+			case utils.IsTypeFlagSet(part, checker.TypeFlagsBooleanLiteral):
+				if part.AsLiteralType().Value() == false {
+					return true
+				}
+			case utils.IsTypeFlagSet(part, checker.TypeFlagsStringLiteral):
+				if part.AsLiteralType().Value() == "" {
+					return true
+				}
+			case utils.IsTypeFlagSet(part, checker.TypeFlagsNumberLiteral|checker.TypeFlagsBigIntLiteral):
+				value := part.AsLiteralType().String()
+				if value == "0" || value == "0n" {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
 // void is falsy but not nullish - x?.() on void would TypeError.
 func (processor *chainProcessor) hasVoidType(node *ast.Node) bool {
 	info := processor.getTypeInfo(node)
@@ -1736,7 +1759,17 @@ func (processor *chainProcessor) processChain(node *ast.Node, operatorKind ast.K
 
 	operands := make([]Operand, len(operandNodes))
 	for i, n := range operandNodes {
-		operands[i] = processor.parseOperand(n, operatorKind)
+		op := processor.parseOperand(n, operatorKind)
+		areMoreOperands := i < len(operandNodes)-1
+		disallowFalsyLiteral := (isAndOperator(operatorKind) && op.typ == OperandTypePlain) ||
+			(operatorKind == ast.KindBarBarToken && op.typ == OperandTypeNot)
+		// Truthiness guards narrow out non-nullish falsy literals, whereas
+		// optional chaining does not. Keep the final operand as a result and
+		// invalidate unsafe guards before building the remaining chains.
+		if areMoreOperands && disallowFalsyLiteral && processor.hasFalsyLiteralType(op.comparedExpr) {
+			op = Operand{typ: OperandTypeInvalid, node: n}
+		}
+		operands[i] = op
 	}
 
 	chains := processor.buildChains(operands, operatorKind)
