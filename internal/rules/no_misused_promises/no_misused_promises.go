@@ -629,11 +629,7 @@ var NoMisusedPromisesRule = rule.Rule{
 				return
 			}
 
-			heritageTypes := utils.Flatten(utils.Map(heritageClauses.Nodes, func(h *ast.Node) []*checker.Type {
-				return utils.Map(h.AsHeritageClause().Types.Nodes, func(n *ast.Node) *checker.Type {
-					return ctx.TypeChecker.GetTypeAtLocation(n)
-				})
-			}))
+			var heritageTypes []*checker.Type
 
 			for _, nodeMember := range node.Members() {
 				if nodeMember.Name() == nil {
@@ -652,6 +648,13 @@ var NoMisusedPromisesRule = rule.Rule{
 				}
 				if !returnsThenable(nodeMember) {
 					continue
+				}
+				if heritageTypes == nil {
+					heritageTypes = utils.Flatten(utils.Map(heritageClauses.Nodes, func(h *ast.Node) []*checker.Type {
+						return utils.Map(h.AsHeritageClause().Types.Nodes, func(n *ast.Node) *checker.Type {
+							return ctx.TypeChecker.GetTypeAtLocation(n)
+						})
+					}))
 				}
 				for _, heritageType := range heritageTypes {
 					checkHeritageTypeForMemberReturningVoid(
