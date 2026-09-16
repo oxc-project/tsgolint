@@ -4551,11 +4551,6 @@ func TestNoUnnecessaryTypeAssertionUpstreamReporting(t *testing.T) {
   return value.length;
  }`},
 		{Code: "type ValuePath = 'values' | `values.${string}`;\ndeclare function apply(paths: ValuePath[]): void;\nexport function update(ids: string[]) {\n  apply(ids.map(id => `values.${id}` as ValuePath));\n}"},
-		{Code: `declare const items: string[] | undefined;
-const counts = items?.reduce((acc, item) => {
-  acc[item] = (acc[item] ?? 0) + 1;
-  return acc;
-}, {} as Record<string, number>);`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
 			{
@@ -4639,6 +4634,24 @@ const counts = items?.reduce((acc, item) => {
 			},
 		}},
 	})
+}
+
+// Regression for #1053: the initial-value assertion determines the accumulator
+// type for both optional and ordinary reduce calls.
+func TestNoUnnecessaryTypeAssertionReduceAccumulator(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTypeAssertionRule, []rule_tester.ValidTestCase{
+		{Code: `declare const items: string[] | undefined;
+const counts = items?.reduce((acc, item) => {
+  acc[item] = (acc[item] ?? 0) + 1;
+  return acc;
+}, {} as Record<string, number>);`},
+		{Code: `declare const items2: string[];
+const counts2 = items2.reduce((acc, item) => {
+  acc[item] = (acc[item] ?? 0) + 1;
+  return acc;
+}, {} as Record<string, number>);`},
+	}, nil)
 }
 
 func TestNoUnnecessaryTypeAssertionAsyncFunctionFix(t *testing.T) {
