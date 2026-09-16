@@ -101,16 +101,15 @@ var RestrictPlusOperandsRule = rule.Rule{
 			invalidFlags |= checker.TypeFlagsNullable
 		}
 
-		checkInvalidPlusOperand := func(baseType, otherType *checker.Type) (checker.TypeFlags, string, bool) {
+		checkInvalidPlusOperand := func(baseType, otherType *checker.Type) (checker.TypeFlags, bool) {
 			foundInvalid := false
 
 			var flags checker.TypeFlags
-			baseTypeString := ctx.TypeChecker.TypeToString(baseType)
 
 			for _, part := range utils.UnionTypeParts(baseType) {
 				flags |= checker.Type_flags(part)
 				if utils.IsTypeFlagSet(part, invalidFlags) {
-					return flags, baseTypeString, true
+					return flags, true
 				}
 
 				// RegExps also contain checker.TypeFlagsAny & checker.TypeFlagsObject
@@ -124,11 +123,7 @@ var RestrictPlusOperandsRule = rule.Rule{
 				foundInvalid = true
 			}
 
-			if foundInvalid {
-				return flags, baseTypeString, true
-			}
-
-			return flags, "", false
+			return flags, foundInvalid
 		}
 
 		checkPlusOperands := func(
@@ -136,10 +131,6 @@ var RestrictPlusOperandsRule = rule.Rule{
 		) {
 			leftType := getTypeConstrained(node.Left)
 			rightType := getTypeConstrained(node.Right)
-			leftTypeString := ctx.TypeChecker.TypeToString(leftType)
-			rightTypeString := ctx.TypeChecker.TypeToString(rightType)
-			leftRange := utils.TrimNodeTextRange(ctx.SourceFile, node.Left)
-			rightRange := utils.TrimNodeTextRange(ctx.SourceFile, node.Right)
 
 			if leftType == rightType &&
 				utils.IsTypeFlagSet(
@@ -151,14 +142,14 @@ var RestrictPlusOperandsRule = rule.Rule{
 				return
 			}
 
-			leftTypeFlags, leftInvalidType, leftInvalid := checkInvalidPlusOperand(leftType, rightType)
-			rightTypeFlags, rightInvalidType, rightInvalid := checkInvalidPlusOperand(rightType, leftType)
+			leftTypeFlags, leftInvalid := checkInvalidPlusOperand(leftType, rightType)
+			rightTypeFlags, rightInvalid := checkInvalidPlusOperand(rightType, leftType)
 
 			if leftInvalid {
-				ctx.ReportDiagnostic(buildInvalidDiagnostic(leftRange, leftInvalidType, stringLike))
+				ctx.ReportDiagnostic(buildInvalidDiagnostic(utils.TrimNodeTextRange(ctx.SourceFile, node.Left), ctx.TypeChecker.TypeToString(leftType), stringLike))
 			}
 			if rightInvalid {
-				ctx.ReportDiagnostic(buildInvalidDiagnostic(rightRange, rightInvalidType, stringLike))
+				ctx.ReportDiagnostic(buildInvalidDiagnostic(utils.TrimNodeTextRange(ctx.SourceFile, node.Right), ctx.TypeChecker.TypeToString(rightType), stringLike))
 			}
 			if leftInvalid || rightInvalid {
 				return
@@ -168,12 +159,25 @@ var RestrictPlusOperandsRule = rule.Rule{
 				if !opts.AllowNumberAndString &&
 					baseTypeFlags&checker.TypeFlagsStringLike != 0 &&
 					otherTypeFlags&(checker.TypeFlagsNumberLike|checker.TypeFlagsBigIntLike) != 0 {
-					ctx.ReportDiagnostic(buildMismatchedDiagnostic(utils.TrimNodeTextRange(ctx.SourceFile, &node.Node), leftRange, rightRange, stringLike, leftTypeString, rightTypeString))
+					ctx.ReportDiagnostic(buildMismatchedDiagnostic(
+						utils.TrimNodeTextRange(ctx.SourceFile, &node.Node),
+						utils.TrimNodeTextRange(ctx.SourceFile, node.Left),
+						utils.TrimNodeTextRange(ctx.SourceFile, node.Right),
+						stringLike,
+						ctx.TypeChecker.TypeToString(leftType),
+						ctx.TypeChecker.TypeToString(rightType),
+					))
 					return true
 				}
 
 				if baseTypeFlags&checker.TypeFlagsNumberLike != 0 && otherTypeFlags&checker.TypeFlagsBigIntLike != 0 {
-					ctx.ReportDiagnostic(buildBigintAndNumberDiagnostic(utils.TrimNodeTextRange(ctx.SourceFile, &node.Node), leftRange, rightRange, leftTypeString, rightTypeString))
+					ctx.ReportDiagnostic(buildBigintAndNumberDiagnostic(
+						utils.TrimNodeTextRange(ctx.SourceFile, &node.Node),
+						utils.TrimNodeTextRange(ctx.SourceFile, node.Left),
+						utils.TrimNodeTextRange(ctx.SourceFile, node.Right),
+						ctx.TypeChecker.TypeToString(leftType),
+						ctx.TypeChecker.TypeToString(rightType),
+					))
 					return true
 				}
 
