@@ -1859,3 +1859,149 @@ Message: Promise-returning function provided to return value where a void return
      |            ^^^^^^^^^^^^^ This expression has type `((x: number) => Promise<void>) | undefined`.
   11 |   }
 ---
+
+[TestNoMisusedPromisesRule/invalid-92 - 1]
+Diagnostic 1: voidReturnArgument (4:11 - 4:18)
+Message: Promise returned in function argument where a void return was expected.
+   3 | function f<T extends () => Promise<void>>(t: T) {
+   4 |   takesCb({ ...t });
+     |           ~~~~~~~~
+   5 | }
+  Label: This callback has type `T`. (4:11 - 4:18)
+   3 | function f<T extends () => Promise<void>>(t: T) {
+   4 |   takesCb({ ...t });
+     |           ^^^^^^^^ This callback has type `T`.
+   5 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (2:30 - 2:39)
+   1 | 
+   2 | declare function takesCb(cb: () => void): void;
+     |                              ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   3 | function f<T extends () => Promise<void>>(t: T) {
+---
+
+[TestNoMisusedPromisesRule/invalid-93 - 1]
+Diagnostic 1: voidReturnVariable (3:26 - 3:33)
+Message: Promise-returning function provided to variable where a void return was expected.
+   2 | function f<T extends () => Promise<void>>(t: T) {
+   3 |   const cb: () => void = { ...t };
+     |                          ~~~~~~~~
+   4 | }
+  Label: This callback has type `T`. (3:26 - 3:33)
+   2 | function f<T extends () => Promise<void>>(t: T) {
+   3 |   const cb: () => void = { ...t };
+     |                          ^^^^^^^^ This callback has type `T`.
+   4 | }
+  Label: This context accepts a `void`-returning callback through type `() => void`. (3:13 - 3:22)
+   2 | function f<T extends () => Promise<void>>(t: T) {
+   3 |   const cb: () => void = { ...t };
+     |             ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-94 - 1]
+Diagnostic 1: voidReturnArgument (6:9 - 6:17)
+Message: Promise returned in function argument where a void return was expected.
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb('literal');
+     |         ~~~~~~~~~
+   7 | takesCb(`template`);
+  Label: This callback has type `"literal"`. (6:9 - 6:17)
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb('literal');
+     |         ^^^^^^^^^ This callback has type `"literal"`.
+   7 | takesCb(`template`);
+  Label: This context accepts a `void`-returning callback through type `() => void`. (5:30 - 5:39)
+   4 | }
+   5 | declare function takesCb(cb: () => void): void;
+     |                              ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   6 | takesCb('literal');
+
+Diagnostic 2: voidReturnArgument (7:9 - 7:18)
+Message: Promise returned in function argument where a void return was expected.
+   6 | takesCb('literal');
+   7 | takesCb(`template`);
+     |         ~~~~~~~~~~
+   8 | const cb: () => void = 'literal';
+  Label: This callback has type `"template"`. (7:9 - 7:18)
+   6 | takesCb('literal');
+   7 | takesCb(`template`);
+     |         ^^^^^^^^^^ This callback has type `"template"`.
+   8 | const cb: () => void = 'literal';
+  Label: This context accepts a `void`-returning callback through type `() => void`. (5:30 - 5:39)
+   4 | }
+   5 | declare function takesCb(cb: () => void): void;
+     |                              ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   6 | takesCb('literal');
+
+Diagnostic 3: voidReturnVariable (8:24 - 8:32)
+Message: Promise-returning function provided to variable where a void return was expected.
+   7 | takesCb(`template`);
+   8 | const cb: () => void = 'literal';
+     |                        ~~~~~~~~~
+   9 |       
+  Label: This callback has type `"literal"`. (8:24 - 8:32)
+   7 | takesCb(`template`);
+   8 | const cb: () => void = 'literal';
+     |                        ^^^^^^^^^ This callback has type `"literal"`.
+   9 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (8:11 - 8:20)
+   7 | takesCb(`template`);
+   8 | const cb: () => void = 'literal';
+     |           ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   9 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-95 - 1]
+Diagnostic 1: voidReturnArgument (6:9 - 6:11)
+Message: Promise returned in function argument where a void return was expected.
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb(123);
+     |         ~~~
+   7 |       
+  Label: This callback has type `123`. (6:9 - 6:11)
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb(123);
+     |         ^^^ This callback has type `123`.
+   7 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (5:30 - 5:39)
+   4 | }
+   5 | declare function takesCb(cb: () => void): void;
+     |                              ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   6 | takesCb(123);
+---
+
+[TestNoMisusedPromisesRule/invalid-96 - 1]
+Diagnostic 1: voidReturnArgument (6:9 - 6:14)
+Message: Promise returned in function argument where a void return was expected.
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb([1, 2]);
+     |         ~~~~~~
+   7 | const cb: () => void = [1, 2];
+  Label: This callback has type `number[]`. (6:9 - 6:14)
+   5 | declare function takesCb(cb: () => void): void;
+   6 | takesCb([1, 2]);
+     |         ^^^^^^ This callback has type `number[]`.
+   7 | const cb: () => void = [1, 2];
+  Label: This context accepts a `void`-returning callback through type `() => void`. (5:30 - 5:39)
+   4 | }
+   5 | declare function takesCb(cb: () => void): void;
+     |                              ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   6 | takesCb([1, 2]);
+
+Diagnostic 2: voidReturnVariable (7:24 - 7:29)
+Message: Promise-returning function provided to variable where a void return was expected.
+   6 | takesCb([1, 2]);
+   7 | const cb: () => void = [1, 2];
+     |                        ~~~~~~
+   8 |       
+  Label: This callback has type `number[]`. (7:24 - 7:29)
+   6 | takesCb([1, 2]);
+   7 | const cb: () => void = [1, 2];
+     |                        ^^^^^^ This callback has type `number[]`.
+   8 |       
+  Label: This context accepts a `void`-returning callback through type `() => void`. (7:11 - 7:20)
+   6 | takesCb([1, 2]);
+   7 | const cb: () => void = [1, 2];
+     |           ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+   8 |       
+---
