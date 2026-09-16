@@ -109,25 +109,24 @@ var NoUnnecessaryTemplateExpressionRule = rule.Rule{
 		}
 
 		reportSingleInterpolation := func(template *ast.Node, interpolation *ast.Node, spanLiteral *ast.Node) {
-			text := nodeText(interpolation)
-			parentIsNullishCoalescing := ast.IsBinaryExpression(template.Parent) &&
-				template.Parent.AsBinaryExpression().OperatorToken.Kind == ast.KindQuestionQuestionToken
-			interpolationIsLogical := ast.IsBinaryExpression(interpolation) &&
-				(interpolation.AsBinaryExpression().OperatorToken.Kind == ast.KindBarBarToken ||
-					interpolation.AsBinaryExpression().OperatorToken.Kind == ast.KindAmpersandAmpersandToken)
-			needsParentheses := parentIsNullishCoalescing && interpolationIsLogical ||
-				ast.IsExpression(template.Parent) &&
-					ast.GetExpressionPrecedence(interpolation) <= ast.GetExpressionPrecedence(template.Parent)
-			if needsParentheses {
-				text = "(" + text + ")"
-			}
-
-			fixes := []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, template, text)}
 			ctx.ReportDiagnosticWithFixes(rule.RuleDiagnostic{
 				Range:   core.NewTextRange(interpolation.Pos()-2, spanLiteral.Pos()+1),
 				Message: buildNoUnnecessaryTemplateExpressionMessage(),
 			}, func() []rule.RuleFix {
-				return fixes
+				text := nodeText(interpolation)
+				parentIsNullishCoalescing := ast.IsBinaryExpression(template.Parent) &&
+					template.Parent.AsBinaryExpression().OperatorToken.Kind == ast.KindQuestionQuestionToken
+				interpolationIsLogical := ast.IsBinaryExpression(interpolation) &&
+					(interpolation.AsBinaryExpression().OperatorToken.Kind == ast.KindBarBarToken ||
+						interpolation.AsBinaryExpression().OperatorToken.Kind == ast.KindAmpersandAmpersandToken)
+				needsParentheses := parentIsNullishCoalescing && interpolationIsLogical ||
+					ast.IsExpression(template.Parent) &&
+						ast.GetExpressionPrecedence(interpolation) <= ast.GetExpressionPrecedence(template.Parent)
+				if needsParentheses {
+					text = "(" + text + ")"
+				}
+
+				return []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, template, text)}
 			})
 		}
 
