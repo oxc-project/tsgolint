@@ -130,13 +130,18 @@ var NoBaseToStringRule = rule.Rule{
 			t *checker.Type,
 			collectSubTypeCertainty func(t *checker.Type) usefulness,
 		) usefulness {
-			certainties := utils.Map(utils.UnionTypeParts(t), collectSubTypeCertainty)
+			allNever, allAlways := true, true
+			for _, part := range utils.UnionTypeParts(t) {
+				certainty := collectSubTypeCertainty(part)
+				allNever = allNever && certainty == usefulnessNever
+				allAlways = allAlways && certainty == usefulnessAlways
+			}
 
-			if utils.Every(certainties, func(c usefulness) bool { return c == usefulnessNever }) {
+			if allNever {
 				return usefulnessNever
 			}
 
-			if utils.Every(certainties, func(c usefulness) bool { return c == usefulnessAlways }) {
+			if allAlways {
 				return usefulnessAlways
 			}
 
@@ -159,15 +164,18 @@ var NoBaseToStringRule = rule.Rule{
 			visited []*checker.Type,
 		) usefulness {
 			typeArgs := checker.Checker_getTypeArguments(ctx.TypeChecker, t)
-			certainties := utils.Map(typeArgs, func(t *checker.Type) usefulness {
-				return collectToStringCertainty(t, visited)
-			})
+			hasNever, hasSometimes := false, false
+			for _, typeArg := range typeArgs {
+				certainty := collectToStringCertainty(typeArg, visited)
+				hasNever = hasNever || certainty == usefulnessNever
+				hasSometimes = hasSometimes || certainty == usefulnessSometimes
+			}
 
-			if utils.Some(certainties, func(c usefulness) bool { return c == usefulnessNever }) {
+			if hasNever {
 				return usefulnessNever
 			}
 
-			if utils.Some(certainties, func(c usefulness) bool { return c == usefulnessSometimes }) {
+			if hasSometimes {
 				return usefulnessSometimes
 			}
 
