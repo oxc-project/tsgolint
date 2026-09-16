@@ -1,5 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -492,6 +493,39 @@ console.log(x);
     const diagnostics = parseHeadlessOutput(output);
 
     expect(diagnostics.length).toBe(0);
+  });
+
+  it.for([false, true])('should lint differently cased editor paths (inferred: %s)', async (inferred, context) => {
+    const directory = await fs.mkdtemp(join(tmpdir(), 'tsgolint-casing-'));
+    try {
+      const file = join(directory, 'original.ts');
+      const editorFile = join(directory, 'Original.ts');
+      await fs.writeFile(file, 'const value = 1;');
+      if (!(await fs.stat(editorFile).catch(() => undefined))) {
+        context.skip(); // This regression requires a case-insensitive filesystem.
+        return;
+      }
+      if (inferred) {
+        // An unsaved editor file exists only in the source overrides.
+        await fs.rm(file);
+      } else {
+        await fs.writeFile(join(directory, 'tsconfig.json'), JSON.stringify({ files: ['original.ts'] }));
+      }
+
+      const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+        cwd: directory,
+        input: JSON.stringify({
+          version: 2,
+          configs: [{ file_paths: [editorFile], rules: [{ name: 'no-unsafe-assignment' }] }],
+          source_overrides: { [file]: 'declare const value: any; const result = value;' },
+        }),
+      });
+      const diagnostics = parseHeadlessOutput(output);
+      expect(diagnostics).toHaveLength(1);
+      expect(diagnostics[0].kind === DiagnosticKind.Rule && diagnostics[0].rule).toBe('no-unsafe-assignment');
+    } finally {
+      await fs.rm(directory, { recursive: true, force: true });
+    }
   });
 
   it('should handle tsconfig diagnostics when TypeScript reports them', async () => {

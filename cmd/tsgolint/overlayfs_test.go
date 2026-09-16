@@ -3,8 +3,38 @@ package main
 import (
 	"testing"
 
+	"github.com/microsoft/typescript-go/shim/vfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 )
+
+type caseSensitivityFS struct {
+	vfs.FS
+	caseSensitive bool
+}
+
+func (fs caseSensitivityFS) UseCaseSensitiveFileNames() bool { return fs.caseSensitive }
+
+func TestOverlayFSFileNameCasing(t *testing.T) {
+	for _, caseSensitive := range []bool{false, true} {
+		name := "case-insensitive"
+		if caseSensitive {
+			name = "case-sensitive"
+		}
+		t.Run(name, func(t *testing.T) {
+			overlay := newOverlayFS(caseSensitivityFS{osvfs.FS(), caseSensitive}, map[string]string{
+				"/virtual/Project/File.ts": "editor content",
+			})
+			path := "/virtual/project/file.ts"
+			if got := overlay.FileExists(path); got != !caseSensitive {
+				t.Errorf("FileExists(%q) = %v", path, got)
+			}
+			content, ok := overlay.ReadFile(path)
+			if ok != !caseSensitive || (ok && content != "editor content") {
+				t.Errorf("ReadFile(%q) = %q, %v", path, content, ok)
+			}
+		})
+	}
+}
 
 func TestOverlayFS(t *testing.T) {
 	baseFS := osvfs.FS()

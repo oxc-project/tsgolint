@@ -118,23 +118,23 @@ func RunLinter(options RunLinterOptions) error {
 			log.Printf("Program created with %d source files", len(program.GetSourceFiles()))
 		}
 
-		fileSet := make(map[string]struct{}, len(filePaths))
+		fileSet := make(map[tspath.Path]string, len(filePaths))
 		for _, f := range filePaths {
-			fileSet[f] = struct{}{}
+			fileSet[tspath.ToPath(f, currentDirectory, fs.UseCaseSensitiveFileNames())] = f
 		}
 
 		sourceFiles := make([]*ast.SourceFile, 0, len(filePaths))
 		for _, sf := range program.SourceFiles() {
-			if _, ok := fileSet[sf.FileName()]; ok {
+			if _, ok := fileSet[sf.Path()]; ok {
 				sourceFiles = append(sourceFiles, sf)
-				delete(fileSet, sf.FileName())
+				delete(fileSet, sf.Path())
 			}
 		}
 
 		if len(fileSet) > 0 {
 			var unmatchedFiles []string
-			for k := range fileSet {
-				unmatchedFiles = append(unmatchedFiles, k)
+			for _, fileName := range fileSet {
+				unmatchedFiles = append(unmatchedFiles, fileName)
 			}
 			unmatchedFilesString := strings.Join(unmatchedFiles, ", ")
 			log.Println("Unmatched files found:", unmatchedFilesString)

@@ -273,13 +273,13 @@ func runHeadless(args []string) int {
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
 	normalizedFiles := make([]string, 0, totalFileCount)
-	fileConfigs := make(map[string][]headlessRule, totalFileCount)
+	fileConfigs := make(map[tspath.Path][]headlessRule, totalFileCount)
 	for _, config := range payload.Configs {
 		for _, filePath := range config.FilePaths {
 			normalized := tspath.NormalizeSlashes(filePath)
 			normalizedFiles = append(normalizedFiles, normalized)
 
-			fileConfigs[normalized] = config.Rules
+			fileConfigs[tspath.ToPath(normalized, cwd, fs.UseCaseSensitiveFileNames())] = config.Rules
 		}
 	}
 
@@ -417,7 +417,7 @@ func runHeadless(args []string) int {
 		Workers:          runtime.GOMAXPROCS(0),
 		FS:               fs,
 		GetRulesForFile: func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			cfg := fileConfigs[sourceFile.FileName()]
+			cfg := fileConfigs[sourceFile.Path()]
 			rules := make([]linter.ConfiguredRule, len(cfg))
 
 			for i, headlessRule := range cfg {

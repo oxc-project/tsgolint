@@ -3,6 +3,7 @@ package main
 import (
 	"time"
 
+	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs"
 )
 
@@ -12,10 +13,18 @@ type overlayFS struct {
 }
 
 func newOverlayFS(underlying vfs.FS, overrides map[string]string) vfs.FS {
-	return &overlayFS{
+	fs := &overlayFS{
 		underlying: underlying,
-		overrides:  overrides,
+		overrides:  make(map[string]string, len(overrides)),
 	}
+	for path, content := range overrides {
+		fs.overrides[fs.canonicalPath(path)] = content
+	}
+	return fs
+}
+
+func (o *overlayFS) canonicalPath(path string) string {
+	return tspath.GetCanonicalFileName(tspath.NormalizePath(path), o.UseCaseSensitiveFileNames())
 }
 
 func (o *overlayFS) UseCaseSensitiveFileNames() bool {
@@ -23,14 +32,14 @@ func (o *overlayFS) UseCaseSensitiveFileNames() bool {
 }
 
 func (o *overlayFS) FileExists(path string) bool {
-	if _, ok := o.overrides[path]; ok {
+	if _, ok := o.overrides[o.canonicalPath(path)]; ok {
 		return true
 	}
 	return o.underlying.FileExists(path)
 }
 
 func (o *overlayFS) ReadFile(path string) (string, bool) {
-	if content, ok := o.overrides[path]; ok {
+	if content, ok := o.overrides[o.canonicalPath(path)]; ok {
 		return content, true
 	}
 	return o.underlying.ReadFile(path)
