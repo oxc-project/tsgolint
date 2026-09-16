@@ -95,12 +95,12 @@ var PreferIncludesRule = rule.Rule{
 				return ""
 			}
 
-			// Validate pattern compiles and is simple literal
-			if _, err := regexp2.Compile(pattern, regexp2.ECMAScript); err != nil {
+			// Reject non-literal patterns before compiling them.
+			if !isSimpleLiteralPattern(pattern) {
 				return ""
 			}
 
-			if !isSimpleLiteralPattern(pattern) {
+			if _, err := regexp2.Compile(pattern, regexp2.ECMAScript); err != nil {
 				return ""
 			}
 
@@ -129,12 +129,12 @@ var PreferIncludesRule = rule.Rule{
 
 			pattern := args[0].AsStringLiteral().Text
 
-			// Validate pattern compiles and is simple literal
-			if _, err := regexp2.Compile(pattern, regexp2.ECMAScript); err != nil {
+			// Reject non-literal patterns before compiling them.
+			if !isSimpleLiteralPattern(pattern) {
 				return ""
 			}
 
-			if !isSimpleLiteralPattern(pattern) {
+			if _, err := regexp2.Compile(pattern, regexp2.ECMAScript); err != nil {
 				return ""
 			}
 
