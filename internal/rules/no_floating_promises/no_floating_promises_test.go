@@ -7,6 +7,13 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
 
+const nodeTestDeclarations = `
+declare module 'node:test' {
+  function test(name: string, action: () => void): Promise<void>;
+  export { test as it };
+}
+`
+
 func TestNoFloatingPromisesRule(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoFloatingPromisesRule, []rule_tester.ValidTestCase{
@@ -751,7 +758,9 @@ promise().then(() => {});
 			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": [{"from": "package", "name": "it", "package": "abc"}]}`),
 		},
 		{
+			Files: map[string]string{"node-test.d.ts": nodeTestDeclarations},
 			Code: `
+        /// <reference path="./node-test.d.ts" />
         import { it } from 'node:test';
 
         it('...', () => {});
@@ -5732,4 +5741,25 @@ await Promise.reject().catch(undefined).finally(() => {});
 			}},
 		},
 	})
+}
+
+func TestNoFloatingPromisesNodeTestWithoutAllowlist(t *testing.T) {
+	const code = `/// <reference path="./node-test.d.ts" />
+import { it } from 'node:test';
+it('...', () => {});`
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoFloatingPromisesRule, nil, []rule_tester.InvalidTestCase{{
+		Code:  code,
+		Files: map[string]string{"node-test.d.ts": nodeTestDeclarations},
+		Errors: []rule_tester.InvalidTestCaseError{{
+			MessageId: "floatingVoid",
+			Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "floatingFixVoid", Output: `/// <reference path="./node-test.d.ts" />
+import { it } from 'node:test';
+void it('...', () => {});`},
+				{MessageId: "floatingFixAwait", Output: `/// <reference path="./node-test.d.ts" />
+import { it } from 'node:test';
+await it('...', () => {});`},
+			},
+		}},
+	}})
 }
