@@ -1,5 +1,5 @@
 
-[TestNoFloatingPromisesNodeTestWithoutAllowlist/invalid-0 - 1]
+[TestNoFloatingPromisesNodeTestAllowlist/invalid-0 - 1]
 Diagnostic 1: floatingVoid (3:1 - 3:19)
 Message: Promises must be awaited, add void operator to ignore.
 Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the `void` operator.
