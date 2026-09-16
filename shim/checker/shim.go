@@ -135,12 +135,16 @@ func Checker_getDeclaredTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) 
 func Checker_getBaseTypeOfLiteralType(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_getUnionTypeEx github.com/microsoft/typescript-go/internal/checker.(*Checker).getUnionTypeEx
 func Checker_getUnionTypeEx(recv *checker.Checker, types []*checker.Type, unionReduction checker.UnionReduction, alias *checker.TypeAlias, origin *checker.Type) *checker.Type
+//go:linkname Checker_getIndexedAccessTypeOrUndefined github.com/microsoft/typescript-go/internal/checker.(*Checker).getIndexedAccessTypeOrUndefined
+func Checker_getIndexedAccessTypeOrUndefined(recv *checker.Checker, objectType *checker.Type, indexType *checker.Type, accessFlags checker.AccessFlags, accessNode *ast.Node, alias *checker.TypeAlias) *checker.Type
 //go:linkname Checker_getBaseConstraintOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseConstraintOfType
 func Checker_getBaseConstraintOfType(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_removeDefinitelyFalsyTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).removeDefinitelyFalsyTypes
 func Checker_removeDefinitelyFalsyTypes(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_extractDefinitelyFalsyTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).extractDefinitelyFalsyTypes
 func Checker_extractDefinitelyFalsyTypes(recv *checker.Checker, t *checker.Type) *checker.Type
+//go:linkname Checker_getTypeOfPropertyOrIndexSignatureOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeOfPropertyOrIndexSignatureOfType
+func Checker_getTypeOfPropertyOrIndexSignatureOfType(recv *checker.Checker, t *checker.Type, name string) *checker.Type
 //go:linkname Checker_getContextualType github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualType
 func Checker_getContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
 //go:linkname Checker_getContextualTypeForArgumentAtIndex github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualTypeForArgumentAtIndex
@@ -151,6 +155,8 @@ func Checker_getApparentTypeOfContextualType(recv *checker.Checker, node *ast.No
 func Checker_hasTypeFacts(recv *checker.Checker, t *checker.Type, mask checker.TypeFacts) bool
 //go:linkname Checker_getAwaitedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getAwaitedType
 func Checker_getAwaitedType(recv *checker.Checker, t *checker.Type) *checker.Type
+//go:linkname Checker_getFlowTypeOfReference github.com/microsoft/typescript-go/internal/checker.(*Checker).getFlowTypeOfReference
+func Checker_getFlowTypeOfReference(recv *checker.Checker, reference *ast.Node, declaredType *checker.Type) *checker.Type
 //go:linkname Checker_getAccessedPropertyName github.com/microsoft/typescript-go/internal/checker.(*Checker).getAccessedPropertyName
 func Checker_getAccessedPropertyName(recv *checker.Checker, access *ast.Node) (string, bool)
 //go:linkname Checker_getPropertyNameForKnownSymbolName github.com/microsoft/typescript-go/internal/checker.(*Checker).getPropertyNameForKnownSymbolName

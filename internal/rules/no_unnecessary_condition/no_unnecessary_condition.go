@@ -65,7 +65,7 @@ func buildAlwaysFalsyFuncMessage() rule.RuleMessage {
 func buildNeverNullishMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "neverNullish",
-		Description: "Unnecessary optional chain on a non-nullish value.",
+		Description: "Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.",
 	}
 }
 
@@ -1524,12 +1524,53 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
+		getNullishCoalescingType := func(node *ast.Node) (*checker.Type, bool) {
+			nodeType := getResolvedType(node)
+			node = ast.SkipParentheses(node)
+			if !noUncheckedIndexedAccess || !ast.IsAssignmentTarget(node) {
+				return nodeType, false
+			}
+
+			var readType *checker.Type
+			switch node.Kind {
+			case ast.KindPropertyAccessExpression:
+				access := node.AsPropertyAccessExpression()
+				name := access.Name()
+				if name == nil || name.Kind == ast.KindPrivateIdentifier {
+					return nodeType, false
+				}
+				baseType := getResolvedType(access.Expression)
+				if baseType == nil || checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, ast.GetTextOfPropertyName(name)) != nil {
+					return nodeType, false
+				}
+				readType = checker.Checker_getTypeOfPropertyOrIndexSignatureOfType(ctx.TypeChecker, baseType, ast.GetTextOfPropertyName(name))
+			case ast.KindElementAccessExpression:
+				access := node.AsElementAccessExpression()
+				if access.ArgumentExpression == nil {
+					return nodeType, false
+				}
+				baseType := getResolvedType(access.Expression)
+				keyType := getResolvedType(access.ArgumentExpression)
+				if baseType == nil || keyType == nil {
+					return nodeType, false
+				}
+				readType = checker.Checker_getIndexedAccessTypeOrUndefined(ctx.TypeChecker, baseType, keyType, checker.AccessFlagsExpressionPosition, nil, nil)
+			}
+			if readType == nil {
+				return nodeType, false
+			}
+
+			// Assignment-target types omit unchecked-index undefined and flow narrowing.
+			// Recover the read type so both missing and already-initialized entries are checked.
+			return checker.Checker_getFlowTypeOfReference(ctx.TypeChecker, node, readType), true
+		}
+
 		checkNodeForNullish := func(node *ast.Node) {
 			if node == nil {
 				return
 			}
 
-			nodeType := getResolvedType(node)
+			nodeType, recoveredReadType := getNullishCoalescingType(node)
 			if nodeType == nil || isConditionalAlwaysNecessary(nodeType) {
 				return
 			}
@@ -1560,7 +1601,8 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				return
 			}
 
-			if !isNullishType(nodeType) && !isNullableMemberExpression(node) {
+			// A recovered read type already accounts for optionality and control-flow narrowing.
+			if !isNullishType(nodeType) && (recoveredReadType || !isNullableMemberExpression(node)) {
 				node = ast.SkipParentheses(node)
 
 				if noUncheckedIndexedAccess ||

@@ -1293,7 +1293,7 @@ Message: This condition will always return the same value since the types have n
 
 [TestNoUnnecessaryConditionRule/invalid-41 - 1]
 Diagnostic 1: neverNullish (3:10 - 3:10)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | function test(a: string) {
    3 |   return a ?? 'default';
      |          ~
@@ -1307,7 +1307,7 @@ Message: Unnecessary optional chain on a non-nullish value.
 
 [TestNoUnnecessaryConditionRule/invalid-42 - 1]
 Diagnostic 1: neverNullish (3:10 - 3:10)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | function test(a: string | false) {
    3 |   return a ?? 'default';
      |          ~
@@ -1321,7 +1321,7 @@ Message: Unnecessary optional chain on a non-nullish value.
 
 [TestNoUnnecessaryConditionRule/invalid-43 - 1]
 Diagnostic 1: neverNullish (3:10 - 3:10)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | function test<T extends string>(a: T) {
    3 |   return a ?? 'default';
      |          ~
@@ -1335,7 +1335,7 @@ Message: Unnecessary optional chain on a non-nullish value.
 
 [TestNoUnnecessaryConditionRule/invalid-44 - 1]
 Diagnostic 1: neverNullish (3:10 - 3:17)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | function test(a: { foo: string }[]) {
    3 |   return a[0].foo ?? 'default';
      |          ~~~~~~~~
@@ -1405,7 +1405,7 @@ Message: Unnecessary conditional, value is `never`.
 
 [TestNoUnnecessaryConditionRule/invalid-49 - 1]
 Diagnostic 1: neverNullish (3:3 - 3:5)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | function test<T extends { foo: number }, K extends 'foo'>(num: T[K]) {
    3 |   num ?? 'default';
      |   ~~~
@@ -2330,7 +2330,7 @@ Message: Unnecessary conditional, value is always truthy.
 
 [TestNoUnnecessaryConditionRule/invalid-97 - 1]
 Diagnostic 1: neverNullish (3:1 - 3:3)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | declare let foo: {};
    3 | foo ??= 1;
      | ~~~
@@ -2344,7 +2344,7 @@ Message: Unnecessary optional chain on a non-nullish value.
 
 [TestNoUnnecessaryConditionRule/invalid-98 - 1]
 Diagnostic 1: neverNullish (3:1 - 3:3)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | declare let foo: number;
    3 | foo ??= 1;
      | ~~~
@@ -2428,7 +2428,7 @@ Message: Unnecessary conditional, value is always falsy.
 
 [TestNoUnnecessaryConditionRule/invalid-104 - 1]
 Diagnostic 1: neverNullish (3:1 - 3:7)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    2 | declare const foo: { bar: number };
    3 | foo.bar ??= 1;
      | ~~~~~~~
@@ -2839,7 +2839,7 @@ Message: Unnecessary optional chain on a non-nullish value.
 
 [TestNoUnnecessaryConditionRule/invalid-131 - 1]
 Diagnostic 1: neverNullish (5:3 - 5:8)
-Message: Unnecessary optional chain on a non-nullish value.
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
    4 | if (arr[0]) {
    5 |   arr[0] ?? 'foo';
      |   ~~~~~~
@@ -2935,17 +2935,17 @@ Message: Unnecessary conditional, value is always truthy.
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-139 - 1]
-Diagnostic 1: neverNullish (6:5 - 6:15)
-Message: Unnecessary optional chain on a non-nullish value.
-   5 |   method() {
-   6 |     this.#value ??= 2;
+Diagnostic 1: neverNullish (7:5 - 7:15)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   6 |   method() {
+   7 |     this.#value ??= 2;
      |     ~~~~~~~~~~~
-   7 |   }
-  Label: Type: number (6:5 - 6:15)
-   5 |   method() {
-   6 |     this.#value ??= 2;
+   8 |   }
+  Label: Type: number (7:5 - 7:15)
+   6 |   method() {
+   7 |     this.#value ??= 2;
      |     ^^^^^^^^^^^ Type: number
-   7 |   }
+   8 |   }
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-140 - 1]
@@ -2997,4 +2997,200 @@ Message: This condition will always return the same value since the types have n
    4 |     case undefined:
      |          ^^^^^^^^^ Type: undefined
    5 |       break;
+---
+
+[TestNullishRecordAssignment/invalid-0 - 1]
+Diagnostic 1: neverNullish (4:5 - 4:19)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   if (opts.perplexity) {
+   4 |     opts.perplexity ?? {};
+     |     ~~~~~~~~~~~~~~~
+   5 |   }
+  Label: Type: object (4:5 - 4:19)
+   3 |   if (opts.perplexity) {
+   4 |     opts.perplexity ?? {};
+     |     ^^^^^^^^^^^^^^^ Type: object
+   5 |   }
+---
+
+[TestNullishRecordAssignment/invalid-1 - 1]
+Diagnostic 1: neverNullish (4:3 - 4:17)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   opts.perplexity = {};
+   4 |   opts.perplexity ?? {};
+     |   ~~~~~~~~~~~~~~~
+   5 | }
+  Label: Type: object (4:3 - 4:17)
+   3 |   opts.perplexity = {};
+   4 |   opts.perplexity ?? {};
+     |   ^^^^^^^^^^^^^^^ Type: object
+   5 | }
+---
+
+[TestNullishRecordAssignment/invalid-2 - 1]
+Diagnostic 1: neverNullish (3:3 - 3:17)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   2 | function test(opts: Record<string, object> & { perplexity: object }) {
+   3 |   opts.perplexity ??= {};
+     |   ~~~~~~~~~~~~~~~
+   4 | }
+  Label: Type: object (3:3 - 3:17)
+   2 | function test(opts: Record<string, object> & { perplexity: object }) {
+   3 |   opts.perplexity ??= {};
+     |   ^^^^^^^^^^^^^^^ Type: object
+   4 | }
+---
+
+[TestNullishRecordAssignment/invalid-3 - 1]
+Diagnostic 1: neverNullish (3:3 - 3:17)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   2 | function test<T extends Record<string, object> & { perplexity: object }>(opts: T) {
+   3 |   opts.perplexity ??= {};
+     |   ~~~~~~~~~~~~~~~
+   4 | }
+  Label: Type: object (3:3 - 3:17)
+   2 | function test<T extends Record<string, object> & { perplexity: object }>(opts: T) {
+   3 |   opts.perplexity ??= {};
+     |   ^^^^^^^^^^^^^^^ Type: object
+   4 | }
+---
+
+[TestNullishRecordAssignment/invalid-4 - 1]
+Diagnostic 1: neverNullish (3:3 - 3:17)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   2 | function test(opts: Record<'perplexity', object>) {
+   3 |   opts.perplexity ??= {};
+     |   ~~~~~~~~~~~~~~~
+   4 | }
+  Label: Type: object (3:3 - 3:17)
+   2 | function test(opts: Record<'perplexity', object>) {
+   3 |   opts.perplexity ??= {};
+     |   ^^^^^^^^^^^^^^^ Type: object
+   4 | }
+---
+
+[TestNullishRecordAssignment/invalid-5 - 1]
+Diagnostic 1: neverNullish (3:3 - 3:17)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   2 | function test(opts: Record<string, object>) {
+   3 |   opts.perplexity ??= {};
+     |   ~~~~~~~~~~~~~~~
+   4 | }
+  Label: Type: object (3:3 - 3:17)
+   2 | function test(opts: Record<string, object>) {
+   3 |   opts.perplexity ??= {};
+     |   ^^^^^^^^^^^^^^^ Type: object
+   4 | }
+---
+
+[TestNullishRecordAssignment/invalid-6 - 1]
+Diagnostic 1: neverNullish (4:5 - 4:19)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   if (opts.perplexity) {
+   4 |     opts.perplexity ??= {};
+     |     ~~~~~~~~~~~~~~~
+   5 |   }
+  Label: Type: object (4:5 - 4:19)
+   3 |   if (opts.perplexity) {
+   4 |     opts.perplexity ??= {};
+     |     ^^^^^^^^^^^^^^^ Type: object
+   5 |   }
+---
+
+[TestNullishRecordAssignment/invalid-7 - 1]
+Diagnostic 1: neverNullish (4:3 - 4:17)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   opts.perplexity ??= {};
+   4 |   opts.perplexity ??= {};
+     |   ~~~~~~~~~~~~~~~
+   5 | }
+  Label: Type: object (4:3 - 4:17)
+   3 |   opts.perplexity ??= {};
+   4 |   opts.perplexity ??= {};
+     |   ^^^^^^^^^^^^^^^ Type: object
+   5 | }
+---
+
+[TestNullishRecordAssignment/invalid-8 - 1]
+Diagnostic 1: neverNullish (4:4 - 4:18)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   opts.perplexity = {};
+   4 |   (opts.perplexity) ??= {};
+     |    ~~~~~~~~~~~~~~~
+   5 | }
+  Label: Type: object (4:4 - 4:18)
+   3 |   opts.perplexity = {};
+   4 |   (opts.perplexity) ??= {};
+     |    ^^^^^^^^^^^^^^^ Type: object
+   5 | }
+---
+
+[TestNullishRecordAssignment/invalid-9 - 1]
+Diagnostic 1: neverNullish (4:3 - 4:13)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   opts.fooBar ??= {};
+   4 |   opts.fooBar ??= {};
+     |   ~~~~~~~~~~~
+   5 | }
+  Label: Type: object (4:3 - 4:13)
+   3 |   opts.fooBar ??= {};
+   4 |   opts.fooBar ??= {};
+     |   ^^^^^^^^^^^ Type: object
+   5 | }
+---
+
+[TestNullishRecordAssignment/invalid-10 - 1]
+Diagnostic 1: neverNullish (4:3 - 4:16)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   opts['fooBar'] ??= {};
+   4 |   opts['fooBar'] ??= {};
+     |   ~~~~~~~~~~~~~~
+   5 | }
+  Label: Type: object (4:3 - 4:16)
+   3 |   opts['fooBar'] ??= {};
+   4 |   opts['fooBar'] ??= {};
+     |   ^^^^^^^^^^^^^^ Type: object
+   5 | }
+---
+
+[TestNullishRecordAssignment/invalid-11 - 1]
+Diagnostic 1: neverNullish (4:5 - 4:15)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   if (opts['foo']) {
+   4 |     opts['foo'] ??= {};
+     |     ~~~~~~~~~~~
+   5 |   }
+  Label: Type: object (4:5 - 4:15)
+   3 |   if (opts['foo']) {
+   4 |     opts['foo'] ??= {};
+     |     ^^^^^^^^^^^ Type: object
+   5 |   }
+---
+
+[TestNullishRecordAssignment/invalid-12 - 1]
+Diagnostic 1: neverNullish (4:3 - 4:13)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   3 |   opts.foo ??= {};
+   4 |   opts['foo'] ??= {};
+     |   ~~~~~~~~~~~
+   5 | }
+  Label: Type: object (4:3 - 4:13)
+   3 |   opts.foo ??= {};
+   4 |   opts['foo'] ??= {};
+     |   ^^^^^^^^^^^ Type: object
+   5 | }
+---
+
+[TestNullishRecordAssignment/invalid-13 - 1]
+Diagnostic 1: neverNullish (3:3 - 3:11)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+   2 | function test(opts: { foo: object; bar: object }, key: 'foo' | 'bar') {
+   3 |   opts[key] ??= {};
+     |   ~~~~~~~~~
+   4 | }
+  Label: Type: object (3:3 - 3:11)
+   2 | function test(opts: { foo: object; bar: object }, key: 'foo' | 'bar') {
+   3 |   opts[key] ??= {};
+     |   ^^^^^^^^^ Type: object
+   4 | }
 ---

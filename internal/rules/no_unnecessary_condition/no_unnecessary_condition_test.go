@@ -1309,6 +1309,16 @@ function repro5WithNoUncheckedIndexedAccess() {
     `,
 			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
 		},
+		{
+			Code: `
+type ProviderOptions = Record<string, Record<string, unknown>>;
+
+function withNullishAssignment(opts: ProviderOptions): Record<string, unknown> {
+  return opts.perplexity ??= {};
+}
+    `,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+		},
 		{Code: `
 type Result<T> = T extends null
   ? string | null
@@ -2856,6 +2866,7 @@ assert(!!a);
 		{
 			Code: `
 class Foo {
+  [key: string]: unknown;
   #value = 1;
 
   method() {
@@ -2863,7 +2874,8 @@ class Foo {
   }
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
 		},
 		{
 			Code: `
@@ -2899,6 +2911,198 @@ function test(value: string) {
 				EndLine:   4,
 				EndColumn: 19,
 			}},
+		},
+	})
+}
+
+func TestNullishRecordAssignment(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.noUncheckedIndexedAccess.json", t, &NoUnnecessaryConditionRule, []rule_tester.ValidTestCase{
+		{Code: `
+function test(opts: Record<string, object>) {
+  opts.perplexity ?? {};
+  if (opts.perplexity === undefined) {
+    opts.perplexity = {};
+  }
+}
+`},
+		{Code: `
+function test(opts: Record<string, object>) {
+  (opts.perplexity) ??= {};
+  opts['other'] ??= {};
+}
+`},
+		{Code: `
+interface Options {
+  [key: string]: object;
+}
+function test(opts: Options) {
+  opts.perplexity ??= {};
+}
+`},
+		{Code: `
+class Options {
+  [key: string]: object;
+  initialize() {
+    this.perplexity ??= {};
+  }
+}
+`},
+		{Code: `
+function test(opts: Record<string, object> | Record<string, number>) {
+  opts.perplexity ??= {};
+}
+`},
+		{Code: `
+function test(opts: { [key: ` + "`foo${string}`" + `]: object }) {
+  opts.fooBar ??= {};
+}
+`},
+		{Code: `
+function test(opts: Record<Lowercase<string>, object>) {
+  opts.foo ??= {};
+}
+`},
+		{Code: `
+function test(opts: { [key: ` + "`foo${string}`" + `]: object }) {
+  opts['fooBar'] ??= {};
+}
+`},
+		{Code: `
+function test(opts: { [key: ` + "`foo${string}`" + `]: object }, key: ` + "`foo${string}`" + `) {
+  opts[key] ??= {};
+}
+`},
+		{Code: `
+function test(opts: Record<string, object>, key: 'foo' | 'bar') {
+  opts[key] ??= {};
+}
+`},
+	}, []rule_tester.InvalidTestCase{
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  if (opts.perplexity) {
+    opts.perplexity ?? {};
+  }
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  opts.perplexity = {};
+  opts.perplexity ?? {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object> & { perplexity: object }) {
+  opts.perplexity ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test<T extends Record<string, object> & { perplexity: object }>(opts: T) {
+  opts.perplexity ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<'perplexity', object>) {
+  opts.perplexity ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  opts.perplexity ??= {};
+}
+`,
+			TSConfig: "tsconfig.json",
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  if (opts.perplexity) {
+    opts.perplexity ??= {};
+  }
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  opts.perplexity ??= {};
+  opts.perplexity ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish", Line: 4}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  opts.perplexity = {};
+  (opts.perplexity) ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: { [key: ` + "`foo${string}`" + `]: object }) {
+  opts.fooBar ??= {};
+  opts.fooBar ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish", Line: 4}},
+		},
+		{
+			Code: `
+function test(opts: { [key: ` + "`foo${string}`" + `]: object }) {
+  opts['fooBar'] ??= {};
+  opts['fooBar'] ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish", Line: 4}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  if (opts['foo']) {
+    opts['foo'] ??= {};
+  }
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
+		},
+		{
+			Code: `
+function test(opts: Record<string, object>) {
+  opts.foo ??= {};
+  opts['foo'] ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish", Line: 4}},
+		},
+		{
+			Code: `
+function test(opts: { foo: object; bar: object }, key: 'foo' | 'bar') {
+  opts[key] ??= {};
+}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish"}},
 		},
 	})
 }
