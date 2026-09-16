@@ -34,37 +34,42 @@ tsgolint uses **typescript-go** for native performance:
 ### Parallel Processing
 
 ```
-Master Thread → [Worker Pool] → Diagnostics
+Coordinator → [Worker Pool] → Diagnostics
      ↓              ↓
 Files + Rules → Rule Execution → Output
 ```
 
-- **Worker Pool**: Utilizes all CPU cores
-- **Shared State**: TypeScript programs shared across workers
-- **Streaming**: Real-time diagnostic collection
+- **Worker Pool**: The CLI uses `runtime.GOMAXPROCS(0)` to set the worker count
+- **Shared Programs**: Workers share a program and file queue, with a separate checker for each checker workload
+- **Diagnostics**: Workers report diagnostics through callbacks; headless mode streams them to Oxlint
 
 ### Rule System
 
 Rules follow a visitor pattern:
 
 ```go
-func (r *Rule) Run(ctx RuleContext) RuleListeners {
-    return RuleListeners{
-        ast.FunctionDeclaration: r.checkFunction,
-        ast.CallExpression: r.checkCall,
-    }
+var ExampleRule = rule.Rule{
+	Name: "example-rule",
+	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+		return rule.RuleListeners{
+			ast.KindCallExpression: func(node *ast.Node) {
+				// Inspect the call using ctx.TypeChecker and report diagnostics.
+			},
+		}
+	},
 }
 ```
 
 Each rule registers listeners for specific AST node types and uses the TypeScript checker for type-aware analysis.
+The interfaces are defined in [`internal/rule/rule.go`](./internal/rule/rule.go); see [CONTRIBUTING.md](./CONTRIBUTING.md#implementing-new-rules) for a complete example.
 
 ## Key Design Decisions
 
 ### Why Go?
 
-- **Performance**: 20-40x faster than JavaScript
+- **Performance**: Native compilation and direct access to typescript-go; see the measured [benchmarks](./benchmarks/README.md)
 - **Concurrency**: Excellent parallel processing primitives
-- **Type Safety**: Prevents runtime errors
+- **Type Safety**: Compile-time checks for Go types and interfaces
 
 ### Why Direct TypeScript AST?
 
@@ -75,7 +80,7 @@ Each rule registers listeners for specific AST node types and uses the TypeScrip
 ### Why Separate from Oxlint?
 
 - **Clean Separation**: Independent development and testing
-- **Focused Scope**: tsgolint only handles type-aware rules
+- **Focused Scope**: Type-aware rules and optional TypeScript diagnostics
 - **Multiple Frontends**: Potential for other integrations
 
 ## TypeScript Shims
@@ -92,7 +97,9 @@ Go Shims → typescript-go Internal APIs → TypeScript Compiler
 - `shim/checker`: Type checker interface
 - `shim/compiler`: Program creation and management
 
-> **Note**: This approach is not recommended for production use. We're waiting for official typescript-go APIs.
+The shims depend on internal APIs at the pinned typescript-go revision. Regenerate them with `just shim` when their configuration or the upstream APIs change. See [tools/gen_shims/README.md](./tools/gen_shims/README.md).
+
+Local typescript-go adaptations are maintained in the [patch stack](./patches/README.md) and applied during `just init`.
 
 ## Performance Architecture
 
@@ -109,12 +116,11 @@ Go Shims → typescript-go Internal APIs → TypeScript Compiler
 - **Shared Programs**: TypeScript programs shared for efficiency
 - **Memory Streaming**: Diagnostics processed immediately
 
-## Known Limitations
+## Maintenance Considerations
 
-- **Large Monorepos**: Performance issues with very large codebases
-- **Memory Usage**: Potential issues with complex TypeScript configurations
-- **Version Synchronization**: Must stay synchronized with TypeScript versions
-- **Concurrency**: Rare potential for deadlocks in complex scenarios
+- **Version Synchronization**: Keep the typescript-go revision, local patches, and generated shims in sync
+- **Concurrency**: Keep mutable rule state local to each rule invocation and use the checker provided by `RuleContext`
+- **Performance**: Profile changes to program creation, rule execution, and diagnostic reporting on representative projects
 
 ## References
 
