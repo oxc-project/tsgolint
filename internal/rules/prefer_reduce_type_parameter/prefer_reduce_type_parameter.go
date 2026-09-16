@@ -59,16 +59,18 @@ var PreferReduceTypeParameterRule = rule.Rule{
 					return
 				}
 
-				fixes := make([]rule.RuleFix, 0, 2)
-				if secondArg.Kind == ast.KindAsExpression {
-					fixes = append(fixes, rule.RuleFixRemoveRange(assertionType.Loc.WithPos(assertionExpr.End())))
-				} else {
-					fixes = append(fixes, rule.RuleFixRemoveRange(secondArg.Loc.WithEnd(assertionExpr.Pos())))
-				}
-				if expr.TypeArguments == nil {
-					fixes = append(fixes, rule.RuleFixInsertAfter(callee, "<"+ctx.SourceFile.Text()[assertionType.Pos():assertionType.End()]+">"))
-				}
-				ctx.ReportNodeWithFixes(secondArg, buildPreferTypeParameterMessage(), func() []rule.RuleFix { return fixes })
+				ctx.ReportNodeWithFixes(secondArg, buildPreferTypeParameterMessage(), func() []rule.RuleFix {
+					fixes := make([]rule.RuleFix, 0, 2)
+					if secondArg.Kind == ast.KindAsExpression {
+						fixes = append(fixes, rule.RuleFixRemoveRange(assertionType.Loc.WithPos(assertionExpr.End())))
+					} else {
+						fixes = append(fixes, rule.RuleFixRemoveRange(secondArg.Loc.WithEnd(assertionExpr.Pos())))
+					}
+					if expr.TypeArguments == nil {
+						fixes = append(fixes, rule.RuleFixInsertAfter(callee, "<"+ctx.SourceFile.Text()[assertionType.Pos():assertionType.End()]+">"))
+					}
+					return fixes
+				})
 			},
 		}
 	},
