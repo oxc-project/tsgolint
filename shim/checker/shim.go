@@ -85,6 +85,8 @@ func Checker_getImmediateAliasedSymbol(recv *checker.Checker, symbol *ast.Symbol
 func Checker_getContextFreeTypeOfExpression(recv *checker.Checker, node *ast.Node) *checker.Type
 //go:linkname Checker_getResolvedSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getResolvedSignature
 func Checker_getResolvedSignature(recv *checker.Checker, node *ast.Node, candidatesOutArray *[]*checker.Signature, checkMode checker.CheckMode) *checker.Signature
+//go:linkname Checker_isSpreadableProperty github.com/microsoft/typescript-go/internal/checker.(*Checker).isSpreadableProperty
+func Checker_isSpreadableProperty(recv *checker.Checker, prop *ast.Symbol) bool
 //go:linkname Checker_isReadonlySymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).isReadonlySymbol
 func Checker_isReadonlySymbol(recv *checker.Checker, symbol *ast.Symbol) bool
 //go:linkname Checker_IsDeprecatedDeclaration github.com/microsoft/typescript-go/internal/checker.(*Checker).IsDeprecatedDeclaration
@@ -131,20 +133,32 @@ func Checker_isArrayOrTupleType(recv *checker.Checker, t *checker.Type) bool
 func Checker_getDeclaredTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) *checker.Type
 //go:linkname Checker_getBaseTypeOfLiteralType github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseTypeOfLiteralType
 func Checker_getBaseTypeOfLiteralType(recv *checker.Checker, t *checker.Type) *checker.Type
+//go:linkname Checker_getUnionTypeEx github.com/microsoft/typescript-go/internal/checker.(*Checker).getUnionTypeEx
+func Checker_getUnionTypeEx(recv *checker.Checker, types []*checker.Type, unionReduction checker.UnionReduction, alias *checker.TypeAlias, origin *checker.Type) *checker.Type
 //go:linkname Checker_getBaseConstraintOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseConstraintOfType
 func Checker_getBaseConstraintOfType(recv *checker.Checker, t *checker.Type) *checker.Type
+//go:linkname Checker_removeDefinitelyFalsyTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).removeDefinitelyFalsyTypes
+func Checker_removeDefinitelyFalsyTypes(recv *checker.Checker, t *checker.Type) *checker.Type
+//go:linkname Checker_extractDefinitelyFalsyTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).extractDefinitelyFalsyTypes
+func Checker_extractDefinitelyFalsyTypes(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_getContextualType github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualType
 func Checker_getContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
 //go:linkname Checker_getContextualTypeForArgumentAtIndex github.com/microsoft/typescript-go/internal/checker.(*Checker).getContextualTypeForArgumentAtIndex
 func Checker_getContextualTypeForArgumentAtIndex(recv *checker.Checker, callTarget *ast.Node, argIndex int) *checker.Type
 //go:linkname Checker_getApparentTypeOfContextualType github.com/microsoft/typescript-go/internal/checker.(*Checker).getApparentTypeOfContextualType
 func Checker_getApparentTypeOfContextualType(recv *checker.Checker, node *ast.Node, contextFlags checker.ContextFlags) *checker.Type
+//go:linkname Checker_hasTypeFacts github.com/microsoft/typescript-go/internal/checker.(*Checker).hasTypeFacts
+func Checker_hasTypeFacts(recv *checker.Checker, t *checker.Type, mask checker.TypeFacts) bool
 //go:linkname Checker_getAwaitedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getAwaitedType
 func Checker_getAwaitedType(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_getAccessedPropertyName github.com/microsoft/typescript-go/internal/checker.(*Checker).getAccessedPropertyName
 func Checker_getAccessedPropertyName(recv *checker.Checker, access *ast.Node) (string, bool)
 //go:linkname Checker_getPropertyNameForKnownSymbolName github.com/microsoft/typescript-go/internal/checker.(*Checker).getPropertyNameForKnownSymbolName
 func Checker_getPropertyNameForKnownSymbolName(recv *checker.Checker, symbolName string) string
+//go:linkname Checker_getTypeWithDefault github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeWithDefault
+func Checker_getTypeWithDefault(recv *checker.Checker, t *checker.Type, defaultExpression *ast.Node) *checker.Type
+//go:linkname Checker_getAssignmentReducedType github.com/microsoft/typescript-go/internal/checker.(*Checker).getAssignmentReducedType
+func Checker_getAssignmentReducedType(recv *checker.Checker, declaredType *checker.Type, assignedType *checker.Type) *checker.Type
 //go:linkname Checker_isTypeIdenticalTo github.com/microsoft/typescript-go/internal/checker.(*Checker).isTypeIdenticalTo
 func Checker_isTypeIdenticalTo(recv *checker.Checker, source *checker.Type, target *checker.Type) bool
 //go:linkname Checker_isTypeAssignableTo github.com/microsoft/typescript-go/internal/checker.(*Checker).isTypeAssignableTo

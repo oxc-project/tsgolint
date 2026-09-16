@@ -6,6 +6,13 @@
   "ExtraMethods": {
     "Checker": [
       "getBaseConstraintOfType",
+      "getAssignmentReducedType",
+      "getUnionTypeEx",
+      "getTypeWithDefault",
+      "hasTypeFacts",
+      "extractDefinitelyFalsyTypes",
+      "removeDefinitelyFalsyTypes",
+      "isSpreadableProperty",
       "getDeclaredTypeOfSymbol",
       "getBaseTypes",
       "getSignaturesOfType",

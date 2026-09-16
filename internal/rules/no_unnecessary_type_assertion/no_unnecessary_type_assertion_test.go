@@ -1320,6 +1320,179 @@ export const item: { content: Guide | GlossaryItem } = {
 };
     `,
 		},
+		// Original reproduction from #1122
+		{Code: `
+interface Node { id: string }
+function transform<NodeOut extends Node | null>(
+  nodeIn: Node,
+  visit: (node: Node) => NodeOut,
+): NodeOut {
+  let transformedNode = visit(nodeIn);
+  if (!transformedNode) return transformedNode;
+  if (transformedNode === nodeIn) {
+    transformedNode = { ...transformedNode };
+  }
+  transformedNode = transformedNode as NonNullable<NodeOut>;
+  console.log(transformedNode.id);
+  return transformedNode;
+}
+`},
+		// Assignment narrowing must survive contextual typing
+		{Code: `
+function narrow(value: string | undefined) {
+  value = value as string;
+  return value.length;
+}
+`},
+		// Parenthesized angle-bracket assignment
+		{Code: `
+function narrow(value: string | undefined) {
+  value = ((<string>value));
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  value = value as unknown as string;
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, condition: boolean) {
+  value = condition ? (value as string) : "";
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  value = (value as string) && "";
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  value ||= (value as string);
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  value ??= (value as unknown as string);
+  return value.length;
+}
+`},
+		// Numeric enum widening and narrowing from #1122
+		{Code: `
+enum NumericEnum { a = 1, b = 2 }
+const key: "a" | "b" = "a";
+export const widened = NumericEnum[key] as number;
+export const narrowed = (1 as number) as NumericEnum;
+`},
+		// Numeric enum union widening and narrowing
+		{Code: `
+enum NumericEnum { a = 1, b = 2 }
+declare const value: NumericEnum | undefined;
+declare const numberValue: number | undefined;
+export const widened = value as number | undefined;
+export const narrowed = numberValue as NumericEnum | undefined;
+`},
+		// Angle-bracket numeric enum assertions
+		{Code: `
+enum NumericEnum { a = 1, b = 2 }
+declare const value: NumericEnum;
+declare const numberValue: number;
+export const widened = <number>value;
+export const narrowed = <NumericEnum>numberValue;
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  value = (console.log(), value as string);
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  [value] = [value as string];
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  ({ value } = { value: value as string });
+  return value.length;
+}
+`},
+		{Code: `
+enum E { A = 1, B = 2 }
+declare const value: number & { brand: "x" };
+const result = value as E & { brand: "x" };
+const onlyMembers: 1 | 2 = result;
+`},
+		{Code: `
+enum E { A = 1, B = 2 }
+declare const value: E & { brand: "x" };
+const result = value as number & { brand: "x" };
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  ({ value } = { ...{ value: value as string } });
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, condition: boolean) {
+  let x: unknown, y: unknown;
+  [x, y, value] = condition
+    ? [...["a", "b"] as const, value as string]
+    : [undefined, undefined, ""];
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | null | undefined) {
+  ({ value = '' } = { value: value as string });
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, fallback: { value?: string }) {
+  ({ value } = { ...{ value: value as string }, ...fallback });
+  return value.length;
+}
+`},
+		{Code: `
+class Fallback {
+  get value() { return ''; }
+}
+function narrow(value: string | undefined) {
+  ({ value } = { ...{ value: value as string }, ...new Fallback() });
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, other: string) {
+  value = other && (value as string);
+  return value.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, a: string | undefined, b: string | undefined) {
+  ({ value: a = '', value: b } = { value: value as string });
+  return b.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, a: string | undefined, b: string | undefined) {
+  ({ nested: { value: a = '' }, nested: { value: b } } = { nested: { value: value as string } });
+  return b.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, a: string | undefined, b: string | undefined) {
+  ({ value: a = '', ['value']: b } = { value: value as string });
+  return b.length;
+}
+`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -1329,6 +1502,8 @@ export const item: { content: Guide | GlossaryItem } = {
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
 					Column:    13,
+					EndLine:   1,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -1339,7 +1514,9 @@ export const item: { content: Guide | GlossaryItem } = {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
-					Column:    15,
+					Column:    13,
+					EndLine:   1,
+					EndColumn: 19,
 				},
 			},
 		},
@@ -1357,6 +1534,9 @@ const alsoRedundant = num;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    23,
+					EndLine:   3,
+					EndColumn: 32,
 				},
 			},
 		},
@@ -1374,6 +1554,9 @@ const redundant =  str;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    20,
+					EndLine:   3,
+					EndColumn: 33,
 				},
 			},
 		},
@@ -1392,6 +1575,8 @@ const redundant =  str;
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
 					Column:    21,
+					EndLine:   3,
+					EndColumn: 27,
 				},
 			},
 		},
@@ -1409,7 +1594,9 @@ const redundant =  str;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    23,
+					Column:    21,
+					EndLine:   3,
+					EndColumn: 29,
 				},
 			},
 		},
@@ -1427,7 +1614,9 @@ const bar = foo;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    16,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -1443,7 +1632,9 @@ const foo = (3 + 5);
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    21,
+					Column:    13,
+					EndLine:   2,
+					EndColumn: 30,
 				},
 			},
 		},
@@ -1460,6 +1651,8 @@ const foo = (3 + 5);
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
 					Column:    13,
+					EndLine:   2,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -1477,7 +1670,9 @@ const foo = (3 + 5);
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    21,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 27,
 				},
 			},
 		},
@@ -1496,6 +1691,8 @@ const foo = (3 + 5);
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
 					Column:    13,
+					EndLine:   3,
+					EndColumn: 25,
 				},
 			},
 		},
@@ -1513,6 +1710,9 @@ bar + 1;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    1,
+					EndLine:   3,
+					EndColumn: 5,
 				},
 			},
 		},
@@ -1530,6 +1730,9 @@ bar + 1;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    1,
+					EndLine:   3,
+					EndColumn: 5,
 				},
 			},
 		},
@@ -1549,6 +1752,9 @@ bar + 1;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      4,
+					Column:    1,
+					EndLine:   4,
+					EndColumn: 5,
 				},
 			},
 		},
@@ -1565,6 +1771,10 @@ bar + 1;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    21,
+					EndLine:   3,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -1574,6 +1784,10 @@ bar + 1;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      1,
+					Column:    1,
+					EndLine:   1,
+					EndColumn: 7,
 				},
 			},
 		},
@@ -1593,6 +1807,9 @@ function foo<T extends string>(bar: T) {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    10,
+					EndLine:   3,
+					EndColumn: 14,
 				},
 			},
 		},
@@ -1610,6 +1827,9 @@ const bar = foo;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -1627,6 +1847,9 @@ declare const prop: string;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    25,
+					EndLine:   3,
+					EndColumn: 39,
 				},
 			},
 		},
@@ -1648,6 +1871,9 @@ async function mergeWithDefaults(loadModule: () => Promise<Record<string, unknow
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    15,
+					EndLine:   3,
+					EndColumn: 62,
 				},
 			},
 		},
@@ -1667,6 +1893,9 @@ function unwrap(input: string | number): number {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    59,
+					EndLine:   3,
+					EndColumn: 74,
 				},
 			},
 		},
@@ -1686,6 +1915,9 @@ nonNull(s);
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      4,
+					Column:    9,
+					EndLine:   4,
+					EndColumn: 11,
 				},
 			},
 		},
@@ -1703,6 +1935,9 @@ const y: number | null = x;
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      3,
+					Column:    26,
+					EndLine:   3,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -1724,6 +1959,9 @@ class Foo {
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      4,
+					Column:    25,
+					EndLine:   4,
+					EndColumn: 27,
 				},
 			},
 		},
@@ -1749,6 +1987,9 @@ class Mx {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
+					Column:    6,
+					EndLine:   5,
+					EndColumn: 8,
 				},
 			},
 		},
@@ -1781,6 +2022,9 @@ function Test(props: { id?: string | number }) {
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      9,
+					Column:    20,
+					EndLine:   9,
+					EndColumn: 29,
 				},
 			},
 		},
@@ -1802,6 +2046,9 @@ y = 0;
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      5,
+					Column:    1,
+					EndLine:   5,
+					EndColumn: 3,
 				},
 			},
 		},
@@ -1819,7 +2066,8 @@ const bar: number | void = foo();
 				{
 					MessageId: "contextuallyUnnecessary",
 					Line:      3,
-					Column:    33,
+					Column:    28,
+					EndLine:   3,
 					EndColumn: 34,
 				},
 			},
@@ -1838,7 +2086,8 @@ const a = foo();
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    16,
+					Column:    11,
+					EndLine:   3,
 					EndColumn: 17,
 				},
 			},
@@ -1855,6 +2104,9 @@ const b = new Date();
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
+					Column:    11,
+					EndLine:   2,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -1870,7 +2122,8 @@ const b = (1 + 1);
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    18,
+					Column:    11,
+					EndLine:   2,
 					EndColumn: 19,
 				},
 			},
@@ -1889,7 +2142,9 @@ const a = foo();
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
-					Column:    17,
+					Column:    11,
+					EndLine:   3,
+					EndColumn: 26,
 				},
 			},
 		},
@@ -1907,6 +2162,9 @@ const a = foo();
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    11,
+					EndLine:   3,
+					EndColumn: 24,
 				},
 			},
 		},
@@ -1925,6 +2183,10 @@ declare function foo(): RT;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      4,
+					Column:    2,
+					EndLine:   4,
+					EndColumn: 13,
 				},
 			},
 		},
@@ -1941,6 +2203,10 @@ const item = arr[0];
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    14,
+					EndLine:   3,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -1956,7 +2222,9 @@ const foo = (  3 + 5  );
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    25,
+					Column:    13,
+					EndLine:   2,
+					EndColumn: 34,
 				},
 			},
 		},
@@ -1972,29 +2240,32 @@ const foo = (  3 + 5  ) /*as*/;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    32,
+					Column:    13,
+					EndLine:   2,
+					EndColumn: 41,
 				},
 			},
 		},
 		{
-			Code: `
+			Code: `// Preserve the comment before as.
 const foo = (  3 + 5
   ) /*as*/ as //as
   (
     number
   );
       `,
-			Output: []string{`
+			Output: []string{`// Preserve the comment before as.
 const foo = (  3 + 5
-  ) /*as*/ //as
-  ;
+  ) /*as*/;
       `,
 			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
-					Line:      3,
-					Column:    12,
+					Line:      2,
+					Column:    13,
+					EndLine:   6,
+					EndColumn: 4,
 				},
 			},
 		},
@@ -2010,7 +2281,9 @@ const foo = (3 + (5 as number) );
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    34,
+					Column:    13,
+					EndLine:   2,
+					EndColumn: 43,
 				},
 			},
 		},
@@ -2026,7 +2299,9 @@ const foo = 3 + 5/*as*/;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    25,
+					Column:    13,
+					EndLine:   2,
+					EndColumn: 34,
 				},
 			},
 		},
@@ -2042,7 +2317,9 @@ const foo = 3 + 5/*a*/ /*b*/;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
-					Column:    30,
+					Column:    13,
+					EndLine:   2,
+					EndColumn: 39,
 				},
 			},
 		},
@@ -2059,6 +2336,8 @@ const foo = (3 + 5);
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
 					Column:    13,
+					EndLine:   2,
+					EndColumn: 30,
 				},
 			},
 		},
@@ -2075,6 +2354,8 @@ const foo = ( 3 + 5 );
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
 					Column:    13,
+					EndLine:   2,
+					EndColumn: 36,
 				},
 			},
 		},
@@ -2091,6 +2372,8 @@ const foo =  /* a */ (3 + 5);
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
 					Column:    13,
+					EndLine:   2,
+					EndColumn: 37,
 				},
 			},
 		},
@@ -2107,6 +2390,8 @@ const foo = (3 + 5);
 					MessageId: "unnecessaryAssertion",
 					Line:      2,
 					Column:    13,
+					EndLine:   2,
+					EndColumn: 36,
 				},
 			},
 		},
@@ -2132,7 +2417,9 @@ function bar(items: string[]) {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
-					Column:    17,
+					Column:    9,
+					EndLine:   5,
+					EndColumn: 18,
 				},
 			},
 		},
@@ -2155,7 +2442,9 @@ const bar = foo.a;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
-					Column:    19,
+					Column:    13,
+					EndLine:   5,
+					EndColumn: 40,
 				},
 			},
 		},
@@ -2178,7 +2467,9 @@ const bar = foo.a;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
-					Column:    19,
+					Column:    13,
+					EndLine:   5,
+					EndColumn: 40,
 				},
 			},
 		},
@@ -2211,6 +2502,9 @@ x;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    1,
+					EndLine:   3,
+					EndColumn: 3,
 				},
 			},
 		},
@@ -2232,6 +2526,9 @@ var x = 1;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      4,
+					Column:    3,
+					EndLine:   4,
+					EndColumn: 5,
 				},
 			},
 		},
@@ -2251,6 +2548,9 @@ class T {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    16,
+					EndLine:   3,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -2274,6 +2574,9 @@ class T {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      5,
+					Column:    16,
+					EndLine:   5,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -2293,6 +2596,9 @@ class T {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    16,
+					EndLine:   3,
+					EndColumn: 33,
 				},
 			},
 		},
@@ -2309,6 +2615,10 @@ const b: string | undefined = (a ? undefined : a);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    31,
+					EndLine:   3,
+					EndColumn: 51,
 				},
 			},
 		},
@@ -2335,6 +2645,10 @@ const b = a;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      8,
+					Column:    11,
+					EndLine:   8,
+					EndColumn: 24,
 				},
 			},
 		},
@@ -2351,6 +2665,10 @@ const bar: unknown = foo;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    22,
+					EndLine:   3,
+					EndColumn: 26,
 				},
 			},
 		},
@@ -2369,6 +2687,10 @@ foo(baz);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    5,
+					EndLine:   4,
+					EndColumn: 9,
 				},
 			},
 		},
@@ -2394,6 +2716,10 @@ if (isString(foo)) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      7,
+					Column:    3,
+					EndLine:   7,
+					EndColumn: 14,
 				},
 			},
 		},
@@ -2411,6 +2737,10 @@ bar;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      4,
+					Column:    1,
+					EndLine:   4,
+					EndColumn: 18,
 				},
 			},
 		},
@@ -2423,6 +2753,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 24,
 				},
 			},
 		},
@@ -2434,6 +2767,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -2445,6 +2781,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -2456,6 +2795,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 19,
 				},
 			},
 		},
@@ -2467,6 +2809,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -2478,6 +2823,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 20,
 				},
 			},
 		},
@@ -2489,6 +2837,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -2500,6 +2851,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -2511,6 +2865,9 @@ bar;
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -2531,6 +2888,9 @@ class T {
 				{
 					MessageId: "unnecessaryAssertion",
 					Line:      3,
+					Column:    16,
+					EndLine:   3,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -2558,6 +2918,10 @@ const b = a;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      8,
+					Column:    11,
+					EndLine:   8,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -2593,6 +2957,10 @@ const s2 = (s);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      2,
+					Column:    1,
+					EndLine:   2,
+					EndColumn: 37,
 				},
 			},
 		},
@@ -2606,6 +2974,10 @@ const s2 = (s);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      2,
+					Column:    1,
+					EndLine:   2,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -2629,6 +3001,10 @@ interface Overloaded {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      7,
+					Column:    1,
+					EndLine:   7,
+					EndColumn: 47,
 				},
 			},
 		},
@@ -2644,6 +3020,10 @@ doThing(5);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    9,
+					EndLine:   3,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -2667,6 +3047,10 @@ doThing({ required: 'yes', alsoRequired: 1 });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      7,
+					Column:    9,
+					EndLine:   7,
+					EndColumn: 52,
 				},
 			},
 		},
@@ -2676,6 +3060,10 @@ doThing({ required: 'yes', alsoRequired: 1 });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      1,
+					Column:    11,
+					EndLine:   1,
+					EndColumn: 24,
 				},
 			},
 		},
@@ -2691,6 +3079,10 @@ const x = v;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    11,
+					EndLine:   3,
+					EndColumn: 33,
 				},
 			},
 		},
@@ -2706,6 +3098,10 @@ const x = v;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    11,
+					EndLine:   3,
+					EndColumn: 29,
 				},
 			},
 		},
@@ -2719,6 +3115,10 @@ const x = 1 + 1;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      2,
+					Column:    11,
+					EndLine:   2,
+					EndColumn: 35,
 				},
 			},
 		},
@@ -2732,6 +3132,10 @@ const x = 2 * (1 + 1);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      2,
+					Column:    16,
+					EndLine:   2,
+					EndColumn: 40,
 				},
 			},
 		},
@@ -2747,6 +3151,10 @@ const x = v;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    11,
+					EndLine:   3,
+					EndColumn: 27,
 				},
 			},
 		},
@@ -2762,6 +3170,10 @@ const obj2 = obj;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    14,
+					EndLine:   3,
+					EndColumn: 35,
 				},
 			},
 		},
@@ -2777,6 +3189,10 @@ const obj2 = obj;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    14,
+					EndLine:   3,
+					EndColumn: 42,
 				},
 			},
 		},
@@ -2792,6 +3208,10 @@ const obj2 = obj;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    14,
+					EndLine:   3,
+					EndColumn: 46,
 				},
 			},
 		},
@@ -2807,6 +3227,10 @@ const array2 = array;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    16,
+					EndLine:   3,
+					EndColumn: 40,
 				},
 			},
 		},
@@ -2822,6 +3246,10 @@ const array2 = array;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    16,
+					EndLine:   3,
+					EndColumn: 44,
 				},
 			},
 		},
@@ -2845,6 +3273,10 @@ fn(a);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      7,
+					Column:    4,
+					EndLine:   7,
+					EndColumn: 13,
 				},
 			},
 		},
@@ -2864,6 +3296,10 @@ const x = { a: 1 };
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      5,
+					Column:    11,
+					EndLine:   5,
+					EndColumn: 39,
 				},
 			},
 		},
@@ -2883,6 +3319,10 @@ const x = { a: 1 };
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      5,
+					Column:    11,
+					EndLine:   5,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -2902,6 +3342,10 @@ const fn = (): Props => ({ a: 1 });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      5,
+					Column:    25,
+					EndLine:   5,
+					EndColumn: 55,
 				},
 			},
 		},
@@ -2917,6 +3361,10 @@ fn(42);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 27,
 				},
 			},
 		},
@@ -2932,6 +3380,10 @@ fn(42);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -2947,6 +3399,10 @@ fn({ param: 42 });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 25,
 				},
 			},
 		},
@@ -2962,6 +3418,10 @@ fn({ param: 42 });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -2979,6 +3439,10 @@ fn(42);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    4,
+					EndLine:   4,
+					EndColumn: 31,
 				},
 			},
 		},
@@ -2998,6 +3462,10 @@ fn({ data: data });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      5,
+					Column:    12,
+					EndLine:   5,
+					EndColumn: 33,
 				},
 			},
 		},
@@ -3023,6 +3491,10 @@ fn({
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      5,
+					Column:    9,
+					EndLine:   7,
+					EndColumn: 21,
 				},
 			},
 		},
@@ -3042,6 +3514,10 @@ const result = updatedColumn;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      5,
+					Column:    16,
+					EndLine:   5,
+					EndColumn: 75,
 				},
 			},
 		},
@@ -3063,6 +3539,10 @@ fn<T>({ a: '' });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      6,
+					Column:    12,
+					EndLine:   6,
+					EndColumn: 24,
 				},
 			},
 		},
@@ -3078,6 +3558,10 @@ update('hi');
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    8,
+					EndLine:   3,
+					EndColumn: 33,
 				},
 			},
 		},
@@ -3093,6 +3577,10 @@ update('hi');
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    8,
+					EndLine:   3,
+					EndColumn: 22,
 				},
 			},
 		},
@@ -3108,6 +3596,10 @@ fn(['hello']);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 20,
 				},
 			},
 		},
@@ -3129,6 +3621,10 @@ update({ chat: chat });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      6,
+					Column:    16,
+					EndLine:   6,
+					EndColumn: 30,
 				},
 			},
 		},
@@ -3150,6 +3646,10 @@ update({ chat: chat });
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      6,
+					Column:    16,
+					EndLine:   6,
+					EndColumn: 30,
 				},
 			},
 		},
@@ -3175,6 +3675,10 @@ function fn2<T extends Node>(node: T): void {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      7,
+					Column:    6,
+					EndLine:   7,
+					EndColumn: 28,
 				},
 			},
 		},
@@ -3206,6 +3710,10 @@ fn(a);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      11,
+					Column:    4,
+					EndLine:   11,
+					EndColumn: 10,
 				},
 			},
 		},
@@ -3223,6 +3731,10 @@ const fileNames: string[] = a.concat(b);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    38,
+					EndLine:   4,
+					EndColumn: 51,
 				},
 			},
 		},
@@ -3240,6 +3752,10 @@ fn(value);
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    4,
+					EndLine:   4,
+					EndColumn: 19,
 				},
 			},
 		},
@@ -3275,6 +3791,10 @@ const schema: A | B = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      12,
+					Column:    6,
+					EndLine:   12,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -3310,6 +3830,10 @@ const schema: A | B = {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      12,
+					Column:    6,
+					EndLine:   12,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -3331,6 +3855,10 @@ fn1(() => {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      5,
+					Column:    7,
+					EndLine:   5,
+					EndColumn: 18,
 				},
 			},
 		},
@@ -3348,6 +3876,10 @@ fn({});
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    4,
+					EndLine:   4,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -3373,6 +3905,10 @@ const result: { item: Box<Empty<string>> } = identity({
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      7,
+					Column:    9,
+					EndLine:   7,
+					EndColumn: 35,
 				},
 			},
 		},
@@ -3388,6 +3924,10 @@ const callback: <T extends string>(value: T) => void =
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    3,
+					EndLine:   4,
+					EndColumn: 34,
 				},
 			},
 		},
@@ -3403,6 +3943,10 @@ function f<T extends string>(value: string) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    26,
+					EndLine:   3,
+					EndColumn: 36,
 				},
 			},
 		},
@@ -3418,6 +3962,10 @@ fn({});
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 44,
 				},
 			},
 		},
@@ -3433,6 +3981,10 @@ fn((() => {})());
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 29,
 				},
 			},
 		},
@@ -3446,6 +3998,10 @@ fn((() => {})());`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 29,
 				},
 			},
 		},
@@ -3455,6 +4011,10 @@ fn((() => {})());`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      1,
+					Column:    26,
+					EndLine:   1,
+					EndColumn: 46,
 				},
 			},
 		},
@@ -3468,8 +4028,20 @@ declare function consume(value: unknown): void;
 consume(42);
 const value: unknown = 42;`},
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "contextuallyUnnecessary"},
-				{MessageId: "contextuallyUnnecessary"},
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    9,
+					EndLine:   3,
+					EndColumn: 22,
+				},
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    24,
+					EndLine:   4,
+					EndColumn: 37,
+				},
 			},
 		},
 		{
@@ -3478,6 +4050,10 @@ const value: unknown = 42;`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    4,
+					EndLine:   2,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -3487,6 +4063,10 @@ const value: unknown = 42;`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    4,
+					EndLine:   3,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -3502,6 +4082,10 @@ f(['x']);`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    4,
+					EndLine:   4,
+					EndColumn: 17,
 				},
 			},
 		},
@@ -3515,6 +4099,10 @@ f([1, 'x'], 1);`},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    7,
+					EndLine:   3,
+					EndColumn: 20,
 				},
 			},
 		},
@@ -3530,6 +4118,10 @@ declare const value: AnyRecord;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      4,
+					Column:    2,
+					EndLine:   4,
+					EndColumn: 20,
 				},
 			},
 		},
@@ -3545,6 +4137,10 @@ function identity<T>(value: T): T {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    10,
+					EndLine:   3,
+					EndColumn: 31,
 				},
 			},
 		},
@@ -3560,6 +4156,10 @@ function upcast<T, U extends T>(value: U): T {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    10,
+					EndLine:   3,
+					EndColumn: 31,
 				},
 			},
 		},
@@ -3575,7 +4175,524 @@ function upcast<T, U extends T & { id: string }>(value: U): T {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "contextuallyUnnecessary",
+					Line:      3,
+					Column:    10,
+					EndLine:   3,
+					EndColumn: 31,
 				},
 			},
-		}})
+		},
+		{
+			Code: `
+const alreadyNumber: number = 1;
+export const genuineNoOp = alreadyNumber as number;`,
+			Output: []string{`
+const alreadyNumber: number = 1;
+export const genuineNoOp = alreadyNumber;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    28,
+					EndLine:   3,
+					EndColumn: 51,
+				},
+			},
+		},
+		{
+			Code: `
+function unchanged(value: string) {
+  value = value as string;
+  return value.length;
+}`,
+			Output: []string{`
+function unchanged(value: string) {
+  value = value;
+  return value.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    11,
+					EndLine:   3,
+					EndColumn: 26,
+				},
+			},
+		},
+		{
+			Code: `
+enum NumericEnum { a = 1, b = 2 }
+const value = NumericEnum.a;
+export const sameMember = value as NumericEnum.a;`,
+			Output: []string{`
+enum NumericEnum { a = 1, b = 2 }
+const value = NumericEnum.a;
+export const sameMember = value;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      4,
+					Column:    27,
+					EndLine:   4,
+					EndColumn: 49,
+				},
+			},
+		},
+		{
+			Code: `
+enum NumericEnum { a = 1, b = 2 }
+declare const value: NumericEnum | undefined;
+export const sameEnum = value as NumericEnum | undefined;`,
+			Output: []string{`
+enum NumericEnum { a = 1, b = 2 }
+declare const value: NumericEnum | undefined;
+export const sameEnum = value;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      4,
+					Column:    25,
+					EndLine:   4,
+					EndColumn: 57,
+				},
+			},
+		},
+		{
+			Code: `let value: number;
+value = 1 as number;`,
+			Output: []string{`let value: number;
+value = 1;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    9,
+					EndLine:   2,
+					EndColumn: 20,
+				},
+			},
+		},
+		{
+			Code: `let value: string | undefined;
+value = 'x' as string;
+console.log(value.length);`,
+			Output: []string{`let value: string | undefined;
+value = 'x';
+console.log(value.length);`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    9,
+					EndLine:   2,
+					EndColumn: 22,
+				},
+			},
+		},
+		{
+			Code: `let value: unknown;
+value = 1 as number;`,
+			Output: []string{`let value: unknown;
+value = 1;`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    9,
+					EndLine:   2,
+					EndColumn: 20,
+				},
+			},
+		},
+		{
+			Code: `let value: string | undefined;
+[value] = ['x' as string];`,
+			Output: []string{`let value: string | undefined;
+[value] = ['x'];`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    12,
+					EndLine:   2,
+					EndColumn: 25,
+				},
+			},
+		},
+		{
+			Code: `let value: string | undefined;
+({ value } = { value: 'x' as string });`,
+			Output: []string{`let value: string | undefined;
+({ value } = { value: 'x' });`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    23,
+					EndLine:   2,
+					EndColumn: 36,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  value = (value as string) || "";
+  return value.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  value = (value) || "";
+  return value.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    12,
+					EndLine:   2,
+					EndColumn: 27,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  value = (value as string) ?? "";
+  return value.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  value = (value) ?? "";
+  return value.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    12,
+					EndLine:   2,
+					EndColumn: 27,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined, condition: boolean) {
+  value = condition ? value as string : undefined;
+}`,
+			Output: []string{`function narrow(value: string | undefined, condition: boolean) {
+  value = condition ? value : undefined;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    23,
+					EndLine:   2,
+					EndColumn: 38,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined, condition: boolean) {
+  value = condition ? undefined : value as string;
+}`,
+			Output: []string{`function narrow(value: string | undefined, condition: boolean) {
+  value = condition ? undefined : value;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    35,
+					EndLine:   2,
+					EndColumn: 50,
+				},
+			},
+		},
+		{
+			Code: `let value: string | undefined;
+({ value } = { ...{ value: 'x' as string } });`,
+			Output: []string{`let value: string | undefined;
+({ value } = { ...{ value: 'x' } });`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    28,
+					EndLine:   2,
+					EndColumn: 41,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  ({ value } = { ...{ value: value as string }, value: '' });
+  return value.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  ({ value } = { ...{ value: value }, value: '' });
+  return value.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    30,
+					EndLine:   2,
+					EndColumn: 45,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined, condition: boolean) {
+  ({ value } = condition ? { value: value as string } : { value: undefined });
+}`,
+			Output: []string{`function narrow(value: string | undefined, condition: boolean) {
+  ({ value } = condition ? { value: value } : { value: undefined });
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    37,
+					EndLine:   2,
+					EndColumn: 52,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined, condition: boolean) {
+  [value] = condition ? [value as string] : [undefined];
+}`,
+			Output: []string{`function narrow(value: string | undefined, condition: boolean) {
+  [value] = condition ? [value] : [undefined];
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    26,
+					EndLine:   2,
+					EndColumn: 41,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  ({ value = '' } = { value: value as string });
+  return value.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  ({ value = '' } = { value: value });
+  return value.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    30,
+					EndLine:   2,
+					EndColumn: 45,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  ({ value } = { ...{ value: value as string }, ...{ value: '' } });
+  return value.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  ({ value } = { ...{ value: value }, ...{ value: '' } });
+  return value.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    30,
+					EndLine:   2,
+					EndColumn: 45,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined, other: string | undefined) {
+  value = other && (value as string);
+}`,
+			Output: []string{`function narrow(value: string | undefined, other: string | undefined) {
+  value = other && (value);
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    21,
+					EndLine:   2,
+					EndColumn: 36,
+				},
+			},
+		},
+	})
+}
+
+// Source: typescript-eslint 90241a75df6cffc5d1d4dc088854f5e756f09027.
+func TestNoUnnecessaryTypeAssertionUpstreamReporting(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTypeAssertionRule, []rule_tester.ValidTestCase{
+		{Code: "const value = (1 + 2) as (number);", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+		{Code: "const value = <(number)>(1 + 2);", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+		{Code: "const value = (1 + 2) as (/*keep*/ number);", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+		{Code: "const value = <(/*keep*/ number)>(1 + 2);", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+		{Code: "const value = (1 + 2) as /*before*/ (/*inside*/ number /*after*/);", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+		{Code: "const value = (1 + 2) as /*keep*/ number;", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+		{Code: "const value = </*keep*/ number>(1 + 2);", Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["number"]}`)},
+
+		{Code: "let value: string; (value)!.length;"},
+		{Code: `function narrow(value: string | undefined) {
+  value = ((value!));
+  return value.length;
+ }`},
+		{Code: "type ValuePath = 'values' | `values.${string}`;\ndeclare function apply(paths: ValuePath[]): void;\nexport function update(ids: string[]) {\n  apply(ids.map(id => `values.${id}` as ValuePath));\n}"},
+		{Code: `declare const items: string[] | undefined;
+const counts = items?.reduce((acc, item) => {
+  acc[item] = (acc[item] ?? 0) + 1;
+  return acc;
+}, {} as Record<string, number>);`},
+	}, []rule_tester.InvalidTestCase{
+		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    16,
+				EndLine:   1,
+				EndColumn: 22,
+			},
+		}},
+		{Code: "const foo = 3 as 3;", Output: []string{"const foo = 3;"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    13,
+				EndLine:   1,
+				EndColumn: 19,
+			},
+		}},
+		{Code: "const foo = <3>3;", Output: []string{"const foo = 3;"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    13,
+				EndLine:   1,
+				EndColumn: 17,
+			},
+		}},
+		{Code: "const s = 'x';\nconst t = s!;", Output: []string{"const s = 'x';\nconst t = s;"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      2,
+				Column:    11,
+				EndLine:   2,
+				EndColumn: 13,
+			},
+		}},
+		{Code: "const foo = (3 + 5) /*before*/ as /*after*/ number;", Output: []string{"const foo = (3 + 5) /*before*/;"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    13,
+				EndLine:   1,
+				EndColumn: 51,
+			},
+		}},
+		{Code: "<number>{ lol: 32 as number }.lol;", Output: []string{"({ lol: 32 as number }.lol);"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    1,
+				EndLine:   1,
+				EndColumn: 34,
+			},
+		}},
+		{Code: "<number>function Fun() {}.length;", Output: []string{"(function Fun() {}.length);"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    1,
+				EndLine:   1,
+				EndColumn: 33,
+			},
+		}},
+		{Code: "<number>class Clazz {}.length;", Output: []string{"(class Clazz {}.length);"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    1,
+				EndLine:   1,
+				EndColumn: 30,
+			},
+		}},
+		{Code: "const foo = () => <number>{ lol: 123 as number }.lol + 54321;", Output: []string{"const foo = () => ({ lol: 123 as number }.lol) + 54321;"}, Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "unnecessaryAssertion",
+				Line:      1,
+				Column:    19,
+				EndLine:   1,
+				EndColumn: 53,
+			},
+		}},
+	})
+}
+
+func TestNoUnnecessaryTypeAssertionAsyncFunctionFix(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTypeAssertionRule, nil, []rule_tester.InvalidTestCase{
+		{
+			Code:   "<number>async function() {}.length;",
+			Output: []string{"(async function() {}.length);"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "<number>async function named() {}.length;",
+			Output: []string{"(async function named() {}.length);"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "<number>async function*() {}.length;",
+			Output: []string{"(async function*() {}.length);"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "<number>async /* comment */ function() {}.length;",
+			Output: []string{"(async /* comment */ function() {}.length);"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "const length = () => <number>async function() {}.length;",
+			Output: []string{"const length = () => async function() {}.length;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "<number>(async function() {}.length);",
+			Output: []string{"(async function() {}.length);"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "const length = <number>async function() {}.length;",
+			Output: []string{"const length = async function() {}.length;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "declare const async: { length: number };\n<number>async.length;",
+			Output: []string{"declare const async: { length: number };\nasync.length;"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "(<number>async function() {}.length);",
+			Output: []string{"(async function() {}.length);"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+		{
+			Code:   "declare const async: number;\n<number>async\nfunction named() {}",
+			Output: []string{"declare const async: number;\nasync\nfunction named() {}"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unnecessaryAssertion"}},
+		},
+	})
 }
