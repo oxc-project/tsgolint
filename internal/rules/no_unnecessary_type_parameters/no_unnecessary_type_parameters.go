@@ -484,8 +484,8 @@ func collectTypeParameterUsageCounts(
 					}
 					visitType(typeArgument, thisAssumeMultipleUses, isReturnType)
 				}
-				return
 			}
+			return
 		}
 
 		if checker.Type_flags(typeNode)&checker.TypeFlagsTemplateLiteral != 0 {

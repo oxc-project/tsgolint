@@ -987,3 +987,18 @@ Message: Type parameter T is used only once in the function signature.
    7 |       
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
+
+[TestNoUnnecessaryTypeParameters/invalid-68 - 1]
+Diagnostic 1: sole (3:5 - 3:5)
+Message: Type parameter T is used only once in the function signature.
+   2 | declare class C {
+   3 |   m<T>(x: { self: C; arg: T }): void;
+     |     ~
+   4 | }
+  Label: This is the only usage of type parameter T in the signature. (3:27 - 3:27)
+   2 | declare class C {
+   3 |   m<T>(x: { self: C; arg: T }): void;
+     |                           ^ This is the only usage of type parameter T in the signature.
+   4 | }
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
