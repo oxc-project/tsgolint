@@ -273,11 +273,13 @@ func fixSwitch(sourceFile *ast.SourceFile, typeChecker *checker.Checker, node *a
 	return applyMissingCases(sourceFile, node, defaultCase, missingCases)
 }
 
+var defaultCaseCommentPattern = regexp2.MustCompile("^no default$", regexp2.ECMAScript|regexp2.Unicode|regexp2.IgnoreCase)
+
 var SwitchExhaustivenessCheckRule = rule.Rule{
 	Name: "switch-exhaustiveness-check",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[SwitchExhaustivenessCheckOptions](options, "switch-exhaustiveness-check")
-		commentPattern := regexp2.MustCompile("^no default$", regexp2.ECMAScript|regexp2.Unicode|regexp2.IgnoreCase)
+		commentPattern := defaultCaseCommentPattern
 		if opts.DefaultCaseCommentPattern != nil {
 			commentPattern = regexp2.MustCompile(*opts.DefaultCaseCommentPattern, regexp2.ECMAScript|regexp2.Unicode)
 		}
