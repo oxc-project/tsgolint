@@ -102,6 +102,10 @@ var NoUnsafeEnumComparisonRule = rule.Rule{
 			leftType *checker.Type,
 			rightType *checker.Type,
 		) bool {
+			if leftType == rightType {
+				return false
+			}
+
 			// Allow comparisons that don't have anything to do with enums:
 			//
 			// ```ts
