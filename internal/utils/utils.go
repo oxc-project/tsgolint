@@ -16,8 +16,10 @@ func TrimNodeTextRange(sourceFile *ast.SourceFile, node *ast.Node) core.TextRang
 	return scanner.GetRangeOfTokenAtPosition(sourceFile, node.Pos()).WithEnd(node.End())
 }
 
+var commentRangeNodeFactory = ast.NewNodeFactory(ast.NodeFactoryHooks{})
+
 func GetCommentsInRange(sourceFile *ast.SourceFile, inRange core.TextRange) iter.Seq[ast.CommentRange] {
-	nodeFactory := ast.NewNodeFactory(ast.NodeFactoryHooks{})
+	nodeFactory := commentRangeNodeFactory
 
 	return func(yield func(ast.CommentRange) bool) {
 		for commentRange := range scanner.GetTrailingCommentRanges(nodeFactory, sourceFile.Text(), inRange.Pos()) {
