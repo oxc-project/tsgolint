@@ -210,12 +210,10 @@ var UnboundMethodRule = rule.Rule{
 			//
 			// See related discussion https://github.com/typescript-eslint/typescript-eslint/pull/8952#discussion_r1576543310
 			if ast.IsIdentifier(object) && ast.IsIdentifier(property) {
-				objectSymbol := ctx.TypeChecker.GetSymbolAtLocation(object)
-				notImported := objectSymbol != nil && isNotImported(objectSymbol, ctx.SourceFile)
-
-				if notImported {
-					if members, ok := nativelyBoundMembers[object.Text()]; ok {
-						if _, ok := members[property.Text()]; ok {
+				if members, ok := nativelyBoundMembers[object.Text()]; ok {
+					if _, ok := members[property.Text()]; ok {
+						objectSymbol := ctx.TypeChecker.GetSymbolAtLocation(object)
+						if objectSymbol != nil && isNotImported(objectSymbol, ctx.SourceFile) {
 							return true
 						}
 					}
