@@ -148,6 +148,10 @@ var StrictVoidReturnRule = rule.Rule{
 		}
 
 		checkFunctionCallNode := func(callNode *ast.Expression) {
+			if len(callNode.Arguments()) == 0 {
+				return
+			}
+
 			funcType := ctx.TypeChecker.GetTypeAtLocation(callNode.Expression())
 			signatures := utils.Flatten(utils.Map(utils.UnionTypeParts(funcType), func(typePart *checker.Type) []*checker.Signature {
 				if ast.IsCallExpression(callNode) {
