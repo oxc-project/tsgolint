@@ -807,7 +807,6 @@ myAsyncFunction();
 			Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"allowForKnownSafeCalls": ["myAsyncFunction"]}`),
 		},
 		{
-			Skip: true,
 			Code: `
       interface CustomNode<P> {
         getNextNode: () => CustomNode<P>;
@@ -5630,7 +5629,6 @@ await Promise.reject('foo').then(...[], () => {});
 			},
 		},
 		{
-			Skip: true,
 			Code: `
         interface CustomNode<P> {
           getNextNode: () => CustomNode<P>;
