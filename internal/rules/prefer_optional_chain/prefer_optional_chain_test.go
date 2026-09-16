@@ -4339,5 +4339,119 @@ if (!item?.myField) {
 		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
 	})
 
+	// An OR chain is true wherever it short-circuits, and the optional chain
+	// replacing it yields `undefined` there. `undefined === null` is false, so
+	// these rewrites change behavior and must be suggestions rather than
+	// `--fix` output. A loose nullish guard used to reach the autofixer.
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string | null } | undefined;
+item == null || item.value === null;
+`,
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{
+						MessageId: "optionalChainSuggest",
+						Output: `
+declare const item: { value: string | null } | undefined;
+item?.value === null;
+`,
+					},
+				},
+			},
+		},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string | null } | null;
+item == null || item.value === null;
+`,
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{
+						MessageId: "optionalChainSuggest",
+						Output: `
+declare const item: { value: string | null } | null;
+item?.value === null;
+`,
+					},
+				},
+			},
+		},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string } | undefined;
+item == null || item.value === null;
+`,
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{
+						MessageId: "optionalChainSuggest",
+						Output: `
+declare const item: { value: string } | undefined;
+item?.value === null;
+`,
+					},
+				},
+			},
+		},
+	})
+
+	// A trailing comparison that is true for `undefined` keeps the OR chain's
+	// meaning, so these stay fixable.
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string | null } | undefined;
+item == null || item.value == null;
+`,
+		Output: []string{`
+declare const item: { value: string | null } | undefined;
+item?.value == null;
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string | null } | undefined;
+item == null || item.value == undefined;
+`,
+		Output: []string{`
+declare const item: { value: string | null } | undefined;
+item?.value == undefined;
+`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: `
+declare const item: { value: string | null | undefined } | undefined;
+item == null || item.value === null;
+`,
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{
+						MessageId: "optionalChainSuggest",
+						Output: `
+declare const item: { value: string | null | undefined } | undefined;
+item?.value === null;
+`,
+					},
+				},
+			},
+		},
+	})
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
