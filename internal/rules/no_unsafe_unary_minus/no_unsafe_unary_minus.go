@@ -27,6 +27,11 @@ var NoUnsafeUnaryMinusRule = rule.Rule{
 					return
 				}
 
+				operand := ast.SkipParentheses(expr.Operand)
+				if ast.IsNumericLiteral(operand) || ast.IsBigIntLiteral(operand) {
+					return
+				}
+
 				argType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, expr.Operand)
 
 				for _, t := range utils.UnionTypeParts(argType) {
