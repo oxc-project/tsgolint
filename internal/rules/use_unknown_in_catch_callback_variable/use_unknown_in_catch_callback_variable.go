@@ -189,23 +189,23 @@ var UseUnknownInCatchCallbackVariableRule = rule.Rule{
 					switch catchVariable.Kind {
 					case ast.KindIdentifier:
 						if catchTypeAnnotation == nil {
-							var fixes []rule.RuleFix
-							if utils.IsParenlessArrowFunction(flagged) {
-								fixes = []rule.RuleFix{
-									rule.RuleFixInsertBefore(ctx.SourceFile, catchVariable, "("),
-									rule.RuleFixInsertAfter(catchVariable, ": unknown)"),
-								}
-							} else {
-								insertAfter := catchVariable
-								if catchParam.QuestionToken != nil {
-									insertAfter = catchParam.QuestionToken
-								}
-								fixes = []rule.RuleFix{
-									rule.RuleFixInsertAfter(insertAfter, ": unknown"),
-								}
-							}
-
 							ctx.ReportNodeWithSuggestions(catchParamNode, buildUseUnknownMessage(method), func() []rule.RuleSuggestion {
+								var fixes []rule.RuleFix
+								if utils.IsParenlessArrowFunction(flagged) {
+									fixes = []rule.RuleFix{
+										rule.RuleFixInsertBefore(ctx.SourceFile, catchVariable, "("),
+										rule.RuleFixInsertAfter(catchVariable, ": unknown)"),
+									}
+								} else {
+									insertAfter := catchVariable
+									if catchParam.QuestionToken != nil {
+										insertAfter = catchParam.QuestionToken
+									}
+									fixes = []rule.RuleFix{
+										rule.RuleFixInsertAfter(insertAfter, ": unknown"),
+									}
+								}
+
 								return []rule.RuleSuggestion{{
 									Message:  buildAddUnknownTypeAnnotationSuggestionMessage(),
 									FixesArr: fixes,
