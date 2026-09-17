@@ -303,15 +303,8 @@ var PreferRegexpExecRule = rule.Rule{
 
 				argumentNode := callExpression.Arguments.Nodes[0]
 				staticArgument := getStaticArgumentValue(argumentNode, map[*ast.Symbol]struct{}{})
-				argumentType := ctx.TypeChecker.GetTypeAtLocation(argumentNode)
-				argumentTypes := collectArgumentTypes(utils.UnionTypeParts(argumentType))
 
 				if staticArgument.kind == staticArgumentValueRegExp && strings.Contains(staticArgument.regExpFlags, "g") {
-					return
-				}
-				if staticArgument.kind == staticArgumentValueUnknown &&
-					argumentTypes&argumentTypeRegExp != 0 &&
-					!definitelyDoesNotContainGlobalFlag(argumentNode) {
 					return
 				}
 
@@ -331,6 +324,14 @@ var PreferRegexpExecRule = rule.Rule{
 					reportWithFix(reportNode, node, objectNode, argumentNode, func(objectCode string, _ string) string {
 						return regExpLiteral + ".exec(" + objectCode + ")"
 					})
+					return
+				}
+
+				argumentType := ctx.TypeChecker.GetTypeAtLocation(argumentNode)
+				argumentTypes := collectArgumentTypes(utils.UnionTypeParts(argumentType))
+				if staticArgument.kind == staticArgumentValueUnknown &&
+					argumentTypes&argumentTypeRegExp != 0 &&
+					!definitelyDoesNotContainGlobalFlag(argumentNode) {
 					return
 				}
 
