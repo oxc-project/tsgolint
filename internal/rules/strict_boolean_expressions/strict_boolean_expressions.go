@@ -335,15 +335,19 @@ func analyzeTypeParts(typeChecker *checker.Checker, types []*checker.Type) typeI
 		isUnion: len(types) > 1,
 		types:   types,
 	}
-	variants := make(map[typeVariant]bool)
+	hasNonNullishVariant := false
 
 	metNotTruthy := false
 
 	for _, part := range info.types {
 		partInfo := analyzeTypePart(typeChecker, part)
-		variants[partInfo.variant] = true
 		if partInfo.variant == typeVariantNullish {
 			info.isNullable = true
+		} else if !hasNonNullishVariant {
+			info.variant = partInfo.variant
+			hasNonNullishVariant = true
+		} else if info.variant != partInfo.variant {
+			info.variant = typeVariantMixed
 		}
 		if partInfo.isEnum {
 			info.isEnum = true
@@ -357,18 +361,7 @@ func analyzeTypeParts(typeChecker *checker.Checker, types []*checker.Type) typeI
 		}
 	}
 
-	if len(variants) == 1 {
-		for v := range variants {
-			info.variant = v
-		}
-	} else if len(variants) == 2 && info.isNullable {
-		for v := range variants {
-			if v != typeVariantNullish {
-				info.variant = v
-				break
-			}
-		}
-	} else {
+	if len(types) == 0 {
 		info.variant = typeVariantMixed
 	}
 
