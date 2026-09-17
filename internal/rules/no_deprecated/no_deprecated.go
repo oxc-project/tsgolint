@@ -348,14 +348,16 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			nameType := ctx.TypeChecker.GetTypeAtLocation(name)
-			propertyNameAllowed := slices.ContainsFunc(opts.Allow, func(specifier utils.TypeOrValueSpecifier) bool {
-				return utils.SymbolMatchesSpecifierNameAndSource(property, propertyName, specifier, ctx.Program)
-			})
-			if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
-				utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
-				propertyNameAllowed {
-				return
+			if len(opts.Allow) > 0 {
+				nameType := ctx.TypeChecker.GetTypeAtLocation(name)
+				propertyNameAllowed := slices.ContainsFunc(opts.Allow, func(specifier utils.TypeOrValueSpecifier) bool {
+					return utils.SymbolMatchesSpecifierNameAndSource(property, propertyName, specifier, ctx.Program)
+				})
+				if utils.TypeMatchesSomeSpecifier(contextualType, opts.Allow, ctx.Program) ||
+					utils.TypeMatchesSomeSpecifier(nameType, opts.Allow, ctx.Program) ||
+					propertyNameAllowed {
+					return
+				}
 			}
 
 			reportedPropertyName := formatPropertyNameForReport(propertyName)
@@ -701,13 +703,15 @@ var NoDeprecatedRule = rule.Rule{
 				return
 			}
 
-			ty := ctx.TypeChecker.GetTypeAtLocation(node)
+			if len(opts.Allow) > 0 {
+				ty := ctx.TypeChecker.GetTypeAtLocation(node)
 
-			// TODO: if type OR value is allowed, skip
+				// TODO: if type OR value is allowed, skip
 
-			if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, ctx.Program) ||
-				utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ty) {
-				return
+				if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, ctx.Program) ||
+					utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ty) {
+					return
+				}
 			}
 
 			name := getReportedNodeName(node)
