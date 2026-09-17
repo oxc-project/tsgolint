@@ -121,11 +121,11 @@ var AwaitThenableRule = rule.Rule{
 			},
 			ast.KindCallExpression: func(node *ast.Node) {
 				expr := node.AsCallExpression()
-				if !isPromiseAggregatorMethod(ctx, expr) {
+				if len(expr.Arguments.Nodes) == 0 {
 					return
 				}
 
-				if len(expr.Arguments.Nodes) == 0 {
+				if !isPromiseAggregatorMethod(ctx, expr) {
 					return
 				}
 
