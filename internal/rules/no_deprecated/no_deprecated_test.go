@@ -2942,5 +2942,43 @@ const jsx = <Foo field={0} />;`,
 				{MessageId: "deprecatedWithReason", Line: 17, Column: 18, EndColumn: 26},
 			},
 		},
+		{
+			Code: `declare namespace jest {
+  type MockedFunction<T extends (...args: any[]) => any> = T & {
+    mockReturnValue(value: ReturnType<T>): void;
+  };
+}
+interface Clean { original(): number }
+interface Legacy {
+  /** @deprecated Use replacement() instead. */
+  original(): number;
+}
+interface Child extends Legacy { original(): number }
+declare class CleanBase { original(): number }
+declare class FirstClean implements Clean, Legacy {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class FirstLegacy implements Legacy, Clean {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class FromBase extends CleanBase implements Legacy {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class Nested implements Child {
+  original: jest.MockedFunction<Child['original']>;
+}
+declare const clean: FirstClean;
+declare const legacy: FirstLegacy;
+declare const base: FromBase;
+declare const nested: Nested;
+clean.original.mockReturnValue(1);
+legacy.original.mockReturnValue(1);
+base.original.mockReturnValue(1);
+nested.original.mockReturnValue(1);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 30, Column: 8, EndColumn: 16},
+				{MessageId: "deprecatedWithReason", Line: 32, Column: 8, EndColumn: 16},
+			},
+		},
 	})
 }

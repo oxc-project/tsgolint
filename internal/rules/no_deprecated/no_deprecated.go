@@ -126,6 +126,40 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
+		var getInheritedDeprecation func(*ast.Node, string, []*ast.Symbol) (bool, string)
+		getInheritedDeprecation = func(decl *ast.Node, name string, seen []*ast.Symbol) (bool, string) {
+			if decl.Parent == nil {
+				return false, ""
+			}
+			hasTags := slices.ContainsFunc(decl.JSDoc(nil), func(doc *ast.Node) bool {
+				return doc.AsJSDoc().Tags != nil && len(doc.AsJSDoc().Tags.Nodes) > 0
+			})
+			if hasTags {
+				return false, ""
+			}
+			heritageClauses := utils.GetHeritageClauses(decl.Parent)
+			if heritageClauses == nil {
+				return false, ""
+			}
+			// TypeScript uses the first eligible member, even if it has no tags.
+			// Class heritage clauses put the base class before implemented interfaces.
+			for _, clause := range heritageClauses.Nodes {
+				for _, heritage := range clause.AsHeritageClause().Types.Nodes {
+					baseType := ctx.TypeChecker.GetTypeAtLocation(heritage)
+					property := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, name)
+					if property == nil || len(property.Declarations) != 1 || slices.Contains(seen, property) {
+						continue
+					}
+					baseDecl := property.Declarations[0]
+					if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, baseDecl) {
+						return true, getJsDocDeprecationFromNode(baseDecl)
+					}
+					return getInheritedDeprecation(baseDecl, name, append(seen, property))
+				}
+			}
+			return false, ""
+		}
+
 		getJsDocDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil {
 				return false, ""
@@ -138,37 +172,20 @@ var NoDeprecatedRule = rule.Rule{
 				}
 			}
 
-			// Class properties inherit JSDoc tags from implemented interface members
-			// when they do not declare their own tags, matching TypeScript's symbol API.
+			// Class properties can inherit tags through their implements relationship,
+			// including tags inherited by the interface member itself.
 			for _, decl := range symbol.Declarations {
 				if decl.Kind != ast.KindPropertyDeclaration || ast.IsStatic(decl) || decl.Parent == nil {
 					continue
 				}
-				hasTags := slices.ContainsFunc(decl.JSDoc(nil), func(doc *ast.Node) bool {
-					return doc.AsJSDoc().Tags != nil && len(doc.AsJSDoc().Tags.Nodes) > 0
-				})
-				if hasTags {
-					continue
-				}
 				heritageClauses := utils.GetHeritageClauses(decl.Parent)
-				if heritageClauses == nil {
+				if heritageClauses == nil || !slices.ContainsFunc(heritageClauses.Nodes, func(clause *ast.Node) bool {
+					return clause.AsHeritageClause().Token == ast.KindImplementsKeyword
+				}) {
 					continue
 				}
-				for _, clause := range heritageClauses.Nodes {
-					if clause.AsHeritageClause().Token != ast.KindImplementsKeyword {
-						continue
-					}
-					for _, heritage := range clause.AsHeritageClause().Types.Nodes {
-						baseType := ctx.TypeChecker.GetTypeAtLocation(heritage)
-						property := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, symbol.Name)
-						if property == nil || len(property.Declarations) != 1 {
-							continue
-						}
-						baseDecl := property.Declarations[0]
-						if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, baseDecl) {
-							return true, getJsDocDeprecationFromNode(baseDecl)
-						}
-					}
+				if deprecated, reason := getInheritedDeprecation(decl, symbol.Name, []*ast.Symbol{symbol}); deprecated {
+					return true, reason
 				}
 			}
 

@@ -1315,3 +1315,18 @@ Message: `original` is deprecated. Use replacement() instead.
      |                  ~~~~~~~~
   18 |         instance.replacement.mockReturnValue(1);
 ---
+
+[TestNoDeprecatedRule/invalid-150 - 1]
+Diagnostic 1: deprecatedWithReason (30:8 - 30:15)
+Message: `original` is deprecated. Use replacement() instead.
+  29 | clean.original.mockReturnValue(1);
+  30 | legacy.original.mockReturnValue(1);
+     |        ~~~~~~~~
+  31 | base.original.mockReturnValue(1);
+
+Diagnostic 2: deprecatedWithReason (32:8 - 32:15)
+Message: `original` is deprecated. Use replacement() instead.
+  31 | base.original.mockReturnValue(1);
+  32 | nested.original.mockReturnValue(1);
+     |        ~~~~~~~~
+---
