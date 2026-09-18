@@ -138,6 +138,40 @@ var NoDeprecatedRule = rule.Rule{
 				}
 			}
 
+			// Class properties inherit JSDoc tags from implemented interface members
+			// when they do not declare their own tags, matching TypeScript's symbol API.
+			for _, decl := range symbol.Declarations {
+				if decl.Kind != ast.KindPropertyDeclaration || ast.IsStatic(decl) || decl.Parent == nil {
+					continue
+				}
+				hasTags := slices.ContainsFunc(decl.JSDoc(nil), func(doc *ast.Node) bool {
+					return doc.AsJSDoc().Tags != nil && len(doc.AsJSDoc().Tags.Nodes) > 0
+				})
+				if hasTags {
+					continue
+				}
+				heritageClauses := utils.GetHeritageClauses(decl.Parent)
+				if heritageClauses == nil {
+					continue
+				}
+				for _, clause := range heritageClauses.Nodes {
+					if clause.AsHeritageClause().Token != ast.KindImplementsKeyword {
+						continue
+					}
+					for _, heritage := range clause.AsHeritageClause().Types.Nodes {
+						baseType := ctx.TypeChecker.GetTypeAtLocation(heritage)
+						property := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, symbol.Name)
+						if property == nil || len(property.Declarations) != 1 {
+							continue
+						}
+						baseDecl := property.Declarations[0]
+						if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, baseDecl) {
+							return true, getJsDocDeprecationFromNode(baseDecl)
+						}
+					}
+				}
+			}
+
 			return false, ""
 		}
 

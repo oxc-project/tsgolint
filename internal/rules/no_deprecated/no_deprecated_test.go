@@ -633,6 +633,64 @@ x.statusCode;
 				}],
 			});
 		`},
+		{Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        declare class MockOfHostInterface  {
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `},
+		{Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        interface MockOfHostInterface {
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `},
+		{Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        declare class MockOfHostInterface implements HostInterface {
+          /** @example original */
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
@@ -2858,6 +2916,30 @@ const jsx = <Foo field={0} />;`,
 					Column:    18,
 					EndColumn: 23,
 				},
+			},
+		},
+		{
+			Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        declare class MockOfHostInterface implements HostInterface {
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 17, Column: 18, EndColumn: 26},
 			},
 		},
 	})
