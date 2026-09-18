@@ -126,15 +126,18 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
+		hasJsDocTags := func(decl *ast.Node) bool {
+			return slices.ContainsFunc(decl.JSDoc(nil), func(doc *ast.Node) bool {
+				return doc.AsJSDoc().Tags != nil && len(doc.AsJSDoc().Tags.Nodes) > 0
+			})
+		}
+
 		var getInheritedDeprecation func(*ast.Node, string, []*ast.Symbol) (bool, string)
 		getInheritedDeprecation = func(decl *ast.Node, name string, seen []*ast.Symbol) (bool, string) {
 			if decl.Parent == nil {
 				return false, ""
 			}
-			hasTags := slices.ContainsFunc(decl.JSDoc(nil), func(doc *ast.Node) bool {
-				return doc.AsJSDoc().Tags != nil && len(doc.AsJSDoc().Tags.Nodes) > 0
-			})
-			if hasTags {
+			if hasJsDocTags(decl) {
 				return false, ""
 			}
 			heritageClauses := utils.GetHeritageClauses(decl.Parent)
@@ -170,6 +173,11 @@ var NoDeprecatedRule = rule.Rule{
 					reason := getJsDocDeprecationFromNode(decl)
 					return true, reason
 				}
+			}
+
+			// TypeScript combines local tags across all merged declarations.
+			if slices.ContainsFunc(symbol.Declarations, hasJsDocTags) {
+				return false, ""
 			}
 
 			// Class properties can inherit tags through their implements relationship,

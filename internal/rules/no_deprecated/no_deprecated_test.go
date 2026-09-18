@@ -691,6 +691,24 @@ x.statusCode;
         instance.original.mockReturnValue(1);
         instance.replacement.mockReturnValue(1);
       `},
+		{Code: `declare namespace jest {
+  type MockedFunction<T extends (...args: any[]) => any> = T & {
+    mockReturnValue(value: ReturnType<T>): void;
+  };
+}
+interface Legacy {
+  /** @deprecated Use replacement() instead. */
+  original(): number;
+}
+interface Mock {
+  /** @example original */
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class Mock implements Legacy {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare const instance: Mock;
+instance.original.mockReturnValue(1);`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
