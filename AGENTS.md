@@ -77,7 +77,7 @@ TSGolint serves as a type-aware linting backend for Oxlint:
 
 - **Parallel Processing**: Uses all CPU cores with worker pool pattern
 - **Direct AST Usage**: No TypeScript → ESTree conversion overhead
-- **Native Speed**: Go implementation for 20-40x speedup over ESLint
+- **Native Speed**: Go implementation; see [benchmarks](./benchmarks/README.md) for measured comparisons
 
 ### 3. Rule Development
 
@@ -143,6 +143,7 @@ ast-grep --pattern 'expect($$$)' --lang ts internal/rules/fixtures/
 3. Add tests in `rule_name_test.go`
 4. Register rule in `cmd/tsgolint/main.go`
 5. Add fixtures in `internal/rules/fixtures/`
+   and `e2e/fixtures/basic/rules/`; update `ALL_RULES` in `e2e/snapshot.test.ts`
 6. Create JSON schema for options at `internal/rules/rule_name/schema.json`
 7. Run `node tools/gen-json-schemas.ts` to generate options struct and unmarshaling code
 8. Run `just test` to verify your implementation
@@ -244,11 +245,11 @@ just pull
 # Run specific rule tests
 go test ./internal/rules/rule_name/...
 
-# Update all rule output snapshots
+# Update Go rule output snapshots (Vitest snapshots are updated separately)
 just update-snaps
 
 # Profile performance
-tsgolint -cpuprof cpu.prof <files>
+./tsgolint --tsconfig path/to/tsconfig.json -cpuprof cpu.prof
 go tool pprof cpu.prof
 
 # Search for code patterns (prefer ast-grep over grep/ripgrep for code searches)
