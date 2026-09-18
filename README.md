@@ -19,7 +19,7 @@ It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabli
 
 Key highlights:
 
-- **Performance**: 20-40x faster than ESLint + typescript-eslint on large repositories
+- **Performance**: 10–20x faster than ESLint + typescript-eslint in the [benchmarks](./benchmarks/README.md)
 - **Coverage**: 59/61 targeted `typescript-eslint` type-aware rules implemented
 - **Parallel**: Multi-core rule execution for scalable analysis
 - **High impact**: catches production-grade bugs that syntax-only linting misses (for example `no-floating-promises`)
@@ -28,7 +28,7 @@ This project originated in [typescript-eslint/tsgolint](https://github.com/types
 
 ## Why Teams Upgrade to Type-Aware Linting
 
-If you ship TypeScript, running `oxlint --type-aware` in CI is a high-leverage upgrade that catches bug classes syntax linting cannot.
+Running `oxlint --type-aware` in CI catches bugs that require type information to detect.
 
 For example, `typescript/no-floating-promises` catches silently dropped async failures:
 
@@ -121,14 +121,14 @@ This approach introduces several bottlenecks:
 
 `tsgolint` takes a different approach: it runs directly on `typescript-go`, avoiding these bottlenecks and allowing semantic analysis to run efficiently alongside Oxlint.
 
-Recent benchmark results (`eslint` + `typescript-eslint` vs `tsgolint`) show consistent large speedups:
+Benchmarks on an Apple M4 Pro compare ESLint + typescript-eslint with `tsgolint`:
 
 | Repository           | ESLint + typescript-eslint | tsgolint | Speedup |
 | -------------------- | -------------------------- | -------- | ------- |
-| microsoft/vscode     | 167.8s                     | 4.89s    | **34x** |
-| microsoft/typescript | 47.4s                      | 2.10s    | **23x** |
-| typeorm/typeorm      | 27.3s                      | 0.93s    | **29x** |
-| vuejs/core           | 20.7s                      | 0.95s    | **22x** |
+| microsoft/vscode     | 83.2s                      | 6.96s    | **12x** |
+| microsoft/typescript | 27.2s                      | 1.94s    | **14x** |
+| typeorm/typeorm      | 13.2s                      | 0.75s    | **18x** |
+| vuejs/core           | 12.3s                      | 0.95s    | **13x** |
 
 See [benchmarks](./benchmarks/README.md) for detailed performance comparisons.
 
@@ -168,7 +168,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-Implemented 59/61.
+59 of the 61 targeted rules are implemented.
 
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
