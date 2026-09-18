@@ -2998,5 +2998,40 @@ nested.original.mockReturnValue(1);`,
 				{MessageId: "deprecatedWithReason", Line: 32, Column: 8, EndColumn: 16},
 			},
 		},
+		{
+			Code: `declare namespace jest {
+  type MockedFunction<T extends (...args: any[]) => any> = T & {
+    mockReturnValue(value: ReturnType<T>): void;
+  };
+}
+interface Legacy {
+  /** @deprecated Use replacement() instead. */
+  original(): number;
+}
+interface Child extends Legacy {
+  /** @inheritdoc */
+  original(): number;
+}
+interface Mock {
+  /** @inheritDoc */
+  original: jest.MockedFunction<Child['original']>;
+}
+declare class Mock implements Child {
+  /** @example original */
+  original: jest.MockedFunction<Child['original']>;
+}
+declare class Direct implements Legacy {
+  /** @inheritDoc */
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare const instance: Mock;
+declare const direct: Direct;
+instance.original.mockReturnValue(1);
+direct.original.mockReturnValue(1);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 28, Column: 10, EndColumn: 18},
+				{MessageId: "deprecatedWithReason", Line: 29, Column: 8, EndColumn: 16},
+			},
+		},
 	})
 }

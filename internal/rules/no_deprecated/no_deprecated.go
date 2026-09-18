@@ -126,18 +126,27 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
-		hasJsDocTags := func(decl *ast.Node) bool {
-			return slices.ContainsFunc(decl.JSDoc(nil), func(doc *ast.Node) bool {
-				return doc.AsJSDoc().Tags != nil && len(doc.AsJSDoc().Tags.Nodes) > 0
-			})
+		canInheritJsDocTags := func(declarations []*ast.Node) bool {
+			hasTags := false
+			for _, decl := range declarations {
+				for _, doc := range decl.JSDoc(nil) {
+					if tags := doc.AsJSDoc().Tags; tags != nil {
+						for _, tag := range tags.Nodes {
+							hasTags = true
+							name := tag.TagName().Text()
+							if name == "inheritDoc" || name == "inheritdoc" {
+								return true
+							}
+						}
+					}
+				}
+			}
+			return !hasTags
 		}
 
 		var getInheritedDeprecation func(*ast.Node, string, []*ast.Symbol) (bool, string)
 		getInheritedDeprecation = func(decl *ast.Node, name string, seen []*ast.Symbol) (bool, string) {
 			if decl.Parent == nil {
-				return false, ""
-			}
-			if hasJsDocTags(decl) {
 				return false, ""
 			}
 			heritageClauses := utils.GetHeritageClauses(decl.Parent)
@@ -156,6 +165,9 @@ var NoDeprecatedRule = rule.Rule{
 					baseDecl := property.Declarations[0]
 					if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, baseDecl) {
 						return true, getJsDocDeprecationFromNode(baseDecl)
+					}
+					if !canInheritJsDocTags(property.Declarations) {
+						return false, ""
 					}
 					return getInheritedDeprecation(baseDecl, name, append(seen, property))
 				}
@@ -176,7 +188,7 @@ var NoDeprecatedRule = rule.Rule{
 			}
 
 			// TypeScript combines local tags across all merged declarations.
-			if slices.ContainsFunc(symbol.Declarations, hasJsDocTags) {
+			if !canInheritJsDocTags(symbol.Declarations) {
 				return false, ""
 			}
 

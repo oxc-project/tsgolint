@@ -1330,3 +1330,18 @@ Message: `original` is deprecated. Use replacement() instead.
   32 | nested.original.mockReturnValue(1);
      |        ~~~~~~~~
 ---
+
+[TestNoDeprecatedRule/invalid-151 - 1]
+Diagnostic 1: deprecatedWithReason (28:10 - 28:17)
+Message: `original` is deprecated. Use replacement() instead.
+  27 | declare const direct: Direct;
+  28 | instance.original.mockReturnValue(1);
+     |          ~~~~~~~~
+  29 | direct.original.mockReturnValue(1);
+
+Diagnostic 2: deprecatedWithReason (29:8 - 29:15)
+Message: `original` is deprecated. Use replacement() instead.
+  28 | instance.original.mockReturnValue(1);
+  29 | direct.original.mockReturnValue(1);
+     |        ~~~~~~~~
+---
