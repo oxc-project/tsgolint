@@ -633,6 +633,82 @@ x.statusCode;
 				}],
 			});
 		`},
+		{Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        declare class MockOfHostInterface  {
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `},
+		{Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        interface MockOfHostInterface {
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `},
+		{Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        declare class MockOfHostInterface implements HostInterface {
+          /** @example original */
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `},
+		{Code: `declare namespace jest {
+  type MockedFunction<T extends (...args: any[]) => any> = T & {
+    mockReturnValue(value: ReturnType<T>): void;
+  };
+}
+interface Legacy {
+  /** @deprecated Use replacement() instead. */
+  original(): number;
+}
+interface Mock {
+  /** @example original */
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class Mock implements Legacy {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare const instance: Mock;
+instance.original.mockReturnValue(1);`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
@@ -2858,6 +2934,103 @@ const jsx = <Foo field={0} />;`,
 					Column:    18,
 					EndColumn: 23,
 				},
+			},
+		},
+		{
+			Code: `
+        declare namespace jest {
+          type MockedFunction<T extends (...args: any[]) => any> = T & {
+            mockReturnValue(value: ReturnType<T>): void;
+          };
+        }
+        interface HostInterface {
+          /** @deprecated Use replacement() instead. */
+          original(): number;
+          replacement(): number;
+        }
+        declare class MockOfHostInterface implements HostInterface {
+          original: jest.MockedFunction<HostInterface['original']>;
+          replacement: jest.MockedFunction<HostInterface['replacement']>;
+        }
+        declare const instance: MockOfHostInterface;
+        instance.original.mockReturnValue(1);
+        instance.replacement.mockReturnValue(1);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 17, Column: 18, EndColumn: 26},
+			},
+		},
+		{
+			Code: `declare namespace jest {
+  type MockedFunction<T extends (...args: any[]) => any> = T & {
+    mockReturnValue(value: ReturnType<T>): void;
+  };
+}
+interface Clean { original(): number }
+interface Legacy {
+  /** @deprecated Use replacement() instead. */
+  original(): number;
+}
+interface Child extends Legacy { original(): number }
+declare class CleanBase { original(): number }
+declare class FirstClean implements Clean, Legacy {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class FirstLegacy implements Legacy, Clean {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class FromBase extends CleanBase implements Legacy {
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare class Nested implements Child {
+  original: jest.MockedFunction<Child['original']>;
+}
+declare const clean: FirstClean;
+declare const legacy: FirstLegacy;
+declare const base: FromBase;
+declare const nested: Nested;
+clean.original.mockReturnValue(1);
+legacy.original.mockReturnValue(1);
+base.original.mockReturnValue(1);
+nested.original.mockReturnValue(1);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 30, Column: 8, EndColumn: 16},
+				{MessageId: "deprecatedWithReason", Line: 32, Column: 8, EndColumn: 16},
+			},
+		},
+		{
+			Code: `declare namespace jest {
+  type MockedFunction<T extends (...args: any[]) => any> = T & {
+    mockReturnValue(value: ReturnType<T>): void;
+  };
+}
+interface Legacy {
+  /** @deprecated Use replacement() instead. */
+  original(): number;
+}
+interface Child extends Legacy {
+  /** @inheritdoc */
+  original(): number;
+}
+interface Mock {
+  /** @inheritDoc */
+  original: jest.MockedFunction<Child['original']>;
+}
+declare class Mock implements Child {
+  /** @example original */
+  original: jest.MockedFunction<Child['original']>;
+}
+declare class Direct implements Legacy {
+  /** @inheritDoc */
+  original: jest.MockedFunction<Legacy['original']>;
+}
+declare const instance: Mock;
+declare const direct: Direct;
+instance.original.mockReturnValue(1);
+direct.original.mockReturnValue(1);`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 28, Column: 10, EndColumn: 18},
+				{MessageId: "deprecatedWithReason", Line: 29, Column: 8, EndColumn: 16},
 			},
 		},
 	})
