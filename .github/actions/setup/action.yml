@@ -33,3 +33,7 @@ runs:
       run: |
         mkdir -p internal/collections
         find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
+
+    - name: Generate compressed TypeScript libraries
+      shell: bash
+      run: GOWORK=off go run -mod=readonly ./tools/gen_bundled_libs -input ./typescript-go/internal/bundled/libs -output ./internal/bundled/libs.zip
