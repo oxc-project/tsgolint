@@ -771,6 +771,28 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
+  it('lints a file listed with a path relative to the working directory', () => {
+    // The tsconfig lives in the subdirectory the file is in, so a relative path
+    // that reached the linter would be resolved against the wrong directory and
+    // miss the program.
+    const directory = resolveTestFilePath('relative-file-paths');
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      cwd: directory,
+      input: JSON.stringify({
+        version: 2,
+        configs: [{ file_paths: ['src/index.ts'], rules: [{ name: 'no-floating-promises' }] }],
+      }),
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    const diagnostics = sortDiagnostics(parseHeadlessOutput(output));
+
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].kind === DiagnosticKind.Rule && diagnostics[0].rule).toBe('no-floating-promises');
+    expect(diagnostics[0].file_path).toBe('fixtures/relative-file-paths/src/index.ts');
+  });
+
   it('should attach the tsconfig path to tsconfig-error diagnostics without a TypeScript diagnostic file (oxc-project/oxc#2200)', async () => {
     const testFiles = await getTestFiles('issue-oxc-2200');
     expect(testFiles.length).toBeGreaterThan(0);

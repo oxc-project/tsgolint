@@ -16,7 +16,26 @@ type headlessPayloadV1 struct {
 	Files []headlessConfigForFileV1 `json:"files"`
 }
 
-// V2 (current) Headless payload format
+// V2 (current) Headless payload format:
+//
+//	{
+//	  "version": 2,
+//	  "configs": [
+//	    {
+//	      "file_paths": ["/abs/path/a.ts"],
+//	      "rules": [{ "name": "no-floating-promises", "options": {} }]
+//	    }
+//	  ],
+//	  "source_overrides": { "/abs/path/a.ts": "source text" },
+//	  "report_syntactic": true,
+//	  "report_semantic": true
+//	}
+//
+// `report_syntactic` and `report_semantic` select which kinds of TypeScript
+// diagnostics are reported.
+//
+// `file_paths` entries and `source_overrides` keys should be absolute paths; a
+// relative one is resolved against the working directory tsgolint runs in.
 type headlessPayload struct {
 	Version         int               `json:"version"` // version must be 2
 	Configs         []headlessConfig  `json:"configs"`
