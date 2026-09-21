@@ -2,7 +2,6 @@
   "name": "tsgolint-e2e",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "pnpm@11.24.0",
   "type": "module",
   "scripts": {
     "test": "vitest"
@@ -12,5 +11,6 @@
     "fast-glob": "^3.3.3",
     "typescript": "^7.0.0",
     "vitest": "^5.0.0"
-  }
+  },
+  "packageManager": "pnpm@11.24.0"
 }
