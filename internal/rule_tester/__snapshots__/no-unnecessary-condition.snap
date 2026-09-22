@@ -1519,6 +1519,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 | if (x[0]?.foo) {
      |     ^^^^ Type: { foo: string; }
    6 | }
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-54 - 1]
@@ -1757,6 +1758,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar;
      | ^^^ Type: { bar: boolean; }
    4 | foo ?. bar;
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:5 - 4:6)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1769,6 +1771,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo ?. bar;
      | ^^^ Type: { bar: boolean; }
    5 | foo ?.
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 3: neverOptionalChain (5:5 - 5:6)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1781,6 +1784,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 | foo ?.
      | ^^^ Type: { bar: boolean; }
    6 |   bar;
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 4: neverOptionalChain (8:3 - 8:4)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1793,6 +1797,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    7 | foo
      | ^^^ Type: { bar: boolean; }
    8 |   ?. bar;
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-70 - 1]
@@ -1807,6 +1812,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.();
      | ^^^ Type: () => void
    4 | foo ?. ();
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:5 - 4:6)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1819,6 +1825,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo ?. ();
      | ^^^ Type: () => void
    5 | foo ?.
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 3: neverOptionalChain (5:5 - 5:6)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1831,6 +1838,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 | foo ?.
      | ^^^ Type: () => void
    6 |   ();
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 4: neverOptionalChain (8:3 - 8:4)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1843,6 +1851,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    7 | foo
      | ^^^ Type: () => void
    8 |   ?. ();
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-71 - 1]
@@ -1857,6 +1866,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.(bar);
      | ^^^ Type: () => void
    4 | foo ?. (bar);
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:5 - 4:6)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1869,6 +1879,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo ?. (bar);
      | ^^^ Type: () => void
    5 | foo ?.
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 3: neverOptionalChain (5:5 - 5:6)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1881,6 +1892,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 | foo ?.
      | ^^^ Type: () => void
    6 |   (bar);
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 4: neverOptionalChain (8:3 - 8:4)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1893,6 +1905,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    7 | foo
      | ^^^ Type: () => void
    8 |   ?. (bar);
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-72 - 1]
@@ -1903,6 +1916,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   Label: Type: number[] (1:13 - 1:21)
    1 | const foo = [1, 2, 3]?.[0];
      |             ^^^^^^^^^ Type: number[]
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-73 - 1]
@@ -1917,6 +1931,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | x?.a?.b;
      | ^ Type: { a?: { b: string; } | undefined; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-74 - 1]
@@ -1931,6 +1946,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | x.a?.b?.c;
      | ^^^ Type: { b?: { c: string; } | undefined; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-75 - 1]
@@ -1945,6 +1961,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | x?.a;
      | ^ Type: { a?: string | undefined; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-76 - 1]
@@ -1959,6 +1976,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz;
      | ^^^^^^^^ Type: { baz: { c: string; }; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-77 - 1]
@@ -1973,6 +1991,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz?.qux;
      | ^^^^^^^^^^^^^ Type: { qux: string; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-78 - 1]
@@ -1987,6 +2006,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz?.qux?.();
      | ^^^^^^^^^^^^^ Type: { qux?: (() => {}) | undefined; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (3:9 - 3:10)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -1999,6 +2019,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz?.qux?.();
      | ^^^^^^^^ Type: { baz: { qux?: (() => {}) | undefined; }; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-79 - 1]
@@ -2013,6 +2034,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz?.qux?.();
      | ^^^^^^^^^^^^^^^^^^ Type: () => {}
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (3:14 - 3:15)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2025,6 +2047,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz?.qux?.();
      | ^^^^^^^^^^^^^ Type: { qux: () => {}; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 3: neverOptionalChain (3:9 - 3:10)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2037,6 +2060,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | foo?.bar?.baz?.qux?.();
      | ^^^^^^^^ Type: { baz: { qux: () => {}; }; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-80 - 1]
@@ -2051,6 +2075,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.().qux?.();
      | ^^^^^^^^^^^^^^^^^^^^^ Type: () => {}
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:14 - 4:15)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2063,6 +2088,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.().qux?.();
      | ^^^^^^^^^^^^^ Type: baz
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 3: neverOptionalChain (4:9 - 4:10)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2075,6 +2101,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.().qux?.();
      | ^^^^^^^^ Type: { baz: baz; }
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-81 - 1]
@@ -2089,6 +2116,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.().qux?.();
      | ^^^^^^^^^^^^^^^^^^^^^ Type: () => {}
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:9 - 4:10)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2101,6 +2129,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.().qux?.();
      | ^^^^^^^^ Type: { baz: baz; }
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-82 - 1]
@@ -2115,6 +2144,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.()?.qux?.();
      | ^^^^^^^^^^^^^^^^^^^^^^ Type: () => {}
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:9 - 4:10)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2127,6 +2157,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz?.()?.qux?.();
      | ^^^^^^^^ Type: { baz: baz; }
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-83 - 1]
@@ -2141,6 +2172,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 | foo?.fooOrBar?.baz?.qux;
      | ^^^^^^^^^^^^^ Type: Bar | Foo
    6 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-84 - 1]
@@ -2155,6 +2187,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | x[0].a?.b;
      | ^^^^^^ Type: { b: number; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-85 - 1]
@@ -2169,6 +2202,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    7 | foo?.[key]?.trim();
      | ^^^^^^^^^^ Type: "bar" | "foo"
    8 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-86 - 1]
@@ -2183,6 +2217,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 | foo?.[key]?.trim();
      | ^^^^^^^^^^ Type: "bar"
    6 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-87 - 1]
@@ -2197,6 +2232,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   11 |   return outer.inner?.[key]?.charCodeAt(0);
      |          ^^^^^^^^^^^^^^^^^^ Type: "bar"
   12 | }
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-88 - 1]
@@ -2211,6 +2247,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   11 |   return outer.inner?.[key]?.charCodeAt(0);
      |          ^^^^^^^^^^^^^^^^^^ Type: "bar"
   12 | }
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-89 - 1]
@@ -2298,6 +2335,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    9 | foo?.test?.length;
      | ^^^^^^^^^ Type: string
   10 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-95 - 1]
@@ -2452,6 +2490,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar()?.toExponential();
      | ^^^^^^^^^^ Type: number
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-106 - 1]
@@ -2466,6 +2505,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz()?.qux?.toExponential();
      | ^^^^^^^^^^^^^^^^^^^^ Type: number
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (4:16 - 4:17)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2478,6 +2518,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.bar?.baz()?.qux?.toExponential();
      | ^^^^^^^^^^^^^^^ Type: { qux: number; }
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-107 - 1]
@@ -2492,6 +2533,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.()?.toExponential();
      | ^^^^^^^ Type: number
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-108 - 1]
@@ -2506,6 +2548,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.['bar']()?.toExponential();
      | ^^^^^^^^^^^^^^ Type: number
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-109 - 1]
@@ -2520,6 +2563,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    4 | foo?.['bar']?.()?.toExponential();
      | ^^^^^^^^^^^^^^^^ Type: number
    5 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-110 - 1]
@@ -2757,6 +2801,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   12 | a.a?.a?.a;
      | ^^^^^^ Type: { a: 1; }
   13 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-128 - 1]
@@ -2771,6 +2816,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   21 | t.a?.a?.a?.value;
      | ^^^^^^^^^ Type: { value: "value"; }
   22 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (21:7 - 21:8)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2783,6 +2829,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   21 | t.a?.a?.a?.value;
      | ^^^^^^ Type: { [name: Lowercase<string>]: { value: "value"; }; }
   22 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 3: neverOptionalChain (21:4 - 21:5)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2795,6 +2842,7 @@ Message: Unnecessary optional chain on a non-nullish value.
   21 | t.a?.a?.a?.value;
      | ^^^ Type: { [name: Lowercase<string>]: { [name: Lowercase<string>]: { value: "value"; }; }; }
   22 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-129 - 1]
@@ -2809,6 +2857,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    5 |   test[0]?.a;
      |   ^^^^^^^ Type: { a?: string | undefined; }
    6 | }
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-130 - 1]
@@ -2823,6 +2872,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | arr2[42]?.x?.y?.z;
      | ^^^^^^^^^^^^^^ Type: { z: object; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 
 Diagnostic 2: neverOptionalChain (3:12 - 3:13)
 Message: Unnecessary optional chain on a non-nullish value.
@@ -2835,6 +2885,7 @@ Message: Unnecessary optional chain on a non-nullish value.
    3 | arr2[42]?.x?.y?.z;
      | ^^^^^^^^^^^ Type: { y: { z: object; }; }
    4 |       
+  Suggestion 1: [suggestRemoveOptionalChain] Remove unnecessary optional chain
 ---
 
 [TestNoUnnecessaryConditionRule/invalid-131 - 1]

@@ -76,6 +76,13 @@ func buildNeverOptionalChainMessage() rule.RuleMessage {
 	}
 }
 
+func buildSuggestRemoveOptionalChainMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "suggestRemoveOptionalChain",
+		Description: "Remove unnecessary optional chain",
+	}
+}
+
 func buildNoStrictNullCheckMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "noStrictNullCheck",
@@ -1347,12 +1354,23 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if typeName == "" {
 					typeName = typeNameForNodeDiagnostic(ctx.TypeChecker, exprType, expression)
 				}
-				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
+				ctx.ReportDiagnosticWithSuggestions(buildTypedValueDiagnostic(
 					buildNeverOptionalChainMessage(),
 					utils.TrimNodeTextRange(ctx.SourceFile, questionDotToken),
 					utils.TrimNodeTextRange(ctx.SourceFile, expression),
 					typeName,
-				))
+				), func() []rule.RuleSuggestion {
+					replacement := ""
+					if node.Kind == ast.KindPropertyAccessExpression {
+						replacement = "."
+					}
+					return []rule.RuleSuggestion{{
+						Message: buildSuggestRemoveOptionalChainMessage(),
+						FixesArr: []rule.RuleFix{
+							rule.RuleFixReplace(ctx.SourceFile, questionDotToken, replacement),
+						},
+					}}
+				})
 			}
 		}
 
