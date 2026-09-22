@@ -177,6 +177,27 @@ func TestRequireArraySortCompare(t *testing.T) {
         }
       `,
 		},
+		{Code: `
+      function sort<T>(values: (T extends 0 ? string : string)[]) {
+        values.sort();
+      }
+    `},
+		{Code: `
+      interface ExternalIdRow {
+        appointment_id: string;
+        patient_id: string;
+      }
+
+      declare function acquireAdvisoryLock(key: string): Promise<void>;
+
+      async function lockRowsInDeterministicOrder<C extends keyof ExternalIdRow>(
+        ids: ExternalIdRow[C][],
+      ): Promise<void> {
+        for (const id of [...ids].sort()) {
+          await acquireAdvisoryLock(id);
+        }
+      }
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -394,6 +415,29 @@ func TestRequireArraySortCompare(t *testing.T) {
 				{
 					MessageId: "requireCompare",
 				},
+			},
+		},
+		{
+			Code: `
+        function sort<T>(values: (T extends 0 ? string : number)[]) {
+          values.sort();
+          values.toSorted();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "requireCompare"},
+				{MessageId: "requireCompare"},
+			},
+		},
+		{
+			Code: `
+        function sort<T>(values: (T extends 0 ? string : string)[]) {
+          values.sort();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "requireCompare"},
 			},
 		},
 	})

@@ -158,3 +158,28 @@ Message: Require 'compare' argument.
      |           ~~~~~~~~
    4 |         }
 ---
+
+[TestRequireArraySortCompare/invalid-18 - 1]
+Diagnostic 1: requireCompare (3:11 - 3:23)
+Message: Require 'compare' argument.
+   2 |         function sort<T>(values: (T extends 0 ? string : number)[]) {
+   3 |           values.sort();
+     |           ~~~~~~~~~~~~~
+   4 |           values.toSorted();
+
+Diagnostic 2: requireCompare (4:11 - 4:27)
+Message: Require 'compare' argument.
+   3 |           values.sort();
+   4 |           values.toSorted();
+     |           ~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestRequireArraySortCompare/invalid-19 - 1]
+Diagnostic 1: requireCompare (3:11 - 3:23)
+Message: Require 'compare' argument.
+   2 |         function sort<T>(values: (T extends 0 ? string : string)[]) {
+   3 |           values.sort();
+     |           ~~~~~~~~~~~~~
+   4 |         }
+---

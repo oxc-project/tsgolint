@@ -39,6 +39,9 @@ var RequireArraySortCompareRule = rule.Rule{
 
 				if opts.IgnoreStringArrays && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, calleeObjType) {
 					if utils.Every(checker.Checker_getTypeArguments(ctx.TypeChecker, calleeObjType), func(t *checker.Type) bool {
+						if constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, t); constraint != nil {
+							t = constraint
+						}
 						return utils.IsTypeFlagSet(t, checker.TypeFlagsString) || utils.GetTypeName(ctx.TypeChecker, t) == "string"
 					}) {
 						return
