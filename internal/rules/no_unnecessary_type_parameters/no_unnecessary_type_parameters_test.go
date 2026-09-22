@@ -106,6 +106,14 @@ func TestNoUnnecessaryTypeParameters(t *testing.T) {
 		{Code: "\ntype Silly<T> = { [P in keyof T]: T[P] };\n\ntype SillyFoo<T, Value> = Silly<{ [P in keyof T]: Value }>;\n\ntype Foo<T, Value> = { [P in keyof T]: Value };\n\ndeclare function foo<T, Constant>(data: T, c: Constant): Foo<T, Constant>;\ndeclare function foo<T, Constant>(c: Constant): (data: T) => Foo<T, Constant>;\n\ndeclare function sillyFoo<T, Constant>(\n  data: T,\n  c: Constant,\n): SillyFoo<T, Constant>;\ndeclare function sillyFoo<T, Constant>(\n  c: Constant,\n): (data: T) => SillyFoo<T, Constant>;\n    "},
 		{Code: "\nconst f = <T,>(setValue: (v: T) => void, getValue: () => NoInfer<T>) => {};\n    "},
 		{Code: "\nconst f = <T,>(\n  setValue: (v: T) => NoInfer<T>,\n  getValue: (v: NoInfer<T>) => NoInfer<T>,\n) => {};\n    "},
+		{Code: "declare class Box<T> { value: T; }"},
+		{Code: "class Box<T> { value!: T; }"},
+		{Code: "const Box = class<T> { value!: T; };"},
+		{Code: "declare class Box<T extends string> { value?: T; }"},
+		{Code: "declare class Box<T> { value: T | undefined; }"},
+		{Code: "declare class Box<T> { value: { nested: T }; }"},
+		{Code: "declare class Box<T> { value: () => T; }"},
+		{Code: "declare class Box<T> { value: T; }\ndeclare const numberBox: Box<number>;\nnumberBox.value = 1;\n// @ts-expect-error\nnumberBox.value = \"\";"},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const func = <T,>(param: T) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: unknown) => null;"}}}}},
 		{Code: "const func = <T,>(param: [T]) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: [unknown]) => null;"}}}}},
@@ -176,5 +184,9 @@ func TestNoUnnecessaryTypeParameters(t *testing.T) {
 		{Code: "\ntype A = string;\ntype B = string;\ntype C = string;\ndeclare function f<T extends A | B>(): T & C;\n      ", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ntype A = string;\ntype B = string;\ntype C = string;\ndeclare function f(): (A | B) & C;\n      "}}}}},
 		{Code: "\ntype A = string;\ntype B = string;\ntype C = string;\ntype D = string;\ndeclare function f<T extends A extends B ? C : D>(): T | null;\n      ", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ntype A = string;\ntype B = string;\ntype C = string;\ntype D = string;\ndeclare function f(): (A extends B ? C : D) | null;\n      "}}}}},
 		{Code: "\ndeclare class C {\n  m<T>(x: { self: C; arg: T }): void;\n}\n      ", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ndeclare class C {\n  m(x: { self: C; arg: unknown }): void;\n}\n      "}}}}},
+		{Code: "declare class Box<T> { readonly value: T; }", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare class Box { readonly value: unknown; }"}}}}},
+		{Code: "declare class Box<T> { get value(): T; }", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare class Box { get value(): unknown; }"}}}}},
+		{Code: "declare class Box<T> { getValue(): T; }", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare class Box { getValue(): unknown; }"}}}}},
+		{Code: "declare class Box<T, U> { value: T; getValue(): U; }", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare class Box<T> { value: T; getValue(): unknown; }"}}}}},
 	})
 }

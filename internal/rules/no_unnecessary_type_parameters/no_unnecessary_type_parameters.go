@@ -551,7 +551,13 @@ func collectTypeParameterUsageCounts(
 	}
 
 	if !functionLikeType {
-		visitType(ctx.TypeChecker.GetTypeAtLocation(node), false, false)
+		t := ctx.TypeChecker.GetTypeAtLocation(node)
+		visitType(t, false, false)
+		if fromClass && ast.IsPropertyDeclaration(node) && node.ModifierFlags()&ast.ModifierFlagsReadonly == 0 {
+			// A mutable field uses its type for both reads and writes. Replacing its
+			// type parameter with the constraint would allow previously invalid writes.
+			visitType(t, false, false)
+		}
 	}
 
 	return remainingTargets

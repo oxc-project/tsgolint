@@ -1002,3 +1002,47 @@ Message: Type parameter T is used only once in the function signature.
    4 | }
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
+
+[TestNoUnnecessaryTypeParameters/invalid-69 - 1]
+Diagnostic 1: sole (1:19 - 1:19)
+Message: Type parameter T is used only once in the class signature.
+   1 | declare class Box<T> { readonly value: T; }
+     |                   ~
+  Label: This is the only usage of type parameter T in the signature. (1:40 - 1:40)
+   1 | declare class Box<T> { readonly value: T; }
+     |                                        ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-70 - 1]
+Diagnostic 1: sole (1:19 - 1:19)
+Message: Type parameter T is used only once in the class signature.
+   1 | declare class Box<T> { get value(): T; }
+     |                   ~
+  Label: This is the only usage of type parameter T in the signature. (1:37 - 1:37)
+   1 | declare class Box<T> { get value(): T; }
+     |                                     ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-71 - 1]
+Diagnostic 1: sole (1:19 - 1:19)
+Message: Type parameter T is used only once in the class signature.
+   1 | declare class Box<T> { getValue(): T; }
+     |                   ~
+  Label: This is the only usage of type parameter T in the signature. (1:36 - 1:36)
+   1 | declare class Box<T> { getValue(): T; }
+     |                                    ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-72 - 1]
+Diagnostic 1: sole (1:22 - 1:22)
+Message: Type parameter U is used only once in the class signature.
+   1 | declare class Box<T, U> { value: T; getValue(): U; }
+     |                      ~
+  Label: This is the only usage of type parameter U in the signature. (1:49 - 1:49)
+   1 | declare class Box<T, U> { value: T; getValue(): U; }
+     |                                                 ^ This is the only usage of type parameter U in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
