@@ -998,6 +998,66 @@ declare const key: Key;
 foo.bar[key] ??= 1;
     `},
 		{Code: `
+type Fields = { hello?: number; world?: boolean };
+let fields: Fields = {};
+for (const key of ['hello', 'world'] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+type Fields = { hello?: boolean | number; world?: boolean };
+let fields: Fields = {};
+for (const key of ['hello', 'world'] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+type Fields = { hello?: number; world?: 1 | 2 | 3 };
+let fields: Fields = {};
+for (const key of ['hello', 'world'] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+type Fields = { hello?: 1 | 2 | 4; world?: 1 | 3 | 5 };
+let fields: Fields = {};
+for (const key of ['hello', 'world'] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+interface Foo { bizz?: number; buzz?: boolean }
+let fields: Foo = {};
+for (const key of ['bizz', 'buzz'] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+let fields: { 0?: number; 1?: boolean } = {};
+for (const key of [0, 1] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+declare const a: unique symbol;
+declare const b: unique symbol;
+let fields: { [a]?: number; [b]?: boolean } = {};
+for (const key of [a, b] as const) {
+  fields[key] ??= undefined;
+}`},
+		{Code: `
+declare const sym: unique symbol;
+declare const key: 'x' | typeof sym;
+declare const fields: { [k: string]: number | undefined; [k: symbol]: boolean | undefined };
+fields[key] ??= undefined;
+`},
+		{Code: `
+declare const sym: unique symbol;
+declare const key: string | symbol;
+declare const fields: { [k: string]: number | undefined; [k: symbol]: boolean | undefined };
+fields[key] ??= undefined;
+`},
+		{Code: `
+declare const sym: unique symbol;
+declare const key: number | symbol;
+declare const fields: { [k: string]: number | undefined; [k: symbol]: boolean | undefined };
+fields[key] ??= undefined;
+`},
+		{Code: `
 enum Keys {
   A = 'A',
   B = 'B',
@@ -2709,6 +2769,118 @@ declare let foo: null;
 foo ??= null;
       `,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish"}},
+		},
+		{
+			Code: `
+declare const foo: { bar: null };
+foo.bar ??= null;`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 3, Column: 1, EndLine: 3, EndColumn: 8}},
+		},
+		{
+			Code: `
+declare const foo: Record<string, undefined>;
+declare const key: string;
+foo[key] ??= undefined;`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 4, Column: 1, EndLine: 4, EndColumn: 9}},
+		},
+		{
+			Code: `
+type Fields = { hello?: undefined; world?: null };
+let fields: Fields = {};
+for (const key of ['hello', 'world'] as const) {
+  fields[key] ??= undefined;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5, Column: 3, EndLine: 5, EndColumn: 14}},
+		},
+		{
+			Code: `
+interface Foo { bizz?: undefined; buzz?: null }
+let fields: Foo = {};
+for (const key of ['buzz', 'bizz'] as const) {
+  fields[key] ??= undefined;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5, Column: 3, EndLine: 5, EndColumn: 14}},
+		},
+		{
+			Code: `
+declare const obj: { x: number | null };
+if (obj['x'] === null) {
+  obj['x'] ?? 1;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 4}},
+		},
+		{
+			Code: `
+declare const a: unique symbol;
+declare const b: unique symbol;
+let fields: { [a]?: undefined; [b]?: null } = {};
+for (const key of [a, b] as const) {
+  fields[key] ??= undefined;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 6}},
+		},
+		{
+			Code: `
+declare let obj: { x: number | null };
+if (obj['x'] === null) {
+  obj['x'] ??= 1;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 4}},
+		},
+		{
+			Code: `
+declare let obj: { x: number | null; y: boolean | null };
+declare const key: 'x' | 'y';
+if (key === 'x' && obj[key] === null) {
+  (obj[key]) ??= 1;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5}},
+		},
+		{
+			Code: `
+declare let obj: { x: number | null; y: number | null };
+declare const key: 'x' | 'y';
+if (obj[key] === null) {
+  obj[key] ??= null;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5}},
+		},
+		{
+			Code: `
+declare let obj: { x: number | null; y: boolean | null };
+declare const key: 'x' | 'y';
+if (obj[key] === null) {
+  obj[key] ??= null;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5}},
+		},
+		{
+			Code: `
+declare let obj: { x: number | null; y: boolean | null };
+declare const key: 'x' | 'y';
+if (obj[key] === null) {
+  obj[key] ??= null;
+}`,
+			TSConfig: "tsconfig.noUncheckedIndexedAccess.json",
+			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5}},
+		},
+		{
+			Code: `
+declare const sym: unique symbol;
+declare const key: 'x' | typeof sym;
+declare const fields: { [k: string]: undefined; [k: symbol]: undefined };
+fields[key] ??= undefined;`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 5}},
+		},
+		{
+			Code: `
+declare const sym: unique symbol;
+declare const key: 'x' | typeof sym;
+declare const fields: { [k: string]: number | undefined; [k: symbol]: boolean | undefined };
+if (fields[key] === undefined) {
+  fields[key] ??= undefined;
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysNullish", Line: 6}},
 		},
 		{
 			Code: `

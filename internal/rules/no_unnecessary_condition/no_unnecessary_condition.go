@@ -1545,7 +1545,14 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		getNullishCoalescingType := func(node *ast.Node) (*checker.Type, bool) {
 			nodeType := getResolvedType(node)
 			node = ast.SkipParentheses(node)
-			if !noUncheckedIndexedAccess || !ast.IsAssignmentTarget(node) {
+			if !ast.IsAssignmentTarget(node) {
+				return nodeType, false
+			}
+			if !noUncheckedIndexedAccess {
+				// Assignment-target types omit control-flow narrowing in TypeScript Go.
+				if nodeType != nil && node.Kind == ast.KindElementAccessExpression {
+					nodeType = checker.Checker_getFlowTypeOfReference(ctx.TypeChecker, node, nodeType)
+				}
 				return nodeType, false
 			}
 
@@ -1583,6 +1590,31 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			return checker.Checker_getFlowTypeOfReference(ctx.TypeChecker, node, readType), true
 		}
 
+		hasPossiblyNonNullishIndexedRead := func(node *ast.Node) bool {
+			node = ast.SkipParentheses(node)
+			if node.Kind != ast.KindElementAccessExpression || !ast.IsAssignmentTarget(node) {
+				return false
+			}
+			access := node.AsElementAccessExpression()
+			objectType := getResolvedType(access.Expression)
+			keyType := getResolvedType(access.ArgumentExpression)
+			if objectType == nil || keyType == nil || !utils.IsUnionType(keyType) {
+				return false
+			}
+
+			// Union-key writes intersect property types. Read lookup handles both
+			// declared properties and index signatures, then flow analysis preserves
+			// narrowing of the indexed value even when the key remains a union.
+			readType := checker.Checker_getIndexedAccessTypeOrUndefined(ctx.TypeChecker, objectType, keyType, checker.AccessFlagsExpressionPosition, nil, nil)
+			if readType == nil {
+				return false
+			}
+			flowType := checker.Checker_getFlowTypeOfReference(ctx.TypeChecker, node, readType)
+			return slices.ContainsFunc(utils.UnionTypeParts(flowType), func(part *checker.Type) bool {
+				return !isAlwaysNullishType(part)
+			})
+		}
+
 		checkNodeForNullish := func(node *ast.Node) {
 			if node == nil {
 				return
@@ -1609,7 +1641,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, node),
 				))
 				return
-			case isAlwaysNullishType(nodeType):
+			case isAlwaysNullishType(nodeType) && !hasPossiblyNonNullishIndexedRead(node):
 				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 					buildAlwaysNullishMessage(),
 					utils.TrimNodeTextRange(ctx.SourceFile, node),
