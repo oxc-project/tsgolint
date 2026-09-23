@@ -1306,3 +1306,42 @@ Message: `field` is deprecated.
    9 | const jsx = <Foo field={0} />;
      |                  ~~~~~
 ---
+
+[TestNoDeprecatedRule/invalid-149 - 1]
+Diagnostic 1: deprecatedWithReason (17:18 - 17:25)
+Message: `original` is deprecated. Use replacement() instead.
+  16 |         declare const instance: MockOfHostInterface;
+  17 |         instance.original.mockReturnValue(1);
+     |                  ~~~~~~~~
+  18 |         instance.replacement.mockReturnValue(1);
+---
+
+[TestNoDeprecatedRule/invalid-150 - 1]
+Diagnostic 1: deprecatedWithReason (30:8 - 30:15)
+Message: `original` is deprecated. Use replacement() instead.
+  29 | clean.original.mockReturnValue(1);
+  30 | legacy.original.mockReturnValue(1);
+     |        ~~~~~~~~
+  31 | base.original.mockReturnValue(1);
+
+Diagnostic 2: deprecatedWithReason (32:8 - 32:15)
+Message: `original` is deprecated. Use replacement() instead.
+  31 | base.original.mockReturnValue(1);
+  32 | nested.original.mockReturnValue(1);
+     |        ~~~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-151 - 1]
+Diagnostic 1: deprecatedWithReason (28:10 - 28:17)
+Message: `original` is deprecated. Use replacement() instead.
+  27 | declare const direct: Direct;
+  28 | instance.original.mockReturnValue(1);
+     |          ~~~~~~~~
+  29 | direct.original.mockReturnValue(1);
+
+Diagnostic 2: deprecatedWithReason (29:8 - 29:15)
+Message: `original` is deprecated. Use replacement() instead.
+  28 | instance.original.mockReturnValue(1);
+  29 | direct.original.mockReturnValue(1);
+     |        ~~~~~~~~
+---

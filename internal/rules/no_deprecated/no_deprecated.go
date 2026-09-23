@@ -126,6 +126,55 @@ var NoDeprecatedRule = rule.Rule{
 			return ""
 		}
 
+		canInheritJsDocTags := func(declarations []*ast.Node) bool {
+			hasTags := false
+			for _, decl := range declarations {
+				for _, doc := range decl.JSDoc(nil) {
+					if tags := doc.AsJSDoc().Tags; tags != nil {
+						for _, tag := range tags.Nodes {
+							hasTags = true
+							name := tag.TagName().Text()
+							if name == "inheritDoc" || name == "inheritdoc" {
+								return true
+							}
+						}
+					}
+				}
+			}
+			return !hasTags
+		}
+
+		var getInheritedDeprecation func(*ast.Node, string, []*ast.Symbol) (bool, string)
+		getInheritedDeprecation = func(decl *ast.Node, name string, seen []*ast.Symbol) (bool, string) {
+			if decl.Parent == nil {
+				return false, ""
+			}
+			heritageClauses := utils.GetHeritageClauses(decl.Parent)
+			if heritageClauses == nil {
+				return false, ""
+			}
+			// TypeScript uses the first eligible member, even if it has no tags.
+			// Class heritage clauses put the base class before implemented interfaces.
+			for _, clause := range heritageClauses.Nodes {
+				for _, heritage := range clause.AsHeritageClause().Types.Nodes {
+					baseType := ctx.TypeChecker.GetTypeAtLocation(heritage)
+					property := checker.Checker_getPropertyOfType(ctx.TypeChecker, baseType, name)
+					if property == nil || len(property.Declarations) != 1 || slices.Contains(seen, property) {
+						continue
+					}
+					baseDecl := property.Declarations[0]
+					if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, baseDecl) {
+						return true, getJsDocDeprecationFromNode(baseDecl)
+					}
+					if !canInheritJsDocTags(property.Declarations) {
+						return false, ""
+					}
+					return getInheritedDeprecation(baseDecl, name, append(seen, property))
+				}
+			}
+			return false, ""
+		}
+
 		getJsDocDeprecation := func(symbol *ast.Symbol) (bool, string) {
 			if symbol == nil {
 				return false, ""
@@ -134,6 +183,28 @@ var NoDeprecatedRule = rule.Rule{
 			for _, decl := range symbol.Declarations {
 				if checker.Checker_IsDeprecatedDeclaration(ctx.TypeChecker, decl) {
 					reason := getJsDocDeprecationFromNode(decl)
+					return true, reason
+				}
+			}
+
+			// TypeScript combines local tags across all merged declarations.
+			if !canInheritJsDocTags(symbol.Declarations) {
+				return false, ""
+			}
+
+			// Class properties can inherit tags through their implements relationship,
+			// including tags inherited by the interface member itself.
+			for _, decl := range symbol.Declarations {
+				if decl.Kind != ast.KindPropertyDeclaration || ast.IsStatic(decl) || decl.Parent == nil {
+					continue
+				}
+				heritageClauses := utils.GetHeritageClauses(decl.Parent)
+				if heritageClauses == nil || !slices.ContainsFunc(heritageClauses.Nodes, func(clause *ast.Node) bool {
+					return clause.AsHeritageClause().Token == ast.KindImplementsKeyword
+				}) {
+					continue
+				}
+				if deprecated, reason := getInheritedDeprecation(decl, symbol.Name, []*ast.Symbol{symbol}); deprecated {
 					return true, reason
 				}
 			}
