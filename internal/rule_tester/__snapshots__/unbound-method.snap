@@ -880,16 +880,16 @@ Help: If your function does not access `this`, you can annotate it with `this: v
 ---
 
 [TestUnboundMethodMemberAccess/invalid-4 - 1]
-Diagnostic 1: unboundWithoutThisAnnotation (6:15 - 6:30)
+Diagnostic 1: unboundWithoutThisAnnotation (6:15 - 6:34)
 Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
 Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
    5 | declare const foo: Foo;
-   6 | const bound = foo[`ba${'zz'}`];
-     |               ~~~~~~~~~~~~~~~~
-  Label: This reference may be unbound and lose `this` context (6:19 - 6:29)
+   6 | const bound = foo[`get${'Value'}`];
+     |               ~~~~~~~~~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (6:19 - 6:33)
    5 | declare const foo: Foo;
-   6 | const bound = foo[`ba${'zz'}`];
-     |                   ^^^^^^^^^^^ This reference may be unbound and lose `this` context
+   6 | const bound = foo[`get${'Value'}`];
+     |                   ^^^^^^^^^^^^^^^ This reference may be unbound and lose `this` context
 ---
 
 [TestUnboundMethodMemberAccess/invalid-5 - 1]

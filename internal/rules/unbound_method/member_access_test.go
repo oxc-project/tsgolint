@@ -76,7 +76,7 @@ class Foo {
 declare const foo: Foo;
 declare const bazz: keyof Foo;
 const bound = foo[bazz];`, Errors: []rule_tester.InvalidTestCaseError{{Line: 7, MessageId: "unboundWithoutThisAnnotation"}}},
-		{Code: "\nclass Foo {\n  bazz() {}\n}\ndeclare const foo: Foo;\nconst bound = foo[`ba${'zz'}`];", Errors: []rule_tester.InvalidTestCaseError{{Line: 6, MessageId: "unboundWithoutThisAnnotation"}}},
+		{Code: "\nclass Foo {\n  getValue() {}\n}\ndeclare const foo: Foo;\nconst bound = foo[`get${'Value'}`];", Errors: []rule_tester.InvalidTestCaseError{{Line: 6, MessageId: "unboundWithoutThisAnnotation"}}},
 		{Code: `
 class Foo {
   1() {}
