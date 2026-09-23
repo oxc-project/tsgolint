@@ -354,85 +354,103 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 		},
 		{
 			Code: "\n        function foo(a = undefined) {}\n      ",
-			Output: []string{
-				"\n        function foo(a) {}\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessUndefined",
 					Line:      2,
 					Column:    26,
 					EndColumn: 35,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function foo(a) {}\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const { a = undefined } = {};\n      ",
-			Output: []string{
-				"\n        const { a } = {};\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessUndefined",
 					Line:      2,
 					Column:    21,
 					EndColumn: 30,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const { a } = {};\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        const [a = undefined] = [];\n      ",
-			Output: []string{
-				"\n        const [a] = [];\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessUndefined",
 					Line:      2,
 					Column:    20,
 					EndColumn: 29,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        const [a] = [];\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        function foo({ a = undefined }) {}\n      ",
-			Output: []string{
-				"\n        function foo({ a }) {}\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "uselessUndefined",
 					Line:      2,
 					Column:    28,
 					EndColumn: 37,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function foo({ a }) {}\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        function myFunction(p1: string, p2: number | undefined = undefined) {\n          console.log(p1, p2);\n        }\n      ",
-			Output: []string{
-				"\n        function myFunction(p1: string, p2?: number | undefined) {\n          console.log(p1, p2);\n        }\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferOptionalSyntax",
 					Line:      2,
 					Column:    66,
 					EndColumn: 75,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "useOptionalSyntax",
+							Output:    "\n        function myFunction(p1: string, p2?: number | undefined) {\n          console.log(p1, p2);\n        }\n      ",
+						},
+					},
 				},
 			},
 		},
 		{
 			Code: "\n        type SomeType = number | undefined;\n        function f(\n          /* comment */ x /* comment 2 */ : /* comment 3 */ SomeType /* comment 4 */ = /* comment 5 */ undefined,\n        ) {}\n      ",
-			Output: []string{
-				"\n        type SomeType = number | undefined;\n        function f(\n          /* comment */ x? /* comment 2 */ : /* comment 3 */ SomeType,\n        ) {}\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "preferOptionalSyntax",
 					Line:      4,
 					Column:    104,
 					EndColumn: 113,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "useOptionalSyntax",
+							Output:    "\n        type SomeType = number | undefined;\n        function f(\n          /* comment */ x? /* comment 2 */ : /* comment 3 */ SomeType,\n        ) {}\n      ",
+						},
+					},
 				},
 			},
 		},
@@ -462,9 +480,6 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 		{
 			Code:     "\n        function foo(a = undefined) {}\n      ",
 			TSConfig: "tsconfig.unstrict.json",
-			Output: []string{
-				"\n        function foo(a) {}\n      ",
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noStrictNullCheck",
@@ -476,6 +491,12 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 					Line:      2,
 					Column:    26,
 					EndColumn: 35,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "removeDefaultAssignment",
+							Output:    "\n        function foo(a) {}\n      ",
+						},
+					},
 				},
 			},
 		},

@@ -2891,7 +2891,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
           },
         ],
         "message": {
-          "description": "Remove the default assignment.",
+          "description": "Remove the default value.",
           "id": "removeDefaultAssignment",
         },
       },
