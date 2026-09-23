@@ -306,10 +306,8 @@ var UnboundMethodRule = rule.Rule{
 				}
 			} else {
 				for _, part := range utils.UnionTypeParts(ctx.TypeChecker.GetTypeAtLocation(property)) {
-					if part.IsStringLiteral() {
-						propertyNames = append(propertyNames, part.AsLiteralType().Value().(string))
-					} else if part.IsNumberLiteral() {
-						propertyNames = append(propertyNames, part.AsLiteralType().String())
+					if utils.IsTypeFlagSet(part, checker.TypeFlagsStringOrNumberLiteralOrUnique) {
+						propertyNames = append(propertyNames, checker.GetPropertyNameFromType(part))
 					}
 				}
 			}
