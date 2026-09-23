@@ -318,6 +318,12 @@ func containsNodeModulesSegment(path string) bool {
 	return strings.Contains(normalized, "/node_modules/")
 }
 
+// pathIsInPackage matches whole path components, allowing a scope such as
+// @angular to cover @angular/core without also matching @angularlol.
+func pathIsInPackage(packagePath string, packageName string) bool {
+	return packagePath == packageName || strings.HasPrefix(packagePath, packageName+"/")
+}
+
 func typeDeclaredInDeclarationFile(
 	packageName string,
 	declarationFiles []*ast.SourceFile,
@@ -338,10 +344,8 @@ func typeDeclaredInDeclarationFile(
 			return false
 		}
 
-		return (packageIdName == packageName ||
-			packageIdName == typesPackageName ||
-			packageIdName == "@types/"+packageName ||
-			packageIdName == "@types/"+typesPackageName) &&
+		return (pathIsInPackage(packageIdName, packageName) ||
+			pathIsInPackage(strings.TrimPrefix(packageIdName, "@types/"), typesPackageName)) &&
 			program.IsSourceFileFromExternalLibrary(declaration)
 	})
 }

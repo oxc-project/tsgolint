@@ -1,4 +1,88 @@
 
+[TestOnlyThrowErrorPackageSpecifiers/@angular/core-extra/allow=@angular/core/invalid-0 - 1]
+Diagnostic 1: object (1:93 - 1:97)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "@angular/core-extra"; declare const error: ErrorLike; throw error;
+     |                                                                                             ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/@angularlol/core/allow=@angular/invalid-0 - 1]
+Diagnostic 1: object (1:90 - 1:94)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "@angularlol/core"; declare const error: ErrorLike; throw error;
+     |                                                                                          ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/@types/babel__code-frame-extra/allow=@babel/code-frame/invalid-0 - 1]
+Diagnostic 1: object (1:97 - 1:101)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "@babel/code-frame-extra"; declare const error: ErrorLike; throw error;
+     |                                                                                                 ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/@types/semver/allow=s.mver/invalid-0 - 1]
+Diagnostic 1: object (1:80 - 1:84)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver"; declare const error: ErrorLike; throw error;
+     |                                                                                ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/@types/semver/allow=sem/invalid-0 - 1]
+Diagnostic 1: object (1:80 - 1:84)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver"; declare const error: ErrorLike; throw error;
+     |                                                                                ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/@types/semver/allow=semve/invalid-0 - 1]
+Diagnostic 1: object (1:80 - 1:84)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver"; declare const error: ErrorLike; throw error;
+     |                                                                                ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/my-semver/allow=semver/invalid-0 - 1]
+Diagnostic 1: object (1:83 - 1:87)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "my-semver"; declare const error: ErrorLike; throw error;
+     |                                                                                   ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/semver-compare/allow=semver/invalid-0 - 1]
+Diagnostic 1: object (1:88 - 1:92)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver-compare"; declare const error: ErrorLike; throw error;
+     |                                                                                        ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/semver/allow=s.mver/invalid-0 - 1]
+Diagnostic 1: object (1:80 - 1:84)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver"; declare const error: ErrorLike; throw error;
+     |                                                                                ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/semver/allow=sem/invalid-0 - 1]
+Diagnostic 1: object (1:80 - 1:84)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver"; declare const error: ErrorLike; throw error;
+     |                                                                                ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/semver/allow=semve/invalid-0 - 1]
+Diagnostic 1: object (1:80 - 1:84)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "semver"; declare const error: ErrorLike; throw error;
+     |                                                                                ~~~~~
+---
+
+[TestOnlyThrowErrorPackageSpecifiers/typescript/allow=script/invalid-0 - 1]
+Diagnostic 1: object (1:84 - 1:88)
+Message: Expected an error object to be thrown.
+   1 | import type { ErrorLike } from "typescript"; declare const error: ErrorLike; throw error;
+     |                                                                                    ~~~~~
+---
+
 [TestOnlyThrowErrorRule/invalid-0 - 1]
 Diagnostic 1: undef (1:1 - 1:16)
 Message: Do not throw undefined.
