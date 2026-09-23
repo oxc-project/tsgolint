@@ -49,6 +49,14 @@ func TestUnboundMethod(t *testing.T) {
 		{Code: "['1', '2', '3'].map(Number.parseInt);"},
 		{Code: "[5.2, 7.1, 3.6].map(Math.floor);"},
 		{Code: `
+const collator = new Intl.Collator('en');
+['a', 'b'].sort(collator.compare);
+    `},
+		{Code: `
+const { compare } = new Intl.Collator('en');
+compare('a', 'b');
+    `},
+		{Code: `
       const foo = Number;
       ['1', '2', '3'].map(foo.parseInt);
     `},
@@ -1267,5 +1275,158 @@ const f = objectLiteral.f;
 					},
 				},
 			},
+			{
+				Code: `
+const collator = new Intl.Collator('en');
+const f = collator.resolvedOptions;
+f();
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{{
+					MessageId: "unboundWithoutThisAnnotation",
+					Line:      3,
+					Column:    11,
+					EndColumn: 35,
+				}},
+			},
+			{
+				Code: `
+class Foo {
+  compare(a: string, b: string): number {
+    return a.length - b.length;
+  }
+}
+declare const foo: Foo;
+const f = foo.compare;
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{{
+					MessageId: "unboundWithoutThisAnnotation",
+					Line:      8,
+					Column:    11,
+					EndColumn: 22,
+				}},
+			},
+			{
+				Code: `
+class Collator {
+  compare(a: string, b: string): number {
+    return a.length - b.length;
+  }
+}
+declare const collator: Collator;
+const f = collator.compare;
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{{
+					MessageId: "unboundWithoutThisAnnotation",
+					Line:      8,
+					Column:    11,
+					EndColumn: 27,
+				}},
+			},
 		}))
+}
+
+func TestUnboundMethodSpecBoundBindings(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &UnboundMethodRule, []rule_tester.ValidTestCase{
+		{Code: `
+function sort({ compare }: Intl.Collator, values: string[]) {
+  values.sort(compare);
+}
+`},
+		{Code: `
+function sort({ compare }: Intl.Collator = new Intl.Collator()) {
+  ['a', 'b'].sort(compare);
+}
+`},
+		{Code: `
+let compare: Intl.Collator['compare'];
+({ compare } = new Intl.Collator());
+`},
+		{Code: `
+for (const { compare } of [new Intl.Collator()]) {
+  ['a', 'b'].sort(compare);
+}
+`},
+	}, []rule_tester.InvalidTestCase{
+		{
+			Code: `
+function sort({ resolvedOptions }: Intl.Collator) {}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "unboundWithoutThisAnnotation", Line: 2, Column: 17,
+			}},
+		},
+		{
+			Code: `
+interface Collator { compare(a: string, b: string): number; }
+function sort({ compare }: Collator = new Intl.Collator()) {}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "unboundWithoutThisAnnotation", Line: 3, Column: 17,
+			}},
+		},
+		{
+			Code: `
+interface CustomCollator { compare(a: string, b: string): number; }
+function sort({ compare }: Intl.Collator | CustomCollator) {}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "unboundWithoutThisAnnotation", Line: 3, Column: 17,
+			}},
+		},
+	})
+}
+
+func TestUnboundMethodInheritedCollator(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &UnboundMethodRule, []rule_tester.ValidTestCase{
+		{Code: `
+class MyCollator extends Intl.Collator {}
+const f = new MyCollator().compare;
+`},
+		{Code: `
+class MyCollator extends Intl.Collator {}
+function sort({ compare }: MyCollator, values: string[]) {
+  values.sort(compare);
+}
+`},
+		{Code: `
+class MyCollator extends Intl.Collator {}
+class DerivedCollator extends MyCollator {}
+const { compare } = new DerivedCollator();
+`},
+	}, []rule_tester.InvalidTestCase{
+		{
+			Code: `
+class MyCollator extends Intl.Collator {
+  compare(a: string, b: string): number { return a.length - b.length; }
+}
+const f = new MyCollator().compare;
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "unboundWithoutThisAnnotation", Line: 5, Column: 11,
+			}},
+		},
+		{
+			Code: `
+class MyCollator extends Intl.Collator {
+  compare(a: string, b: string): number { return a.length - b.length; }
+}
+function sort({ compare }: MyCollator) {}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "unboundWithoutThisAnnotation", Line: 5, Column: 17,
+			}},
+		},
+		{
+			Code: `
+interface CustomCollator { compare(a: string, b: string): number; }
+class MyCollator extends Intl.Collator {}
+function sort({ compare }: MyCollator | CustomCollator) {}
+`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "unboundWithoutThisAnnotation", Line: 4, Column: 17,
+			}},
+		},
+	})
 }

@@ -201,6 +201,27 @@ var UnboundMethodRule = rule.Rule{
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[UnboundMethodOptions](options, "unbound-method")
 
+		isSpecBoundBuiltinMethod := func(objectType *checker.Type, property *ast.Node) bool {
+			// Intl.Collator.prototype.compare is a bound getter in ECMA-402,
+			// but TypeScript declares it as an ordinary method. Only exempt the
+			// method declared on the default-library Collator, including when
+			// inherited by a subclass, but not a user-defined override.
+			if !ast.IsIdentifier(property) || property.Text() != "compare" {
+				return false
+			}
+			symbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, objectType, property.Text())
+			if symbol == nil || len(symbol.Declarations) == 0 {
+				return false
+			}
+			for _, declaration := range symbol.Declarations {
+				owner := declaration.Parent
+				if owner == nil || !ast.IsInterfaceDeclaration(owner) || owner.Name().Text() != "Collator" || !utils.IsSourceFileDefaultLibrary(ctx.Program, ast.GetSourceFileOfNode(declaration)) {
+					return false
+				}
+			}
+			return true
+		}
+
 		isNativelyBound := func(object *ast.Node, property *ast.Node) bool {
 			// We can't rely entirely on the type-level checks made at the end of this
 			// function, because sometimes type declarations don't come from the
@@ -220,9 +241,14 @@ var UnboundMethodRule = rule.Rule{
 				}
 			}
 
+			objectType := ctx.TypeChecker.GetTypeAtLocation(object)
+			if isSpecBoundBuiltinMethod(objectType, property) {
+				return true
+			}
+
 			// if `${object.name}.${property.name}` doesn't match any of
 			// the nativelyBoundMembers, then we fallback to type-level checks
-			return utils.IsBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(object), supportedGlobalTypes...) && utils.IsAnyBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(property))
+			return utils.IsBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, objectType, supportedGlobalTypes...) && utils.IsAnyBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(property))
 		}
 
 		checkIfMethodAndReport := func(node *ast.Node, dangerousReference *ast.Node, symbol *ast.Symbol) bool {
@@ -266,6 +292,9 @@ var UnboundMethodRule = rule.Rule{
 			}
 
 			utils.TypeRecurser(ctx.TypeChecker.GetTypeAtLocation(patternNode), func(t *checker.Type) bool {
+				if isSpecBoundBuiltinMethod(t, propertyName) {
+					return false
+				}
 				return checkIfMethodAndReport(propertyName, propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName.Text()))
 			})
 		}

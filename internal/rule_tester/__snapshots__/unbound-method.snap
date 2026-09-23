@@ -716,3 +716,113 @@ Help: If your function does not access `this`, you can annotate it with `this: v
      |                         ^ This reference may be unbound and lose `this` context
    6 |       
 ---
+
+[TestUnboundMethod/invalid-61 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (3:11 - 3:34)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   2 | const collator = new Intl.Collator('en');
+   3 | const f = collator.resolvedOptions;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | f();
+  Label: This reference may be unbound and lose `this` context (3:20 - 3:34)
+   2 | const collator = new Intl.Collator('en');
+   3 | const f = collator.resolvedOptions;
+     |                    ^^^^^^^^^^^^^^^ This reference may be unbound and lose `this` context
+   4 | f();
+---
+
+[TestUnboundMethod/invalid-62 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (8:11 - 8:21)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   7 | declare const foo: Foo;
+   8 | const f = foo.compare;
+     |           ~~~~~~~~~~~
+   9 |       
+  Label: This reference may be unbound and lose `this` context (8:15 - 8:21)
+   7 | declare const foo: Foo;
+   8 | const f = foo.compare;
+     |               ^^^^^^^ This reference may be unbound and lose `this` context
+   9 |       
+---
+
+[TestUnboundMethod/invalid-63 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (8:11 - 8:26)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   7 | declare const collator: Collator;
+   8 | const f = collator.compare;
+     |           ~~~~~~~~~~~~~~~~
+   9 |       
+  Label: This reference may be unbound and lose `this` context (8:20 - 8:26)
+   7 | declare const collator: Collator;
+   8 | const f = collator.compare;
+     |                    ^^^^^^^ This reference may be unbound and lose `this` context
+   9 |       
+---
+
+[TestUnboundMethodInheritedCollator/invalid-0 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (5:11 - 5:34)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   4 | }
+   5 | const f = new MyCollator().compare;
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | 
+  Label: This reference may be unbound and lose `this` context (5:28 - 5:34)
+   4 | }
+   5 | const f = new MyCollator().compare;
+     |                            ^^^^^^^ This reference may be unbound and lose `this` context
+   6 | 
+---
+
+[TestUnboundMethodInheritedCollator/invalid-1 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (5:17 - 5:23)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   4 | }
+   5 | function sort({ compare }: MyCollator) {}
+     |                 ~~~~~~~
+   6 | 
+---
+
+[TestUnboundMethodInheritedCollator/invalid-2 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (4:17 - 4:23)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   3 | class MyCollator extends Intl.Collator {}
+   4 | function sort({ compare }: MyCollator | CustomCollator) {}
+     |                 ~~~~~~~
+   5 | 
+---
+
+[TestUnboundMethodSpecBoundBindings/invalid-0 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (2:17 - 2:31)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | 
+   2 | function sort({ resolvedOptions }: Intl.Collator) {}
+     |                 ~~~~~~~~~~~~~~~
+   3 | 
+---
+
+[TestUnboundMethodSpecBoundBindings/invalid-1 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (3:17 - 3:23)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   2 | interface Collator { compare(a: string, b: string): number; }
+   3 | function sort({ compare }: Collator = new Intl.Collator()) {}
+     |                 ~~~~~~~
+   4 | 
+---
+
+[TestUnboundMethodSpecBoundBindings/invalid-2 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (3:17 - 3:23)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   2 | interface CustomCollator { compare(a: string, b: string): number; }
+   3 | function sort({ compare }: Intl.Collator | CustomCollator) {}
+     |                 ~~~~~~~
+   4 | 
+---
