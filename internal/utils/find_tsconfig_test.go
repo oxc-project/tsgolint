@@ -1,14 +1,50 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
 
+	"github.com/microsoft/typescript-go/shim/vfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 	"gotest.tools/v3/assert"
 )
+
+type caseSensitivityFS struct {
+	vfs.FS
+	caseSensitive bool
+}
+
+func (fs caseSensitivityFS) UseCaseSensitiveFileNames() bool {
+	return fs.caseSensitive
+}
+
+func TestFindTsConfigParallel_CaseInsensitivePaths(t *testing.T) {
+	rootDir := t.TempDir()
+	actualFile := filepath.Join(rootDir, "Included.ts")
+	inputFile := filepath.Join(rootDir, "included.ts")
+	configPath := filepath.Join(rootDir, "tsconfig.json")
+	assert.NilError(t, os.WriteFile(actualFile, []byte("export const included = true;\n"), 0o644))
+	assert.NilError(t, os.WriteFile(configPath, []byte(`{"include":["*.ts"]}`), 0o644))
+
+	for _, tc := range []struct {
+		name          string
+		caseSensitive bool
+		expected      string
+	}{
+		{name: "case insensitive", caseSensitive: false, expected: configPath},
+		{name: "case sensitive", caseSensitive: true, expected: ""},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			fs := caseSensitivityFS{FS: osvfs.FS(), caseSensitive: tc.caseSensitive}
+			resolver := NewTsConfigResolver(fs, rootDir)
+			results := resolver.FindTsConfigParallel([]string{inputFile})
+			assert.Equal(t, tc.expected, results[inputFile])
+		})
+	}
+}
 
 func TestFindTsconfigForFile(t *testing.T) {
 	rootDir := fixtures.GetRootDir()
@@ -157,19 +193,27 @@ func TestFindTsConfigParallel(t *testing.T) {
 func TestFindTsConfigParallel_UsesAncestorConfigWhenNearestConfigExcludesFile(t *testing.T) {
 	rootDir := t.TempDir()
 	filePath := filepath.Join(rootDir, "packages", "cli", "src", "utils", "terminal.ts")
+	keptFilePath := filepath.Join(rootDir, "packages", "cli", "src", "utils", "kept.ts")
 	nestedConfigPath := filepath.Join(rootDir, "packages", "cli", "tsconfig.json")
 	rootConfigPath := filepath.Join(rootDir, "tsconfig.json")
 
 	assert.NilError(t, os.MkdirAll(filepath.Dir(filePath), 0o755))
 	assert.NilError(t, os.WriteFile(filePath, []byte("import { styleText } from 'node:util';\n"), 0o644))
+	assert.NilError(t, os.WriteFile(keptFilePath, []byte("export const kept = true;\n"), 0o644))
 	assert.NilError(t, os.WriteFile(rootConfigPath, []byte(`{ "compilerOptions": { "types": ["node"] } }`), 0o644))
 	assert.NilError(t, os.WriteFile(nestedConfigPath, []byte(`{
   "extends": "../../tsconfig.json",
   "files": [],
-  "include": [],
-  "exclude": ["**/*"]
+  "include": ["src/utils/kept.ts"],
+  "exclude": []
 }
 `), 0o644))
+	filePaths := []string{filePath, keptFilePath}
+	for i := range 64 {
+		anotherFile := filepath.Join(filepath.Dir(filePath), fmt.Sprintf("excluded-%d.ts", i))
+		assert.NilError(t, os.WriteFile(anotherFile, []byte("export {};\n"), 0o644))
+		filePaths = append(filePaths, anotherFile)
+	}
 
 	resolver := NewTsConfigResolver(osvfs.FS(), rootDir)
 
@@ -177,8 +221,13 @@ func TestFindTsConfigParallel_UsesAncestorConfigWhenNearestConfigExcludesFile(t 
 	assert.Equal(t, true, found)
 	assert.Equal(t, rootConfigPath, config)
 
-	results := resolver.FindTsConfigParallel([]string{filePath})
-	assert.Equal(t, rootConfigPath, results[filePath])
+	results := resolver.FindTsConfigParallel(filePaths)
+	for _, file := range filePaths {
+		if file != keptFilePath {
+			assert.Equal(t, rootConfigPath, results[file])
+		}
+	}
+	assert.Equal(t, nestedConfigPath, results[keptFilePath])
 }
 
 // TestFindTsConfigParallel_Consistency verifies that the parallel

@@ -1,10 +1,7 @@
 package utils
 
 import (
-	"path/filepath"
 	"runtime"
-	"slices"
-	"strings"
 	"sync"
 
 	"github.com/microsoft/typescript-go/shim/core"
@@ -111,39 +108,7 @@ func (r *TsConfigResolver) findConfigWithReferences(
 				}
 			}
 
-			if slices.ContainsFunc(config.FileNames(), func(file string) bool {
-				// Fast checks:
-				// 1) check if the strings happen to already be equal (subject to case sensitivity of FS)
-				// 2) check if the base names are equal (subject to case sensitivity of FS)
-
-				// If we're on a case-insensitive FS and the strings are equal, we can return true immediately,
-				// no need to allocate and do any path conversions.
-				if r.fs.UseCaseSensitiveFileNames() {
-					if file == string(path) {
-						return true
-					}
-				} else {
-					if strings.EqualFold(file, string(path)) {
-						return true
-					}
-				}
-
-				// If the base names don't match, we can return false immediately.
-				pathBaseName := filepath.Base(string(path))
-				fileBaseName := filepath.Base(file)
-				if r.fs.UseCaseSensitiveFileNames() {
-					if fileBaseName != pathBaseName {
-						return false
-					}
-				} else {
-					if !strings.EqualFold(fileBaseName, pathBaseName) {
-						return false
-					}
-				}
-
-				// Finally, do a full path conversion and comparison (note: this allocates)
-				return r.toPath(file) == path
-			}) {
+			if _, ok := config.FileNamesByPath()[path]; ok {
 				return true, true
 			}
 
@@ -213,48 +178,102 @@ type ResolutionResult struct {
 	config string
 }
 
-func (r *TsConfigResolver) work(in <-chan string, out chan<- ResolutionResult) {
-	for file := range in {
-		config := r.configFileRegistryBuilder.ComputeConfigFileName(file, false, nil)
-		if config == "" {
-			out <- ResolutionResult{
-				file:   file,
-				config: config,
+const resolutionBatchSize = 16
+
+type resolutionTask struct {
+	files      []string
+	configName string
+	search     bool
+}
+
+func (r *TsConfigResolver) work(in chan resolutionTask, out chan<- ResolutionResult, pending *sync.WaitGroup) {
+	for task := range in {
+		if task.search {
+			for _, file := range task.files {
+				filePath := r.toPath(file)
+				result := r.findConfigWithReferences(file, filePath, task.configName, nil, nil)
+				out <- ResolutionResult{file: file, config: result.configFileName}
 			}
+		} else {
+			r.resolveDirectory(task.files, in, out, pending)
+		}
+		pending.Done()
+	}
+}
+
+func (r *TsConfigResolver) resolveDirectory(files []string, in chan<- resolutionTask, out chan<- ResolutionResult, pending *sync.WaitGroup) {
+	// ComputeConfigFileName only inspects the containing directory and its
+	// ancestors. Files in one directory therefore share this lookup.
+	configName := r.configFileRegistryBuilder.ComputeConfigFileName(files[0], false, nil)
+	var includedFiles map[tspath.Path]string
+	if configName != "" {
+		configPath := r.toPath(configName)
+		config := r.configFileRegistryBuilder.FindOrAcquireConfigForFile(
+			configName, configPath, r.toPath(files[0]), project.ProjectLoadKindCreate, nil,
+		)
+		if config != nil {
+			// A file included by the nearest config cannot be claimed by a
+			// reference or ancestor. Only misses need the full search.
+			includedFiles = config.FileNamesByPath()
+		}
+	}
+	var misses []string
+	for _, file := range files {
+		if configName == "" {
+			out <- ResolutionResult{file: file}
 			continue
 		}
 
 		fileNormalized := tspath.ToPath(file, r.currentDirectory, r.fs.UseCaseSensitiveFileNames())
-
-		// Search through the config and its references
-		result := r.findConfigWithReferences(file, fileNormalized, config, nil, nil)
-		out <- ResolutionResult{
-			config: result.configFileName,
-			file:   file,
+		if _, ok := includedFiles[fileNormalized]; ok {
+			out <- ResolutionResult{file: file, config: configName}
+			continue
 		}
+
+		misses = append(misses, file)
+	}
+	// Keep expensive reference and ancestor searches parallel even when all
+	// files came from the same directory. This directory task remains pending
+	// until its batches are queued, so the queue cannot close during Add.
+	pending.Add((len(misses) + resolutionBatchSize - 1) / resolutionBatchSize)
+	for len(misses) > 0 {
+		batchSize := min(len(misses), resolutionBatchSize)
+		in <- resolutionTask{files: misses[:batchSize], configName: configName, search: true}
+		misses = misses[batchSize:]
 	}
 }
 
 func (r *TsConfigResolver) FindTsConfigParallel(fileNames []string) map[string]string {
-	in := make(chan string, len(fileNames))
+	if len(fileNames) == 0 {
+		return map[string]string{}
+	}
+
+	filesByDirectory := make(map[string][]string)
+	for _, file := range fileNames {
+		directory := tspath.GetDirectoryPath(file)
+		filesByDirectory[directory] = append(filesByDirectory[directory], file)
+	}
+
+	// The buffer holds all directory tasks and any batches they can enqueue,
+	// so workers never block each other while dispatching misses.
+	in := make(chan resolutionTask, len(filesByDirectory)+(len(fileNames)+resolutionBatchSize-1)/resolutionBatchSize)
 	out := make(chan ResolutionResult, len(fileNames))
 
 	numWorker := runtime.GOMAXPROCS(0)
 
-	var wg sync.WaitGroup
+	var pending sync.WaitGroup
+	pending.Add(len(filesByDirectory))
 	for range numWorker {
-		wg.Go(func() {
-			r.work(in, out)
-		})
+		go r.work(in, out, &pending)
 	}
 
-	for i := range fileNames {
-		in <- fileNames[i]
+	for _, files := range filesByDirectory {
+		in <- resolutionTask{files: files}
 	}
-	close(in)
 
 	go func() {
-		wg.Wait()
+		pending.Wait()
+		close(in)
 		close(out)
 	}()
 
