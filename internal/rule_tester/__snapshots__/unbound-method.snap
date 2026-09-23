@@ -1044,3 +1044,58 @@ Help: If your function does not access `this`, you can annotate it with `this: v
    1 | const key = Symbol(); class Foo { [key]() {} other() {} } declare const foo: Foo; declare const name: keyof Foo; const method = foo[name];
      |                                                                                                                                     ^^^^ This reference may be unbound and lose `this` context
 ---
+
+[TestUnboundMethodComputedNativeBound/invalid-0 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (1:54 - 1:80)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | const collator = new Intl.Collator(); const method = collator['resolvedOptions'];
+     |                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:63 - 1:79)
+   1 | const collator = new Intl.Collator(); const method = collator['resolvedOptions'];
+     |                                                               ^^^^^^^^^^^^^^^^^ This reference may be unbound and lose `this` context
+---
+
+[TestUnboundMethodComputedNativeBound/invalid-1 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (1:101 - 1:124)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | class Derived extends Intl.Collator { compare(a: string, b: string) { return 0; } } const compare = new Derived()['compare'];
+     |                                                                                                     ~~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:115 - 1:123)
+   1 | class Derived extends Intl.Collator { compare(a: string, b: string) { return 0; } } const compare = new Derived()['compare'];
+     |                                                                                                                   ^^^^^^^^^ This reference may be unbound and lose `this` context
+---
+
+[TestUnboundMethodComputedNativeBound/invalid-2 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (1:125 - 1:143)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | interface Custom { compare(a: string, b: string): number; } declare const collator: Intl.Collator | Custom; const compare = collator['compare'];
+     |                                                                                                                             ~~~~~~~~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:134 - 1:142)
+   1 | interface Custom { compare(a: string, b: string): number; } declare const collator: Intl.Collator | Custom; const compare = collator['compare'];
+     |                                                                                                                                      ^^^^^^^^^ This reference may be unbound and lose `this` context
+---
+
+[TestUnboundMethodComputedNativeBound/invalid-3 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (1:104 - 1:116)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | const collator = new Intl.Collator(); declare const key: 'compare' | 'resolvedOptions'; const method = collator[key];
+     |                                                                                                        ~~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:113 - 1:115)
+   1 | const collator = new Intl.Collator(); declare const key: 'compare' | 'resolvedOptions'; const method = collator[key];
+     |                                                                                                                 ^^^ This reference may be unbound and lose `this` context
+---
+
+[TestUnboundMethodComputedNativeBound/invalid-4 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (1:44 - 1:56)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | const Math = { floor() {} }; const floor = Math['floor']; export {};
+     |                                            ~~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:49 - 1:55)
+   1 | const Math = { floor() {} }; const floor = Math['floor']; export {};
+     |                                                 ^^^^^^^ This reference may be unbound and lose `this` context
+---
