@@ -1306,3 +1306,27 @@ Message: `field` is deprecated.
    9 | const jsx = <Foo field={0} />;
      |                  ~~~~~
 ---
+
+[TestNoDeprecatedRule/invalid-149 - 1]
+Diagnostic 1: deprecated (2:8 - 2:25)
+Message: `deprecatedVariable` is deprecated.
+   1 | import { deprecatedVariable } from './deprecated';
+   2 | void { deprecatedVariable };
+     |        ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-150 - 1]
+Diagnostic 1: deprecated (2:8 - 2:21)
+Message: `normalVariable` is deprecated.
+   1 | import { normalVariable } from './deprecated';
+   2 | void { normalVariable };
+     |        ~~~~~~~~~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-151 - 1]
+Diagnostic 1: deprecated (2:1 - 2:18)
+Message: `deprecatedVariable` is deprecated.
+   1 | import { deprecatedVariable } from './deprecated';
+   2 | deprecatedVariable;
+     | ~~~~~~~~~~~~~~~~~~
+---

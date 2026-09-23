@@ -565,7 +565,7 @@ var NoDeprecatedRule = rule.Rule{
 						// Check shorthand assignment value symbol
 						if propertySymbol != nil && propertySymbol.ValueDeclaration != nil {
 							valueSymbol := checker.Checker_GetShorthandAssignmentValueSymbol(ctx.TypeChecker, propertySymbol.ValueDeclaration)
-							isDeprecated, reason = getJsDocDeprecation(valueSymbol)
+							isDeprecated, reason = searchForDeprecationInAliasesChain(valueSymbol, true)
 							if isDeprecated {
 								return true, reason
 							}

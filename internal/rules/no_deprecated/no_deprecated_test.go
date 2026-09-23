@@ -633,6 +633,13 @@ x.statusCode;
 				}],
 			});
 		`},
+		{
+			Code: `import { normalVariable } from './release-port-normal';
+void { normalVariable };`,
+			Files: map[string]string{
+				"release-port-normal.ts": "export const normalVariable = 1;",
+			},
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
@@ -2857,6 +2864,39 @@ const jsx = <Foo field={0} />;`,
 					Line:      9,
 					Column:    18,
 					EndColumn: 23,
+				},
+			},
+		},
+		{
+			Code: `import { deprecatedVariable } from './deprecated';
+void { deprecatedVariable };`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecated",
+					Line:      2,
+					Column:    8,
+					EndColumn: 26,
+				},
+			},
+		},
+		{
+			Code: `import { normalVariable } from './deprecated';
+void { normalVariable };`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecated",
+					Line:      2,
+					Column:    8,
+					EndColumn: 22,
+				},
+			},
+		},
+		{
+			Code: `import { deprecatedVariable } from './deprecated';
+deprecatedVariable;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "deprecated",
 				},
 			},
 		},
