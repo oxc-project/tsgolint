@@ -48,11 +48,12 @@ var StrictVoidReturnRule = rule.Rule{
 
 		isVoidReturningFunctionType := func(t *checker.Type) bool {
 			returnTypes := []*checker.Type{}
-			for _, typePart := range utils.UnionTypeParts(t) {
+			utils.VisitUnionTypeParts(t, func(typePart *checker.Type) bool {
 				for _, signature := range utils.GetCallSignatures(ctx.TypeChecker, typePart) {
 					returnTypes = append(returnTypes, checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature))
 				}
-			}
+				return true
+			})
 			return len(returnTypes) > 0 && utils.Every(returnTypes, func(returnType *checker.Type) bool {
 				return utils.Every(utils.UnionTypeParts(returnType), func(typePart *checker.Type) bool {
 					return utils.IsTypeFlagSet(typePart, checker.TypeFlagsVoid)
@@ -172,11 +173,12 @@ var StrictVoidReturnRule = rule.Rule{
 						continue
 					}
 					paramType := ctx.TypeChecker.GetTypeOfSymbolAtLocation(parameters[argIdx], callNode.Expression())
-					for _, paramTypePart := range utils.UnionTypeParts(paramType) {
+					utils.VisitUnionTypeParts(paramType, func(paramTypePart *checker.Type) bool {
 						for _, paramSignature := range utils.GetCallSignatures(ctx.TypeChecker, paramTypePart) {
 							argExpectedReturnTypes = append(argExpectedReturnTypes, checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, paramSignature))
 						}
-					}
+						return true
+					})
 				}
 
 				hasSingleSignature := len(signatures) == 1

@@ -12,6 +12,34 @@ func UnionTypeParts(t *checker.Type) []*checker.Type {
 	}
 	return []*checker.Type{t}
 }
+
+// VisitUnionTypeParts visits each union member, or t when it is not a union.
+// Returning false from visit stops iteration and makes this function return false.
+func VisitUnionTypeParts(t *checker.Type, visit func(*checker.Type) bool) bool {
+	if IsUnionType(t) {
+		for _, part := range t.Types() {
+			if !visit(part) {
+				return false
+			}
+		}
+		return true
+	}
+	return visit(t)
+}
+
+// SomeUnionTypePart reports whether any union member, or t itself, matches.
+func SomeUnionTypePart(t *checker.Type, predicate func(*checker.Type) bool) bool {
+	if IsUnionType(t) {
+		for _, part := range t.Types() {
+			if predicate(part) {
+				return true
+			}
+		}
+		return false
+	}
+	return predicate(t)
+}
+
 func IntersectionTypeParts(t *checker.Type) []*checker.Type {
 	if IsIntersectionType(t) {
 		return t.Types()

@@ -365,8 +365,8 @@ var NoMisusedPromisesRule = rule.Rule{
 			t *checker.Type,
 		) bool {
 			hadVoidReturn := false
-			for _, t := range utils.UnionTypeParts(t) {
-				for _, sig := range utils.GetCallSignatures(ctx.TypeChecker, t) {
+			if !utils.VisitUnionTypeParts(t, func(part *checker.Type) bool {
+				for _, sig := range utils.GetCallSignatures(ctx.TypeChecker, part) {
 					returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, sig)
 					// If a certain positional argument accepts both thenable and void returns,
 					// a promise-returning function is valid
@@ -376,6 +376,9 @@ var NoMisusedPromisesRule = rule.Rule{
 
 					hadVoidReturn = hadVoidReturn || utils.IsTypeFlagSet(returnType, checker.TypeFlagsVoid)
 				}
+				return true
+			}) {
+				return false
 			}
 			return hadVoidReturn
 		}
@@ -449,7 +452,7 @@ var NoMisusedPromisesRule = rule.Rule{
 			node *ast.Node,
 			t *checker.Type,
 		) bool {
-			return utils.Some(utils.UnionTypeParts(t), func(t *checker.Type) bool {
+			return utils.SomeUnionTypePart(t, func(t *checker.Type) bool {
 				return anySignatureIsThenableType(node, t)
 			})
 		}
@@ -526,7 +529,7 @@ var NoMisusedPromisesRule = rule.Rule{
 			// We can't use checker.getResolvedSignature because it prefers an early '() => void' over a later '() => Promise<void>'
 			// See https://github.com/microsoft/TypeScript/issues/48077
 
-			for _, subType := range utils.UnionTypeParts(t) {
+			utils.VisitUnionTypeParts(t, func(subType *checker.Type) bool {
 				// Standard function calls and `new` have two different types of signatures
 				var signatures []*checker.Signature
 				if ast.IsCallExpression(node) {
@@ -590,7 +593,8 @@ var NoMisusedPromisesRule = rule.Rule{
 						}
 					}
 				}
-			}
+				return true
+			})
 
 			for _, index := range thenableReturnIndices {
 				at := slices.Index(voidReturnIndices, index)
