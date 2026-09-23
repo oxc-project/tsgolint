@@ -1,0 +1,54 @@
+[
+  {
+    "time": 1790172550.790857,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790172581.3409438,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 49641
+  },
+  {
+    "time": 1790172652.1184692,
+    "kind": "contention",
+    "attempt": 1,
+    "builders": [],
+    "other_cpu": 252.9
+  },
+  {
+    "time": 1790172652.121068,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typescript",
+        "full-check",
+        "4"
+      ]
+    ],
+    "samples": 3,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790172652.164835,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 252.9
+  },
+  {
+    "time": 1790172723.147254,
+    "kind": "started",
+    "attempt": 2,
+    "pid": 50189
+  },
+  {
+    "time": 1790172788.808738,
+    "kind": "completed",
+    "attempt": 2
+  }
+]

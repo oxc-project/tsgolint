@@ -1,0 +1,64 @@
+/tmp/tsgolint-node-sort/stealing.test: go1.27.1
+	path	github.com/typescript-eslint/tsgolint/cmd/tsgolint.test
+	mod	github.com/typescript-eslint/tsgolint	(devel)	
+	dep	github.com/dlclark/regexp2/v2	v2.8.0	h1:CekDhPLGfm+GAJmPVFIG+5dqMIQPkyHJll7BbdneDfw=
+	dep	github.com/go-json-experiment/json	v0.0.0-20260820222146-c27c302e5fc3	h1:UADEEmDKgfXbtnGJZ97beY5XLo9ZechG1nlU4KnRrkE=
+	dep	github.com/mackerelio/go-osstat	v0.2.7	h1:TCavZi10wF49bT6iQZ9eT2keGZQpC69MTDfdJej5e94=
+	dep	github.com/microsoft/typescript-go	(devel)	
+	dep	github.com/microsoft/typescript-go/shim/ast	v0.0.0
+	=>	./shim/ast	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/bundled	v0.0.0
+	=>	./shim/bundled	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/checker	v0.0.0
+	=>	./shim/checker	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/compiler	v0.0.0
+	=>	./shim/compiler	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/core	v0.0.0
+	=>	./shim/core	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/jsnum	v0.0.0
+	=>	./shim/jsnum	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/parser	v0.0.0
+	=>	./shim/parser	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/project	v0.0.0
+	=>	./shim/project	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/scanner	v0.0.0
+	=>	./shim/scanner	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/tsoptions	v0.0.0
+	=>	./shim/tsoptions	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/tspath	v0.0.0
+	=>	./shim/tspath	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/vfs	v0.0.0
+	=>	./shim/vfs	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/vfs/cachedvfs	v0.0.0
+	=>	./shim/vfs/cachedvfs	(devel)	
+	
+	dep	github.com/microsoft/typescript-go/shim/vfs/osvfs	v0.0.0
+	=>	./shim/vfs/osvfs	(devel)	
+	
+	dep	github.com/zeebo/xxh3	v1.1.0	h1:s7DLGDK45Dyfg7++yxI0khrfwq9661w9EN78eP/UZVs=
+	dep	golang.org/x/sync	v0.23.0	h1:KameEIfc1IkluZyXWLn39Wd4tURc6GbCiISGiZm2bQk=
+	dep	golang.org/x/sys	v0.48.0	h1:bbX/i/6MgT9BVLM9RT1thmxL04yeTAhbEz4SyadbXoo=
+	dep	golang.org/x/text	v0.42.0	h1:JbOZXgfeCPU9gacVtYliJqOhD+zhrEqK4LfdpmlUZqI=
+	build	-buildmode=exe
+	build	-compiler=gc
+	build	DefaultGODEBUG=tracebacklabels=0,x509sslcertoverrideplatform=0
+	build	CGO_ENABLED=1
+	build	CGO_CFLAGS=
+	build	CGO_CPPFLAGS=
+	build	CGO_CXXFLAGS=
+	build	CGO_LDFLAGS=
+	build	GOARCH=arm64
+	build	GOOS=darwin
+	build	GOARM64=v8.0

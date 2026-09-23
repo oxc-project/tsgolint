@@ -1,0 +1,224 @@
+[
+  {
+    "time": 1790172909.3331141,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790172909.379912,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 292.4
+  },
+  {
+    "time": 1790172944.921897,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 50372
+  },
+  {
+    "time": 1790173126.884696,
+    "kind": "contention",
+    "attempt": 1,
+    "builders": [],
+    "other_cpu": 385.0
+  },
+  {
+    "time": 1790173126.887584,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-lint",
+        "4"
+      ]
+    ],
+    "samples": 1,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790173126.941813,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 345.2
+  },
+  {
+    "time": 1790173344.840788,
+    "kind": "started",
+    "attempt": 2,
+    "pid": 54358
+  },
+  {
+    "time": 1790173380.301292,
+    "kind": "contention",
+    "attempt": 2,
+    "builders": [],
+    "other_cpu": 343.6
+  },
+  {
+    "time": 1790173380.304329,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-lint",
+        "4"
+      ]
+    ],
+    "samples": 2,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790173380.356253,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 343.6
+  },
+  {
+    "time": 1790173436.155025,
+    "kind": "started",
+    "attempt": 3,
+    "pid": 54433
+  },
+  {
+    "time": 1790173567.6947148,
+    "kind": "contention",
+    "attempt": 3,
+    "builders": [],
+    "other_cpu": 356.5
+  },
+  {
+    "time": 1790173567.6980429,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-check",
+        "4"
+      ]
+    ],
+    "samples": 2,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790173567.748352,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 356.2
+  },
+  {
+    "time": 1790173618.48098,
+    "kind": "started",
+    "attempt": 4,
+    "pid": 54640
+  },
+  {
+    "time": 1790173846.170053,
+    "kind": "contention",
+    "attempt": 4,
+    "builders": [],
+    "other_cpu": 212.3
+  },
+  {
+    "time": 1790173846.173621,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "ten-warm",
+        "4"
+      ]
+    ],
+    "samples": 2,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790173846.225037,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 212.3
+  },
+  {
+    "time": 1790173922.425497,
+    "kind": "started",
+    "attempt": 5,
+    "pid": 57868
+  },
+  {
+    "time": 1790173947.759541,
+    "kind": "contention",
+    "attempt": 5,
+    "builders": [],
+    "other_cpu": 251.0
+  },
+  {
+    "time": 1790173947.7630389,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typeorm",
+        "full-lint",
+        "4"
+      ],
+      [
+        "vscode",
+        "ten-warm",
+        "4"
+      ]
+    ],
+    "samples": 9,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790173947.8135219,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 250.0
+  },
+  {
+    "time": 1790174150.672081,
+    "kind": "started",
+    "attempt": 6,
+    "pid": 58904
+  },
+  {
+    "time": 1790174221.5869162,
+    "kind": "contention",
+    "attempt": 6,
+    "builders": [],
+    "other_cpu": 486.7
+  },
+  {
+    "time": 1790174221.590664,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typeorm",
+        "ten-cold",
+        "4"
+      ],
+      [
+        "typeorm",
+        "ten-warm",
+        "4"
+      ]
+    ],
+    "samples": 16,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790174252.11452,
+    "kind": "started",
+    "attempt": 7,
+    "pid": 59151
+  },
+  {
+    "time": 1790174348.151932,
+    "kind": "completed",
+    "attempt": 7
+  }
+]

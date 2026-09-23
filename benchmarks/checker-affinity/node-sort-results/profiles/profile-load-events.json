@@ -1,0 +1,23 @@
+[
+  {
+    "time": 1790178349.013557,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 400,
+    "ignore_pprof_http_as_builder": true,
+    "phase": "profile"
+  },
+  {
+    "time": 1790178379.552763,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 78484
+  },
+  {
+    "time": 1790178409.948247,
+    "kind": "completed",
+    "attempt": 1
+  }
+]

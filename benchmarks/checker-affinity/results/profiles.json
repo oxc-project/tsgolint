@@ -1,0 +1,1202 @@
+[
+  {
+    "project": "synthetic",
+    "selection": "full",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 12,
+        "calls": 3084,
+        "rule_ns": 24519515
+      },
+      {
+        "files": 17,
+        "calls": 4369,
+        "rule_ns": 23655700
+      },
+      {
+        "files": 18,
+        "calls": 4626,
+        "rule_ns": 24107781
+      },
+      {
+        "files": 17,
+        "calls": 4369,
+        "rule_ns": 23138157
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.25696100108955927
+  },
+  {
+    "project": "synthetic",
+    "selection": "full",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 20989158
+      },
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 21634744
+      },
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 21510684
+      },
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 25444718
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2840468374257518
+  },
+  {
+    "project": "synthetic",
+    "selection": "full",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 17,
+        "calls": 4369,
+        "rule_ns": 24326822
+      },
+      {
+        "files": 10,
+        "calls": 2570,
+        "rule_ns": 26424331
+      },
+      {
+        "files": 19,
+        "calls": 4883,
+        "rule_ns": 25143719
+      },
+      {
+        "files": 18,
+        "calls": 4626,
+        "rule_ns": 23754745
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.26517242911229655
+  },
+  {
+    "project": "synthetic",
+    "selection": "full",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 1753163
+      },
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 3865082
+      },
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 2050435
+      },
+      {
+        "files": 16,
+        "calls": 4112,
+        "rule_ns": 1924728
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.40288935902653156
+  },
+  {
+    "project": "synthetic",
+    "selection": "ten",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 3012297
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 2989460
+      },
+      {
+        "files": 1,
+        "calls": 257,
+        "rule_ns": 1240866
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 3531963
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.3278049848040565
+  },
+  {
+    "project": "synthetic",
+    "selection": "ten",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 1,
+        "calls": 257,
+        "rule_ns": 1985206
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 3633660
+      },
+      {
+        "files": 3,
+        "calls": 771,
+        "rule_ns": 6211330
+      },
+      {
+        "files": 1,
+        "calls": 257,
+        "rule_ns": 2020239
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.4484573950204452
+  },
+  {
+    "project": "synthetic",
+    "selection": "ten",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 1,
+        "calls": 257,
+        "rule_ns": 1065210
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 1059654
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 132802
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 1180856
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.34341964367248484
+  },
+  {
+    "project": "synthetic",
+    "selection": "ten",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 1,
+        "calls": 257,
+        "rule_ns": 109754
+      },
+      {
+        "files": 2,
+        "calls": 514,
+        "rule_ns": 169875
+      },
+      {
+        "files": 3,
+        "calls": 771,
+        "rule_ns": 237416
+      },
+      {
+        "files": 1,
+        "calls": 257,
+        "rule_ns": 94588
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.38816741411925126
+  },
+  {
+    "project": "vscode",
+    "selection": "full",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 1081,
+        "calls": 5831046,
+        "rule_ns": 4713702913
+      },
+      {
+        "files": 1108,
+        "calls": 5850253,
+        "rule_ns": 4681381513
+      },
+      {
+        "files": 1033,
+        "calls": 5563207,
+        "rule_ns": 4680011415
+      },
+      {
+        "files": 1144,
+        "calls": 5741780,
+        "rule_ns": 4698464535
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2510819907675034
+  },
+  {
+    "project": "vscode",
+    "selection": "full",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 1088,
+        "calls": 5850169,
+        "rule_ns": 4520877152
+      },
+      {
+        "files": 1096,
+        "calls": 5471829,
+        "rule_ns": 4222161914
+      },
+      {
+        "files": 1092,
+        "calls": 6353457,
+        "rule_ns": 4782881090
+      },
+      {
+        "files": 1090,
+        "calls": 5310831,
+        "rule_ns": 4351791294
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2675331852948102
+  },
+  {
+    "project": "vscode",
+    "selection": "full",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 1131,
+        "calls": 5916165,
+        "rule_ns": 3899280468
+      },
+      {
+        "files": 1089,
+        "calls": 5627086,
+        "rule_ns": 3961135028
+      },
+      {
+        "files": 1069,
+        "calls": 5522665,
+        "rule_ns": 3955022712
+      },
+      {
+        "files": 1077,
+        "calls": 5920370,
+        "rule_ns": 3977261782
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.251841786681088
+  },
+  {
+    "project": "vscode",
+    "selection": "full",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 1088,
+        "calls": 5850169,
+        "rule_ns": 1815971927
+      },
+      {
+        "files": 1096,
+        "calls": 5471829,
+        "rule_ns": 1690717813
+      },
+      {
+        "files": 1092,
+        "calls": 6353457,
+        "rule_ns": 1967589101
+      },
+      {
+        "files": 1090,
+        "calls": 5310831,
+        "rule_ns": 1713466675
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.273742176405679
+  },
+  {
+    "project": "vscode",
+    "selection": "ten",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 110,
+        "calls": 570734,
+        "rule_ns": 686482741
+      },
+      {
+        "files": 124,
+        "calls": 612225,
+        "rule_ns": 688052814
+      },
+      {
+        "files": 75,
+        "calls": 573555,
+        "rule_ns": 707528474
+      },
+      {
+        "files": 128,
+        "calls": 577841,
+        "rule_ns": 678740753
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.256276169402839
+  },
+  {
+    "project": "vscode",
+    "selection": "ten",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 94,
+        "calls": 525296,
+        "rule_ns": 511852121
+      },
+      {
+        "files": 122,
+        "calls": 660581,
+        "rule_ns": 701937502
+      },
+      {
+        "files": 119,
+        "calls": 619293,
+        "rule_ns": 654674446
+      },
+      {
+        "files": 102,
+        "calls": 529185,
+        "rule_ns": 547710864
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.29051601041504554
+  },
+  {
+    "project": "vscode",
+    "selection": "ten",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 112,
+        "calls": 563898,
+        "rule_ns": 472603343
+      },
+      {
+        "files": 132,
+        "calls": 652857,
+        "rule_ns": 428879610
+      },
+      {
+        "files": 76,
+        "calls": 599193,
+        "rule_ns": 396746411
+      },
+      {
+        "files": 117,
+        "calls": 518407,
+        "rule_ns": 432521316
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2730626360349025
+  },
+  {
+    "project": "vscode",
+    "selection": "ten",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 94,
+        "calls": 525296,
+        "rule_ns": 271917453
+      },
+      {
+        "files": 122,
+        "calls": 660581,
+        "rule_ns": 318547134
+      },
+      {
+        "files": 119,
+        "calls": 619293,
+        "rule_ns": 334210744
+      },
+      {
+        "files": 102,
+        "calls": 529185,
+        "rule_ns": 347808823
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2733305730422479
+  },
+  {
+    "project": "typescript",
+    "selection": "full",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 50,
+        "calls": 1485522,
+        "rule_ns": 2123533190
+      },
+      {
+        "files": 194,
+        "calls": 1377912,
+        "rule_ns": 2049736839
+      },
+      {
+        "files": 221,
+        "calls": 1370018,
+        "rule_ns": 2112833328
+      },
+      {
+        "files": 135,
+        "calls": 1562288,
+        "rule_ns": 2107174642
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.25300403373425784
+  },
+  {
+    "project": "typescript",
+    "selection": "full",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 152,
+        "calls": 2077696,
+        "rule_ns": 2812007845
+      },
+      {
+        "files": 150,
+        "calls": 1022491,
+        "rule_ns": 1376708641
+      },
+      {
+        "files": 150,
+        "calls": 1365402,
+        "rule_ns": 2112163801
+      },
+      {
+        "files": 148,
+        "calls": 1330151,
+        "rule_ns": 1709950579
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.3510257415288688
+  },
+  {
+    "project": "typescript",
+    "selection": "full",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 119,
+        "calls": 1350462,
+        "rule_ns": 1766758872
+      },
+      {
+        "files": 170,
+        "calls": 1591073,
+        "rule_ns": 1754857479
+      },
+      {
+        "files": 204,
+        "calls": 1358224,
+        "rule_ns": 1774146595
+      },
+      {
+        "files": 107,
+        "calls": 1495981,
+        "rule_ns": 1767280549
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.25118726739484704
+  },
+  {
+    "project": "typescript",
+    "selection": "full",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 152,
+        "calls": 2077696,
+        "rule_ns": 2072410508
+      },
+      {
+        "files": 150,
+        "calls": 1022491,
+        "rule_ns": 896914439
+      },
+      {
+        "files": 150,
+        "calls": 1365402,
+        "rule_ns": 1583873659
+      },
+      {
+        "files": 148,
+        "calls": 1330151,
+        "rule_ns": 1155308133
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.3630389877341266
+  },
+  {
+    "project": "typescript",
+    "selection": "ten",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 3,
+        "calls": 51429,
+        "rule_ns": 453004722
+      },
+      {
+        "files": 39,
+        "calls": 224828,
+        "rule_ns": 355019481
+      },
+      {
+        "files": 12,
+        "calls": 267852,
+        "rule_ns": 352591426
+      },
+      {
+        "files": 6,
+        "calls": 241763,
+        "rule_ns": 373521682
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.29528303545705237
+  },
+  {
+    "project": "typescript",
+    "selection": "ten",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 16,
+        "calls": 101646,
+        "rule_ns": 219446420
+      },
+      {
+        "files": 15,
+        "calls": 71128,
+        "rule_ns": 163574225
+      },
+      {
+        "files": 14,
+        "calls": 339495,
+        "rule_ns": 719617099
+      },
+      {
+        "files": 15,
+        "calls": 273603,
+        "rule_ns": 390129875
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.4820690707921901
+  },
+  {
+    "project": "typescript",
+    "selection": "ten",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 3,
+        "calls": 51429,
+        "rule_ns": 389022348
+      },
+      {
+        "files": 41,
+        "calls": 215341,
+        "rule_ns": 204441551
+      },
+      {
+        "files": 10,
+        "calls": 277339,
+        "rule_ns": 200541884
+      },
+      {
+        "files": 6,
+        "calls": 241763,
+        "rule_ns": 205243142
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.38931475257779236
+  },
+  {
+    "project": "typescript",
+    "selection": "ten",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 16,
+        "calls": 101646,
+        "rule_ns": 95057826
+      },
+      {
+        "files": 15,
+        "calls": 71128,
+        "rule_ns": 38042351
+      },
+      {
+        "files": 14,
+        "calls": 339495,
+        "rule_ns": 585325432
+      },
+      {
+        "files": 15,
+        "calls": 273603,
+        "rule_ns": 234657750
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.6141387597136716
+  },
+  {
+    "project": "typeorm",
+    "selection": "full",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 872,
+        "calls": 953256,
+        "rule_ns": 675267273
+      },
+      {
+        "files": 747,
+        "calls": 969350,
+        "rule_ns": 682604555
+      },
+      {
+        "files": 773,
+        "calls": 955515,
+        "rule_ns": 684454535
+      },
+      {
+        "files": 780,
+        "calls": 988075,
+        "rule_ns": 649659944
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.25425632114851615
+  },
+  {
+    "project": "typeorm",
+    "selection": "full",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 794,
+        "calls": 1014422,
+        "rule_ns": 721900891
+      },
+      {
+        "files": 794,
+        "calls": 841934,
+        "rule_ns": 635806369
+      },
+      {
+        "files": 792,
+        "calls": 1169976,
+        "rule_ns": 786436703
+      },
+      {
+        "files": 792,
+        "calls": 839864,
+        "rule_ns": 664275578
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2800282121381237
+  },
+  {
+    "project": "typeorm",
+    "selection": "full",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 757,
+        "calls": 914697,
+        "rule_ns": 581555809
+      },
+      {
+        "files": 777,
+        "calls": 972693,
+        "rule_ns": 578517281
+      },
+      {
+        "files": 817,
+        "calls": 967462,
+        "rule_ns": 551618394
+      },
+      {
+        "files": 821,
+        "calls": 1011344,
+        "rule_ns": 572465895
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.25460408916946176
+  },
+  {
+    "project": "typeorm",
+    "selection": "full",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 794,
+        "calls": 1014422,
+        "rule_ns": 412243215
+      },
+      {
+        "files": 794,
+        "calls": 841934,
+        "rule_ns": 392576619
+      },
+      {
+        "files": 792,
+        "calls": 1169976,
+        "rule_ns": 408820896
+      },
+      {
+        "files": 792,
+        "calls": 839864,
+        "rule_ns": 391637297
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2568048699765826
+  },
+  {
+    "project": "typeorm",
+    "selection": "ten",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 132,
+        "calls": 122374,
+        "rule_ns": 86642161
+      },
+      {
+        "files": 30,
+        "calls": 63566,
+        "rule_ns": 88786603
+      },
+      {
+        "files": 61,
+        "calls": 120309,
+        "rule_ns": 83838181
+      },
+      {
+        "files": 95,
+        "calls": 127344,
+        "rule_ns": 81841265
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.26028867203166994
+  },
+  {
+    "project": "typeorm",
+    "selection": "ten",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 87,
+        "calls": 152540,
+        "rule_ns": 86897915
+      },
+      {
+        "files": 75,
+        "calls": 72055,
+        "rule_ns": 42403016
+      },
+      {
+        "files": 75,
+        "calls": 139449,
+        "rule_ns": 80454523
+      },
+      {
+        "files": 81,
+        "calls": 69549,
+        "rule_ns": 57705005
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.3249000443837569
+  },
+  {
+    "project": "typeorm",
+    "selection": "ten",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 90,
+        "calls": 159786,
+        "rule_ns": 94502877
+      },
+      {
+        "files": 64,
+        "calls": 64620,
+        "rule_ns": 107186685
+      },
+      {
+        "files": 93,
+        "calls": 107278,
+        "rule_ns": 97945601
+      },
+      {
+        "files": 71,
+        "calls": 101909,
+        "rule_ns": 99675002
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2684296429067865
+  },
+  {
+    "project": "typeorm",
+    "selection": "ten",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 87,
+        "calls": 152540,
+        "rule_ns": 58403475
+      },
+      {
+        "files": 75,
+        "calls": 72055,
+        "rule_ns": 56789550
+      },
+      {
+        "files": 75,
+        "calls": 139449,
+        "rule_ns": 61105971
+      },
+      {
+        "files": 81,
+        "calls": 69549,
+        "rule_ns": 48491677
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2718349929047101
+  },
+  {
+    "project": "vue",
+    "selection": "full",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 100,
+        "calls": 431652,
+        "rule_ns": 837743935
+      },
+      {
+        "files": 124,
+        "calls": 623310,
+        "rule_ns": 863444826
+      },
+      {
+        "files": 93,
+        "calls": 446588,
+        "rule_ns": 843882210
+      },
+      {
+        "files": 115,
+        "calls": 536400,
+        "rule_ns": 834872366
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.25546133171758556
+  },
+  {
+    "project": "vue",
+    "selection": "full",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 111,
+        "calls": 488645,
+        "rule_ns": 760438786
+      },
+      {
+        "files": 108,
+        "calls": 651066,
+        "rule_ns": 899831722
+      },
+      {
+        "files": 105,
+        "calls": 376688,
+        "rule_ns": 632528376
+      },
+      {
+        "files": 108,
+        "calls": 521551,
+        "rule_ns": 890919743
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.28263544220548986
+  },
+  {
+    "project": "vue",
+    "selection": "full",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 130,
+        "calls": 525703,
+        "rule_ns": 510241331
+      },
+      {
+        "files": 106,
+        "calls": 599664,
+        "rule_ns": 483103555
+      },
+      {
+        "files": 108,
+        "calls": 464042,
+        "rule_ns": 526498053
+      },
+      {
+        "files": 88,
+        "calls": 448541,
+        "rule_ns": 499244445
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2607604094662601
+  },
+  {
+    "project": "vue",
+    "selection": "full",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 111,
+        "calls": 488645,
+        "rule_ns": 299077155
+      },
+      {
+        "files": 108,
+        "calls": 651066,
+        "rule_ns": 281900362
+      },
+      {
+        "files": 105,
+        "calls": 376688,
+        "rule_ns": 202772868
+      },
+      {
+        "files": 108,
+        "calls": 521551,
+        "rule_ns": 277196767
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.2818963738544443
+  },
+  {
+    "project": "vue",
+    "selection": "ten",
+    "semantic": false,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 7,
+        "calls": 28782,
+        "rule_ns": 131974431
+      },
+      {
+        "files": 20,
+        "calls": 58945,
+        "rule_ns": 103560036
+      },
+      {
+        "files": 5,
+        "calls": 41295,
+        "rule_ns": 149523785
+      },
+      {
+        "files": 12,
+        "calls": 30668,
+        "rule_ns": 98177114
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.30942227229287683
+  },
+  {
+    "project": "vue",
+    "selection": "ten",
+    "semantic": false,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 14,
+        "calls": 58139,
+        "rule_ns": 112173319
+      },
+      {
+        "files": 7,
+        "calls": 13271,
+        "rule_ns": 67604519
+      },
+      {
+        "files": 17,
+        "calls": 49261,
+        "rule_ns": 113782097
+      },
+      {
+        "files": 6,
+        "calls": 39019,
+        "rule_ns": 150411419
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.3387863150287845
+  },
+  {
+    "project": "vue",
+    "selection": "ten",
+    "semantic": true,
+    "version": "baseline",
+    "checkers": [
+      {
+        "files": 14,
+        "calls": 62703,
+        "rule_ns": 105025507
+      },
+      {
+        "files": 7,
+        "calls": 28595,
+        "rule_ns": 66398398
+      },
+      {
+        "files": 5,
+        "calls": 23342,
+        "rule_ns": 56820643
+      },
+      {
+        "files": 18,
+        "calls": 45050,
+        "rule_ns": 32871130
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.4022183110736078
+  },
+  {
+    "project": "vue",
+    "selection": "ten",
+    "semantic": true,
+    "version": "candidate",
+    "checkers": [
+      {
+        "files": 14,
+        "calls": 58139,
+        "rule_ns": 22095531
+      },
+      {
+        "files": 7,
+        "calls": 13271,
+        "rule_ns": 5895092
+      },
+      {
+        "files": 17,
+        "calls": 49261,
+        "rule_ns": 19754025
+      },
+      {
+        "files": 6,
+        "calls": 39019,
+        "rule_ns": 23089051
+      }
+    ],
+    "active_checkers": 4,
+    "slowest_share": 0.325961390213435
+  }
+]

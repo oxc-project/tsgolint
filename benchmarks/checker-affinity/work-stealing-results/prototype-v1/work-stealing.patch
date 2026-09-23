@@ -1,0 +1,85 @@
+--- a/internal/linter/linter.go
++++ b/internal/linter/linter.go
+@@ -46,6 +46,36 @@
+ 	checker *checker.Checker
+ 	program *compiler.Program
+ 	queue   chan *ast.SourceFile
++	peers   []chan *ast.SourceFile
++	pending <-chan checkerWorkload
++}
++
++func (w checkerWorkload) nextFile() *ast.SourceFile {
++	if file, ok := <-w.queue; ok {
++		return file
++	}
++	// Claim unstarted checker workloads before stealing. This preserves cache
++	// affinity when there are fewer workers than checkers, including one worker.
++	if len(w.pending) > 0 {
++		return nil
++	}
++	for {
++		var largest chan *ast.SourceFile
++		for _, queue := range w.peers {
++			if len(queue) > len(largest) {
++				largest = queue
++			}
++		}
++		if largest == nil {
++			return nil
++		}
++		// All queues are prefilled and closed. Another worker may win the last
++		// file, in which case rescan. Only the file moves: the thief continues
++		// using its own checker, never the victim's mutable checker state.
++		if file, ok := <-largest; ok {
++			return file
++		}
++	}
+ }
+ 
+ type RunLinterOptions struct {
+@@ -387,7 +417,7 @@
+ 	})
+ 
+ 	workloadQueue := make(chan checkerWorkload, len(checkers))
+-	if len(checkers) == 0 {
++	if len(checkers) == 0 || len(files) == 0 {
+ 		close(workloadQueue)
+ 		return workloadQueue
+ 	}
+@@ -401,10 +431,14 @@
+ 		filesByChecker[ch] = append(filesByChecker[ch], file)
+ 		done()
+ 	}
+-	for idx := range len(checkers) {
+-		ch := checkers[idx]
+-		if checkerFiles := filesByChecker[ch]; len(checkerFiles) > 0 {
+-			workloadQueue <- checkerWorkload{ch, program, makeSourceFileQueue(checkerFiles)}
++	queues := make([]chan *ast.SourceFile, len(checkers))
++	for idx := range queues {
++		queues[idx] = makeSourceFileQueue(filesByChecker[checkers[idx]])
++	}
++	for idx := range queues {
++		workloadQueue <- checkerWorkload{
++			checker: checkers[idx], program: program, queue: queues[idx],
++			peers: queues, pending: workloadQueue,
+ 		}
+ 	}
+ 	close(workloadQueue)
+@@ -523,7 +557,7 @@
+ 					ctx.Program = w.program
+ 					ctx.TypeChecker = w.checker
+ 
+-					for file := range w.queue {
++					for file := w.nextFile(); file != nil; file = w.nextFile() {
+ 						if logLevel == utils.LogLevelDebug {
+ 							log.Print(file.FileName())
+ 						}
+@@ -581,7 +615,7 @@
+ 				ctx.Program = w.program
+ 				ctx.TypeChecker = w.checker
+ 
+-				for file := range w.queue {
++				for file := w.nextFile(); file != nil; file = w.nextFile() {
+ 					if logLevel == utils.LogLevelDebug {
+ 						log.Print(file.FileName())
+ 					}

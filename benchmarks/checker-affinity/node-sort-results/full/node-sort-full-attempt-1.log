@@ -1,0 +1,2 @@
+typescript full-lint workers=4: baseline=2354.8, affinity=3099.5, stealing=2381.7, sorted=2471.9 ms
+typescript full-check workers=4: baseline=3325.8, affinity=3575.6, stealing=3005.0, sorted=3029.2 ms

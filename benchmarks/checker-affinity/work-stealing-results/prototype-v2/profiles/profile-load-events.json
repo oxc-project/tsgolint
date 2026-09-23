@@ -1,0 +1,53 @@
+[
+  {
+    "time": 1790171099.234541,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "phase": "profile"
+  },
+  {
+    "time": 1790171099.29825,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 36535,
+        "name": "go"
+      },
+      {
+        "pid": 37649,
+        "name": "cargo"
+      },
+      {
+        "pid": 37868,
+        "name": "compile"
+      },
+      {
+        "pid": 37869,
+        "name": "rustc"
+      },
+      {
+        "pid": 37914,
+        "name": "rustc"
+      },
+      {
+        "pid": 37902,
+        "name": "cargo"
+      }
+    ],
+    "other_cpu": 715.4
+  },
+  {
+    "time": 1790171455.696665,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 44338
+  },
+  {
+    "time": 1790171475.944022,
+    "kind": "completed",
+    "attempt": 1
+  }
+]

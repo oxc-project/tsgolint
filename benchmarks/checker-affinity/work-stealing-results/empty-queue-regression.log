@@ -1,0 +1,8 @@
+--- FAIL: TestRunLinterOnProgram_StealFromSingleOwner (5.05s)
+    --- FAIL: TestRunLinterOnProgram_StealFromSingleOwner/timed=false (5.05s)
+        checker_affinity_test.go:207: idle checkers did not steal while the owner was busy
+        checker_affinity_test.go:207: idle checkers did not steal while the owner was busy
+        checker_affinity_test.go:217: assertion failed: 2 (int) != 4 (int)
+FAIL
+FAIL	github.com/typescript-eslint/tsgolint/internal/linter	5.531s
+FAIL

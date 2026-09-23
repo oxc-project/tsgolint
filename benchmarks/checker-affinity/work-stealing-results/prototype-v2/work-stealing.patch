@@ -1,0 +1,117 @@
+--- a/internal/linter/linter.go
++++ b/internal/linter/linter.go
+@@ -46,6 +46,36 @@
+ 	checker *checker.Checker
+ 	program *compiler.Program
+ 	queue   chan *ast.SourceFile
++	peers   []chan *ast.SourceFile
++	pending <-chan checkerWorkload
++}
++
++func (w checkerWorkload) nextFile() *ast.SourceFile {
++	if file, ok := <-w.queue; ok {
++		return file
++	}
++	// Claim unstarted checker workloads before stealing. This preserves cache
++	// affinity when there are fewer workers than checkers, including one worker.
++	if len(w.pending) > 0 {
++		return nil
++	}
++	for {
++		var largest chan *ast.SourceFile
++		for _, queue := range w.peers {
++			if len(queue) > len(largest) {
++				largest = queue
++			}
++		}
++		if largest == nil {
++			return nil
++		}
++		// All queues are prefilled and closed. Another worker may win the last
++		// file, in which case rescan. Only the file moves: the thief continues
++		// using its own checker, never the victim's mutable checker state.
++		if file, ok := <-largest; ok {
++			return file
++		}
++	}
+ }
+ 
+ type RunLinterOptions struct {
+@@ -387,7 +417,7 @@
+ 	})
+ 
+ 	workloadQueue := make(chan checkerWorkload, len(checkers))
+-	if len(checkers) == 0 {
++	if len(checkers) == 0 || len(files) == 0 {
+ 		close(workloadQueue)
+ 		return workloadQueue
+ 	}
+@@ -401,10 +431,14 @@
+ 		filesByChecker[ch] = append(filesByChecker[ch], file)
+ 		done()
+ 	}
+-	for idx := range len(checkers) {
+-		ch := checkers[idx]
+-		if checkerFiles := filesByChecker[ch]; len(checkerFiles) > 0 {
+-			workloadQueue <- checkerWorkload{ch, program, makeSourceFileQueue(checkerFiles)}
++	queues := make([]chan *ast.SourceFile, len(checkers))
++	for idx := range queues {
++		queues[idx] = makeSourceFileQueue(filesByChecker[checkers[idx]])
++	}
++	for idx := range queues {
++		workloadQueue <- checkerWorkload{
++			checker: checkers[idx], program: program, queue: queues[idx],
++			peers: queues, pending: workloadQueue,
+ 		}
+ 	}
+ 	close(workloadQueue)
+@@ -495,9 +529,16 @@
+ 
+ 	reportTypeScriptDiagnostics(program, files, typeErrors, onInternalDiagnostic)
+ 	workloadQueue := makeCheckerWorkloadQueue(program, files)
++	// Reserve one checker per worker before starting any of them. Otherwise a
++	// fast worker can claim several empty workloads, leaving later workers with
++	// no checker to use for stealing from a concentrated file selection.
++	initialWorkloads := make([]checkerWorkload, 0, len(workloadQueue))
++	for range min(workers, len(workloadQueue)) {
++		initialWorkloads = append(initialWorkloads, <-workloadQueue)
++	}
+ 
+ 	wg := core.NewWorkGroup(workers == 1)
+-	for range workers {
++	for _, initial := range initialWorkloads {
+ 		wg.Queue(func() {
+ 			ctxBuilder := &ruleContextBuilder{
+ 				fixState:     fixState,
+@@ -517,13 +558,13 @@
+ 				}
+ 				registeredListeners := make(map[ast.Kind][]taggedListener, 20)
+ 
+-				for w := range workloadQueue {
++				for w, ok := initial, true; ok; w, ok = <-workloadQueue {
+ 					ctxBuilder.program = w.program
+ 					ctxBuilder.checker = w.checker
+ 					ctx.Program = w.program
+ 					ctx.TypeChecker = w.checker
+ 
+-					for file := range w.queue {
++					for file := w.nextFile(); file != nil; file = w.nextFile() {
+ 						if logLevel == utils.LogLevelDebug {
+ 							log.Print(file.FileName())
+ 						}
+@@ -575,13 +616,13 @@
+ 				stat.Calls++
+ 			}
+ 
+-			for w := range workloadQueue {
++			for w, ok := initial, true; ok; w, ok = <-workloadQueue {
+ 				ctxBuilder.program = w.program
+ 				ctxBuilder.checker = w.checker
+ 				ctx.Program = w.program
+ 				ctx.TypeChecker = w.checker
+ 
+-				for file := range w.queue {
++				for file := w.nextFile(); file != nil; file = w.nextFile() {
+ 					if logLevel == utils.LogLevelDebug {
+ 						log.Print(file.FileName())
+ 					}

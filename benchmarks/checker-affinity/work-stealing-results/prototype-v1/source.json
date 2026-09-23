@@ -1,0 +1,35 @@
+{
+  "baseline_commit": "acd88e1b1ef8f219e8956f804f2548dafd949705",
+  "compiler_patched_head": "5a3d883d936a70e75e39334f61a5b4f2784e3c6e",
+  "source_sha256": {
+    "internal/linter/linter.go": "5ea752ed83e0b4c7d91eea12fb5249e5f97a0001f52150ad7ab8bec8f9f3ae36",
+    "internal/linter/checker_affinity_test.go": "f597a7735bb354ba02f603f155a06cc9c92cad5a16625860307263f8c57ee9c2",
+    "cmd/tsgolint/checker_affinity_bench_test.go": "2c0d65719b5d2424561783f374642ed878bc5e0b7fd20f423fdbaae38c645038",
+    "benchmarks/checker-affinity/run.py": "71dc5668e4de22c40ede76b5478c15158a5de52aabc14837e679d0adb107f2d8"
+  },
+  "binaries": {
+    "baseline.test": "4a135d67ccce92b5c128d57dc60726ba4afe4b486ba4a96141b2bf8b22e19370",
+    "candidate.test": "799f7e2bf62f4ae6fcb84ac093dc02d3383cd0730e3414ab309fe195566c8a2e",
+    "steal.test": "b51207eee1b76510ad73cbbcfb25a7b70ff08560bc0e63e8aed81052a891b5bf",
+    "pure-profile-v2.test": "d10ea105c670e1d3687da11e343b6456cb32d4f2abf1a8a9f69862396762acc1"
+  },
+  "comparison_labels": {
+    "affinity": {
+      "baseline": "pure affinity",
+      "candidate": "hybrid work stealing"
+    },
+    "shared": {
+      "baseline": "original shared queue",
+      "candidate": "hybrid work stealing"
+    },
+    "profiles": {
+      "baseline": "pure affinity",
+      "candidate": "hybrid work stealing"
+    },
+    "validation": {
+      "baseline": "original shared queue",
+      "candidate": "hybrid work stealing"
+    }
+  },
+  "timed_harness_unchanged": true
+}

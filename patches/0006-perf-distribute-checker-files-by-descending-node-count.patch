@@ -1,0 +1,108 @@
+From 75d30596211226dc1a298a34c1c4bdc97d06d88c Mon Sep 17 00:00:00 2001
+From: TSGolint experiment <tsgolint-experiment@localhost>
+Date: Wed, 23 Sep 2026 16:02:44 +0100
+Subject: [PATCH] perf: distribute checker files by descending node count
+
+---
+ internal/compiler/checkerpool.go      | 12 +++++-
+ internal/compiler/checkerpool_test.go | 61 +++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+), 1 deletion(-)
+ create mode 100644 internal/compiler/checkerpool_test.go
+
+diff --git a/internal/compiler/checkerpool.go b/internal/compiler/checkerpool.go
+index 5515837..8c576d6 100644
+--- a/internal/compiler/checkerpool.go
++++ b/internal/compiler/checkerpool.go
+@@ -1,6 +1,7 @@
+ package compiler
+ 
+ import (
++	"cmp"
+ 	"context"
+ 	"slices"
+ 	"sync"
+@@ -112,7 +113,16 @@ func (p *checkerPool) createCheckers() {
+ 		wg.RunAndWait()
+ 
+ 		p.fileAssociations = make(map[*ast.SourceFile]*checker.Checker, len(p.program.files))
+-		for i, file := range p.program.files {
++		files := p.program.files
++		if checkerCount > 1 {
++			// Spread large files across checkers without changing program order.
++			// Preserve that order for files with equal node counts.
++			files = slices.Clone(files)
++			slices.SortStableFunc(files, func(a, b *ast.SourceFile) int {
++				return cmp.Compare(b.NodeCount, a.NodeCount)
++			})
++		}
++		for i, file := range files {
+ 			p.fileAssociations[file] = p.checkers[i%checkerCount]
+ 		}
+ 	})
+diff --git a/internal/compiler/checkerpool_test.go b/internal/compiler/checkerpool_test.go
+new file mode 100644
+index 0000000..693bab7
+--- /dev/null
++++ b/internal/compiler/checkerpool_test.go
+@@ -0,0 +1,61 @@
++package compiler_test
++
++import (
++	"fmt"
++	"slices"
++	"strings"
++	"sync"
++	"testing"
++
++	"github.com/microsoft/typescript-go/internal/checker"
++	"github.com/microsoft/typescript-go/internal/compiler"
++	"github.com/microsoft/typescript-go/internal/core"
++	"github.com/microsoft/typescript-go/internal/tsoptions"
++	"github.com/microsoft/typescript-go/internal/vfs/vfstest"
++	"gotest.tools/v3/assert"
++)
++
++func TestCheckerPoolNodeCountAssignment(t *testing.T) {
++	for _, checkerCount := range []int{1, 4, 12} {
++		t.Run(fmt.Sprintf("checkers=%d", checkerCount), func(t *testing.T) {
++			t.Parallel()
++			fs := vfstest.FromMap[any](nil, true)
++			var names []string
++			// In input order the largest files concentrate on the even slots.
++			// Equal-size pairs also exercise deterministic tie handling.
++			for i, statements := range []int{8, 1, 8, 2, 7, 1, 6, 3} {
++				name := fmt.Sprintf("/src/file%d.ts", i)
++				names = append(names, name)
++				assert.NilError(t, fs.WriteFile(name, strings.Repeat("void 0;\n", statements)))
++			}
++			program := compiler.NewProgram(compiler.ProgramOptions{
++				Config: &tsoptions.ParsedCommandLine{ParsedConfig: &core.ParsedOptions{
++					FileNames: names,
++					CompilerOptions: &core.CompilerOptions{
++						NoLib: core.TSTrue, Checkers: &checkerCount,
++					},
++				}},
++				Host: compiler.NewCompilerHost("/src", fs, "", nil, nil),
++			})
++			original := slices.Clone(program.GetSourceFiles())
++			assert.Equal(t, len(original), len(names))
++			for i, file := range original {
++				assert.Equal(t, file.FileName(), names[i])
++			}
++			indices := make(map[*checker.Checker]int)
++			var mu sync.Mutex
++			program.ForEachCheckerParallel(func(i int, c *checker.Checker) {
++				mu.Lock()
++				defer mu.Unlock()
++				indices[c] = i
++			})
++			assert.Equal(t, len(indices), min(checkerCount, len(names)))
++			assert.Assert(t, slices.Equal(original, program.GetSourceFiles()), "checker creation changed program order")
++			for rank, index := range []int{0, 2, 4, 6, 7, 3, 1, 5} {
++				c, release := program.GetTypeCheckerForFileExclusive(t.Context(), original[index])
++				release()
++				assert.Equal(t, indices[c], rank%len(indices), "unexpected checker for %s", names[index])
++			}
++		})
++	}
++}

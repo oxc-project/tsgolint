@@ -1,0 +1,86 @@
+{
+  "base_commit": "acd88e1b1ef8f219e8956f804f2548dafd949705",
+  "compiler_patched_head": "5a3d883d936a70e75e39334f61a5b4f2784e3c6e",
+  "variants": {
+    "baseline": {
+      "binary_sha256": "47b252a1fc44455d66fb1a9fbab73a431382c2ca81470145e02acb6351f0d870",
+      "compiler_sha256": "86946fd4ecec2dd7e85cde73021b86c2520b0ba499f49ad7a100144aaad533e8",
+      "linter_sha256": "cb8edc25dc62e716ce150c5ec442f1861c08f5ad3efc140768517771988549f7"
+    },
+    "affinity": {
+      "binary_sha256": "2a6852fdb6c05f1c9fc8290be34d4f41b787919f83781743b62b7cb34fbb154a",
+      "compiler_sha256": "86946fd4ecec2dd7e85cde73021b86c2520b0ba499f49ad7a100144aaad533e8",
+      "linter_sha256": "eaeede0a2d74b4c7043d12b47099aab1ccbc95281904482cdde3255bdcc7fc34"
+    },
+    "stealing": {
+      "binary_sha256": "352786c62de2baa5173499065cc7d8104b8c4a9e6de7b368f4cdcf28a345daa3",
+      "compiler_sha256": "86946fd4ecec2dd7e85cde73021b86c2520b0ba499f49ad7a100144aaad533e8",
+      "linter_sha256": "3d2c13c857c49c1f9ea560867a0839c7d720f335cff6a2f916814edb1c932953"
+    },
+    "sorted": {
+      "binary_sha256": "c50cac5f28fbd494acae7e22dc2b5081125f56c1d0665d2c19317e3334a614fc",
+      "compiler_sha256": "af63b7ff6f0da5561746e362383cf97252b1712341a6c5ecdedb90661e1cc364",
+      "linter_sha256": "3d2c13c857c49c1f9ea560867a0839c7d720f335cff6a2f916814edb1c932953"
+    }
+  },
+  "source_sha256": {
+    "cmd/tsgolint/checker_affinity_bench_test.go": "92a3d2afe5d0c82987582769e331d65e25602583be4bc81c5575ff4ff9875e35",
+    "benchmarks/checker-affinity/run.py": "1fef819bac68162a65272ab008199e6f4e83547d6ee89ef1b919a3d2dc0d3104",
+    "patches/0006-perf-distribute-checker-files-by-descending-node-count.patch": "3861919dd9f376bc6ed6642709094cc8eacb8efa58dc58888122b7605719bdcf"
+  },
+  "labels": {
+    "baseline": "original shared queue",
+    "affinity": "pure checker affinity",
+    "stealing": "checker affinity + work stealing",
+    "sorted": "checker affinity + work stealing + descending node-count round robin"
+  },
+  "timed_harness_unchanged": true,
+  "comparison": {
+    "full": {
+      "versions": [
+        "baseline",
+        "affinity",
+        "stealing",
+        "sorted"
+      ],
+      "cases": [
+        "full-lint",
+        "full-check"
+      ],
+      "projects": [
+        "typescript",
+        "vscode",
+        "typeorm",
+        "vue"
+      ],
+      "workers": 4,
+      "gomaxprocs": 4,
+      "samples_per_version": 10,
+      "batch_order": "ABCDDCBA",
+      "samples_per_batch": 5
+    },
+    "profiles": {
+      "baseline": "stealing",
+      "candidate": "sorted",
+      "scope": "full lint only, no semantic preparation"
+    }
+  },
+  "checks": {
+    "all_internal_rules_engine_cli_compiler": "passed",
+    "targeted_race_count": 3,
+    "e2e_passed": 22,
+    "e2e_skipped": 1,
+    "unsorted_assignment_regression": "fails as expected for multiple checkers",
+    "two_and_four_variant_resume": "passed",
+    "binary_build_settings_match": true,
+    "diagnostic_fixture_comparisons": 12,
+    "four_variant_summary": "passed",
+    "timing_samples": 320,
+    "profiles": 8,
+    "complete_ordered_batches": true,
+    "all_checker_worker_gomaxprocs_counts": 4,
+    "profile_consistency": "passed"
+  },
+  "load_threshold_external_cpu_percent": 400,
+  "profile_driver_sha256": "c79604d4c22082b240b0226d4d02e0b5a46ee18e734a37e7d99e361f2c41d0ba"
+}

@@ -1,0 +1,8 @@
+--- FAIL: TestCheckerPoolNodeCountAssignment (0.00s)
+    --- FAIL: TestCheckerPoolNodeCountAssignment/checkers=4 (0.00s)
+        checkerpool_test.go:57: assertion failed: 2 (indices[c] int) != 1 (rank % len(indices) int): unexpected checker for /src/file2.ts
+    --- FAIL: TestCheckerPoolNodeCountAssignment/checkers=12 (0.00s)
+        checkerpool_test.go:57: assertion failed: 2 (indices[c] int) != 1 (rank % len(indices) int): unexpected checker for /src/file2.ts
+FAIL
+FAIL	github.com/microsoft/typescript-go/internal/compiler	0.473s
+FAIL

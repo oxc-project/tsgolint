@@ -1,0 +1,42 @@
+--- a/internal/linter/linter.go
++++ b/internal/linter/linter.go
+@@ -76,6 +76,21 @@
+ 			return file
+ 		}
+ 	}
++}
++
++func (w checkerWorkload) nextWorkload() (checkerWorkload, bool) {
++	if next, ok := <-w.pending; ok {
++		return next, true
++	}
++	// Another worker may claim the last pending workload after nextFile saw
++	// it. Keep this checker available to steal instead of abandoning its lane.
++	// Queues only shrink, so an empty scan means no stealable work remains.
++	for _, queue := range w.peers {
++		if len(queue) > 0 {
++			return w, true
++		}
++	}
++	return checkerWorkload{}, false
+ }
+ 
+ type RunLinterOptions struct {
+@@ -560,7 +575,7 @@
+ 				}
+ 				registeredListeners := make(map[ast.Kind][]taggedListener, 20)
+ 
+-				for w, ok := initial, true; ok; w, ok = <-workloadQueue {
++				for w, ok := initial, true; ok; w, ok = w.nextWorkload() {
+ 					ctxBuilder.program = w.program
+ 					ctxBuilder.checker = w.checker
+ 					ctx.Program = w.program
+@@ -618,7 +633,7 @@
+ 				stat.Calls++
+ 			}
+ 
+-			for w, ok := initial, true; ok; w, ok = <-workloadQueue {
++			for w, ok := initial, true; ok; w, ok = w.nextWorkload() {
+ 				ctxBuilder.program = w.program
+ 				ctxBuilder.checker = w.checker
+ 				ctx.Program = w.program

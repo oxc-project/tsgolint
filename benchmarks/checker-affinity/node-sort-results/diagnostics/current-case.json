@@ -1,0 +1,11 @@
+{
+  "root": "/private/tmp/tsgolint-affinity-w4vcz79f/projects/issue1141",
+  "config": "/private/tmp/tsgolint-affinity-w4vcz79f/projects/issue1141/tsconfig.json",
+  "workers": 4,
+  "rules": [
+    "no-unnecessary-type-assertion"
+  ],
+  "semantic": true,
+  "warm": false,
+  "mode": "diagnostics"
+}

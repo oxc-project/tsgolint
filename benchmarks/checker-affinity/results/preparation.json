@@ -1,0 +1,74 @@
+{
+  "vscode": {
+    "repo": "microsoft/vscode",
+    "ref": "1.99.0",
+    "revision": "4437686ffebaf200fa4a6e6e67f735f3edf24ada",
+    "config": "src/tsconfig.json",
+    "install": [
+      "/Users/cameron/.vite-plus/js_runtime/node/26.5.0/bin/node",
+      "/Users/cameron/.vite-plus/package_manager/npm/11.17.0/npm/bin/npm-cli.js",
+      "ci",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund"
+    ],
+    "lock_sha256": "17e7caedaf54d8bbae998aa042c27c731bd7d9e34281f8c7d42ee6fe2e8f29ce",
+    "config_diff": ""
+  },
+  "typescript": {
+    "repo": "microsoft/typescript",
+    "ref": "v5.8.2",
+    "revision": "beb69e4cdd61b1a0fd9ae21ae58bd4bd409d7217",
+    "config": "src/tsconfig-eslint.json",
+    "install": [
+      "/Users/cameron/.vite-plus/js_runtime/node/26.5.0/bin/node",
+      "/Users/cameron/.vite-plus/package_manager/npm/11.17.0/npm/bin/npm-cli.js",
+      "ci",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund"
+    ],
+    "lock_sha256": "561a5dd41beedd44f67019d9d4ac649c557980f16e5ed0088881f9f1f35d0e42",
+    "config_diff": ""
+  },
+  "typeorm": {
+    "repo": "typeorm/typeorm",
+    "ref": "0.3.22",
+    "revision": "6c5668bd82233301642593a83236cc4ae315d6fc",
+    "config": "tsconfig.json",
+    "install": [
+      "node@22.14.0",
+      "npm@8.19.4",
+      "ci",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund"
+    ],
+    "lock_sha256": "c0f5f46cbda18227a09000cad4b4c24d433877b21ee1a892ca9f3cf2776a02bb",
+    "config_diff": "diff --git a/tsconfig.json b/tsconfig.json\nindex 0d66575..b9a5239 100644\n--- a/tsconfig.json\n+++ b/tsconfig.json\n@@ -1,36 +1,35 @@\n {\n-    \"extends\": \"@tsconfig/node16/tsconfig.json\",\n-    \"compilerOptions\": {\n-        \"allowSyntheticDefaultImports\": true,\n-        \"declaration\": true,\n-        \"downlevelIteration\": true,\n-        \"emitDecoratorMetadata\": true,\n-        \"experimentalDecorators\": true,\n-        \"importHelpers\": true,\n-        \"module\": \"commonjs\",\n-        \"moduleResolution\": \"node\",\n-        \"noFallthroughCasesInSwitch\": true,\n-        \"noImplicitAny\": true,\n-        \"noImplicitReturns\": true,\n-        \"noUnusedLocals\": true,\n-        \"outDir\": \"build/compiled\",\n-        \"pretty\": true,\n-        \"sourceMap\": true,\n-        \"strictFunctionTypes\": false,\n-        \"strictPropertyInitialization\": false,\n-        \"stripInternal\": true,\n-        \"useUnknownInCatchVariables\": false\n-    },\n-    \"include\": [\n-      \"sample\",\n-      \"src\",\n-      \"test\",\n-      \"*.ts\"\n-    ],\n-    \"exclude\": [\n-        \"build\",\n-        \"node_modules\",\n-        \"temp\",\n-        \"tmp\"\n-    ]\n+  \"extends\": \"@tsconfig/node16/tsconfig.json\",\n+  \"compilerOptions\": {\n+    \"allowSyntheticDefaultImports\": true,\n+    \"declaration\": true,\n+    \"emitDecoratorMetadata\": true,\n+    \"experimentalDecorators\": true,\n+    \"importHelpers\": true,\n+    \"module\": \"node16\",\n+    \"moduleResolution\": \"node16\",\n+    \"noFallthroughCasesInSwitch\": true,\n+    \"noImplicitAny\": true,\n+    \"noImplicitReturns\": true,\n+    \"noUnusedLocals\": true,\n+    \"outDir\": \"build/compiled\",\n+    \"pretty\": true,\n+    \"sourceMap\": true,\n+    \"strictFunctionTypes\": false,\n+    \"strictPropertyInitialization\": false,\n+    \"stripInternal\": true,\n+    \"useUnknownInCatchVariables\": false\n+  },\n+  \"include\": [\n+    \"sample\",\n+    \"src\",\n+    \"test\",\n+    \"*.ts\"\n+  ],\n+  \"exclude\": [\n+    \"build\",\n+    \"node_modules\",\n+    \"temp\",\n+    \"tmp\"\n+  ]\n }"
+  },
+  "vue": {
+    "repo": "vuejs/core",
+    "ref": "v3.5.13",
+    "revision": "6eb29d345aa73746207f80c89ee8b37ff7b949c9",
+    "config": "tsconfig.json",
+    "install": [
+      "/Users/cameron/.vite-plus/js_runtime/node/26.5.0/bin/node",
+      "/Users/cameron/.vite-plus/package_manager/npm/11.17.0/npm/bin/npx-cli.js",
+      "--yes",
+      "pnpm@9.12.3",
+      "install",
+      "--ignore-scripts",
+      "--frozen-lockfile"
+    ],
+    "lock_sha256": "5393cf844ef2568b250bab52f06aabf32d3fb108b469a30f59d393d0cfd61dce",
+    "config_diff": "diff --git a/tsconfig.json b/tsconfig.json\nindex 9896083..5933c77 100644\n--- a/tsconfig.json\n+++ b/tsconfig.json\n@@ -1,6 +1,5 @@\n {\n   \"compilerOptions\": {\n-    \"baseUrl\": \".\",\n     \"outDir\": \"temp\",\n     \"sourceMap\": false,\n     \"target\": \"es2016\",\n@@ -18,13 +17,26 @@\n     \"esModuleInterop\": true,\n     \"removeComments\": false,\n     \"jsx\": \"preserve\",\n-    \"lib\": [\"es2016\", \"dom\"],\n-    \"types\": [\"vitest/globals\", \"puppeteer\", \"node\"],\n+    \"lib\": [\n+      \"es2016\",\n+      \"dom\"\n+    ],\n+    \"types\": [\n+      \"vitest/globals\",\n+      \"puppeteer\",\n+      \"node\"\n+    ],\n     \"rootDir\": \".\",\n     \"paths\": {\n-      \"@vue/compat\": [\"packages/vue-compat/src\"],\n-      \"@vue/*\": [\"packages/*/src\"],\n-      \"vue\": [\"packages/vue/src\"]\n+      \"@vue/compat\": [\n+        \"./packages/vue-compat/src\"\n+      ],\n+      \"@vue/*\": [\n+        \"./packages/*/src\"\n+      ],\n+      \"vue\": [\n+        \"./packages/vue/src\"\n+      ]\n     },\n     \"isolatedDeclarations\": true,\n     \"composite\": true\n@@ -38,5 +50,7 @@\n     \"scripts/*\",\n     \"rollup.*.js\"\n   ],\n-  \"exclude\": [\"packages-private/sfc-playground/src/vue-dev-proxy*\"]\n+  \"exclude\": [\n+    \"packages-private/sfc-playground/src/vue-dev-proxy*\"\n+  ]\n }"
+  },
+  "runtime": {
+    "node": "26.5.0",
+    "npm": "11.17.0",
+    "typeorm_node": "22.14.0",
+    "typeorm_npm": "8.19.4",
+    "vue_pnpm": "9.12.3"
+  }
+}

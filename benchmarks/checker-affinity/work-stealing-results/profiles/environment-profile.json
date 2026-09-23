@@ -1,0 +1,25 @@
+{
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "machine": "arm64",
+  "logical_cpus": 12,
+  "workers": [
+    4
+  ],
+  "projects": [
+    "typescript"
+  ],
+  "samples_per_version": 10,
+  "scenarios": null,
+  "go": "go version go1.27.1 darwin/arm64",
+  "started": "2026-09-23T15:45:07+0100",
+  "environment": {
+    "GOGC": null,
+    "GOMEMLIMIT": null,
+    "GOMAXPROCS": null
+  },
+  "binaries": {
+    "baseline": "d10ea105c670e1d3687da11e343b6456cb32d4f2abf1a8a9f69862396762acc1",
+    "candidate": "246c7ab42d1f2edeb4f17168cff81cc6dfb8ddef978dc9324420f213f6476952"
+  },
+  "cpu": "Apple M2 Max"
+}

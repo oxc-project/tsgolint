@@ -1,0 +1,512 @@
+[
+  {
+    "project": "typescript",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 3310443207.5,
+        "min": 3281608126.0,
+        "max": 3576054376.0,
+        "stdev": 113260894.66038033,
+        "relative_stdev_percent": 3.3817286769084416
+      },
+      "B/op": {
+        "median": 2064799412.0,
+        "min": 2064066680.0,
+        "max": 2064937624.0,
+        "stdev": 357239.1400340487,
+        "relative_stdev_percent": 0.01730294781734861
+      },
+      "allocs/op": {
+        "median": 13884752.5,
+        "min": 13883267.0,
+        "max": 13889354.0,
+        "stdev": 2169.1404442005746,
+        "relative_stdev_percent": 0.015621652875119185
+      },
+      "samples": 6,
+      "diagnostics": [
+        53388
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 2845213479.0,
+        "min": 2808542834.0,
+        "max": 2934176875.0,
+        "stdev": 55148219.294382215,
+        "relative_stdev_percent": 1.9266125140529875
+      },
+      "B/op": {
+        "median": 2126700864.0,
+        "min": 2118165696.0,
+        "max": 2137336336.0,
+        "stdev": 6790188.400178599,
+        "relative_stdev_percent": 0.3192197867413834
+      },
+      "allocs/op": {
+        "median": 14243807.0,
+        "min": 14201824.0,
+        "max": 14308321.0,
+        "stdev": 40795.95105726384,
+        "relative_stdev_percent": 0.28636361219765083
+      },
+      "samples": 6,
+      "diagnostics": [
+        53388
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -14.053397063148376,
+    "bytes_delta_percent": 2.997940218320827
+  },
+  {
+    "project": "typescript",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 3175623750.5,
+        "min": 3105363166.0,
+        "max": 3428008041.0,
+        "stdev": 127152671.70740867,
+        "relative_stdev_percent": 3.9334040679662974
+      },
+      "B/op": {
+        "median": 1979546420.0,
+        "min": 1979123896.0,
+        "max": 1979788184.0,
+        "stdev": 271759.8909468921,
+        "relative_stdev_percent": 0.013728763171024422
+      },
+      "allocs/op": {
+        "median": 13484286.5,
+        "min": 13483921.0,
+        "max": 13490237.0,
+        "stdev": 2437.786345573924,
+        "relative_stdev_percent": 0.018077357743386573
+      },
+      "samples": 6,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 2423229104.0,
+        "min": 2383294167.0,
+        "max": 2698408583.0,
+        "stdev": 118384660.92910744,
+        "relative_stdev_percent": 4.808852329586177
+      },
+      "B/op": {
+        "median": 1983411992.0,
+        "min": 1965320064.0,
+        "max": 1992415536.0,
+        "stdev": 10178025.802412307,
+        "relative_stdev_percent": 0.5133809851732006
+      },
+      "allocs/op": {
+        "median": 13439944.5,
+        "min": 13376822.0,
+        "max": 13463471.0,
+        "stdev": 32824.048230933775,
+        "relative_stdev_percent": 0.2443316386050799
+      },
+      "samples": 6,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -23.692814565375887,
+    "bytes_delta_percent": 0.19527564299299804
+  },
+  {
+    "project": "typescript",
+    "scenario": "one-cold",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 191432021.5,
+        "min": 186116042.0,
+        "max": 223391292.0,
+        "stdev": 14359160.654390916,
+        "relative_stdev_percent": 7.248845809507413
+      },
+      "B/op": {
+        "median": 399608384.0,
+        "min": 399475088.0,
+        "max": 399763432.0,
+        "stdev": 120552.07934166877,
+        "relative_stdev_percent": 0.030167230463002213
+      },
+      "allocs/op": {
+        "median": 762550.0,
+        "min": 762435.0,
+        "max": 762819.0,
+        "stdev": 133.51067373060476,
+        "relative_stdev_percent": 0.017507840030554937
+      },
+      "samples": 6,
+      "diagnostics": [
+        49
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 191114250.5,
+        "min": 185861667.0,
+        "max": 209611959.0,
+        "stdev": 9446065.662797192,
+        "relative_stdev_percent": 4.8507372408011245
+      },
+      "B/op": {
+        "median": 399589656.0,
+        "min": 399421672.0,
+        "max": 399725896.0,
+        "stdev": 119151.73438043891,
+        "relative_stdev_percent": 0.0298185213349
+      },
+      "allocs/op": {
+        "median": 762279.0,
+        "min": 762017.0,
+        "max": 762600.0,
+        "stdev": 240.41353261966486,
+        "relative_stdev_percent": 0.0315370608632323
+      },
+      "samples": 6,
+      "diagnostics": [
+        49
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -0.1659967843990029,
+    "bytes_delta_percent": -0.004686588357460941
+  },
+  {
+    "project": "typescript",
+    "scenario": "one-warm",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 4405145.5,
+        "min": 3773875.0,
+        "max": 5418916.0,
+        "stdev": 611466.2177097494,
+        "relative_stdev_percent": 13.898408297177403
+      },
+      "B/op": {
+        "median": 1293156.0,
+        "min": 1292640.0,
+        "max": 1293704.0,
+        "stdev": 445.88070153349315,
+        "relative_stdev_percent": 0.03447929308849268
+      },
+      "allocs/op": {
+        "median": 12897.5,
+        "min": 12896.0,
+        "max": 12901.0,
+        "stdev": 2.160246899469287,
+        "relative_stdev_percent": 0.01674826385426505
+      },
+      "samples": 6,
+      "diagnostics": [
+        49
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 4772208.5,
+        "min": 4215249.0,
+        "max": 5806500.0,
+        "stdev": 581527.6643114238,
+        "relative_stdev_percent": 11.93390724134997
+      },
+      "B/op": {
+        "median": 1289768.0,
+        "min": 1289272.0,
+        "max": 1344144.0,
+        "stdev": 24304.405877673016,
+        "relative_stdev_percent": 1.8627072782379954
+      },
+      "allocs/op": {
+        "median": 12859.0,
+        "min": 12858.0,
+        "max": 12864.0,
+        "stdev": 2.943920288775949,
+        "relative_stdev_percent": 0.022891477323884413
+      },
+      "samples": 6,
+      "diagnostics": [
+        49
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 8.33259650560918,
+    "bytes_delta_percent": -0.2619946858693045
+  },
+  {
+    "project": "typescript",
+    "scenario": "ten-cold",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 938310541.5,
+        "min": 901033583.0,
+        "max": 954496292.0,
+        "stdev": 21088224.274426755,
+        "relative_stdev_percent": 2.2611749466715048
+      },
+      "B/op": {
+        "median": 751346388.0,
+        "min": 750651384.0,
+        "max": 752015560.0,
+        "stdev": 440802.2647564325,
+        "relative_stdev_percent": 0.05866835798321141
+      },
+      "allocs/op": {
+        "median": 3211980.5,
+        "min": 3211323.0,
+        "max": 3213530.0,
+        "stdev": 744.6022875781854,
+        "relative_stdev_percent": 0.023180959613176122
+      },
+      "samples": 6,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 775086375.5,
+        "min": 753758458.0,
+        "max": 784621542.0,
+        "stdev": 11583932.168552134,
+        "relative_stdev_percent": 1.5015323316678344
+      },
+      "B/op": {
+        "median": 751553148.0,
+        "min": 746614792.0,
+        "max": 759591224.0,
+        "stdev": 5803543.427513367,
+        "relative_stdev_percent": 0.7709944526109964
+      },
+      "allocs/op": {
+        "median": 3226752.0,
+        "min": 3212708.0,
+        "max": 3253237.0,
+        "stdev": 17004.12779788092,
+        "relative_stdev_percent": 0.5263387790185923
+      },
+      "samples": 6,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -17.395537914246063,
+    "bytes_delta_percent": 0.027518599051279402
+  },
+  {
+    "project": "typescript",
+    "scenario": "ten-warm",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 588059063.0,
+        "min": 567933833.0,
+        "max": 622671750.0,
+        "stdev": 19938933.376002464,
+        "relative_stdev_percent": 3.366294706948416
+      },
+      "B/op": {
+        "median": 177694660.0,
+        "min": 176994424.0,
+        "max": 178103264.0,
+        "stdev": 458776.4809711442,
+        "relative_stdev_percent": 0.25828435160624147
+      },
+      "allocs/op": {
+        "median": 1542704.5,
+        "min": 1542483.0,
+        "max": 1542794.0,
+        "stdev": 116.81780686179654,
+        "relative_stdev_percent": 0.007572433210805443
+      },
+      "samples": 6,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 483107625.0,
+        "min": 476850459.0,
+        "max": 539502292.0,
+        "stdev": 30316258.256466966,
+        "relative_stdev_percent": 6.06750876510821
+      },
+      "B/op": {
+        "median": 195072916.0,
+        "min": 193887072.0,
+        "max": 195559832.0,
+        "stdev": 614019.9149343611,
+        "relative_stdev_percent": 0.3149694108625472
+      },
+      "allocs/op": {
+        "median": 1642692.5,
+        "min": 1634653.0,
+        "max": 1642849.0,
+        "stdev": 3299.411826371482,
+        "relative_stdev_percent": 0.20101401173469963
+      },
+      "samples": 6,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -17.847091321845674,
+    "bytes_delta_percent": 9.779841442618476
+  }
+]

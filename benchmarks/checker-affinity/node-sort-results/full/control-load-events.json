@@ -1,0 +1,485 @@
+[
+  {
+    "time": 1790175874.545412,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790175874.5926578,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 354.1
+  },
+  {
+    "time": 1790176056.12824,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "ignore_pprof_http_as_builder": true,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790176056.1836338,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 236.5
+  },
+  {
+    "time": 1790176262.088794,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 400,
+    "ignore_pprof_http_as_builder": true,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790176292.546497,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 67928
+  },
+  {
+    "time": 1790176591.225556,
+    "kind": "contention",
+    "attempt": 1,
+    "builders": [
+      {
+        "pid": 69584,
+        "name": "go"
+      },
+      {
+        "pid": 69687,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 678.5
+  },
+  {
+    "time": 1790176591.2310798,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-lint",
+        "4"
+      ]
+    ],
+    "samples": 1,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790176591.3001611,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 69584,
+        "name": "go"
+      },
+      {
+        "pid": 69687,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 708.8
+  },
+  {
+    "time": 1790176962.108876,
+    "kind": "started",
+    "attempt": 2,
+    "pid": 70839
+  },
+  {
+    "time": 1790177185.106783,
+    "kind": "contention",
+    "attempt": 2,
+    "builders": [
+      {
+        "pid": 71526,
+        "name": "go"
+      },
+      {
+        "pid": 71596,
+        "name": "compile"
+      },
+      {
+        "pid": 71597,
+        "name": "compile"
+      },
+      {
+        "pid": 71598,
+        "name": "compile"
+      },
+      {
+        "pid": 71599,
+        "name": "compile"
+      },
+      {
+        "pid": 71600,
+        "name": "compile"
+      },
+      {
+        "pid": 71601,
+        "name": "compile"
+      },
+      {
+        "pid": 71602,
+        "name": "compile"
+      },
+      {
+        "pid": 71603,
+        "name": "compile"
+      },
+      {
+        "pid": 71604,
+        "name": "compile"
+      },
+      {
+        "pid": 71606,
+        "name": "link"
+      },
+      {
+        "pid": 71610,
+        "name": "link"
+      },
+      {
+        "pid": 71612,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 982.3
+  },
+  {
+    "time": 1790177185.115125,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-check",
+        "4"
+      ]
+    ],
+    "samples": 1,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790177185.346547,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 71526,
+        "name": "go"
+      },
+      {
+        "pid": 71596,
+        "name": "compile"
+      },
+      {
+        "pid": 71597,
+        "name": "compile"
+      },
+      {
+        "pid": 71598,
+        "name": "compile"
+      },
+      {
+        "pid": 71599,
+        "name": "compile"
+      },
+      {
+        "pid": 71600,
+        "name": "compile"
+      },
+      {
+        "pid": 71601,
+        "name": "compile"
+      },
+      {
+        "pid": 71602,
+        "name": "compile"
+      },
+      {
+        "pid": 71603,
+        "name": "compile"
+      },
+      {
+        "pid": 71604,
+        "name": "compile"
+      },
+      {
+        "pid": 71606,
+        "name": "link"
+      },
+      {
+        "pid": 71610,
+        "name": "link"
+      },
+      {
+        "pid": 71612,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 1071.8
+  },
+  {
+    "time": 1790177261.787943,
+    "kind": "started",
+    "attempt": 3,
+    "pid": 72400
+  },
+  {
+    "time": 1790177327.647466,
+    "kind": "contention",
+    "attempt": 3,
+    "builders": [
+      {
+        "pid": 72619,
+        "name": "go"
+      }
+    ],
+    "other_cpu": 310.8
+  },
+  {
+    "time": 1790177327.6506538,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-check",
+        "4"
+      ]
+    ],
+    "samples": 2,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790177327.709308,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 72619,
+        "name": "go"
+      }
+    ],
+    "other_cpu": 352.4
+  },
+  {
+    "time": 1790177378.495778,
+    "kind": "started",
+    "attempt": 4,
+    "pid": 72691
+  },
+  {
+    "time": 1790177403.851033,
+    "kind": "contention",
+    "attempt": 4,
+    "builders": [
+      {
+        "pid": 72791,
+        "name": "go"
+      },
+      {
+        "pid": 72813,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 412.3
+  },
+  {
+    "time": 1790177403.857749,
+    "kind": "excluded",
+    "cases": [
+      [
+        "vscode",
+        "full-check",
+        "4"
+      ]
+    ],
+    "samples": 2,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790177403.9203498,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 72791,
+        "name": "go"
+      },
+      {
+        "pid": 72813,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 560.7
+  },
+  {
+    "time": 1790177492.02049,
+    "kind": "reordered_remaining_cases",
+    "order": [
+      "typeorm",
+      "vue",
+      "typescript",
+      "vscode"
+    ],
+    "reason": "Prioritize shorter cases between external build bursts; preserve per-case variant order and samples."
+  },
+  {
+    "time": 1790177494.722646,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 400,
+    "ignore_pprof_http_as_builder": true,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790177494.777708,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 502.2
+  },
+  {
+    "time": 1790177575.956774,
+    "kind": "started",
+    "attempt": 5,
+    "pid": 73232
+  },
+  {
+    "time": 1790177601.3261828,
+    "kind": "contention",
+    "attempt": 5,
+    "builders": [],
+    "other_cpu": 508.4
+  },
+  {
+    "time": 1790177601.332512,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typeorm",
+        "full-lint",
+        "4"
+      ]
+    ],
+    "samples": 9,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790177601.3908842,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 503.2
+  },
+  {
+    "time": 1790177667.236879,
+    "kind": "started",
+    "attempt": 6,
+    "pid": 73450
+  },
+  {
+    "time": 1790177677.418748,
+    "kind": "contention",
+    "attempt": 6,
+    "builders": [
+      {
+        "pid": 73462,
+        "name": "go"
+      }
+    ],
+    "other_cpu": 247.4
+  },
+  {
+    "time": 1790177677.424208,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typeorm",
+        "full-lint",
+        "4"
+      ]
+    ],
+    "samples": 3,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790177677.477581,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 73462,
+        "name": "go"
+      }
+    ],
+    "other_cpu": 249.5
+  },
+  {
+    "time": 1790177814.587233,
+    "kind": "started",
+    "attempt": 7,
+    "pid": 73888
+  },
+  {
+    "time": 1790177875.452086,
+    "kind": "contention",
+    "attempt": 7,
+    "builders": [
+      {
+        "pid": 74111,
+        "name": "go"
+      },
+      {
+        "pid": 74119,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 443.2
+  },
+  {
+    "time": 1790177875.4572349,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typeorm",
+        "full-check",
+        "4"
+      ]
+    ],
+    "samples": 9,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790177875.522429,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 74111,
+        "name": "go"
+      },
+      {
+        "pid": 74119,
+        "name": "compile"
+      }
+    ],
+    "other_cpu": 441.9
+  },
+  {
+    "time": 1790177956.982145,
+    "kind": "started",
+    "attempt": 8,
+    "pid": 74531
+  },
+  {
+    "time": 1790178311.2416892,
+    "kind": "completed",
+    "attempt": 8
+  }
+]

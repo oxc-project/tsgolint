@@ -1,0 +1,31 @@
+--- timing-harness.go
++++ profile-harness.go
+@@ -169,9 +169,9 @@
+ }
+ 
+ type affinityCheckerProfile struct {
+-	Files  int           `json:"files"`
+-	Calls  int           `json:"calls"`
+-	RuleNS time.Duration `json:"rule_ns"`
++	Files  int   `json:"files"`
++	Calls  int   `json:"calls"`
++	RuleNS int64 `json:"rule_ns"`
+ }
+ 
+ func TestCheckerAffinityProbe(t *testing.T) {
+@@ -228,13 +228,13 @@
+ 				}
+ 				start := time.Now()
+ 				listeners := r.Run(ctx)
+-				profile.RuleNS += time.Since(start)
++				profile.RuleNS += time.Since(start).Nanoseconds()
+ 				profile.Calls++
+ 				for kind, listener := range listeners {
+ 					listeners[kind] = func(node *ast.Node) {
+ 						start := time.Now()
+ 						listener(node)
+-						profile.RuleNS += time.Since(start)
++						profile.RuleNS += time.Since(start).Nanoseconds()
+ 						profile.Calls++
+ 					}
+ 				}

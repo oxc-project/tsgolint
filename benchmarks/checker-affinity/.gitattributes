@@ -1,0 +1,2 @@
+# Preserve compressed diagnostic evidence even under the repository's text rule.
+*.gz binary

@@ -1,0 +1,133 @@
+[
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module00.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module01.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module02.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module03.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module04.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module05.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module06.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module07.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module08.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module09.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module10.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module11.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module12.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module13.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module14.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module15.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module16.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module17.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module18.ts"
+  },
+  {
+    "kind": 1,
+    "range": { "pos": 124, "end": 129 },
+    "message": { "id": "TS2339", "description": "Property 'extra' does not exist on type 'Base'." },
+    "file_path": "module19.ts"
+  },
+  {
+    "kind": 0,
+    "range": { "pos": 67, "end": 110 },
+    "message": {
+      "id": "unnecessaryAssertion",
+      "description": "This assertion is unnecessary since it does not change the type of the expression."
+    },
+    "file_path": "controls.ts",
+    "rule": "no-unnecessary-type-assertion",
+    "fixes": [{ "text": "", "range": { "pos": 89, "end": 110 } }]
+  }
+]

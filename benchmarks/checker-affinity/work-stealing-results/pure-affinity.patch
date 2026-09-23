@@ -1,0 +1,57 @@
+--- a/internal/linter/linter.go
++++ b/internal/linter/linter.go
+@@ -375,18 +375,37 @@
+ }
+ 
+ func makeCheckerWorkloadQueue(program *compiler.Program, files []*ast.SourceFile) chan checkerWorkload {
+-	queue := makeSourceFileQueue(files)
+-	flatQueue := []checkerWorkload{}
+-	var flatQueueMu sync.Mutex
++	// Only the compiler-owned pool exposes stable checkers through this API.
++	// A custom pool can return request-scoped checkers that cannot be retained
++	// after their release callback has been called.
++	checkers := make(map[int]*checker.Checker)
++	var checkersMu sync.Mutex
+ 	program.ForEachCheckerParallel(func(idx int, ch *checker.Checker) {
+-		flatQueueMu.Lock()
+-		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
+-		flatQueueMu.Unlock()
++		checkersMu.Lock()
++		checkers[idx] = ch
++		checkersMu.Unlock()
+ 	})
+ 
+-	workloadQueue := make(chan checkerWorkload, len(flatQueue))
+-	for _, w := range flatQueue {
+-		workloadQueue <- w
++	workloadQueue := make(chan checkerWorkload, len(checkers))
++	if len(checkers) == 0 {
++		close(workloadQueue)
++		return workloadQueue
++	}
++
++	// Reuse the checker that performed semantic diagnostics for each file.
++	// Keep one workload per checker so that lint workers never use it concurrently.
++	ctx := core.WithRequestID(context.Background(), "__single_run__")
++	filesByChecker := make(map[*checker.Checker][]*ast.SourceFile, len(checkers))
++	for _, file := range files {
++		ch, done := program.GetTypeCheckerForFile(ctx, file)
++		filesByChecker[ch] = append(filesByChecker[ch], file)
++		done()
++	}
++	for idx := range len(checkers) {
++		ch := checkers[idx]
++		if checkerFiles := filesByChecker[ch]; len(checkerFiles) > 0 {
++			workloadQueue <- checkerWorkload{ch, program, makeSourceFileQueue(checkerFiles)}
++		}
+ 	}
+ 	close(workloadQueue)
+ 	return workloadQueue
+@@ -461,6 +480,7 @@
+ 	file.Node.ForEachChild(childVisitor)
+ }
+ 
++// RunLinterOnProgram requires exclusive use of the program's checkers until it returns.
+ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
+ 	logLevel := options.LogLevel
+ 	program := options.Program

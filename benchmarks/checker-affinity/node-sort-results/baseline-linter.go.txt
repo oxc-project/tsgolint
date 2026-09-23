@@ -46,51 +46,6 @@ type checkerWorkload struct {
 	checker *checker.Checker
 	program *compiler.Program
 	queue   chan *ast.SourceFile
-	peers   []chan *ast.SourceFile
-	pending <-chan checkerWorkload
-}
-
-func (w checkerWorkload) nextFile() *ast.SourceFile {
-	if file, ok := <-w.queue; ok {
-		return file
-	}
-	// Claim unstarted checker workloads before stealing. This preserves cache
-	// affinity when there are fewer workers than checkers, including one worker.
-	if len(w.pending) > 0 {
-		return nil
-	}
-	for {
-		var largest chan *ast.SourceFile
-		for _, queue := range w.peers {
-			if len(queue) > len(largest) {
-				largest = queue
-			}
-		}
-		if largest == nil {
-			return nil
-		}
-		// All queues are prefilled and closed. Another worker may win the last
-		// file, in which case rescan. Only the file moves: the thief continues
-		// using its own checker, never the victim's mutable checker state.
-		if file, ok := <-largest; ok {
-			return file
-		}
-	}
-}
-
-func (w checkerWorkload) nextWorkload() (checkerWorkload, bool) {
-	if next, ok := <-w.pending; ok {
-		return next, true
-	}
-	// Another worker may claim the last pending workload after nextFile saw
-	// it. Keep this checker available to steal instead of abandoning its lane.
-	// Queues only shrink, so an empty scan means no stealable work remains.
-	for _, queue := range w.peers {
-		if len(queue) > 0 {
-			return w, true
-		}
-	}
-	return checkerWorkload{}, false
 }
 
 type RunLinterOptions struct {
@@ -420,41 +375,18 @@ func makeSourceFileQueue(files []*ast.SourceFile) chan *ast.SourceFile {
 }
 
 func makeCheckerWorkloadQueue(program *compiler.Program, files []*ast.SourceFile) chan checkerWorkload {
-	// Only the compiler-owned pool exposes stable checkers through this API.
-	// A custom pool can return request-scoped checkers that cannot be retained
-	// after their release callback has been called.
-	checkers := make(map[int]*checker.Checker)
-	var checkersMu sync.Mutex
+	queue := makeSourceFileQueue(files)
+	flatQueue := []checkerWorkload{}
+	var flatQueueMu sync.Mutex
 	program.ForEachCheckerParallel(func(idx int, ch *checker.Checker) {
-		checkersMu.Lock()
-		checkers[idx] = ch
-		checkersMu.Unlock()
+		flatQueueMu.Lock()
+		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
+		flatQueueMu.Unlock()
 	})
 
-	workloadQueue := make(chan checkerWorkload, len(checkers))
-	if len(checkers) == 0 || len(files) == 0 {
-		close(workloadQueue)
-		return workloadQueue
-	}
-
-	// Reuse the checker that performed semantic diagnostics for each file.
-	// Keep one workload per checker so that lint workers never use it concurrently.
-	ctx := core.WithRequestID(context.Background(), "__single_run__")
-	filesByChecker := make(map[*checker.Checker][]*ast.SourceFile, len(checkers))
-	for _, file := range files {
-		ch, done := program.GetTypeCheckerForFile(ctx, file)
-		filesByChecker[ch] = append(filesByChecker[ch], file)
-		done()
-	}
-	queues := make([]chan *ast.SourceFile, len(checkers))
-	for idx := range queues {
-		queues[idx] = makeSourceFileQueue(filesByChecker[checkers[idx]])
-	}
-	for idx := range queues {
-		workloadQueue <- checkerWorkload{
-			checker: checkers[idx], program: program, queue: queues[idx],
-			peers: queues, pending: workloadQueue,
-		}
+	workloadQueue := make(chan checkerWorkload, len(flatQueue))
+	for _, w := range flatQueue {
+		workloadQueue <- w
 	}
 	close(workloadQueue)
 	return workloadQueue
@@ -529,7 +461,6 @@ func visitLintNodes(file *ast.SourceFile, runListeners func(kind ast.Kind, node 
 	file.Node.ForEachChild(childVisitor)
 }
 
-// RunLinterOnProgram requires exclusive use of the program's checkers until it returns.
 func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 	logLevel := options.LogLevel
 	program := options.Program
@@ -544,18 +475,9 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 
 	reportTypeScriptDiagnostics(program, files, typeErrors, onInternalDiagnostic)
 	workloadQueue := makeCheckerWorkloadQueue(program, files)
-	// Reserve one checker per worker before starting any of them. Otherwise a
-	// fast worker can claim several empty workloads, leaving later workers with
-	// no checker to use for stealing from a concentrated file selection.
-	initialWorkloads := make([]checkerWorkload, 0, len(workloadQueue))
-	// More workers than files cannot add parallelism. In particular, a single
-	// file should keep its warmed owner instead of being stolen by an idle peer.
-	for range min(workers, len(workloadQueue), len(files)) {
-		initialWorkloads = append(initialWorkloads, <-workloadQueue)
-	}
 
 	wg := core.NewWorkGroup(workers == 1)
-	for _, initial := range initialWorkloads {
+	for range workers {
 		wg.Queue(func() {
 			ctxBuilder := &ruleContextBuilder{
 				fixState:     fixState,
@@ -575,13 +497,13 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 				}
 				registeredListeners := make(map[ast.Kind][]taggedListener, 20)
 
-				for w, ok := initial, true; ok; w, ok = w.nextWorkload() {
+				for w := range workloadQueue {
 					ctxBuilder.program = w.program
 					ctxBuilder.checker = w.checker
 					ctx.Program = w.program
 					ctx.TypeChecker = w.checker
 
-					for file := w.nextFile(); file != nil; file = w.nextFile() {
+					for file := range w.queue {
 						if logLevel == utils.LogLevelDebug {
 							log.Print(file.FileName())
 						}
@@ -633,13 +555,13 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 				stat.Calls++
 			}
 
-			for w, ok := initial, true; ok; w, ok = w.nextWorkload() {
+			for w := range workloadQueue {
 				ctxBuilder.program = w.program
 				ctxBuilder.checker = w.checker
 				ctx.Program = w.program
 				ctx.TypeChecker = w.checker
 
-				for file := w.nextFile(); file != nil; file = w.nextFile() {
+				for file := range w.queue {
 					if logLevel == utils.LogLevelDebug {
 						log.Print(file.FileName())
 					}

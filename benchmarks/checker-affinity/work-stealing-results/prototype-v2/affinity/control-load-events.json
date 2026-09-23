@@ -1,0 +1,65 @@
+[
+  {
+    "time": 1790171494.8706229,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790171510.101481,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 244.3
+  },
+  {
+    "time": 1790171915.150949,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 47327
+  },
+  {
+    "time": 1790171991.025105,
+    "kind": "contention",
+    "attempt": 1,
+    "builders": [],
+    "other_cpu": 395.7
+  },
+  {
+    "time": 1790171991.0276191,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typescript",
+        "full-check",
+        "4"
+      ],
+      [
+        "typescript",
+        "one-cold",
+        "4"
+      ]
+    ],
+    "samples": 15,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790171991.076093,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 394.4
+  },
+  {
+    "time": 1790172036.834935,
+    "kind": "started",
+    "attempt": 2,
+    "pid": 47555
+  },
+  {
+    "time": 1790172102.537631,
+    "kind": "completed",
+    "attempt": 2
+  }
+]

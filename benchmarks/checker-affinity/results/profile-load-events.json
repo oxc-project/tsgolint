@@ -1,0 +1,43 @@
+[
+  {
+    "time": 1790164890.167567,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 500,
+    "phase": "profile"
+  },
+  {
+    "time": 1790164920.71933,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 29335
+  },
+  {
+    "time": 1790164925.77744,
+    "kind": "failed",
+    "attempt": 1,
+    "exit_code": 1
+  },
+  {
+    "time": 1790165617.592646,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 500,
+    "phase": "profile"
+  },
+  {
+    "time": 1790165648.1302872,
+    "kind": "started",
+    "attempt": 2,
+    "pid": 30790
+  },
+  {
+    "time": 1790165713.8859048,
+    "kind": "completed",
+    "attempt": 2
+  }
+]

@@ -1,0 +1,10 @@
+$ vitest --run
+
+ RUN  v5.0.0 /Users/cameron/.codex/worktrees/b7ca/tsgolint/e2e
+
+
+ Test Files  1 passed (1)
+      Tests  22 passed | 1 skipped (23)
+   Start at  16:04:13
+   Duration  1.71s (tests 97%, import 2%, transform 1%)
+

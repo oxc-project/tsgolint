@@ -1,0 +1,6 @@
+{
+  "retained_samples": 600,
+  "excluded_control_samples": 247,
+  "reason": "Other Go compiler processes saturated the machine during the one-worker controls. The complete one-worker pass was excluded conservatively; four-worker measurements finished before this incident.",
+  "quarantined_original": "/private/tmp/tsgolint-affinity-w4vcz79f/samples-before-contention.csv"
+}

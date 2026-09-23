@@ -1,0 +1,1303 @@
+[
+  {
+    "project": "typeorm",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1376363291.5,
+        "min": 1275784125.0,
+        "max": 1490653958.0,
+        "stdev": 60473675.28491518,
+        "relative_stdev_percent": 4.369968790962232
+      },
+      "B/op": {
+        "median": 1222575116.0,
+        "min": 1215330120.0,
+        "max": 1241610816.0,
+        "stdev": 8447875.396993715,
+        "relative_stdev_percent": 0.6904155974602139
+      },
+      "allocs/op": {
+        "median": 10144784.5,
+        "min": 10084697.0,
+        "max": 10217265.0,
+        "stdev": 41124.97242417178,
+        "relative_stdev_percent": 0.40535948608536
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525,
+        27526
+      ],
+      "type_diagnostics": [
+        1
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 1171803166.5,
+        "min": 1124304500.0,
+        "max": 1370118750.0,
+        "stdev": 69199684.10612394,
+        "relative_stdev_percent": 5.790586994279357
+      },
+      "B/op": {
+        "median": 1038896384.0,
+        "min": 1038582160.0,
+        "max": 1039569080.0,
+        "stdev": 340395.96738804714,
+        "relative_stdev_percent": 0.032763158171495985
+      },
+      "allocs/op": {
+        "median": 8971508.5,
+        "min": 8970814.0,
+        "max": 8977052.0,
+        "stdev": 1870.6820384257953,
+        "relative_stdev_percent": 0.020849814806635815
+      },
+      "samples": 10,
+      "diagnostics": [
+        27526
+      ],
+      "type_diagnostics": [
+        1
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 1155751729.5,
+        "min": 1062457793.0,
+        "max": 1178701625.0,
+        "stdev": 39071667.41937301,
+        "relative_stdev_percent": 3.4292683112100235
+      },
+      "B/op": {
+        "median": 1048972576.0,
+        "min": 1045504736.0,
+        "max": 1053679032.0,
+        "stdev": 2046371.0870931174,
+        "relative_stdev_percent": 0.195069033478719
+      },
+      "allocs/op": {
+        "median": 9044734.5,
+        "min": 9019894.0,
+        "max": 9074108.0,
+        "stdev": 13419.007315495932,
+        "relative_stdev_percent": 0.14835041717516298
+      },
+      "samples": 10,
+      "diagnostics": [
+        27526
+      ],
+      "type_diagnostics": [
+        1
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 1165598916.5,
+        "min": 1100860417.0,
+        "max": 1287610750.0,
+        "stdev": 52256251.942919545,
+        "relative_stdev_percent": 4.476163719546482
+      },
+      "B/op": {
+        "median": 1052630096.0,
+        "min": 1048826960.0,
+        "max": 1054982320.0,
+        "stdev": 2178101.116080539,
+        "relative_stdev_percent": 0.20701997087460214
+      },
+      "allocs/op": {
+        "median": 9054969.5,
+        "min": 9034179.0,
+        "max": 9066696.0,
+        "stdev": 11203.046750772755,
+        "relative_stdev_percent": 0.12376611263920667
+      },
+      "samples": 10,
+      "diagnostics": [
+        27526
+      ],
+      "type_diagnostics": [
+        1
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "typeorm",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1028341750.0,
+        "min": 998307833.0,
+        "max": 1064316583.0,
+        "stdev": 23177974.853516996,
+        "relative_stdev_percent": 2.2510298943013707
+      },
+      "B/op": {
+        "median": 988271916.0,
+        "min": 988026592.0,
+        "max": 989745000.0,
+        "stdev": 604527.7245415447,
+        "relative_stdev_percent": 0.06115379761403508
+      },
+      "allocs/op": {
+        "median": 8630337.0,
+        "min": 8627318.0,
+        "max": 8643482.0,
+        "stdev": 4755.7332931479195,
+        "relative_stdev_percent": 0.05509986278423866
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 1086542624.5,
+        "min": 1039698167.0,
+        "max": 1096539291.0,
+        "stdev": 19764773.005741943,
+        "relative_stdev_percent": 1.8315015097432095
+      },
+      "B/op": {
+        "median": 986814356.0,
+        "min": 986180200.0,
+        "max": 987863968.0,
+        "stdev": 442263.40412744984,
+        "relative_stdev_percent": 0.044818221171583225
+      },
+      "allocs/op": {
+        "median": 8632633.5,
+        "min": 8630583.0,
+        "max": 8637615.0,
+        "stdev": 1933.7310625374519,
+        "relative_stdev_percent": 0.022399975499514807
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 1020074375.0,
+        "min": 997284541.0,
+        "max": 1163475750.0,
+        "stdev": 61801056.037571035,
+        "relative_stdev_percent": 5.909123373669222
+      },
+      "B/op": {
+        "median": 989407308.0,
+        "min": 988655952.0,
+        "max": 990394104.0,
+        "stdev": 541471.4503185228,
+        "relative_stdev_percent": 0.05472575421431455
+      },
+      "allocs/op": {
+        "median": 8631281.0,
+        "min": 8625503.0,
+        "max": 8636059.0,
+        "stdev": 3293.2507766305584,
+        "relative_stdev_percent": 0.03815392020133723
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 1050567666.5,
+        "min": 988457751.0,
+        "max": 1198504000.0,
+        "stdev": 71936828.74037564,
+        "relative_stdev_percent": 6.696291363430838
+      },
+      "B/op": {
+        "median": 989276188.0,
+        "min": 988131824.0,
+        "max": 989820192.0,
+        "stdev": 580505.4712438118,
+        "relative_stdev_percent": 0.05868859900885765
+      },
+      "allocs/op": {
+        "median": 8634764.0,
+        "min": 8631611.0,
+        "max": 8641192.0,
+        "stdev": 3242.448438723086,
+        "relative_stdev_percent": 0.037550508422548944
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "typescript",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 3325845186.5,
+        "min": 3229622251.0,
+        "max": 3478386250.0,
+        "stdev": 93717581.24905851,
+        "relative_stdev_percent": 2.7939551605278163
+      },
+      "B/op": {
+        "median": 2352909012.0,
+        "min": 2309866840.0,
+        "max": 2377065512.0,
+        "stdev": 21449281.361166168,
+        "relative_stdev_percent": 0.9112979309256596
+      },
+      "allocs/op": {
+        "median": 15546671.0,
+        "min": 15371241.0,
+        "max": 15710560.0,
+        "stdev": 132990.9172881951,
+        "relative_stdev_percent": 0.8546942040281489
+      },
+      "samples": 10,
+      "diagnostics": [
+        53388,
+        53389
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 3575620271.0,
+        "min": 3465069375.0,
+        "max": 4466615625.0,
+        "stdev": 294686815.417798,
+        "relative_stdev_percent": 8.055056989417876
+      },
+      "B/op": {
+        "median": 2064948668.0,
+        "min": 2064340072.0,
+        "max": 2066457632.0,
+        "stdev": 634922.620704252,
+        "relative_stdev_percent": 0.03074680949852262
+      },
+      "allocs/op": {
+        "median": 13884508.0,
+        "min": 13883844.0,
+        "max": 13890663.0,
+        "stdev": 2627.4397529830358,
+        "relative_stdev_percent": 0.01892171051506434
+      },
+      "samples": 10,
+      "diagnostics": [
+        53388
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 3004962582.5,
+        "min": 2900540000.0,
+        "max": 3653231749.0,
+        "stdev": 237809092.0447056,
+        "relative_stdev_percent": 7.673678325793115
+      },
+      "B/op": {
+        "median": 2128464064.0,
+        "min": 2118053856.0,
+        "max": 2135752024.0,
+        "stdev": 5438650.602641701,
+        "relative_stdev_percent": 0.25550329972820585
+      },
+      "allocs/op": {
+        "median": 14259994.0,
+        "min": 14215108.0,
+        "max": 14306454.0,
+        "stdev": 31274.143725022008,
+        "relative_stdev_percent": 0.21930763763087754
+      },
+      "samples": 10,
+      "diagnostics": [
+        53388
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 3029181854.0,
+        "min": 2985542500.0,
+        "max": 3287729625.0,
+        "stdev": 88151075.64252737,
+        "relative_stdev_percent": 2.891021219201795
+      },
+      "B/op": {
+        "median": 2137640800.0,
+        "min": 2128331960.0,
+        "max": 2151982784.0,
+        "stdev": 7047631.824721127,
+        "relative_stdev_percent": 0.3296906109368511
+      },
+      "allocs/op": {
+        "median": 14214384.0,
+        "min": 14162087.0,
+        "max": 14252225.0,
+        "stdev": 27729.336293696048,
+        "relative_stdev_percent": 0.19511902195995104
+      },
+      "samples": 10,
+      "diagnostics": [
+        53388
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "typescript",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 2354796041.5,
+        "min": 2327739499.0,
+        "max": 2420048666.0,
+        "stdev": 30495531.634623364,
+        "relative_stdev_percent": 1.288587304702955
+      },
+      "B/op": {
+        "median": 1977644464.0,
+        "min": 1970627832.0,
+        "max": 1992429816.0,
+        "stdev": 6307175.020126924,
+        "relative_stdev_percent": 0.3188520995834755
+      },
+      "allocs/op": {
+        "median": 13423906.0,
+        "min": 13380974.0,
+        "max": 13446691.0,
+        "stdev": 23366.769241096783,
+        "relative_stdev_percent": 0.17410722997487435
+      },
+      "samples": 10,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 3099466584.0,
+        "min": 3016511333.0,
+        "max": 3218571416.0,
+        "stdev": 58689990.75056927,
+        "relative_stdev_percent": 1.8974428503141632
+      },
+      "B/op": {
+        "median": 1979285028.0,
+        "min": 1978741176.0,
+        "max": 1980193960.0,
+        "stdev": 469345.40837875707,
+        "relative_stdev_percent": 0.0237118428549839
+      },
+      "allocs/op": {
+        "median": 13484341.0,
+        "min": 13483840.0,
+        "max": 13489447.0,
+        "stdev": 2127.730676879321,
+        "relative_stdev_percent": 0.01577809890167284
+      },
+      "samples": 10,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 2381722521.0,
+        "min": 2346635500.0,
+        "max": 2498941584.0,
+        "stdev": 48774286.93420092,
+        "relative_stdev_percent": 2.0388964396523153
+      },
+      "B/op": {
+        "median": 1982355964.0,
+        "min": 1977274856.0,
+        "max": 1999958912.0,
+        "stdev": 7208528.112317138,
+        "relative_stdev_percent": 0.3632245975450642
+      },
+      "allocs/op": {
+        "median": 13432629.5,
+        "min": 13406683.0,
+        "max": 13469697.0,
+        "stdev": 22816.25032515203,
+        "relative_stdev_percent": 0.1698618840237682
+      },
+      "samples": 10,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 2471862688.0,
+        "min": 2364301751.0,
+        "max": 2663678166.0,
+        "stdev": 93413784.14880997,
+        "relative_stdev_percent": 3.744524969554829
+      },
+      "B/op": {
+        "median": 1964200408.0,
+        "min": 1953474632.0,
+        "max": 1973466968.0,
+        "stdev": 7038904.7202501735,
+        "relative_stdev_percent": 0.358441145313051
+      },
+      "allocs/op": {
+        "median": 13356322.5,
+        "min": 13320004.0,
+        "max": 13405593.0,
+        "stdev": 34773.49400541229,
+        "relative_stdev_percent": 0.26025904575877223
+      },
+      "samples": 10,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "vscode",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 8173001687.5,
+        "min": 7501487125.0,
+        "max": 9379638834.0,
+        "stdev": 708042124.3390527,
+        "relative_stdev_percent": 8.531485405622403
+      },
+      "B/op": {
+        "median": 6357821140.0,
+        "min": 6330968248.0,
+        "max": 6382506856.0,
+        "stdev": 16231786.777229184,
+        "relative_stdev_percent": 0.2552367702733514
+      },
+      "allocs/op": {
+        "median": 44463528.0,
+        "min": 44354161.0,
+        "max": 44601632.0,
+        "stdev": 78000.2083444511,
+        "relative_stdev_percent": 0.17542590618641424
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846,
+        144848,
+        144849,
+        144853,
+        144854,
+        144855,
+        144865
+      ],
+      "type_diagnostics": [
+        363
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 6595627812.5,
+        "min": 6195662916.0,
+        "max": 7482912458.0,
+        "stdev": 405540940.2124241,
+        "relative_stdev_percent": 6.086932809083874
+      },
+      "B/op": {
+        "median": 5339610652.0,
+        "min": 5338717144.0,
+        "max": 5345372648.0,
+        "stdev": 1979638.9090312405,
+        "relative_stdev_percent": 0.03706975298722431
+      },
+      "allocs/op": {
+        "median": 37957372.5,
+        "min": 37954264.0,
+        "max": 37977576.0,
+        "stdev": 6963.124477480557,
+        "relative_stdev_percent": 0.018343535773416467
+      },
+      "samples": 10,
+      "diagnostics": [
+        144873
+      ],
+      "type_diagnostics": [
+        363
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 6227037729.0,
+        "min": 6041881084.0,
+        "max": 6597044167.0,
+        "stdev": 150830825.31515762,
+        "relative_stdev_percent": 2.4121399127074583
+      },
+      "B/op": {
+        "median": 5362429684.0,
+        "min": 5356077720.0,
+        "max": 5373716744.0,
+        "stdev": 5738004.389646127,
+        "relative_stdev_percent": 0.10698808832763733
+      },
+      "allocs/op": {
+        "median": 38127655.5,
+        "min": 38100522.0,
+        "max": 38198093.0,
+        "stdev": 32934.205695092554,
+        "relative_stdev_percent": 0.08636122300073229
+      },
+      "samples": 10,
+      "diagnostics": [
+        144872,
+        144873
+      ],
+      "type_diagnostics": [
+        363
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 6307283917.0,
+        "min": 5857719001.0,
+        "max": 7100801166.0,
+        "stdev": 422673251.81365883,
+        "relative_stdev_percent": 6.666846393953472
+      },
+      "B/op": {
+        "median": 5327379384.0,
+        "min": 5325472072.0,
+        "max": 5330792664.0,
+        "stdev": 1597838.3223674276,
+        "relative_stdev_percent": 0.029991453375214347
+      },
+      "allocs/op": {
+        "median": 37972233.0,
+        "min": 37965914.0,
+        "max": 37989702.0,
+        "stdev": 8555.405038791429,
+        "relative_stdev_percent": 0.02252867557595928
+      },
+      "samples": 10,
+      "diagnostics": [
+        144873
+      ],
+      "type_diagnostics": [
+        363
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "vscode",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 5802323708.0,
+        "min": 5400806750.0,
+        "max": 6224001625.0,
+        "stdev": 290184039.3400508,
+        "relative_stdev_percent": 5.0041702017133725
+      },
+      "B/op": {
+        "median": 5119360156.0,
+        "min": 5112505304.0,
+        "max": 5124317856.0,
+        "stdev": 3703331.6451558108,
+        "relative_stdev_percent": 0.07234827004141918
+      },
+      "allocs/op": {
+        "median": 36591842.5,
+        "min": 36569547.0,
+        "max": 36616416.0,
+        "stdev": 13295.902341197707,
+        "relative_stdev_percent": 0.03633326227089035
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 6023890562.5,
+        "min": 5486524666.0,
+        "max": 6227752418.0,
+        "stdev": 267097235.0936362,
+        "relative_stdev_percent": 4.494633210201943
+      },
+      "B/op": {
+        "median": 5120610976.0,
+        "min": 5118932664.0,
+        "max": 5125062216.0,
+        "stdev": 1813708.3992089431,
+        "relative_stdev_percent": 0.03541602456813129
+      },
+      "allocs/op": {
+        "median": 36578631.5,
+        "min": 36573482.0,
+        "max": 36585114.0,
+        "stdev": 3733.716998143033,
+        "relative_stdev_percent": 0.010207151213285501
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 5446838500.0,
+        "min": 5116491792.0,
+        "max": 6430162625.0,
+        "stdev": 403739800.384576,
+        "relative_stdev_percent": 7.1922398300946
+      },
+      "B/op": {
+        "median": 5111073712.0,
+        "min": 5107904008.0,
+        "max": 5114622160.0,
+        "stdev": 2226729.533293605,
+        "relative_stdev_percent": 0.04356770430818856
+      },
+      "allocs/op": {
+        "median": 36563493.0,
+        "min": 36554298.0,
+        "max": 36576908.0,
+        "stdev": 6575.283334833058,
+        "relative_stdev_percent": 0.017983012796136028
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 5276629187.0,
+        "min": 5149789333.0,
+        "max": 6349836375.0,
+        "stdev": 358193686.12083405,
+        "relative_stdev_percent": 6.637376656736727
+      },
+      "B/op": {
+        "median": 5099995408.0,
+        "min": 5098697544.0,
+        "max": 5105634376.0,
+        "stdev": 2367390.602517802,
+        "relative_stdev_percent": 0.046410792678328004
+      },
+      "allocs/op": {
+        "median": 36511679.0,
+        "min": 36504285.0,
+        "max": 36528852.0,
+        "stdev": 8363.358260225907,
+        "relative_stdev_percent": 0.02290454288223867
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "vue",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1483796479.0,
+        "min": 1391201167.0,
+        "max": 1560414416.0,
+        "stdev": 48539877.78253496,
+        "relative_stdev_percent": 3.263943438872194
+      },
+      "B/op": {
+        "median": 1346193460.0,
+        "min": 1321762664.0,
+        "max": 1373616024.0,
+        "stdev": 16996085.160861805,
+        "relative_stdev_percent": 1.260412345091279
+      },
+      "allocs/op": {
+        "median": 11874771.0,
+        "min": 11402669.0,
+        "max": 11946875.0,
+        "stdev": 205351.36502871258,
+        "relative_stdev_percent": 1.7449497532479226
+      },
+      "samples": 10,
+      "diagnostics": [
+        12293,
+        12294,
+        12295,
+        12296
+      ],
+      "type_diagnostics": [
+        6
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 1134992000.5,
+        "min": 1059129000.0,
+        "max": 1216297209.0,
+        "stdev": 54319429.65858103,
+        "relative_stdev_percent": 4.817924540441871
+      },
+      "B/op": {
+        "median": 1021201564.0,
+        "min": 1020892952.0,
+        "max": 1021634520.0,
+        "stdev": 228709.95946404355,
+        "relative_stdev_percent": 0.0223963818206069
+      },
+      "allocs/op": {
+        "median": 8536847.5,
+        "min": 8535889.0,
+        "max": 8541717.0,
+        "stdev": 1664.3549835029519,
+        "relative_stdev_percent": 0.019495291433006774
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        6
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 1131055500.0,
+        "min": 1039537666.0,
+        "max": 1224664584.0,
+        "stdev": 61096223.37822597,
+        "relative_stdev_percent": 5.407314954517119
+      },
+      "B/op": {
+        "median": 1031745308.0,
+        "min": 1027747248.0,
+        "max": 1040920432.0,
+        "stdev": 5587711.851797021,
+        "relative_stdev_percent": 0.5403851029819795
+      },
+      "allocs/op": {
+        "median": 8650730.0,
+        "min": 8608890.0,
+        "max": 8787111.0,
+        "stdev": 53498.76482686306,
+        "relative_stdev_percent": 0.6177493868766569
+      },
+      "samples": 10,
+      "diagnostics": [
+        12294,
+        12295
+      ],
+      "type_diagnostics": [
+        6
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 1197722563.0,
+        "min": 1110783625.0,
+        "max": 1337480667.0,
+        "stdev": 71189633.04405783,
+        "relative_stdev_percent": 5.888910356674966
+      },
+      "B/op": {
+        "median": 1037790836.0,
+        "min": 1021073856.0,
+        "max": 1048648288.0,
+        "stdev": 9272678.861455072,
+        "relative_stdev_percent": 0.895767845115359
+      },
+      "allocs/op": {
+        "median": 9051482.5,
+        "min": 8576518.0,
+        "max": 9079101.0,
+        "stdev": 244187.04799870573,
+        "relative_stdev_percent": 2.750320614611288
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        6
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  },
+  {
+    "project": "vue",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1032120875.0,
+        "min": 976886167.0,
+        "max": 1171360167.0,
+        "stdev": 66078954.4709154,
+        "relative_stdev_percent": 6.29934417337773
+      },
+      "B/op": {
+        "median": 983367684.0,
+        "min": 971892352.0,
+        "max": 996176056.0,
+        "stdev": 6885509.367598607,
+        "relative_stdev_percent": 0.69997651566976
+      },
+      "allocs/op": {
+        "median": 8338077.0,
+        "min": 8305583.0,
+        "max": 8375198.0,
+        "stdev": 24768.42046190628,
+        "relative_stdev_percent": 0.2970253129902223
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "affinity": {
+      "ns/op": {
+        "median": 1053865375.0,
+        "min": 1009743374.0,
+        "max": 1126792250.0,
+        "stdev": 32214401.662396733,
+        "relative_stdev_percent": 3.0317907537866624
+      },
+      "B/op": {
+        "median": 997071912.0,
+        "min": 996809280.0,
+        "max": 997790712.0,
+        "stdev": 276412.10368610447,
+        "relative_stdev_percent": 0.02772090417589646
+      },
+      "allocs/op": {
+        "median": 8371669.5,
+        "min": 8370691.0,
+        "max": 8378683.0,
+        "stdev": 2304.1277067230644,
+        "relative_stdev_percent": 0.027520534707766088
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "stealing": {
+      "ns/op": {
+        "median": 1004782895.5,
+        "min": 925833042.0,
+        "max": 1181711625.0,
+        "stdev": 81484766.90572359,
+        "relative_stdev_percent": 7.920326119984582
+      },
+      "B/op": {
+        "median": 983867128.0,
+        "min": 977254872.0,
+        "max": 996940848.0,
+        "stdev": 6313987.031733333,
+        "relative_stdev_percent": 0.6409661547318285
+      },
+      "allocs/op": {
+        "median": 8340471.0,
+        "min": 8306931.0,
+        "max": 8375917.0,
+        "stdev": 23164.191230815242,
+        "relative_stdev_percent": 0.27760565197295817
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "sorted": {
+      "ns/op": {
+        "median": 996228062.5,
+        "min": 947801000.0,
+        "max": 1258084584.0,
+        "stdev": 85949305.43028344,
+        "relative_stdev_percent": 8.401999591284866
+      },
+      "B/op": {
+        "median": 977196120.0,
+        "min": 963745248.0,
+        "max": 984304784.0,
+        "stdev": 6954699.755463208,
+        "relative_stdev_percent": 0.7125994467480459
+      },
+      "allocs/op": {
+        "median": 8301545.5,
+        "min": 8289518.0,
+        "max": 8306526.0,
+        "stdev": 6690.59146696148,
+        "relative_stdev_percent": 0.08061482718722887
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    }
+  }
+]

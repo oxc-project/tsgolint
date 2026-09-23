@@ -1,0 +1,28 @@
+[
+  {
+    "time": 1790174494.293483,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 200,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790174504.526589,
+    "kind": "waiting",
+    "builders": [],
+    "other_cpu": 215.4
+  },
+  {
+    "time": 1790174570.617237,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 60112
+  },
+  {
+    "time": 1790174641.415348,
+    "kind": "completed",
+    "attempt": 1
+  }
+]

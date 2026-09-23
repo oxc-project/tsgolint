@@ -1,0 +1,15 @@
+{
+  "baseline_commit": "acd88e1b1ef8f219e8956f804f2548dafd949705",
+  "compiler_base": "2bd066d87f5bafd315be9f40889d0a60b9e58e0b",
+  "compiler_patched_head": "5a3d883d936a70e75e39334f61a5b4f2784e3c6e",
+  "compiler_patches": {
+    "0001-Adapt-project-service-for-single-run-mode.patch": "52dca882c7720248d1d22cdef73b8f0bda90e93289fa2fa3813e0fb3b6ffe561",
+    "0002-patch-expose-more-functions-via-the-shim-with-type-f.patch": "f7d87e74cee9ef2cb0c02017b7057643728cf2b816f4d3b95ac15a8307cfc8a7",
+    "0003-fix-early-return-from-invalid-tsconfig-for-better-er.patch": "9077e7b8954aa0895b019ccb8b9cef7ab3b9f106d87aef15e7267d10e2cfc5fd",
+    "0004-fix-collections-avoid-internal-json-import-in-ordere.patch": "a610609935fdae28d2ee6163abf97652e69429a845a5276808b758992796e953",
+    "0005-perf-vfs-cache-ReadFile-results-in-cachedvfs.patch": "c05d113614347b9c3e9a3b59622da79335f98038a67b0207ace9e63937e70fd0"
+  },
+  "benchmark_harness_sha256": "788b69340b9f57537d1984e4ee442821c0a71652d8f5b81786463f44fb9b6261",
+  "profiling_harness_sha256": "9d2ff961bd79a47352b0933d731cd51c66e516acaa740cf29d6714c55801fa6a",
+  "profiling_harness_change": "Integer nanosecond serialization only; timing binaries and BenchmarkCheckerAffinity unchanged. See profile-harness-fix.patch."
+}

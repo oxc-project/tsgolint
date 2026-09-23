@@ -1,0 +1,52 @@
+{
+  "baseline_commit": "acd88e1b1ef8f219e8956f804f2548dafd949705",
+  "compiler_patched_head": "5a3d883d936a70e75e39334f61a5b4f2784e3c6e",
+  "source_sha256": {
+    "internal/linter/linter.go": "ba25de1c1f92d2141b396fed2d92947b6a72238ea008215c712e5b7d89a19d7e",
+    "internal/linter/checker_affinity_test.go": "13ea29a3d1492cb98c78855a8cb0f460dc626e478d2f9391bf3ed3af1ffda2cb",
+    "cmd/tsgolint/checker_affinity_bench_test.go": "2c0d65719b5d2424561783f374642ed878bc5e0b7fd20f423fdbaae38c645038",
+    "benchmarks/checker-affinity/run.py": "71dc5668e4de22c40ede76b5478c15158a5de52aabc14837e679d0adb107f2d8"
+  },
+  "binaries": {
+    "baseline.test": "4a135d67ccce92b5c128d57dc60726ba4afe4b486ba4a96141b2bf8b22e19370",
+    "candidate.test": "799f7e2bf62f4ae6fcb84ac093dc02d3383cd0730e3414ab309fe195566c8a2e",
+    "steal-v3.test": "8a6ba1a8eb9b905b9a25a10d7018d273a633a18a2734f08e0bbc396fc14cf063",
+    "pure-profile-v2.test": "d10ea105c670e1d3687da11e343b6456cb32d4f2abf1a8a9f69862396762acc1"
+  },
+  "comparison_labels": {
+    "affinity": {
+      "baseline": "pure affinity",
+      "candidate": "hybrid work stealing"
+    },
+    "shared": {
+      "baseline": "original shared queue",
+      "candidate": "hybrid work stealing"
+    },
+    "profiles": {
+      "baseline": "pure affinity",
+      "candidate": "hybrid work stealing"
+    },
+    "validation": {
+      "baseline": "original shared queue",
+      "candidate": "hybrid work stealing"
+    },
+    "final-check": {
+      "baseline": "frozen primary timing variant",
+      "candidate": "final hybrid with handoff correction"
+    }
+  },
+  "timed_harness_unchanged": true,
+  "candidate": "Final hybrid: reserves initial checker workloads and caps active workers by selected file count.",
+  "primary_timing_variant": "steal-v3.test: before the supplemental two-worker handoff correction; original source_sha256 entries identify this frozen version.",
+  "final_source_sha256": {
+    "internal/linter/linter.go": "3d2c13c857c49c1f9ea560867a0839c7d720f335cff6a2f916814edb1c932953",
+    "internal/linter/checker_affinity_test.go": "307d53b6908fe8faafc1a1bf5dcefd62d3601126c1ffd82d09c27b41446c7a94",
+    "cmd/tsgolint/checker_affinity_bench_test.go": "2c0d65719b5d2424561783f374642ed878bc5e0b7fd20f423fdbaae38c645038",
+    "benchmarks/checker-affinity/run.py": "71dc5668e4de22c40ede76b5478c15158a5de52aabc14837e679d0adb107f2d8"
+  },
+  "final_binary": {
+    "name": "steal-final.test",
+    "sha256": "246c7ab42d1f2edeb4f17168cff81cc6dfb8ddef978dc9324420f213f6476952"
+  },
+  "final_correction": "final-handoff-fix.patch; deterministically tested lost-claim fallback. Primary four-worker/four-checker and single-file cases cannot encounter this race."
+}

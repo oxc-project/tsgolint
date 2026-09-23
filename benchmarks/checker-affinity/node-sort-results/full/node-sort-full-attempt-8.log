@@ -1,0 +1,4 @@
+typeorm full-check workers=4: baseline=1376.4, affinity=1171.8, stealing=1155.8, sorted=1165.6 ms
+vue full-lint workers=4: baseline=1032.1, affinity=1053.9, stealing=1004.8, sorted=996.2 ms
+vue full-check workers=4: baseline=1483.8, affinity=1135.0, stealing=1131.1, sorted=1197.7 ms
+vscode full-check workers=4: baseline=8173.0, affinity=6595.6, stealing=6227.0, sorted=6307.3 ms

@@ -1,0 +1,210 @@
+[
+  {
+    "time": 1790168528.5648692,
+    "kind": "monitor_policy",
+    "sample_interval_seconds": 5,
+    "quiet_seconds": 30,
+    "sustained_busy_seconds": 10,
+    "other_cpu_threshold": 500,
+    "retain_uncontended_prefix": true
+  },
+  {
+    "time": 1790168559.059825,
+    "kind": "started",
+    "attempt": 1,
+    "pid": 36694
+  },
+  {
+    "time": 1790168655.3596008,
+    "kind": "contention",
+    "attempt": 1,
+    "builders": [
+      {
+        "pid": 40104,
+        "name": "cargo"
+      },
+      {
+        "pid": 40390,
+        "name": "rustc"
+      },
+      {
+        "pid": 40391,
+        "name": "rustc"
+      },
+      {
+        "pid": 40459,
+        "name": "rustc"
+      },
+      {
+        "pid": 40462,
+        "name": "rustc"
+      },
+      {
+        "pid": 40479,
+        "name": "rustc"
+      },
+      {
+        "pid": 40498,
+        "name": "rustc"
+      },
+      {
+        "pid": 40617,
+        "name": "clang"
+      },
+      {
+        "pid": 40619,
+        "name": "clang"
+      },
+      {
+        "pid": 40633,
+        "name": "rustc"
+      },
+      {
+        "pid": 40644,
+        "name": "rustc"
+      },
+      {
+        "pid": 40651,
+        "name": "rustc"
+      }
+    ],
+    "other_cpu": 724.4
+  },
+  {
+    "time": 1790168655.366453,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typescript",
+        "ten-cold",
+        "4"
+      ]
+    ],
+    "samples": 7,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790168655.453249,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 40104,
+        "name": "cargo"
+      },
+      {
+        "pid": 40390,
+        "name": "rustc"
+      },
+      {
+        "pid": 40391,
+        "name": "rustc"
+      },
+      {
+        "pid": 40459,
+        "name": "rustc"
+      },
+      {
+        "pid": 40462,
+        "name": "rustc"
+      },
+      {
+        "pid": 40479,
+        "name": "rustc"
+      },
+      {
+        "pid": 40498,
+        "name": "rustc"
+      },
+      {
+        "pid": 40617,
+        "name": "clang"
+      },
+      {
+        "pid": 40619,
+        "name": "clang"
+      },
+      {
+        "pid": 40633,
+        "name": "rustc"
+      },
+      {
+        "pid": 40644,
+        "name": "rustc"
+      },
+      {
+        "pid": 40651,
+        "name": "rustc"
+      },
+      {
+        "pid": 40654,
+        "name": "rustc"
+      },
+      {
+        "pid": 40655,
+        "name": "rustc"
+      }
+    ],
+    "other_cpu": 713.9
+  },
+  {
+    "time": 1790169854.462104,
+    "kind": "started",
+    "attempt": 2,
+    "pid": 75276
+  },
+  {
+    "time": 1790169900.0225852,
+    "kind": "contention",
+    "attempt": 2,
+    "builders": [
+      {
+        "pid": 75955,
+        "name": "cargo"
+      },
+      {
+        "pid": 75971,
+        "name": "rustc"
+      }
+    ],
+    "other_cpu": 309.5
+  },
+  {
+    "time": 1790169900.02639,
+    "kind": "excluded",
+    "cases": [
+      [
+        "typescript",
+        "ten-warm",
+        "4"
+      ]
+    ],
+    "samples": 5,
+    "retained_ordered_prefix": true
+  },
+  {
+    "time": 1790169900.0781891,
+    "kind": "waiting",
+    "builders": [
+      {
+        "pid": 75955,
+        "name": "cargo"
+      },
+      {
+        "pid": 75971,
+        "name": "rustc"
+      }
+    ],
+    "other_cpu": 331.9
+  },
+  {
+    "time": 1790170046.8779159,
+    "kind": "started",
+    "attempt": 3,
+    "pid": 82175
+  },
+  {
+    "time": 1790170067.101662,
+    "kind": "completed",
+    "attempt": 3
+  }
+]

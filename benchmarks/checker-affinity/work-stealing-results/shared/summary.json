@@ -1,0 +1,1378 @@
+[
+  {
+    "project": "typeorm",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1320012583.0,
+        "min": 1284751250.0,
+        "max": 1532940875.0,
+        "stdev": 84495702.03432335,
+        "relative_stdev_percent": 6.225984526889258
+      },
+      "B/op": {
+        "median": 1226911492.0,
+        "min": 1214927048.0,
+        "max": 1235021368.0,
+        "stdev": 7040831.464514981,
+        "relative_stdev_percent": 0.5743277408424641
+      },
+      "allocs/op": {
+        "median": 10150182.5,
+        "min": 10091260.0,
+        "max": 10189984.0,
+        "stdev": 34416.12608389012,
+        "relative_stdev_percent": 0.33927673440685385
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525,
+        27526
+      ],
+      "type_diagnostics": [
+        1
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 1161512563.0,
+        "min": 1058951167.0,
+        "max": 1228533791.0,
+        "stdev": 52125007.75304413,
+        "relative_stdev_percent": 4.51991610240972
+      },
+      "B/op": {
+        "median": 1049143032.0,
+        "min": 1047995096.0,
+        "max": 1052773208.0,
+        "stdev": 1670347.2676029443,
+        "relative_stdev_percent": 0.15913458706651396
+      },
+      "allocs/op": {
+        "median": 9050575.5,
+        "min": 9032879.0,
+        "max": 9075346.0,
+        "stdev": 11971.014478963574,
+        "relative_stdev_percent": 0.1322649873717924
+      },
+      "samples": 10,
+      "diagnostics": [
+        27526
+      ],
+      "type_diagnostics": [
+        1
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -12.007462810678371,
+    "bytes_delta_percent": -14.489102201676985
+  },
+  {
+    "project": "typeorm",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1027678208.5,
+        "min": 990412291.0,
+        "max": 1206207834.0,
+        "stdev": 61999656.32811749,
+        "relative_stdev_percent": 5.962140086550639
+      },
+      "B/op": {
+        "median": 988352160.0,
+        "min": 985856760.0,
+        "max": 991059168.0,
+        "stdev": 1673238.6831736297,
+        "relative_stdev_percent": 0.169324549762469
+      },
+      "allocs/op": {
+        "median": 8629380.5,
+        "min": 8616587.0,
+        "max": 8642200.0,
+        "stdev": 7505.461212418002,
+        "relative_stdev_percent": 0.08697758970831297
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 1091083958.5,
+        "min": 1039222750.0,
+        "max": 1152790708.0,
+        "stdev": 41165840.11182874,
+        "relative_stdev_percent": 3.7636727594615684
+      },
+      "B/op": {
+        "median": 989335712.0,
+        "min": 987814600.0,
+        "max": 990603776.0,
+        "stdev": 793344.0132161807,
+        "relative_stdev_percent": 0.08019990645756238
+      },
+      "allocs/op": {
+        "median": 8630896.0,
+        "min": 8628312.0,
+        "max": 8635067.0,
+        "stdev": 2043.448775966748,
+        "relative_stdev_percent": 0.02367519675168793
+      },
+      "samples": 10,
+      "diagnostics": [
+        27525
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 6.169805827891106,
+    "bytes_delta_percent": 0.09951432695811668
+  },
+  {
+    "project": "typeorm",
+    "scenario": "ten-cold",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 366118625.0,
+        "min": 358298125.0,
+        "max": 399183959.0,
+        "stdev": 12024685.088550229,
+        "relative_stdev_percent": 3.2565452236742334
+      },
+      "B/op": {
+        "median": 410842212.0,
+        "min": 409609176.0,
+        "max": 412758592.0,
+        "stdev": 1027100.1907373117,
+        "relative_stdev_percent": 0.2498594046031248
+      },
+      "allocs/op": {
+        "median": 2295498.5,
+        "min": 2285617.0,
+        "max": 2300849.0,
+        "stdev": 5198.39276871013,
+        "relative_stdev_percent": 0.2266480058230852
+      },
+      "samples": 10,
+      "diagnostics": [
+        3321
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 373892625.0,
+        "min": 354417542.0,
+        "max": 391912084.0,
+        "stdev": 11344960.010890413,
+        "relative_stdev_percent": 3.0481791704017236
+      },
+      "B/op": {
+        "median": 410103616.0,
+        "min": 409444688.0,
+        "max": 410636872.0,
+        "stdev": 374474.90471598285,
+        "relative_stdev_percent": 0.09131953195080741
+      },
+      "allocs/op": {
+        "median": 2288479.0,
+        "min": 2283867.0,
+        "max": 2295491.0,
+        "stdev": 3858.530716333471,
+        "relative_stdev_percent": 0.16856256945296916
+      },
+      "samples": 10,
+      "diagnostics": [
+        3321
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 2.123355510799274,
+    "bytes_delta_percent": -0.17977607422676734
+  },
+  {
+    "project": "typeorm",
+    "scenario": "ten-warm",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 55365041.5,
+        "min": 51119624.0,
+        "max": 120458208.0,
+        "stdev": 20766108.618833687,
+        "relative_stdev_percent": 33.455625122285035
+      },
+      "B/op": {
+        "median": 59427976.0,
+        "min": 54070744.0,
+        "max": 62266032.0,
+        "stdev": 2334050.647720263,
+        "relative_stdev_percent": 3.9471775467419272
+      },
+      "allocs/op": {
+        "median": 722115.0,
+        "min": 688794.0,
+        "max": 740573.0,
+        "stdev": 16016.97769521107,
+        "relative_stdev_percent": 2.220440347775352
+      },
+      "samples": 10,
+      "diagnostics": [
+        3321,
+        3322
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 38205292.5,
+        "min": 36611958.0,
+        "max": 50431834.0,
+        "stdev": 4592650.022741486,
+        "relative_stdev_percent": 11.493168392926679
+      },
+      "B/op": {
+        "median": 41196700.0,
+        "min": 40639208.0,
+        "max": 41788112.0,
+        "stdev": 398680.70505494886,
+        "relative_stdev_percent": 0.9686331001154662
+      },
+      "allocs/op": {
+        "median": 595654.5,
+        "min": 590872.0,
+        "max": 601797.0,
+        "stdev": 3051.8759713403238,
+        "relative_stdev_percent": 0.5124212588479495
+      },
+      "samples": 10,
+      "diagnostics": [
+        3322
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -30.99383389787579,
+    "bytes_delta_percent": -30.67793525392821
+  },
+  {
+    "project": "typescript",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 3066193687.5,
+        "min": 2954840583.0,
+        "max": 3311803917.0,
+        "stdev": 102973002.93281148,
+        "relative_stdev_percent": 3.335940675204961
+      },
+      "B/op": {
+        "median": 2333664240.0,
+        "min": 2294246920.0,
+        "max": 2365127664.0,
+        "stdev": 25974602.572430395,
+        "relative_stdev_percent": 1.1146811189027015
+      },
+      "allocs/op": {
+        "median": 15435720.5,
+        "min": 15236808.0,
+        "max": 15706263.0,
+        "stdev": 160438.5785047419,
+        "relative_stdev_percent": 1.0378185927530117
+      },
+      "samples": 10,
+      "diagnostics": [
+        53388,
+        53389
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 2863159791.5,
+        "min": 2782649667.0,
+        "max": 2955646792.0,
+        "stdev": 58928342.62929004,
+        "relative_stdev_percent": 2.0562246520106386
+      },
+      "B/op": {
+        "median": 2130280120.0,
+        "min": 2109272104.0,
+        "max": 2135306544.0,
+        "stdev": 7160047.553277419,
+        "relative_stdev_percent": 0.33633485918927974
+      },
+      "allocs/op": {
+        "median": 14281981.0,
+        "min": 14160301.0,
+        "max": 14308942.0,
+        "stdev": 43445.93357278804,
+        "relative_stdev_percent": 0.30441859915973896
+      },
+      "samples": 10,
+      "diagnostics": [
+        53388
+      ],
+      "type_diagnostics": [
+        178
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -6.621691800740159,
+    "bytes_delta_percent": -8.715226317218628
+  },
+  {
+    "project": "typescript",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 2352546146.0,
+        "min": 2299786000.0,
+        "max": 2473030875.0,
+        "stdev": 58592557.1249855,
+        "relative_stdev_percent": 2.477312553704973
+      },
+      "B/op": {
+        "median": 1980399780.0,
+        "min": 1973915792.0,
+        "max": 1989748920.0,
+        "stdev": 5666589.625572545,
+        "relative_stdev_percent": 0.2860913036164345
+      },
+      "allocs/op": {
+        "median": 13422780.0,
+        "min": 13383388.0,
+        "max": 13442290.0,
+        "stdev": 20203.032035645872,
+        "relative_stdev_percent": 0.1505847205612565
+      },
+      "samples": 10,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 2333502333.0,
+        "min": 2299567708.0,
+        "max": 2391630750.0,
+        "stdev": 39257850.49988708,
+        "relative_stdev_percent": 1.677449672163207
+      },
+      "B/op": {
+        "median": 1986214204.0,
+        "min": 1972156248.0,
+        "max": 1999691496.0,
+        "stdev": 9212915.898327183,
+        "relative_stdev_percent": 0.4635701801134464
+      },
+      "allocs/op": {
+        "median": 13438886.5,
+        "min": 13399463.0,
+        "max": 13472605.0,
+        "stdev": 25053.641040553146,
+        "relative_stdev_percent": 0.18639972332445437
+      },
+      "samples": 10,
+      "diagnostics": [
+        53389
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -0.8094979574526096,
+    "bytes_delta_percent": 0.29359849757204515
+  },
+  {
+    "project": "typescript",
+    "scenario": "ten-cold",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 643505292.0,
+        "min": 623949293.0,
+        "max": 704431875.0,
+        "stdev": 24191704.883418452,
+        "relative_stdev_percent": 3.724666499385313
+      },
+      "B/op": {
+        "median": 737898680.0,
+        "min": 735739232.0,
+        "max": 745914568.0,
+        "stdev": 3681267.620442019,
+        "relative_stdev_percent": 0.49790464017160513
+      },
+      "allocs/op": {
+        "median": 3173344.5,
+        "min": 3162409.0,
+        "max": 3198984.0,
+        "stdev": 13372.144906068319,
+        "relative_stdev_percent": 0.4209942940675085
+      },
+      "samples": 10,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 785276396.5,
+        "min": 751485668.0,
+        "max": 830011125.0,
+        "stdev": 21684906.94597762,
+        "relative_stdev_percent": 2.7503862147615172
+      },
+      "B/op": {
+        "median": 746864384.0,
+        "min": 742967080.0,
+        "max": 756946600.0,
+        "stdev": 3910155.770216743,
+        "relative_stdev_percent": 0.5230976521738628
+      },
+      "allocs/op": {
+        "median": 3209709.0,
+        "min": 3194597.0,
+        "max": 3254051.0,
+        "stdev": 16025.488108704278,
+        "relative_stdev_percent": 0.4987548348942804
+      },
+      "samples": 10,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 22.031070491957983,
+    "bytes_delta_percent": 1.2150318523404868
+  },
+  {
+    "project": "typescript",
+    "scenario": "ten-warm",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 421083792.0,
+        "min": 407522833.0,
+        "max": 560665792.0,
+        "stdev": 49412868.31559566,
+        "relative_stdev_percent": 11.216911888702583
+      },
+      "B/op": {
+        "median": 217319828.0,
+        "min": 202199864.0,
+        "max": 219228608.0,
+        "stdev": 5058024.180974737,
+        "relative_stdev_percent": 2.344118844606797
+      },
+      "allocs/op": {
+        "median": 1754983.5,
+        "min": 1673713.0,
+        "max": 1761229.0,
+        "stdev": 25983.967574897666,
+        "relative_stdev_percent": 1.4887050195213831
+      },
+      "samples": 10,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 471253729.0,
+        "min": 459734251.0,
+        "max": 628495250.0,
+        "stdev": 55679814.518091835,
+        "relative_stdev_percent": 11.054017444991842
+      },
+      "B/op": {
+        "median": 194999780.0,
+        "min": 192437832.0,
+        "max": 196298888.0,
+        "stdev": 1208024.3765770071,
+        "relative_stdev_percent": 0.6208523156350709
+      },
+      "allocs/op": {
+        "median": 1642523.0,
+        "min": 1631619.0,
+        "max": 1650217.0,
+        "stdev": 5242.826782058193,
+        "relative_stdev_percent": 0.31948897029246687
+      },
+      "samples": 10,
+      "diagnostics": [
+        7261
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 11.914478294619336,
+    "bytes_delta_percent": -10.27059896255762
+  },
+  {
+    "project": "vscode",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 7783183813.0,
+        "min": 6920810084.0,
+        "max": 8474205417.0,
+        "stdev": 602893985.2710602,
+        "relative_stdev_percent": 7.888616550905205
+      },
+      "B/op": {
+        "median": 6348613560.0,
+        "min": 6316177048.0,
+        "max": 6389128216.0,
+        "stdev": 29690984.558153886,
+        "relative_stdev_percent": 0.467607893771512
+      },
+      "allocs/op": {
+        "median": 44416181.0,
+        "min": 44236936.0,
+        "max": 44595861.0,
+        "stdev": 147112.34447368598,
+        "relative_stdev_percent": 0.3312036335921863
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846,
+        144847,
+        144851,
+        144852,
+        144854,
+        144857,
+        144859,
+        144860
+      ],
+      "type_diagnostics": [
+        363
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 6058905521.0,
+        "min": 5945359125.0,
+        "max": 6782553583.0,
+        "stdev": 293219806.6566796,
+        "relative_stdev_percent": 4.732340336382911
+      },
+      "B/op": {
+        "median": 5359806700.0,
+        "min": 5356790704.0,
+        "max": 5376572120.0,
+        "stdev": 5636294.888115127,
+        "relative_stdev_percent": 0.10512747631717273
+      },
+      "allocs/op": {
+        "median": 38121920.5,
+        "min": 38101334.0,
+        "max": 38233596.0,
+        "stdev": 36798.40944645419,
+        "relative_stdev_percent": 0.09649955583885453
+      },
+      "samples": 10,
+      "diagnostics": [
+        144873
+      ],
+      "type_diagnostics": [
+        363
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -22.153894003119824,
+    "bytes_delta_percent": -15.575162209117044
+  },
+  {
+    "project": "vscode",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 5400101417.0,
+        "min": 5178793458.0,
+        "max": 5625811125.0,
+        "stdev": 160589805.13811335,
+        "relative_stdev_percent": 2.977523501690227
+      },
+      "B/op": {
+        "median": 5117468572.0,
+        "min": 5110529512.0,
+        "max": 5131120920.0,
+        "stdev": 5620018.34113537,
+        "relative_stdev_percent": 0.1098112842577675
+      },
+      "allocs/op": {
+        "median": 36593011.5,
+        "min": 36580820.0,
+        "max": 36667917.0,
+        "stdev": 25626.794566971847,
+        "relative_stdev_percent": 0.07001437691874617
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 5497409313.0,
+        "min": 5218937791.0,
+        "max": 5944157333.0,
+        "stdev": 263504174.3317612,
+        "relative_stdev_percent": 4.756765898776491
+      },
+      "B/op": {
+        "median": 5110353392.0,
+        "min": 5106646552.0,
+        "max": 5114216440.0,
+        "stdev": 2234465.5854409174,
+        "relative_stdev_percent": 0.043727027032504084
+      },
+      "allocs/op": {
+        "median": 36563851.5,
+        "min": 36551230.0,
+        "max": 36570109.0,
+        "stdev": 7235.0137533463685,
+        "relative_stdev_percent": 0.019788560368357785
+      },
+      "samples": 10,
+      "diagnostics": [
+        144846
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 1.8019642315173279,
+    "bytes_delta_percent": -0.13903710203381214
+  },
+  {
+    "project": "vscode",
+    "scenario": "ten-cold",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1436052645.5,
+        "min": 1329145083.0,
+        "max": 2364963167.0,
+        "stdev": 306761729.02781487,
+        "relative_stdev_percent": 20.16417589917842
+      },
+      "B/op": {
+        "median": 2037678544.0,
+        "min": 2029791144.0,
+        "max": 2041483848.0,
+        "stdev": 3557941.5040976466,
+        "relative_stdev_percent": 0.17462299470682352
+      },
+      "allocs/op": {
+        "median": 8288254.0,
+        "min": 8247898.0,
+        "max": 8311545.0,
+        "stdev": 20309.70259533879,
+        "relative_stdev_percent": 0.24514680785501453
+      },
+      "samples": 10,
+      "diagnostics": [
+        13429,
+        13431
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 1440332584.0,
+        "min": 1326449959.0,
+        "max": 1573079500.0,
+        "stdev": 82835456.91766822,
+        "relative_stdev_percent": 5.791258707842088
+      },
+      "B/op": {
+        "median": 2039979436.0,
+        "min": 2036816192.0,
+        "max": 2043894936.0,
+        "stdev": 2460061.0479823826,
+        "relative_stdev_percent": 0.12058813752297992
+      },
+      "allocs/op": {
+        "median": 8306888.5,
+        "min": 8291086.0,
+        "max": 8364223.0,
+        "stdev": 22223.073363811167,
+        "relative_stdev_percent": 0.2673368237715072
+      },
+      "samples": 10,
+      "diagnostics": [
+        13429
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": 0.29803493022428906,
+    "bytes_delta_percent": 0.11291731989695464
+  },
+  {
+    "project": "vscode",
+    "scenario": "ten-warm",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 560555103.5,
+        "min": 355438083.0,
+        "max": 677657959.0,
+        "stdev": 130130368.9690935,
+        "relative_stdev_percent": 25.050661589011902
+      },
+      "B/op": {
+        "median": 252513032.0,
+        "min": 222587136.0,
+        "max": 267100704.0,
+        "stdev": 13488710.81210375,
+        "relative_stdev_percent": 5.4156572755958745
+      },
+      "allocs/op": {
+        "median": 2888114.5,
+        "min": 2727123.0,
+        "max": 2942044.0,
+        "stdev": 68893.83453377135,
+        "relative_stdev_percent": 2.4048744127391193
+      },
+      "samples": 10,
+      "diagnostics": [
+        13429,
+        13430,
+        13431
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 201416374.5,
+        "min": 198278625.0,
+        "max": 284669916.0,
+        "stdev": 26498278.198390838,
+        "relative_stdev_percent": 12.465586857694706
+      },
+      "B/op": {
+        "median": 139871912.0,
+        "min": 138745464.0,
+        "max": 140958680.0,
+        "stdev": 807387.4970805255,
+        "relative_stdev_percent": 0.5771023817097671
+      },
+      "allocs/op": {
+        "median": 2208856.5,
+        "min": 2201462.0,
+        "max": 2212365.0,
+        "stdev": 3237.7505033930925,
+        "relative_stdev_percent": 0.1466558420785811
+      },
+      "samples": 10,
+      "diagnostics": [
+        13430
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -64.06840768331351,
+    "bytes_delta_percent": -44.60804224947883
+  },
+  {
+    "project": "vue",
+    "scenario": "full-check",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 1464846750.0,
+        "min": 1425016792.0,
+        "max": 1648977292.0,
+        "stdev": 65400457.875418894,
+        "relative_stdev_percent": 4.417974331893327
+      },
+      "B/op": {
+        "median": 1341814680.0,
+        "min": 1298180952.0,
+        "max": 1374381376.0,
+        "stdev": 22353922.81320192,
+        "relative_stdev_percent": 1.6670126822331564
+      },
+      "allocs/op": {
+        "median": 11815367.0,
+        "min": 11149656.0,
+        "max": 12101913.0,
+        "stdev": 374755.1938159838,
+        "relative_stdev_percent": 3.210484855446732
+      },
+      "samples": 10,
+      "diagnostics": [
+        12293,
+        12295,
+        12296
+      ],
+      "type_diagnostics": [
+        6
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 1091614375.5,
+        "min": 1015109542.0,
+        "max": 1220603458.0,
+        "stdev": 68614807.52468404,
+        "relative_stdev_percent": 6.165569296564681
+      },
+      "B/op": {
+        "median": 1035983708.0,
+        "min": 1027766728.0,
+        "max": 1042706312.0,
+        "stdev": 5529905.652135261,
+        "relative_stdev_percent": 0.534081093398731
+      },
+      "allocs/op": {
+        "median": 8654648.0,
+        "min": 8609325.0,
+        "max": 8783666.0,
+        "stdev": 53236.348287090885,
+        "relative_stdev_percent": 0.6145797137620392
+      },
+      "samples": 10,
+      "diagnostics": [
+        12294,
+        12295
+      ],
+      "type_diagnostics": [
+        6
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -25.47927791763882,
+    "bytes_delta_percent": -22.792340593560954
+  },
+  {
+    "project": "vue",
+    "scenario": "full-lint",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 975449250.5,
+        "min": 935313792.0,
+        "max": 1006793917.0,
+        "stdev": 30789392.364001658,
+        "relative_stdev_percent": 3.1681729251170148
+      },
+      "B/op": {
+        "median": 983955328.0,
+        "min": 975705664.0,
+        "max": 994905696.0,
+        "stdev": 6552837.505812225,
+        "relative_stdev_percent": 0.6650753392898459
+      },
+      "allocs/op": {
+        "median": 8329194.5,
+        "min": 8298627.0,
+        "max": 8376580.0,
+        "stdev": 21162.935904547838,
+        "relative_stdev_percent": 0.2541201822978651
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 965461478.5,
+        "min": 927689458.0,
+        "max": 1006390542.0,
+        "stdev": 31810756.479111712,
+        "relative_stdev_percent": 3.288839503537962
+      },
+      "B/op": {
+        "median": 988771736.0,
+        "min": 976926176.0,
+        "max": 997500480.0,
+        "stdev": 7643073.560284617,
+        "relative_stdev_percent": 0.7734722222015501
+      },
+      "allocs/op": {
+        "median": 8361916.5,
+        "min": 8335444.0,
+        "max": 8380797.0,
+        "stdev": 16377.518702307882,
+        "relative_stdev_percent": 0.19591479805621978
+      },
+      "samples": 10,
+      "diagnostics": [
+        12295
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -1.0239150827047516,
+    "bytes_delta_percent": 0.4894945799815753
+  },
+  {
+    "project": "vue",
+    "scenario": "ten-cold",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 261477271.0,
+        "min": 247289417.0,
+        "max": 282058375.0,
+        "stdev": 12794353.437339079,
+        "relative_stdev_percent": 4.8712375152745535
+      },
+      "B/op": {
+        "median": 320514620.0,
+        "min": 318876584.0,
+        "max": 327141528.0,
+        "stdev": 2359060.462785942,
+        "relative_stdev_percent": 0.7353601681296933
+      },
+      "allocs/op": {
+        "median": 1798395.5,
+        "min": 1793371.0,
+        "max": 1817131.0,
+        "stdev": 6543.226000138532,
+        "relative_stdev_percent": 0.36353852837144546
+      },
+      "samples": 10,
+      "diagnostics": [
+        1443
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 226155917.5,
+        "min": 216151708.0,
+        "max": 250548666.0,
+        "stdev": 13119105.063798068,
+        "relative_stdev_percent": 5.684339820121271
+      },
+      "B/op": {
+        "median": 325511432.0,
+        "min": 319380032.0,
+        "max": 327350848.0,
+        "stdev": 2187313.256829371,
+        "relative_stdev_percent": 0.6724112000544458
+      },
+      "allocs/op": {
+        "median": 1806960.0,
+        "min": 1798101.0,
+        "max": 1814137.0,
+        "stdev": 4937.1726378116,
+        "relative_stdev_percent": 0.2731787033529424
+      },
+      "samples": 10,
+      "diagnostics": [
+        1443
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -13.508383870198804,
+    "bytes_delta_percent": 1.558996591169537
+  },
+  {
+    "project": "vue",
+    "scenario": "ten-warm",
+    "worker_setting": 4,
+    "baseline": {
+      "ns/op": {
+        "median": 102208979.0,
+        "min": 39619582.0,
+        "max": 237105750.0,
+        "stdev": 53714925.4062969,
+        "relative_stdev_percent": 51.74526352788293
+      },
+      "B/op": {
+        "median": 50770336.0,
+        "min": 30993248.0,
+        "max": 52526976.0,
+        "stdev": 8489484.694958854,
+        "relative_stdev_percent": 17.98583026928311
+      },
+      "allocs/op": {
+        "median": 1072649.5,
+        "min": 553307.0,
+        "max": 1083756.0,
+        "stdev": 219707.32325995772,
+        "relative_stdev_percent": 22.643574830290436
+      },
+      "samples": 10,
+      "diagnostics": [
+        1443
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "candidate": {
+      "ns/op": {
+        "median": 23049041.0,
+        "min": 20968541.0,
+        "max": 81618625.0,
+        "stdev": 18630348.201379545,
+        "relative_stdev_percent": 61.69971047671986
+      },
+      "B/op": {
+        "median": 18918204.0,
+        "min": 18376728.0,
+        "max": 25415080.0,
+        "stdev": 2110903.5541601717,
+        "relative_stdev_percent": 10.819900499934903
+      },
+      "allocs/op": {
+        "median": 366946.5,
+        "min": 362635.0,
+        "max": 511481.0,
+        "stdev": 46106.330645102906,
+        "relative_stdev_percent": 12.117746946038201
+      },
+      "samples": 10,
+      "diagnostics": [
+        1443
+      ],
+      "type_diagnostics": [
+        0
+      ],
+      "checkers": [
+        4
+      ],
+      "actual_workers": [
+        4
+      ],
+      "gomaxprocs": [
+        4
+      ]
+    },
+    "time_delta_percent": -77.44910356652717,
+    "bytes_delta_percent": -62.73768209846001
+  }
+]

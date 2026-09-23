@@ -1,0 +1,14 @@
+{
+  "labels": {
+    "baseline": "affinity + stealing",
+    "candidate": "affinity + stealing + node sort"
+  },
+  "workers": 4,
+  "gomaxprocs": 4,
+  "semantic": false,
+  "selection": "full",
+  "binaries": {
+    "baseline": "352786c62de2baa5173499065cc7d8104b8c4a9e6de7b368f4cdcf28a345daa3",
+    "candidate": "c50cac5f28fbd494acae7e22dc2b5081125f56c1d0665d2c19317e3334a614fc"
+  }
+}

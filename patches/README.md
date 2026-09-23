@@ -1,7 +1,14 @@
 # Patches
 
-These patches do not change the behavior of typescript-go.
-The main purpose of the patches is to tune tsgo performance a bit.
+These patches adapt typescript-go for TSGolint and tune its performance.
+
+`0006-perf-distribute-checker-files-by-descending-node-count.patch` is an
+experimental checker-pool scheduling change. It stably sorts a copy of the source
+files by descending parser-recorded node count before round-robin assignment.
+Program order and traversal order remain unchanged, and single-checker pools skip
+the sort. The patch includes assignment, tie-order, and program-order tests. See
+the [node-count benchmark](../benchmarks/checker-affinity/NODE-SORT.md) for the
+four-way comparison and correctness limitations.
 
 Module resolution caching is tracked [here](https://github.com/microsoft/typescript-go/issues/673).
 
