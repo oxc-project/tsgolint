@@ -1,0 +1,64 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Cameron Clark <cameron.clark@hey.com>
+Date: Wed, 23 Sep 2026 17:00:50 +0100
+Subject: [PATCH 6/6] fix(checker): isolate context-free call signature inference
+
+A context-free expression check currently reuses a previously cached call
+signature, including any type arguments inferred from an assertion. When it
+runs first, it also leaves its context-free signature in the normal cache.
+
+Temporarily bypass and restore resolved signatures while checking without a
+contextual type. This makes the result independent of check order and keeps
+normal type queries unchanged.
+
+---
+ internal/checker/checker.go | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/internal/checker/checker.go b/internal/checker/checker.go
+index b639d488e..bf21051f4 100644
+--- a/internal/checker/checker.go
++++ b/internal/checker/checker.go
+@@ -895,8 +895,9 @@ type Checker struct {
+ 	deferredDiagnosticCallbacks                 []func()
+ 	typeToStringNodebuilder                     *NodeBuilder
+ 
+-	mu     sync.Mutex
+-	tracer *Tracer // Optional tracer for trace events and type recording (for --generateTrace)
++	mu                            sync.Mutex
++	tracer                        *Tracer // Optional tracer for trace events and type recording (for --generateTrace)
++	checkingContextFreeExpression bool
+ }
+ 
+ func NewChecker(program Program, tracer *Tracer) (*Checker, *sync.Mutex) {
+@@ -7520,10 +7521,13 @@ func (c *Checker) getContextFreeTypeOfExpression(node *ast.Node) *Type {
+ 	if cached := c.contextFreeTypes[node]; cached != nil {
+ 		return cached
+ 	}
++	previouslyCheckingContextFreeExpression := c.checkingContextFreeExpression
++	c.checkingContextFreeExpression = true
+ 	c.pushContextualType(node, c.anyType, false /*isCache*/)
+ 	t := c.checkExpressionEx(node, CheckModeSkipContextSensitive)
+-	c.contextFreeTypes[node] = t
+ 	c.popContextualType()
++	c.checkingContextFreeExpression = previouslyCheckingContextFreeExpression
++	c.contextFreeTypes[node] = t
+ 	return t
+ }
+ 
+@@ -8382,6 +8386,13 @@ func (c *Checker) isSymbolOrSymbolForCall(node *ast.Node) bool {
+  */
+ func (c *Checker) getResolvedSignature(node *ast.Node, candidatesOutArray *[]*Signature, checkMode CheckMode) *Signature {
+ 	links := c.signatureLinks.Get(node)
++	if c.checkingContextFreeExpression && links.resolvedSignature != c.resolvingSignature {
++		// A context-free check must not reuse a signature inferred from the node's
++		// context, or leave its own inference cached for a later normal check.
++		cached := links.resolvedSignature
++		links.resolvedSignature = nil
++		defer func() { links.resolvedSignature = cached }()
++	}
+ 	// If getResolvedSignature has already been called, we will have cached the resolvedSignature.
+ 	// However, it is possible that either candidatesOutArray was not passed in the first time,
+ 	// or that a different candidatesOutArray was passed in. Therefore, we need to redo the work
+-- 
+2.50.1
