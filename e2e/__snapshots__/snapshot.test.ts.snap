@@ -1108,6 +1108,19 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-for-in-array",
   },
   {
+    "file_path": "fixtures/basic/rules/no-generated-empty-object-type/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This type resolves to \`{}\`, the empty object type. This was likely not intentional.",
+      "id": "noGeneratedEmptyObjectType",
+    },
+    "range": {
+      "end": 61,
+      "pos": 43,
+    },
+    "rule": "no-generated-empty-object-type",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-implied-eval/index.ts",
     "kind": 0,
     "message": {

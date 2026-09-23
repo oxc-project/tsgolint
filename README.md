@@ -168,7 +168,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-59 of the 61 targeted rules are implemented.
+60 of the 62 targeted rules are implemented.
 
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
@@ -183,6 +183,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [x] [no-duplicate-type-constituents](https://typescript-eslint.io/rules/no-duplicate-type-constituents)
 - [x] [no-floating-promises](https://typescript-eslint.io/rules/no-floating-promises)
 - [x] [no-for-in-array](https://typescript-eslint.io/rules/no-for-in-array)
+- [x] [no-generated-empty-object-type](https://typescript-eslint.io/rules/no-generated-empty-object-type)
 - [x] [no-implied-eval](https://typescript-eslint.io/rules/no-implied-eval)
 - [x] [no-meaningless-void-operator](https://typescript-eslint.io/rules/no-meaningless-void-operator)
 - [x] [no-misused-promises](https://typescript-eslint.io/rules/no-misused-promises)

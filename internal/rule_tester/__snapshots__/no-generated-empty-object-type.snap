@@ -1,0 +1,81 @@
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-0 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (4:19 - 4:44)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   3 | type NullableData = null | Data;
+   4 | type Unexpected = Omit<NullableData, 'name'>;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-1 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (4:32 - 4:57)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   3 | type NullableData = null | Data;
+   4 | function doSomething<T extends Omit<NullableData, 'name'>>(param: T) {}
+     |                                ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-2 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (3:19 - 3:35)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   2 | type Data = { name: string; num: number };
+   3 | type Unexpected = Pick<Data, never>;
+     |                   ~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-3 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (2:19 - 2:38)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   1 | 
+   2 | type Unexpected = NonNullable<unknown>;
+     |                   ~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-4 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (4:27 - 4:52)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   3 | type NullableData = null | Data;
+   4 | declare const unexpected: Omit<NullableData, 'name'>;
+     |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-5 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (4:19 - 4:44)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   3 | type NullableData = null | Data;
+   4 | type Unexpected = Omit<NullableData, 'name'>;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | type Referencing = Unexpected;
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-6 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (4:25 - 4:50)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   3 | type NullableData = null | Data;
+   4 | type Unexpected = Array<Omit<NullableData, 'name'>>;
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-7 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (7:19 - 7:56)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   6 |   : never;
+   7 | type Unexpected = DistributiveOmit<Data | Data2, 'name'>;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-8 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (3:19 - 3:51)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   2 | type Data = { a: string };
+   3 | type Unexpected = Omit<Data, 'a'> & Omit<Data, 'a'>;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
