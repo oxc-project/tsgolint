@@ -588,7 +588,6 @@ func IsStrongPrecedenceNode(innerNode *ast.Node) bool {
 		ast.IsParenthesizedExpression(innerNode) ||
 		innerNode.Kind == ast.KindIdentifier ||
 		innerNode.Kind == ast.KindTypeReference ||
-		innerNode.Kind == ast.KindTypeOperator ||
 		innerNode.Kind == ast.KindArrayLiteralExpression ||
 		innerNode.Kind == ast.KindObjectLiteralExpression ||
 		innerNode.Kind == ast.KindPropertyAccessExpression ||

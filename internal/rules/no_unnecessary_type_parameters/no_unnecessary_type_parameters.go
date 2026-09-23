@@ -46,20 +46,21 @@ func findTypeParameterIndex(typeParameters []*ast.Node, target *ast.Node) int {
 	return -1
 }
 
-func isComplexConstraint(node *ast.Node) bool {
+func isWeakPrecedenceConstraint(node *ast.Node) bool {
 	if node == nil {
 		return false
 	}
 
 	switch node.Kind {
-	case ast.KindUnionType, ast.KindIntersectionType, ast.KindConditionalType:
+	case ast.KindUnionType, ast.KindIntersectionType, ast.KindConditionalType,
+		ast.KindTypeOperator, ast.KindFunctionType, ast.KindConstructorType:
 		return true
 	default:
 		return false
 	}
 }
 
-func hasMatchingAncestorType(reference *ast.Node) bool {
+func isWeakPrecedenceTypeParent(reference *ast.Node) bool {
 	if reference == nil || reference.Parent == nil {
 		return false
 	}
@@ -70,7 +71,8 @@ func hasMatchingAncestorType(reference *ast.Node) bool {
 	}
 
 	switch grandparent.Kind {
-	case ast.KindArrayType, ast.KindIndexedAccessType, ast.KindIntersectionType, ast.KindUnionType:
+	case ast.KindArrayType, ast.KindIndexedAccessType, ast.KindIntersectionType, ast.KindUnionType,
+		ast.KindConditionalType, ast.KindTypeOperator:
 		return true
 	default:
 		return false
@@ -637,10 +639,10 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 						continue
 					}
 					replacement := constraintText
-					if isComplexConstraint(constraintNode) && hasMatchingAncestorType(reference) {
+					if isWeakPrecedenceConstraint(constraintNode) && isWeakPrecedenceTypeParent(reference) {
 						replacement = "(" + replacement + ")"
 					}
-					fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, reference, replacement))
+					fixes = append(fixes, rule.RuleFixReplace(ctx.SourceFile, reference.Parent, replacement))
 				}
 
 				fixes = append(fixes, rule.RuleFixRemoveRange(removalRange))

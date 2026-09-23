@@ -1002,3 +1002,86 @@ Message: Type parameter T is used only once in the function signature.
    4 | }
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
+
+[TestNoUnnecessaryTypeParameters/invalid-69 - 1]
+Diagnostic 1: sole (1:22 - 1:43)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends () => number>(arg: T[]): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:51 - 1:51)
+   1 | declare function foo<T extends () => number>(arg: T[]): void;
+     |                                                   ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-70 - 1]
+Diagnostic 1: sole (2:22 - 2:40)
+Message: Type parameter T is used only once in the function signature.
+   1 | interface Foo { a: string; b: number; }
+   2 | declare function foo<T extends keyof Foo>(arg: T[]): void;
+     |                      ~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (2:48 - 2:48)
+   1 | interface Foo { a: string; b: number; }
+   2 | declare function foo<T extends keyof Foo>(arg: T[]): void;
+     |                                                ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-71 - 1]
+Diagnostic 1: sole (1:22 - 1:41)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends () => void>(arg: T | string): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:49 - 1:49)
+   1 | declare function foo<T extends () => void>(arg: T | string): void;
+     |                                                 ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-72 - 1]
+Diagnostic 1: sole (3:22 - 3:36)
+Message: Type parameter T is used only once in the function signature.
+   2 | interface B { y: string; shared: string; }
+   3 | declare function foo<T extends A | B>(k: keyof T): void;
+     |                      ~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (3:48 - 3:48)
+   2 | interface B { y: string; shared: string; }
+   3 | declare function foo<T extends A | B>(k: keyof T): void;
+     |                                                ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-73 - 1]
+Diagnostic 1: sole (2:22 - 2:44)
+Message: Type parameter T is used only once in the function signature.
+   1 | class Foo {}
+   2 | declare function bar<T extends new () => Foo>(arg: T[]): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (2:52 - 2:52)
+   1 | class Foo {}
+   2 | declare function bar<T extends new () => Foo>(arg: T[]): void;
+     |                                                    ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-74 - 1]
+Diagnostic 1: sole (1:22 - 1:52)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends () => Promise<string>>(arg: T extends () => Promise<infer R> ? R : never): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:60 - 1:60)
+   1 | declare function foo<T extends () => Promise<string>>(arg: T extends () => Promise<infer R> ? R : never): void;
+     |                                                            ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-75 - 1]
+Diagnostic 1: sole (1:22 - 1:48)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends readonly string[]>(x: T[]): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:54 - 1:54)
+   1 | declare function foo<T extends readonly string[]>(x: T[]): void;
+     |                                                      ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
