@@ -270,6 +270,55 @@ var UnboundMethodRule = rule.Rule{
 			return true
 		}
 
+		checkUnionConstituentsAndReport := func(node *ast.Node, dangerousReference *ast.Node, propertyName string, t *checker.Type) bool {
+			for _, unionPart := range utils.UnionTypeParts(t) {
+				for _, intersectionPart := range utils.IntersectionTypeParts(unionPart) {
+					if isSpecBoundBuiltinMethod(intersectionPart, dangerousReference) {
+						continue
+					}
+					if checkIfMethodAndReport(node, dangerousReference, checker.Checker_getPropertyOfType(ctx.TypeChecker, intersectionPart, propertyName)) {
+						return true
+					}
+				}
+			}
+			return false
+		}
+
+		checkMemberAccess := func(node *ast.Node) {
+			property := node.Name()
+			if ast.IsElementAccessExpression(node) {
+				property = node.AsElementAccessExpression().ArgumentExpression
+			}
+			if isSafeUse(node) || isNativelyBound(node.Expression(), property) {
+				return
+			}
+
+			var propertyNames []string
+			if ast.IsPropertyAccessExpression(node) {
+				if ast.IsIdentifier(property) {
+					propertyNames = append(propertyNames, property.Text())
+				}
+			} else {
+				for _, part := range utils.UnionTypeParts(ctx.TypeChecker.GetTypeAtLocation(property)) {
+					if part.IsStringLiteral() {
+						propertyNames = append(propertyNames, part.AsLiteralType().Value().(string))
+					} else if part.IsNumberLiteral() {
+						propertyNames = append(propertyNames, part.AsLiteralType().String())
+					}
+				}
+			}
+			if len(propertyNames) == 0 {
+				return
+			}
+
+			objectType := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
+			for _, propertyName := range propertyNames {
+				if checkUnionConstituentsAndReport(node, property, propertyName, objectType) {
+					break
+				}
+			}
+		}
+
 		checkBindingProperty := func(patternNode *ast.Node, initNode *ast.Node, propertyName *ast.Node, parentIsAssignmentPatternLike bool) {
 			// Skip computed property names as they cannot be statically analyzed
 			if ast.IsComputedPropertyName(propertyName) {
@@ -291,22 +340,12 @@ var UnboundMethodRule = rule.Rule{
 				}
 			}
 
-			utils.TypeRecurser(ctx.TypeChecker.GetTypeAtLocation(patternNode), func(t *checker.Type) bool {
-				if isSpecBoundBuiltinMethod(t, propertyName) {
-					return false
-				}
-				return checkIfMethodAndReport(propertyName, propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName.Text()))
-			})
+			checkUnionConstituentsAndReport(propertyName, propertyName, propertyName.Text(), ctx.TypeChecker.GetTypeAtLocation(patternNode))
 		}
 
 		return rule.RuleListeners{
-			ast.KindPropertyAccessExpression: func(node *ast.Node) {
-				if isSafeUse(node) || isNativelyBound(node.Expression(), node.Name()) {
-					return
-				}
-
-				checkIfMethodAndReport(node, node.Name(), ctx.TypeChecker.GetSymbolAtLocation(node))
-			},
+			ast.KindPropertyAccessExpression: checkMemberAccess,
+			ast.KindElementAccessExpression:  checkMemberAccess,
 
 			rule.ListenerOnAllowPattern(ast.KindObjectLiteralExpression): func(node *ast.Node) {
 				if !ast.IsAssignmentExpression(node.Parent, true) {
