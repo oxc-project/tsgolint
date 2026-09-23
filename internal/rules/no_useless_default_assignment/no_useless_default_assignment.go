@@ -523,8 +523,28 @@ var NoUselessDefaultAssignmentRule = rule.Rule{
 					return
 				}
 
-				if !canBeUndefined(tupleArgs[elementIndex]) {
-					reportUselessDefaultAssignment(node, "property", tupleArgs[elementIndex])
+				tupleTarget := sourceType.Target().AsTupleType()
+				if elementIndex >= checker.TupleType_minLength(tupleTarget) {
+					return
+				}
+
+				elementTypes := tupleArgs[elementIndex : elementIndex+1]
+				if elementIndex >= tupleTarget.FixedLength() {
+					// A trailing element cannot reach this position if too many required elements precede it.
+					end := tupleTarget.FixedLength()
+					position := end
+					elementInfos := tupleTarget.ElementInfos()
+					for end < len(tupleArgs) && position <= elementIndex {
+						if elementInfos[end].TupleElementFlags()&checker.ElementFlagsRequired != 0 {
+							position++
+						}
+						end++
+					}
+					elementTypes = tupleArgs[tupleTarget.FixedLength():end]
+				}
+				if !slices.ContainsFunc(elementTypes, canBeUndefined) {
+					elementType := checker.Checker_getUnionTypeEx(ctx.TypeChecker, elementTypes, checker.UnionReductionLiteral, nil, nil)
+					reportUselessDefaultAssignment(node, "property", elementType)
 				}
 			}
 		}

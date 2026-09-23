@@ -364,3 +364,45 @@ Help: Remove the default assignment
    3 |       
   Suggestion 1: [removeDefaultAssignment] Remove the default value.
 ---
+
+[TestNoUselessDefaultAssignmentRule/invalid-22 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:15 - 2:15)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+Help: Remove the default assignment
+   1 | declare const mixed: [boolean, ...number[], string];
+   2 | const [a, b = 0] = mixed;
+     |               ~
+  Label: Default value (2:15 - 2:15)
+   1 | declare const mixed: [boolean, ...number[], string];
+   2 | const [a, b = 0] = mixed;
+     |               ^ Default value
+  Suggestion 1: [removeDefaultAssignment] Remove the default value.
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-23 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:16 - 2:25)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+Help: Remove the default assignment
+   1 | declare const x: [...string[], number, boolean | undefined];
+   2 | const [first = 'fallback'] = x;
+     |                ~~~~~~~~~~
+  Label: Default value (2:16 - 2:25)
+   1 | declare const x: [...string[], number, boolean | undefined];
+   2 | const [first = 'fallback'] = x;
+     |                ^^^^^^^^^^ Default value
+  Suggestion 1: [removeDefaultAssignment] Remove the default value.
+---
+
+[TestNoUselessDefaultAssignmentRule/invalid-24 - 1]
+Diagnostic 1: uselessDefaultAssignment (2:22 - 2:31)
+Message: Default value is useless because the property is not nullish. This default assignment will never be used.
+Help: Remove the default assignment
+   1 | declare const x: [boolean, ...string[], number, boolean | undefined];
+   2 | const [head, first = 'fallback'] = x;
+     |                      ~~~~~~~~~~
+  Label: Default value (2:22 - 2:31)
+   1 | declare const x: [boolean, ...string[], number, boolean | undefined];
+   2 | const [head, first = 'fallback'] = x;
+     |                      ^^^^^^^^^^ Default value
+  Suggestion 1: [removeDefaultAssignment] Remove the default value.
+---

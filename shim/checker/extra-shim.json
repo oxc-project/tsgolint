@@ -64,6 +64,7 @@
     ],
     "TupleType": [
       "combinedFlags",
+      "minLength",
       "readonly"
     ],
     "Signature": [

@@ -198,6 +198,33 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 		{
 			Code: "\n      function f(this: void, { bar = 42 }: { bar?: number }) {\n        return bar;\n      }\n    ",
 		},
+		{
+			Code: `declare const commands: [string, ...string[]];
+const [cmd, arg = 'run'] = commands;`,
+		},
+		{
+			Code: `declare const commands: readonly [string, ...string[]];
+const [cmd, arg = 'run'] = commands;`,
+		},
+		{
+			Code: `function run([cmd, arg = 'run']: [string, ...string[]]) {}`,
+		},
+		{
+			Code: `declare const mixed: [boolean, ...number[], string];
+const [a, b, c = 0] = mixed;`,
+		},
+		{
+			Code: `declare const items: [...string[], string | undefined];
+const [first = 'fallback'] = items;`,
+		},
+		{
+			Code: `declare const x: [...string[], number, boolean | undefined];
+const [first, second = 'fallback'] = x;`,
+		},
+		{
+			Code: `declare const x: [...string[], number | undefined, boolean];
+const [first = 'fallback'] = x;`,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: "\n        function Bar({ foo = '' }: { foo: string }) {\n          return foo;\n        }\n      ",
@@ -584,6 +611,51 @@ func TestNoUselessDefaultAssignmentRule(t *testing.T) {
 					},
 				},
 			},
+		},
+		{
+			Code: `declare const mixed: [boolean, ...number[], string];
+const [a, b = 0] = mixed;`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "uselessDefaultAssignment",
+				Line:      2,
+				Column:    15,
+				EndColumn: 16,
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "removeDefaultAssignment",
+					Output: `declare const mixed: [boolean, ...number[], string];
+const [a, b] = mixed;`,
+				}},
+			}},
+		},
+		{
+			Code: `declare const x: [...string[], number, boolean | undefined];
+const [first = 'fallback'] = x;`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "uselessDefaultAssignment",
+				Line:      2,
+				Column:    16,
+				EndColumn: 26,
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "removeDefaultAssignment",
+					Output: `declare const x: [...string[], number, boolean | undefined];
+const [first] = x;`,
+				}},
+			}},
+		},
+		{
+			Code: `declare const x: [boolean, ...string[], number, boolean | undefined];
+const [head, first = 'fallback'] = x;`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "uselessDefaultAssignment",
+				Line:      2,
+				Column:    22,
+				EndColumn: 32,
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "removeDefaultAssignment",
+					Output: `declare const x: [boolean, ...string[], number, boolean | undefined];
+const [head, first] = x;`,
+				}},
+			}},
 		},
 	})
 }

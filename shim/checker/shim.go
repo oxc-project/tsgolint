@@ -1065,6 +1065,9 @@ type extra_TupleType struct {
 func TupleType_combinedFlags(v *checker.TupleType) checker.ElementFlags {
   return ((*extra_TupleType)(unsafe.Pointer(v))).combinedFlags
 }
+func TupleType_minLength(v *checker.TupleType) int {
+  return ((*extra_TupleType)(unsafe.Pointer(v))).minLength
+}
 func TupleType_readonly(v *checker.TupleType) bool {
   return ((*extra_TupleType)(unsafe.Pointer(v))).readonly
 }
