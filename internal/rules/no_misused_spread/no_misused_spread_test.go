@@ -895,15 +895,6 @@ func TestNoMisusedSpreadRule(t *testing.T) {
 					Line:      3,
 					Column:    21,
 					EndColumn: 27,
-					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						{
-							MessageId: "replaceMapSpreadInObject",
-							Output: `
-        declare const map: WeakMap<{ a: number }, string>;
-        const o =  Object.fromEntries(map) ;
-      `,
-						},
-					},
 				},
 			},
 		},
@@ -1870,6 +1861,47 @@ func TestNoMisusedSpreadRule(t *testing.T) {
       `,
 						},
 					},
+				},
+			},
+		},
+		{
+			Code: `
+declare const map: Map<object, string> | WeakMap<object, string>;
+const o = { other: 1, ...map };`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noMapSpreadInObject",
+					Line:      3,
+					Column:    23,
+					EndColumn: 29,
+				},
+			},
+		},
+		{
+			Code: `
+class CustomWeakMap extends WeakMap<object, string> {}
+declare const map: CustomWeakMap;
+const o = { ...map };`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noMapSpreadInObject",
+					Line:      4,
+					Column:    13,
+					EndColumn: 19,
+				},
+			},
+		},
+		{
+			Code: `
+declare const map: WeakMap<object, string>;
+const element = <Component {...map} />;`,
+			Tsx: true,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noMapSpreadInObject",
+					Line:      3,
+					Column:    28,
+					EndColumn: 36,
 				},
 			},
 		},

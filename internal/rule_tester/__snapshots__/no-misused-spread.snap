@@ -387,7 +387,6 @@ Help: Did you mean to use `Object.fromEntries(map)` instead?
    3 |         const o = { ...map };
      |                     ~~~~~~
    4 |       
-  Suggestion 1: [replaceMapSpreadInObject] Replace map spread in object with `Object.fromEntries()`
 ---
 
 [TestNoMisusedSpreadRule/invalid-39 - 1]
@@ -887,4 +886,31 @@ Help: Did you forget to await the promise before spreading it?
      |                        ~~~~~~~~~~~~
    5 |       
   Suggestion 1: [addAwait] Add await operator.
+---
+
+[TestNoMisusedSpreadRule/invalid-91 - 1]
+Diagnostic 1: noMapSpreadInObject (3:23 - 3:28)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
+   2 | declare const map: Map<object, string> | WeakMap<object, string>;
+   3 | const o = { other: 1, ...map };
+     |                       ~~~~~~
+---
+
+[TestNoMisusedSpreadRule/invalid-92 - 1]
+Diagnostic 1: noMapSpreadInObject (4:13 - 4:18)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
+   3 | declare const map: CustomWeakMap;
+   4 | const o = { ...map };
+     |             ~~~~~~
+---
+
+[TestNoMisusedSpreadRule/invalid-93 - 1]
+Diagnostic 1: noMapSpreadInObject (3:28 - 3:35)
+Message: Using the spread operator on a Map in an object will result in an empty object.
+Help: Did you mean to use `Object.fromEntries(map)` instead?
+   2 | declare const map: WeakMap<object, string>;
+   3 | const element = <Component {...map} />;
+     |                            ~~~~~~~~
 ---

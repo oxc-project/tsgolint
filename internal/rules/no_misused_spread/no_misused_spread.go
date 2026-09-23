@@ -98,6 +98,12 @@ func isMap(program *compiler.Program, typeChecker *checker.Checker, t *checker.T
 	})
 }
 
+func isIterableMap(program *compiler.Program, typeChecker *checker.Checker, t *checker.Type) bool {
+	return utils.TypeRecurser(t, func(t *checker.Type) bool {
+		return utils.IsBuiltinSymbolLike(program, typeChecker, t, "Map", "ReadonlyMap")
+	})
+}
+
 func isArray(typeChecker *checker.Checker, t *checker.Type) bool {
 	return utils.TypeRecurser(t, func(t *checker.Type) bool {
 		return checker.Checker_isArrayOrTupleType(typeChecker, t)
@@ -170,9 +176,9 @@ var NoMisusedSpreadRule = rule.Rule{
 		}
 
 		getMapSpreadSuggestions := func(node *ast.Node, argument *ast.Node, t *checker.Type) []rule.RuleSuggestion {
-			// TODO(port): do we need this loop?
+			// Every union member must be an iterable map for Object.fromEntries.
 			for _, t := range utils.UnionTypeParts(t) {
-				if !isMap(ctx.Program, ctx.TypeChecker, t) {
+				if !isIterableMap(ctx.Program, ctx.TypeChecker, t) {
 					return []rule.RuleSuggestion{}
 				}
 			}
