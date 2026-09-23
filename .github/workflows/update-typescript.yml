@@ -1,13 +1,13 @@
-name: Update typescript-go
+name: Update TypeScript
 
 permissions: {}
 
 on:
   push:
     branches:
-      - renovate/typescript-go-*
+      - renovate/typescript-*
     paths:
-      - typescript-go
+      - typescript
 
 jobs:
   update:
@@ -42,9 +42,9 @@ jobs:
       - shell: bash
         run: |
           mkdir -p internal/collections
-          find ./typescript-go/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
+          find ./typescript/tsc/internal/collections -type f ! -name '*_test.go' -exec cp {} internal/collections/ \;
 
-      - run: ./tools/update-typescript-go-shims.sh
+      - run: ./tools/update-typescript-shims.sh
 
       - name: Check for changes
         id: check_changes
@@ -56,5 +56,5 @@ jobs:
       - name: Push changes
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
-          git commit -m "update typescript-go"
+          git commit -m "update TypeScript"
           git push

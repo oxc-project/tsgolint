@@ -1,4 +1,5 @@
-[submodule "typescript-go"]
-	path = typescript-go
-	url = https://github.com/microsoft/typescript-go
+[submodule "typescript"]
+	path = typescript
+	url = https://github.com/microsoft/TypeScript
+	shallow = true
 	ignore = dirty

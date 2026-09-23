@@ -1,22 +1,22 @@
-From 37c294c9b5621171de72ec92584142b9bdd56b0d Mon Sep 17 00:00:00 2001
+From 942322033cfd9362151ad005b4ea9f6283064e88 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
 Date: Fri, 13 Feb 2026 18:37:25 +0000
 Subject: [PATCH 4/5] fix(collections): avoid internal json import in
  ordered_map
 
 ---
- internal/collections/ordered_map.go | 17 +++++++++--------
+ tsc/internal/collections/ordered_map.go | 17 +++++++++--------
  1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/internal/collections/ordered_map.go b/internal/collections/ordered_map.go
-index df66ec640..02f0a5678 100644
---- a/internal/collections/ordered_map.go
-+++ b/internal/collections/ordered_map.go
+diff --git a/tsc/internal/collections/ordered_map.go b/tsc/internal/collections/ordered_map.go
+index d4d84f3f8e9..02f0a567814 100644
+--- a/tsc/internal/collections/ordered_map.go
++++ b/tsc/internal/collections/ordered_map.go
 @@ -9,7 +9,8 @@ import (
  	"slices"
  	"strconv"
  
--	"github.com/microsoft/typescript-go/internal/json"
+-	"github.com/microsoft/TypeScript/tsc/internal/json"
 +	"github.com/go-json-experiment/json"
 +	"github.com/go-json-experiment/json/jsontext"
  )

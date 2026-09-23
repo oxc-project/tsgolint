@@ -282,7 +282,7 @@ Debug logging provides information about:
 
 #### Build Issues
 
-- **Patch application fails:** Ensure you're in the `typescript-go` directory when applying patches
+- **Patch application fails:** Ensure you're in the `typescript` directory when applying patches
 - **Go build errors:** Check Go version (requires 1.26+) and ensure all dependencies are available
 
 #### Test Issues
@@ -301,7 +301,7 @@ Debug logging provides information about:
 
 ### Understanding the Shim Layer
 
-**tsgolint** uses a shim layer to access internal typescript-go APIs. This is **not recommended for production use** but enables access to full TypeScript compiler functionality.
+**tsgolint** uses a shim layer to access internal native TypeScript APIs. This is **not recommended for production use** but enables access to full TypeScript compiler functionality.
 
 Key shim components:
 
@@ -423,6 +423,6 @@ By contributing to tsgolint, you agree that your contributions will be licensed 
 ## Additional Resources
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
-- [typescript-go documentation](https://github.com/microsoft/typescript-go) - Understanding the underlying TypeScript compiler
+- [TypeScript native compiler](https://github.com/microsoft/TypeScript/tree/main/tsc) - Understanding the underlying TypeScript compiler
 - [typescript-eslint rules](https://typescript-eslint.io/rules/) - Reference for rule compatibility
 - [Go testing](https://golang.org/pkg/testing/) - Go testing documentation
