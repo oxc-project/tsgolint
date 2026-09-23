@@ -30,6 +30,11 @@ var NoMeaninglessVoidOperatorRule = rule.Rule{
 		return rule.RuleListeners{
 			ast.KindVoidExpression: func(node *ast.Node) {
 				arg := node.AsVoidExpression().Expression
+				inner := ast.SkipOuterExpressions(arg, ast.OEKParentheses|ast.OEKAssertions|ast.OEKComma)
+				// `void (x = value)` explicitly discards the assignment result.
+				if ast.IsAssignmentExpression(inner, false) {
+					return
+				}
 				argType := ctx.TypeChecker.GetTypeAtLocation(arg)
 
 				unionParts := utils.UnionTypeParts(argType)

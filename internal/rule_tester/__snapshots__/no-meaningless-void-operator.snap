@@ -33,3 +33,10 @@ Message: void operator shouldn't be used on void | undefined; it should convey t
      | ~~~~~~~~~~~~
    4 |       
 ---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-4 - 1]
+Diagnostic 1: meaninglessVoidOperator (1:56 - 1:83)
+Message: void operator shouldn't be used on void; it should convey that a return value is being ignored
+   1 | declare let x: undefined; declare function fn(): void; void ((x = undefined), fn());
+     |                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---

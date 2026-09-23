@@ -27,6 +27,30 @@ function bar(x: never) {
   void x;
 }
     `},
+		// Assignment regressions from typescript-eslint/typescript-eslint#12873.
+		{Code: `declare let x: number; void (x = 1);`},
+		{Code: `declare let x: number; () => void (x = 1);`},
+		{Code: `declare let x: number; void (x += 1);`},
+		{Code: `declare let x: number; declare let y: number; void (x = y = 1);`},
+		{Code: `declare let x: string; declare function getValue(): string; void (x = getValue());`},
+		{Code: `declare const obj: { prop: number }; void (obj.prop = 1);`},
+		{Code: `declare let x: number; declare let y: number; void ((x = 1), (y = 2));`},
+		{Code: `declare let x: undefined; () => void (((x = undefined)));`},
+		{Code: `declare let x: void; declare function fn(): void; void (x = fn());`},
+		{Code: `declare let x: undefined; void (x ??= undefined);`},
+		{Code: `declare let x: undefined; void ((x = undefined) as undefined);`},
+		{Code: `declare let x: undefined; void (<undefined>(x = undefined));`},
+		{Code: `declare let x: undefined; void ((x = undefined) satisfies undefined);`},
+		{Code: `declare let x: undefined; void ((x = undefined), (x = undefined));`},
+		{Code: `declare let x: undefined; void ((x = undefined)!, ((x = undefined) as undefined));`},
+		{
+			Code:    `declare let x: undefined; void ((x = undefined)!);`,
+			Options: rule_tester.OptionsFromJSON[NoMeaninglessVoidOperatorOptions](`{"checkNever": true}`),
+		},
+		{
+			Code:    `declare let x: never; declare function fail(): never; void (x = fail());`,
+			Options: rule_tester.OptionsFromJSON[NoMeaninglessVoidOperatorOptions](`{"checkNever": true}`),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "void (() => {})();",
@@ -99,6 +123,11 @@ const foo = (() => {}) as (() => void) | undefined;
 					Column:    1,
 				},
 			},
+		},
+		{
+			Code:   `declare let x: undefined; declare function fn(): void; void ((x = undefined), fn());`,
+			Output: []string{`declare let x: undefined; declare function fn(): void;  ((x = undefined), fn());`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOperator"}},
 		},
 	})
 }
