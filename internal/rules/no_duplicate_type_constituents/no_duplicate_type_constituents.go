@@ -292,7 +292,7 @@ var NoDuplicateTypeConstituentsRule = rule.Rule{
 						return
 					}
 					param := node.Parent.AsParameterDeclaration()
-					if param.QuestionToken == nil {
+					if param.QuestionToken == nil || ast.IsParameterPropertyDeclaration(node.Parent, node.Parent.Parent) {
 						return
 					}
 					if utils.IsTypeFlagSet(constituentNodeType, checker.TypeFlagsUndefined) {

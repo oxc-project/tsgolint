@@ -149,6 +149,24 @@ type T = Record<string, A | B>;
 		{
 			Code: "(a: string | undefined) => {};",
 		},
+		{
+			Code: "export class A { constructor(readonly name?: string | undefined) {} }",
+		},
+		{
+			Code: "class A { constructor(public name?: string | undefined) {} }",
+		},
+		{
+			Code: "class A { constructor(protected name?: string | undefined) {} }",
+		},
+		{
+			Code: "class A { constructor(private name?: string | undefined) {} }",
+		},
+		{
+			Code: `
+type U = undefined;
+class A { constructor(private readonly name?: string | U) {} }
+`,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "type T = 1 | 1;",
@@ -784,6 +802,33 @@ type T = Record<string, A  >;
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "unnecessary",
+				},
+			},
+		},
+		{
+			Code:   "class A { constructor(name?: string | undefined) {} }",
+			Output: []string{"class A { constructor(name?: string  ) {} }"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessary",
+				},
+			},
+		},
+		{
+			Code:   "class A { constructor(readonly name?: string | string | undefined) {} }",
+			Output: []string{"class A { constructor(readonly name?: string   | undefined) {} }"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "duplicate",
+				},
+			},
+		},
+		{
+			Code:   "class A { constructor(readonly name?: string | undefined | undefined) {} }",
+			Output: []string{"class A { constructor(readonly name?: string | undefined  ) {} }"},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "duplicate",
 				},
 			},
 		},

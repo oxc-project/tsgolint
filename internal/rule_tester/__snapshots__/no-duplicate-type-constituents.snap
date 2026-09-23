@@ -580,3 +580,30 @@ Message: Explicit undefined is unnecessary on an optional parameter.
      |                                   ~~~~~~~~~
    4 |         }
 ---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-48 - 1]
+Diagnostic 1: unnecessary (1:39 - 1:47)
+Message: Explicit undefined is unnecessary on an optional parameter.
+   1 | class A { constructor(name?: string | undefined) {} }
+     |                                       ~~~~~~~~~
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-49 - 1]
+Diagnostic 1: duplicate (1:48 - 1:53)
+Message: Union type constituent is duplicated with  string.
+   1 | class A { constructor(readonly name?: string | string | undefined) {} }
+     |                                                ~~~~~~
+  Label: Type 'string' is first declared here. (1:39 - 1:44)
+   1 | class A { constructor(readonly name?: string | string | undefined) {} }
+     |                                       ^^^^^^ Type 'string' is first declared here.
+---
+
+[TestNoDuplicateTypeConstituentsRule/invalid-50 - 1]
+Diagnostic 1: duplicate (1:60 - 1:68)
+Message: Union type constituent is duplicated with  undefined.
+   1 | class A { constructor(readonly name?: string | undefined | undefined) {} }
+     |                                                            ~~~~~~~~~
+  Label: Type 'undefined' is first declared here. (1:48 - 1:56)
+   1 | class A { constructor(readonly name?: string | undefined | undefined) {} }
+     |                                                ^^^^^^^^^ Type 'undefined' is first declared here.
+---
