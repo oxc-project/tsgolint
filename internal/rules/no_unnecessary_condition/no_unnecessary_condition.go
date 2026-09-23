@@ -255,6 +255,46 @@ func isAlwaysNullishType(t *checker.Type) bool {
 	return flags&(checker.TypeFlagsNull|checker.TypeFlagsUndefined|checker.TypeFlagsVoid) != 0
 }
 
+// isOnlyUsedForTruthiness reports whether an expression is checked for
+// truthiness by its consuming context, including assertion calls when enabled.
+// ParenthesizedExpression nodes are explicit in the TypeScript Go AST, so skip
+// them while walking to the consuming context.
+func isOnlyUsedForTruthiness(node *ast.Node, isAssertionArgument func(*ast.Node) bool) bool {
+	parent := node.Parent
+	for parent != nil && ast.IsParenthesizedExpression(parent) {
+		node = parent
+		parent = parent.Parent
+	}
+	if parent == nil {
+		return false
+	}
+
+	switch parent.Kind {
+	case ast.KindConditionalExpression:
+		return parent.AsConditionalExpression().Condition == node
+	case ast.KindDoStatement:
+		return parent.AsDoStatement().Expression == node
+	case ast.KindForStatement:
+		return parent.AsForStatement().Condition == node
+	case ast.KindIfStatement:
+		return parent.AsIfStatement().Expression == node
+	case ast.KindWhileStatement:
+		return parent.AsWhileStatement().Expression == node
+	case ast.KindPrefixUnaryExpression:
+		return parent.AsPrefixUnaryExpression().Operator == ast.KindExclamationToken
+	case ast.KindCallExpression:
+		return isAssertionArgument(node)
+	}
+
+	if ast.IsLogicalExpression(parent) {
+		parentExpression := parent.AsBinaryExpression()
+		return (parentExpression.OperatorToken.Kind == ast.KindAmpersandAmpersandToken && parentExpression.Left == node) ||
+			isOnlyUsedForTruthiness(parent, isAssertionArgument)
+	}
+
+	return false
+}
+
 func toStaticValue(t *checker.Type) (any, bool) { //nolint:unparam // the value return is reserved for follow-up checks; current callers only need the static-ness signal
 	if t == nil {
 		return nil, false
@@ -1456,6 +1496,47 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			}
 		}
 
+		isAssertionArgument := func(argument *ast.Node) bool {
+			if !opts.CheckTypePredicates || argument.Parent == nil || argument.Parent.Kind != ast.KindCallExpression {
+				return false
+			}
+
+			callNode := argument.Parent
+			callExpr := callNode.AsCallExpression()
+			if callExpr.Arguments == nil {
+				return false
+			}
+
+			argumentIndex := 0
+			found := false
+			for _, arg := range callExpr.Arguments.Nodes {
+				if arg == nil {
+					continue
+				}
+				if arg.Kind == ast.KindSpreadElement {
+					break
+				}
+				if arg == argument {
+					found = true
+					break
+				}
+				argumentIndex++
+			}
+			if !found {
+				return false
+			}
+
+			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callNode, nil, checker.CheckModeNormal)
+			if signature == nil {
+				return false
+			}
+			predicate := ctx.TypeChecker.GetTypePredicateOfSignature(signature)
+			return predicate != nil &&
+				checker.TypePredicate_kind(predicate) == checker.TypePredicateKindAssertsIdentifier &&
+				checker.TypePredicate_t(predicate) == nil &&
+				int(checker.TypePredicate_parameterIndex(predicate)) == argumentIndex
+		}
+
 		var checkNode func(expression *ast.Node, isUnaryNotArgument bool, reportNode *ast.Node)
 		checkNode = func(expression *ast.Node, isUnaryNotArgument bool, reportNode *ast.Node) {
 			if expression == nil {
@@ -1483,7 +1564,9 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				binExpr := expression.AsBinaryExpression()
 				if opKind := binExpr.OperatorToken.Kind; opKind != ast.KindQuestionQuestionToken &&
 					(opKind == ast.KindAmpersandAmpersandToken || opKind == ast.KindBarBarToken) {
-					checkNode(binExpr.Right, false, nil)
+					if isOnlyUsedForTruthiness(expression, isAssertionArgument) {
+						checkNode(binExpr.Right, false, nil)
+					}
 					return
 				}
 			}

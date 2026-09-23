@@ -3226,6 +3226,72 @@ Message: This condition will always return the same value since the types have n
    5 |       break;
 ---
 
+[TestNoUnnecessaryConditionRule/invalid-156 - 1]
+Diagnostic 1: alwaysTruthy (4:12 - 4:15)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | if ((b1 && 'b1') || b2) {
+     |            ~~~~
+   5 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-157 - 1]
+Diagnostic 1: alwaysTruthy (4:21 - 4:24)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | do {} while ((b1 && 'b1') || b2);
+     |                     ~~~~
+---
+
+[TestNoUnnecessaryConditionRule/invalid-158 - 1]
+Diagnostic 1: alwaysTruthy (4:15 - 4:18)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | for (; (b1 && 'b1') || b2;) {}
+     |               ~~~~
+---
+
+[TestNoUnnecessaryConditionRule/invalid-159 - 1]
+Diagnostic 1: alwaysTruthy (4:14 - 4:17)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | if (!((b1 && 'b1') || b2)) {
+     |              ~~~~
+   5 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-160 - 1]
+Diagnostic 1: alwaysTruthy (4:18 - 4:21)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b2: boolean;
+   4 | const t1 = b1 && 'b1' && b2;
+     |                  ~~~~
+---
+
+[TestNoUnnecessaryConditionRule/invalid-161 - 1]
+Diagnostic 1: alwaysTruthy (4:13 - 4:15)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b: boolean;
+   4 | assert(b && 'b');
+     |             ~~~
+---
+
+[TestNoUnnecessaryConditionRule/invalid-162 - 1]
+Diagnostic 1: alwaysTruthy (5:14 - 5:16)
+Message: Unnecessary conditional, value is always truthy.
+   4 | declare const c: boolean;
+   5 | assert((b && 'b') || c);
+     |              ~~~
+---
+
+[TestNoUnnecessaryConditionRule/invalid-163 - 1]
+Diagnostic 1: alwaysTruthy (4:22 - 4:24)
+Message: Unnecessary conditional, value is always truthy.
+   3 | declare const b: boolean;
+   4 | assertSecond(b, b && 'b');
+     |                      ~~~
+---
+
 [TestNullishRecordAssignment/invalid-0 - 1]
 Diagnostic 1: neverNullish (4:5 - 4:19)
 Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.

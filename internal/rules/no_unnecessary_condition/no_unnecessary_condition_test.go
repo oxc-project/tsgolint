@@ -559,6 +559,16 @@ declare const b1: boolean;
 declare const b2: true;
 const x = b1 && b2;
       `},
+		{Code: `
+function test(foo?: boolean, bar?: boolean) {
+  return (foo && 'foo') || (bar && 'bar');
+}
+      `},
+		{Code: `
+declare const b1: boolean;
+declare const b2: boolean;
+const x = (b1 && 'b1') || b2;
+      `},
 
 		// Allow constant loop conditions
 		{
@@ -1181,6 +1191,13 @@ declare function assert(x: unknown): asserts x;
 
 assert(Math.random() > 0.5);
       `,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+		},
+		{
+			Code: `
+declare function assertSecond(x: unknown, y: unknown): asserts y;
+declare const b: boolean;
+assertSecond(b && 'b', b);`,
 			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 		},
 		{
@@ -3407,6 +3424,98 @@ function test(value: string) {
 				EndLine:   4,
 				EndColumn: 19,
 			}},
+		},
+		{
+			Code: `
+declare const b1: boolean;
+declare const b2: boolean;
+if ((b1 && 'b1') || b2) {
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "alwaysTruthy",
+				Line:      4,
+				Column:    12,
+				EndLine:   4,
+				EndColumn: 16,
+			}},
+		},
+		{
+			Code: `
+declare const b1: boolean;
+declare const b2: boolean;
+do {} while ((b1 && 'b1') || b2);`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "alwaysTruthy",
+				Line:      4,
+				Column:    21,
+				EndLine:   4,
+				EndColumn: 25,
+			}},
+		},
+		{
+			Code: `
+declare const b1: boolean;
+declare const b2: boolean;
+for (; (b1 && 'b1') || b2;) {}`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "alwaysTruthy",
+				Line:      4,
+				Column:    15,
+				EndLine:   4,
+				EndColumn: 19,
+			}},
+		},
+		{
+			Code: `
+declare const b1: boolean;
+declare const b2: boolean;
+if (!((b1 && 'b1') || b2)) {
+}`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "alwaysTruthy",
+				Line:      4,
+				Column:    14,
+				EndLine:   4,
+				EndColumn: 18,
+			}},
+		},
+		{
+			Code: `
+declare const b1: boolean;
+declare const b2: boolean;
+const t1 = b1 && 'b1' && b2;`,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "alwaysTruthy",
+				Line:      4,
+				Column:    18,
+				EndLine:   4,
+				EndColumn: 22,
+			}},
+		},
+		{
+			Code: `
+declare function assert(x: unknown): asserts x;
+declare const b: boolean;
+assert(b && 'b');`,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+declare function assert(x: unknown): asserts x;
+declare const b: boolean;
+declare const c: boolean;
+assert((b && 'b') || c);`,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+declare function assertSecond(x: unknown, y: unknown): asserts y;
+declare const b: boolean;
+assertSecond(b, b && 'b');`,
+			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
 		},
 	})
 }
