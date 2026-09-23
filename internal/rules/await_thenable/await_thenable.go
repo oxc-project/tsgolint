@@ -110,11 +110,25 @@ var AwaitThenableRule = rule.Rule{
 						buildAwaitMessage(),
 						utils.TrimNodeTextRange(ctx.SourceFile, awaitArgument),
 					), func() []rule.RuleSuggestion {
+						fixes := []rule.RuleFix{rule.RuleFixRemoveRange(utils.GetAwaitTokenRemovalRange(ctx.SourceFile, node.Pos()))}
+						s := scanner.GetScannerForSourceFile(ctx.SourceFile, awaitArgument.Pos())
+						firstToken := s.Token()
+						statementStartToken := firstToken
+						if firstToken == ast.KindAsyncKeyword && s.Scan() == ast.KindFunctionKeyword && !s.HasPrecedingLineBreak() {
+							statementStartToken = ast.KindFunctionKeyword
+						}
+						startsWithParenthesis := firstToken == ast.KindOpenParenToken
+						if utils.IsStartOfArrowFunctionBodyNeedingParentheses(ctx.SourceFile, node, firstToken) ||
+							utils.IsStartOfExpressionStatementNeedingParentheses(ctx.SourceFile, node, statementStartToken) {
+							fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, awaitArgument, "("), rule.RuleFixInsertAfter(awaitArgument, ")"))
+							startsWithParenthesis = true
+						}
+						if startsWithParenthesis && needsPrecedingSemicolon(ctx.SourceFile, node) {
+							fixes[0].Text = ";"
+						}
 						return []rule.RuleSuggestion{{
-							Message: buildRemoveAwaitMessage(),
-							FixesArr: []rule.RuleFix{
-								rule.RuleFixRemoveRange(awaitTokenRange),
-							},
+							Message:  buildRemoveAwaitMessage(),
+							FixesArr: fixes,
 						}}
 					})
 				}
@@ -198,7 +212,7 @@ var AwaitThenableRule = rule.Rule{
 						return []rule.RuleSuggestion{{
 							Message: buildConvertToOrdinaryForMessage(),
 							FixesArr: []rule.RuleFix{
-								rule.RuleFixRemove(ctx.SourceFile, stmt.AwaitModifier),
+								rule.RuleFixRemoveRange(utils.GetAwaitTokenRemovalRange(ctx.SourceFile, stmt.AwaitModifier.Pos())),
 							},
 						}}
 					},
@@ -235,7 +249,7 @@ var AwaitThenableRule = rule.Rule{
 						suggestions = append(suggestions, rule.RuleSuggestion{
 							Message: buildRemoveAwaitMessage(),
 							FixesArr: []rule.RuleFix{
-								rule.RuleFixRemoveRange(scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos())),
+								rule.RuleFixRemoveRange(utils.GetAwaitTokenRemovalRange(ctx.SourceFile, node.Pos())),
 							},
 						})
 					}

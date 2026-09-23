@@ -197,8 +197,14 @@ var ReturnAwaitRule = rule.Rule{
 			}
 		}
 
-		removeAwaitFix := func(node *ast.Node) rule.RuleFix {
-			return rule.RuleFixRemoveRange(scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos()))
+		removeAwaitFix := func(node *ast.Node) []rule.RuleFix {
+			fixes := []rule.RuleFix{rule.RuleFixRemoveRange(utils.GetAwaitTokenRemovalRange(ctx.SourceFile, node.Pos()))}
+			operand := node.Expression()
+			firstToken := scanner.ScanTokenAtPosition(ctx.SourceFile, operand.Pos())
+			if utils.IsStartOfArrowFunctionBodyNeedingParentheses(ctx.SourceFile, node, firstToken) {
+				fixes = append(fixes, rule.RuleFixInsertBefore(ctx.SourceFile, operand, "("), rule.RuleFixInsertAfter(operand, ")"))
+			}
+			return fixes
 		}
 		insertAwaitFix := func(node *ast.Node, isHighPrecedence bool) []rule.RuleFix {
 			if isHighPrecedence {
@@ -231,7 +237,7 @@ var ReturnAwaitRule = rule.Rule{
 						return
 					}
 
-					ctx.ReportNodeWithFixes(node, buildNonPromiseAwaitMessage(), func() []rule.RuleFix { return []rule.RuleFix{removeAwaitFix(node)} })
+					ctx.ReportNodeWithFixes(node, buildNonPromiseAwaitMessage(), func() []rule.RuleFix { return removeAwaitFix(node) })
 				}
 				return
 			}
@@ -254,7 +260,7 @@ var ReturnAwaitRule = rule.Rule{
 				if !isAwait {
 					break
 				}
-				rule.ReportNodeWithFixesOrSuggestions(ctx, node, useAutoFix, buildDisallowedPromiseAwaitMessage(), buildDisallowedPromiseAwaitSuggestionMessage(), removeAwaitFix(node))
+				rule.ReportNodeWithFixesOrSuggestions(ctx, node, useAutoFix, buildDisallowedPromiseAwaitMessage(), buildDisallowedPromiseAwaitSuggestionMessage(), removeAwaitFix(node)...)
 			}
 		}
 

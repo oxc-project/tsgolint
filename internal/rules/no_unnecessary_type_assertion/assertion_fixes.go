@@ -61,8 +61,8 @@ func createAssertionFixer(ctx rule.RuleContext, node *ast.Node) []rule.RuleFix {
 		if firstOperandToken == ast.KindAsyncKeyword && s.Scan() == ast.KindFunctionKeyword && !s.HasPrecedingLineBreak() {
 			statementStartToken = ast.KindFunctionKeyword
 		}
-		needsParens := isStartOfExpressionStatementNeedingParentheses(ctx, node, statementStartToken) ||
-			isStartOfArrowFunctionBodyNeedingParentheses(ctx, node, firstOperandToken)
+		needsParens := utils.IsStartOfExpressionStatementNeedingParentheses(ctx.SourceFile, node, statementStartToken) ||
+			utils.IsStartOfArrowFunctionBodyNeedingParentheses(ctx.SourceFile, node, firstOperandToken)
 
 		var fixes []rule.RuleFix
 		if needsParens {
@@ -84,38 +84,4 @@ func createAssertionFixer(ctx rule.RuleContext, node *ast.Node) []rule.RuleFix {
 		tokenBeforeAsEnd = max(tokenBeforeAsEnd, comment.End())
 	}
 	return []rule.RuleFix{rule.RuleFixRemoveRange(core.NewTextRange(tokenBeforeAsEnd, node.End()))}
-}
-
-// Matching start positions limits traversal to the beginning of a statement
-// and stops at existing parentheses.
-func isStartOfExpressionStatementNeedingParentheses(ctx rule.RuleContext, node *ast.Node, firstToken ast.Kind) bool {
-	if firstToken != ast.KindOpenBraceToken && firstToken != ast.KindClassKeyword && firstToken != ast.KindFunctionKeyword {
-		return false
-	}
-	start := utils.TrimNodeTextRange(ctx.SourceFile, node).Pos()
-	for ancestor := node.Parent; ancestor != nil && utils.TrimNodeTextRange(ctx.SourceFile, ancestor).Pos() == start; ancestor = ancestor.Parent {
-		if ast.IsExpressionStatement(ancestor) {
-			return true
-		}
-	}
-	return false
-}
-
-func isStartOfArrowFunctionBodyNeedingParentheses(ctx rule.RuleContext, node *ast.Node, firstToken ast.Kind) bool {
-	if firstToken != ast.KindOpenBraceToken {
-		return false
-	}
-	for current := node; current.Parent != nil; current = current.Parent {
-		parent := current.Parent
-		if ast.IsParenthesizedExpression(parent) {
-			return false
-		}
-		if ast.IsArrowFunction(parent) && parent.Body() == current {
-			return true
-		}
-		if utils.TrimNodeTextRange(ctx.SourceFile, parent).Pos() != utils.TrimNodeTextRange(ctx.SourceFile, current).Pos() {
-			return false
-		}
-	}
-	return false
 }

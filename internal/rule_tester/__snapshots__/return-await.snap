@@ -1,4 +1,53 @@
 
+[TestRemoveAwaitSyntax/invalid-0 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:39)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await { a: 1 };
+     |                          ~~~~~~~~~~~~~~
+---
+
+[TestRemoveAwaitSyntax/invalid-1 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:41)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await { a: 1 }.a;
+     |                          ~~~~~~~~~~~~~~~~
+---
+
+[TestRemoveAwaitSyntax/invalid-2 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:41)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await ({ a: 1 });
+     |                          ~~~~~~~~~~~~~~~~
+---
+
+[TestRemoveAwaitSyntax/invalid-3 - 1]
+Diagnostic 1: nonPromiseAwait (1:27 - 1:40)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => (await { a: 1 });
+     |                           ~~~~~~~~~~~~~~
+---
+
+[TestRemoveAwaitSyntax/invalid-4 - 1]
+Diagnostic 1: nonPromiseAwait (1:34 - 1:47)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => (true ? await { a: 1 } : 2);
+     |                                  ~~~~~~~~~~~~~~
+---
+
+[TestRemoveAwaitSyntax/invalid-5 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:46)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await /* comment */ 1;
+     |                          ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestRemoveAwaitSyntax/invalid-6 - 1]
+Diagnostic 1: nonPromiseAwait (1:26 - 1:53)
+Message: Returning an awaited value that is not a promise is not allowed.
+   1 | const test = async () => await /* comment */ { a: 1 };
+     |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
 [TestReturnAwait/invalid-0 - 1]
 Diagnostic 1: nonPromiseAwait (3:18 - 3:24)
 Message: Returning an awaited value that is not a promise is not allowed.

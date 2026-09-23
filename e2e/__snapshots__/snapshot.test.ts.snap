@@ -89,7 +89,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "fixes": [
           {
             "range": {
-              "end": 60,
+              "end": 61,
               "pos": 55,
             },
             "text": "",
@@ -129,7 +129,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "fixes": [
           {
             "range": {
-              "end": 70,
+              "end": 71,
               "pos": 65,
             },
             "text": "",
@@ -169,7 +169,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "fixes": [
           {
             "range": {
-              "end": 111,
+              "end": 112,
               "pos": 106,
             },
             "text": "",
@@ -209,10 +209,24 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "fixes": [
           {
             "range": {
-              "end": 130,
+              "end": 131,
               "pos": 125,
             },
             "text": "",
+          },
+          {
+            "range": {
+              "end": 131,
+              "pos": 131,
+            },
+            "text": "(",
+          },
+          {
+            "range": {
+              "end": 144,
+              "pos": 144,
+            },
+            "text": ")",
           },
         ],
         "message": {
@@ -249,7 +263,7 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
         "fixes": [
           {
             "range": {
-              "end": 267,
+              "end": 268,
               "pos": 262,
             },
             "text": "",
