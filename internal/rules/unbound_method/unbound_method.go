@@ -292,6 +292,12 @@ var UnboundMethodRule = rule.Rule{
 			if isSafeUse(node) || isNativelyBound(node.Expression(), property) {
 				return
 			}
+			if ast.IsPrivateIdentifier(property) {
+				// Private names are resolved in their declaring class's scope, not
+				// through the object's public property table.
+				checkIfMethodAndReport(node, property, ctx.TypeChecker.GetSymbolAtLocation(node))
+				return
+			}
 
 			var propertyNames []string
 			if ast.IsPropertyAccessExpression(node) {

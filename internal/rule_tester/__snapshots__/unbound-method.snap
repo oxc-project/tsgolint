@@ -990,3 +990,24 @@ Help: If your function does not access `this`, you can annotate it with `this: v
    1 | class Foo { 1() {} } declare const foo: Foo; declare const key: 1; const method = foo[key];
      |                                                                                       ^^^ This reference may be unbound and lose `this` context
 ---
+
+[TestUnboundMethodPrivateAccess/invalid-0 - 1]
+Diagnostic 1: unboundWithoutThisAnnotation (1:41 - 1:52)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+Help: If your function does not access `this`, you can annotate it with `this: void`, or consider using an arrow function instead.
+   1 | class Foo { #method() {} run() { return this.#method; } }
+     |                                         ~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:46 - 1:52)
+   1 | class Foo { #method() {} run() { return this.#method; } }
+     |                                              ^^^^^^^ This reference may be unbound and lose `this` context
+---
+
+[TestUnboundMethodPrivateAccess/invalid-1 - 1]
+Diagnostic 1: unbound (1:50 - 1:61)
+Message: Avoid referencing unbound methods which may cause unintentional scoping of `this`.
+   1 | class Foo { #method(this: Foo) {} run() { return this.#method; } }
+     |                                                  ~~~~~~~~~~~~
+  Label: This reference may be unbound and lose `this` context (1:55 - 1:61)
+   1 | class Foo { #method(this: Foo) {} run() { return this.#method; } }
+     |                                                       ^^^^^^^ This reference may be unbound and lose `this` context
+---
