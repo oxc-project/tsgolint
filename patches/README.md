@@ -1,7 +1,14 @@
 # Patches
 
-These patches do not change the behavior of typescript-go.
-The main purpose of the patches is to tune tsgo performance a bit.
+Most patches adapt typescript-go for TSGolint or tune its performance.
+
+`0006-fix-context-free-expression-signature-caching.patch` makes
+`getContextFreeTypeOfExpression` recompute call signatures and contextual
+callback and object-literal method types without reading or writing their
+normal caches. Assertion checks then stay independent of whether semantic
+diagnostics already checked the call. Context-free queries also cannot change
+later normal type queries. See
+[TSGolint issue #1141](https://github.com/oxc-project/tsgolint/issues/1141).
 
 Module resolution caching is tracked [here](https://github.com/microsoft/typescript-go/issues/673).
 
