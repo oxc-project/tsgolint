@@ -6,7 +6,6 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
@@ -40,12 +39,6 @@ type Fixes struct {
 type TypeErrors struct {
 	ReportSyntactic bool
 	ReportSemantic  bool
-}
-
-type checkerWorkload struct {
-	checker *checker.Checker
-	program *compiler.Program
-	queue   chan *ast.SourceFile
 }
 
 type RunLinterOptions struct {
@@ -363,33 +356,6 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 			}
 		}
 	}
-}
-
-func makeSourceFileQueue(files []*ast.SourceFile) chan *ast.SourceFile {
-	queue := make(chan *ast.SourceFile, len(files))
-	for _, file := range files {
-		queue <- file
-	}
-	close(queue)
-	return queue
-}
-
-func makeCheckerWorkloadQueue(program *compiler.Program, files []*ast.SourceFile) chan checkerWorkload {
-	queue := makeSourceFileQueue(files)
-	flatQueue := []checkerWorkload{}
-	var flatQueueMu sync.Mutex
-	program.ForEachCheckerParallel(func(idx int, ch *checker.Checker) {
-		flatQueueMu.Lock()
-		flatQueue = append(flatQueue, checkerWorkload{ch, program, queue})
-		flatQueueMu.Unlock()
-	})
-
-	workloadQueue := make(chan checkerWorkload, len(flatQueue))
-	for _, w := range flatQueue {
-		workloadQueue <- w
-	}
-	close(workloadQueue)
-	return workloadQueue
 }
 
 func visitLintNodes(file *ast.SourceFile, runListeners func(kind ast.Kind, node *ast.Node)) {
