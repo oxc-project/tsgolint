@@ -1110,83 +1110,6 @@ declare const callable: RecursiveConditional<number>;
 declare function consume(value: unknown): void;
 consume(callable as unknown);
     `},
-		// Assertions involving nested `any`, recursive callables, or asymmetric type variables are
-		// intentionally retained.
-		{Code: `
-function f<T extends () => any>(value: T) {
-  const result = value as NonNullable<T>;
-}
-    `},
-		{Code: `
-interface Empty<X> {}
-type Alias<T> = T & Empty<any>;
-
-function f<T extends object>(value: T) {
-  const result = value as Alias<T>;
-}
-    `},
-		{Code: `
-interface Empty<X> {}
-type Alias<T> = T & Empty<Promise<any>>;
-
-function f<T extends object>(value: T) {
-  const result = value as Alias<T>;
-}
-    `},
-		{Code: `
-interface Empty<X> {}
-type Alias<T> = T & Empty<() => any>;
-
-function f<T extends object>(value: T) {
-  const result = value as Alias<T>;
-}
-    `},
-		{Code: `
-function f<T extends { (...args: any[]): unknown }>(value: T) {
-  const result = value as NonNullable<T>;
-}
-    `},
-		{Code: `
-type RecursiveCallable<T> = (value: T) => RecursiveCallable<{ value: T }>;
-
-function f<T extends RecursiveCallable<string>>(value: T) {
-  const result = value as NonNullable<T>;
-}
-    `},
-		{Code: `
-interface Empty<X> {}
-type Alias<T, U> = T & Empty<U>;
-
-function f<T extends object, U>(value: T) {
-  const result = value as Alias<T, U>;
-}
-    `},
-		{Code: `
-interface Source<T> {
-  value: T;
-}
-interface Target<T> {
-  value: T;
-}
-
-declare const source: Source<any>;
-const result = source as Target<any>;
-    `},
-		// Matching type arguments and property names ensure this pair reaches mutual assignability.
-		// The nested callable layers make recursive type inspection nontrivial.
-		{Code: `
-type Layer0<T> = T;
-type Layer1<T> = (value: Layer0<T>) => Layer0<T>;
-type Layer2<T> = (value: Layer1<T>) => Layer1<T>;
-type Layer3<T> = (value: Layer2<T>) => Layer2<T>;
-type Layer4<T> = (value: Layer3<T>) => Layer3<T>;
-
-type Watcher<T> = ((handler: Layer4<T>) => void) & { readonly kind: 'watcher' };
-type Subscription<T> = ((handler: T) => void) & { readonly kind: 'subscription' };
-
-declare const watcher: Watcher<string>;
-const subscription = watcher as Subscription<string>;
-    `},
 		{Code: `
 type RecursiveCallable<Options = {}> =
   & (<NewOptions = {}>(options: NewOptions) => RecursiveCallable<Options & NewOptions>)
@@ -1578,6 +1501,83 @@ function narrow(value: string | undefined, a: string | undefined, b: string | un
   return b.length;
 }
 `},
+		// Assertions involving nested `any`, recursive callables, or asymmetric type variables are
+		// intentionally retained.
+		{Code: `
+function f<T extends () => any>(value: T) {
+  const result = value as NonNullable<T>;
+}
+    `},
+		{Code: `
+interface Empty<X> {}
+type Alias<T> = T & Empty<any>;
+
+function f<T extends object>(value: T) {
+  const result = value as Alias<T>;
+}
+    `},
+		{Code: `
+interface Empty<X> {}
+type Alias<T> = T & Empty<Promise<any>>;
+
+function f<T extends object>(value: T) {
+  const result = value as Alias<T>;
+}
+    `},
+		{Code: `
+interface Empty<X> {}
+type Alias<T> = T & Empty<() => any>;
+
+function f<T extends object>(value: T) {
+  const result = value as Alias<T>;
+}
+    `},
+		{Code: `
+function f<T extends { (...args: any[]): unknown }>(value: T) {
+  const result = value as NonNullable<T>;
+}
+    `},
+		{Code: `
+type RecursiveCallable<T> = (value: T) => RecursiveCallable<{ value: T }>;
+
+function f<T extends RecursiveCallable<string>>(value: T) {
+  const result = value as NonNullable<T>;
+}
+    `},
+		{Code: `
+interface Empty<X> {}
+type Alias<T, U> = T & Empty<U>;
+
+function f<T extends object, U>(value: T) {
+  const result = value as Alias<T, U>;
+}
+    `},
+		{Code: `
+interface Source<T> {
+  value: T;
+}
+interface Target<T> {
+  value: T;
+}
+
+declare const source: Source<any>;
+const result = source as Target<any>;
+    `},
+		// Matching type arguments and property names ensure this pair reaches mutual assignability.
+		// The nested callable layers make recursive type inspection nontrivial.
+		{Code: `
+type Layer0<T> = T;
+type Layer1<T> = (value: Layer0<T>) => Layer0<T>;
+type Layer2<T> = (value: Layer1<T>) => Layer1<T>;
+type Layer3<T> = (value: Layer2<T>) => Layer2<T>;
+type Layer4<T> = (value: Layer3<T>) => Layer3<T>;
+
+type Watcher<T> = ((handler: Layer4<T>) => void) & { readonly kind: 'watcher' };
+type Subscription<T> = ((handler: T) => void) & { readonly kind: 'subscription' };
+
+declare const watcher: Watcher<string>;
+const subscription = watcher as Subscription<string>;
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
