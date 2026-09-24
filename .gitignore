@@ -1,8 +1,8 @@
 /tsgolint
 internal/collections/
+internal/bundled/libs.zip
 e2e/node_modules/
 node_modules/
 
 *.pprof
 *.out
-
