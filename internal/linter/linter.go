@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -37,9 +38,27 @@ type Fixes struct {
 	FixSuggestions bool
 }
 
+// TypeErrors selects the TypeScript diagnostics reported alongside the lint
+// rule diagnostics. It covers the diagnostics attached to a source file:
+// program-level tsconfig and program creation diagnostics are always reported.
 type TypeErrors struct {
 	ReportSyntactic bool
 	ReportSemantic  bool
+	// ReportTypeErrorsForFile optionally selects the files to report the
+	// diagnostics for. A nil callback reports them for every linted file.
+	ReportTypeErrorsForFile func(sourceFile *ast.SourceFile) bool
+}
+
+// filterFiles returns the files TypeScript diagnostics should be reported for.
+// The input slice is returned as-is when no callback selects them.
+func (t TypeErrors) filterFiles(files []*ast.SourceFile) []*ast.SourceFile {
+	if t.ReportTypeErrorsForFile == nil {
+		return files
+	}
+
+	return slices.DeleteFunc(slices.Clone(files), func(file *ast.SourceFile) bool {
+		return !t.ReportTypeErrorsForFile(file)
+	})
 }
 
 type checkerWorkload struct {
@@ -314,6 +333,18 @@ func newRuleContext(ctxBuilder *ruleContextBuilder) rule.RuleContext {
 }
 
 func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceFile, typeErrors TypeErrors, onInternalDiagnostic func(d diagnostic.Internal)) {
+	if !typeErrors.ReportSyntactic && !typeErrors.ReportSemantic {
+		return
+	}
+
+	// Left out files report none of the diagnostics attached to them, the
+	// include processor ones included. Type-aware lint rules still run on them,
+	// with a checker.
+	files = typeErrors.filterFiles(files)
+	if len(files) == 0 {
+		return
+	}
+
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
 
 	if typeErrors.ReportSyntactic {

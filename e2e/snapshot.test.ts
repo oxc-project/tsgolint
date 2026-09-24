@@ -202,6 +202,15 @@ function resolveTestFilePath(relativePath: string): string {
   return join(FIXTURES_DIR, relativePath);
 }
 
+function getDiagnostics(config: string): Diagnostic[] {
+  const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+    input: config,
+    env: { ...process.env, GOMAXPROCS: '1' },
+  });
+
+  return sortDiagnostics(parseHeadlessOutput(output));
+}
+
 function generateConfig(
   files: string[],
   rules:
@@ -212,17 +221,7 @@ function generateConfig(
     reportSemantic?: boolean;
   },
 ): string {
-  // Headless payload format:
-  // ```json
-  // {
-  //   "configs": [
-  //     {
-  //       "file_paths": ["/abs/path/a.ts", ...],
-  //       "rules": [ { "name": "rule-a" }, { "name": "rule-b" } ]
-  //     }
-  //   ]
-  // }
-  // ```
+  // See the headless payload schema in `cmd/tsgolint/payload.go`.
   const config = {
     version: 2,
     configs: [
@@ -357,15 +356,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     // Run tsgolint in headless mode with single thread for deterministic results
     // Set GOMAXPROCS=1 for single-threaded execution
-    const env = { ...process.env, GOMAXPROCS: '1' };
-
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -376,15 +367,7 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     const config = generateConfig(testFiles, ['no-unsafe-argument']);
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -401,17 +384,6 @@ describe('TSGoLint E2E Snapshot Tests', () => {
         })),
       };
       return JSON.stringify(config);
-    }
-
-    function getDiagnostics(config: string): Diagnostic[] {
-      let output: Buffer;
-      output = execFileSync(TSGOLINT_BIN, ['headless'], {
-        input: config,
-        env: { ...process.env, GOMAXPROCS: '1' },
-      });
-
-      const diagnostics = parseHeadlessOutput(output);
-      return sortDiagnostics(diagnostics);
     }
 
     const testFiles = await getTestFiles('basic');
@@ -448,14 +420,7 @@ promise;
       },
     };
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: JSON.stringify(config),
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(JSON.stringify(config));
 
     expect(diagnostics.length).toBe(1);
     expect(diagnostics[0].kind == DiagnosticKind.Rule && diagnostics[0].rule).toBe('no-floating-promises');
@@ -485,13 +450,7 @@ console.log(x);
       },
     };
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: JSON.stringify(config),
-      env,
-    });
-
-    const diagnostics = parseHeadlessOutput(output);
+    const diagnostics = getDiagnostics(JSON.stringify(config));
 
     expect(diagnostics.length).toBe(0);
   });
@@ -535,15 +494,7 @@ console.log(x);
 
     const config = generateConfig(testFiles, ['no-floating-promises']);
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -554,15 +505,7 @@ console.log(x);
 
     const config = generateConfig(testFiles, ['no-floating-promises']);
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -627,13 +570,7 @@ console.log(x);
       },
     ]);
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env: { ...process.env, GOMAXPROCS: '1' },
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -678,13 +615,7 @@ console.log(x);
 
     const config = generateConfig(testFiles, ['no-unnecessary-boolean-literal-compare']);
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env: { ...process.env, GOMAXPROCS: '1' },
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toHaveLength(0);
   });
@@ -695,12 +626,7 @@ console.log(x);
       reportSemantic: true,
     });
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env: { ...process.env, GOMAXPROCS: '1' },
-    });
-
-    const diagnostics = parseHeadlessOutput(output);
+    const diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toStrictEqual([]);
   });
@@ -713,13 +639,7 @@ console.log(x);
       reportSemantic: true,
     });
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env: { ...process.env, GOMAXPROCS: '1' },
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -737,15 +657,7 @@ console.log(x);
       reportSyntactic: true,
     });
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
@@ -759,17 +671,201 @@ console.log(x);
       reportSyntactic: true,
     });
 
-    const env = { ...process.env, GOMAXPROCS: '1' };
-
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env,
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
+  });
+
+  describe('per-config `type_check`', () => {
+    const SYNTACTIC_FILE = 'semantic-syntactic-diagnostics/src/a.ts';
+    const SEMANTIC_FILE = 'semantic-syntactic-diagnostics/src/b.mts';
+    const TYPE_ERROR_FILES = [`fixtures/${SYNTACTIC_FILE}`, `fixtures/${SEMANTIC_FILE}`];
+
+    // Both files belong to the same tsconfig, so they are linted by a single program.
+    // The options are keyed by fixture file, not by kind of diagnostic to report.
+    function runWithTypeCheck(typeCheckByFile: { 'src/a.ts'?: boolean; 'src/b.mts'?: boolean }): Diagnostic[] {
+      const configFor = (file: string, typeCheck: boolean | undefined) => ({
+        file_paths: [resolveTestFilePath(file)],
+        rules: [{ name: 'no-floating-promises' }],
+        ...(typeCheck !== undefined && { type_check: typeCheck }),
+      });
+
+      return getDiagnostics(JSON.stringify({
+        version: 2,
+        configs: [
+          configFor(SYNTACTIC_FILE, typeCheckByFile['src/a.ts']),
+          configFor(SEMANTIC_FILE, typeCheckByFile['src/b.mts']),
+        ],
+        report_semantic: true,
+        report_syntactic: true,
+      }));
+    }
+
+    // Diagnostics of the fixture's two source files: internal diagnostics of
+    // other files are tsconfig diagnostics, which `type_check` doesn't cover
+    // and which can carry a TS id and a range too.
+    function typeErrorFiles(diagnostics: Diagnostic[]): string[] {
+      const files = diagnostics
+        .filter((d) => d.kind === DiagnosticKind.Internal && TYPE_ERROR_FILES.includes(d.file_path))
+        .map((d) => d.file_path);
+      return [...new Set(files)].sort();
+    }
+
+    // Rule 1 of the `type_check` semantics documented in cmd/tsgolint/payload.go.
+    it('reports type errors for every file when no config group carries `type_check`', () => {
+      expect(typeErrorFiles(runWithTypeCheck({}))).toStrictEqual([...TYPE_ERROR_FILES].sort());
+    });
+
+    it('skips the files of a config group setting `type_check: false`', () => {
+      expect(typeErrorFiles(runWithTypeCheck({ 'src/b.mts': false }))).toStrictEqual([`fixtures/${SYNTACTIC_FILE}`]);
+    });
+
+    it('reports only the opted-in config group when every group carries the flag', () => {
+      expect(typeErrorFiles(runWithTypeCheck({ 'src/a.ts': false, 'src/b.mts': true }))).toStrictEqual([
+        `fixtures/${SEMANTIC_FILE}`,
+      ]);
+    });
+
+    it('reports no type errors when every config group sets `type_check: false`', () => {
+      expect(typeErrorFiles(runWithTypeCheck({ 'src/a.ts': false, 'src/b.mts': false }))).toStrictEqual([]);
+    });
+
+    // Rule 3 of the `type_check` semantics documented in cmd/tsgolint/payload.go:
+    // `false` excludes every TypeScript diagnostic attached to the file, while
+    // the type-aware lint rules still run on it.
+    it('rule 3: a `type_check: false` file reports no type error but still runs the rules', () => {
+      const testFile = resolveTestFilePath('type-check-and-rules/index.ts');
+      const runOn = (typeCheck: boolean) =>
+        getDiagnostics(JSON.stringify({
+          version: 2,
+          configs: [
+            {
+              file_paths: [testFile],
+              rules: [{ name: 'no-floating-promises' }],
+              type_check: typeCheck,
+            },
+          ],
+          report_semantic: true,
+        }));
+
+      // The fixture has both a type error and a floating promise.
+      const reported = runOn(true);
+      expect(reported.filter((d) => d.kind === DiagnosticKind.Rule).map((d) => (d as RuleDiagnostic).rule))
+        .toStrictEqual(['no-floating-promises']);
+      expect(reported.filter((d) => d.kind === DiagnosticKind.Internal).map((d) => d.message.id))
+        .toStrictEqual(['TS2322']);
+
+      // Opting out only drops the type error.
+      const skipped = runOn(false);
+      expect(skipped.filter((d) => d.kind === DiagnosticKind.Rule).map((d) => (d as RuleDiagnostic).rule))
+        .toStrictEqual(['no-floating-promises']);
+      expect(skipped.filter((d) => d.kind === DiagnosticKind.Internal)).toStrictEqual([]);
+    });
+
+    // Rule 4 of the `type_check` semantics documented in cmd/tsgolint/payload.go:
+    // `report_syntactic`/`report_semantic` stay the run-wide kind selectors, so
+    // opting a file in reports nothing more without them.
+    it('rule 4: `type_check: true` is a no-op without a kind selector', () => {
+      const testFile = resolveTestFilePath('type-check-and-rules/index.ts');
+      const diagnostics = getDiagnostics(JSON.stringify({
+        version: 2,
+        configs: [
+          {
+            file_paths: [testFile],
+            rules: [{ name: 'no-floating-promises' }],
+            type_check: true,
+          },
+        ],
+      }));
+
+      expect(diagnostics.filter((d) => d.kind === DiagnosticKind.Rule).map((d) => (d as RuleDiagnostic).rule))
+        .toStrictEqual(['no-floating-promises']);
+      expect(diagnostics.filter((d) => d.kind === DiagnosticKind.Internal)).toStrictEqual([]);
+    });
+
+    // Rule 2 of the `type_check` semantics documented in cmd/tsgolint/payload.go,
+    // rules half: the last config group listing a file defines its rules too.
+    it("rule 2: a file listed twice is linted with the last config group's rules", () => {
+      const testFile = resolveTestFilePath('type-check-and-rules/index.ts');
+      const rulesReportedFor = (rules: string[][]) =>
+        getDiagnostics(JSON.stringify({
+          version: 2,
+          configs: rules.map((names) => ({
+            file_paths: [testFile],
+            rules: names.map((name) => ({ name })),
+          })),
+        })).filter((d) => d.kind === DiagnosticKind.Rule).map((d) => (d as RuleDiagnostic).rule);
+
+      // The fixture violates both rules, so only the last group's rule reports.
+      expect(rulesReportedFor([['no-unsafe-argument'], ['no-floating-promises']]))
+        .toStrictEqual(['no-floating-promises']);
+      expect(rulesReportedFor([['no-floating-promises'], ['no-unsafe-argument']]))
+        .toStrictEqual(['no-unsafe-argument']);
+    });
+
+    // Rule 3 of the `type_check` semantics documented in cmd/tsgolint/payload.go:
+    // the program-level tsconfig diagnostics belong to no file in particular, so
+    // opting a file out doesn't silence them.
+    it('rule 3: a `type_check: false` file still reports its tsconfig diagnostics', () => {
+      const testFile = resolveTestFilePath('with-invalid-tsconfig-option/index.ts');
+      const diagnostics = getDiagnostics(JSON.stringify({
+        version: 2,
+        configs: [
+          {
+            file_paths: [testFile],
+            rules: [{ name: 'no-floating-promises' }],
+            type_check: false,
+          },
+        ],
+        report_semantic: true,
+      }));
+
+      expect(diagnostics.filter((d) => d.kind === DiagnosticKind.Internal).map((d) => d.message.id))
+        .toStrictEqual(['tsconfig-error']);
+    });
+
+    // The files that match no tsconfig are linted through an inferred program,
+    // which `type_check` has to scope like any other.
+    it('skips the type errors of a `type_check: false` file outside any project', () => {
+      const testFile = resolveTestFilePath('with-unmatched-files/test.ts');
+      const typeErrorsOf = (typeCheck: boolean) =>
+        getDiagnostics(JSON.stringify({
+          version: 2,
+          configs: [
+            {
+              file_paths: [testFile],
+              rules: [{ name: 'no-unsafe-argument' }],
+              type_check: typeCheck,
+            },
+          ],
+          report_semantic: true,
+        })).filter((d) => d.kind === DiagnosticKind.Internal).map((d) => d.message.id);
+
+      expect(typeErrorsOf(true)).toStrictEqual(['TS2322']);
+      expect(typeErrorsOf(false)).toStrictEqual([]);
+    });
+  });
+
+  it('lints a file listed with a path relative to the working directory', () => {
+    // The tsconfig lives in the subdirectory the file is in, so a relative path
+    // that reached the linter would be resolved against the wrong directory and
+    // miss the program.
+    const directory = resolveTestFilePath('relative-file-paths');
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+      cwd: directory,
+      input: JSON.stringify({
+        version: 2,
+        configs: [{ file_paths: ['src/index.ts'], rules: [{ name: 'no-floating-promises' }] }],
+      }),
+      env: { ...process.env, GOMAXPROCS: '1' },
+    });
+
+    const diagnostics = sortDiagnostics(parseHeadlessOutput(output));
+
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].kind === DiagnosticKind.Rule && diagnostics[0].rule).toBe('no-floating-promises');
+    expect(diagnostics[0].file_path).toBe('fixtures/relative-file-paths/src/index.ts');
   });
 
   it('should attach the tsconfig path to tsconfig-error diagnostics without a TypeScript diagnostic file (oxc-project/oxc#2200)', async () => {
@@ -778,13 +874,7 @@ console.log(x);
 
     const config = generateConfig(testFiles, ['no-floating-promises']);
 
-    const output = execFileSync(TSGOLINT_BIN, ['headless'], {
-      input: config,
-      env: { ...process.env, GOMAXPROCS: '1' },
-    });
-
-    let diagnostics = parseHeadlessOutput(output);
-    diagnostics = sortDiagnostics(diagnostics);
+    let diagnostics = getDiagnostics(config);
 
     expect(diagnostics).toMatchSnapshot();
   });
