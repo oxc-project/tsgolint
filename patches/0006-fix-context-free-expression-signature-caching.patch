@@ -1,22 +1,24 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Cameron Clark <cameron.clark@hey.com>
-Date: Wed, 23 Sep 2026 17:00:50 +0100
-Subject: [PATCH 6/6] fix(checker): isolate context-free call signature inference
+Date: Thu, 24 Sep 2026 10:17:43 +0100
+Subject: [PATCH 6/6] fix(checker): isolate context-free call and callback caches
 
-A context-free expression check currently reuses a previously cached call
-signature, including any type arguments inferred from an assertion. When it
-runs first, it also leaves its context-free signature in the normal cache.
+A context-free expression check can reuse a call signature previously inferred
+from an assertion, or leave its own signature in the normal cache. A call
+containing a contextual callback also caches the callback's function type,
+signature, parameter types, and contextual-check state. Recomputing just the
+call signature leaves the callback's inference order-dependent.
 
-Temporarily bypass and restore resolved signatures while checking without a
-contextual type. This makes the result independent of check order and keeps
-normal type queries unchanged.
+Temporarily clear and restore these caches during context-free resolution.
+Normal type queries retain their original caches, while context-free checks
+recompute the operand without the assertion's context.
 
 ---
- internal/checker/checker.go | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ internal/checker/checker.go | 67 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 3 deletions(-)
 
 diff --git a/internal/checker/checker.go b/internal/checker/checker.go
-index b639d488e..bf21051f4 100644
+index b639d488e..5a33c9458 100644
 --- a/internal/checker/checker.go
 +++ b/internal/checker/checker.go
 @@ -895,8 +895,9 @@ type Checker struct {
@@ -46,7 +48,7 @@ index b639d488e..bf21051f4 100644
  	return t
  }
  
-@@ -8382,6 +8386,13 @@ func (c *Checker) isSymbolOrSymbolForCall(node *ast.Node) bool {
+@@ -8382,6 +8386,63 @@ func (c *Checker) isSymbolOrSymbolForCall(node *ast.Node) bool {
   */
  func (c *Checker) getResolvedSignature(node *ast.Node, candidatesOutArray *[]*Signature, checkMode CheckMode) *Signature {
  	links := c.signatureLinks.Get(node)
@@ -56,6 +58,56 @@ index b639d488e..bf21051f4 100644
 +		cached := links.resolvedSignature
 +		links.resolvedSignature = nil
 +		defer func() { links.resolvedSignature = cached }()
++
++		// Contextual checks can also cache callback signatures and parameter
++		// types. Recompute them without this call's context and restore them after.
++		var cachedFunctionTypes map[*ValueSymbolLinks]*Type
++		var cachedFunctionSignatures map[*SignatureLinks]*Signature
++		var cachedFunctionChecks map[*NodeLinks]NodeCheckFlags
++		var clearFunctionTypes func(*ast.Node)
++		clearFunctionTypes = func(expression *ast.Node) {
++			if ast.IsFunctionExpressionOrArrowFunction(expression) {
++				if cachedFunctionTypes == nil {
++					cachedFunctionTypes = make(map[*ValueSymbolLinks]*Type)
++					cachedFunctionSignatures = make(map[*SignatureLinks]*Signature)
++					cachedFunctionChecks = make(map[*NodeLinks]NodeCheckFlags)
++				}
++				symbolLinks := c.valueSymbolLinks.Get(c.getSymbolOfDeclaration(expression))
++				cachedFunctionTypes[symbolLinks] = symbolLinks.resolvedType
++				symbolLinks.resolvedType = nil
++				signatureLinks := c.signatureLinks.Get(expression)
++				cachedFunctionSignatures[signatureLinks] = signatureLinks.resolvedSignature
++				signatureLinks.resolvedSignature = nil
++				nodeLinks := c.nodeLinks.Get(expression)
++				cachedFunctionChecks[nodeLinks] = nodeLinks.flags
++				nodeLinks.flags &^= NodeCheckFlagsContextChecked
++				for _, parameter := range expression.Parameters() {
++					if parameter.Symbol() != nil {
++						parameterLinks := c.valueSymbolLinks.Get(parameter.Symbol())
++						cachedFunctionTypes[parameterLinks] = parameterLinks.resolvedType
++						parameterLinks.resolvedType = nil
++					}
++				}
++			}
++			expression.ForEachChild(func(child *ast.Node) bool {
++				clearFunctionTypes(child)
++				return false
++			})
++		}
++		clearFunctionTypes(node)
++		if cachedFunctionTypes != nil {
++			defer func() {
++				for symbolLinks, resolvedType := range cachedFunctionTypes {
++					symbolLinks.resolvedType = resolvedType
++				}
++				for signatureLinks, resolvedSignature := range cachedFunctionSignatures {
++					signatureLinks.resolvedSignature = resolvedSignature
++				}
++				for nodeLinks, flags := range cachedFunctionChecks {
++					nodeLinks.flags = flags
++				}
++			}()
++		}
 +	}
  	// If getResolvedSignature has already been called, we will have cached the resolvedSignature.
  	// However, it is possible that either candidatesOutArray was not passed in the first time,

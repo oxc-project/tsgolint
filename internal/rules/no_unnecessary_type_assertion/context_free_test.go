@@ -31,6 +31,13 @@ declare function tag<T extends Base = Base>(strings: TemplateStringsArray): T;
 const tagged = tag` + "`key`" + ` as Derived;
 declare function queryAsync<T extends Base = Base>(key: string): Promise<T>;
 async function awaited() { return (await queryAsync("key")) as Derived; }
+declare function withCallback<T extends Base = Base>(cb: (x: T) => void): T;
+const callbackNecessary = withCallback(x => {}) as Derived;
+const functionCallbackNecessary = withCallback(function (x) {}) as Derived;
+declare function withCallbackAndValue<T extends Base>(cb: (x: T) => void, value: T): T;
+const callbackRedundant = withCallbackAndValue(x => {}, derived) as Derived;
+declare function withDestructuredCallback<T extends Base = Base>(cb: (arg: { value: T }) => void): T;
+const destructuredCallbackNecessary = withDestructuredCallback(({ value }) => {}) as Derived;
 `
 
 func contextFreeAssertionProgram(t *testing.T) (*ast.SourceFile, *linter.RunLinterOnProgramOptions) {
@@ -51,31 +58,53 @@ func contextFreeAssertionProgram(t *testing.T) (*ast.SourceFile, *linter.RunLint
 }
 
 func TestContextFreeCallTypeIsIndependentOfCheckOrder(t *testing.T) {
-	for _, contextualFirst := range []bool{false, true} {
-		name := "contextFreeFirst"
-		if contextualFirst {
-			name = "contextualFirst"
-		}
-		t.Run(name, func(t *testing.T) {
-			file, options := contextFreeAssertionProgram(t)
-			c, done := options.Program.GetTypeChecker(t.Context())
-			defer done()
-			declaration := file.Statements.Nodes[3].AsVariableStatement().DeclarationList.AsVariableDeclarationList().Declarations.Nodes[0]
-			call := declaration.Initializer().Expression()
-
+	for _, testCase := range []struct {
+		name        string
+		declaration string
+	}{
+		{name: "plainCall", declaration: "necessary"},
+		{name: "arrowCallback", declaration: "callbackNecessary"},
+		{name: "functionCallback", declaration: "functionCallbackNecessary"},
+		{name: "destructuredCallback", declaration: "destructuredCallbackNecessary"},
+	} {
+		for _, contextualFirst := range []bool{false, true} {
+			order := "contextFreeFirst"
 			if contextualFirst {
-				if got := c.TypeToString(c.GetTypeAtLocation(call)); got != "Derived" {
-					t.Fatalf("contextual type before context-free check = %s, want Derived", got)
+				order = "contextualFirst"
+			}
+			t.Run(testCase.name+"/"+order, func(t *testing.T) {
+				file, options := contextFreeAssertionProgram(t)
+				c, done := options.Program.GetTypeChecker(t.Context())
+				defer done()
+				var call *ast.Node
+				for _, statement := range file.Statements.Nodes {
+					if !ast.IsVariableStatement(statement) {
+						continue
+					}
+					for _, declaration := range statement.AsVariableStatement().DeclarationList.AsVariableDeclarationList().Declarations.Nodes {
+						if declaration.Name().Text() == testCase.declaration {
+							call = declaration.Initializer().Expression()
+						}
+					}
 				}
-			}
-			contextFree := c.TypeToString(checker.Checker_getContextFreeTypeOfExpression(c, call))
-			if contextFree == "Derived" {
-				t.Fatalf("context-free type inherited the assertion: %s", contextFree)
-			}
-			if got := c.TypeToString(c.GetTypeAtLocation(call)); got != "Derived" {
-				t.Fatalf("contextual type after context-free check = %s, want Derived", got)
-			}
-		})
+				if call == nil {
+					t.Fatalf("declaration %q not found", testCase.declaration)
+				}
+
+				if contextualFirst {
+					if got := c.TypeToString(c.GetTypeAtLocation(call)); got != "Derived" {
+						t.Fatalf("contextual type before context-free check = %s, want Derived", got)
+					}
+				}
+				contextFree := c.TypeToString(checker.Checker_getContextFreeTypeOfExpression(c, call))
+				if contextFree == "Derived" {
+					t.Fatalf("context-free type inherited the assertion: %s", contextFree)
+				}
+				if got := c.TypeToString(c.GetTypeAtLocation(call)); got != "Derived" {
+					t.Fatalf("contextual type after context-free check = %s, want Derived", got)
+				}
+			})
+		}
 	}
 }
 
@@ -102,10 +131,13 @@ func TestContextFreeCallWithSemanticDiagnostics(t *testing.T) {
 			if err := linter.RunLinterOnProgram(*options); err != nil {
 				t.Fatal(err)
 			}
-			if len(diagnostics) != 2 || diagnostics[0].Message.Id != "unnecessaryAssertion" || diagnostics[1].Message.Id != "unnecessaryAssertion" {
-				t.Fatalf("got %v rule diagnostics, want two redundant assertions", diagnostics)
+			if len(diagnostics) != 3 {
+				t.Fatalf("got %v rule diagnostics, want three redundant assertions", diagnostics)
 			}
-			for i, expected := range []string{"const redundant", "const inferred"} {
+			for i, expected := range []string{"const redundant", "const inferred", "const callbackRedundant"} {
+				if diagnostics[i].Message.Id != "unnecessaryAssertion" {
+					t.Fatalf("diagnostic %d has ID %q, want unnecessaryAssertion", i, diagnostics[i].Message.Id)
+				}
 				lineStart := strings.LastIndex(contextFreeAssertionSource[:diagnostics[i].Range.Pos()], "\n") + 1
 				if !strings.HasPrefix(contextFreeAssertionSource[lineStart:], expected) {
 					t.Fatalf("diagnostic %d is on %q, want %q", i, contextFreeAssertionSource[lineStart:], expected)
