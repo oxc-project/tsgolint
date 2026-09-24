@@ -427,6 +427,7 @@ func visitLintNodes(file *ast.SourceFile, runListeners func(kind ast.Kind, node 
 	file.Node.ForEachChild(childVisitor)
 }
 
+// RunLinterOnProgram requires exclusive use of the program's checkers until it returns.
 func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 	logLevel := options.LogLevel
 	program := options.Program
@@ -439,12 +440,17 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 	typeErrors := options.TypeErrors
 	timingStore := options.TimingStore
 
+	scheduling := checkerSchedulingFromEnvironment()
 	reportTypeScriptDiagnostics(program, files, typeErrors, onInternalDiagnostic)
-	workloadQueue := makeCheckerWorkloadQueue(program, files)
+	scheduler := newCheckerScheduler(scheduling, program, files, workers)
 
-	wg := core.NewWorkGroup(workers == 1)
-	for range workers {
+	wg := core.NewWorkGroup(scheduler.workers == 1)
+	for i := range scheduler.workers {
 		wg.Queue(func() {
+			initial, hasWork := scheduler.initialWorkload(i)
+			if !hasWork {
+				return
+			}
 			ctxBuilder := &ruleContextBuilder{
 				fixState:     fixState,
 				onDiagnostic: onDiagnostic,
@@ -463,13 +469,13 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 				}
 				registeredListeners := make(map[ast.Kind][]taggedListener, 20)
 
-				for w := range workloadQueue {
+				for w, ok := initial, true; ok; w, ok = w.nextWorkload() {
 					ctxBuilder.program = w.program
 					ctxBuilder.checker = w.checker
 					ctx.Program = w.program
 					ctx.TypeChecker = w.checker
 
-					for file := range w.queue {
+					for file := w.nextFile(); file != nil; file = w.nextFile() {
 						if logLevel == utils.LogLevelDebug {
 							log.Print(file.FileName())
 						}
@@ -521,13 +527,13 @@ func RunLinterOnProgram(options RunLinterOnProgramOptions) error {
 				stat.Calls++
 			}
 
-			for w := range workloadQueue {
+			for w, ok := initial, true; ok; w, ok = w.nextWorkload() {
 				ctxBuilder.program = w.program
 				ctxBuilder.checker = w.checker
 				ctx.Program = w.program
 				ctx.TypeChecker = w.checker
 
-				for file := range w.queue {
+				for file := w.nextFile(); file != nil; file = w.nextFile() {
 					if logLevel == utils.LogLevelDebug {
 						log.Print(file.FileName())
 					}

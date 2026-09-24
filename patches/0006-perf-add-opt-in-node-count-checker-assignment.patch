@@ -1,0 +1,44 @@
+From 8474067611a516cca604ce183254db7fc06c2c91 Mon Sep 17 00:00:00 2001
+From: TSGolint experiment <tsgolint-experiment@localhost>
+Date: Thu, 24 Sep 2026 11:18:06 +0100
+Subject: [PATCH] perf: add opt-in node-count checker assignment
+
+---
+ internal/compiler/checkerpool.go | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/internal/compiler/checkerpool.go b/internal/compiler/checkerpool.go
+index 551583707..2c19b9d73 100644
+--- a/internal/compiler/checkerpool.go
++++ b/internal/compiler/checkerpool.go
+@@ -1,7 +1,9 @@
+ package compiler
+ 
+ import (
++	"cmp"
+ 	"context"
++	"os"
+ 	"slices"
+ 	"sync"
+ 
+@@ -112,7 +114,16 @@ func (p *checkerPool) createCheckers() {
+ 		wg.RunAndWait()
+ 
+ 		p.fileAssociations = make(map[*ast.SourceFile]*checker.Checker, len(p.program.files))
+-		for i, file := range p.program.files {
++		files := p.program.files
++		if checkerCount > 1 && os.Getenv("OXLINT_TSGOLINT_CHECKER_SCHEDULING") == "sorted" {
++			// Spread large files across checkers without changing program order.
++			// Preserve that order for files with equal node counts.
++			files = slices.Clone(files)
++			slices.SortStableFunc(files, func(a, b *ast.SourceFile) int {
++				return cmp.Compare(b.NodeCount, a.NodeCount)
++			})
++		}
++		for i, file := range files {
+ 			p.fileAssociations[file] = p.checkers[i%checkerCount]
+ 		}
+ 	})
+-- 
+2.54.0 (Apple Git-157)
+
