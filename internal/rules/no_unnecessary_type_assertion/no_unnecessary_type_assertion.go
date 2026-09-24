@@ -11,6 +11,25 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+func hasDirectAny(t *checker.Type, typeArguments []*checker.Type) bool {
+	return utils.IsTypeFlagSet(t, checker.TypeFlagsAny) ||
+		slices.ContainsFunc(typeArguments, func(typeArgument *checker.Type) bool {
+			return utils.IsTypeFlagSet(typeArgument, checker.TypeFlagsAny)
+		})
+}
+
+func haveSameTypeArguments(uncastArgs, castArgs []*checker.Type) bool {
+	if len(uncastArgs) != len(castArgs) {
+		return false
+	}
+	for i, arg := range uncastArgs {
+		if arg != castArgs[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func buildContextuallyUnnecessaryMessage(assertion core.TextRange) rule.RuleDiagnostic {
 	return rule.RuleDiagnostic{
 		Range: assertion,
@@ -249,20 +268,6 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return true
 		}
 
-		haveSameTypeArguments := func(uncast, cast *checker.Type) bool {
-			uncastArgs := getTypeArguments(uncast)
-			castArgs := getTypeArguments(cast)
-			if len(uncastArgs) != len(castArgs) {
-				return false
-			}
-			for i, arg := range uncastArgs {
-				if arg != castArgs[i] {
-					return false
-				}
-			}
-			return true
-		}
-
 		areMutuallyAssignable := func(a, b *checker.Type) bool {
 			return checker.Checker_isTypeAssignableTo(ctx.TypeChecker, a, b) &&
 				checker.Checker_isTypeAssignableTo(ctx.TypeChecker, b, a)
@@ -395,10 +400,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			if (utils.IsTypeFlagSet(uncast, checker.TypeFlagsNonPrimitive) && !utils.IsTypeFlagSet(cast, checker.TypeFlagsNonPrimitive)) ||
-				(hasIndexSignature(uncast) != hasIndexSignature(cast)) ||
-				containsAny(uncast) ||
-				containsAny(cast) ||
-				(containsTypeVariable(cast) && !containsTypeVariable(uncast)) {
+				(hasIndexSignature(uncast) != hasIndexSignature(cast)) {
 				return false
 			}
 
@@ -411,7 +413,20 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return false
 			}
 
+			uncastTypeArguments := getTypeArguments(uncast)
+			castTypeArguments := getTypeArguments(cast)
+			// Assertions involving direct `any` are not reported and do not require a recursive type walk.
+			if hasDirectAny(uncast, uncastTypeArguments) || hasDirectAny(cast, castTypeArguments) {
+				return false
+			}
+
 			if utils.IsIntersectionType(cast) && !utils.IsIntersectionType(uncast) {
+				if containsAny(uncast) ||
+					containsAny(cast) ||
+					(containsTypeVariable(cast) && !containsTypeVariable(uncast)) {
+					return false
+				}
+
 				castParts := cast.Types()
 				var otherPart *checker.Type
 				for _, part := range castParts {
@@ -427,18 +442,22 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					isEmptyObjectType(otherPart) &&
 					!containsTypeVariable(otherPart) {
 					constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, uncast)
-					if constraint != nil && !utils.IsNullableType(ctx.TypeChecker, constraint) {
-						return true
-					}
+					return constraint != nil && !utils.IsNullableType(ctx.TypeChecker, constraint)
 				}
 				return false
 			}
 
-			if !hasSameProperties(uncast, cast) || !haveSameTypeArguments(uncast, cast) {
+			// Check shape and assignability before recursively walking nested types. Assertions between
+			// incompatible callable types can otherwise traverse very large generic parameter graphs.
+			if !hasSameProperties(uncast, cast) ||
+				!haveSameTypeArguments(uncastTypeArguments, castTypeArguments) ||
+				!areMutuallyAssignable(uncast, cast) {
 				return false
 			}
 
-			return areMutuallyAssignable(uncast, cast)
+			return !containsAny(uncast) &&
+				!containsAny(cast) &&
+				!(containsTypeVariable(cast) && !containsTypeVariable(uncast))
 		}
 
 		isTypeAny := func(t *checker.Type) bool {
@@ -874,7 +893,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return isInGenericContext(node) &&
 				(hasPhantomTypeArguments(uncastType) ||
 					hasPhantomTypeArguments(contextualType)) &&
-				!haveSameTypeArguments(uncastType, contextualType)
+				!haveSameTypeArguments(getTypeArguments(uncastType), getTypeArguments(contextualType))
 		}
 
 		isNullishLiteralToUnion := func(node *ast.Node, castType *checker.Type) bool {
