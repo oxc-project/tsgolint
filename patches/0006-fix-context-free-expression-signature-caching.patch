@@ -5,9 +5,9 @@ Subject: [PATCH 6/6] fix(checker): isolate context-free call and callback caches
 
 A context-free expression check can reuse a call signature previously inferred
 from an assertion, or leave its own signature in the normal cache. A call
-containing a contextual callback also caches the callback's function type,
-signature, parameter types, and contextual-check state. Recomputing just the
-call signature leaves the callback's inference order-dependent.
+containing a contextual callback or object-literal method also caches its
+function type, signature, parameter types, and contextual-check state.
+Recomputing just the call signature leaves inference order-dependent.
 
 Temporarily clear and restore these caches during context-free resolution.
 Normal type queries retain their original caches, while context-free checks
@@ -18,7 +18,7 @@ recompute the operand without the assertion's context.
  1 file changed, 64 insertions(+), 3 deletions(-)
 
 diff --git a/internal/checker/checker.go b/internal/checker/checker.go
-index b639d488e..5a33c9458 100644
+index b639d488e..c487e2fd1 100644
 --- a/internal/checker/checker.go
 +++ b/internal/checker/checker.go
 @@ -895,8 +895,9 @@ type Checker struct {
@@ -66,7 +66,7 @@ index b639d488e..5a33c9458 100644
 +		var cachedFunctionChecks map[*NodeLinks]NodeCheckFlags
 +		var clearFunctionTypes func(*ast.Node)
 +		clearFunctionTypes = func(expression *ast.Node) {
-+			if ast.IsFunctionExpressionOrArrowFunction(expression) {
++			if ast.IsFunctionExpressionOrArrowFunction(expression) || ast.IsObjectLiteralMethod(expression) {
 +				if cachedFunctionTypes == nil {
 +					cachedFunctionTypes = make(map[*ValueSymbolLinks]*Type)
 +					cachedFunctionSignatures = make(map[*SignatureLinks]*Signature)

@@ -38,6 +38,8 @@ declare function withCallbackAndValue<T extends Base>(cb: (x: T) => void, value:
 const callbackRedundant = withCallbackAndValue(x => {}, derived) as Derived;
 declare function withDestructuredCallback<T extends Base = Base>(cb: (arg: { value: T }) => void): T;
 const destructuredCallbackNecessary = withDestructuredCallback(({ value }) => {}) as Derived;
+declare function withObjectMethod<T extends Base = Base>(object: { method(x: T): void }): T;
+const objectMethodNecessary = withObjectMethod({ method(x) {} }) as Derived;
 `
 
 func contextFreeAssertionProgram(t *testing.T) (*ast.SourceFile, *linter.RunLinterOnProgramOptions) {
@@ -57,6 +59,22 @@ func contextFreeAssertionProgram(t *testing.T) (*ast.SourceFile, *linter.RunLint
 	return file, &linter.RunLinterOnProgramOptions{Program: program, Files: []*ast.SourceFile{file}, Workers: 1}
 }
 
+func contextFreeAssertionCall(t *testing.T, file *ast.SourceFile, name string) *ast.Node {
+	t.Helper()
+	for _, statement := range file.Statements.Nodes {
+		if !ast.IsVariableStatement(statement) {
+			continue
+		}
+		for _, declaration := range statement.AsVariableStatement().DeclarationList.AsVariableDeclarationList().Declarations.Nodes {
+			if declaration.Name().Text() == name {
+				return declaration.Initializer().Expression()
+			}
+		}
+	}
+	t.Fatalf("declaration %q not found", name)
+	return nil
+}
+
 func TestContextFreeCallTypeIsIndependentOfCheckOrder(t *testing.T) {
 	for _, testCase := range []struct {
 		name        string
@@ -66,6 +84,7 @@ func TestContextFreeCallTypeIsIndependentOfCheckOrder(t *testing.T) {
 		{name: "arrowCallback", declaration: "callbackNecessary"},
 		{name: "functionCallback", declaration: "functionCallbackNecessary"},
 		{name: "destructuredCallback", declaration: "destructuredCallbackNecessary"},
+		{name: "objectMethod", declaration: "objectMethodNecessary"},
 	} {
 		for _, contextualFirst := range []bool{false, true} {
 			order := "contextFreeFirst"
@@ -76,20 +95,7 @@ func TestContextFreeCallTypeIsIndependentOfCheckOrder(t *testing.T) {
 				file, options := contextFreeAssertionProgram(t)
 				c, done := options.Program.GetTypeChecker(t.Context())
 				defer done()
-				var call *ast.Node
-				for _, statement := range file.Statements.Nodes {
-					if !ast.IsVariableStatement(statement) {
-						continue
-					}
-					for _, declaration := range statement.AsVariableStatement().DeclarationList.AsVariableDeclarationList().Declarations.Nodes {
-						if declaration.Name().Text() == testCase.declaration {
-							call = declaration.Initializer().Expression()
-						}
-					}
-				}
-				if call == nil {
-					t.Fatalf("declaration %q not found", testCase.declaration)
-				}
+				call := contextFreeAssertionCall(t, file, testCase.declaration)
 
 				if contextualFirst {
 					if got := c.TypeToString(c.GetTypeAtLocation(call)); got != "Derived" {
@@ -110,39 +116,53 @@ func TestContextFreeCallTypeIsIndependentOfCheckOrder(t *testing.T) {
 
 func TestContextFreeCallWithSemanticDiagnostics(t *testing.T) {
 	for _, reportSemantic := range []bool{false, true} {
-		name := "withoutSemanticDiagnostics"
-		if reportSemantic {
-			name = "withSemanticDiagnostics"
+		for _, contextualFirst := range []bool{false, true} {
+			name := "withoutSemanticDiagnostics"
+			if reportSemantic {
+				name = "withSemanticDiagnostics"
+			}
+			if contextualFirst {
+				name += "/contextualFirst"
+			}
+			t.Run(name, func(t *testing.T) {
+				file, options := contextFreeAssertionProgram(t)
+				if contextualFirst {
+					c, done := options.Program.GetTypeChecker(t.Context())
+					call := contextFreeAssertionCall(t, file, "objectMethodNecessary")
+					got := c.TypeToString(c.GetTypeAtLocation(call))
+					done()
+					if got != "Derived" {
+						t.Fatalf("contextual method call type = %s, want Derived", got)
+					}
+				}
+				var diagnostics []rule.RuleDiagnostic
+				options.GetRulesForFile = func(*ast.SourceFile) []linter.ConfiguredRule {
+					return []linter.ConfiguredRule{{
+						Name: NoUnnecessaryTypeAssertionRule.Name,
+						Run: func(ctx rule.RuleContext) rule.RuleListeners {
+							return NoUnnecessaryTypeAssertionRule.Run(ctx, nil)
+						},
+					}}
+				}
+				options.OnDiagnostic = func(d rule.RuleDiagnostic) { diagnostics = append(diagnostics, d) }
+				options.OnInternalDiagnostic = func(d diagnostic.Internal) {}
+				options.TypeErrors = linter.TypeErrors{ReportSemantic: reportSemantic}
+				if err := linter.RunLinterOnProgram(*options); err != nil {
+					t.Fatal(err)
+				}
+				if len(diagnostics) != 3 {
+					t.Fatalf("got %v rule diagnostics, want three redundant assertions", diagnostics)
+				}
+				for i, expected := range []string{"const redundant", "const inferred", "const callbackRedundant"} {
+					if diagnostics[i].Message.Id != "unnecessaryAssertion" {
+						t.Fatalf("diagnostic %d has ID %q, want unnecessaryAssertion", i, diagnostics[i].Message.Id)
+					}
+					lineStart := strings.LastIndex(contextFreeAssertionSource[:diagnostics[i].Range.Pos()], "\n") + 1
+					if !strings.HasPrefix(contextFreeAssertionSource[lineStart:], expected) {
+						t.Fatalf("diagnostic %d is on %q, want %q", i, contextFreeAssertionSource[lineStart:], expected)
+					}
+				}
+			})
 		}
-		t.Run(name, func(t *testing.T) {
-			_, options := contextFreeAssertionProgram(t)
-			var diagnostics []rule.RuleDiagnostic
-			options.GetRulesForFile = func(*ast.SourceFile) []linter.ConfiguredRule {
-				return []linter.ConfiguredRule{{
-					Name: NoUnnecessaryTypeAssertionRule.Name,
-					Run: func(ctx rule.RuleContext) rule.RuleListeners {
-						return NoUnnecessaryTypeAssertionRule.Run(ctx, nil)
-					},
-				}}
-			}
-			options.OnDiagnostic = func(d rule.RuleDiagnostic) { diagnostics = append(diagnostics, d) }
-			options.OnInternalDiagnostic = func(d diagnostic.Internal) {}
-			options.TypeErrors = linter.TypeErrors{ReportSemantic: reportSemantic}
-			if err := linter.RunLinterOnProgram(*options); err != nil {
-				t.Fatal(err)
-			}
-			if len(diagnostics) != 3 {
-				t.Fatalf("got %v rule diagnostics, want three redundant assertions", diagnostics)
-			}
-			for i, expected := range []string{"const redundant", "const inferred", "const callbackRedundant"} {
-				if diagnostics[i].Message.Id != "unnecessaryAssertion" {
-					t.Fatalf("diagnostic %d has ID %q, want unnecessaryAssertion", i, diagnostics[i].Message.Id)
-				}
-				lineStart := strings.LastIndex(contextFreeAssertionSource[:diagnostics[i].Range.Pos()], "\n") + 1
-				if !strings.HasPrefix(contextFreeAssertionSource[lineStart:], expected) {
-					t.Fatalf("diagnostic %d is on %q, want %q", i, contextFreeAssertionSource[lineStart:], expected)
-				}
-			}
-		})
 	}
 }
