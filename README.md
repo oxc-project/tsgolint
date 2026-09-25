@@ -168,9 +168,9 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-60 of the 62 targeted rules are implemented.
+61 of the 62 targeted rules are implemented.
 
-- [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
+- [x] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
 - [x] [await-thenable](https://typescript-eslint.io/rules/await-thenable)
 - [x] [consistent-return](https://typescript-eslint.io/rules/consistent-return)

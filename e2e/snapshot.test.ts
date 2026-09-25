@@ -20,6 +20,7 @@ const ALL_RULES = [
   'consistent-return',
   'consistent-type-exports',
   'dot-notation',
+  'naming-convention',
   'no-array-delete',
   'no-base-to-string',
   'no-confusing-void-expression',
@@ -204,9 +205,7 @@ function resolveTestFilePath(relativePath: string): string {
 
 function generateConfig(
   files: string[],
-  rules:
-    readonly ((typeof ALL_RULES)[number] | { name: (typeof ALL_RULES)[number]; options: Record<string, unknown> })[] =
-      ALL_RULES,
+  rules: readonly ((typeof ALL_RULES)[number] | { name: (typeof ALL_RULES)[number]; options: unknown })[] = ALL_RULES,
   options?: {
     reportSyntactic?: boolean;
     reportSemantic?: boolean;
@@ -233,7 +232,7 @@ function generateConfig(
             r,
           ): {
             name: (typeof ALL_RULES)[number];
-            options?: Record<string, unknown>;
+            options?: unknown;
           } => (typeof r === 'string' ? { name: r } : r),
         ),
       },
@@ -325,6 +324,98 @@ describe('TSGoLint E2E Snapshot Tests', () => {
 
     diagnostics = parseHeadlessOutput(output);
     expect(diagnostics.length).toBe(0);
+  });
+
+  it('passes naming-convention option arrays through the headless payload', () => {
+    const testFile = resolveTestFilePath('basic/rules/naming-convention/options.ts');
+    const lint = (format: 'camelCase' | 'snake_case') => {
+      const config = generateConfig([testFile], [
+        { name: 'naming-convention', options: [{ selector: 'variable', format: [format] }] },
+      ]);
+      const output = execFileSync(TSGOLINT_BIN, ['headless'], { input: config });
+      return parseHeadlessOutput(output).filter(
+        (d): d is RuleDiagnostic => d.kind === DiagnosticKind.Rule && d.rule === 'naming-convention',
+      );
+    };
+
+    const camelCase = lint('camelCase');
+    expect(camelCase).toHaveLength(1);
+    expect(camelCase[0].message.id).toBe('doesNotMatchFormat');
+    expect(camelCase[0].message.description).toContain('snake_case');
+
+    const snakeCase = lint('snake_case');
+    expect(snakeCase).toHaveLength(1);
+    expect(snakeCase[0].message.id).toBe('doesNotMatchFormat');
+    expect(snakeCase[0].message.description).toContain('camelCase');
+  });
+
+  it('applies naming-convention type selectors before broader selectors', () => {
+    const testFile = resolveTestFilePath('basic/rules/naming-convention/index.ts');
+    const config = generateConfig([testFile], [
+      {
+        name: 'naming-convention',
+        options: [
+          { selector: 'variable', format: ['camelCase'] },
+          { selector: 'class', format: ['PascalCase'] },
+          { selector: 'variable', types: ['boolean'], format: ['UPPER_CASE'] },
+        ],
+      },
+    ]);
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], { input: config });
+    const diagnostics = parseHeadlessOutput(output).filter(
+      (d): d is RuleDiagnostic => d.kind === DiagnosticKind.Rule && d.rule === 'naming-convention',
+    );
+
+    expect(diagnostics).toHaveLength(3);
+    expect(diagnostics.map(d => d.message.id)).toEqual([
+      'doesNotMatchFormat',
+      'doesNotMatchFormat',
+      'doesNotMatchFormat',
+    ]);
+    for (const name of ['snake_case', 'wrongBoolean', 'lower_case']) {
+      expect(diagnostics.some(d => d.message.description.includes(name))).toBe(true);
+    }
+  });
+
+  it.each(
+    [
+      ['ID_Start', 1],
+      ['Alphabetic', 1],
+      ['ASCII', 1],
+      ['XID_Continue', 1],
+      ['Script=Unknown', 0],
+    ] as const,
+  )('accepts the JavaScript Unicode property %s in naming filters', (property, expectedCount) => {
+    const testFile = resolveTestFilePath('basic/rules/naming-convention/options.ts');
+    const config = JSON.parse(generateConfig([testFile], [
+      {
+        name: 'naming-convention',
+        options: [{ selector: 'variable', format: ['UPPER_CASE'], filter: `^\\p{${property}}+$` }],
+      },
+    ]));
+    config.source_overrides = { [testFile]: 'let a = 1;' };
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], { input: JSON.stringify(config) });
+    const diagnostics = parseHeadlessOutput(output);
+    expect(diagnostics).toHaveLength(expectedCount);
+    if (expectedCount) expect(diagnostics[0].message.id).toBe('doesNotMatchFormat');
+  });
+
+  it('preserves the original Unicode regex in naming custom-expression diagnostics', () => {
+    const testFile = resolveTestFilePath('basic/rules/naming-convention/options.ts');
+    const config = JSON.parse(generateConfig([testFile], [
+      {
+        name: 'naming-convention',
+        options: [{ selector: 'variable', format: null, custom: { regex: '^\\p{Script=Unknown}+$', match: true } }],
+      },
+    ]));
+    config.source_overrides = { [testFile]: 'let a = 1;' };
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], { input: JSON.stringify(config) });
+    const diagnostics = parseHeadlessOutput(output);
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].message).toEqual({
+      id: 'satisfyCustom',
+      description: 'Variable name `a` must match the RegExp: /^\\p{Script=Unknown}+$/u',
+    });
   });
 
   it.runIf(process.platform === 'win32')(

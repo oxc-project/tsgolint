@@ -124,6 +124,17 @@ for (const schemaDir of schemaDirs) {
     let content = fs.readFileSync(outputPath, 'utf8');
     let modified = false;
 
+    // go-jsonschema cannot derive a useful Go struct from naming-convention's
+    // variadic array of selector-specific oneOf options. Keep its typed option
+    // shell in a template; the schema remains the source of config validation.
+    if (ruleName === 'naming_convention') {
+      content = fs.readFileSync(
+        path.join(process.cwd(), 'tools', 'naming-convention-options.go.txt'),
+        'utf8',
+      );
+      modified = true;
+    }
+
     // General post-processing for ALL schemas:
     // Replace encoding/json with go-json-experiment/json for compatibility with TypeOrValueSpecifier
     // Only if the file actually uses json (has UnmarshalJSON methods)

@@ -31,9 +31,14 @@ class RuleTester {
 const context = vm.createContext({});
 const modules = new Map();
 function synthetic(key, exports) {
-  if (!modules.has(key)) modules.set(key, new vm.SyntheticModule(Object.keys(exports), function() {
-    for (const [name, value] of Object.entries(exports)) this.setExport(name, value);
-  }, { context, identifier: key }));
+  if (!modules.has(key)) {
+    modules.set(
+      key,
+      new vm.SyntheticModule(Object.keys(exports), function() {
+        for (const [name, value] of Object.entries(exports)) this.setExport(name, value);
+      }, { context, identifier: key }),
+    );
+  }
   return modules.get(key);
 }
 function moduleFor(file) {
@@ -44,11 +49,16 @@ function moduleFor(file) {
   return modules.get(file);
 }
 async function linker(id, parent) {
-  if (id === '@typescript-eslint/rule-tester') return synthetic(id, {
-    RuleTester, noFormat: (raw, ...keys) => String.raw({ raw }, ...keys),
-  });
+  if (id === '@typescript-eslint/rule-tester') {
+    return synthetic(id, {
+      RuleTester,
+      noFormat: (raw, ...keys) => String.raw({ raw }, ...keys),
+    });
+  }
   if (id.endsWith('/src/rules/naming-convention')) return synthetic('rule', { default: {} });
-  if (id.endsWith('/src/rules/naming-convention-utils')) return moduleFor('packages/eslint-plugin/src/rules/naming-convention-utils/shared.ts');
+  if (id.endsWith('/src/rules/naming-convention-utils')) {
+    return moduleFor('packages/eslint-plugin/src/rules/naming-convention-utils/shared.ts');
+  }
   if (id === './enums' && parent.identifier.endsWith('/src/rules/naming-convention-utils/shared.ts')) {
     // The imported enum is used only by helper functions that case expansion never calls.
     return synthetic('enums', { MetaSelectors: {} });
@@ -57,7 +67,10 @@ async function linker(id, parent) {
   assert.ok(id.startsWith('.'), `Unaccounted import: ${id}`);
   return moduleFor(path.posix.normalize(path.posix.join(path.posix.dirname(parent.identifier), id + '.ts')));
 }
-const files = ['naming-convention.test.ts', ...fs.readdirSync(path.join(root, base, 'cases')).filter(f => f.endsWith('.test.ts')).sort().map(f => 'cases/' + f)];
+const files = [
+  'naming-convention.test.ts',
+  ...fs.readdirSync(path.join(root, base, 'cases')).filter(f => f.endsWith('.test.ts')).sort().map(f => 'cases/' + f),
+];
 for (current of files) {
   const module = moduleFor(base + '/' + current);
   await module.link(linker);
@@ -65,7 +78,9 @@ for (current of files) {
 }
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
-  if (value !== null && typeof value === 'object') return Object.fromEntries(Object.keys(value).sort().map(k => [k, stable(value[k])]));
+  if (value !== null && typeof value === 'object') {
+    return Object.fromEntries(Object.keys(value).sort().map(k => [k, stable(value[k])]));
+  }
   return value;
 }
 const fingerprint = value => createHash('sha256').update(JSON.stringify(stable(value))).digest('hex');
@@ -82,19 +97,26 @@ for (const { file, cases } of suites) {
   keys(cases, ['assertionOptions', 'valid', 'invalid']);
   if (cases.assertionOptions) assert.equal(JSON.stringify(cases.assertionOptions), '{"requireData":true}');
   const result = { valid: [], invalid: [] };
-  for (const kind of ['valid', 'invalid']) for (const c of cases[kind]) {
-    keys(c, ['code', 'options', 'languageOptions', 'errors']);
-    if (c.languageOptions) assert.equal(JSON.stringify(c.languageOptions), '{"parserOptions":{"project":"./tsconfig.json","projectService":false,"tsconfigRootDir":"<fixtures>"}}');
-    for (const e of c.errors ?? []) {
-      keys(e, ['messageId', 'data', 'line', 'column', 'endLine', 'endColumn']);
-      assert.ok(e.messageId in messages);
-      if (e.data) {
-        const required = [...messages[e.messageId].matchAll(/\{\{(\w+)\}\}/g)].map(m => m[1]);
-        assert.deepEqual(Object.keys(e.data).sort(), required.sort());
+  for (const kind of ['valid', 'invalid']) {
+    for (const c of cases[kind]) {
+      keys(c, ['code', 'options', 'languageOptions', 'errors']);
+      if (c.languageOptions) {
+        assert.equal(
+          JSON.stringify(c.languageOptions),
+          '{"parserOptions":{"project":"./tsconfig.json","projectService":false,"tsconfigRootDir":"<fixtures>"}}',
+        );
       }
+      for (const e of c.errors ?? []) {
+        keys(e, ['messageId', 'data', 'line', 'column', 'endLine', 'endColumn']);
+        assert.ok(e.messageId in messages);
+        if (e.data) {
+          const required = [...messages[e.messageId].matchAll(/\{\{(\w+)\}\}/g)].map(m => m[1]);
+          assert.deepEqual(Object.keys(e.data).sort(), required.sort());
+        }
+      }
+      // Preserve every original field, including absent options vs [], null, and diagnostic data.
+      result[kind].push(stable(c));
     }
-    // Preserve every original field, including absent options vs [], null, and diagnostic data.
-    result[kind].push(stable(c));
   }
   const name = file.replace('cases/', '').replace('.test.ts', '');
   const hashes = {};
@@ -112,4 +134,8 @@ assert.equal(manifest.invalid, 7146);
 assert.equal(manifest.diagnostics, 44065);
 write(output + '/messages.json', stable(messages));
 write(output + '/manifest.json', manifest);
-console.log(`${check ? 'Verified' : 'Generated'} ${manifest.valid} valid + ${manifest.invalid} invalid cases; ${manifest.diagnostics} diagnostics across ${suites.length} suites (${UPSTREAM}).`);
+console.log(
+  `${
+    check ? 'Verified' : 'Generated'
+  } ${manifest.valid} valid + ${manifest.invalid} invalid cases; ${manifest.diagnostics} diagnostics across ${suites.length} suites (${UPSTREAM}).`,
+);
