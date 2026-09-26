@@ -194,3 +194,31 @@ func TestNamingConventionTypePredicateReferences(t *testing.T) {
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
 }
+
+func TestNamingConventionForInOfSingleReturnUsage(t *testing.T) {
+	options := modifierTestOptions("variable", "unused")
+	valid := []rule_tester.ValidTestCase{
+		{Code: `function f(items: Record<string, number>) { for (const BadName in items) { void 0; return true; } }`, Options: options},
+		{Code: `function f(items: Record<string, number>) { for (const BadName in items) {} }`, Options: options},
+		{Code: `function f(items: [number, number][]) { let BadName, OtherName; for ([BadName, OtherName] of items) return true; }`, Options: options},
+		{Code: `function f(items: unknown[]) { for (const [] of items) return true; }`, Options: options},
+	}
+	codes := []string{
+		`function f(items: Record<string, number>) { for (const BadName in items) return true; }`,
+		`function f(items: [number, number][]) { for (const [BadName, OtherName] of items) return true; }`,
+		`function f(items: Record<string, number>) { let BadName; for (BadName in items) return true; }`,
+		`function f(items: Record<string, number>) { for (const BadName in items) { return true; } }`,
+	}
+	invalid := make([]rule_tester.InvalidTestCase, 0, len(codes))
+	for _, code := range codes {
+		expected := modifierFailure(code)
+		expected.Message = "Variable name `BadName` must match one of the following formats: snake_case"
+		invalid = append(invalid, rule_tester.InvalidTestCase{
+			Code:    code,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{expected},
+		})
+	}
+
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
+}

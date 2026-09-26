@@ -28,6 +28,7 @@ func newNamingScope(ctx rule.RuleContext) *namingScope {
 	// This is one whole-file walk per rule invocation. Resolving identifiers
 	// here lets all subsequent modifier checks use constant-time symbol maps.
 	var identifiers []*ast.Node
+	var forInOfStatements []*ast.Node
 	var visit func(*ast.Node)
 	visit = func(node *ast.Node) {
 		if node == nil {
@@ -35,6 +36,9 @@ func newNamingScope(ctx rule.RuleContext) *namingScope {
 		}
 		if ast.IsIdentifier(node) {
 			identifiers = append(identifiers, node)
+		}
+		if node.Kind == ast.KindForInStatement || node.Kind == ast.KindForOfStatement {
+			forInOfStatements = append(forInOfStatements, node)
 		}
 		node.ForEachChild(func(child *ast.Node) bool {
 			visit(child)
@@ -77,6 +81,40 @@ func newNamingScope(ctx rule.RuleContext) *namingScope {
 		scope.unused[symbol] = false
 	}
 
+	// ESLint treats the iteration binding as used for the legacy
+	// for-in/of-with-a-single-return exception. For destructured declarations,
+	// only the first declared binding receives this treatment.
+	for _, statement := range forInOfStatements {
+		if !isSingleReturnForInOfBody(statement) {
+			continue
+		}
+
+		initializer := statement.Initializer()
+		if initializer == nil {
+			continue
+		}
+		var firstBinding *ast.Node
+		switch initializer.Kind {
+		case ast.KindVariableDeclarationList:
+			declarationList := initializer.AsVariableDeclarationList().Declarations
+			if declarationList == nil || len(declarationList.Nodes) == 0 {
+				continue
+			}
+			namingBindings(declarationList.Nodes[0].Name(), func(identifier *ast.Node) {
+				if firstBinding == nil {
+					firstBinding = identifier
+				}
+			})
+		case ast.KindIdentifier:
+			firstBinding = initializer
+		}
+		if firstBinding != nil {
+			if symbol := scope.symbolAtLocation(firstBinding); symbol != nil {
+				scope.unused[symbol] = false
+			}
+		}
+	}
+
 	// An export modifier applies to each declaration in a merged symbol.
 	for _, identifier := range identifiers {
 		if !ast.IsDeclarationName(identifier) {
@@ -92,6 +130,21 @@ func newNamingScope(ctx rule.RuleContext) *namingScope {
 	}
 
 	return scope
+}
+
+func isSingleReturnForInOfBody(statement *ast.Node) bool {
+	body := statement.AsForInOrOfStatement().Statement
+	if body == nil {
+		return false
+	}
+	if body.Kind == ast.KindReturnStatement {
+		return true
+	}
+	if body.Kind != ast.KindBlock {
+		return false
+	}
+	statements := body.AsBlock().Statements
+	return statements != nil && len(statements.Nodes) == 1 && statements.Nodes[0].Kind == ast.KindReturnStatement
 }
 
 func isShorthandValueReference(identifier *ast.Node) bool {

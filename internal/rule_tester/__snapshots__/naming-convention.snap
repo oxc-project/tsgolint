@@ -158,6 +158,34 @@ Message: Auto Accessor name `undefined` must match one of the following formats:
      |                                                                                                                                  ~~~~~
 ---
 
+[TestNamingConventionForInOfSingleReturnUsage/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:56 - 1:62)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: Record<string, number>) { for (const BadName in items) return true; }
+     |                                                        ~~~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:53 - 1:59)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: [number, number][]) { for (const [BadName, OtherName] of items) return true; }
+     |                                                     ~~~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:49 - 1:55)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: Record<string, number>) { let BadName; for (BadName in items) return true; }
+     |                                                 ~~~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:56 - 1:62)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: Record<string, number>) { for (const BadName in items) { return true; } }
+     |                                                        ~~~~~~~
+---
+
 [TestNamingConventionLogicalAssignments/invalid-0 - 1]
 Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
 Message: Variable name `BadName` must match one of the following formats: snake_case
