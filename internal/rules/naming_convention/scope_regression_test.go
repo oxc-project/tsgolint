@@ -164,3 +164,33 @@ func TestNamingConventionBodylessSignatureParameters(t *testing.T) {
 	}
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
 }
+
+func TestNamingConventionTypePredicateReferences(t *testing.T) {
+	options := append(modifierTestOptions("typeAlias", "unused"), modifierTestOptions("parameter", "unused")...)
+	qualifiedOptions := append(NamingConventionOptions{}, options...)
+	qualifiedOptions = append(qualifiedOptions, NamingConventionOptions{{Selector: NamingSelector{"typeAlias"}, Modifiers: []string{"exported"}, Format: []string{"PascalCase"}}}...)
+	valid := []rule_tester.ValidTestCase{
+		{Code: `function isBad(ValueName: unknown): ValueName is string { return true; }`, Options: modifierTestOptions("parameter", "unused")},
+		{
+			Code:    `namespace Types { export type BadName = {}; function isBad(ValueName: unknown): ValueName is Types.BadName { return true; } }`,
+			Options: qualifiedOptions,
+		},
+	}
+	codes := []string{
+		`type BadName = {}; function isBad(ValueName: unknown): ValueName is BadName { return true; }`,
+		`type BadName = {}; function isBad(ValueName: unknown): ValueName is Array<BadName> { return true; }`,
+		`type BadName = {}; function isBad(ValueName: unknown): ValueName is Promise<Array<BadName>> { return true; }`,
+	}
+	invalid := make([]rule_tester.InvalidTestCase, 0, len(codes))
+	for _, code := range codes {
+		expected := modifierFailure(code)
+		expected.Message = "Type Alias name `BadName` must match one of the following formats: snake_case"
+		invalid = append(invalid, rule_tester.InvalidTestCase{
+			Code:    code,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{expected},
+		})
+	}
+
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
+}

@@ -249,6 +249,27 @@ Message: Variable name `BadName` must match one of the following formats: snake_
      |       ~~~~~~~
 ---
 
+[TestNamingConventionTypePredicateReferences/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
+Message: Type Alias name `BadName` must match one of the following formats: snake_case
+   1 | type BadName = {}; function isBad(ValueName: unknown): ValueName is BadName { return true; }
+     |      ~~~~~~~
+---
+
+[TestNamingConventionTypePredicateReferences/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
+Message: Type Alias name `BadName` must match one of the following formats: snake_case
+   1 | type BadName = {}; function isBad(ValueName: unknown): ValueName is Array<BadName> { return true; }
+     |      ~~~~~~~
+---
+
+[TestNamingConventionTypePredicateReferences/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
+Message: Type Alias name `BadName` must match one of the following formats: snake_case
+   1 | type BadName = {}; function isBad(ValueName: unknown): ValueName is Promise<Array<BadName>> { return true; }
+     |      ~~~~~~~
+---
+
 [TestNamingConventionUnusedClosures/invalid-0 - 1]
 Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
 Message: Variable name `BadName` must match one of the following formats: snake_case

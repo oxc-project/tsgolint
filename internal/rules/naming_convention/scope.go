@@ -197,11 +197,16 @@ func declarationIsDirectlyExported(declaration *ast.Node) bool {
 }
 
 func isTypeQueryOrPredicateReference(identifier *ast.Node) bool {
-	for node := identifier.Parent; node != nil; node = node.Parent {
+	for node := identifier; node != nil; node = node.Parent {
 		switch node.Kind {
 		case ast.KindTypeQuery, ast.KindTypePredicate:
 			return true
-		case ast.KindSourceFile:
+		case ast.KindIdentifier, ast.KindQualifiedName:
+			// Only references that are part of an entity name belong to the
+			// type query or predicate itself. Stop at wrappers such as a type
+			// reference so names in its type arguments remain ordinary reads.
+			continue
+		default:
 			return false
 		}
 	}
