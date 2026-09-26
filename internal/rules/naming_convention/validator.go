@@ -6,11 +6,13 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"github.com/dlclark/regexp2/v2"
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/jsnum"
+	"github.com/microsoft/typescript-go/shim/stringutil"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -380,7 +382,25 @@ func namingRegexString(pattern string) string {
 	return out.String()
 }
 func (m *namingMatch) test(s string) bool {
-	ok, err := m.regex.MatchString(s)
+	var (
+		ok  bool
+		err error
+	)
+	if utf8.ValidString(s) {
+		ok, err = m.regex.MatchString(s)
+	} else {
+		// TypeScript strings are UTF-16. typescript-go preserves lone surrogates
+		// as WTF-8, which regexp2's string path decodes as RuneError. Decode the
+		// JavaScript string explicitly so Unicode property escapes and surrogate
+		// escapes see the original code units.
+		runes := make([]rune, 0, len(s))
+		for i := 0; i < len(s); {
+			r, size := stringutil.DecodeJSStringRune(s[i:])
+			runes = append(runes, r)
+			i += size
+		}
+		ok, err = m.regex.MatchRunes(runes)
+	}
 	if err != nil {
 		return false
 	}

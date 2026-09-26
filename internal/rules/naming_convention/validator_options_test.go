@@ -112,6 +112,27 @@ func TestNamingOptionNormalizationAndRegex(t *testing.T) {
 	}
 }
 
+func TestNamingRegexMatchesLoneSurrogatesLikeJavaScript(t *testing.T) {
+	// TypeScript encodes lone UTF-16 surrogates as their WTF-8 byte sequence.
+	surrogate := string([]byte{0xed, 0xa0, 0x80}) // U+D800
+	for _, tc := range []struct {
+		pattern string
+		text    string
+		want    bool
+	}{
+		{`^\p{Surrogate}$`, surrogate, true},
+		{`^\P{Surrogate}$`, surrogate, false},
+		{`^\uD800$`, surrogate, true},
+		{`^\p{Surrogate}$`, "𐐀", false}, // Supplementary characters are not surrogate code points.
+		{`^\u{10400}$`, "𐐀", true},
+		{`^A\p{Surrogate}Ω$`, "A" + surrogate + "Ω", true},
+	} {
+		if got := namingRegex(tc.pattern, true).test(tc.text); got != tc.want {
+			t.Errorf("%q on %q: got %v, want %v", tc.pattern, tc.text, got, tc.want)
+		}
+	}
+}
+
 func TestNamingRegexDiagnosticString(t *testing.T) {
 	if got := namingRegexString("a/b\n"); got != "/a\\/b\\n/u" {
 		t.Fatalf("regex diagnostic string = %q", got)
