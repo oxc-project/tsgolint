@@ -418,6 +418,38 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     });
   });
 
+  it.each(
+    [
+      ['without a filter', undefined],
+      ['with a matching filter', '^\\p{Surrogate}$'],
+    ] as const,
+  )('preserves naming diagnostics for lone-surrogate properties in headless output %s', (_label, filter) => {
+    const testFile = resolveTestFilePath('basic/rules/naming-convention/options.ts');
+    const config = JSON.parse(generateConfig([testFile], [
+      {
+        name: 'naming-convention',
+        options: [{
+          selector: 'classProperty',
+          format: null,
+          ...(filter === undefined ? {} : { filter }),
+          custom: { regex: 'a', match: true },
+        }],
+      },
+    ]));
+    config.source_overrides = { [testFile]: "class C { '\\uD800': 0 }" };
+
+    const output = execFileSync(TSGOLINT_BIN, ['headless'], { input: JSON.stringify(config) });
+    const diagnostics = parseHeadlessOutput(output).filter(
+      (d): d is RuleDiagnostic => d.kind === DiagnosticKind.Rule && d.rule === 'naming-convention',
+    );
+
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].message).toEqual({
+      id: 'satisfyCustom',
+      description: 'Class Property name `\\uD800` must match the RegExp: /a/u',
+    });
+  });
+
   it.runIf(process.platform === 'win32')(
     'should not panic with mixed forward/backslash paths from Rust (issue #143)',
     async () => {

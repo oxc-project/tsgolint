@@ -10,13 +10,16 @@ import (
 	"os"
 	"runtime"
 	"slices"
+	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/go-json-experiment/json"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
 	"github.com/microsoft/typescript-go/shim/core"
+	"github.com/microsoft/typescript-go/shim/stringutil"
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
@@ -87,11 +90,55 @@ type headlessRuleMessage struct {
 }
 
 func headlessRuleMessageFromRuleMessage(msg rule.RuleMessage) headlessRuleMessage {
+	return headlessRuleMessageFromFields(msg.Id, msg.Description, msg.Help)
+}
+
+func headlessRuleMessageFromFields(id, description, help string) headlessRuleMessage {
 	return headlessRuleMessage{
-		Id:          msg.Id,
-		Description: msg.Description,
-		Help:        msg.Help,
+		Id:          id,
+		Description: headlessStringFromJSString(description),
+		Help:        headlessStringFromJSString(help),
 	}
+}
+
+// headlessStringFromJSString converts JavaScript strings containing lone
+// surrogates into valid UTF-8 text before they cross the headless transport
+// boundary. The transport requires valid UTF-8, so display each lone surrogate
+// with its JavaScript escape spelling.
+func headlessStringFromJSString(s string) string {
+	if utf8.ValidString(s) {
+		return s
+	}
+
+	var result strings.Builder
+	result.Grow(len(s))
+	for i := 0; i < len(s); {
+		r, size := stringutil.DecodeJSStringRune(s[i:])
+		if stringutil.IsHighSurrogate(r) {
+			if low, lowSize := stringutil.DecodeJSStringRune(s[i+size:]); stringutil.IsLowSurrogate(low) {
+				codePoint := stringutil.SurrogatePairToCodePoint(r, low)
+				result.WriteRune(codePoint)
+				i += size + lowSize
+				continue
+			}
+			_, _ = fmt.Fprintf(&result, `\u%04X`, r)
+			i += size
+			continue
+		}
+		if stringutil.IsLowSurrogate(r) {
+			_, _ = fmt.Fprintf(&result, `\u%04X`, r)
+			i += size
+			continue
+		}
+		if r == utf8.RuneError && size == 1 {
+			result.WriteRune(utf8.RuneError)
+			i++
+			continue
+		}
+		result.WriteString(s[i : i+size])
+		i += size
+	}
+	return result.String()
 }
 
 type headlessFix struct {
@@ -380,14 +427,10 @@ func runHeadless(args []string) int {
 				internalDiagnostic := d.internalDiagnostic
 
 				hd = headlessDiagnostic{
-					Kind:  headlessDiagnosticKindTsconfig,
-					Range: headlessRangeFromRange(internalDiagnostic.Range),
-					Rule:  nil, // Internal diagnostics don't have a rule
-					Message: headlessRuleMessage{
-						Id:          internalDiagnostic.Id,
-						Description: internalDiagnostic.Description,
-						Help:        internalDiagnostic.Help,
-					},
+					Kind:        headlessDiagnosticKindTsconfig,
+					Range:       headlessRangeFromRange(internalDiagnostic.Range),
+					Rule:        nil, // Internal diagnostics don't have a rule
+					Message:     headlessRuleMessageFromFields(internalDiagnostic.Id, internalDiagnostic.Description, internalDiagnostic.Help),
 					Fixes:       nil,
 					Suggestions: nil,
 					FilePath:    internalDiagnostic.FilePath,
