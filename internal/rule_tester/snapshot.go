@@ -35,6 +35,15 @@ func newSnapshotter(filename string) *snapshotter {
 	return &snapshotter{filename: filename}
 }
 
+// DeferWrites batches snapshot creation until this test and all of its subtests
+// finish. Large upstream suites would otherwise rewrite a growing file for
+// every case.
+func (s *snapshotter) DeferWrites(t *testing.T) {
+	t.Helper()
+	path := filepath.Join(snapshotDir, s.filename+".snap")
+	snapshotRegistry.beginBatch(t, path)
+}
+
 // MatchSnapshot compares content against the stored snapshot for the current test.
 // If the snapshot doesn't exist, it is created. If UPDATE_SNAPS=true, the snapshot
 // is overwritten. Otherwise, a mismatch fails the test.
@@ -75,6 +84,23 @@ func (r *snapRegistry) getFile(path string) *snapshotFile {
 	return sf
 }
 
+func (r *snapRegistry) beginBatch(t *testing.T, path string) {
+	t.Helper()
+	sf := r.getFile(path)
+	sf.mu.Lock()
+	sf.batches++
+	sf.mu.Unlock()
+	t.Cleanup(func() {
+		sf.mu.Lock()
+		defer sf.mu.Unlock()
+		sf.batches--
+		if sf.batches == 0 && sf.dirty {
+			sf.write(t)
+			sf.dirty = false
+		}
+	})
+}
+
 func (r *snapRegistry) matchSnapshot(t *testing.T, path, key, content string, update bool) {
 	t.Helper()
 
@@ -90,7 +116,11 @@ func (r *snapRegistry) matchSnapshot(t *testing.T, path, key, content string, up
 
 	if update || !exists {
 		sf.entries[key] = content
-		sf.write(t)
+		if sf.batches == 0 {
+			sf.write(t)
+		} else {
+			sf.dirty = true
+		}
 		return
 	}
 
@@ -104,6 +134,8 @@ type snapshotFile struct {
 	path    string
 	entries map[string]string
 	loaded  bool
+	dirty   bool
+	batches int
 }
 
 func (sf *snapshotFile) load() {

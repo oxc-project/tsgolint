@@ -1,0 +1,8 @@
+{
+  "doesNotMatchFormat": "{{type}} name `{{name}}` must match one of the following formats: {{formats}}",
+  "doesNotMatchFormatTrimmed": "{{type}} name `{{name}}` trimmed as `{{processedName}}` must match one of the following formats: {{formats}}",
+  "missingAffix": "{{type}} name `{{name}}` must have one of the following {{position}}es: {{affixes}}",
+  "missingUnderscore": "{{type}} name `{{name}}` must have {{count}} {{position}} underscore(s).",
+  "satisfyCustom": "{{type}} name `{{name}}` must {{regexMatch}} the RegExp: {{regex}}",
+  "unexpectedUnderscore": "{{type}} name `{{name}}` must not have a {{position}} underscore."
+}

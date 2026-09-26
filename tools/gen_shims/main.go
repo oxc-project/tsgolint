@@ -57,6 +57,7 @@ func main() {
 		"parser",
 		"project",
 		"scanner",
+		"stringutil",
 		"tsoptions",
 		"tspath",
 		"vfs",
