@@ -430,17 +430,16 @@ func isImplicitlyUsed(identifier *ast.Node, symbol *ast.Symbol) bool {
 			return true
 		}
 	}
-	isParameter := false
+	var parameter *ast.Node
 	for _, declaration := range symbol.Declarations {
-		if ast.IsParameterDeclaration(declaration) {
-			isParameter = true
+		if parameter = parameterDeclarationForBinding(declaration); parameter != nil {
 			break
 		}
 	}
-	if !isParameter {
+	if parameter == nil {
 		return false
 	}
-	for node := identifier.Parent; node != nil; node = node.Parent {
+	for node := parameter.Parent; node != nil; node = node.Parent {
 		switch node.Kind {
 		case ast.KindCallSignature, ast.KindConstructSignature, ast.KindConstructorType,
 			ast.KindFunctionType, ast.KindMethodSignature:
@@ -451,8 +450,35 @@ func isImplicitlyUsed(identifier *ast.Node, symbol *ast.Symbol) bool {
 			return false
 		}
 		if ast.IsFunctionLike(node) {
-			return false
+			// typescript-eslint's collectVariables does not report parameters
+			// from bodyless function-like declarations as unused. This includes
+			// declare functions and abstract/ambient methods and constructors.
+			return node.Body() == nil
 		}
 	}
 	return false
+}
+
+// parameterDeclarationForBinding finds the parameter that owns a binding.
+// Destructured parameters are represented by BindingElement declarations,
+// rather than by the ParameterDeclaration itself.
+func parameterDeclarationForBinding(declaration *ast.Node) *ast.Node {
+	if declaration == nil {
+		return nil
+	}
+	if ast.IsParameterDeclaration(declaration) {
+		return declaration
+	}
+	if declaration.Kind != ast.KindBindingElement {
+		return nil
+	}
+	for node := declaration.Parent; node != nil; node = node.Parent {
+		if ast.IsParameterDeclaration(node) {
+			return node
+		}
+		if ast.IsFunctionLike(node) {
+			return nil
+		}
+	}
+	return nil
 }

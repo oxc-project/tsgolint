@@ -82,6 +82,55 @@ Message: Parameter name `Bad_Name` must match one of the following formats: came
      |                     ~~~~~~~~
 ---
 
+[TestNamingConventionBodylessSignatureParameters/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:20 - 1:34)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare function f(BadName: string): void;
+     |                    ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:22 - 1:28)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare function f({ BadName }: { BadName: string }): void;
+     |                      ~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:32 - 1:46)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { method(BadName: number): void; }
+     |                                ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:34 - 1:40)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { method({ BadName }: { BadName: number }): void; }
+     |                                  ~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-4 - 1]
+Diagnostic 1: doesNotMatchFormat (1:37 - 1:51)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { constructor(BadName: string); }
+     |                                     ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-5 - 1]
+Diagnostic 1: doesNotMatchFormat (1:39 - 1:45)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { constructor({ BadName }: { BadName: string }); }
+     |                                       ~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-6 - 1]
+Diagnostic 1: doesNotMatchFormat (1:42 - 1:56)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | abstract class Example { abstract method(BadName: number): void; }
+     |                                          ~~~~~~~~~~~~~~~
+---
+
 [TestNamingConventionComputedAutoAccessors/invalid-0 - 1]
 Diagnostic 1: doesNotMatchFormat (1:27 - 1:36)
 Message: Auto Accessor name `Bad_Name` must match one of the following formats: PascalCase

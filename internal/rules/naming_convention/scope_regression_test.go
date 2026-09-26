@@ -117,3 +117,50 @@ func TestNamingConventionLogicalAssignments(t *testing.T) {
 	}
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
 }
+
+func TestNamingConventionBodylessSignatureParameters(t *testing.T) {
+	options := modifierTestOptions("parameter", "unused")
+	message := "Parameter name `BadName` must match one of the following formats: snake_case"
+	invalid := []rule_tester.InvalidTestCase{
+		{
+			Code:    `declare function f(BadName: string): void;`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 20, EndLine: 1, EndColumn: 35}},
+		},
+		{
+			Code:    `declare function f({ BadName }: { BadName: string }): void;`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 22, EndLine: 1, EndColumn: 29}},
+		},
+		{
+			Code:    `declare class Example { method(BadName: number): void; }`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 32, EndLine: 1, EndColumn: 47}},
+		},
+		{
+			Code:    `declare class Example { method({ BadName }: { BadName: number }): void; }`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 34, EndLine: 1, EndColumn: 41}},
+		},
+		{
+			Code:    `declare class Example { constructor(BadName: string); }`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 37, EndLine: 1, EndColumn: 52}},
+		},
+		{
+			Code:    `declare class Example { constructor({ BadName }: { BadName: string }); }`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 39, EndLine: 1, EndColumn: 46}},
+		},
+		{
+			Code:    `abstract class Example { abstract method(BadName: number): void; }`,
+			Options: options,
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "doesNotMatchFormat", Message: message, Line: 1, Column: 42, EndLine: 1, EndColumn: 57}},
+		},
+	}
+	valid := []rule_tester.ValidTestCase{
+		{Code: `function f(BadName: string) {}`, Options: options},
+		{Code: `function f({ BadName }: { BadName: string }) {}`, Options: options},
+	}
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
+}
