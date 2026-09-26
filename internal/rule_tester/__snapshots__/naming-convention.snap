@@ -109,6 +109,27 @@ Message: Auto Accessor name `undefined` must match one of the following formats:
      |                                                                                                                                  ~~~~~
 ---
 
+[TestNamingConventionLogicalAssignments/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName &&= 1;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionLogicalAssignments/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName ||= 1;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionLogicalAssignments/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName ??= 1;
+     |     ~~~~~~~
+---
+
 [TestNamingConventionScopeModifiers/invalid-0 - 1]
 Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
 Message: Variable name `BadName` must match one of the following formats: snake_case

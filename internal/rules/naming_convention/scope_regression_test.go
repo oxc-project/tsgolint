@@ -101,3 +101,19 @@ func TestNamingConventionUnusedClosures(t *testing.T) {
 	}
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
 }
+
+func TestNamingConventionLogicalAssignments(t *testing.T) {
+	options := modifierTestOptions("variable", "unused")
+	valid := []rule_tester.ValidTestCase{
+		{Code: `let BadName = 0; BadName += 1;`, Options: options},
+		{Code: `let BadName = 0; BadName *= 1;`, Options: options},
+	}
+	var invalid []rule_tester.InvalidTestCase
+	for _, operator := range []string{"&&=", "||=", "??="} {
+		code := "let BadName = 0; BadName " + operator + " 1;"
+		expected := modifierFailure(code)
+		expected.Message = "Variable name `BadName` must match one of the following formats: snake_case"
+		invalid = append(invalid, rule_tester.InvalidTestCase{Code: code, Options: options, Errors: []rule_tester.InvalidTestCaseError{expected}})
+	}
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)
+}

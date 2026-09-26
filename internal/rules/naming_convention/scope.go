@@ -381,6 +381,12 @@ func isUnusedSelfWrite(identifier *ast.Node) bool {
 		return (operator == ast.KindPlusPlusToken || operator == ast.KindMinusMinusToken) && isUnusedExpression(parent)
 	}
 	if parent.Kind == ast.KindBinaryExpression && parent.AsBinaryExpression().Left == identifier && ast.IsAssignmentOperator(parent.AsBinaryExpression().OperatorToken.Kind) {
+		// Logical assignments read the existing value to choose whether to write.
+		// Upstream excludes them from the discarded self-update heuristic.
+		switch parent.AsBinaryExpression().OperatorToken.Kind {
+		case ast.KindAmpersandAmpersandEqualsToken, ast.KindBarBarEqualsToken, ast.KindQuestionQuestionEqualsToken:
+			return false
+		}
 		return isUnusedExpression(parent)
 	}
 	return false
