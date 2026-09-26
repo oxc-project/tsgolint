@@ -60,7 +60,7 @@ func TestNamingOptionNormalizationAndRegex(t *testing.T) {
 	if configs[1].format != nil {
 		t.Fatal("null format should retain other validation settings")
 	}
-	if got := namingUnicodeProperties(`\\p{Script=Greek}`); got != `\\p{Script=Greek}` {
+	if got := namingRegexPattern(`\\p{Script=Greek}`); got != `\\p{Script=Greek}` {
 		t.Fatalf("escaped backslash changed: %q", got)
 	}
 	greekAlias := namingRegex(`^\p{sc=Grek}$`, true)
@@ -105,6 +105,28 @@ func TestNamingOptionNormalizationAndRegex(t *testing.T) {
 		{`^[X\P{scx=Kana}]$`, "😀", true},
 		{`^\p{scx=Kana}$`, "𚿰", true},
 		{`^\P{scx=Kana}$`, "𚿰", false},
+	} {
+		if got := namingRegex(tc.pattern, true).test(tc.text); got != tc.want {
+			t.Errorf("%q on %q: got %v, want %v", tc.pattern, tc.text, got, tc.want)
+		}
+	}
+}
+
+func TestNamingRegexDotLineTerminators(t *testing.T) {
+	for _, tc := range []struct {
+		pattern, text string
+		want          bool
+	}{
+		{`^.$`, "\n", false},
+		{`^.$`, "\r", false},
+		{`^.$`, "\u2028", false},
+		{`^.$`, "\u2029", false},
+		{`^.$`, "Ω", true},
+		{`^.$`, "😀", true},
+		{`^\.$`, ".", true},
+		{`^\.$`, "a", false},
+		{`^[.]$`, ".", true},
+		{`^[.]$`, "a", false},
 	} {
 		if got := namingRegex(tc.pattern, true).test(tc.text); got != tc.want {
 			t.Errorf("%q on %q: got %v, want %v", tc.pattern, tc.text, got, tc.want)

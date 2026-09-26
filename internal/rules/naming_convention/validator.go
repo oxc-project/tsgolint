@@ -77,17 +77,17 @@ func namingRegex(pattern string, match bool) *namingMatch {
 	// mode supplies JS character-class and backreference behavior.
 	// Frontend option validation cannot bridge regexp2's different Unicode
 	// property support, so valid ECMAScript properties must be expanded here.
-	compiled, err := regexp2.Compile(namingUnicodeProperties(pattern), regexp2.ECMAScript|regexp2.Unicode)
+	compiled, err := regexp2.Compile(namingRegexPattern(pattern), regexp2.ECMAScript|regexp2.Unicode)
 	if err != nil {
 		panic(fmt.Sprintf("naming-convention: invalid regular expression %q: %v", pattern, err))
 	}
 	return &namingMatch{regex: compiled, pattern: pattern, match: match}
 }
 
-// regexp2 understands JS Unicode code-point escapes, but its property names
-// and Unicode data differ from ECMAScript's. Expand recognized properties
-// using the pinned ECMAScript Unicode tables. Escaped backslashes remain intact.
-func namingUnicodeProperties(pattern string) string {
+// Adapt regexp2's character matching to ECMAScript /u semantics. Unicode
+// properties use the pinned ECMAScript tables, and dot excludes all four JS
+// line terminators. Escaped characters and character classes remain intact.
+func namingRegexPattern(pattern string) string {
 	var out strings.Builder
 	inClass := false
 	for i := 0; i < len(pattern); {
@@ -111,6 +111,11 @@ func namingUnicodeProperties(pattern string) string {
 		if pattern[i] == '\\' && i+1 < len(pattern) {
 			out.WriteString(pattern[i : i+2])
 			i += 2
+			continue
+		}
+		if pattern[i] == '.' && !inClass {
+			out.WriteString(`[^\n\r\u2028\u2029]`)
+			i++
 			continue
 		}
 		if pattern[i] == '[' && !inClass {
