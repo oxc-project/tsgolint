@@ -85,8 +85,8 @@ func namingRegex(pattern string, match bool) *namingMatch {
 }
 
 // Adapt regexp2's character matching to ECMAScript /u semantics. Unicode
-// properties use the pinned ECMAScript tables, and dot excludes all four JS
-// line terminators. Escaped characters and character classes remain intact.
+// properties use the pinned ECMAScript tables, dot excludes all four JS line
+// terminators, and word boundaries use ECMAScript's ASCII word set.
 func namingRegexPattern(pattern string) string {
 	var out strings.Builder
 	inClass := false
@@ -107,6 +107,17 @@ func namingRegexPattern(pattern string) string {
 				i = end + 1
 				continue
 			}
+		}
+		if !inClass && pattern[i] == '\\' && i+1 < len(pattern) && (pattern[i+1] == 'b' || pattern[i+1] == 'B') {
+			// ECMAScript \w is ASCII-only without the ignore-case flag, so its
+			// word boundaries must not use regexp2's Unicode-aware \b semantics.
+			if pattern[i+1] == 'b' {
+				out.WriteString(`(?:(?<![A-Za-z0-9_])(?=[A-Za-z0-9_])|(?<=[A-Za-z0-9_])(?![A-Za-z0-9_]))`)
+			} else {
+				out.WriteString(`(?:(?<![A-Za-z0-9_])(?![A-Za-z0-9_])|(?<=[A-Za-z0-9_])(?=[A-Za-z0-9_]))`)
+			}
+			i += 2
+			continue
 		}
 		if pattern[i] == '\\' && i+1 < len(pattern) {
 			out.WriteString(pattern[i : i+2])

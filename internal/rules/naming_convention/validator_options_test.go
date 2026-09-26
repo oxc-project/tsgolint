@@ -134,6 +134,33 @@ func TestNamingRegexDotLineTerminators(t *testing.T) {
 	}
 }
 
+func TestNamingRegexWordBoundariesUseECMAScriptASCIIWordSet(t *testing.T) {
+	for _, tc := range []struct {
+		pattern, text string
+		want          bool
+	}{
+		{`\b`, "", false},
+		{`\B`, "", true},
+		{`^\bfoo\b$`, "foo", true},
+		{`a\b`, "aΩ", true},
+		{`a\B`, "aΩ", false},
+		{`a\b`, "a\u0301", true},
+		{`a\B`, "a\u0301", false},
+		{`a\b`, "a\u200c", true},
+		{`a\B`, "a\u200c", false},
+		{`a\b`, "a\u200d", true},
+		{`a\B`, "a\u200d", false},
+		{`^\BΩ\B$`, "Ω", true},
+		{`^(a)\B(b)\2$`, "abb", true}, // Boundary expansion must not shift capture numbers.
+		{`^[\b]$`, "\b", true},        // Inside a class, \b still means backspace.
+		{`^\\b$`, `\b`, true},         // Escaped backslash remains literal.
+	} {
+		if got := namingRegex(tc.pattern, true).test(tc.text); got != tc.want {
+			t.Errorf("%q on %q: got %v, want %v", tc.pattern, tc.text, got, tc.want)
+		}
+	}
+}
+
 func TestNamingRegexMatchesLoneSurrogatesLikeJavaScript(t *testing.T) {
 	// TypeScript encodes lone UTF-16 surrogates as their WTF-8 byte sequence.
 	surrogate := string([]byte{0xed, 0xa0, 0x80}) // U+D800
