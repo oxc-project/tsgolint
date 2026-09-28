@@ -4753,6 +4753,26 @@ declare const id: Id;
 declare function consume<B>(value: B | null): B;
 const result = consume({} as Record<Id, number>);
 export const useResult = result[id];`},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<T>(value: Record<string, T>): T;
+const result = consume({ slot: {} as Record<Id, number> });
+export const useResult = result[id];`},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<T>(value: { 0: T }): T;
+const result = consume({ 0: {} as Record<Id, number> });
+export const useResult = result[id];`},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<B>(value: B | null): B;
+type IdMap = Record<Id, number> & { readonly marker?: never };
+const result = consume({} as IdMap);
+export const useResult = result[id];`},
+		{Code: "declare const brand: unique symbol;\ntype Brand = { readonly [brand]: 'Id' };\ntype Id = `id-${number}` & Brand;\ndeclare const id: Id;\ndeclare function consume<B>(value: B | null): B;\nconst result = consume({} as Record<Id, number>);\nexport const useResult = result[id];"},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
 			{

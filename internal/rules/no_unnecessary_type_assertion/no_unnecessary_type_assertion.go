@@ -869,7 +869,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				if ast.IsPropertyAssignment(current) &&
 					ast.SkipParentheses(current.Initializer()) == ast.SkipParentheses(child) {
 					name := current.Name()
-					if name == nil || (!ast.IsIdentifier(name) && !ast.IsStringLiteral(name)) {
+					if name == nil || (!ast.IsIdentifier(name) && !ast.IsStringLiteral(name) && !ast.IsNumericLiteral(name)) {
 						return false
 					}
 					propertyPath = append(propertyPath, name.Text())
@@ -899,30 +899,28 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					if hasDirectTypeParameter(paramType) {
 						return true
 					}
-					property := checker.Checker_getPropertyOfType(
+					paramType = checker.Checker_getTypeOfPropertyOrIndexSignatureOfType(
 						ctx.TypeChecker,
 						checker.Checker_GetNonNullableType(ctx.TypeChecker, paramType),
 						propertyPath[i],
 					)
-					if property == nil {
+					if paramType == nil {
 						return false
 					}
-					paramType = checker.Checker_getTypeOfSymbol(ctx.TypeChecker, property)
 				}
 				return containsTypeVariable(paramType)
 			}
 			return false
 		}
 
-		isEmptyObjectAssertedToMappedTypeWithBrandedKey := func(node *ast.Node, castType *checker.Type) bool {
+		isEmptyObjectAssertedToBrandedIndexType := func(node *ast.Node, castType *checker.Type) bool {
 			expression := ast.SkipParentheses(node.Expression())
 			if !ast.IsObjectLiteralExpression(expression) ||
-				len(expression.AsObjectLiteralExpression().Properties.Nodes) != 0 ||
-				checker.Type_objectFlags(castType)&checker.ObjectFlagsMapped == 0 {
+				len(expression.AsObjectLiteralExpression().Properties.Nodes) != 0 {
 				return false
 			}
 
-			// Alias type arguments may describe the value, so inspect the mapped index key.
+			// Alias arguments and intersection wrappers do not identify the actual index key.
 			return slices.ContainsFunc(checker.Checker_getIndexInfosOfType(ctx.TypeChecker, castType), func(info *checker.IndexInfo) bool {
 				keyType := info.KeyType()
 				if !utils.IsIntersectionType(keyType) {
@@ -930,7 +928,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				}
 				keyParts := keyType.Types()
 				return slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
-					return utils.IsTypeFlagSet(part, checker.TypeFlagsString|checker.TypeFlagsNumber|checker.TypeFlagsESSymbol)
+					return utils.IsTypeFlagSet(part, checker.TypeFlagsStringLike|checker.TypeFlagsNumberLike|checker.TypeFlagsESSymbolLike)
 				}) && slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
 					return utils.IsTypeFlagSet(part, checker.TypeFlagsObject) &&
 						len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, part)) > 0
@@ -961,7 +959,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			// even when the inferred contextual type accepts the empty object.
 			if isSkipParentType(node) ||
 				ast.IsArrayLiteralExpression(ast.SkipParentheses(node.Expression())) ||
-				(isInGenericInferenceArgument(node) && isEmptyObjectAssertedToMappedTypeWithBrandedKey(node, castType)) ||
+				(isInGenericInferenceArgument(node) && isEmptyObjectAssertedToBrandedIndexType(node, castType)) ||
 				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
