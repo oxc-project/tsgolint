@@ -849,11 +849,33 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					ast.IsSatisfiesExpression(parent))
 		}
 
+		var hasDirectTypeParameter func(t *checker.Type) bool
+		hasDirectTypeParameter = func(t *checker.Type) bool {
+			if utils.IsTypeParameter(t) {
+				return true
+			}
+			return (utils.IsUnionType(t) || utils.IsIntersectionType(t)) &&
+				slices.ContainsFunc(t.Types(), hasDirectTypeParameter)
+		}
+
 		isInGenericInferenceArgument := func(node *ast.Node) bool {
+			propertyPath := []string{}
 			for child, current := node, node.Parent; current != nil; child, current = current, current.Parent {
 				if current.Kind == ast.KindFunctionDeclaration ||
 					((ast.IsFunctionExpression(current) || ast.IsArrowFunction(current)) &&
 						current.Body() != nil && current.Body().Kind == ast.KindBlock) {
+					return false
+				}
+				if ast.IsPropertyAssignment(current) &&
+					ast.SkipParentheses(current.Initializer()) == ast.SkipParentheses(child) {
+					name := current.Name()
+					if name == nil || (!ast.IsIdentifier(name) && !ast.IsStringLiteral(name)) {
+						return false
+					}
+					propertyPath = append(propertyPath, name.Text())
+				}
+				if ast.IsArrayLiteralExpression(current) {
+					// Array elements are handled by isNestedInArrayLiteralArgumentToGenericCall.
 					return false
 				}
 				if !ast.IsCallExpression(current) && !ast.IsNewExpression(current) {
@@ -865,8 +887,29 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				argIndex := slices.IndexFunc(current.Arguments(), func(argument *ast.Node) bool {
 					return argument == child || ast.SkipParentheses(argument) == ast.SkipParentheses(child)
 				})
-				return argIndex >= 0 &&
-					utils.IsTypeParameter(getGenericInferenceParameterTypeAtArgument(current, argIndex, nil))
+				if argIndex < 0 {
+					return false
+				}
+				paramType := getGenericInferenceParameterTypeAtArgument(current, argIndex, nil)
+				if paramType == nil {
+					return false
+				}
+				// Property names were collected from the assertion outward.
+				for i := len(propertyPath) - 1; i >= 0; i-- {
+					if hasDirectTypeParameter(paramType) {
+						return true
+					}
+					property := checker.Checker_getPropertyOfType(
+						ctx.TypeChecker,
+						checker.Checker_GetNonNullableType(ctx.TypeChecker, paramType),
+						propertyPath[i],
+					)
+					if property == nil {
+						return false
+					}
+					paramType = checker.Checker_getTypeOfSymbol(ctx.TypeChecker, property)
+				}
+				return containsTypeVariable(paramType)
 			}
 			return false
 		}

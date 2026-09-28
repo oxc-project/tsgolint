@@ -1578,6 +1578,13 @@ type Subscription<T> = ((handler: T) => void) & { readonly kind: 'subscription' 
 declare const watcher: Watcher<string>;
 const subscription = watcher as Subscription<string>;
     `},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<B>(value: B | null): B;
+const direct = consume({} as Record<Id, number>);
+const nested = consume({ byId: {} as Record<Id, number> });
+export const useDirect = (id: Id): number | undefined => direct[id];
+export const useNested = (id: Id): number | undefined => nested.byId[id];`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -4663,6 +4670,25 @@ consume({ fixed: {}, tag: 0 });`},
 				Line:      4,
 				Column:    18,
 				EndLine:   4,
+				EndColumn: 42,
+			}},
+		},
+		{
+			Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+type Box<T> = { fixed: {}; tag: T };
+declare function consume<T>(value: Box<T>): void;
+consume({ fixed: {} as Record<Id, number>, tag: 0 });`,
+			Output: []string{`declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+type Box<T> = { fixed: {}; tag: T };
+declare function consume<T>(value: Box<T>): void;
+consume({ fixed: {}, tag: 0 });`},
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "contextuallyUnnecessary",
+				Line:      5,
+				Column:    18,
+				EndLine:   5,
 				EndColumn: 42,
 			}},
 		},
