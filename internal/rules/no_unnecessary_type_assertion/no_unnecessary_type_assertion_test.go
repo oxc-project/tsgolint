@@ -4615,6 +4615,23 @@ value = 1;`},
 				},
 			},
 		},
+		{
+			Code: `declare const pipe: <A, B>(a: A, ab: (a: A) => B) => B;
+declare const reduce: <A, B>(b: B, f: (b: B, a: A) => B) => (as: readonly A[]) => B;
+declare const strings: readonly string[];
+const c = pipe(strings, reduce({} as Record<string, number>, (acc, s) => ({ ...acc, [s]: 1 })));`,
+			Output: []string{`declare const pipe: <A, B>(a: A, ab: (a: A) => B) => B;
+declare const reduce: <A, B>(b: B, f: (b: B, a: A) => B) => (as: readonly A[]) => B;
+declare const strings: readonly string[];
+const c = pipe(strings, reduce({}, (acc, s) => ({ ...acc, [s]: 1 })));`},
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "contextuallyUnnecessary",
+				Line:      4,
+				Column:    32,
+				EndLine:   4,
+				EndColumn: 60,
+			}},
+		},
 	})
 }
 
@@ -4641,6 +4658,20 @@ const counts = items?.reduce((acc, item) => {
   acc[item] = (acc[item] ?? 0) + 1;
   return acc;
 }, {} as Record<string, number>);`},
+		{Code: `declare const pipe: <A, B>(a: A, ab: (a: A) => B) => B;
+declare const reduce: <A, B>(b: B, f: (b: B, a: A) => B) => (as: readonly A[]) => B;
+declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const ids: readonly Id[];
+export const a = pipe(ids, reduce({} as Record<Id, number>, (acc, id) => ({ ...acc, [id]: 1 })));
+export const useA = (id: Id): number | undefined => a[id];`},
+		{Code: `declare const pipe: <A, B>(a: A, ab: (a: A) => B) => B;
+declare const reduce: <A, B>(b: B, f: (b: B, a: A) => B) => (as: readonly A[]) => B;
+declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const ids: readonly Id[];
+export const b = pipe(ids, reduce({ byId: {} as Record<Id, number> }, (acc, id) => ({ byId: { ...acc.byId, [id]: 1 } })));
+export const useB = (id: Id): number | undefined => b.byId[id];`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
 			{

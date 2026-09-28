@@ -849,6 +849,28 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					ast.IsSatisfiesExpression(parent))
 		}
 
+		isEmptyObjectAssertedToMappedTypeWithBrandedKey := func(node *ast.Node, castType *checker.Type) bool {
+			expression := ast.SkipParentheses(node.Expression())
+			if !ast.IsObjectLiteralExpression(expression) ||
+				len(expression.AsObjectLiteralExpression().Properties.Nodes) != 0 ||
+				checker.Type_objectFlags(castType)&checker.ObjectFlagsMapped == 0 {
+				return false
+			}
+
+			typeArguments := getTypeArguments(castType)
+			if len(typeArguments) == 0 || !utils.IsIntersectionType(typeArguments[0]) {
+				return false
+			}
+
+			keyParts := typeArguments[0].Types()
+			return slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
+				return utils.IsTypeFlagSet(part, checker.TypeFlagsString)
+			}) && slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
+				return utils.IsTypeFlagSet(part, checker.TypeFlagsObject) &&
+					len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, part)) > 0
+			})
+		}
+
 		shouldSkipContextualTypeFallback := func(node *ast.Node, castIsAny bool, uncastType, castType *checker.Type) bool {
 			parent := parentThroughParens(node)
 			// An assignment can narrow the receiver for subsequent statements.
@@ -868,8 +890,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return true
 			}
 
+			// The assertion can determine a generic accumulator's branded key type,
+			// even when the inferred contextual type accepts the empty object.
 			if isSkipParentType(node) ||
 				ast.IsArrayLiteralExpression(ast.SkipParentheses(node.Expression())) ||
+				(isInGenericContext(node) && isEmptyObjectAssertedToMappedTypeWithBrandedKey(node, castType)) ||
 				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
