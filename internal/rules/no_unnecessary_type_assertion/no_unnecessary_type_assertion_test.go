@@ -4732,6 +4732,21 @@ type Id = string & { readonly [brand]: 'Id' };
 declare const ids: readonly Id[];
 export const b = pipe(ids, reduce({ byId: {} as Record<Id, number> }, (acc, id) => ({ byId: { ...acc.byId, [id]: 1 } })));
 export const useB = (id: Id): number | undefined => b.byId[id];`},
+		{Code: `declare const pipe: <A, B>(a: A, ab: (a: A) => B) => B;
+declare const reduce: <A, B>(b: B, f: (b: B, a: A) => B) => (as: readonly A[]) => B;
+declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+type IdMap<V> = Record<Id, V>;
+declare const ids: readonly Id[];
+const result = pipe(ids, reduce({} as IdMap<number>, (acc, id) => ({ ...acc, [id]: 1 })));
+export const useResult = (id: Id): number | undefined => result[id];`},
+		{Code: `declare const pipe: <A, B>(a: A, ab: (a: A) => B) => B;
+declare const reduce: <A, B>(b: B, f: (b: B, a: A) => B) => (as: readonly A[]) => B;
+declare const brand: unique symbol;
+type Id = number & { readonly [brand]: 'Id' };
+declare const ids: readonly Id[];
+const result = pipe(ids, reduce({} as Record<Id, number>, (acc, id) => ({ ...acc, [id]: 1 })));
+export const useResult = (id: Id): number | undefined => result[id];`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
 			{

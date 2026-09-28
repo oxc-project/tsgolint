@@ -922,17 +922,19 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return false
 			}
 
-			typeArguments := getTypeArguments(castType)
-			if len(typeArguments) == 0 || !utils.IsIntersectionType(typeArguments[0]) {
-				return false
-			}
-
-			keyParts := typeArguments[0].Types()
-			return slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
-				return utils.IsTypeFlagSet(part, checker.TypeFlagsString)
-			}) && slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
-				return utils.IsTypeFlagSet(part, checker.TypeFlagsObject) &&
-					len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, part)) > 0
+			// Alias type arguments may describe the value, so inspect the mapped index key.
+			return slices.ContainsFunc(checker.Checker_getIndexInfosOfType(ctx.TypeChecker, castType), func(info *checker.IndexInfo) bool {
+				keyType := info.KeyType()
+				if !utils.IsIntersectionType(keyType) {
+					return false
+				}
+				keyParts := keyType.Types()
+				return slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
+					return utils.IsTypeFlagSet(part, checker.TypeFlagsString|checker.TypeFlagsNumber)
+				}) && slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
+					return utils.IsTypeFlagSet(part, checker.TypeFlagsObject) &&
+						len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, part)) > 0
+				})
 			})
 		}
 
