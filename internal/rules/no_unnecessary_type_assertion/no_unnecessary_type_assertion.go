@@ -560,21 +560,21 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return slices.ContainsFunc(utils.GetCallSignatures(ctx.TypeChecker, t), hasTypeParams)
 		}
 
-		hasGenericInferenceParameterAtArgument := func(callOrNew *ast.Node, argIndex int, elementPath []int) bool {
+		getGenericInferenceParameterTypeAtArgument := func(callOrNew *ast.Node, argIndex int, elementPath []int) *checker.Type {
 			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callOrNew, nil, checker.CheckModeNormal)
 			if signature == nil {
-				return false
+				return nil
 			}
 			for signature.Target() != nil {
 				signature = signature.Target()
 			}
 			if len(signature.TypeParameters()) == 0 {
-				return false
+				return nil
 			}
 
 			params := checker.Signature_parameters(signature)
 			if len(params) == 0 {
-				return false
+				return nil
 			}
 
 			paramIndex := argIndex
@@ -610,7 +610,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				paramType = elementType
 			}
 
-			return containsTypeVariable(paramType)
+			return paramType
 		}
 
 		genericsMismatch := func(uncast, contextual *checker.Type) bool {
@@ -781,7 +781,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				if ast.IsSpreadElement(callArgument) {
 					parameterElementPath = parameterElementPath[1:]
 				}
-				return hasGenericInferenceParameterAtArgument(parent, argIndex+spreadOffset, parameterElementPath)
+				return containsTypeVariable(getGenericInferenceParameterTypeAtArgument(parent, argIndex+spreadOffset, parameterElementPath))
 			}
 			return false
 		}
@@ -849,6 +849,28 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					ast.IsSatisfiesExpression(parent))
 		}
 
+		isInGenericInferenceArgument := func(node *ast.Node) bool {
+			for child, current := node, node.Parent; current != nil; child, current = current, current.Parent {
+				if current.Kind == ast.KindFunctionDeclaration ||
+					((ast.IsFunctionExpression(current) || ast.IsArrowFunction(current)) &&
+						current.Body() != nil && current.Body().Kind == ast.KindBlock) {
+					return false
+				}
+				if !ast.IsCallExpression(current) && !ast.IsNewExpression(current) {
+					continue
+				}
+				if current.TypeArguments() != nil {
+					return false
+				}
+				argIndex := slices.IndexFunc(current.Arguments(), func(argument *ast.Node) bool {
+					return argument == child || ast.SkipParentheses(argument) == ast.SkipParentheses(child)
+				})
+				return argIndex >= 0 &&
+					utils.IsTypeParameter(getGenericInferenceParameterTypeAtArgument(current, argIndex, nil))
+			}
+			return false
+		}
+
 		isEmptyObjectAssertedToMappedTypeWithBrandedKey := func(node *ast.Node, castType *checker.Type) bool {
 			expression := ast.SkipParentheses(node.Expression())
 			if !ast.IsObjectLiteralExpression(expression) ||
@@ -894,7 +916,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			// even when the inferred contextual type accepts the empty object.
 			if isSkipParentType(node) ||
 				ast.IsArrayLiteralExpression(ast.SkipParentheses(node.Expression())) ||
-				(isInGenericContext(node) && isEmptyObjectAssertedToMappedTypeWithBrandedKey(node, castType)) ||
+				(isInGenericInferenceArgument(node) && isEmptyObjectAssertedToMappedTypeWithBrandedKey(node, castType)) ||
 				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||

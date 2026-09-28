@@ -4632,6 +4632,40 @@ const c = pipe(strings, reduce({}, (acc, s) => ({ ...acc, [s]: 1 })));`},
 				EndColumn: 60,
 			}},
 		},
+		{
+			Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: {}, tag: T): void;
+consume({} as Record<Id, number>, 0);`,
+			Output: []string{`declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: {}, tag: T): void;
+consume({}, 0);`},
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "contextuallyUnnecessary",
+				Line:      4,
+				Column:    9,
+				EndLine:   4,
+				EndColumn: 33,
+			}},
+		},
+		{
+			Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: { fixed: {}; tag: T }): void;
+consume({ fixed: {} as Record<Id, number>, tag: 0 });`,
+			Output: []string{`declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: { fixed: {}; tag: T }): void;
+consume({ fixed: {}, tag: 0 });`},
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "contextuallyUnnecessary",
+				Line:      4,
+				Column:    18,
+				EndLine:   4,
+				EndColumn: 42,
+			}},
+		},
 	})
 }
 
