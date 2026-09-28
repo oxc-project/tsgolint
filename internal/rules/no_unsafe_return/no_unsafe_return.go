@@ -78,21 +78,22 @@ var NoUnsafeReturnRule = rule.Rule{
 			returnNode *ast.Node,
 			primaryRange core.TextRange,
 		) {
-			t := ctx.TypeChecker.GetTypeAtLocation(returnNode)
-
-			anyType := utils.DiscriminateAnyType(
-				t,
-				ctx.TypeChecker,
-				ctx.Program,
-				returnNode,
-			)
 			functionNode := utils.GetParentFunctionNode(returnNode)
 			if functionNode == nil {
 				return
 			}
 
+			returnNodeType := ctx.TypeChecker.GetTypeAtLocation(returnNode)
+
+			anyType := utils.DiscriminateAnyType(
+				returnNodeType,
+				ctx.TypeChecker,
+				ctx.Program,
+				returnNode,
+			)
+
 			// function has an explicit return type, so ensure it's a safe return
-			returnNodeType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, returnNode)
+			constrainedReturnNodeType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, returnNode)
 
 			// function expressions will not have their return type modified based on receiver typing
 			// so we have to use the contextual typing in these cases, i.e.
@@ -131,7 +132,7 @@ var NoUnsafeReturnRule = rule.Rule{
 					message,
 					primaryRange,
 					utils.TrimNodeTextRange(ctx.SourceFile, returnNode),
-					renderReturnType(ctx.TypeChecker, returnNodeType),
+					renderReturnType(ctx.TypeChecker, constrainedReturnNodeType),
 					expectedRange,
 					expectedType,
 				))
@@ -185,7 +186,7 @@ var NoUnsafeReturnRule = rule.Rule{
 				}
 
 				var typeString string
-				if utils.IsIntrinsicErrorType(returnNodeType) {
+				if utils.IsIntrinsicErrorType(constrainedReturnNodeType) {
 					typeString = "error"
 				} else if anyType == utils.DiscriminatedAnyTypeAny {
 					typeString = "`any`"

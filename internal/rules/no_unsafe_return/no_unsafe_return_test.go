@@ -193,6 +193,20 @@ function foo(): Set<number> {
         }
       }
     `},
+		{Code: `
+interface Schema<Output = any> {
+  readonly _output: Output;
+  parse(input: unknown): Output;
+}
+type Infer<S extends Schema> = S['_output'];
+const parse = <S extends Schema>(schema: S, input: unknown): Infer<S> =>
+  schema.parse(input) as Infer<S>;
+    `},
+		{Code: `
+function f<T extends Set<any>>(x: T): Set<string> {
+  return x;
+}
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -658,6 +672,18 @@ const foo: Fn = () => new Set<any>();
 					Column:    20,
 					EndColumn: 22,
 				},
+			},
+		},
+		{
+			Code: `
+interface Schema<Output = any> {
+  readonly _output: Output;
+}
+type Infer<S extends Schema> = S['_output'];
+const getOutput = <S extends Schema>(schema: S): Infer<S> =>
+  schema._output;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unsafeReturn"},
 			},
 		},
 	})

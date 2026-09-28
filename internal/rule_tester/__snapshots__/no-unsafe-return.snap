@@ -565,3 +565,21 @@ Message: Unsafe return of type `Set<any>` from function with return type `Set<st
      |                       ^^^^^^^^^^^^^^ Returned expression has type `Set<any>`.
    4 |       
 ---
+
+[TestNoUnsafeReturnRule/invalid-33 - 1]
+Diagnostic 1: unsafeReturn (6:59 - 6:60)
+Message: Unsafe return of a value of type `any`.
+   5 | type Infer<S extends Schema> = S['_output'];
+   6 | const getOutput = <S extends Schema>(schema: S): Infer<S> =>
+     |                                                           ~~
+   7 |   schema._output;
+  Label: Returned expression has type `any`. (7:3 - 7:16)
+   6 | const getOutput = <S extends Schema>(schema: S): Infer<S> =>
+   7 |   schema._output;
+     |   ^^^^^^^^^^^^^^ Returned expression has type `any`.
+  Label: Function expects return type `Infer<S>`. (6:50 - 6:57)
+   5 | type Infer<S extends Schema> = S['_output'];
+   6 | const getOutput = <S extends Schema>(schema: S): Infer<S> =>
+     |                                                  ^^^^^^^^ Function expects return type `Infer<S>`.
+   7 |   schema._output;
+---
