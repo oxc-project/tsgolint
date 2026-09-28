@@ -4747,6 +4747,12 @@ type Id = number & { readonly [brand]: 'Id' };
 declare const ids: readonly Id[];
 const result = pipe(ids, reduce({} as Record<Id, number>, (acc, id) => ({ ...acc, [id]: 1 })));
 export const useResult = (id: Id): number | undefined => result[id];`},
+		{Code: `declare const brand: unique symbol;
+type Id = symbol & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<B>(value: B | null): B;
+const result = consume({} as Record<Id, number>);
+export const useResult = result[id];`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
 			{

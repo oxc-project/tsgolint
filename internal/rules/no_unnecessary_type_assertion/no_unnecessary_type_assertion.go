@@ -930,7 +930,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				}
 				keyParts := keyType.Types()
 				return slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
-					return utils.IsTypeFlagSet(part, checker.TypeFlagsString|checker.TypeFlagsNumber)
+					return utils.IsTypeFlagSet(part, checker.TypeFlagsString|checker.TypeFlagsNumber|checker.TypeFlagsESSymbol)
 				}) && slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
 					return utils.IsTypeFlagSet(part, checker.TypeFlagsObject) &&
 						len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, part)) > 0
