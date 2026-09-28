@@ -561,6 +561,17 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 		}
 
 		getGenericInferenceParameterTypeAtArgument := func(callOrNew *ast.Node, argIndex int, elementPath []int) *checker.Type {
+			calleeType := ctx.TypeChecker.GetTypeAtLocation(callOrNew.Expression())
+			var calleeSignatures []*checker.Signature
+			if ast.IsCallExpression(callOrNew) {
+				calleeSignatures = ctx.TypeChecker.GetCallSignatures(calleeType)
+			} else {
+				calleeSignatures = ctx.TypeChecker.GetConstructSignatures(calleeType)
+			}
+			if !slices.ContainsFunc(calleeSignatures, hasTypeParams) {
+				return nil
+			}
+
 			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callOrNew, nil, checker.CheckModeNormal)
 			if signature == nil {
 				return nil
@@ -859,7 +870,12 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 		}
 
 		isInGenericInferenceArgument := func(node *ast.Node) bool {
-			propertyPath := []string{}
+			type inferencePathStep struct {
+				propertyName   string
+				elementIndex   int
+				isArrayElement bool
+			}
+			path := []inferencePathStep{}
 			for child, current := node, node.Parent; current != nil; child, current = current, current.Parent {
 				if current.Kind == ast.KindFunctionDeclaration ||
 					((ast.IsFunctionExpression(current) || ast.IsArrowFunction(current)) &&
@@ -869,14 +885,22 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				if ast.IsPropertyAssignment(current) &&
 					ast.SkipParentheses(current.Initializer()) == ast.SkipParentheses(child) {
 					name := current.Name()
-					if name == nil || (!ast.IsIdentifier(name) && !ast.IsStringLiteral(name) && !ast.IsNumericLiteral(name)) {
+					if name != nil && ast.IsComputedPropertyName(name) {
+						name = ast.SkipParentheses(name.AsComputedPropertyName().Expression)
+					}
+					if name == nil || (!ast.IsIdentifier(name) && !ast.IsStringLiteral(name) && !ast.IsNumericLiteral(name) && name.Kind != ast.KindNoSubstitutionTemplateLiteral) {
 						return false
 					}
-					propertyPath = append(propertyPath, name.Text())
+					path = append(path, inferencePathStep{propertyName: name.Text()})
 				}
 				if ast.IsArrayLiteralExpression(current) {
-					// Array elements are handled by isNestedInArrayLiteralArgumentToGenericCall.
-					return false
+					elementIndex := slices.IndexFunc(current.AsArrayLiteralExpression().Elements.Nodes, func(element *ast.Node) bool {
+						return element == child || ast.SkipParentheses(element) == ast.SkipParentheses(child)
+					})
+					if elementIndex < 0 {
+						return false
+					}
+					path = append(path, inferencePathStep{elementIndex: elementIndex, isArrayElement: true})
 				}
 				if !ast.IsCallExpression(current) && !ast.IsNewExpression(current) {
 					continue
@@ -894,16 +918,25 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				if paramType == nil {
 					return false
 				}
-				// Property names were collected from the assertion outward.
-				for i := len(propertyPath) - 1; i >= 0; i-- {
+				// Property and array steps were collected from the assertion outward.
+				for i := len(path) - 1; i >= 0; i-- {
 					if hasDirectTypeParameter(paramType) {
 						return true
 					}
-					paramType = checker.Checker_getTypeOfPropertyOrIndexSignatureOfType(
-						ctx.TypeChecker,
-						checker.Checker_GetNonNullableType(ctx.TypeChecker, paramType),
-						propertyPath[i],
-					)
+					paramType = checker.Checker_GetNonNullableType(ctx.TypeChecker, paramType)
+					if path[i].isArrayElement {
+						if checker.IsTupleType(paramType) {
+							typeArguments := checker.Checker_getTypeArguments(ctx.TypeChecker, paramType)
+							if len(typeArguments) == 0 {
+								return false
+							}
+							paramType = typeArguments[min(path[i].elementIndex, len(typeArguments)-1)]
+						} else {
+							paramType = utils.GetNumberIndexType(ctx.TypeChecker, paramType)
+						}
+					} else {
+						paramType = checker.Checker_getTypeOfPropertyOrIndexSignatureOfType(ctx.TypeChecker, paramType, path[i].propertyName)
+					}
 					if paramType == nil {
 						return false
 					}

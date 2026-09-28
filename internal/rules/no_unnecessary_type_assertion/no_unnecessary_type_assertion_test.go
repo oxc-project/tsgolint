@@ -4692,6 +4692,42 @@ consume({ fixed: {}, tag: 0 });`},
 				EndColumn: 42,
 			}},
 		},
+		{
+			Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: { rows: { fixed: {} }[]; tag: T }): void;
+consume({ rows: [{ fixed: {} as Record<Id, number> }], tag: 0 });`,
+			Output: []string{`declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: { rows: { fixed: {} }[]; tag: T }): void;
+consume({ rows: [{ fixed: {} }], tag: 0 });`},
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "contextuallyUnnecessary",
+				Line:      4,
+				Column:    27,
+				EndLine:   4,
+				EndColumn: 51,
+			}},
+		},
+		{
+			Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: T): T;
+const fixed = consume<{}>;
+fixed({} as Record<Id, number>);`,
+			Output: []string{`declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare function consume<T>(value: T): T;
+const fixed = consume<{}>;
+fixed({});`},
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "contextuallyUnnecessary",
+				Line:      5,
+				Column:    7,
+				EndLine:   5,
+				EndColumn: 31,
+			}},
+		},
 	})
 }
 
@@ -4773,6 +4809,24 @@ type IdMap = Record<Id, number> & { readonly marker?: never };
 const result = consume({} as IdMap);
 export const useResult = result[id];`},
 		{Code: "declare const brand: unique symbol;\ntype Brand = { readonly [brand]: 'Id' };\ntype Id = `id-${number}` & Brand;\ndeclare const id: Id;\ndeclare function consume<B>(value: B | null): B;\nconst result = consume({} as Record<Id, number>);\nexport const useResult = result[id];"},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<T>(value: { rows: { slot: T }[] }): T;
+const result = consume({ rows: [{ slot: {} as Record<Id, number> }] });
+export const useResult = result[id];`},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<T>(value: { slot: T }): T;
+const result = consume({ ['slot']: {} as Record<Id, number> });
+export const useResult = result[id];`},
+		{Code: `declare const brand: unique symbol;
+type Id = string & { readonly [brand]: 'Id' };
+declare const id: Id;
+declare function consume<T>(value: { 0: T }): T;
+const result = consume({ [0]: {} as Record<Id, number> });
+export const useResult = result[id];`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const value = (3 as 3);", Output: []string{"const value = (3);"}, Errors: []rule_tester.InvalidTestCaseError{
 			{
