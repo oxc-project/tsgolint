@@ -201,15 +201,15 @@ var UnboundMethodRule = rule.Rule{
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[UnboundMethodOptions](options, "unbound-method")
 
-		isSpecBoundBuiltinMethod := func(objectType *checker.Type, property *ast.Node) bool {
+		isSpecBoundBuiltinMethod := func(objectType *checker.Type, propertyName string) bool {
 			// Intl.Collator.prototype.compare is a bound getter in ECMA-402,
 			// but TypeScript declares it as an ordinary method. Only exempt the
 			// method declared on the default-library Collator, including when
 			// inherited by a subclass, but not a user-defined override.
-			if !ast.IsIdentifier(property) || property.Text() != "compare" {
+			if propertyName != "compare" {
 				return false
 			}
-			symbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, objectType, property.Text())
+			symbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, objectType, propertyName)
 			if symbol == nil || len(symbol.Declarations) == 0 {
 				return false
 			}
@@ -222,7 +222,7 @@ var UnboundMethodRule = rule.Rule{
 			return true
 		}
 
-		isNativelyBound := func(object *ast.Node, property *ast.Node) bool {
+		isNativelyBound := func(object *ast.Node, propertyName string) bool {
 			// We can't rely entirely on the type-level checks made at the end of this
 			// function, because sometimes type declarations don't come from the
 			// default library, but come from, for example, "@types/node". And we can't
@@ -230,9 +230,9 @@ var UnboundMethodRule = rule.Rule{
 			// the interface.
 			//
 			// See related discussion https://github.com/typescript-eslint/typescript-eslint/pull/8952#discussion_r1576543310
-			if ast.IsIdentifier(object) && ast.IsIdentifier(property) {
+			if ast.IsIdentifier(object) {
 				if members, ok := nativelyBoundMembers[object.Text()]; ok {
-					if _, ok := members[property.Text()]; ok {
+					if _, ok := members[propertyName]; ok {
 						objectSymbol := ctx.TypeChecker.GetSymbolAtLocation(object)
 						if objectSymbol != nil && isNotImported(objectSymbol, ctx.SourceFile) {
 							return true
@@ -242,13 +242,13 @@ var UnboundMethodRule = rule.Rule{
 			}
 
 			objectType := ctx.TypeChecker.GetTypeAtLocation(object)
-			if isSpecBoundBuiltinMethod(objectType, property) {
+			if isSpecBoundBuiltinMethod(objectType, propertyName) {
 				return true
 			}
 
 			// if `${object.name}.${property.name}` doesn't match any of
 			// the nativelyBoundMembers, then we fallback to type-level checks
-			return utils.IsBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, objectType, supportedGlobalTypes...) && utils.IsAnyBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(property))
+			return utils.IsBuiltinSymbolLike(ctx.Program, ctx.TypeChecker, objectType, supportedGlobalTypes...) && utils.IsSymbolFromDefaultLibrary(ctx.Program, checker.Checker_getPropertyOfType(ctx.TypeChecker, objectType, propertyName))
 		}
 
 		checkIfMethodAndReport := func(node *ast.Node, dangerousReference *ast.Node, symbol *ast.Symbol) bool {
@@ -270,6 +270,62 @@ var UnboundMethodRule = rule.Rule{
 			return true
 		}
 
+		checkUnionConstituentsAndReport := func(node *ast.Node, dangerousReference *ast.Node, propertyName string, t *checker.Type) bool {
+			for _, unionPart := range utils.UnionTypeParts(t) {
+				for _, intersectionPart := range utils.IntersectionTypeParts(unionPart) {
+					if isSpecBoundBuiltinMethod(intersectionPart, propertyName) {
+						continue
+					}
+					if checkIfMethodAndReport(node, dangerousReference, checker.Checker_getPropertyOfType(ctx.TypeChecker, intersectionPart, propertyName)) {
+						return true
+					}
+				}
+			}
+			return false
+		}
+
+		checkMemberAccess := func(node *ast.Node) {
+			property := node.Name()
+			if ast.IsElementAccessExpression(node) {
+				property = node.AsElementAccessExpression().ArgumentExpression
+			}
+			if isSafeUse(node) {
+				return
+			}
+			if ast.IsPrivateIdentifier(property) {
+				// Private names are resolved in their declaring class's scope, not
+				// through the object's public property table.
+				checkIfMethodAndReport(node, property, ctx.TypeChecker.GetSymbolAtLocation(node))
+				return
+			}
+
+			var propertyNames []string
+			if ast.IsPropertyAccessExpression(node) {
+				if ast.IsIdentifier(property) {
+					propertyNames = append(propertyNames, property.Text())
+				}
+			} else {
+				for _, part := range utils.UnionTypeParts(ctx.TypeChecker.GetTypeAtLocation(property)) {
+					if utils.IsTypeFlagSet(part, checker.TypeFlagsStringOrNumberLiteralOrUnique) {
+						propertyNames = append(propertyNames, checker.GetPropertyNameFromType(part))
+					}
+				}
+			}
+			if len(propertyNames) == 0 {
+				return
+			}
+
+			objectType := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
+			for _, propertyName := range propertyNames {
+				if isNativelyBound(node.Expression(), propertyName) {
+					continue
+				}
+				if checkUnionConstituentsAndReport(node, property, propertyName, objectType) {
+					break
+				}
+			}
+		}
+
 		checkBindingProperty := func(patternNode *ast.Node, initNode *ast.Node, propertyName *ast.Node, parentIsAssignmentPatternLike bool) {
 			// Skip computed property names as they cannot be statically analyzed
 			if ast.IsComputedPropertyName(propertyName) {
@@ -277,7 +333,7 @@ var UnboundMethodRule = rule.Rule{
 			}
 
 			if initNode != nil {
-				if !isNativelyBound(initNode, propertyName) {
+				if !isNativelyBound(initNode, propertyName.Text()) {
 					reported := checkIfMethodAndReport(propertyName, propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(initNode), propertyName.Text()))
 					if reported {
 						return
@@ -291,22 +347,12 @@ var UnboundMethodRule = rule.Rule{
 				}
 			}
 
-			utils.TypeRecurser(ctx.TypeChecker.GetTypeAtLocation(patternNode), func(t *checker.Type) bool {
-				if isSpecBoundBuiltinMethod(t, propertyName) {
-					return false
-				}
-				return checkIfMethodAndReport(propertyName, propertyName, checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName.Text()))
-			})
+			checkUnionConstituentsAndReport(propertyName, propertyName, propertyName.Text(), ctx.TypeChecker.GetTypeAtLocation(patternNode))
 		}
 
 		return rule.RuleListeners{
-			ast.KindPropertyAccessExpression: func(node *ast.Node) {
-				if isSafeUse(node) || isNativelyBound(node.Expression(), node.Name()) {
-					return
-				}
-
-				checkIfMethodAndReport(node, node.Name(), ctx.TypeChecker.GetSymbolAtLocation(node))
-			},
+			ast.KindPropertyAccessExpression: checkMemberAccess,
+			ast.KindElementAccessExpression:  checkMemberAccess,
 
 			rule.ListenerOnAllowPattern(ast.KindObjectLiteralExpression): func(node *ast.Node) {
 				if !ast.IsAssignmentExpression(node.Parent, true) {
