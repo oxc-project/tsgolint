@@ -9,3 +9,15 @@ extend-exclude = [
 
 [default.extend-identifiers]
 IIFEs = "IIFEs"
+
+[type.naming-convention]
+extend-glob = ["unicode_properties_generated.go", "upstream_generator_test.go", "default.json"]
+
+[type.naming-convention.extend-identifiers]
+# Upstream regex fragment and standard Unicode property names/aliases.
+gnored = "gnored"
+Tai_Tham = "Tai_Tham"
+Vai = "Vai"
+Nd = "Nd"
+Beng = "Beng"
+Maka = "Maka"
