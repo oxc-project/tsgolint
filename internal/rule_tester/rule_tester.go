@@ -51,20 +51,20 @@ type InvalidTestCaseSuggestion struct {
 }
 
 type InvalidTestCase struct {
-	Code     string
-	Only     bool
-	Skip     bool
-	FileName string
-	Output   []string
-	Errors   []InvalidTestCaseError
-	TSConfig string
-	Options  any
-	Tsx      bool
-	Files    map[string]string
+	Code         string
+	Only         bool
+	Skip         bool
+	SkipSnapshot bool // Use explicit diagnostic assertions without a rendered snapshot.
+	FileName     string
+	Output       []string
+	Errors       []InvalidTestCaseError
+	TSConfig     string
+	Options      any
+	Tsx          bool
+	Files        map[string]string
 }
 
 func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Rule, validTestCases []ValidTestCase, invalidTestCases []InvalidTestCase) {
-	newSnapshotter(r.Name).DeferWrites(t)
 	onlyMode := slices.ContainsFunc(validTestCases, func(c ValidTestCase) bool { return c.Only }) ||
 		slices.ContainsFunc(invalidTestCases, func(c InvalidTestCase) bool { return c.Only })
 
@@ -257,7 +257,7 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 					}
 				}
 			}
-			if !t.Failed() {
+			if !testCase.SkipSnapshot && !t.Failed() {
 				newSnapshotter(r.Name).MatchSnapshot(t, formatDiagnosticsSnapshot(testCase.Code, initialDiagnostics))
 			}
 		})

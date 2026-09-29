@@ -30,10 +30,11 @@ type upstreamManifest struct {
 }
 
 type upstreamSuite struct {
-	File    string   `json:"file"`
-	Fixture string   `json:"fixture"`
-	Valid   []string `json:"valid"`
-	Invalid []string `json:"invalid"`
+	File              string `json:"file"`
+	Fixture           string `json:"fixture"`
+	FingerprintOffset int    `json:"fingerprintOffset"`
+	Valid             int    `json:"valid"`
+	Invalid           int    `json:"invalid"`
 }
 
 type upstreamCases struct {
@@ -141,8 +142,9 @@ func expectedMessage(t *testing.T, templates map[string]string, id string, data 
 	return message
 }
 
-// The JSON fixtures are the fully expanded upstream RuleTester cases. Running the
-// generator with --check also compares every source hash against the pinned checkout.
+// Compare every expanded Go case with the fingerprints captured by the upstream
+// RuleTester. The JavaScript generator's --check also verifies the source hashes
+// and compact templates against the pinned checkout.
 func TestGeneratedUpstreamCaseParity(t *testing.T) {
 	manifest := readGenerated[upstreamManifest](t, "manifest.json")
 	if manifest.Upstream != upstreamCommit || len(manifest.Suites) != 17 || len(manifest.Sources) != 20 {
@@ -159,15 +161,23 @@ func TestGeneratedUpstreamCaseParity(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	fingerprints, err := os.ReadFile(filepath.Join("testdata", "fingerprints.bin"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(fingerprints) != (manifest.Valid+manifest.Invalid)*sha256.Size {
+		t.Fatalf("unexpected fingerprint file length: %d", len(fingerprints))
+	}
 	files, err := filepath.Glob(filepath.Join("testdata", "*.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(files) != len(manifest.Suites)+2 { // messages.json and manifest.json
+	if len(files) != len(manifest.Suites)+3 { // messages.json, manifest.json, generator.json
 		t.Fatalf("found %d generated files for %d suites", len(files), len(manifest.Suites))
 	}
 	seen := map[string]bool{}
 	valid, invalid, diagnostics := 0, 0, 0
+	consumedFingerprints := 0
 	for _, suite := range manifest.Suites {
 		if seen[suite.Fixture] || !strings.HasSuffix(suite.File, ".test.ts") ||
 			suite.Fixture != strings.TrimSuffix(filepath.Base(suite.File), ".test.ts")+".json" {
@@ -178,14 +188,17 @@ func TestGeneratedUpstreamCaseParity(t *testing.T) {
 		if manifest.Sources[source] == "" {
 			t.Fatalf("missing source hash for %s", source)
 		}
-		cases := readGenerated[upstreamCases](t, suite.Fixture)
-		if len(cases.Valid) != len(suite.Valid) || len(cases.Invalid) != len(suite.Invalid) {
+		if suite.FingerprintOffset != consumedFingerprints || suite.Valid < 0 || suite.Invalid < 0 {
+			t.Fatalf("invalid fingerprint span in %s: offset %d, expected %d", suite.Fixture, suite.FingerprintOffset, consumedFingerprints)
+		}
+		cases := readUpstreamCases(t, suite.Fixture)
+		if len(cases.Valid) != suite.Valid || len(cases.Invalid) != suite.Invalid {
 			t.Fatalf("case count mismatch in %s", suite.Fixture)
 		}
 		for kind, items := range map[string][]jsontext.Value{"valid": cases.Valid, "invalid": cases.Invalid} {
-			hashes := suite.Valid
+			start := suite.FingerprintOffset
 			if kind == "invalid" {
-				hashes = suite.Invalid
+				start += suite.Valid * sha256.Size
 			}
 			for i, raw := range items {
 				compact := bytes.Clone(raw)
@@ -194,8 +207,9 @@ func TestGeneratedUpstreamCaseParity(t *testing.T) {
 					t.Fatal(err)
 				}
 				digest := sha256.Sum256(value)
-				if got := hex.EncodeToString(digest[:]); got != hashes[i] {
-					t.Fatalf("case hash mismatch: %s/%s-%d: %s != %s", suite.Fixture, kind, i, got, hashes[i])
+				expected := fingerprints[start+i*sha256.Size : start+(i+1)*sha256.Size]
+				if !bytes.Equal(digest[:], expected) {
+					t.Fatalf("case hash mismatch: %s/%s-%d: %s != %s", suite.Fixture, kind, i, hex.EncodeToString(digest[:]), hex.EncodeToString(expected))
 				}
 				c := loadUpstreamCase(t, raw)
 				if kind == "invalid" {
@@ -208,13 +222,17 @@ func TestGeneratedUpstreamCaseParity(t *testing.T) {
 		}
 		valid += len(cases.Valid)
 		invalid += len(cases.Invalid)
+		consumedFingerprints += (suite.Valid + suite.Invalid) * sha256.Size
+	}
+	if consumedFingerprints != len(fingerprints) {
+		t.Fatalf("fingerprint spans consume %d of %d bytes", consumedFingerprints, len(fingerprints))
 	}
 	if valid != manifest.Valid || invalid != manifest.Invalid || diagnostics != manifest.Diagnostics {
 		t.Fatalf("actual totals %d valid, %d invalid, %d diagnostics disagree with manifest", valid, invalid, diagnostics)
 	}
 	for _, file := range files {
 		name := filepath.Base(file)
-		if name != "manifest.json" && name != "messages.json" && !seen[name] {
+		if name != "manifest.json" && name != "messages.json" && name != "generator.json" && !seen[name] {
 			t.Fatalf("unlisted generated suite: %s", name)
 		}
 	}
@@ -225,7 +243,7 @@ func TestNamingConventionUpstream(t *testing.T) {
 	messages := readGenerated[map[string]string](t, "messages.json")
 	for _, suite := range manifest.Suites {
 		t.Run(strings.TrimSuffix(suite.Fixture, ".json"), func(t *testing.T) {
-			cases := readGenerated[upstreamCases](t, suite.Fixture)
+			cases := readUpstreamCases(t, suite.Fixture)
 			valid := make([]rule_tester.ValidTestCase, 0, len(cases.Valid))
 			invalid := make([]rule_tester.InvalidTestCase, 0, len(cases.Invalid))
 			for _, raw := range cases.Valid {
@@ -249,10 +267,10 @@ func TestNamingConventionUpstream(t *testing.T) {
 					})
 				}
 				invalid = append(invalid, rule_tester.InvalidTestCase{
-					Code: c.Code, Options: caseOptions(t, c.Options), TSConfig: caseTSConfig(t, c), Errors: errors,
+					Code: c.Code, Options: caseOptions(t, c.Options), TSConfig: caseTSConfig(t, c), Errors: errors, SkipSnapshot: true,
 				})
 			}
-			if len(valid) != len(suite.Valid) || len(invalid) != len(suite.Invalid) {
+			if len(valid) != suite.Valid || len(invalid) != suite.Invalid {
 				t.Fatal(fmt.Sprintf("loaded case count mismatch: %d valid, %d invalid", len(valid), len(invalid)))
 			}
 			rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NamingConventionRule, valid, invalid)

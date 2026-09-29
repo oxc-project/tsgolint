@@ -21,6 +21,7 @@ const read = relative => {
 const ruleSource = read('packages/eslint-plugin/src/rules/naming-convention.ts');
 const messages = vm.runInNewContext('(' + ruleSource.match(/messages: (\{[\s\S]*?\n    \}),\n    schema:/)[1] + ')');
 const suites = [];
+const templates = new Map();
 let current;
 class RuleTester {
   run(name, rule, cases) {
@@ -28,7 +29,12 @@ class RuleTester {
     suites.push({ file: current, cases });
   }
 }
-const context = vm.createContext({});
+const context = vm.createContext({
+  captureTemplates(cases) {
+    assert.ok(!templates.has(current), `Repeated generator call: ${current}`);
+    templates.set(current, cases);
+  },
+});
 const modules = new Map();
 function synthetic(key, exports) {
   if (!modules.has(key)) {
@@ -43,7 +49,12 @@ function synthetic(key, exports) {
 }
 function moduleFor(file) {
   if (!modules.has(file)) {
-    const source = stripTypeScriptTypes(read(file), { mode: 'strip' });
+    let source = stripTypeScriptTypes(read(file), { mode: 'strip' });
+    if (file === base + '/cases/createTestCases.ts') {
+      const header = /export function createTestCases\(cases\s*\)\s*\{/;
+      assert.ok(header.test(source), 'Upstream generator entry point changed');
+      source = source.replace(header, '$& globalThis.captureTemplates(cases);');
+    }
     modules.set(file, new vm.SourceTextModule(source, { context, identifier: file }));
   }
   return modules.get(file);
@@ -88,10 +99,15 @@ function keys(value, allowed) {
   for (const key of Object.keys(value)) assert.ok(allowed.includes(key), `Unhandled field: ${key}`);
 }
 const manifest = { upstream: UPSTREAM, sources, suites: [], valid: 0, invalid: 0, diagnostics: 0 };
+const fingerprints = [];
+let fingerprintOffset = 0;
+function writeBytes(file, data) {
+  if (check) assert.deepEqual(fs.readFileSync(file), data, `Generated file differs: ${file}`);
+  else fs.writeFileSync(file, data);
+}
 function write(file, value) {
   const text = JSON.stringify(value, null, 2) + '\n';
-  if (check) assert.equal(fs.readFileSync(file, 'utf8'), text, `Generated file differs: ${file}`);
-  else fs.writeFileSync(file, text);
+  writeBytes(file, Buffer.from(text));
 }
 for (const { file, cases } of suites) {
   keys(cases, ['assertionOptions', 'valid', 'invalid']);
@@ -119,20 +135,30 @@ for (const { file, cases } of suites) {
     }
   }
   const name = file.replace('cases/', '').replace('.test.ts', '');
-  const hashes = {};
   for (const kind of ['valid', 'invalid']) {
-    hashes[kind] = result[kind].map(fingerprint);
+    fingerprints.push(...result[kind].map(c => Buffer.from(fingerprint(c), 'hex')));
     manifest[kind] += result[kind].length;
   }
   manifest.diagnostics += result.invalid.reduce((n, c) => n + c.errors.length, 0);
-  manifest.suites.push({ file, fixture: name + '.json', ...hashes });
-  write(output + '/' + name + '.json', result);
+  manifest.suites.push({
+    file,
+    fixture: name + '.json',
+    valid: result.valid.length,
+    invalid: result.invalid.length,
+    fingerprintOffset,
+  });
+  fingerprintOffset += (result.valid.length + result.invalid.length) * 32;
+  write(output + '/' + name + '.json', templates.has(file) ? { templates: templates.get(file) } : result);
 }
 assert.equal(suites.length, 17);
 assert.equal(manifest.valid, 8966);
 assert.equal(manifest.invalid, 7146);
 assert.equal(manifest.diagnostics, 44065);
 write(output + '/messages.json', stable(messages));
+write(output + '/generator.json', {
+  formatTestNames: modules.get(base + '/cases/createTestCases.ts').namespace.formatTestNames,
+});
+writeBytes(output + '/fingerprints.bin', Buffer.concat(fingerprints));
 write(output + '/manifest.json', manifest);
 console.log(
   `${
