@@ -2005,3 +2005,31 @@ Message: Promise-returning function provided to variable where a void return was
      |           ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
    8 |       
 ---
+
+[TestNoMisusedPromisesRule/invalid-97 - 1]
+Diagnostic 1: conditional (4:2 - 4:24)
+Message: Expected non-Promise value in a boolean conditional.
+   3 | declare const pending: Promise<void>;
+   4 | (sent.push('x'), pending) ? 1 : 2;
+     |  ~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Label: This expression has type `Promise<void>`. (4:2 - 4:24)
+   3 | declare const pending: Promise<void>;
+   4 | (sent.push('x'), pending) ? 1 : 2;
+     |  ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   5 |       
+---
+
+[TestNoMisusedPromisesRule/invalid-98 - 1]
+Diagnostic 1: conditional (4:2 - 4:24)
+Message: Expected non-Promise value in a boolean conditional.
+   3 | declare const pending: Promise<void>;
+   4 | (sent.push('x'), pending) || false;
+     |  ~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+  Label: This expression has type `Promise<void>`. (4:2 - 4:24)
+   3 | declare const pending: Promise<void>;
+   4 | (sent.push('x'), pending) || false;
+     |  ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   5 |       
+---

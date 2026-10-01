@@ -901,7 +901,9 @@ var NoMisusedPromisesRule = rule.Rule{
 
 		listeners := rule.RuleListeners{
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				if opts.ChecksConditionals {
+				// only logical expressions, like typescript-eslint's LogicalExpression listener;
+				// a comma expression is a binary expression here but not a conditional
+				if opts.ChecksConditionals && ast.IsLogicalOrCoalescingBinaryExpression(node) {
 					checkConditional(node, false)
 				}
 
