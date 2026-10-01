@@ -247,8 +247,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 		}
 
 		hasSameProperties := func(uncast, cast *checker.Type) bool {
-			uncastProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, uncast)
-			castProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, cast)
+			// Local safeguard: a union only has the properties common to all of its
+			// members, so a nullable member hides every object property. Compare the
+			// non-nullable parts, as for the same assertion without `| undefined`.
+			uncastProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, checker.Checker_GetNonNullableType(ctx.TypeChecker, uncast))
+			castProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, checker.Checker_GetNonNullableType(ctx.TypeChecker, cast))
 			if len(uncastProps) != len(castProps) {
 				return false
 			}
@@ -736,6 +739,54 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				ast.IsLogicalOrCoalescingAssignmentOperator(parent.AsBinaryExpression().OperatorToken.Kind)
 		}
 
+		isElementInProblematicContext := func(node *ast.Node) bool {
+			// Local safeguard: the contextual type of an array element merges the
+			// element types of every member of a union contextual type, including
+			// `string` from string members. Accepting the original element there does
+			// not mean the array literal still matches one member, as for object
+			// properties above.
+			arrayExpr := parentThroughParens(node)
+			if arrayExpr == nil || !ast.IsArrayLiteralExpression(arrayExpr) {
+				return false
+			}
+			arrayContextualType := checker.Checker_getContextualType(ctx.TypeChecker, arrayExpr, checker.ContextFlagsNone)
+			if arrayContextualType == nil || !utils.IsUnionType(checker.Checker_GetNonNullableType(ctx.TypeChecker, arrayContextualType)) {
+				return false
+			}
+			elementContextualType := checker.Checker_getContextualType(ctx.TypeChecker, node, checker.ContextFlagsNone)
+			if elementContextualType == nil {
+				return true
+			}
+			nonNullableContextualType := checker.Checker_GetNonNullableType(ctx.TypeChecker, elementContextualType)
+			if utils.IsUnionType(nonNullableContextualType) {
+				return true
+			}
+			uncastType := ctx.TypeChecker.GetTypeAtLocation(node.Expression())
+			return !checker.Checker_isTypeAssignableTo(ctx.TypeChecker, uncastType, nonNullableContextualType)
+		}
+
+		isRightOperandTypedByLeftOperand := func(node *ast.Node) bool {
+			// Local safeguard: typescript-go contextually types the right operand of
+			// `||` and `??` by the left operand when the whole expression has no
+			// contextual type of its own. Nothing receives the operand there; the
+			// assertion still decides the type of the whole expression.
+			current := node
+			for {
+				parent := parentThroughParens(current)
+				if parent == nil || !ast.IsBinaryExpression(parent) || ast.SkipParentheses(parent.AsBinaryExpression().Right) != current {
+					return false
+				}
+				operator := parent.AsBinaryExpression().OperatorToken.Kind
+				if operator != ast.KindBarBarToken && operator != ast.KindQuestionQuestionToken {
+					return false
+				}
+				if checker.Checker_getContextualType(ctx.TypeChecker, parent, checker.ContextFlagsSkipBindingPatterns) == nil {
+					return true
+				}
+				current = parent
+			}
+		}
+
 		isNestedInArrayLiteralArgumentToGenericCall := func(node *ast.Node) bool {
 			// Local safeguard: contextual acceptance alone does not preserve inference
 			// for a generic parameter inferred from an array element.
@@ -873,9 +924,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
+				isElementInProblematicContext(node) ||
 				isPropertyInInferredCallbackReturn(node) ||
 				isAssignmentInNonStatementContext(node) ||
 				isRightHandSideOfLogicalAssignment(node) ||
+				isRightOperandTypedByLeftOperand(node) ||
 				isArgumentToOverloadedFunction(node) {
 				return true
 			}
