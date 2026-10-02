@@ -1,0 +1,13 @@
+{
+  "templates": [
+    {
+      "code": [
+        "enum Ignored { % }",
+        "enum Ignored { \"%\" }"
+      ],
+      "options": {
+        "selector": "enumMember"
+      }
+    }
+  ]
+}

@@ -1,0 +1,362 @@
+
+[TestNamingConventionASTRegressions/ignored_binding_contexts/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:30 - 1:38)
+Message: Object Literal Property name `Good_Name` must match one of the following formats: camelCase
+   1 | let Bad_Name; ({Bad_Name} = {Good_Name:1}); try {} catch(Bad_Error) {} type Example<T> = T extends infer U ? { [Bad_Key in keyof U]: U[Bad_Key] } : never;
+     |                              ~~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/method_parameters_checked/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:24 - 1:39)
+Message: Parameter name `Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { method(Bad_Name: number) {} set value(Bad_Name: number) {} }
+     |                        ~~~~~~~~~~~~~~~~
+
+Diagnostic 2: doesNotMatchFormat (1:55 - 1:70)
+Message: Parameter name `Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { method(Bad_Name: number) {} set value(Bad_Name: number) {} }
+     |                                                       ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/numeric_and_private_member_names/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:17 - 1:25)
+Message: Class Property name `Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { #Bad_Name = 1; "#Bad_Name" = 1; 0x10 = 1; }
+     |                 ~~~~~~~~~
+
+Diagnostic 2: doesNotMatchFormat (1:32 - 1:42)
+Message: Class Property name `#Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { #Bad_Name = 1; "#Bad_Name" = 1; 0x10 = 1; }
+     |                                ~~~~~~~~~~~
+
+Diagnostic 3: doesNotMatchFormat (1:49 - 1:52)
+Message: Class Property name `16` must match one of the following formats: camelCase
+   1 | class Example { #Bad_Name = 1; "#Bad_Name" = 1; 0x10 = 1; }
+     |                                                 ~~~~
+---
+
+[TestNamingConventionASTRegressions/optional_parameter_annotation/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:18 - 1:34)
+Message: Parameter name `Bad_Name` must match one of the following formats: camelCase
+   1 | function example(Bad_Name?: number) {}
+     |                  ~~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/parameter_property_annotation/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:36 - 1:51)
+Message: Parameter Property name `Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { constructor(public Bad_Name: number) {} }
+     |                                    ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/parenthesized_async_methods/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:17 - 1:24)
+Message: Class Method name `Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { Bad_Name = (async () => {}); } const obj = { Bad_Name: (async function () {}) };
+     |                 ~~~~~~~~
+
+Diagnostic 2: doesNotMatchFormat (1:62 - 1:69)
+Message: Object Literal Method name `Bad_Name` must match one of the following formats: camelCase
+   1 | class Example { Bad_Name = (async () => {}); } const obj = { Bad_Name: (async function () {}) };
+     |                                                              ~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/parenthesized_async_variable/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:14)
+Message: Variable name `Bad_Name` must match one of the following formats: camelCase
+   1 | const Bad_Name = (async () => {});
+     |       ~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/parenthesized_function_type/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:21 - 1:28)
+Message: Type Method name `Bad_Name` must match one of the following formats: camelCase
+   1 | interface Example { Bad_Name: (() => void); }
+     |                     ~~~~~~~~
+---
+
+[TestNamingConventionASTRegressions/rest_parameter_annotation/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:21 - 1:28)
+Message: Parameter name `Bad_Name` must match one of the following formats: camelCase
+   1 | function example(...Bad_Name: number[]) {}
+     |                     ~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:20 - 1:34)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare function f(BadName: string): void;
+     |                    ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:22 - 1:28)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare function f({ BadName }: { BadName: string }): void;
+     |                      ~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:32 - 1:46)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { method(BadName: number): void; }
+     |                                ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:34 - 1:40)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { method({ BadName }: { BadName: number }): void; }
+     |                                  ~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-4 - 1]
+Diagnostic 1: doesNotMatchFormat (1:37 - 1:51)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { constructor(BadName: string); }
+     |                                     ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-5 - 1]
+Diagnostic 1: doesNotMatchFormat (1:39 - 1:45)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | declare class Example { constructor({ BadName }: { BadName: string }); }
+     |                                       ~~~~~~~
+---
+
+[TestNamingConventionBodylessSignatureParameters/invalid-6 - 1]
+Diagnostic 1: doesNotMatchFormat (1:42 - 1:56)
+Message: Parameter name `BadName` must match one of the following formats: snake_case
+   1 | abstract class Example { abstract method(BadName: number): void; }
+     |                                          ~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionComputedAutoAccessors/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:27 - 1:36)
+Message: Auto Accessor name `Bad_Name` must match one of the following formats: PascalCase
+   1 | class Example { accessor ["Bad_Name"] = 1; accessor [Bad_Name] = 1; accessor ["foo" + "bar"] = 1; accessor [true] = 1; accessor [`foo`] = 1; }
+     |                           ~~~~~~~~~~
+
+Diagnostic 2: doesNotMatchFormat (1:54 - 1:61)
+Message: Auto Accessor name `Bad_Name` must match one of the following formats: PascalCase
+   1 | class Example { accessor ["Bad_Name"] = 1; accessor [Bad_Name] = 1; accessor ["foo" + "bar"] = 1; accessor [true] = 1; accessor [`foo`] = 1; }
+     |                                                      ~~~~~~~~
+
+Diagnostic 3: doesNotMatchFormat (1:79 - 1:91)
+Message: Auto Accessor name `undefined` must match one of the following formats: PascalCase
+   1 | class Example { accessor ["Bad_Name"] = 1; accessor [Bad_Name] = 1; accessor ["foo" + "bar"] = 1; accessor [true] = 1; accessor [`foo`] = 1; }
+     |                                                                               ~~~~~~~~~~~~~
+
+Diagnostic 4: doesNotMatchFormat (1:109 - 1:112)
+Message: Auto Accessor name `true` must match one of the following formats: PascalCase
+   1 | class Example { accessor ["Bad_Name"] = 1; accessor [Bad_Name] = 1; accessor ["foo" + "bar"] = 1; accessor [true] = 1; accessor [`foo`] = 1; }
+     |                                                                                                             ~~~~
+
+Diagnostic 5: doesNotMatchFormat (1:130 - 1:134)
+Message: Auto Accessor name `undefined` must match one of the following formats: PascalCase
+   1 | class Example { accessor ["Bad_Name"] = 1; accessor [Bad_Name] = 1; accessor ["foo" + "bar"] = 1; accessor [true] = 1; accessor [`foo`] = 1; }
+     |                                                                                                                                  ~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:56 - 1:62)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: Record<string, number>) { for (const BadName in items) return true; }
+     |                                                        ~~~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:53 - 1:59)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: [number, number][]) { for (const [BadName, OtherName] of items) return true; }
+     |                                                     ~~~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:49 - 1:55)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: Record<string, number>) { let BadName; for (BadName in items) return true; }
+     |                                                 ~~~~~~~
+---
+
+[TestNamingConventionForInOfSingleReturnUsage/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:56 - 1:62)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | function f(items: Record<string, number>) { for (const BadName in items) { return true; } }
+     |                                                        ~~~~~~~
+---
+
+[TestNamingConventionLogicalAssignments/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName &&= 1;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionLogicalAssignments/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName ||= 1;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionLogicalAssignments/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName ??= 1;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | const BadName = BadName;
+     |       ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | const BadName = 1; const obj = { BadName }; void obj;
+     |       ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:17 - 1:23)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | if (true) { var BadName = 1; }
+     |                 ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:10 - 1:16)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | for (let BadName = 0; false;) {}
+     |          ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-4 - 1]
+Diagnostic 1: doesNotMatchFormat (1:20 - 1:26)
+Message: Function name `BadName` must match one of the following formats: snake_case
+   1 | const f = function BadName() {};
+     |                    ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-5 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; !BadName;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-6 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; +BadName;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-7 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; -BadName;
+     |     ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-8 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:11)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName = 0; BadName = BadName + 1; console.log(BadName);
+     |     ~~~~~~~
+---
+
+[TestNamingConventionScopeModifiers/invalid-9 - 1]
+Diagnostic 1: doesNotMatchFormat (1:7 - 1:13)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | const BadName = (((() => BadName()))); console.log(BadName);
+     |       ~~~~~~~
+---
+
+[TestNamingConventionTypePredicateReferences/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
+Message: Type Alias name `BadName` must match one of the following formats: snake_case
+   1 | type BadName = {}; function isBad(ValueName: unknown): ValueName is BadName { return true; }
+     |      ~~~~~~~
+---
+
+[TestNamingConventionTypePredicateReferences/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
+Message: Type Alias name `BadName` must match one of the following formats: snake_case
+   1 | type BadName = {}; function isBad(ValueName: unknown): ValueName is Array<BadName> { return true; }
+     |      ~~~~~~~
+---
+
+[TestNamingConventionTypePredicateReferences/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:6 - 1:12)
+Message: Type Alias name `BadName` must match one of the following formats: snake_case
+   1 | type BadName = {}; function isBad(ValueName: unknown): ValueName is Promise<Array<BadName>> { return true; }
+     |      ~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-0 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown = 0; BadName = consume(() => BadName);
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-1 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown = 0; BadName = (other = () => BadName);
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-2 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown; function f() { BadName = BadName + 1; }
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-3 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown = 0; for (;;) { BadName = () => BadName; break; }
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-4 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown; BadName = () => { function inner() { return BadName; } };
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-5 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown; BadName = class { static { BadName = () => BadName; } };
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-6 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown; namespace N { BadName = () => BadName; }
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-7 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown; class C { value = (BadName = () => BadName, 0); }
+     |     ~~~~~~~~~~~~~~~~
+---
+
+[TestNamingConventionUnusedClosures/invalid-8 - 1]
+Diagnostic 1: doesNotMatchFormat (1:5 - 1:20)
+Message: Variable name `BadName` must match one of the following formats: snake_case
+   1 | let BadName: unknown; BadName = consume(() => { BadName = BadName; });
+     |     ~~~~~~~~~~~~~~~~
+---

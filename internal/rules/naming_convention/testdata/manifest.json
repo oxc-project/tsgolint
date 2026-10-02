@@ -1,0 +1,149 @@
+{
+  "upstream": "afb56de7d0123c79d2a2ffbb28ff7a8f8d951eab",
+  "sources": {
+    "packages/eslint-plugin/src/rules/naming-convention.ts": "b7fed3f6021452bc0092877243bce61c94d4647e9e98a320e575a624f2452c0d",
+    "packages/eslint-plugin/tests/rules/naming-convention/naming-convention.test.ts": "80eb3dc5f1a98a1427a991ff2b8439ca7825b625e8a7894cc9051d94a195bd0e",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/accessor.test.ts": "b3577b69b4e8377d6b0373ff87dc8e3f81a18f3c9765e9a594601228d0ad5542",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/createTestCases.ts": "5e3774fd46b6b5a83cd6016075355c018723fa8c1a8acb28a04e634ddfcfc9cf",
+    "packages/eslint-plugin/src/rules/naming-convention-utils/shared.ts": "931f52f0246f23ce5275d3f8121711062988182327dac4c8167180a4c9a38748",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/autoAccessor.test.ts": "e86ac20e715014301be74f7d46596eeaa43981d17d09f65c0090adc38ba30fbc",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/class.test.ts": "b7ee9f47f1e8b97b603fd9cb1ff2db9c03fc618c189827a568ba2f9d6863cbd3",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/classicAccessor.test.ts": "b14bb6716ce2a42980b7547c47452b6a074063c7727a41835d44e34849f29fe8",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/default.test.ts": "ef5c17a3200091cd3eaa9bbc1893dfd6b1c0444d72d849ab9f078578c8007ebf",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/enum.test.ts": "9784e6cbd50070b92642a6b02d543bd78ffe215ce1ef27f90de2dfd3afd3eb15",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/enumMember.test.ts": "24fb98a80618c002cd4b062d8b7464d0d12f476d3056a0b6de4cf9257461bf70",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/function.test.ts": "19da88b67a0f0b899cfd0c364180438aff9b533af93d6230a0272f90e49a9fab",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/interface.test.ts": "cc81c1615c9c22507850a114641f3ecb546dcb1ad4037b464798d9f93a8ddf9d",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/method.test.ts": "8a73fa5e1a8dd3647d59818017f039d258d54442a1dab214776fca6b21c285e0",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/parameter.test.ts": "348b19bf65bab769fe85eb20d0ac0bfb2fea491dde8522cc788e7e86dcb06fc6",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/parameterProperty.test.ts": "542113bf1a7dad57e812540d47c667c68af1705761e2014b5052d34825a76224",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/property.test.ts": "c3b7cbf3010758233a631183d6a0dcb22e3e00f04cc8d782eaf4adde59d13d4f",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/typeAlias.test.ts": "f393189b6f7ee43b32f6881f567c18e986b7b2e659448a0e90edd17fc7f0ba69",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/typeParameter.test.ts": "40952c0f4b6e7eb75fa6133a38052489698f403a4ac14f1c9e523dea87672a89",
+    "packages/eslint-plugin/tests/rules/naming-convention/cases/variable.test.ts": "66d7ff14583cdf84820876357babce14a7b37c14501c6a8ac9811c6e8831d038"
+  },
+  "suites": [
+    {
+      "file": "naming-convention.test.ts",
+      "fixture": "naming-convention.json",
+      "valid": 41,
+      "invalid": 48,
+      "fingerprintOffset": 0
+    },
+    {
+      "file": "cases/accessor.test.ts",
+      "fixture": "accessor.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 2848
+    },
+    {
+      "file": "cases/autoAccessor.test.ts",
+      "fixture": "autoAccessor.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 27264
+    },
+    {
+      "file": "cases/class.test.ts",
+      "fixture": "class.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 51680
+    },
+    {
+      "file": "cases/classicAccessor.test.ts",
+      "fixture": "classicAccessor.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 76096
+    },
+    {
+      "file": "cases/default.test.ts",
+      "fixture": "default.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 100512
+    },
+    {
+      "file": "cases/enum.test.ts",
+      "fixture": "enum.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 124928
+    },
+    {
+      "file": "cases/enumMember.test.ts",
+      "fixture": "enumMember.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 149344
+    },
+    {
+      "file": "cases/function.test.ts",
+      "fixture": "function.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 173760
+    },
+    {
+      "file": "cases/interface.test.ts",
+      "fixture": "interface.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 198176
+    },
+    {
+      "file": "cases/method.test.ts",
+      "fixture": "method.json",
+      "valid": 1275,
+      "invalid": 1014,
+      "fingerprintOffset": 222592
+    },
+    {
+      "file": "cases/parameter.test.ts",
+      "fixture": "parameter.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 295840
+    },
+    {
+      "file": "cases/parameterProperty.test.ts",
+      "fixture": "parameterProperty.json",
+      "valid": 850,
+      "invalid": 676,
+      "fingerprintOffset": 320256
+    },
+    {
+      "file": "cases/property.test.ts",
+      "fixture": "property.json",
+      "valid": 1275,
+      "invalid": 1014,
+      "fingerprintOffset": 369088
+    },
+    {
+      "file": "cases/typeAlias.test.ts",
+      "fixture": "typeAlias.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 442336
+    },
+    {
+      "file": "cases/typeParameter.test.ts",
+      "fixture": "typeParameter.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 466752
+    },
+    {
+      "file": "cases/variable.test.ts",
+      "fixture": "variable.json",
+      "valid": 425,
+      "invalid": 338,
+      "fingerprintOffset": 491168
+    }
+  ],
+  "valid": 8966,
+  "invalid": 7146,
+  "diagnostics": 44065
+}

@@ -1,0 +1,83 @@
+{
+  "formatTestNames": {
+    "camelCase": {
+      "invalid": [
+        "snake_case",
+        "UPPER_CASE",
+        "UPPER",
+        "StrictPascalCase"
+      ],
+      "valid": [
+        "strictCamelCase",
+        "lower",
+        "camelCaseUNSTRICT"
+      ]
+    },
+    "PascalCase": {
+      "invalid": [
+        "snake_case",
+        "UPPER_CASE",
+        "strictCamelCase"
+      ],
+      "valid": [
+        "StrictPascalCase",
+        "Pascal",
+        "I18n",
+        "PascalCaseUNSTRICT",
+        "UPPER"
+      ]
+    },
+    "snake_case": {
+      "invalid": [
+        "UPPER_CASE",
+        "SNAKE_case_UNSTRICT",
+        "strictCamelCase",
+        "StrictPascalCase"
+      ],
+      "valid": [
+        "snake_case",
+        "lower"
+      ]
+    },
+    "strictCamelCase": {
+      "invalid": [
+        "snake_case",
+        "UPPER_CASE",
+        "UPPER",
+        "StrictPascalCase",
+        "camelCaseUNSTRICT"
+      ],
+      "valid": [
+        "strictCamelCase",
+        "lower"
+      ]
+    },
+    "StrictPascalCase": {
+      "invalid": [
+        "snake_case",
+        "UPPER_CASE",
+        "UPPER",
+        "strictCamelCase",
+        "PascalCaseUNSTRICT"
+      ],
+      "valid": [
+        "StrictPascalCase",
+        "Pascal",
+        "I18n"
+      ]
+    },
+    "UPPER_CASE": {
+      "invalid": [
+        "lower",
+        "snake_case",
+        "SNAKE_case_UNSTRICT",
+        "strictCamelCase",
+        "StrictPascalCase"
+      ],
+      "valid": [
+        "UPPER_CASE",
+        "UPPER"
+      ]
+    }
+  }
+}

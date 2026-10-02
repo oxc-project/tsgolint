@@ -1,0 +1,12 @@
+{
+  "templates": [
+    {
+      "code": [
+        "enum % {}"
+      ],
+      "options": {
+        "selector": "enum"
+      }
+    }
+  ]
+}

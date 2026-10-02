@@ -1,0 +1,13 @@
+{
+  "templates": [
+    {
+      "code": [
+        "type % = {};",
+        "type % = 1;"
+      ],
+      "options": {
+        "selector": "typeAlias"
+      }
+    }
+  ]
+}

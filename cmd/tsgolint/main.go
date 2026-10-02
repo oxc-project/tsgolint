@@ -25,6 +25,7 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/rules/consistent_return"
 	"github.com/typescript-eslint/tsgolint/internal/rules/consistent_type_exports"
 	"github.com/typescript-eslint/tsgolint/internal/rules/dot_notation"
+	"github.com/typescript-eslint/tsgolint/internal/rules/naming_convention"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_array_delete"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_base_to_string"
 	"github.com/typescript-eslint/tsgolint/internal/rules/no_confusing_void_expression"
@@ -165,6 +166,7 @@ var allRules = []rule.Rule{
 	consistent_return.ConsistentReturnRule,
 	consistent_type_exports.ConsistentTypeExportsRule,
 	dot_notation.DotNotationRule,
+	naming_convention.NamingConventionRule,
 	no_array_delete.NoArrayDeleteRule,
 	no_base_to_string.NoBaseToStringRule,
 	no_confusing_void_expression.NoConfusingVoidExpressionRule,
