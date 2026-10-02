@@ -1095,6 +1095,16 @@ const sent: string[] = [];
 declare const pending: Promise<void>;
 const last = (sent.push('c'), pending);
     `},
+		{Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+let assigned: Promise<void>;
+assigned = (sent.push('a'), pending);
+function returned(): Promise<void> {
+  return (sent.push('b'), pending);
+}
+(sent.push('c'), pending);
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -2860,6 +2870,19 @@ declare const pending: Promise<void>;
 					EndLine:   4,
 					EndColumn: 25,
 				},
+			},
+		},
+		{
+			Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+if (sent.push('a'), pending) {}
+!(sent.push('b'), pending);
+(sent.push('c'), pending) && true;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "conditional", Line: 4},
+				{MessageId: "conditional", Line: 5},
+				{MessageId: "conditional", Line: 6},
 			},
 		},
 	})

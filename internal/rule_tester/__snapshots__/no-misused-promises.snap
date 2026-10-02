@@ -2033,3 +2033,39 @@ Message: Expected non-Promise value in a boolean conditional.
      |  ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
    5 |       
 ---
+
+[TestNoMisusedPromisesRule/invalid-99 - 1]
+Diagnostic 1: conditional (4:5 - 4:27)
+Message: Expected non-Promise value in a boolean conditional.
+   3 | declare const pending: Promise<void>;
+   4 | if (sent.push('a'), pending) {}
+     |     ~~~~~~~~~~~~~~~~~~~~~~~
+   5 | !(sent.push('b'), pending);
+  Label: This expression has type `Promise<void>`. (4:5 - 4:27)
+   3 | declare const pending: Promise<void>;
+   4 | if (sent.push('a'), pending) {}
+     |     ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   5 | !(sent.push('b'), pending);
+
+Diagnostic 2: conditional (5:3 - 5:25)
+Message: Expected non-Promise value in a boolean conditional.
+   4 | if (sent.push('a'), pending) {}
+   5 | !(sent.push('b'), pending);
+     |   ~~~~~~~~~~~~~~~~~~~~~~~
+   6 | (sent.push('c'), pending) && true;
+  Label: This expression has type `Promise<void>`. (5:3 - 5:25)
+   4 | if (sent.push('a'), pending) {}
+   5 | !(sent.push('b'), pending);
+     |   ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+   6 | (sent.push('c'), pending) && true;
+
+Diagnostic 3: conditional (6:2 - 6:24)
+Message: Expected non-Promise value in a boolean conditional.
+   5 | !(sent.push('b'), pending);
+   6 | (sent.push('c'), pending) && true;
+     |  ~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This expression has type `Promise<void>`. (6:2 - 6:24)
+   5 | !(sent.push('b'), pending);
+   6 | (sent.push('c'), pending) && true;
+     |  ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+---
