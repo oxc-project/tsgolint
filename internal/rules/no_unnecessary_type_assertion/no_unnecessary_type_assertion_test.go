@@ -1578,6 +1578,63 @@ type Subscription<T> = ((handler: T) => void) & { readonly kind: 'subscription' 
 declare const watcher: Watcher<string>;
 const subscription = watcher as Subscription<string>;
     `},
+		{
+			// https://github.com/oxc-project/tsgolint/issues/1253
+			Code: `
+type Severity = 'minor' | 'major';
+declare function list(severity: Severity | readonly Severity[]): void;
+declare const input: string;
+list(['major', 'loud' as never]);
+list(['major', input as Severity]);
+    `,
+		},
+		{
+			Code: `
+declare function pick(values: string[] | number[]): void;
+declare const value: string | number;
+pick([value as string]);
+    `,
+		},
+		{
+			// https://github.com/oxc-project/tsgolint/issues/1253
+			Code: `
+interface Client {
+  restore(): Promise<void>;
+}
+declare const client: Client | undefined;
+declare const owned: Client | undefined;
+declare const spare: Client | undefined;
+const value = client ?? (owned as Client);
+value.restore();
+const other = client || (owned as Client);
+other.restore();
+const { restore } = client ?? (owned as Client);
+restore();
+const nested = client ?? (owned ?? (spare as Client));
+nested.restore();
+    `,
+		},
+		{
+			// https://github.com/oxc-project/tsgolint/issues/1253
+			Code: `
+interface Request {
+  user?: { id: string; [key: string]: unknown };
+}
+type UserWithRoles = NonNullable<Request['user']> & { roles?: string[] };
+declare function joinRoles(roles: string[]): string;
+function rolesOf(req: Request): string {
+  const user = req.user as UserWithRoles | undefined;
+  return joinRoles(user?.roles ?? []);
+}
+    `,
+		},
+		{
+			Code: `
+declare const meta: {} | undefined;
+const typed = meta as { schema?: object } | undefined;
+typed?.schema;
+    `,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -4612,6 +4669,78 @@ value = 1;`},
 					Column:    21,
 					EndLine:   2,
 					EndColumn: 36,
+				},
+			},
+		},
+		{
+			Code: `
+declare function names(values?: readonly string[]): void;
+declare const name: 'a';
+names([name as string]);
+      `,
+			Output: []string{`
+declare function names(values?: readonly string[]): void;
+declare const name: 'a';
+names([name]);
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      4,
+					Column:    8,
+					EndLine:   4,
+					EndColumn: 22,
+				},
+			},
+		},
+		{
+			Code: `
+interface Client {
+  restore(): Promise<void>;
+}
+declare const client: Client | undefined;
+declare const owned: Client | undefined;
+declare function use(client: Client | undefined): void;
+use(client ?? (owned as Client));
+      `,
+			Output: []string{`
+interface Client {
+  restore(): Promise<void>;
+}
+declare const client: Client | undefined;
+declare const owned: Client | undefined;
+declare function use(client: Client | undefined): void;
+use(client ?? (owned));
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      8,
+					Column:    16,
+					EndLine:   8,
+					EndColumn: 31,
+				},
+			},
+		},
+		{
+			Code: `
+declare const user: { id: string } | undefined;
+const same = user as { id: string } | undefined;
+      `,
+			Output: []string{`
+declare const user: { id: string } | undefined;
+const same = user;
+      `,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    14,
+					EndLine:   3,
+					EndColumn: 48,
 				},
 			},
 		},

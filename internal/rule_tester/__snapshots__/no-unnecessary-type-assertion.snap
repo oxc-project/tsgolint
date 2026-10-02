@@ -1325,6 +1325,33 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
+[TestNoUnnecessaryTypeAssertion/invalid-150 - 1]
+Diagnostic 1: contextuallyUnnecessary (4:8 - 4:21)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   3 | declare const name: 'a';
+   4 | names([name as string]);
+     |        ~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-151 - 1]
+Diagnostic 1: contextuallyUnnecessary (8:16 - 8:30)
+Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
+   7 | declare function use(client: Client | undefined): void;
+   8 | use(client ?? (owned as Client));
+     |                ~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-152 - 1]
+Diagnostic 1: unnecessaryAssertion (3:14 - 3:47)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare const user: { id: string } | undefined;
+   3 | const same = user as { id: string } | undefined;
+     |              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
 [TestNoUnnecessaryTypeAssertionAsyncFunctionFix/invalid-0 - 1]
 Diagnostic 1: unnecessaryAssertion (1:1 - 1:34)
 Message: This assertion is unnecessary since it does not change the type of the expression.
