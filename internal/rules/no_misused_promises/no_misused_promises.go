@@ -901,7 +901,7 @@ var NoMisusedPromisesRule = rule.Rule{
 
 		listeners := rule.RuleListeners{
 			ast.KindBinaryExpression: func(node *ast.Node) {
-				if opts.ChecksConditionals {
+				if opts.ChecksConditionals && ast.IsLogicalOrCoalescingBinaryExpression(node) {
 					checkConditional(node, false)
 				}
 

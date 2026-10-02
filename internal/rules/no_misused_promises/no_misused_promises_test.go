@@ -1081,6 +1081,30 @@ declare const useCallback: <T extends (...args: unknown[]) => unknown>(
 useCallback<ReturnsVoid | ReturnsPromiseVoid>(async () => {});
     `},
 		{Code: `if (process.env.SKIP) { return x; }`},
+		{Code: `
+const sent: string[] = [];
+const send = (message: string): Promise<void> => (sent.push(message), Promise.resolve());
+    `},
+		{Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+const all = ['a', 'b'].map(message => (sent.push(message), pending));
+    `},
+		{Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+const last = (sent.push('c'), pending);
+    `},
+		{Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+let assigned: Promise<void>;
+assigned = (sent.push('a'), pending);
+function returned(): Promise<void> {
+  return (sent.push('b'), pending);
+}
+(sent.push('c'), pending);
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -2814,6 +2838,51 @@ const cb: () => void = [1, 2];
 					MessageId: "voidReturnVariable",
 					Line:      7,
 				},
+			},
+		},
+		{
+			Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+(sent.push('x'), pending) ? 1 : 2;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      4,
+					Column:    2,
+					EndLine:   4,
+					EndColumn: 25,
+				},
+			},
+		},
+		{
+			Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+(sent.push('x'), pending) || false;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      4,
+					Column:    2,
+					EndLine:   4,
+					EndColumn: 25,
+				},
+			},
+		},
+		{
+			Code: `
+const sent: string[] = [];
+declare const pending: Promise<void>;
+if (sent.push('a'), pending) {}
+!(sent.push('b'), pending);
+(sent.push('c'), pending) && true;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "conditional", Line: 4},
+				{MessageId: "conditional", Line: 5},
+				{MessageId: "conditional", Line: 6},
 			},
 		},
 	})
