@@ -5,7 +5,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
-    "dprint": "^0.57.0"
+    "dprint": "^0.58.0"
   },
   "packageManager": "pnpm@11.24.0"
 }
