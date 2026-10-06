@@ -1,4 +1,22 @@
 
+[TestNoDeprecatedDestructuredAllowanceSources/invalid-0 - 1]
+Diagnostic 1: deprecated (2:11 - 2:25)
+Message: `deprecatedValue` is deprecated.
+   1 | async function probe() {
+   2 |   const { deprecatedValue } = await import('./deprecated');
+     |           ~~~~~~~~~~~~~~~
+   3 | }
+---
+
+[TestNoDeprecatedDestructuredAllowanceSources/invalid-1 - 1]
+Diagnostic 1: deprecated (2:11 - 2:25)
+Message: `deprecatedValue` is deprecated.
+   1 | async function probe() {
+   2 |   const { deprecatedValue } = await import('./deprecated');
+     |           ~~~~~~~~~~~~~~~
+   3 | }
+---
+
 [TestNoDeprecatedRule/invalid-0 - 1]
 Diagnostic 1: deprecated (11:22 - 11:22)
 Message: `b` is deprecated.
@@ -1329,4 +1347,20 @@ Message: `deprecatedVariable` is deprecated.
    1 | import { deprecatedVariable } from './deprecated';
    2 | deprecatedVariable;
      | ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoDeprecatedShorthandAllowanceSources/invalid-0 - 1]
+Diagnostic 1: deprecated (2:8 - 2:22)
+Message: `deprecatedValue` is deprecated.
+   1 | import { deprecatedValue } from './deprecated';
+   2 | void { deprecatedValue };
+     |        ~~~~~~~~~~~~~~~
+---
+
+[TestNoDeprecatedShorthandAllowanceSources/invalid-1 - 1]
+Diagnostic 1: deprecated (2:8 - 2:22)
+Message: `deprecatedValue` is deprecated.
+   1 | import { deprecatedValue } from './deprecated';
+   2 | void { deprecatedValue };
+     |        ~~~~~~~~~~~~~~~
 ---

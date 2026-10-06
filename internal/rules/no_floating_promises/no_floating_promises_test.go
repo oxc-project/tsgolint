@@ -1,6 +1,7 @@
 package no_floating_promises
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
@@ -5733,4 +5734,81 @@ await Promise.reject().catch(undefined).finally(() => {});
 			}},
 		},
 	})
+}
+
+func TestNoFloatingPromisesSafeCallSources(t *testing.T) {
+	t.Parallel()
+	const code = `import { trusted as frameworkTrusted } from "./trusted.js";
+frameworkTrusted();
+function trusted(): Promise<void> { return Promise.resolve(); }
+trusted();
+Promise.resolve();`
+	for _, test := range []struct {
+		name  string
+		allow string
+		lines []int
+	}{
+		{name: "baseline", allow: `[]`, lines: []int{2, 4, 5}},
+		{name: "exact file", allow: `[{"from":"file","path":"./trusted.d.ts","name":"trusted"}]`, lines: []int{4, 5}},
+		{name: "import alias exact file", allow: `[{"from":"file","path":"./trusted.d.ts","name":"frameworkTrusted"}]`, lines: []int{4, 5}},
+		{name: "import alias missing file", allow: `[{"from":"file","path":"./missing.d.ts","name":"frameworkTrusted"}]`, lines: []int{2, 4, 5}},
+		{name: "missing file", allow: `[{"from":"file","path":"./missing.d.ts","name":"trusted"}]`, lines: []int{2, 4, 5}},
+		{name: "library", allow: `[{"from":"lib","name":"trusted"}]`, lines: []int{2, 4, 5}},
+		{name: "name only", allow: `["trusted"]`, lines: []int{5}},
+		{name: "file without path", allow: `[{"from":"file","name":"trusted"}]`, lines: []int{5}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			var errors []rule_tester.InvalidTestCaseError
+			for _, line := range test.lines {
+				lines := strings.Split(code, "\n")
+				lines[line-1] = "await " + lines[line-1]
+				errors = append(errors, rule_tester.InvalidTestCaseError{
+					MessageId: "floating",
+					Line:      line,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "floatingFixAwait",
+						Output:    strings.Join(lines, "\n"),
+					}},
+				})
+			}
+			rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoFloatingPromisesRule, nil, []rule_tester.InvalidTestCase{{
+				Code:    code,
+				Files:   map[string]string{"trusted.d.ts": `export declare function trusted(): Promise<void>;`},
+				Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid":false,"allowForKnownSafeCalls":` + test.allow + `}`),
+				Errors:  errors,
+			}})
+		})
+	}
+}
+
+func TestNoFloatingPromisesDestructuredSafeCalls(t *testing.T) {
+	t.Parallel()
+	const code = `async function probe() {
+  const { trusted } = await import('./destructured-safe-call');
+  trusted();
+}`
+	files := map[string]string{
+		"destructured-safe-call.ts": "export const trusted: () => Promise<void> = () => Promise.resolve();",
+	}
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoFloatingPromisesRule, []rule_tester.ValidTestCase{{
+		Code:    code,
+		Files:   files,
+		Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid":false,"allowForKnownSafeCalls":[{"from":"file","path":"./destructured-safe-call.ts","name":"trusted"}]}`),
+	}}, []rule_tester.InvalidTestCase{{
+		Code:    code,
+		Files:   files,
+		Options: rule_tester.OptionsFromJSON[NoFloatingPromisesOptions](`{"ignoreVoid":false,"allowForKnownSafeCalls":[{"from":"file","path":"./file.ts","name":"trusted"}]}`),
+		Errors: []rule_tester.InvalidTestCaseError{{
+			MessageId: "floating",
+			Line:      3,
+			Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+				MessageId: "floatingFixAwait",
+				Output: `async function probe() {
+  const { trusted } = await import('./destructured-safe-call');
+  await trusted();
+}`,
+			}},
+		}},
+	}})
 }

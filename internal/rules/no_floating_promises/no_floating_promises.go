@@ -219,7 +219,7 @@ var NoFloatingPromisesRule = rule.Rule{
 				callExpression.Expression,
 				opts.AllowForKnownSafeCalls,
 				ctx.Program,
-				t,
+				ctx.TypeChecker,
 			) {
 				return true
 			}

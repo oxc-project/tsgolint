@@ -414,7 +414,7 @@ func typeMatchesSpecifier(
 // SymbolMatchesSpecifierNameAndSource reports whether a symbol with a known
 // static name is allowed by a type-or-value specifier.
 //
-// This is used when the AST node being checked is not itself a value reference
+// This also supports AST nodes that are not themselves value references
 // with declarations that ValueMatchesSomeSpecifier can inspect. For example,
 // contextual object literal properties such as `{ statusCode: 500 }` are checked
 // by resolving the `statusCode` property symbol from the target object type, then
@@ -563,7 +563,7 @@ func valueMatchesSpecifier(
 	node *ast.Node,
 	specifier TypeOrValueSpecifier,
 	program *compiler.Program,
-	t *checker.Type,
+	typeChecker *checker.Checker,
 ) bool {
 	nodeName := getStaticName(node)
 	if nodeName == "" {
@@ -575,53 +575,42 @@ func valueMatchesSpecifier(
 		return false
 	}
 
-	// Get the source file of the node
-	sourceFile := ast.GetSourceFileOfNode(node)
-	if sourceFile == nil {
-		return false
+	if specifier.From == TypeOrValueSpecifierFromName {
+		return true
 	}
-
-	if specifier.From == TypeOrValueSpecifierFromPackage {
-		symbol := checker.Type_symbol(t)
-		if symbol != nil {
-			declarationFiles := Map(symbol.Declarations, func(d *ast.Node) *ast.SourceFile {
-				return ast.GetSourceFileOfNode(d)
-			})
-
-			return typeDeclaredInPackageDeclarationFile(
-				specifier.Package,
-				symbol.Declarations,
-				declarationFiles,
-				program,
-			)
-		}
-
-		// Also check if the type's declarations are from a declare module
-		if t != nil {
-			symbol := checker.Type_symbol(t)
-			if symbol != nil && len(symbol.Declarations) > 0 {
-				return typeDeclaredInDeclareModule(specifier.Package, symbol.Declarations)
+	symbol := typeChecker.GetSymbolAtLocation(node)
+	if symbol != nil && symbol.ValueDeclaration != nil && ast.IsShorthandPropertyAssignment(symbol.ValueDeclaration) {
+		symbol = checker.Checker_GetShorthandAssignmentValueSymbol(typeChecker, symbol.ValueDeclaration)
+	}
+	if symbol != nil && symbol.ValueDeclaration != nil && ast.IsBindingElement(symbol.ValueDeclaration) {
+		declaration := symbol.ValueDeclaration
+		if ast.IsObjectBindingPattern(declaration.Parent) && declaration.AsBindingElement().DotDotDotToken == nil {
+			propertyName := getStaticName(declaration.PropertyNameOrName())
+			if propertyName == "" {
+				return false
 			}
+			sourceType := typeChecker.GetTypeAtLocation(declaration.Parent)
+			symbol = checker.Checker_getPropertyOfType(typeChecker, sourceType, propertyName)
 		}
-
-		return false
-
 	}
-	return true
+	if symbol != nil && symbol.Flags&ast.SymbolFlagsAlias != 0 {
+		symbol = typeChecker.GetAliasedSymbol(symbol)
+	}
+	return SymbolMatchesSpecifierNameAndSource(symbol, nodeName, specifier, program)
 }
 
 func ValueMatchesSomeSpecifier(
 	node *ast.Node,
 	specifiers []TypeOrValueSpecifier,
 	program *compiler.Program,
-	ty *checker.Type,
+	typeChecker *checker.Checker,
 ) bool {
 	for _, s := range specifiers {
 		if valueMatchesSpecifier(
 			node,
 			s,
 			program,
-			ty,
+			typeChecker,
 		) {
 			return true
 		}

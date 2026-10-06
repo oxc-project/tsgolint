@@ -709,7 +709,7 @@ var NoDeprecatedRule = rule.Rule{
 				// TODO: if type OR value is allowed, skip
 
 				if utils.TypeMatchesSomeSpecifier(ty, opts.Allow, ctx.Program) ||
-					utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ty) {
+					utils.ValueMatchesSomeSpecifier(node, opts.Allow, ctx.Program, ctx.TypeChecker) {
 					return
 				}
 			}

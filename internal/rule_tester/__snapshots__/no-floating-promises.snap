@@ -1,4 +1,20 @@
 
+[TestNoFloatingPromisesDestructuredSafeCalls/invalid-0 - 1]
+Diagnostic 1: floating (3:3 - 3:11)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   2 |   const { trusted } = await import('./destructured-safe-call');
+   3 |   trusted();
+     |   ~~~~~~~~~
+   4 | }
+  Label: This unhandled promise-like value has type `Promise<void>`. (3:3 - 3:11)
+   2 |   const { trusted } = await import('./destructured-safe-call');
+   3 |   trusted();
+     |   ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   4 | }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
 [TestNoFloatingPromisesRule/invalid-0 - 1]
 Diagnostic 1: floatingVoid (3:3 - 3:26)
 Message: Promises must be awaited, add void operator to ignore.
@@ -2628,4 +2644,256 @@ Help: The promise must end with a call to .catch, or end with a call to .then wi
    3 |       
   Suggestion 1: [floatingFixVoid] Add void operator to ignore.
   Suggestion 2: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/baseline/invalid-0 - 1]
+Diagnostic 1: floating (2:1 - 2:18)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ~~~~~~~~~~~~~~~~~~
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Label: This unhandled promise-like value has type `Promise<void>`. (2:1 - 2:18)
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ^^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floating (4:1 - 4:9)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ~~~~~~~~~
+   5 | Promise.resolve();
+  Label: This unhandled promise-like value has type `Promise<void>`. (4:1 - 4:9)
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   5 | Promise.resolve();
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/exact_file/invalid-0 - 1]
+Diagnostic 1: floating (4:1 - 4:9)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ~~~~~~~~~
+   5 | Promise.resolve();
+  Label: This unhandled promise-like value has type `Promise<void>`. (4:1 - 4:9)
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   5 | Promise.resolve();
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/file_without_path/invalid-0 - 1]
+Diagnostic 1: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/import_alias_exact_file/invalid-0 - 1]
+Diagnostic 1: floating (4:1 - 4:9)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ~~~~~~~~~
+   5 | Promise.resolve();
+  Label: This unhandled promise-like value has type `Promise<void>`. (4:1 - 4:9)
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   5 | Promise.resolve();
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/import_alias_missing_file/invalid-0 - 1]
+Diagnostic 1: floating (2:1 - 2:18)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ~~~~~~~~~~~~~~~~~~
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Label: This unhandled promise-like value has type `Promise<void>`. (2:1 - 2:18)
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ^^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floating (4:1 - 4:9)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ~~~~~~~~~
+   5 | Promise.resolve();
+  Label: This unhandled promise-like value has type `Promise<void>`. (4:1 - 4:9)
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   5 | Promise.resolve();
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/library/invalid-0 - 1]
+Diagnostic 1: floating (2:1 - 2:18)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ~~~~~~~~~~~~~~~~~~
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Label: This unhandled promise-like value has type `Promise<void>`. (2:1 - 2:18)
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ^^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floating (4:1 - 4:9)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ~~~~~~~~~
+   5 | Promise.resolve();
+  Label: This unhandled promise-like value has type `Promise<void>`. (4:1 - 4:9)
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   5 | Promise.resolve();
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/missing_file/invalid-0 - 1]
+Diagnostic 1: floating (2:1 - 2:18)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ~~~~~~~~~~~~~~~~~~
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Label: This unhandled promise-like value has type `Promise<void>`. (2:1 - 2:18)
+   1 | import { trusted as frameworkTrusted } from "./trusted.js";
+   2 | frameworkTrusted();
+     | ^^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 2: floating (4:1 - 4:9)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ~~~~~~~~~
+   5 | Promise.resolve();
+  Label: This unhandled promise-like value has type `Promise<void>`. (4:1 - 4:9)
+   3 | function trusted(): Promise<void> { return Promise.resolve(); }
+   4 | trusted();
+     | ^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+   5 | Promise.resolve();
+  Suggestion 1: [floatingFixAwait] Add await operator.
+
+Diagnostic 3: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
+---
+
+[TestNoFloatingPromisesSafeCallSources/name_only/invalid-0 - 1]
+Diagnostic 1: floating (5:1 - 5:17)
+Message: Promises must be awaited, add await operator.
+Help: The promise must end with a call to .catch, or end with a call to .then with a rejection handler.
+   4 | trusted();
+   5 | Promise.resolve();
+     | ~~~~~~~~~~~~~~~~~
+  Label: This unhandled promise-like value has type `Promise<void>`. (5:1 - 5:17)
+   4 | trusted();
+   5 | Promise.resolve();
+     | ^^^^^^^^^^^^^^^^^ This unhandled promise-like value has type `Promise<void>`.
+  Suggestion 1: [floatingFixAwait] Add await operator.
 ---
