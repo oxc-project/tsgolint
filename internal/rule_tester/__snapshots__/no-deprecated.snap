@@ -81,8 +81,8 @@ Message: `a` is deprecated.
 ---
 
 [TestNoDeprecatedRule/invalid-7 - 1]
-Diagnostic 1: deprecated (3:19 - 3:19)
-Message: `a` is deprecated.
+Diagnostic 1: deprecatedWithReason (3:19 - 3:19)
+Message: `a` is deprecated. Reason.
    2 |         /** @deprecated Reason. */ const a = { b: 1 };
    3 |         const c = a;
      |                   ~
@@ -1347,6 +1347,87 @@ Message: `deprecatedVariable` is deprecated.
    1 | import { deprecatedVariable } from './deprecated';
    2 | deprecatedVariable;
      | ~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-152 - 1]
+Diagnostic 1: deprecatedWithReason (7:1 - 7:8)
+Message: `oldConst` is deprecated. Use replacementConst instead.
+   6 | var oldVar = 1;
+   7 | oldConst;
+     | ~~~~~~~~
+   8 | oldLet;
+
+Diagnostic 2: deprecatedWithReason (8:1 - 8:6)
+Message: `oldLet` is deprecated. Use replacementLet instead.
+   7 | oldConst;
+   8 | oldLet;
+     | ~~~~~~
+   9 | oldVar;
+
+Diagnostic 3: deprecatedWithReason (9:1 - 9:6)
+Message: `oldVar` is deprecated. Use replacementVar instead.
+   8 | oldLet;
+   9 | oldVar;
+     | ~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-153 - 1]
+Diagnostic 1: deprecatedWithReason (2:1 - 2:6)
+Message: `constA` is deprecated. reason for constA
+   1 | import { constA, constMultiline, constTyped, letA, constReexported, constInline } from './variable-reasons';
+   2 | constA;
+     | ~~~~~~
+   3 | constMultiline();
+
+Diagnostic 2: deprecatedWithReason (3:1 - 3:14)
+Message: `constMultiline` is deprecated. reason for constMultiline
+   2 | constA;
+   3 | constMultiline();
+     | ~~~~~~~~~~~~~~
+   4 | constTyped;
+
+Diagnostic 3: deprecatedWithReason (4:1 - 4:10)
+Message: `constTyped` is deprecated. reason for constTyped
+   3 | constMultiline();
+   4 | constTyped;
+     | ~~~~~~~~~~
+   5 | letA;
+
+Diagnostic 4: deprecatedWithReason (5:1 - 5:4)
+Message: `letA` is deprecated. reason for letA
+   4 | constTyped;
+   5 | letA;
+     | ~~~~
+   6 | constReexported;
+
+Diagnostic 5: deprecatedWithReason (6:1 - 6:15)
+Message: `constReexported` is deprecated. reason for constReexported
+   5 | letA;
+   6 | constReexported;
+     | ~~~~~~~~~~~~~~~
+   7 | constInline;
+
+Diagnostic 6: deprecatedWithReason (7:1 - 7:11)
+Message: `constInline` is deprecated. reason for constInline
+   6 | constReexported;
+   7 | constInline;
+     | ~~~~~~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-154 - 1]
+Diagnostic 1: deprecatedWithReason (3:1 - 3:8)
+Message: `oldValue` is deprecated. Inline reason.
+   2 | const /** @deprecated Inline reason. */ oldValue = 1;
+   3 | oldValue;
+     | ~~~~~~~~
+---
+
+[TestNoDeprecatedRule/invalid-155 - 1]
+Diagnostic 1: deprecated (3:1 - 3:8)
+Message: `oldValue` is deprecated.
+   2 | const /** @deprecated */ oldValue = 1;
+   3 | oldValue;
+     | ~~~~~~~~
 ---
 
 [TestNoDeprecatedShorthandAllowanceSources/invalid-0 - 1]

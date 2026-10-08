@@ -99,6 +99,11 @@ var NoDeprecatedRule = rule.Rule{
 
 		// Helper to extract deprecation reason from a JSDoc deprecated tag
 		getJsDocDeprecationFromNode := func(node *ast.Node) string {
+			// Match IsDeprecatedDeclaration's lookup: variable declarations can
+			// inherit their @deprecated tag from the containing statement.
+			for node != nil && node.Flags&ast.NodeFlagsPossiblyContainsDeprecatedTag == 0 {
+				node = node.Parent
+			}
 			if node == nil {
 				return ""
 			}

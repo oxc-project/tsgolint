@@ -734,8 +734,7 @@ void { normalVariable };`,
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
-					// TODO: this should be `deprecatedWithReason`
-					MessageId: "deprecated",
+					MessageId: "deprecatedWithReason",
 				},
 			},
 		},
@@ -2899,6 +2898,67 @@ deprecatedVariable;`,
 					MessageId: "deprecated",
 				},
 			},
+		},
+		{
+			Code: `/** @deprecated Use replacementConst instead. */
+const oldConst = 1;
+/** @deprecated Use replacementLet instead. */
+let oldLet: number = 1;
+/** @deprecated Use replacementVar instead. */
+var oldVar = 1;
+oldConst;
+oldLet;
+oldVar;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 7},
+				{MessageId: "deprecatedWithReason", Line: 8},
+				{MessageId: "deprecatedWithReason", Line: 9},
+			},
+		},
+		{
+			Code: `import { constA, constMultiline, constTyped, letA, constReexported, constInline } from './variable-reasons';
+constA;
+constMultiline();
+constTyped;
+letA;
+constReexported;
+constInline;`,
+			Files: map[string]string{
+				"variable-reasons.ts": `/** @deprecated reason for constA */
+export const constA = 1;
+/**
+ * @deprecated reason for constMultiline
+ */
+export const constMultiline = () => 1;
+/** @deprecated reason for constTyped */
+export const constTyped: number = 1;
+/** @deprecated reason for letA */
+export let letA = 1;
+/** @deprecated reason for constReexported */
+const constReexported = 1;
+export { constReexported };
+export const /** @deprecated reason for constInline */ constInline = 1;`,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecatedWithReason", Line: 2},
+				{MessageId: "deprecatedWithReason", Line: 3},
+				{MessageId: "deprecatedWithReason", Line: 4},
+				{MessageId: "deprecatedWithReason", Line: 5},
+				{MessageId: "deprecatedWithReason", Line: 6},
+				{MessageId: "deprecatedWithReason", Line: 7},
+			},
+		},
+		{
+			Code: `/** @deprecated Statement reason. */
+const /** @deprecated Inline reason. */ oldValue = 1;
+oldValue;`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "deprecatedWithReason", Line: 3}},
+		},
+		{
+			Code: `/** @deprecated Statement reason. */
+const /** @deprecated */ oldValue = 1;
+oldValue;`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "deprecated", Line: 3}},
 		},
 	})
 }
