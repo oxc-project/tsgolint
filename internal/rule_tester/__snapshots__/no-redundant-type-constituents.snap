@@ -353,26 +353,26 @@ Message: bigint is overridden by the -1n in this intersection type.
 ---
 
 [TestNoRedundantTypeConstituentsRule/invalid-47 - 1]
-Diagnostic 1: primitiveOverridden (3:18 - 3:18)
-Message: "\"a\"" | "\"b\"" is overridden by the string in this intersection type.
+Diagnostic 1: primitiveOverridden (3:22 - 3:27)
+Message: string is overridden by the "\"a\"" | "\"b\"" in this intersection type.
    2 |         type T = 'a' | 'b';
    3 |         type U = T & string;
-     |                  ~
+     |                      ~~~~~~
    4 |       
 ---
 
 [TestNoRedundantTypeConstituentsRule/invalid-48 - 1]
-Diagnostic 1: primitiveOverridden (4:18 - 4:18)
-Message: 1 | 2 is overridden by the number in this intersection type.
+Diagnostic 1: primitiveOverridden (4:35 - 4:40)
+Message: number is overridden by the 1 | 2 in this intersection type.
    3 |         type T = 'a' | 'b';
    4 |         type U = S & T & string & number;
-     |                  ~
+     |                                   ~~~~~~
    5 |       
 
-Diagnostic 2: primitiveOverridden (4:22 - 4:22)
-Message: 1 | 2 is overridden by the string in this intersection type.
+Diagnostic 2: primitiveOverridden (4:26 - 4:31)
+Message: string is overridden by the "\"a\"" | "\"b\"" in this intersection type.
    3 |         type T = 'a' | 'b';
    4 |         type U = S & T & string & number;
-     |                      ~
+     |                          ~~~~~~
    5 |       
 ---
