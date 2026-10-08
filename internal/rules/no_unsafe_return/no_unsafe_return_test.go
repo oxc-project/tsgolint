@@ -207,6 +207,26 @@ function f<T extends Set<any>>(x: T): Set<string> {
   return x;
 }
     `},
+		{
+			FileName: "repro.js",
+			TSConfig: "tsconfig.checkJs.json",
+			Code: `
+/** @callback Fn */
+
+/** @type {Fn} */
+const f = function () {
+  return 1;
+};`,
+		},
+		{
+			FileName: "repro.js",
+			TSConfig: "tsconfig.checkJs.json",
+			Code: `
+/** @callback Fn */
+
+/** @type {Fn} */
+const f = () => 1;`,
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -684,6 +704,54 @@ const getOutput = <S extends Schema>(schema: S): Infer<S> =>
   schema._output;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unsafeReturn"},
+			},
+		},
+		{
+			FileName: "repro.js",
+			TSConfig: "tsconfig.checkJs.json",
+			Code: `
+/**
+ * @callback Fn
+ * @param {*} value
+ */
+
+/** @type {Fn} */
+const f = function (value) {
+  return value;
+};`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unsafeReturn", Line: 9, Column: 3},
+			},
+		},
+		{
+			FileName: "repro.js",
+			TSConfig: "tsconfig.checkJs.json",
+			Code: `
+/**
+ * @callback Fn
+ * @param {*} value
+ */
+
+/** @type {Fn} */
+const f = value => value;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unsafeReturn", Line: 8, Column: 17},
+			},
+		},
+		{
+			FileName: "repro.js",
+			TSConfig: "tsconfig.checkJs.json",
+			Code: `
+/**
+ * @callback Fn
+ * @param {*} value
+ * @returns {number}
+ */
+
+/** @type {Fn} */
+const f = value => value;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "unsafeReturn", Line: 9, Column: 17},
 			},
 		},
 	})

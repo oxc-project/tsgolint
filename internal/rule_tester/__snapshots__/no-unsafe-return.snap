@@ -583,3 +583,46 @@ Message: Unsafe return of a value of type `any`.
      |                                                  ^^^^^^^^ Function expects return type `Infer<S>`.
    7 |   schema._output;
 ---
+
+[TestNoUnsafeReturnRule/invalid-34 - 1]
+Diagnostic 1: unsafeReturn (9:3 - 9:8)
+Message: Unsafe return of a value of type `any`.
+   8 | const f = function (value) {
+   9 |   return value;
+     |   ~~~~~~
+  10 | };
+  Label: Returned expression has type `any`. (9:10 - 9:14)
+   8 | const f = function (value) {
+   9 |   return value;
+     |          ^^^^^ Returned expression has type `any`.
+  10 | };
+---
+
+[TestNoUnsafeReturnRule/invalid-35 - 1]
+Diagnostic 1: unsafeReturn (8:17 - 8:18)
+Message: Unsafe return of a value of type `any`.
+   7 | /** @type {Fn} */
+   8 | const f = value => value;
+     |                 ~~
+  Label: Returned expression has type `any`. (8:20 - 8:24)
+   7 | /** @type {Fn} */
+   8 | const f = value => value;
+     |                    ^^^^^ Returned expression has type `any`.
+---
+
+[TestNoUnsafeReturnRule/invalid-36 - 1]
+Diagnostic 1: unsafeReturn (9:17 - 9:18)
+Message: Unsafe return of a value of type `any`.
+   8 | /** @type {Fn} */
+   9 | const f = value => value;
+     |                 ~~
+  Label: Returned expression has type `any`. (9:20 - 9:24)
+   8 | /** @type {Fn} */
+   9 | const f = value => value;
+     |                    ^^^^^ Returned expression has type `any`.
+  Label: Function expects return type `number`. (5:14 - 5:19)
+   4 |  * @param {*} value
+   5 |  * @returns {number}
+     |              ^^^^^^ Function expects return type `number`.
+   6 |  */
+---

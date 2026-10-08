@@ -118,10 +118,14 @@ var NoUnsafeReturnRule = rule.Rule{
 			} else if usesContextualType {
 				for _, signature := range callSignatures {
 					declaration := checker.Signature_declaration(signature)
-					if declaration == nil || declaration.Type() == nil || ast.GetSourceFileOfNode(declaration) != ctx.SourceFile {
+					if declaration == nil || ast.GetSourceFileOfNode(declaration) != ctx.SourceFile {
 						continue
 					}
-					r := utils.TrimNodeTextRange(ctx.SourceFile, declaration.Type())
+					returnTypeNode := declaration.Type()
+					if returnTypeNode == nil || ast.NodeIsSynthesized(returnTypeNode) {
+						continue
+					}
+					r := utils.TrimNodeTextRange(ctx.SourceFile, returnTypeNode)
 					expectedRange = &r
 					expectedType = renderReturnType(ctx.TypeChecker, checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature))
 					break
