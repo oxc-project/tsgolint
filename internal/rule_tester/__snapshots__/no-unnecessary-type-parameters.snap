@@ -1085,3 +1085,36 @@ Message: Type parameter T is used only once in the function signature.
      |                                                      ^ This is the only usage of type parameter T in the signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
+
+[TestNoUnnecessaryTypeParameters/invalid-76 - 1]
+Diagnostic 1: sole (1:22 - 1:46)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends string | number>(arg: [T?]): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:55 - 1:55)
+   1 | declare function foo<T extends string | number>(arg: [T?]): void;
+     |                                                       ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-77 - 1]
+Diagnostic 1: sole (1:22 - 1:41)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends () => void>(arg: [T?]): void;
+     |                      ~~~~~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:50 - 1:50)
+   1 | declare function foo<T extends () => void>(arg: [T?]): void;
+     |                                                  ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-78 - 1]
+Diagnostic 1: sole (1:22 - 1:37)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function foo<T extends string>(arg: [T?]): void;
+     |                      ~~~~~~~~~~~~~~~~
+  Label: This is the only usage of type parameter T in the signature. (1:46 - 1:46)
+   1 | declare function foo<T extends string>(arg: [T?]): void;
+     |                                              ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
