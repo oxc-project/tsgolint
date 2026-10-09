@@ -72,7 +72,7 @@ func isWeakPrecedenceTypeParent(reference *ast.Node) bool {
 
 	switch grandparent.Kind {
 	case ast.KindArrayType, ast.KindIndexedAccessType, ast.KindIntersectionType, ast.KindUnionType,
-		ast.KindConditionalType, ast.KindTypeOperator:
+		ast.KindConditionalType, ast.KindTypeOperator, ast.KindOptionalType:
 		return true
 	default:
 		return false
