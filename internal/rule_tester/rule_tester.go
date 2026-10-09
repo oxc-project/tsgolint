@@ -37,6 +37,7 @@ type ValidTestCase struct {
 
 type InvalidTestCaseError struct {
 	MessageId   string
+	Message     string
 	Line        int
 	Column      int
 	EndLine     int
@@ -50,16 +51,17 @@ type InvalidTestCaseSuggestion struct {
 }
 
 type InvalidTestCase struct {
-	Code     string
-	Only     bool
-	Skip     bool
-	FileName string
-	Output   []string
-	Errors   []InvalidTestCaseError
-	TSConfig string
-	Options  any
-	Tsx      bool
-	Files    map[string]string
+	Code         string
+	Only         bool
+	Skip         bool
+	SkipSnapshot bool // Use explicit diagnostic assertions without a rendered snapshot.
+	FileName     string
+	Output       []string
+	Errors       []InvalidTestCaseError
+	TSConfig     string
+	Options      any
+	Tsx          bool
+	Files        map[string]string
 }
 
 func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Rule, validTestCases []ValidTestCase, invalidTestCases []InvalidTestCase) {
@@ -196,8 +198,6 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 				outputs = append(outputs, fixedCode)
 			}
 
-			newSnapshotter(r.Name).MatchSnapshot(t, formatDiagnosticsSnapshot(testCase.Code, initialDiagnostics))
-
 			if len(testCase.Output) == len(outputs) {
 				for i, expected := range testCase.Output {
 					assert.Equal(t, expected, outputs[i], "Expected code after fix")
@@ -215,6 +215,9 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 
 				if expected.MessageId != diagnostic.Message.Id {
 					t.Errorf("Invalid message id %v. Expected %v", diagnostic.Message.Id, expected.MessageId)
+				}
+				if expected.Message != "" && expected.Message != diagnostic.Message.Description {
+					t.Errorf("Invalid message description %q. Expected %q", diagnostic.Message.Description, expected.Message)
 				}
 
 				lineIndex, columnIndex := scanner.GetECMALineAndUTF16CharacterOfPosition(diagnostic.SourceFile, diagnostic.Range.Pos())
@@ -253,6 +256,9 @@ func RunRuleTester(rootDir string, tsconfigPath string, t *testing.T, r *rule.Ru
 						}
 					}
 				}
+			}
+			if !testCase.SkipSnapshot && !t.Failed() {
+				newSnapshotter(r.Name).MatchSnapshot(t, formatDiagnosticsSnapshot(testCase.Code, initialDiagnostics))
 			}
 		})
 	}

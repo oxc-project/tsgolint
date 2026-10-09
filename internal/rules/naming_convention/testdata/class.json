@@ -1,0 +1,14 @@
+{
+  "templates": [
+    {
+      "code": [
+        "class % {}",
+        "abstract class % {}",
+        "const ignored = class % {}"
+      ],
+      "options": {
+        "selector": "class"
+      }
+    }
+  ]
+}

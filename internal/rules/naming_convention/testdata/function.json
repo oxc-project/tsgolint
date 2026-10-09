@@ -1,0 +1,14 @@
+{
+  "templates": [
+    {
+      "code": [
+        "function % () {}",
+        "(function % () {});",
+        "declare function % ();"
+      ],
+      "options": {
+        "selector": "function"
+      }
+    }
+  ]
+}

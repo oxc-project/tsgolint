@@ -1,0 +1,12 @@
+{
+  "templates": [
+    {
+      "code": [
+        "interface % {}"
+      ],
+      "options": {
+        "selector": "interface"
+      }
+    }
+  ]
+}
