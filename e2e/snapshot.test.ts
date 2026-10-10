@@ -266,6 +266,34 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(fileSystemRulesList.sort()).toEqual([...ALL_RULES].sort());
   });
 
+  it('should use a single range on the line targeted by existing disable comments', async () => {
+    const cases = [
+      { rule: 'no-unnecessary-condition', expression: 'names.filter(' },
+      { rule: 'no-unsafe-assignment', expression: '{\n  firstName,' },
+      { rule: 'no-unsafe-return', expression: 'parseUntrustedPayload(rawText).displayName' },
+      { rule: 'no-unsafe-type-assertion', expression: '{\n  id: input.id,' },
+    ] as const;
+    const files = cases.map(({ rule }) => resolveTestFilePath(`issue-oxc-27534/${rule}.ts`));
+    const diagnostics = parseHeadlessOutput(
+      execFileSync(TSGOLINT_BIN, ['headless'], {
+        input: generateConfig(files, cases.map(({ rule }) => rule)),
+      }),
+    );
+
+    expect(diagnostics).toHaveLength(cases.length);
+    for (const [index, { rule, expression }] of cases.entries()) {
+      const code = await fs.readFile(files[index], 'utf-8');
+      const diagnostic = diagnostics.find((d) => d.kind === DiagnosticKind.Rule && d.rule === rule);
+      expect(diagnostic).toBeDefined();
+      expect(diagnostic!.range.pos).toBe(code.indexOf(expression));
+      expect(diagnostic).not.toHaveProperty('labeled_ranges');
+      expect(diagnostic!.message.help).toBeTruthy();
+      const line = code.slice(0, diagnostic!.range.pos).split('\n').length;
+      expect(code.split('\n')[line - 2]).toContain(`eslint-disable-next-line @typescript-eslint/${rule}`);
+    }
+    expect(sortDiagnostics(diagnostics)).toMatchSnapshot();
+  });
+
   it('should generate consistent diagnostics snapshot', async () => {
     const testFiles = await getTestFiles('basic');
     expect(testFiles.length).toBeGreaterThan(0);

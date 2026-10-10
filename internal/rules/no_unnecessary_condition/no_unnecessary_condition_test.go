@@ -3,40 +3,9 @@ package no_unnecessary_condition
 import (
 	"testing"
 
-	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
-
-func TestDiagnosticRangesAndLabels(t *testing.T) {
-	t.Parallel()
-
-	primaryRange := core.NewTextRange(10, 3)
-	leftRange := core.NewTextRange(2, 1)
-	rightRange := core.NewTextRange(16, 9)
-	diagnostic := buildNoOverlapDiagnostic(primaryRange, "string", leftRange, "undefined", rightRange)
-
-	if diagnostic.Range.Pos() != primaryRange.Pos() || diagnostic.Range.End() != primaryRange.End() {
-		t.Fatalf("comparison primary range = %v, want %v", diagnostic.Range, primaryRange)
-	}
-	if len(diagnostic.LabeledRanges) != 2 {
-		t.Fatalf("comparison labels = %d, want 2", len(diagnostic.LabeledRanges))
-	}
-	if diagnostic.LabeledRanges[0].Label != "Type: string" || diagnostic.LabeledRanges[0].Range != leftRange {
-		t.Fatalf("left comparison label = %+v", diagnostic.LabeledRanges[0])
-	}
-	if diagnostic.LabeledRanges[1].Label != "Type: undefined" || diagnostic.LabeledRanges[1].Range != rightRange {
-		t.Fatalf("right comparison label = %+v", diagnostic.LabeledRanges[1])
-	}
-
-	typedDiagnostic := buildTypedValueDiagnostic(buildAlwaysTruthyMessage(), primaryRange, leftRange, "object")
-	if len(typedDiagnostic.LabeledRanges) != 1 || typedDiagnostic.LabeledRanges[0].Label != "Type: object" {
-		t.Fatalf("type labels = %+v", typedDiagnostic.LabeledRanges)
-	}
-	if noisyDiagnostic := buildTypedValueDiagnostic(buildAlwaysTruthyMessage(), primaryRange, leftRange, ""); len(noisyDiagnostic.LabeledRanges) != 0 {
-		t.Fatalf("self-explanatory value labels = %+v, want none", noisyDiagnostic.LabeledRanges)
-	}
-}
 
 func TestNoUnnecessaryConditionRule(t *testing.T) {
 	t.Parallel()
@@ -1699,7 +1668,7 @@ function test(a: 'a') {
   return a === 'a';
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 3, Column: 12, EndLine: 3, EndColumn: 15}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 3, Column: 10, EndLine: 3, EndColumn: 19}},
 		},
 		{
 			Code: `
@@ -1715,7 +1684,7 @@ const y = 1;
 if (y === 0) {
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 3, Column: 7, EndLine: 3, EndColumn: 10}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 3, Column: 5, EndLine: 3, EndColumn: 12}},
 		},
 		{
 			Code: `
@@ -1782,7 +1751,7 @@ const x = Foo.a;
 if (x === Foo.a) {
 }
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 8, Column: 7, EndLine: 8, EndColumn: 10}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "comparisonBetweenLiteralTypes", Line: 8, Column: 5, EndLine: 8, EndColumn: 16}},
 		},
 		{
 			Code: `
@@ -1871,7 +1840,7 @@ function test(a: string) {
 }
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "noOverlapBooleanExpression", Line: 3, Column: 16, EndLine: 3, EndColumn: 19},
+				{MessageId: "noOverlapBooleanExpression", Line: 3, Column: 14, EndLine: 3, EndColumn: 29},
 				{MessageId: "noOverlapBooleanExpression"},
 				{MessageId: "noOverlapBooleanExpression"},
 				{MessageId: "noOverlapBooleanExpression"},
@@ -2252,8 +2221,7 @@ foo ?. bar;
 foo ?.
   bar;
 foo
-  ?. bar;
-      `,
+  ?. bar;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = { bar: true };
@@ -2262,8 +2230,7 @@ foo ?. bar;
 foo ?.
   bar;
 foo
-  ?. bar;
-      `}}},
+  ?. bar;`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = { bar: true };
 foo?.bar;
@@ -2271,8 +2238,7 @@ foo . bar;
 foo ?.
   bar;
 foo
-  ?. bar;
-      `}}},
+  ?. bar;`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = { bar: true };
 foo?.bar;
@@ -2280,8 +2246,7 @@ foo ?. bar;
 foo .
   bar;
 foo
-  ?. bar;
-      `}}},
+  ?. bar;`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = { bar: true };
 foo?.bar;
@@ -2289,8 +2254,7 @@ foo ?. bar;
 foo ?.
   bar;
 foo
-  . bar;
-      `}}},
+  . bar;`}}},
 			},
 		},
 		{
@@ -2301,8 +2265,7 @@ foo ?. ();
 foo ?.
   ();
 foo
-  ?. ();
-      `,
+  ?. ();`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
@@ -2311,8 +2274,7 @@ foo ?. ();
 foo ?.
   ();
 foo
-  ?. ();
-      `}}},
+  ?. ();`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
 foo?.();
@@ -2320,8 +2282,7 @@ foo  ();
 foo ?.
   ();
 foo
-  ?. ();
-      `}}},
+  ?. ();`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
 foo?.();
@@ -2329,8 +2290,7 @@ foo ?. ();
 foo` + " " + `
   ();
 foo
-  ?. ();
-      `}}},
+  ?. ();`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
 foo?.();
@@ -2338,8 +2298,7 @@ foo ?. ();
 foo ?.
   ();
 foo
-   ();
-      `}}},
+   ();`}}},
 			},
 		},
 		{
@@ -2350,8 +2309,7 @@ foo ?. (bar);
 foo ?.
   (bar);
 foo
-  ?. (bar);
-      `,
+  ?. (bar);`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
@@ -2360,8 +2318,7 @@ foo ?. (bar);
 foo ?.
   (bar);
 foo
-  ?. (bar);
-      `}}},
+  ?. (bar);`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
 foo?.(bar);
@@ -2369,8 +2326,7 @@ foo  (bar);
 foo ?.
   (bar);
 foo
-  ?. (bar);
-      `}}},
+  ?. (bar);`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
 foo?.(bar);
@@ -2378,8 +2334,7 @@ foo ?. (bar);
 foo` + " " + `
   (bar);
 foo
-  ?. (bar);
-      `}}},
+  ?. (bar);`}}},
 				{MessageId: "neverOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 let foo = () => {};
 foo?.(bar);
@@ -2387,13 +2342,12 @@ foo ?. (bar);
 foo ?.
   (bar);
 foo
-   (bar);
-      `}}},
+   (bar);`}}},
 			},
 		},
 		{
 			Code:   "const foo = [1, 2, 3]?.[0];",
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain", Line: 1, Column: 22, EndLine: 1, EndColumn: 24, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `const foo = [1, 2, 3][0];`}}}},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain", Line: 1, Column: 13, EndLine: 1, EndColumn: 27, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `const foo = [1, 2, 3][0];`}}}},
 		},
 		{
 			Code: `
@@ -2576,7 +2530,7 @@ declare const key: Key;
 
 foo?.[key]?.trim();
       `,
-			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain", Line: 7, Column: 11, EndLine: 7, EndColumn: 13, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverOptionalChain", Line: 7, Column: 1, EndLine: 7, EndColumn: 17, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "suggestRemoveOptionalChain", Output: `
 type Foo = { [key: string]: string; foo: 'foo'; bar: 'bar' } | null;
 type Key = 'bar' | 'foo';
 declare const foo: Foo;

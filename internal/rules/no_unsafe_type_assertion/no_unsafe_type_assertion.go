@@ -6,7 +6,6 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -15,14 +14,14 @@ func buildUnsafeOfAnyTypeAssertionMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeOfAnyTypeAssertion",
 		Description: fmt.Sprintf("Unsafe assertion from %v detected.", t),
-		Help:        "Consider using type guards or a safer assertion.",
+		Help:        "Use a type guard to check the value before asserting its type.",
 	}
 }
 func buildUnsafeToAnyTypeAssertionMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeToAnyTypeAssertion",
 		Description: fmt.Sprintf("Unsafe assertion to %v detected.", t),
-		Help:        "Consider using a more specific type to ensure safety.",
+		Help:        "Keep the original type or use `unknown` and narrow the value before use.",
 	}
 }
 func buildUnsafeToUnconstrainedTypeAssertionMessage(t string) rule.RuleMessage {
@@ -55,20 +54,6 @@ func isObjectLiteralType(t *checker.Type) bool {
 	return utils.IsObjectType(t) && checker.Type_objectFlags(t)&checker.ObjectFlagsObjectLiteral != 0
 }
 
-func getAssertionRange(sourceFile *ast.SourceFile, node, expression, typeAnnotation *ast.Node) core.TextRange {
-	if ast.IsAsExpression(node) {
-		asKeywordRange := scanner.GetScannerForSourceFile(sourceFile, expression.End()).TokenRange()
-		return asKeywordRange.WithEnd(typeAnnotation.End())
-	}
-
-	s := scanner.GetScannerForSourceFile(sourceFile, node.Pos())
-	openingAngleBracket := s.TokenRange()
-	s.ResetPos(typeAnnotation.End())
-	s.Scan()
-	closingAngleBracket := s.TokenRange()
-	return openingAngleBracket.WithEnd(closingAngleBracket.End())
-}
-
 func typeLabel(typeChecker *checker.Checker, t *checker.Type) string {
 	if utils.IsIntrinsicErrorType(t) {
 		return "error"
@@ -78,26 +63,18 @@ func typeLabel(typeChecker *checker.Checker, t *checker.Type) string {
 
 func buildUnsafeTypeAssertionDiagnostic(
 	assertionRange core.TextRange,
-	expressionRange core.TextRange,
-	typeAnnotationRange core.TextRange,
 	originalType string,
 	assertedType string,
 	message rule.RuleMessage,
 ) rule.RuleDiagnostic {
-	return rule.RuleDiagnostic{
-		Range:   assertionRange,
-		Message: message,
-		LabeledRanges: []rule.RuleLabeledRange{
-			{
-				Label: fmt.Sprintf("Original expression has type `%s`.", originalType),
-				Range: expressionRange,
-			},
-			{
-				Label: fmt.Sprintf("Asserted type is `%s`.", assertedType),
-				Range: typeAnnotationRange,
-			},
-		},
+	help := fmt.Sprintf("The original expression has type `%s`, and the assertion changes it to `%s`.", originalType, assertedType)
+	if message.Help != "" {
+		help += " " + message.Help
+	} else {
+		help += " Use a type guard to narrow the value before asserting a more specific type."
 	}
+	message.Help = help
+	return rule.RuleDiagnostic{Range: assertionRange, Message: message}
 }
 
 var NoUnsafeTypeAssertionRule = rule.Rule{
@@ -110,9 +87,7 @@ var NoUnsafeTypeAssertionRule = rule.Rule{
 			assertedType := ctx.TypeChecker.GetTypeAtLocation(typeAnnotation)
 			report := func(message rule.RuleMessage) {
 				ctx.ReportDiagnostic(buildUnsafeTypeAssertionDiagnostic(
-					getAssertionRange(ctx.SourceFile, node, expression, typeAnnotation),
-					utils.TrimNodeTextRange(ctx.SourceFile, expression),
-					utils.TrimNodeTextRange(ctx.SourceFile, typeAnnotation),
+					utils.TrimNodeTextRange(ctx.SourceFile, node),
 					typeLabel(ctx.TypeChecker, expressionType),
 					typeLabel(ctx.TypeChecker, assertedType),
 					message,

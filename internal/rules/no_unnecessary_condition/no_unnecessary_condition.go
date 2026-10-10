@@ -73,6 +73,7 @@ func buildNeverOptionalChainMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "neverOptionalChain",
 		Description: "Unnecessary optional chain on a non-nullish value.",
+		Help:        "Remove the optional chain; the value cannot be `null` or `undefined`.",
 	}
 }
 
@@ -97,73 +98,40 @@ func buildLiteralBinaryExpressionMessage() rule.RuleMessage {
 	}
 }
 
-func buildTypedValueDiagnostic(message rule.RuleMessage, primaryRange core.TextRange, typeRange core.TextRange, typeName string) rule.RuleDiagnostic {
-	diagnostic := rule.RuleDiagnostic{
-		Range:   primaryRange,
-		Message: message,
-	}
+func buildTypedValueDiagnostic(message rule.RuleMessage, reportRange core.TextRange, typeName string) rule.RuleDiagnostic {
 	if typeName != "" {
-		diagnostic.LabeledRanges = []rule.RuleLabeledRange{
-			{
-				Label: fmt.Sprintf("Type: %v", typeName),
-				Range: typeRange,
-			},
+		help := fmt.Sprintf("The checked value has type `%s`.", typeName)
+		if message.Help != "" {
+			help += " " + message.Help
 		}
+		message.Help = help
 	}
-	return diagnostic
+	return rule.RuleDiagnostic{Range: reportRange, Message: message}
 }
 
-func buildTypedReturnDiagnostic(message rule.RuleMessage, primaryRange core.TextRange, typeRange core.TextRange, typeName string) rule.RuleDiagnostic {
-	diagnostic := rule.RuleDiagnostic{
-		Range:   primaryRange,
-		Message: message,
-	}
+func buildTypedReturnDiagnostic(message rule.RuleMessage, reportRange core.TextRange, typeName string) rule.RuleDiagnostic {
 	if typeName != "" {
-		diagnostic.LabeledRanges = []rule.RuleLabeledRange{
-			{
-				Label: fmt.Sprintf("Return type: %v", typeName),
-				Range: typeRange,
-			},
-		}
+		message.Help = fmt.Sprintf("The callback returns type `%s`.", typeName)
 	}
-	return diagnostic
+	return rule.RuleDiagnostic{Range: reportRange, Message: message}
 }
 
-func buildTypeGuardDiagnostic(primaryRange core.TextRange, typeRange core.TextRange, valueType string, predicateType string) rule.RuleDiagnostic {
-	return rule.RuleDiagnostic{
-		Range:   primaryRange,
-		Message: buildTypeGuardAlreadyIsTypeMessage(),
-		LabeledRanges: []rule.RuleLabeledRange{
-			{
-				Label: fmt.Sprintf("Type %v already satisfies predicate type %v", valueType, predicateType),
-				Range: typeRange,
-			},
-		},
-	}
+func buildTypeGuardDiagnostic(reportRange core.TextRange, valueType string, predicateType string) rule.RuleDiagnostic {
+	message := buildTypeGuardAlreadyIsTypeMessage()
+	message.Help = fmt.Sprintf("Type `%s` already satisfies predicate type `%s`. Remove the redundant type check.", valueType, predicateType)
+	return rule.RuleDiagnostic{Range: reportRange, Message: message}
 }
 
-func buildComparisonDiagnostic(message rule.RuleMessage, primaryRange core.TextRange, leftType string, leftRange core.TextRange, rightType string, rightRange core.TextRange) rule.RuleDiagnostic {
-	return rule.RuleDiagnostic{
-		Range:   primaryRange,
-		Message: message,
-		LabeledRanges: []rule.RuleLabeledRange{
-			{
-				Label: fmt.Sprintf("Type: %v", leftType),
-				Range: leftRange,
-			},
-			{
-				Label: fmt.Sprintf("Type: %v", rightType),
-				Range: rightRange,
-			},
-		},
-	}
+func buildComparisonDiagnostic(message rule.RuleMessage, reportRange core.TextRange, leftType string, rightType string) rule.RuleDiagnostic {
+	message.Help = fmt.Sprintf("The left side has type `%s`, and the right side has type `%s`.", leftType, rightType)
+	return rule.RuleDiagnostic{Range: reportRange, Message: message}
 }
 
-func buildNoOverlapDiagnostic(primaryRange core.TextRange, leftType string, leftRange core.TextRange, rightType string, rightRange core.TextRange) rule.RuleDiagnostic {
+func buildNoOverlapDiagnostic(reportRange core.TextRange, leftType string, rightType string) rule.RuleDiagnostic {
 	return buildComparisonDiagnostic(rule.RuleMessage{
 		Id:          "noOverlapBooleanExpression",
 		Description: "This condition will always return the same value since the types have no overlap.",
-	}, primaryRange, leftType, leftRange, rightType, rightRange)
+	}, reportRange, leftType, rightType)
 }
 
 func buildAlwaysNullishMessage() rule.RuleMessage {
@@ -1396,8 +1364,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				}
 				ctx.ReportDiagnosticWithSuggestions(buildTypedValueDiagnostic(
 					buildNeverOptionalChainMessage(),
-					utils.TrimNodeTextRange(ctx.SourceFile, questionDotToken),
-					utils.TrimNodeTextRange(ctx.SourceFile, expression),
+					utils.TrimNodeTextRange(ctx.SourceFile, node),
 					typeName,
 				), func() []rule.RuleSuggestion {
 					replacement := ""
@@ -1591,7 +1558,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 					buildNeverMessage(),
 					utils.TrimNodeTextRange(ctx.SourceFile, reportNode),
-					utils.TrimNodeTextRange(ctx.SourceFile, expression),
 					typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, expression),
 				))
 				return
@@ -1606,7 +1572,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 					message,
 					utils.TrimNodeTextRange(ctx.SourceFile, reportNode),
-					utils.TrimNodeTextRange(ctx.SourceFile, expression),
 					typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, expression),
 				))
 				return
@@ -1619,7 +1584,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 					message,
 					utils.TrimNodeTextRange(ctx.SourceFile, reportNode),
-					utils.TrimNodeTextRange(ctx.SourceFile, expression),
 					typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, expression),
 				))
 			}
@@ -1720,14 +1684,12 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 					buildNeverMessage(),
 					utils.TrimNodeTextRange(ctx.SourceFile, node),
-					utils.TrimNodeTextRange(ctx.SourceFile, node),
 					typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, node),
 				))
 				return
 			case isAlwaysNullishType(nodeType) && !hasPossiblyNonNullishIndexedRead(node):
 				ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 					buildAlwaysNullishMessage(),
-					utils.TrimNodeTextRange(ctx.SourceFile, node),
 					utils.TrimNodeTextRange(ctx.SourceFile, node),
 					typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, node),
 				))
@@ -1743,7 +1705,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 						!(hasOptionalChain(node) && optionChainContainsOptionArrayIndex(node))) {
 					ctx.ReportDiagnostic(buildTypedValueDiagnostic(
 						buildNeverNullishMessage(),
-						utils.TrimNodeTextRange(ctx.SourceFile, node),
 						utils.TrimNodeTextRange(ctx.SourceFile, node),
 						typeNameForNodeDiagnostic(ctx.TypeChecker, nodeType, node),
 					))
@@ -1761,16 +1722,11 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			if _, ok := toStaticValue(leftType); ok {
 				if _, ok := toStaticValue(rightType); ok {
 					primaryRange := utils.TrimNodeTextRange(ctx.SourceFile, node)
-					if ast.IsBinaryExpression(node) {
-						primaryRange = utils.TrimNodeTextRange(ctx.SourceFile, node.AsBinaryExpression().OperatorToken)
-					}
 					ctx.ReportDiagnostic(buildComparisonDiagnostic(
 						buildLiteralBinaryExpressionMessage(),
 						primaryRange,
 						typeNameForDiagnostic(ctx.TypeChecker, leftType),
-						utils.TrimNodeTextRange(ctx.SourceFile, left),
 						typeNameForDiagnostic(ctx.TypeChecker, rightType),
-						utils.TrimNodeTextRange(ctx.SourceFile, right),
 					))
 					return
 				}
@@ -1835,15 +1791,10 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				(leftFlags == checker.TypeFlagsNull && !isComparable(rightType, checker.TypeFlagsNull)) ||
 				(rightFlags == checker.TypeFlagsNull && !isComparable(leftType, checker.TypeFlagsNull)) {
 				primaryRange := utils.TrimNodeTextRange(ctx.SourceFile, node)
-				if ast.IsBinaryExpression(node) {
-					primaryRange = utils.TrimNodeTextRange(ctx.SourceFile, node.AsBinaryExpression().OperatorToken)
-				}
 				ctx.ReportDiagnostic(buildNoOverlapDiagnostic(
 					primaryRange,
 					typeNameForDiagnostic(ctx.TypeChecker, leftType),
-					left.Loc,
 					typeNameForDiagnostic(ctx.TypeChecker, rightType),
-					right.Loc,
 				))
 			}
 		}
@@ -1936,7 +1887,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 					argRange := utils.TrimNodeTextRange(ctx.SourceFile, arg)
 					ctx.ReportDiagnostic(buildTypeGuardDiagnostic(
 						argRange,
-						argRange,
 						typeNameForDiagnostic(ctx.TypeChecker, argType),
 						typeNameForDiagnostic(ctx.TypeChecker, predicateType),
 					))
@@ -1945,7 +1895,6 @@ var NoUnnecessaryConditionRule = rule.Rule{
 				if argType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, arg); argType != nil && argType == predicateType {
 					argRange := utils.TrimNodeTextRange(ctx.SourceFile, arg)
 					ctx.ReportDiagnostic(buildTypeGuardDiagnostic(
-						argRange,
 						argRange,
 						typeNameForDiagnostic(ctx.TypeChecker, argType),
 						typeNameForDiagnostic(ctx.TypeChecker, predicateType),
@@ -2309,14 +2258,11 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeG
 									// If so, the type guard is unnecessary
 									if checker.Checker_isTypeAssignableTo(ctx.TypeChecker, paramType, predicateType) {
 										primaryRange := utils.TrimNodeTextRange(ctx.SourceFile, funcNode)
-										typeRange := primaryRange
 										if declaration := param.ValueDeclaration; declaration != nil && ast.GetSourceFileOfNode(declaration) == ctx.SourceFile {
-											typeRange = utils.TrimNodeTextRange(ctx.SourceFile, declaration)
-											primaryRange = typeRange
+											primaryRange = utils.TrimNodeTextRange(ctx.SourceFile, declaration)
 										}
 										ctx.ReportDiagnostic(buildTypeGuardDiagnostic(
 											primaryRange,
-											typeRange,
 											typeNameForDiagnostic(ctx.TypeChecker, paramType),
 											typeNameForDiagnostic(ctx.TypeChecker, predicateType),
 										))
@@ -2362,7 +2308,6 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeG
 				ctx.ReportDiagnostic(buildTypedReturnDiagnostic(
 					message,
 					reportRange,
-					reportRange,
 					typeNameForNodeDiagnostic(ctx.TypeChecker, returnType, reportNode),
 				))
 			} else if isFalsy {
@@ -2372,7 +2317,6 @@ func checkPredicateFunction(ctx rule.RuleContext, funcNode *ast.Node, checkTypeG
 				}
 				ctx.ReportDiagnostic(buildTypedReturnDiagnostic(
 					message,
-					reportRange,
 					reportRange,
 					typeNameForNodeDiagnostic(ctx.TypeChecker, returnType, reportNode),
 				))

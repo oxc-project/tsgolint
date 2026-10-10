@@ -488,17 +488,9 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Type: undefined",
-        "range": {
-          "end": 255,
-          "pos": 245,
-        },
-      },
-    ],
     "message": {
       "description": "Unnecessary conditional, value is always falsy.",
+      "help": "The checked value has type \`undefined\`.",
       "id": "alwaysFalsy",
     },
     "range": {
@@ -510,29 +502,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-confusing-void-expression/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`error\`.",
-        "range": {
-          "end": 215,
-          "pos": 185,
-        },
-      },
-      {
-        "label": "Target is inferred as \`error\`.",
-        "range": {
-          "end": 182,
-          "pos": 176,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an error typed value.",
+      "help": "Assigned value has type \`error\`, so the target is also inferred as \`error\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 184,
-      "pos": 183,
+      "end": 215,
+      "pos": 176,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2018,60 +1995,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`string\`.",
-        "range": {
-          "end": 127,
-          "pos": 122,
-        },
-      },
-      {
-        "label": "Asserted type is \`any\`.",
-        "range": {
-          "end": 134,
-          "pos": 131,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected.",
-      "help": "Consider using a more specific type to ensure safety.",
+      "help": "The original expression has type \`string\`, and the assertion changes it to \`any\`. Keep the original type or use \`unknown\` and narrow the value before use.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 134,
-      "pos": 128,
+      "pos": 122,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unnecessary-type-parameters/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`any\`.",
-        "range": {
-          "end": 134,
-          "pos": 122,
-        },
-      },
-      {
-        "label": "Asserted type is \`T\`.",
-        "range": {
-          "end": 139,
-          "pos": 138,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assertion from \`any\` detected.",
-      "help": "Consider using type guards or a safer assertion.",
+      "help": "The original expression has type \`any\`, and the assertion changes it to \`T\`. Use a type guard to check the value before asserting its type.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
       "end": 139,
-      "pos": 135,
+      "pos": 122,
     },
     "rule": "no-unsafe-type-assertion",
   },
@@ -2126,116 +2071,56 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 119,
-          "pos": 111,
-        },
-      },
-      {
-        "label": "Target expects type \`string\`.",
-        "range": {
-          "end": 108,
-          "pos": 102,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`; the target has type \`string\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 110,
-      "pos": 109,
+      "end": 119,
+      "pos": 97,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 174,
-          "pos": 166,
-        },
-      },
-      {
-        "label": "Target expects type \`number\`.",
-        "range": {
-          "end": 163,
-          "pos": 160,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`; the target has type \`number\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 165,
-      "pos": 164,
+      "end": 174,
+      "pos": 160,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-assignment/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 235,
-          "pos": 220,
-        },
-      },
-      {
-        "label": "Target expects type \`any\`.",
-        "range": {
-          "end": 218,
-          "pos": 214,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`; the target has type \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 219,
-      "pos": 218,
+      "end": 235,
+      "pos": 214,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-call/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 180,
-          "pos": 163,
-        },
-      },
-      {
-        "label": "Target is inferred as \`any\`.",
-        "range": {
-          "end": 160,
-          "pos": 154,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`, so the target is also inferred as \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 162,
-      "pos": 161,
+      "end": 180,
+      "pos": 154,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2346,29 +2231,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Type: Status.Open",
-        "range": {
-          "end": 228,
-          "pos": 217,
-        },
-      },
-      {
-        "label": "Type: Color.Red",
-        "range": {
-          "end": 242,
-          "pos": 233,
-        },
-      },
-    ],
     "message": {
       "description": "Unnecessary comparison between literal values.",
+      "help": "The left side has type \`Status.Open\`, and the right side has type \`Color.Red\`.",
       "id": "comparisonBetweenLiteralTypes",
     },
     "range": {
-      "end": 232,
-      "pos": 229,
+      "end": 242,
+      "pos": 217,
     },
     "rule": "no-unnecessary-condition",
   },
@@ -2434,29 +2304,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-member-access/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 266,
-          "pos": 249,
-        },
-      },
-      {
-        "label": "Target is inferred as \`any\`.",
-        "range": {
-          "end": 246,
-          "pos": 240,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`, so the target is also inferred as \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 248,
-      "pos": 247,
+      "end": 266,
+      "pos": 240,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2528,28 +2383,13 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Returned expression has type \`any\`.",
-        "range": {
-          "end": 135,
-          "pos": 127,
-        },
-      },
-      {
-        "label": "Function expects return type \`string\`.",
-        "range": {
-          "end": 115,
-          "pos": 109,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
+      "help": "Returned expression has type \`any\`; the function return type is \`string\`. Return a safely typed value or narrow the value before returning it.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 126,
+      "end": 136,
       "pos": 120,
     },
     "rule": "no-unsafe-return",
@@ -2557,57 +2397,27 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Returned expression has type \`any\`.",
-        "range": {
-          "end": 197,
-          "pos": 189,
-        },
-      },
-      {
-        "label": "Function expects return type \`number\`.",
-        "range": {
-          "end": 185,
-          "pos": 179,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
+      "help": "Returned expression has type \`any\`; the function return type is \`number\`. Return a safely typed value or narrow the value before returning it.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 188,
-      "pos": 186,
+      "end": 197,
+      "pos": 189,
     },
     "rule": "no-unsafe-return",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-return/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Returned expression has type \`any\`.",
-        "range": {
-          "end": 290,
-          "pos": 282,
-        },
-      },
-      {
-        "label": "Function expects return type \`{ name: string; age: number; }\`.",
-        "range": {
-          "end": 270,
-          "pos": 241,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
+      "help": "Returned expression has type \`any\`; the function return type is \`{ name: string; age: number; }\`. Return a safely typed value or narrow the value before returning it.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 281,
+      "end": 291,
       "pos": 275,
     },
     "rule": "no-unsafe-return",
@@ -2615,58 +2425,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 120,
-          "pos": 108,
-        },
-      },
-      {
-        "label": "Target is inferred as \`any\`.",
-        "range": {
-          "end": 105,
-          "pos": 102,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`, so the target is also inferred as \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 107,
-      "pos": 106,
+      "end": 120,
+      "pos": 102,
     },
     "rule": "no-unsafe-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 289,
-          "pos": 277,
-        },
-      },
-      {
-        "label": "Target is inferred as \`any\`.",
-        "range": {
-          "end": 274,
-          "pos": 265,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`, so the target is also inferred as \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 276,
-      "pos": 275,
+      "end": 289,
+      "pos": 265,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -2686,21 +2466,13 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Returned expression has type \`any\`.",
-        "range": {
-          "end": 332,
-          "pos": 310,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe return of a value of type \`any\`.",
+      "help": "Returned expression has type \`any\`. Return a safely typed value or narrow the value before returning it.",
       "id": "unsafeReturn",
     },
     "range": {
-      "end": 309,
+      "end": 333,
       "pos": 303,
     },
     "rule": "no-unsafe-return",
@@ -2708,120 +2480,56 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`unknown\`.",
-        "range": {
-          "end": 113,
-          "pos": 108,
-        },
-      },
-      {
-        "label": "Asserted type is \`any\`.",
-        "range": {
-          "end": 120,
-          "pos": 117,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected.",
-      "help": "Consider using a more specific type to ensure safety.",
+      "help": "The original expression has type \`unknown\`, and the assertion changes it to \`any\`. Keep the original type or use \`unknown\` and narrow the value before use.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 120,
-      "pos": 114,
+      "pos": 108,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`unknown\`.",
-        "range": {
-          "end": 165,
-          "pos": 160,
-        },
-      },
-      {
-        "label": "Asserted type is \`any\`.",
-        "range": {
-          "end": 172,
-          "pos": 169,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected.",
-      "help": "Consider using a more specific type to ensure safety.",
+      "help": "The original expression has type \`unknown\`, and the assertion changes it to \`any\`. Keep the original type or use \`unknown\` and narrow the value before use.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 172,
-      "pos": 166,
+      "pos": 160,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`any\`.",
-        "range": {
-          "end": 172,
-          "pos": 160,
-        },
-      },
-      {
-        "label": "Asserted type is \`string\`.",
-        "range": {
-          "end": 182,
-          "pos": 176,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assertion from \`any\` detected.",
-      "help": "Consider using type guards or a safer assertion.",
+      "help": "The original expression has type \`any\`, and the assertion changes it to \`string\`. Use a type guard to check the value before asserting its type.",
       "id": "unsafeOfAnyTypeAssertion",
     },
     "range": {
       "end": 182,
-      "pos": 173,
+      "pos": 160,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-type-assertion/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`unknown\`.",
-        "range": {
-          "end": 282,
-          "pos": 277,
-        },
-      },
-      {
-        "label": "Asserted type is \`any\`.",
-        "range": {
-          "end": 289,
-          "pos": 286,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assertion to \`any\` detected.",
-      "help": "Consider using a more specific type to ensure safety.",
+      "help": "The original expression has type \`unknown\`, and the assertion changes it to \`any\`. Keep the original type or use \`unknown\` and narrow the value before use.",
       "id": "unsafeToAnyTypeAssertion",
     },
     "range": {
       "end": 289,
-      "pos": 283,
+      "pos": 277,
     },
     "rule": "no-unsafe-type-assertion",
   },
@@ -2914,58 +2622,28 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`string | null\`.",
-        "range": {
-          "end": 191,
-          "pos": 186,
-        },
-      },
-      {
-        "label": "Asserted type is \`string\`.",
-        "range": {
-          "end": 201,
-          "pos": 195,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe type assertion: type 'string' is more narrow than the original type.",
+      "help": "The original expression has type \`string | null\`, and the assertion changes it to \`string\`. Use a type guard to narrow the value before asserting a more specific type.",
       "id": "unsafeTypeAssertion",
     },
     "range": {
       "end": 201,
-      "pos": 192,
+      "pos": 186,
     },
     "rule": "no-unsafe-type-assertion",
   },
   {
     "file_path": "fixtures/basic/rules/non-nullable-type-assertion-style/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Original expression has type \`number | undefined\`.",
-        "range": {
-          "end": 266,
-          "pos": 261,
-        },
-      },
-      {
-        "label": "Asserted type is \`number\`.",
-        "range": {
-          "end": 276,
-          "pos": 270,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe type assertion: type 'number' is more narrow than the original type.",
+      "help": "The original expression has type \`number | undefined\`, and the assertion changes it to \`number\`. Use a type guard to narrow the value before asserting a more specific type.",
       "id": "unsafeTypeAssertion",
     },
     "range": {
       "end": 276,
-      "pos": 267,
+      "pos": 261,
     },
     "rule": "no-unsafe-type-assertion",
   },
@@ -3915,29 +3593,14 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
   {
     "file_path": "fixtures/basic/rules/restrict-plus-operands/index.ts",
     "kind": 0,
-    "labeled_ranges": [
-      {
-        "label": "Assigned value has type \`any\`.",
-        "range": {
-          "end": 16,
-          "pos": 10,
-        },
-      },
-      {
-        "label": "Target is inferred as \`any\`.",
-        "range": {
-          "end": 7,
-          "pos": 4,
-        },
-      },
-    ],
     "message": {
       "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`, so the target is also inferred as \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
       "id": "anyAssignment",
     },
     "range": {
-      "end": 9,
-      "pos": 8,
+      "end": 16,
+      "pos": 4,
     },
     "rule": "no-unsafe-assignment",
   },
@@ -5929,6 +5592,67 @@ exports[`TSGoLint E2E Snapshot Tests > should still report lint rule diagnostics
       "pos": 26,
     },
     "rule": "no-floating-promises",
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should use a single range on the line targeted by existing disable comments 1`] = `
+[
+  {
+    "file_path": "fixtures/issue-oxc-27534/no-unnecessary-condition.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unnecessary optional chain on a non-nullish value.",
+      "help": "The checked value has type \`string[]\`. Remove the optional chain; the value cannot be \`null\` or \`undefined\`.",
+      "id": "neverOptionalChain",
+    },
+    "range": {
+      "end": 212,
+      "pos": 133,
+    },
+    "rule": "no-unnecessary-condition",
+  },
+  {
+    "file_path": "fixtures/issue-oxc-27534/no-unsafe-assignment.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe assignment of an any value.",
+      "help": "Assigned value has type \`any\`, so the target is also inferred as \`any\`. Use a safely typed value or \`unknown\`, and narrow it before use.",
+      "id": "anyAssignment",
+    },
+    "range": {
+      "end": 196,
+      "pos": 110,
+    },
+    "rule": "no-unsafe-assignment",
+  },
+  {
+    "file_path": "fixtures/issue-oxc-27534/no-unsafe-return.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe return of a value of type \`any\`.",
+      "help": "Returned expression has type \`any\`; the function return type is \`string\`. Return a safely typed value or narrow the value before returning it.",
+      "id": "unsafeReturn",
+    },
+    "range": {
+      "end": 231,
+      "pos": 189,
+    },
+    "rule": "no-unsafe-return",
+  },
+  {
+    "file_path": "fixtures/issue-oxc-27534/no-unsafe-type-assertion.ts",
+    "kind": 0,
+    "message": {
+      "description": "Unsafe type assertion: type '{ id: number; name: string; }' is more narrow than the original type.",
+      "help": "The original expression has type \`{ id: string | number; name: string; }\`, and the assertion changes it to \`{ id: number; name: string; }\`. Use a type guard to narrow the value before asserting a more specific type.",
+      "id": "unsafeTypeAssertion",
+    },
+    "range": {
+      "end": 224,
+      "pos": 153,
+    },
+    "rule": "no-unsafe-type-assertion",
   },
 ]
 `;

@@ -6,7 +6,6 @@ import (
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/microsoft/typescript-go/shim/core"
-	"github.com/microsoft/typescript-go/shim/scanner"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
@@ -26,36 +25,28 @@ func buildUnsafeReturnAssignmentMessage(sender, receiver string) rule.RuleMessag
 func buildUnsafeReturnThisMessage(t string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "unsafeReturnThis",
-		Description: fmt.Sprintf("Unsafe return of a value of type `%v`. `this` is typed as `any`.", t),
-		Help:        "You can try to fix this by turning on the `noImplicitThis` compiler option, or adding a `this` parameter to the function.",
+		Description: fmt.Sprintf("Unsafe return of a value of type %v. `this` is typed as `any`.", t),
+		Help:        "Enable `noImplicitThis` or add an explicit `this` parameter to the function.",
 	}
 }
 
 func buildUnsafeReturnDiagnostic(
 	message rule.RuleMessage,
-	primaryRange core.TextRange,
-	returnedRange core.TextRange,
+	reportRange core.TextRange,
 	returnedType string,
-	expectedRange *core.TextRange,
 	expectedType string,
 ) rule.RuleDiagnostic {
-	diagnostic := rule.RuleDiagnostic{
-		Range:   primaryRange,
-		Message: message,
-		LabeledRanges: []rule.RuleLabeledRange{
-			{
-				Label: fmt.Sprintf("Returned expression has type `%s`.", returnedType),
-				Range: returnedRange,
-			},
-		},
+	help := fmt.Sprintf("Returned expression has type `%s`.", returnedType)
+	if expectedType != "" {
+		help = fmt.Sprintf("Returned expression has type `%s`; the function return type is `%s`.", returnedType, expectedType)
 	}
-	if expectedRange != nil {
-		diagnostic.LabeledRanges = append(diagnostic.LabeledRanges, rule.RuleLabeledRange{
-			Label: fmt.Sprintf("Function expects return type `%s`.", expectedType),
-			Range: *expectedRange,
-		})
+	if message.Help != "" {
+		help += " " + message.Help
+	} else {
+		help += " Return a safely typed value or narrow the value before returning it."
 	}
-	return diagnostic
+	message.Help = help
+	return rule.RuleDiagnostic{Range: reportRange, Message: message}
 }
 
 func renderReturnType(typeChecker *checker.Checker, t *checker.Type) string {
@@ -76,7 +67,7 @@ var NoUnsafeReturnRule = rule.Rule{
 
 		checkReturn := func(
 			returnNode *ast.Node,
-			primaryRange core.TextRange,
+			reportingNode *ast.Node,
 		) {
 			functionNode := utils.GetParentFunctionNode(returnNode)
 			if functionNode == nil {
@@ -109,35 +100,17 @@ var NoUnsafeReturnRule = rule.Rule{
 				functionType = ctx.TypeChecker.GetTypeAtLocation(functionNode)
 			}
 			callSignatures := utils.CollectAllCallSignatures(ctx.TypeChecker, functionType)
-			var expectedRange *core.TextRange
-			var expectedType string
-			if returnTypeNode := functionNode.Type(); returnTypeNode != nil {
-				r := utils.TrimNodeTextRange(ctx.SourceFile, returnTypeNode)
-				expectedRange = &r
-				expectedType = renderReturnType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(returnTypeNode))
-			} else if usesContextualType {
-				for _, signature := range callSignatures {
-					declaration := checker.Signature_declaration(signature)
-					if declaration == nil || ast.GetSourceFileOfNode(declaration) != ctx.SourceFile {
-						continue
-					}
-					returnTypeNode := declaration.Type()
-					if returnTypeNode == nil || ast.NodeIsSynthesized(returnTypeNode) {
-						continue
-					}
-					r := utils.TrimNodeTextRange(ctx.SourceFile, returnTypeNode)
-					expectedRange = &r
-					expectedType = renderReturnType(ctx.TypeChecker, checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, signature))
-					break
-				}
-			}
 			report := func(message rule.RuleMessage) {
+				var expectedType string
+				if functionNode.Type() != nil || usesContextualType {
+					if len(callSignatures) > 0 {
+						expectedType = renderReturnType(ctx.TypeChecker, checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, callSignatures[0]))
+					}
+				}
 				ctx.ReportDiagnostic(buildUnsafeReturnDiagnostic(
 					message,
-					primaryRange,
-					utils.TrimNodeTextRange(ctx.SourceFile, returnNode),
+					utils.TrimNodeTextRange(ctx.SourceFile, reportingNode),
 					renderReturnType(ctx.TypeChecker, constrainedReturnNodeType),
-					expectedRange,
 					expectedType,
 				))
 			}
@@ -238,7 +211,7 @@ var NoUnsafeReturnRule = rule.Rule{
 			ast.KindArrowFunction: func(node *ast.Node) {
 				body := node.Body()
 				if !ast.IsBlock(body) {
-					checkReturn(body, utils.TrimNodeTextRange(ctx.SourceFile, node.AsArrowFunction().EqualsGreaterThanToken))
+					checkReturn(body, body)
 				}
 			},
 			ast.KindReturnStatement: func(node *ast.Node) {
@@ -247,7 +220,7 @@ var NoUnsafeReturnRule = rule.Rule{
 					return
 				}
 
-				checkReturn(argument, scanner.GetRangeOfTokenAtPosition(ctx.SourceFile, node.Pos()))
+				checkReturn(argument, node)
 			},
 		}
 	},

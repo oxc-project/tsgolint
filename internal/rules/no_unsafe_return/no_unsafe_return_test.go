@@ -3,44 +3,9 @@ package no_unsafe_return
 import (
 	"testing"
 
-	"github.com/microsoft/typescript-go/shim/core"
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
-
-func TestDiagnosticRangesAndLabels(t *testing.T) {
-	t.Parallel()
-
-	primaryRange := core.NewTextRange(10, 6)
-	returnedRange := core.NewTextRange(17, 12)
-	expectedRange := core.NewTextRange(2, 7)
-	diagnostic := buildUnsafeReturnDiagnostic(
-		buildUnsafeReturnAssignmentMessage("Set<any>", "Set<string>"),
-		primaryRange,
-		returnedRange,
-		"Set<any>",
-		&expectedRange,
-		"Set<string>",
-	)
-
-	if diagnostic.Range != primaryRange {
-		t.Fatalf("primary range = %v, want %v", diagnostic.Range, primaryRange)
-	}
-	if len(diagnostic.LabeledRanges) != 2 {
-		t.Fatalf("labels = %d, want 2", len(diagnostic.LabeledRanges))
-	}
-	if diagnostic.LabeledRanges[0].Label != "Returned expression has type `Set<any>`." || diagnostic.LabeledRanges[0].Range != returnedRange {
-		t.Fatalf("returned expression label = %+v", diagnostic.LabeledRanges[0])
-	}
-	if diagnostic.LabeledRanges[1].Label != "Function expects return type `Set<string>`." || diagnostic.LabeledRanges[1].Range != expectedRange {
-		t.Fatalf("expected return label = %+v", diagnostic.LabeledRanges[1])
-	}
-
-	withoutExpectation := buildUnsafeReturnDiagnostic(buildUnsafeReturnMessage("`any`"), primaryRange, returnedRange, "any", nil, "")
-	if len(withoutExpectation.LabeledRanges) != 1 {
-		t.Fatalf("labels without local expectation = %d, want 1", len(withoutExpectation.LabeledRanges))
-	}
-}
 
 func TestNoUnsafeReturnRule(t *testing.T) {
 	t.Parallel()
@@ -442,13 +407,13 @@ function bar() {
 					MessageId: "unsafeReturnThis",
 					Line:      3,
 					Column:    3,
-					EndColumn: 9,
+					EndColumn: 15,
 				},
 				{
 					MessageId: "unsafeReturnThis",
 					Line:      7,
-					Column:    13,
-					EndColumn: 15,
+					Column:    16,
+					EndColumn: 20,
 				},
 			},
 		},
@@ -461,8 +426,8 @@ foo(() => 'foo' as any);
 				{
 					MessageId: "unsafeReturn",
 					Line:      3,
-					Column:    8,
-					EndColumn: 10,
+					Column:    11,
+					EndColumn: 23,
 				},
 			},
 		},
@@ -479,7 +444,7 @@ function example() {
 					MessageId: "unsafeReturn",
 					Line:      5,
 					Column:    3,
-					EndColumn: 9,
+					EndColumn: 16,
 				},
 			},
 		},
@@ -689,8 +654,8 @@ const foo: Fn = () => new Set<any>();
 				{
 					MessageId: "unsafeReturnAssignment",
 					Line:      3,
-					Column:    20,
-					EndColumn: 22,
+					Column:    23,
+					EndColumn: 37,
 				},
 			},
 		},
@@ -735,7 +700,7 @@ const f = function (value) {
 /** @type {Fn} */
 const f = value => value;`,
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unsafeReturn", Line: 8, Column: 17},
+				{MessageId: "unsafeReturn", Line: 8, Column: 20},
 			},
 		},
 		{
@@ -751,8 +716,38 @@ const f = value => value;`,
 /** @type {Fn} */
 const f = value => value;`,
 			Errors: []rule_tester.InvalidTestCaseError{
-				{MessageId: "unsafeReturn", Line: 9, Column: 17},
+				{MessageId: "unsafeReturn", Line: 9, Column: 20},
 			},
+		},
+	})
+}
+
+func TestNoUnsafeReturnRule_ReturnTypeHelp(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeReturnRule, nil, []rule_tester.InvalidTestCase{
+		{
+			Code:   "const foo = () => 1 as any;",
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn"}},
+		},
+		{
+			Code:   "const foo = function () { return 1 as any; };",
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn"}},
+		},
+		{
+			Code:   "const foo = (): number => 1 as any;",
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn"}},
+		},
+		{
+			Code:   "const foo = function (): number { return 1 as any; };",
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn"}},
+		},
+		{
+			Code:   "const foo: () => number = () => 1 as any;",
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn"}},
+		},
+		{
+			Code:   "const foo: () => number = function () { return 1 as any; };",
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn"}},
 		},
 	})
 }
