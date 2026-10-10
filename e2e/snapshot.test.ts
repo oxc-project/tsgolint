@@ -752,6 +752,166 @@ console.log(x);
     expect(diagnostics).toMatchSnapshot();
   });
 
+  it.each([
+    {
+      name: 'globals once per program',
+      fixture: 'globals',
+      compilerOptions: {},
+      reportSemantic: true,
+      code: 'TS2318',
+      count: 10,
+    },
+    {
+      name: 'globals with noCheck',
+      fixture: 'globals',
+      compilerOptions: { noCheck: true },
+      reportSemantic: true,
+      code: 'TS2318',
+      count: 10,
+    },
+    {
+      name: 'globals with type checking disabled',
+      fixture: 'globals',
+      compilerOptions: {},
+      reportSemantic: false,
+      code: '',
+      count: 0,
+    },
+    {
+      name: 'declarations only for selected files',
+      fixture: 'declarations',
+      compilerOptions: {},
+      reportSemantic: true,
+      code: 'TS4094',
+      count: 1,
+    },
+    {
+      name: 'declarations with noEmit',
+      fixture: 'declarations',
+      compilerOptions: { noEmit: true },
+      reportSemantic: true,
+      code: 'TS4094',
+      count: 1,
+    },
+    {
+      name: 'declarations across checkers',
+      fixture: 'declarations',
+      compilerOptions: {},
+      reportSemantic: true,
+      selectedFileCount: 12,
+      code: 'TS4094',
+      count: 12,
+    },
+    {
+      name: 'declarations across checkers with noCheck',
+      fixture: 'declarations',
+      compilerOptions: { noCheck: true },
+      reportSemantic: true,
+      selectedFileCount: 12,
+      code: 'TS4094',
+      count: 12,
+    },
+    {
+      name: 'declarations across checkers with type checking disabled',
+      fixture: 'declarations',
+      compilerOptions: {},
+      reportSemantic: false,
+      selectedFileCount: 12,
+      code: '',
+      count: 0,
+    },
+    {
+      name: 'declarations with noCheck',
+      fixture: 'declarations',
+      compilerOptions: { noCheck: true },
+      reportSemantic: true,
+      code: 'TS4094',
+      count: 1,
+    },
+    {
+      name: 'declarations enabled by composite',
+      fixture: 'declarations',
+      compilerOptions: { declaration: undefined, composite: true },
+      reportSemantic: true,
+      code: 'TS4094',
+      count: 1,
+    },
+    {
+      name: 'declaration output disabled',
+      fixture: 'declarations',
+      compilerOptions: { declaration: false },
+      reportSemantic: true,
+      code: '',
+      count: 0,
+    },
+    {
+      name: 'declarations with type checking disabled',
+      fixture: 'declarations',
+      compilerOptions: {},
+      reportSemantic: false,
+      code: '',
+      count: 0,
+    },
+  ])(
+    'should handle $name (oxc-project/oxc#27499)',
+    async ({ fixture, compilerOptions, reportSemantic, selectedFileCount = 1, code, count }) => {
+      const directory = await fs.mkdtemp(join(tmpdir(), 'tsgolint-type-diagnostics-'));
+      try {
+        await fs.cp(resolveTestFilePath(`issue-oxc-27499/${fixture}`), directory, { recursive: true });
+        const testFile = join(directory, 'input.ts').replaceAll('\\', '/');
+        const otherFile = join(directory, 'other.ts').replaceAll('\\', '/');
+        await fs.copyFile(testFile, otherFile);
+        const selectedFiles = [testFile];
+        for (let i = 1; i < selectedFileCount; i++) {
+          const file = join(directory, `input-${i}.ts`).replaceAll('\\', '/');
+          await fs.copyFile(testFile, file);
+          selectedFiles.push(file);
+        }
+        const tsconfigPath = join(directory, 'tsconfig.json');
+        const tsconfig = JSON.parse(await fs.readFile(tsconfigPath, 'utf8'));
+        tsconfig.compilerOptions = { ...tsconfig.compilerOptions, ...compilerOptions };
+        tsconfig.files = [...selectedFiles, otherFile];
+        await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig));
+
+        const files = fixture === 'globals' ? [testFile, otherFile] : selectedFiles;
+        const config = generateConfig(files, [], { reportSemantic, reportSyntactic: true });
+        const output = execFileSync(TSGOLINT_BIN, ['headless'], {
+          input: config,
+          env: { ...process.env, GOMAXPROCS: '2' },
+        });
+        const diagnostics = parseHeadlessOutput(output);
+
+        expect(diagnostics).toHaveLength(count);
+        for (const diagnostic of diagnostics) {
+          expect(diagnostic.kind).toBe(DiagnosticKind.Internal);
+          expect(diagnostic.message.id).toBe(code);
+          if (fixture === 'globals') {
+            expect(diagnostic.file_path).toBeNull();
+            expect(diagnostic.range).toBeUndefined();
+          } else {
+            expect(selectedFiles).toContain(diagnostic.file_path);
+            expect(diagnostic.range).toEqual({ pos: 13, end: 17 });
+            expect(diagnostic.message.description).toBe(
+              "Property 'value' of exported anonymous class type may not be private or protected.",
+            );
+          }
+        }
+        if (fixture === 'declarations' && count > 0) {
+          expect(diagnostics.map(diagnostic => diagnostic.file_path).sort()).toEqual(
+            [...selectedFiles].sort(),
+          );
+        }
+        if (fixture === 'globals' && count > 0) {
+          const messages = diagnostics.map(diagnostic => diagnostic.message.description);
+          expect(new Set(messages).size).toBe(count);
+          expect(messages).toContain("Cannot find global type 'Array'.");
+        }
+      } finally {
+        await fs.rm(directory, { recursive: true, force: true });
+      }
+    },
+  );
+
   it('should handle circular project references (issue #297)', async () => {
     // Regression test for https://github.com/oxc-project/tsgolint/issues/297
     // This test reproduces the issue where circular tsconfig references
