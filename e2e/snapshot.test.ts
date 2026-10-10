@@ -766,6 +766,24 @@ console.log(x);
       count: 1,
     },
     {
+      name: 'declarations across checkers',
+      fixture: 'declarations',
+      compilerOptions: {},
+      reportSemantic: true,
+      selectedFileCount: 12,
+      code: 'TS4094',
+      count: 12,
+    },
+    {
+      name: 'declarations across checkers with noCheck',
+      fixture: 'declarations',
+      compilerOptions: { noCheck: true },
+      reportSemantic: true,
+      selectedFileCount: 12,
+      code: 'TS4094',
+      count: 12,
+    },
+    {
       name: 'declarations with noCheck',
       fixture: 'declarations',
       compilerOptions: { noCheck: true },
@@ -799,20 +817,26 @@ console.log(x);
     },
   ])(
     'should handle $name (oxc-project/oxc#27499)',
-    async ({ fixture, compilerOptions, reportSemantic, code, count }) => {
+    async ({ fixture, compilerOptions, reportSemantic, selectedFileCount = 1, code, count }) => {
       const directory = await fs.mkdtemp(join(tmpdir(), 'tsgolint-type-diagnostics-'));
       try {
         await fs.cp(resolveTestFilePath(`issue-oxc-27499/${fixture}`), directory, { recursive: true });
         const testFile = join(directory, 'input.ts').replaceAll('\\', '/');
         const otherFile = join(directory, 'other.ts').replaceAll('\\', '/');
         await fs.copyFile(testFile, otherFile);
+        const selectedFiles = [testFile];
+        for (let i = 1; i < selectedFileCount; i++) {
+          const file = join(directory, `input-${i}.ts`).replaceAll('\\', '/');
+          await fs.copyFile(testFile, file);
+          selectedFiles.push(file);
+        }
         const tsconfigPath = join(directory, 'tsconfig.json');
         const tsconfig = JSON.parse(await fs.readFile(tsconfigPath, 'utf8'));
         tsconfig.compilerOptions = { ...tsconfig.compilerOptions, ...compilerOptions };
-        tsconfig.files = ['input.ts', 'other.ts'];
+        tsconfig.files = [...selectedFiles, otherFile];
         await fs.writeFile(tsconfigPath, JSON.stringify(tsconfig));
 
-        const files = fixture === 'globals' ? [testFile, otherFile] : [testFile];
+        const files = fixture === 'globals' ? [testFile, otherFile] : selectedFiles;
         const config = generateConfig(files, [], { reportSemantic, reportSyntactic: true });
         const output = execFileSync(TSGOLINT_BIN, ['headless'], {
           input: config,
@@ -828,12 +852,17 @@ console.log(x);
             expect(diagnostic.file_path).toBeNull();
             expect(diagnostic.range).toBeUndefined();
           } else {
-            expect(diagnostic.file_path).toBe(testFile);
+            expect(selectedFiles).toContain(diagnostic.file_path);
             expect(diagnostic.range).toEqual({ pos: 13, end: 17 });
             expect(diagnostic.message.description).toBe(
               "Property 'value' of exported anonymous class type may not be private or protected.",
             );
           }
+        }
+        if (fixture === 'declarations' && count > 0) {
+          expect(diagnostics.map(diagnostic => diagnostic.file_path).sort()).toEqual(
+            [...selectedFiles].sort(),
+          );
         }
         if (fixture === 'globals' && count > 0) {
           const messages = diagnostics.map(diagnostic => diagnostic.message.description);

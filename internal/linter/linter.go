@@ -6,6 +6,7 @@ import (
 	"log"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/typescript-eslint/tsgolint/internal/diagnostic"
@@ -306,6 +307,45 @@ func newRuleContext(ctxBuilder *ruleContextBuilder) rule.RuleContext {
 	}
 }
 
+func getDeclarationDiagnosticsForFiles(ctx context.Context, program *compiler.Program, files []*ast.SourceFile) [][]*ast.Diagnostic {
+	diagnostics := make([][]*ast.Diagnostic, len(files))
+	filesByChecker := make(map[*checker.Checker][]int)
+	var mu sync.Mutex
+	program.ForEachCheckerParallel(func(_ int, ch *checker.Checker) {
+		mu.Lock()
+		filesByChecker[ch] = nil
+		mu.Unlock()
+	})
+	if len(filesByChecker) == 0 {
+		// Custom checker pools do not expose stable checker ownership.
+		for i, file := range files {
+			diagnostics[i] = program.GetDeclarationDiagnostics(ctx, file)
+		}
+		return diagnostics
+	}
+
+	for i, file := range files {
+		ch, done := program.GetTypeCheckerForFile(ctx, file)
+		filesByChecker[ch] = append(filesByChecker[ch], i)
+		done()
+	}
+	// Reuse each warmed checker sequentially. Declaration emission locks the
+	// checker internally, so these tasks must run outside ForEachCheckerParallel.
+	wg := core.NewWorkGroup(program.SingleThreaded())
+	for _, indexes := range filesByChecker {
+		if len(indexes) == 0 {
+			continue
+		}
+		wg.Queue(func() {
+			for _, i := range indexes {
+				diagnostics[i] = program.GetDeclarationDiagnostics(ctx, files[i])
+			}
+		})
+	}
+	wg.RunAndWait()
+	return diagnostics
+}
+
 func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceFile, typeErrors TypeErrors, onInternalDiagnostic func(d diagnostic.Internal)) {
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
 	reportDiagnostic := func(d *ast.Diagnostic) {
@@ -341,14 +381,18 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 		semanticDiagnosticsByFile := program.GetSemanticDiagnosticsWithoutNoEmitFiltering(ctx, files)
 
 		programOption := program.Options()
+		var declarationDiagnosticsByFile [][]*ast.Diagnostic
+		if programOption.GetEmitDeclarations() {
+			declarationDiagnosticsByFile = getDeclarationDiagnosticsForFiles(ctx, program, files)
+		}
 
-		for _, file := range files {
+		for i, file := range files {
 			fileName := file.FileName()
 			finalDiagnostics := compiler.FilterNoEmitSemanticDiagnostics(semanticDiagnosticsByFile[file], programOption)
 			includeProcessorDiagnostics := program.GetIncludeProcessorDiagnostics(file)
 			var declarationDiagnostics []*ast.Diagnostic
-			if programOption.GetEmitDeclarations() {
-				declarationDiagnostics = program.GetDeclarationDiagnostics(ctx, file)
+			if declarationDiagnosticsByFile != nil {
+				declarationDiagnostics = declarationDiagnosticsByFile[i]
 			}
 			if len(finalDiagnostics) == 0 && len(includeProcessorDiagnostics) == 0 && len(declarationDiagnostics) == 0 {
 				continue
