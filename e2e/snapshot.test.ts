@@ -784,6 +784,15 @@ console.log(x);
       count: 12,
     },
     {
+      name: 'declarations across checkers with type checking disabled',
+      fixture: 'declarations',
+      compilerOptions: {},
+      reportSemantic: false,
+      selectedFileCount: 12,
+      code: '',
+      count: 0,
+    },
+    {
       name: 'declarations with noCheck',
       fixture: 'declarations',
       compilerOptions: { noCheck: true },
