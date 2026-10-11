@@ -1,6 +1,8 @@
 package linter
 
 import (
+	"fmt"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -367,4 +369,58 @@ function greet() {
 	assert.Equal(t, recordsByRule[ruleA].Calls, uint64(2), "rule A should count Run plus its variable listener")
 	assert.Equal(t, recordsByRule[ruleB].Calls, uint64(2), "rule B should count Run plus its function listener")
 	assert.Equal(t, recordsByRule[ruleC].Calls, uint64(1), "rule C should count its Run call")
+}
+
+// Both interfaces at each level extend the previous level, so the deepest interface reaches
+// the first one through 2^40 paths. Type checking it relies on the hasBaseType patch
+// (patches/0007) to search each shared base type once.
+func TestRunLinterOnProgram_SharedBaseTypes(t *testing.T) {
+	const depth = 40
+	var code strings.Builder
+	code.WriteString("interface I0 { i0: string }\ninterface J0 { j0: string }\n")
+	for k := 1; k <= depth; k++ {
+		fmt.Fprintf(&code, "interface A%[1]d extends I%[2]d { a%[1]d: string }\n", k, k-1)
+		fmt.Fprintf(&code, "interface B%[1]d extends I%[2]d { b%[1]d: string }\n", k, k-1)
+		fmt.Fprintf(&code, "interface I%[1]d extends A%[1]d, B%[1]d {}\n", k)
+		// The same graph through an intersection.
+		fmt.Fprintf(&code, "interface C%[1]d extends J%[2]d { c%[1]d: string }\n", k, k-1)
+		fmt.Fprintf(&code, "interface D%[1]d extends J%[2]d { d%[1]d: string }\n", k, k-1)
+		fmt.Fprintf(&code, "type Both%[1]d = C%[1]d & D%[1]d;\ninterface J%[1]d extends Both%[1]d {}\n", k)
+	}
+	fmt.Fprintf(&code, "declare const viaInterfaces: I%[1]d;\ndeclare const viaIntersections: J%[1]d;\n", depth)
+	code.WriteString("const fromInterfaces: number = viaInterfaces.i0;\nconst fromIntersections: number = viaIntersections.j0;\n")
+
+	rootDir := fixtures.GetRootDir()
+	filePath := tspath.ResolvePath(rootDir, "file.ts")
+	fs := utils.NewOverlayVFS(cachedBaseFS, map[string]string{filePath: code.String()})
+	host := utils.CreateCompilerHost(rootDir, fs)
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
+	assert.NilError(t, err, "couldn't create program")
+
+	var diagnostics []diagnostic.Internal
+	done := make(chan error, 1)
+	go func() {
+		done <- RunLinterOnProgram(RunLinterOnProgramOptions{
+			LogLevel:             utils.LogLevelNormal,
+			Program:              program,
+			Files:                []*ast.SourceFile{program.GetSourceFile(filePath)},
+			Workers:              1,
+			GetRulesForFile:      func(*ast.SourceFile) []ConfiguredRule { return nil },
+			OnDiagnostic:         func(rule.RuleDiagnostic) {},
+			OnInternalDiagnostic: func(d diagnostic.Internal) { diagnostics = append(diagnostics, d) },
+			TypeErrors:           TypeErrors{ReportSemantic: true},
+		})
+	}()
+	select {
+	case err = <-done:
+	case <-time.After(30 * time.Second):
+		t.Fatal("type checking did not finish in 30s; hasBaseType is walking every path through shared base types again")
+	}
+	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
+
+	// Both properties resolve to string through the whole hierarchy.
+	assert.Equal(t, len(diagnostics), 2, "expected one type error per property access")
+	for _, d := range diagnostics {
+		assert.Equal(t, d.Id, "TS2322")
+	}
 }

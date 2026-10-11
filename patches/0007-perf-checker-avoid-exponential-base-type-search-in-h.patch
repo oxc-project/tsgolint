@@ -1,0 +1,50 @@
+From d6fdec6d225ae6393c8e2b6b7e4ea2a51003056e Mon Sep 17 00:00:00 2001
+From: Mitch Fultz <57411549+fitchmultz@users.noreply.github.com>
+Date: Sun, 11 Oct 2026 15:10:46 -0600
+Subject: [PATCH] perf(checker): avoid exponential base type search in
+ hasBaseType
+
+hasBaseType followed every path through the base type graph. When types
+share base types, the number of paths doubles at each level, so checking
+an interface hierarchy 40 levels deep never finishes.
+
+Search each type with several base types, and each intersection, once.
+Single inheritance allocates nothing, and the result is unchanged.
+
+Upstream: https://github.com/microsoft/TypeScript/pull/64737
+---
+ internal/checker/checker.go | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/internal/checker/checker.go b/internal/checker/checker.go
+index b639d488e..4ddd07b88 100644
+--- a/internal/checker/checker.go
++++ b/internal/checker/checker.go
+@@ -19454,14 +19454,22 @@ func (c *Checker) isValidBaseType(t *Type) bool {
+ 
+ // TODO: GH#18217 If `checkBase` is undefined, we should not call this because this will always return false.
+ func (c *Checker) hasBaseType(t *Type, checkBase *Type) bool {
++	// Paths through base types only branch at types with several base types and at
++	// intersections. Searching each of those once keeps shared base types from making
++	// the search exponential, and single inheritance allocates nothing.
++	var visited collections.Set[*Type]
+ 	var check func(*Type) bool
+ 	check = func(t *Type) bool {
+ 		if t.objectFlags&(ObjectFlagsClassOrInterface|ObjectFlagsReference) != 0 {
+ 			target := getTargetType(t)
+-			return target == checkBase || core.Some(c.getBaseTypes(target), check)
++			if target == checkBase {
++				return true
++			}
++			baseTypes := c.getBaseTypes(target)
++			return (len(baseTypes) < 2 || visited.AddIfAbsent(target)) && core.Some(baseTypes, check)
+ 		}
+ 		if t.flags&TypeFlagsIntersection != 0 {
+-			return core.Some(t.Types(), check)
++			return visited.AddIfAbsent(t) && core.Some(t.Types(), check)
+ 		}
+ 		return false
+ 	}
+-- 
+2.54.0 (Apple Git-157)
+
