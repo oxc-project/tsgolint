@@ -46,6 +46,12 @@ func TestUnboundMethod(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &UnboundMethodRule, slices.Concat([]rule_tester.ValidTestCase{
 		{Code: "Promise.resolve().then(console.log);"},
+		{Code: `
+class Foo {
+  f = function (this: void) {};
+}
+const f = new Foo().f;
+    `},
 		{Code: "['1', '2', '3'].map(Number.parseInt);"},
 		{Code: "[5.2, 7.1, 3.6].map(Math.floor);"},
 		{Code: `
@@ -658,7 +664,7 @@ const foo = Foo;
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -768,7 +774,7 @@ const unbound = new Foo().unbound;
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -796,7 +802,7 @@ const { unbound } = new Foo();
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -826,7 +832,7 @@ let unbound;
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -840,7 +846,7 @@ function foo({ unbound }: Foo = new Foo()) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -855,7 +861,7 @@ function foo({ unbound }: Foo = bar) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -870,7 +876,7 @@ function foo({ unbound }: Foo = { unbound: () => {} }) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -899,7 +905,7 @@ function foo({ unbound }: Foo) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -914,7 +920,7 @@ bar(({ unbound }) => {});
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -929,7 +935,7 @@ bar(({ unbound } = new Foo()) => {});
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -944,7 +950,7 @@ for (const { unbound } of [new Foo(), new Foo()]) {
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -959,7 +965,7 @@ class Foo {
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -976,7 +982,7 @@ function foo({ unbound }: Foo | Bar) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      8,
 					},
 				},
@@ -990,7 +996,7 @@ function foo({ unbound }: { unbound: () => string } | Foo) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -1007,7 +1013,7 @@ function foo({ unbound }: Foo | Bar) {}
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      8,
 					},
 				},
@@ -1021,7 +1027,7 @@ const foo = ({ unbound }: Foo & { foo: () => 'bar' }) => {};
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      5,
 					},
 				},
@@ -1038,7 +1044,7 @@ const foo = ({ unbound }: (Foo & { foo: () => 'bar' }) | Bar) => {};
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      8,
 					},
 				},
@@ -1055,7 +1061,7 @@ const foo = ({ unbound }: Foo & Bar) => {};
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      8,
 					},
 				},
@@ -1074,7 +1080,7 @@ const foo = ({ unbound, ...rest }: Foo & Bar) => {};
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      10,
 					},
 				},
@@ -1111,7 +1117,7 @@ const { floor } = Math.random() > 0.5 ? new Foo() : Math;
       `,
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
-						MessageId: "unbound",
+						MessageId: "unboundWithoutThisAnnotation",
 						Line:      6,
 					},
 				},
@@ -1320,6 +1326,20 @@ const f = collator.compare;
 					Line:      8,
 					Column:    11,
 					EndColumn: 27,
+				}},
+			},
+			{
+				Code: `
+class Foo {
+  unbound = function (this: Foo) {};
+}
+const unbound = new Foo().unbound;
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{{
+					MessageId: "unbound",
+					Line:      5,
+					Column:    17,
+					EndColumn: 34,
 				}},
 			},
 		}))

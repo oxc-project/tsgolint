@@ -179,16 +179,13 @@ func checkIfMethod(symbol *ast.Symbol, ignoreStatic bool) ( /* dangerous */ bool
 	}
 
 	switch valueDeclaration.Kind {
-	case ast.KindPropertyDeclaration:
-		init := valueDeclaration.Initializer()
-		return init != nil && ast.IsFunctionExpression(valueDeclaration.Initializer()), true
-	case ast.KindPropertyAssignment:
-		assignee := valueDeclaration.Initializer()
-		if !ast.IsFunctionExpression(assignee) {
+	case ast.KindPropertyAssignment, ast.KindPropertyDeclaration:
+		initializer := valueDeclaration.Initializer()
+		if initializer == nil || !ast.IsFunctionExpression(initializer) {
 			return false, false
 		}
 
-		return checkMethod(assignee, ignoreStatic)
+		return checkMethod(initializer, ignoreStatic)
 	case ast.KindMethodDeclaration, ast.KindMethodSignature:
 		return checkMethod(valueDeclaration, ignoreStatic)
 	}
