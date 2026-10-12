@@ -246,6 +246,15 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			})
 		}
 
+		// Whether `object` (the non-primitive type) is one of t's union parts. `object`
+		// and an all-optional object type are mutually assignable, yet an assertion
+		// between them changes the type: the property reads exist on one side only.
+		hasNonPrimitivePart := func(t *checker.Type) bool {
+			return slices.ContainsFunc(utils.UnionTypeParts(t), func(part *checker.Type) bool {
+				return utils.IsTypeFlagSet(part, checker.TypeFlagsNonPrimitive)
+			})
+		}
+
 		hasSameProperties := func(uncast, cast *checker.Type) bool {
 			uncastProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, uncast)
 			castProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, cast)
@@ -399,7 +408,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return areUnionPartsEquivalentIgnoringUndefined(uncast, cast)
 			}
 
-			if (utils.IsTypeFlagSet(uncast, checker.TypeFlagsNonPrimitive) && !utils.IsTypeFlagSet(cast, checker.TypeFlagsNonPrimitive)) ||
+			if (hasNonPrimitivePart(uncast) && !hasNonPrimitivePart(cast)) ||
 				(hasIndexSignature(uncast) != hasIndexSignature(cast)) {
 				return false
 			}
