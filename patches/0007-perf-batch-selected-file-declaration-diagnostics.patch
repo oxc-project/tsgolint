@@ -1,0 +1,60 @@
+From ddfb9eb5973a36e89e2c61d8fbaf9cb797c1b3dd Mon Sep 17 00:00:00 2001
+From: Codex <codex@example.com>
+Date: Sat, 10 Oct 2026 11:30:56 +0100
+Subject: [PATCH] perf(compiler): batch selected-file declaration diagnostics
+
+---
+ internal/compiler/program.go | 37 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/internal/compiler/program.go b/internal/compiler/program.go
+index 74b2504..74bf9b1 100644
+--- a/internal/compiler/program.go
++++ b/internal/compiler/program.go
+@@ -1308,6 +1308,43 @@ func (p *Program) GetDeclarationDiagnostics(ctx context.Context, sourceFile *ast
+ 	return p.collectDiagnostics(ctx, sourceFile, true /*concurrent*/, p.getDeclarationDiagnosticsForFile)
+ }
+ 
++// GetDeclarationDiagnosticsForFiles returns declaration diagnostics indexed by
++// the selected files. Compiler-owned checkers process their files sequentially
++// in parallel with other checkers, preserving semantic-checking cache affinity.
++func (p *Program) GetDeclarationDiagnosticsForFiles(ctx context.Context, sourceFiles []*ast.SourceFile) [][]*ast.Diagnostic {
++	diagnostics := make([][]*ast.Diagnostic, len(sourceFiles))
++	if len(sourceFiles) == 0 {
++		return diagnostics
++	}
++	if p.compilerCheckerPool == nil {
++		// External pools do not expose stable checker ownership.
++		for i, file := range sourceFiles {
++			diagnostics[i] = p.GetDeclarationDiagnostics(ctx, file)
++		}
++		return diagnostics
++	}
++
++	pool := p.compilerCheckerPool
++	pool.createCheckers()
++	filesByChecker := make(map[*checker.Checker][]int, len(pool.checkers))
++	for i, file := range sourceFiles {
++		c := pool.fileAssociations[file]
++		filesByChecker[c] = append(filesByChecker[c], i)
++	}
++	// Do not use forEachCheckerGroupDo: declaration emit resolvers acquire the
++	// checker mutex internally, so holding it around collection would deadlock.
++	wg := core.NewWorkGroup(p.SingleThreaded())
++	for _, indexes := range filesByChecker {
++		wg.Queue(func() {
++			for _, i := range indexes {
++				diagnostics[i] = p.GetDeclarationDiagnostics(ctx, sourceFiles[i])
++			}
++		})
++	}
++	wg.RunAndWait()
++	return diagnostics
++}
++
+ func FilterNoEmitSemanticDiagnostics(diagnostics []*ast.Diagnostic, options *core.CompilerOptions) []*ast.Diagnostic {
+ 	if !options.NoEmit.IsTrue() {
+ 		return diagnostics
+-- 
+2.54.0 (Apple Git-157)
+

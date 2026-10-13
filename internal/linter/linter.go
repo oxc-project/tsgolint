@@ -308,6 +308,21 @@ func newRuleContext(ctxBuilder *ruleContextBuilder) rule.RuleContext {
 
 func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceFile, typeErrors TypeErrors, onInternalDiagnostic func(d diagnostic.Internal)) {
 	ctx := core.WithRequestID(context.Background(), "__single_run__")
+	reportDiagnostic := func(d *ast.Diagnostic) {
+		var filePath *string
+		textRange := core.UndefinedTextRange()
+		if file := d.File(); file != nil {
+			fileName := file.FileName()
+			filePath = &fileName
+			textRange = d.Loc()
+		}
+		onInternalDiagnostic(diagnostic.Internal{
+			Range:       textRange,
+			Id:          "TS" + strconv.Itoa(int(d.Code())),
+			Description: utils.GetDiagnosticMessage(d),
+			FilePath:    filePath,
+		})
+	}
 
 	if typeErrors.ReportSyntactic {
 		for _, file := range files {
@@ -316,12 +331,7 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 			syntacticDiagnostics := program.GetSyntacticDiagnostics(ctx, file)
 			for _, d := range syntacticDiagnostics {
 				if d.File() != nil && d.File().FileName() == fileName {
-					onInternalDiagnostic(diagnostic.Internal{
-						Range:       d.Loc(),
-						Id:          "TS" + strconv.Itoa(int(d.Code())),
-						Description: utils.GetDiagnosticMessage(d),
-						FilePath:    &fileName,
-					})
+					reportDiagnostic(d)
 				}
 			}
 		}
@@ -331,29 +341,39 @@ func reportTypeScriptDiagnostics(program *compiler.Program, files []*ast.SourceF
 		semanticDiagnosticsByFile := program.GetSemanticDiagnosticsWithoutNoEmitFiltering(ctx, files)
 
 		programOption := program.Options()
+		var declarationDiagnosticsByFile [][]*ast.Diagnostic
+		if programOption.GetEmitDeclarations() {
+			declarationDiagnosticsByFile = program.GetDeclarationDiagnosticsForFiles(ctx, files)
+		}
 
-		for _, file := range files {
+		for i, file := range files {
 			fileName := file.FileName()
 			finalDiagnostics := compiler.FilterNoEmitSemanticDiagnostics(semanticDiagnosticsByFile[file], programOption)
 			includeProcessorDiagnostics := program.GetIncludeProcessorDiagnostics(file)
-			if len(finalDiagnostics) == 0 && len(includeProcessorDiagnostics) == 0 {
+			var declarationDiagnostics []*ast.Diagnostic
+			if declarationDiagnosticsByFile != nil {
+				declarationDiagnostics = declarationDiagnosticsByFile[i]
+			}
+			if len(finalDiagnostics) == 0 && len(includeProcessorDiagnostics) == 0 && len(declarationDiagnostics) == 0 {
 				continue
 			}
-			finalDiagnostics = append(append(make([]*ast.Diagnostic, 0, len(finalDiagnostics)+len(includeProcessorDiagnostics)), finalDiagnostics...), includeProcessorDiagnostics...)
+			finalDiagnostics = append(make([]*ast.Diagnostic, 0, len(finalDiagnostics)+len(includeProcessorDiagnostics)+len(declarationDiagnostics)), finalDiagnostics...)
+			finalDiagnostics = append(finalDiagnostics, includeProcessorDiagnostics...)
+			finalDiagnostics = append(finalDiagnostics, declarationDiagnostics...)
 			if len(finalDiagnostics) > 1 {
 				finalDiagnostics = compiler.SortAndDeduplicateDiagnostics(finalDiagnostics)
 			}
 
 			for _, d := range finalDiagnostics {
 				if d.File() != nil && d.File().FileName() == fileName {
-					onInternalDiagnostic(diagnostic.Internal{
-						Range:       d.Loc(),
-						Id:          "TS" + strconv.Itoa(int(d.Code())),
-						Description: utils.GetDiagnosticMessage(d),
-						FilePath:    &fileName,
-					})
+					reportDiagnostic(d)
 				}
 			}
+		}
+
+		// Global diagnostics have no source file and may be discovered during checking.
+		for _, d := range program.GetGlobalDiagnostics(ctx) {
+			reportDiagnostic(d)
 		}
 	}
 }
