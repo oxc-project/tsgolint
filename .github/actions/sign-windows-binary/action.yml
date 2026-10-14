@@ -1,0 +1,70 @@
+name: Sign Windows binary
+
+# Authenticode-sign a single cross-compiled Windows `tsgolint` binary.
+#
+# Company-managed Windows machines enforce Microsoft Defender's ASR rule
+# "Block executable files from running unless they meet a prevalence, age, or
+# trusted list criteria", which silently blocks the unsigned tsgolint.exe that
+# oxlint spawns for type-aware rules:
+#
+#   Error: spawnSync ...\@oxlint-tsgolint\win32-x64\tsgolint.exe EACCES
+#     errno: -4092, code: 'EACCES', syscall: 'spawnSync ...tsgolint.exe'
+#
+# It is a policy block (no user-facing "Unblock" prompt), so end users cannot
+# override it. A valid Authenticode signature satisfies the ASR "trusted"
+# criterion for all enterprise Windows users. See
+# https://github.com/oxc-project/tsgolint/issues/876.
+#
+# Signing uses SignPath Foundation (free Authenticode signing for OSS), which
+# signs a GitHub-uploaded artifact via their service and therefore works from
+# this all-Linux pipeline (no Windows runner / signtool required). The
+# cross-compiled binary is still named `tsgolint` (no extension) at this stage;
+# Authenticode signs the PE image regardless of file name, and the signed bytes
+# are copied to `tsgolint.exe` later by gen-npm-packages.mjs. The SignPath
+# artifact configuration must therefore target the extension-less `tsgolint`
+# file inside the uploaded zip.
+
+inputs:
+  goarch:
+    description: Go architecture of the Windows binary to sign (e.g. amd64, arm64)
+    required: true
+  api-token:
+    description: SignPath REST API access token
+    required: true
+  organization-id:
+    description: SignPath organization ID
+    required: true
+  project-slug:
+    description: SignPath project slug
+    required: true
+  signing-policy-slug:
+    description: SignPath signing policy slug
+    required: true
+  artifact-configuration-slug:
+    description: SignPath artifact configuration slug
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Upload unsigned binary for signing
+      id: upload
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: unsigned-tsgolint-windows-${{ inputs.goarch }}
+        path: build/tsgolint-windows-${{ inputs.goarch }}/tsgolint
+        if-no-files-found: error
+
+    - name: Submit signing request
+      uses: SignPath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
+      with:
+        api-token: ${{ inputs.api-token }}
+        organization-id: ${{ inputs.organization-id }}
+        project-slug: ${{ inputs.project-slug }}
+        signing-policy-slug: ${{ inputs.signing-policy-slug }}
+        artifact-configuration-slug: ${{ inputs.artifact-configuration-slug }}
+        github-artifact-id: ${{ steps.upload.outputs.artifact-id }}
+        wait-for-completion: true
+        # Extracts the signed `tsgolint` back over the unsigned one so that
+        # gen-npm-packages.mjs packs the signed binary.
+        output-artifact-directory: build/tsgolint-windows-${{ inputs.goarch }}
