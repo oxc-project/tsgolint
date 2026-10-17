@@ -10,6 +10,19 @@ import (
 func TestNoUnnecessaryTypeAssertion(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTypeAssertionRule, []rule_tester.ValidTestCase{
+		// `object | null` to an all-optional shape: mutually assignable, yet the
+		// property reads exist only after the assertion. oxc-project/tsgolint#1283
+		{Code: `
+export function fields(error: unknown): string {
+  const structured = typeof error === 'object' && error !== null ? error : null;
+  const typed = structured as { code?: unknown; name?: unknown } | null;
+  return typeof typed?.code === 'string' ? typed.code : '';
+}
+    `},
+		{Code: `
+declare const value: object | undefined;
+const typed = value as { id?: string } | undefined;
+    `},
 		{Code: `
 import { TSESTree } from '@typescript-eslint/utils';
 declare const member: TSESTree.TSEnumMember;
