@@ -7,6 +7,14 @@ associating them with checkers. Program order is unchanged, and single-checker
 pools skip sorting. All other values retain the original assignment. See the
 [checker scheduling options](https://github.com/oxc-project/tsgolint/pull/1240).
 
+`0007-perf-checker-avoid-exponential-base-type-search-in-h.patch` makes
+`hasBaseType` search each type with several base types, and each intersection,
+only once. Without it, checking interfaces that share base types follows every
+path through them, and the number of paths doubles with each level of the
+hierarchy. The fix is proposed upstream in
+[microsoft/TypeScript#64737](https://github.com/microsoft/TypeScript/pull/64737);
+drop this patch once the pinned TypeScript includes it.
+
 These patches do not change the behavior of typescript-go.
 The main purpose of the patches is to tune tsgo performance a bit.
 
