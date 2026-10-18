@@ -10,6 +10,18 @@ import (
 func TestNoMisusedPromisesRule(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMisusedPromisesRule, []rule_tester.ValidTestCase{
+		{Code: `Promise.resolve().finally(async () => {});`},
+		{Code: `Promise.resolve()['finally'](async () => {});`},
+		{Code: `
+class Derived extends Promise<number> {}
+declare const value: Derived;
+value.finally(async () => {});
+`},
+		{Code: `
+function cleanup<P extends Promise<unknown>>(value: P) {
+  value.finally(async () => {});
+}
+`},
 		{Code: `
 if (true) {
 }
@@ -2885,5 +2897,14 @@ if (sent.push('a'), pending) {}
 				{MessageId: "conditional", Line: 6},
 			},
 		},
+	})
+}
+
+func TestNoMisusedPromisesFinallyControls(t *testing.T) {
+	t.Parallel()
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoMisusedPromisesRule, nil, []rule_tester.InvalidTestCase{
+		{Code: `declare const value: { finally(callback: () => void): void }; value.finally(async () => {});`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "voidReturnArgument"}}},
+		{Code: `namespace Local { export class Promise { finally(callback: () => void) {} } } new Local.Promise().finally(async () => {});`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "voidReturnArgument"}}},
+		{Code: `declare function accept(callback: () => void): void; Promise.resolve().finally(() => { accept(async () => {}); });`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "voidReturnArgument"}}},
 	})
 }
