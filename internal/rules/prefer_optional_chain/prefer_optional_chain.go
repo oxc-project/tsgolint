@@ -2007,6 +2007,13 @@ func (processor *chainProcessor) buildOrChains(operands []Operand) [][]Operand {
 		if len(chain) >= 2 {
 			break
 		}
+		// Restarting after an unrelated operand must apply the same guard as
+		// starting a fresh chain. A value comparison is not a nullish guard.
+		if processor.isInvalidOrChainStartingOperand(op) {
+			chain = nil
+			lastExpr = nil
+			continue
+		}
 		chain = []Operand{op}
 		lastExpr = op.comparedExpr
 	}
