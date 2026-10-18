@@ -10,6 +10,25 @@ import (
 func TestNoUnnecessaryTypeParameters(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnnecessaryTypeParametersRule, []rule_tester.ValidTestCase{
+		{Code: `
+type Pair<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? Pair<T> : never;
+`},
+		{Code: `
+type Pair<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? never : Pair<T>;
+`},
+		{Code: `
+type Pair<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? Pair<(T)> : never;
+`},
+		{Code: `
+type Outcome<T, E> = { value: T } | { error: E };
+type Flatten<R> = R extends Outcome<infer T, infer E> ? Outcome<T, E> : never;
+declare function flatten<T, E extends Error>(value: T): T extends Outcome<unknown, Error>
+  ? Flatten<Outcome<T, E>>
+  : T;
+`},
 		{Code: "\n      class ClassyArray<T> {\n        arr: T[];\n      }\n    "},
 		{Code: "\n      class ClassyArray<T> {\n        value1: T;\n        value2: T;\n      }\n    "},
 		{Code: "\n      class ClassyArray<T> {\n        arr: T[];\n        constructor(arr: T[]) {\n          this.arr = arr;\n        }\n      }\n    "},
@@ -186,5 +205,7 @@ func TestNoUnnecessaryTypeParameters(t *testing.T) {
 		{Code: "declare function foo<T extends string | number>(arg: [T?]): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 1, Column: 22, EndLine: 1, EndColumn: 47, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function foo(arg: [(string | number)?]): void;"}}}}},
 		{Code: "declare function foo<T extends () => void>(arg: [T?]): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 1, Column: 22, EndLine: 1, EndColumn: 42, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function foo(arg: [(() => void)?]): void;"}}}}},
 		{Code: "declare function foo<T extends string>(arg: [T?]): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 1, Column: 22, EndLine: 1, EndColumn: 38, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function foo(arg: [string?]): void;"}}}}},
+		{Code: "declare function takeArray<T>(input: Array<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeArray(input: Array<unknown>): void;"}}}}},
+		{Code: "declare function makeReadonlyArray<T>(): ReadonlyArray<T>;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function makeReadonlyArray(): ReadonlyArray<unknown>;"}}}}},
 	})
 }
