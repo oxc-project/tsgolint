@@ -23,6 +23,16 @@ export function fields(error: unknown): string {
 declare const value: object | undefined;
 const typed = value as { id?: string } | undefined;
     `},
+		// The cast adds a member through an intersection: still mutually assignable
+		// (the member is optional), and the union with `undefined` has no properties
+		// of its own to compare. oxc-project/tsgolint#1283
+		{Code: `
+interface Init { method?: string }
+export function f(inits: (Init | undefined)[]): unknown {
+  const init = inits[0] as (Init & { timeout?: unknown }) | undefined;
+  return init?.timeout;
+}
+    `},
 		{Code: `
 import { TSESTree } from '@typescript-eslint/utils';
 declare const member: TSESTree.TSEnumMember;
