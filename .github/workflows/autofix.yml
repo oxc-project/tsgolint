@@ -28,6 +28,7 @@ jobs:
       - uses: extractions/setup-crate@7577c1bdf2d95e6d65d532788f35ed79d4b1dda2 # v2.0.1
         with:
           repo: casey/just
+          version: 1.59.0
 
       - run: just fmt
 
