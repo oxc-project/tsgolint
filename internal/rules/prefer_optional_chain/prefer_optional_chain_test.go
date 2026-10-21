@@ -4382,5 +4382,52 @@ if (!item?.myField) {
           }
         `})
 
+	// Chains inside a function passed as a JSX attribute are not rendered as JSX children.
+	validCases = append(validCases,
+		rule_tester.ValidTestCase{Code: `declare const foo: { bar: string } | null; const el = <div>{foo && foo.bar}</div>;`, Tsx: true},
+		rule_tester.ValidTestCase{Code: `declare const foo: { bar: string } | null; const el = <div title={foo && foo.bar} />;`, Tsx: true},
+	)
+	invalidCases = append(invalidCases,
+		rule_tester.InvalidTestCase{
+			Code: `
+declare const ref: { current: { parentNode: unknown; remove(): void } | null };
+const el = (
+  <div
+    onClick={() => {
+      const g = ref.current;
+      if (g && g.parentNode) g.remove();
+    }}
+  />
+);`,
+			Tsx: true,
+			Output: []string{`
+declare const ref: { current: { parentNode: unknown; remove(): void } | null };
+const el = (
+  <div
+    onClick={() => {
+      const g = ref.current;
+      if (g?.parentNode) g.remove();
+    }}
+  />
+);`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+		rule_tester.InvalidTestCase{
+			Code: `declare const foo: { bar: string } | null; const el = <div onClick={function () { return foo && foo.bar; }} />;`,
+			Tsx:  true,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferOptionalChain",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{
+							MessageId: "optionalChainSuggest",
+							Output:    `declare const foo: { bar: string } | null; const el = <div onClick={function () { return foo?.bar; }} />;`,
+						},
+					},
+				},
+			},
+		},
+	)
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
