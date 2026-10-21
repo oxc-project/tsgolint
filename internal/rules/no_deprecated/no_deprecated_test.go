@@ -640,6 +640,24 @@ void { normalVariable };`,
 				"release-port-normal.ts": "export const normalVariable = 1;",
 			},
 		},
+		// A circular alias chain must not make the alias walk loop forever.
+		// The cases that import './file' set FileName, so that './file' is the file under test.
+		{Code: `export { x } from './file';`, FileName: "file.ts"},
+		{
+			Code:     `export { default } from './circular-reexport';`,
+			FileName: "file.ts",
+			Files: map[string]string{
+				"circular-reexport.ts": "export { default } from './file';",
+			},
+		},
+		{
+			Code: `import value from './circular-import-a';
+void value;`,
+			Files: map[string]string{
+				"circular-import-a.ts": "import value from './circular-import-b';\nexport default value;",
+				"circular-import-b.ts": "import value from './circular-import-a';\nexport default value;",
+			},
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Tsx: true,
@@ -2959,6 +2977,19 @@ oldValue;`,
 const /** @deprecated */ oldValue = 1;
 oldValue;`,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "deprecated", Line: 3}},
+		},
+		{
+			Code: `import value from './circular-deprecated';
+export default value;
+value;`,
+			FileName: "file.ts",
+			Files: map[string]string{
+				"circular-deprecated.ts": "import value from './file';\n/** @deprecated */\nexport default value;",
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "deprecated", Line: 2},
+				{MessageId: "deprecated", Line: 3},
+			},
 		},
 	})
 }

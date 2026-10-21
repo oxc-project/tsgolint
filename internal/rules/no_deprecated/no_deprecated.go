@@ -163,7 +163,12 @@ var NoDeprecatedRule = rule.Rule{
 
 			targetSymbol := ctx.TypeChecker.GetAliasedSymbol(symbol)
 
-			for utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsAlias) {
+			// A circular alias chain (for example `export { x } from './a'` in a.ts) never reaches nil or
+			// targetSymbol, so stop at the first alias that has been visited.
+			visited := map[*ast.Symbol]bool{}
+			for utils.IsSymbolFlagSet(symbol, ast.SymbolFlagsAlias) && !visited[symbol] {
+				visited[symbol] = true
+
 				isDeprecated, reason := getJsDocDeprecation(symbol)
 				if isDeprecated {
 					return true, reason
