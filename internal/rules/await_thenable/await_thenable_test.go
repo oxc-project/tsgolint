@@ -574,6 +574,117 @@ Promise.all([
   Promise.resolve(3),
 ]);
       `},
+		{
+			Code: `
+declare const maybePromises: (number | Promise<number>)[];
+Promise.all(maybePromises);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const maybePromises: [number, Promise<number>];
+Promise.all(maybePromises);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const maybePromises: number[] | Promise<number>[];
+Promise.all(maybePromises);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+Promise.all([1, 2, Promise.resolve(3)]);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const maybePromise: number | Promise<number>;
+Promise.all([1, maybePromise]);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+Promise.all([]);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+Promise.all(1);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const input: unknown;
+Promise.all(input);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const input: any;
+Promise.all(input);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+function test<T>(input: T) {
+  Promise.all(input);
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+function test<T extends Iterable<number | Promise<number>>>(maybePromises: T) {
+  Promise.all(maybePromises);
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const maybePromises: ReadonlyArray<number | PromiseLike<number>>;
+Promise.all(maybePromises);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const maybePromises: Set<number | Promise<number>>;
+Promise.all(maybePromises);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const value: unknown;
+Promise.all([1, value]);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const value: any;
+Promise.all([1, value]);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const promises: Promise<number>[];
+Promise.all([1, ...promises]);
+      `,
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: "await 0;",
@@ -1333,6 +1444,118 @@ Promise.all([...[1, 2, 3]]);
 					EndColumn: 26,
 				},
 			},
+		},
+		{
+			Code: `
+declare const numbers: number[];
+Promise.all(numbers);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+					Line:      3,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 20,
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const numbers: [number, string];
+Promise.all(numbers);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+					Line:      3,
+					Column:    13,
+					EndLine:   3,
+					EndColumn: 20,
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+Promise.all([1, 2]);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+					Line:      2,
+					Column:    14,
+					EndLine:   2,
+					EndColumn: 15,
+				},
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+					Line:      2,
+					Column:    17,
+					EndLine:   2,
+					EndColumn: 18,
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+Promise.all('abc');
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+declare const numbers: Set<number>;
+Promise.all(numbers);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+function test<T extends Iterable<number>>(numbers: T) {
+  Promise.all(numbers);
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": true}`),
+		},
+		{
+			Code: `
+Promise.all([1, Promise.resolve(2)]);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{}`),
+		},
+		{
+			Code: `
+Promise.all([1, Promise.resolve(2)]);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "invalidPromiseAggregatorInput",
+				},
+			},
+			Options: rule_tester.OptionsFromJSON[AwaitThenableOptions](`{"allowMixedPromiseArrays": false}`),
 		},
 	})
 }

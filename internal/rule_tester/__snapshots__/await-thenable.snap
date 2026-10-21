@@ -726,6 +726,159 @@ Help: Pass an iterable of Promise-like values, or wrap each synchronous value in
    3 |       
 ---
 
+[TestAwaitThenable/invalid-44 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:19)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   2 | declare const numbers: number[];
+   3 | Promise.all(numbers);
+     |             ~~~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:19)
+   2 | declare const numbers: number[];
+   3 | Promise.all(numbers);
+     |             ^^^^^^^ This expression is not Promise-like
+   4 |       
+---
+
+[TestAwaitThenable/invalid-45 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:19)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   2 | declare const numbers: [number, string];
+   3 | Promise.all(numbers);
+     |             ~~~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:19)
+   2 | declare const numbers: [number, string];
+   3 | Promise.all(numbers);
+     |             ^^^^^^^ This expression is not Promise-like
+   4 |       
+---
+
+[TestAwaitThenable/invalid-46 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:14)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   1 | 
+   2 | Promise.all([1, 2]);
+     |              ~
+   3 |       
+  Label: This expression is not Promise-like (2:14 - 2:14)
+   1 | 
+   2 | Promise.all([1, 2]);
+     |              ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:18)
+   1 | 
+   2 | Promise.all([1, 2]);
+     |             ^^^^^^ Promise aggregator input
+   3 |       
+
+Diagnostic 2: invalidPromiseAggregatorInput (2:17 - 2:17)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   1 | 
+   2 | Promise.all([1, 2]);
+     |                 ~
+   3 |       
+  Label: This expression is not Promise-like (2:17 - 2:17)
+   1 | 
+   2 | Promise.all([1, 2]);
+     |                 ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:18)
+   1 | 
+   2 | Promise.all([1, 2]);
+     |             ^^^^^^ Promise aggregator input
+   3 |       
+---
+
+[TestAwaitThenable/invalid-47 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:13 - 2:17)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   1 | 
+   2 | Promise.all('abc');
+     |             ~~~~~
+   3 |       
+  Label: This expression is not Promise-like (2:13 - 2:17)
+   1 | 
+   2 | Promise.all('abc');
+     |             ^^^^^ This expression is not Promise-like
+   3 |       
+---
+
+[TestAwaitThenable/invalid-48 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:13 - 3:19)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   2 | declare const numbers: Set<number>;
+   3 | Promise.all(numbers);
+     |             ~~~~~~~
+   4 |       
+  Label: This expression is not Promise-like (3:13 - 3:19)
+   2 | declare const numbers: Set<number>;
+   3 | Promise.all(numbers);
+     |             ^^^^^^^ This expression is not Promise-like
+   4 |       
+---
+
+[TestAwaitThenable/invalid-49 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (3:15 - 3:21)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   2 | function test<T extends Iterable<number>>(numbers: T) {
+   3 |   Promise.all(numbers);
+     |               ~~~~~~~
+   4 | }
+  Label: This expression is not Promise-like (3:15 - 3:21)
+   2 | function test<T extends Iterable<number>>(numbers: T) {
+   3 |   Promise.all(numbers);
+     |               ^^^^^^^ This expression is not Promise-like
+   4 | }
+---
+
+[TestAwaitThenable/invalid-50 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:14)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   1 | 
+   2 | Promise.all([1, Promise.resolve(2)]);
+     |              ~
+   3 |       
+  Label: This expression is not Promise-like (2:14 - 2:14)
+   1 | 
+   2 | Promise.all([1, Promise.resolve(2)]);
+     |              ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:35)
+   1 | 
+   2 | Promise.all([1, Promise.resolve(2)]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^ Promise aggregator input
+   3 |       
+---
+
+[TestAwaitThenable/invalid-51 - 1]
+Diagnostic 1: invalidPromiseAggregatorInput (2:14 - 2:14)
+Message: Unexpected iterable of non-Promise (non-"Thenable") values passed to promise aggregator.
+Help: Pass an iterable of Promise-like values, or wrap each synchronous value in `Promise.resolve(...)` before calling the aggregator.
+   1 | 
+   2 | Promise.all([1, Promise.resolve(2)]);
+     |              ~
+   3 |       
+  Label: This expression is not Promise-like (2:14 - 2:14)
+   1 | 
+   2 | Promise.all([1, Promise.resolve(2)]);
+     |              ^ This expression is not Promise-like
+   3 |       
+  Label: Promise aggregator input (2:13 - 2:35)
+   1 | 
+   2 | Promise.all([1, Promise.resolve(2)]);
+     |             ^^^^^^^^^^^^^^^^^^^^^^^ Promise aggregator input
+   3 |       
+---
+
 [TestRemoveAwaitAsyncFunction/invalid-0 - 1]
 Diagnostic 1: await (1:1 - 1:5)
 Message: Unexpected `await` of a non-Promise (non-"Thenable") value.

@@ -97,6 +97,8 @@ var promiseAggregatorMethods = []string{
 var AwaitThenableRule = rule.Rule{
 	Name: "await-thenable",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+		opts := utils.UnmarshalOptions[AwaitThenableOptions](options, "await-thenable")
+
 		return rule.RuleListeners{
 			ast.KindAwaitExpression: func(node *ast.Node) {
 				awaitArgument := node.AsAwaitExpression().Expression
@@ -145,6 +147,10 @@ var AwaitThenableRule = rule.Rule{
 
 				argument := expr.Arguments.Nodes[0]
 				if argument == nil {
+					return
+				}
+
+				if opts.AllowMixedPromiseArrays && hasMaybeAwaitableValue(ctx.TypeChecker, argument) {
 					return
 				}
 
@@ -308,6 +314,18 @@ func isInvalidPromiseAggregatorInput(
 	return false
 }
 
+func hasMaybeAwaitableValue(typeChecker *checker.Checker, node *ast.Node) bool {
+	t := utils.GetConstrainedTypeAtLocation(typeChecker, node)
+	for _, part := range utils.UnionTypeParts(t) {
+		for _, valueType := range getValueTypesOfArrayLike(typeChecker, part) {
+			if !isAlwaysNonAwaitableType(typeChecker, node, valueType) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func getValueTypesOfArrayLike(
 	typeChecker *checker.Checker,
 	t *checker.Type,
@@ -320,9 +338,11 @@ func getValueTypesOfArrayLike(
 		return []*checker.Type{numberIndexType}
 	}
 
-	typeArguments := checker.Checker_getTypeArguments(typeChecker, t)
-	if len(typeArguments) != 0 {
-		return typeArguments[:1]
+	if checker.Type_objectFlags(t)&checker.ObjectFlagsReference != 0 {
+		typeArguments := checker.Checker_getTypeArguments(typeChecker, t)
+		if len(typeArguments) != 0 {
+			return typeArguments[:1]
+		}
 	}
 
 	return nil

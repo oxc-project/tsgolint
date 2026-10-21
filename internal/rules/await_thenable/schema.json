@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "await_thenable_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowMixedPromiseArrays": {
+          "type": "boolean",
+          "description": "Whether to allow promise aggregators to receive iterables mixing Promise and non-Promise values, as long as at least one value may be a Promise.",
+          "default": false
+        }
+      }
+    }
+  }
+}
