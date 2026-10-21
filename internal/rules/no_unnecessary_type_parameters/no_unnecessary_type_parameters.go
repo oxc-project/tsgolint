@@ -3,6 +3,7 @@ package no_unnecessary_type_parameters
 import (
 	"fmt"
 	"math"
+	"slices"
 	"sort"
 
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -300,7 +301,7 @@ func getStartOfBody(node *ast.Node) int {
 	return math.MaxInt
 }
 
-func isTypeParameterRepeatedInAST(typeParameter *ast.Node, references []*ast.Node, startOfBody int) bool {
+func isTypeParameterRepeatedInAST(ctx rule.RuleContext, typeParameter *ast.Node, references []*ast.Node, startOfBody int) bool {
 	total := 0
 
 	for _, reference := range references {
@@ -312,6 +313,27 @@ func isTypeParameterRepeatedInAST(typeParameter *ast.Node, references []*ast.Nod
 		// References in the body don't count for fast-path usage checks.
 		if reference.Pos() > startOfBody {
 			continue
+		}
+
+		// A type argument can be reused by the generic type even when it occurs
+		// only once in this signature. Leave arrays to the type-aware check.
+		if ast.IsTypeReferenceNode(reference.Parent) {
+			typeArgument := reference.Parent
+			for typeArgument.Parent != nil && ast.IsParenthesizedTypeNode(typeArgument.Parent) {
+				typeArgument = typeArgument.Parent
+			}
+			if parent := typeArgument.Parent; parent != nil {
+				switch parent.Kind {
+				case ast.KindTypeReference, ast.KindExpressionWithTypeArguments, ast.KindImportType, ast.KindTypeQuery:
+					isArray := false
+					if ast.IsTypeReferenceNode(parent) {
+						isArray = checker.Checker_isArrayType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(parent))
+					}
+					if !isArray && slices.Contains(parent.TypeArguments(), typeArgument) {
+						return true
+					}
+				}
+			}
 		}
 
 		total++
@@ -583,7 +605,7 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 
 		typeParameterNameNode := typeParameter.AsTypeParameterDeclaration().Name()
 		references := collectTypeParameterReferenceNodes(ctx, node, typeParameterSymbol, typeParameterNameNode)
-		if isTypeParameterRepeatedInAST(typeParameter, references, startOfBody) {
+		if isTypeParameterRepeatedInAST(ctx, typeParameter, references, startOfBody) {
 			continue
 		}
 

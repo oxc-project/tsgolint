@@ -1118,3 +1118,58 @@ Message: Type parameter T is used only once in the function signature.
      |                                              ^ This is the only usage of type parameter T in the signature.
   Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
 ---
+
+[TestNoUnnecessaryTypeParameters/invalid-79 - 1]
+Diagnostic 1: sole (1:28 - 1:28)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function takeArray<T>(input: Array<T>): void;
+     |                            ~
+  Label: This is the only usage of type parameter T in the signature. (1:44 - 1:44)
+   1 | declare function takeArray<T>(input: Array<T>): void;
+     |                                            ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-80 - 1]
+Diagnostic 1: sole (1:36 - 1:36)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function makeReadonlyArray<T>(): ReadonlyArray<T>;
+     |                                    ~
+  Label: This is the only usage of type parameter T in the signature. (1:56 - 1:56)
+   1 | declare function makeReadonlyArray<T>(): ReadonlyArray<T>;
+     |                                                        ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-81 - 1]
+Diagnostic 1: sole (1:37 - 1:37)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function takeQualifiedArray<T>(input: globalThis.Array<T>): void;
+     |                                     ~
+  Label: This is the only usage of type parameter T in the signature. (1:64 - 1:64)
+   1 | declare function takeQualifiedArray<T>(input: globalThis.Array<T>): void;
+     |                                                                ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-82 - 1]
+Diagnostic 1: sole (1:45 - 1:45)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function takeQualifiedReadonlyArray<T>(input: globalThis.ReadonlyArray<T>): void;
+     |                                             ~
+  Label: This is the only usage of type parameter T in the signature. (1:80 - 1:80)
+   1 | declare function takeQualifiedReadonlyArray<T>(input: globalThis.ReadonlyArray<T>): void;
+     |                                                                                ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
+
+[TestNoUnnecessaryTypeParameters/invalid-83 - 1]
+Diagnostic 1: sole (1:45 - 1:45)
+Message: Type parameter T is used only once in the function signature.
+   1 | declare function makeQualifiedReadonlyArray<T>(): globalThis.ReadonlyArray<T>;
+     |                                             ~
+  Label: This is the only usage of type parameter T in the signature. (1:76 - 1:76)
+   1 | declare function makeQualifiedReadonlyArray<T>(): globalThis.ReadonlyArray<T>;
+     |                                                                            ^ This is the only usage of type parameter T in the signature.
+  Suggestion 1: [replaceUsagesWithConstraint] Replace all usages of type parameter with its constraint.
+---
