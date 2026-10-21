@@ -4382,5 +4382,71 @@ if (!item?.myField) {
           }
         `})
 
+	// https://github.com/oxc-project/tsgolint/issues/1280
+	// A lone strict nullish check right before a trailing comparison is not reported,
+	// matching typescript-eslint.
+	validCases = append(validCases,
+		rule_tester.ValidTestCase{Code: `
+          declare const a: { kind: "origin" } | { kind: "refused"; reason: string } | null;
+          a !== null && a.kind === "refused";
+        `},
+		rule_tester.ValidTestCase{Code: `
+          declare const b: { kind: string } | null;
+          b !== null && b.kind === "refused";
+        `},
+		rule_tester.ValidTestCase{Code: `
+          declare const c: { kind: string } | null | undefined;
+          c !== null && c.kind === "refused";
+        `},
+		rule_tester.ValidTestCase{Code: `
+          declare const d: { kind: string } | undefined;
+          d !== undefined && d.kind === "refused";
+        `},
+		rule_tester.ValidTestCase{Code: `
+          declare const e: { x: { kind: string } | null } | null;
+          e && e.x !== null && e.x.kind === "refused";
+        `},
+	)
+	invalidCases = append(invalidCases,
+		rule_tester.InvalidTestCase{
+			Code: `
+          declare const c: { kind: string } | null | undefined;
+          c != null && c.kind === "refused";
+        `,
+			Output: []string{`
+          declare const c: { kind: string } | null | undefined;
+          c?.kind === "refused";
+        `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+		rule_tester.InvalidTestCase{
+			Code: `
+          declare const b: { kind: string } | null;
+          b !== null && b.kind;
+        `,
+			Errors: []rule_tester.InvalidTestCaseError{{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "optionalChainSuggest",
+					Output: `
+          declare const b: { kind: string } | null;
+          b?.kind;
+        `,
+				}},
+			}},
+		},
+		rule_tester.InvalidTestCase{
+			Code: `
+          declare const c: { kind: string } | null | undefined;
+          c !== null && c !== undefined && c.kind === "refused";
+        `,
+			Output: []string{`
+          declare const c: { kind: string } | null | undefined;
+          c?.kind === "refused";
+        `},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		},
+	)
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
