@@ -10,25 +10,6 @@ import (
 func TestNoUnnecessaryTypeParameters(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &NoUnnecessaryTypeParametersRule, []rule_tester.ValidTestCase{
-		{Code: `
-type Pair<T> = [T, T];
-declare function makePair<K, T>(kind: K): K extends string ? Pair<T> : never;
-`},
-		{Code: `
-type Pair<T> = [T, T];
-declare function makePair<K, T>(kind: K): K extends string ? never : Pair<T>;
-`},
-		{Code: `
-type Pair<T> = [T, T];
-declare function makePair<K, T>(kind: K): K extends string ? Pair<(T)> : never;
-`},
-		{Code: `
-type Outcome<T, E> = { value: T } | { error: E };
-type Flatten<R> = R extends Outcome<infer T, infer E> ? Outcome<T, E> : never;
-declare function flatten<T, E extends Error>(value: T): T extends Outcome<unknown, Error>
-  ? Flatten<Outcome<T, E>>
-  : T;
-`},
 		{Code: "\n      class ClassyArray<T> {\n        arr: T[];\n      }\n    "},
 		{Code: "\n      class ClassyArray<T> {\n        value1: T;\n        value2: T;\n      }\n    "},
 		{Code: "\n      class ClassyArray<T> {\n        arr: T[];\n        constructor(arr: T[]) {\n          this.arr = arr;\n        }\n      }\n    "},
@@ -125,6 +106,25 @@ declare function flatten<T, E extends Error>(value: T): T extends Outcome<unknow
 		{Code: "\ntype Silly<T> = { [P in keyof T]: T[P] };\n\ntype SillyFoo<T, Value> = Silly<{ [P in keyof T]: Value }>;\n\ntype Foo<T, Value> = { [P in keyof T]: Value };\n\ndeclare function foo<T, Constant>(data: T, c: Constant): Foo<T, Constant>;\ndeclare function foo<T, Constant>(c: Constant): (data: T) => Foo<T, Constant>;\n\ndeclare function sillyFoo<T, Constant>(\n  data: T,\n  c: Constant,\n): SillyFoo<T, Constant>;\ndeclare function sillyFoo<T, Constant>(\n  c: Constant,\n): (data: T) => SillyFoo<T, Constant>;\n    "},
 		{Code: "\nconst f = <T,>(setValue: (v: T) => void, getValue: () => NoInfer<T>) => {};\n    "},
 		{Code: "\nconst f = <T,>(\n  setValue: (v: T) => NoInfer<T>,\n  getValue: (v: NoInfer<T>) => NoInfer<T>,\n) => {};\n    "},
+		{Code: `
+type Pair<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? Pair<T> : never;
+`},
+		{Code: `
+type Pair<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? never : Pair<T>;
+`},
+		{Code: `
+type Pair<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? Pair<(T)> : never;
+`},
+		{Code: `
+type Outcome<T, E> = { value: T } | { error: E };
+type Flatten<R> = R extends Outcome<infer T, infer E> ? Outcome<T, E> : never;
+declare function flatten<T, E extends Error>(value: T): T extends Outcome<unknown, Error>
+  ? Flatten<Outcome<T, E>>
+  : T;
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const func = <T,>(param: T) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: unknown) => null;"}}}}},
 		{Code: "const func = <T,>(param: [T]) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: [unknown]) => null;"}}}}},
