@@ -10,6 +10,24 @@ import (
 	"github.com/typescript-eslint/tsgolint/internal/utils"
 )
 
+// getJsxAttributePropType returns the declared type of the prop that a JSX attribute sets, or nil
+// if it cannot be resolved. `nameNode` must be the name of the attribute.
+func getJsxAttributePropType(typeChecker *checker.Checker, nameNode *ast.Node) *checker.Type {
+	attribute := nameNode.Parent
+	if attribute == nil || attribute.Kind != ast.KindJsxAttribute || attribute.Name() != nameNode || !ast.IsIdentifier(nameNode) {
+		return nil
+	}
+	attributesType := checker.Checker_getApparentTypeOfContextualType(typeChecker, attribute.Parent, checker.ContextFlagsNone)
+	if attributesType == nil || utils.IsTypeAnyType(attributesType) {
+		return nil
+	}
+	prop := checker.Checker_getPropertyOfType(typeChecker, attributesType, nameNode.Text())
+	if prop == nil {
+		return nil
+	}
+	return checker.Checker_getTypeOfSymbol(typeChecker, prop)
+}
+
 func formatSenderType(senderType *checker.Type) string {
 	if utils.IsIntrinsicErrorType(senderType) {
 		return "error typed"
@@ -396,7 +414,15 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 				// handle cases when we assign any ==> unknown.
 				if utils.IsTypeUnknownType(receiverType) {
-					return false
+					// The contextual type of a JSX attribute value is `unknown` both for props
+					// declared as `unknown` and for props declared as `any` when the props type is
+					// an intersection (for example with `JSX.IntrinsicAttributes`), because the
+					// checker replaces `any` with `unknown` there. Use the declared prop type instead.
+					propType := getJsxAttributePropType(ctx.TypeChecker, receiverNode)
+					if propType == nil || utils.IsTypeUnknownType(propType) {
+						return false
+					}
+					receiverType = propType
 				}
 
 				if !isNoImplicitThis {

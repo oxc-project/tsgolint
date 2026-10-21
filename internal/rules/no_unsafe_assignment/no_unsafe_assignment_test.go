@@ -153,6 +153,18 @@ let a = 1;
 
 a+= foo;
 		`},
+		{
+			Code: `
+declare namespace JSX {
+  interface Element {}
+  interface IntrinsicAttributes { key?: string }
+}
+declare function Foo(props: { a: unknown; b?: unknown }): null;
+declare const v: any;
+<Foo a={v} b={v} />;
+      `,
+			Tsx: true,
+		},
 	}, slices.Concat([]rule_tester.InvalidTestCase{
 		{
 			Code: "const x = 1 as any;",
@@ -525,6 +537,26 @@ foo = { bar: 2 } as any;
 						Line:      4,
 						Column:    1,
 						EndColumn: 24,
+					},
+				},
+			},
+			{
+				Code: `
+declare namespace JSX {
+  interface Element {}
+  interface IntrinsicAttributes { key?: string }
+}
+declare function Foo(props: { a: any; b: string }): null;
+declare const v: any;
+<Foo a={v} b="x" />;
+      `,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "anyAssignment",
+						Line:      8,
+						Column:    9,
+						EndColumn: 10,
 					},
 				},
 			},
