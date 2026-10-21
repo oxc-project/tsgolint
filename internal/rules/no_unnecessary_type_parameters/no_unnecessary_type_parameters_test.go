@@ -125,6 +125,17 @@ declare function flatten<T, E extends Error>(value: T): T extends Outcome<unknow
   ? Flatten<Outcome<T, E>>
   : T;
 `},
+		{Code: "declare function makeQualifiedArray<T>(): globalThis.Array<T>;"},
+		{Code: `
+export {};
+type Array<T> = [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? Array<T> : never;
+`},
+		{Code: `
+export {};
+type ReadonlyArray<T> = readonly [T, T];
+declare function makePair<K, T>(kind: K): K extends string ? ReadonlyArray<T> : never;
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const func = <T,>(param: T) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: unknown) => null;"}}}}},
 		{Code: "const func = <T,>(param: [T]) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: [unknown]) => null;"}}}}},
@@ -207,5 +218,8 @@ declare function flatten<T, E extends Error>(value: T): T extends Outcome<unknow
 		{Code: "declare function foo<T extends string>(arg: [T?]): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 1, Column: 22, EndLine: 1, EndColumn: 38, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function foo(arg: [string?]): void;"}}}}},
 		{Code: "declare function takeArray<T>(input: Array<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeArray(input: Array<unknown>): void;"}}}}},
 		{Code: "declare function makeReadonlyArray<T>(): ReadonlyArray<T>;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function makeReadonlyArray(): ReadonlyArray<unknown>;"}}}}},
+		{Code: "declare function takeQualifiedArray<T>(input: globalThis.Array<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeQualifiedArray(input: globalThis.Array<unknown>): void;"}}}}},
+		{Code: "declare function takeQualifiedReadonlyArray<T>(input: globalThis.ReadonlyArray<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeQualifiedReadonlyArray(input: globalThis.ReadonlyArray<unknown>): void;"}}}}},
+		{Code: "declare function makeQualifiedReadonlyArray<T>(): globalThis.ReadonlyArray<T>;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function makeQualifiedReadonlyArray(): globalThis.ReadonlyArray<unknown>;"}}}}},
 	})
 }

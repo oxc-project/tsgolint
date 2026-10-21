@@ -301,7 +301,7 @@ func getStartOfBody(node *ast.Node) int {
 	return math.MaxInt
 }
 
-func isTypeParameterRepeatedInAST(typeParameter *ast.Node, references []*ast.Node, startOfBody int) bool {
+func isTypeParameterRepeatedInAST(ctx rule.RuleContext, typeParameter *ast.Node, references []*ast.Node, startOfBody int) bool {
 	total := 0
 
 	for _, reference := range references {
@@ -327,8 +327,7 @@ func isTypeParameterRepeatedInAST(typeParameter *ast.Node, references []*ast.Nod
 				case ast.KindTypeReference, ast.KindExpressionWithTypeArguments, ast.KindImportType, ast.KindTypeQuery:
 					isArray := false
 					if ast.IsTypeReferenceNode(parent) {
-						typeName := parent.AsTypeReferenceNode().TypeName
-						isArray = ast.IsIdentifier(typeName) && (typeName.Text() == "Array" || typeName.Text() == "ReadonlyArray")
+						isArray = checker.Checker_isArrayType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(parent))
 					}
 					if !isArray && slices.Contains(parent.TypeArguments(), typeArgument) {
 						return true
@@ -606,7 +605,7 @@ func checkNoUnnecessaryTypeParametersNode(ctx rule.RuleContext, node *ast.Node, 
 
 		typeParameterNameNode := typeParameter.AsTypeParameterDeclaration().Name()
 		references := collectTypeParameterReferenceNodes(ctx, node, typeParameterSymbol, typeParameterNameNode)
-		if isTypeParameterRepeatedInAST(typeParameter, references, startOfBody) {
+		if isTypeParameterRepeatedInAST(ctx, typeParameter, references, startOfBody) {
 			continue
 		}
 
