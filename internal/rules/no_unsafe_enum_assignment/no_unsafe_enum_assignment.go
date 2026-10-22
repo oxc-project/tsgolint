@@ -198,8 +198,15 @@ var NoUnsafeEnumAssignmentRule = rule.Rule{
 				if nameKnown {
 					if clauses := utils.GetHeritageClauses(node.Parent); clauses != nil {
 						for _, clause := range clauses.Nodes {
+							if ast.IsStatic(node) && clause.AsHeritageClause().Token != ast.KindExtendsKeyword {
+								continue
+							}
 							for _, heritage := range clause.AsHeritageClause().Types.Nodes {
-								if symbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(heritage), memberName); symbol != nil {
+								heritageNode := heritage
+								if ast.IsStatic(node) {
+									heritageNode = heritage.Expression()
+								}
+								if symbol := checker.Checker_getPropertyOfType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(heritageNode), memberName); symbol != nil {
 									heritageTypes = append(heritageTypes, checker.Checker_getTypeOfSymbol(ctx.TypeChecker, symbol))
 								}
 							}

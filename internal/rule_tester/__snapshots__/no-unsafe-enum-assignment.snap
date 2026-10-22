@@ -1252,3 +1252,30 @@ Message: The value assigned here does not have a shared enum type with the expec
      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 | }
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-137 - 1]
+Diagnostic 1: unsafeEnumAssignment (4:28 - 4:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   3 | class Base { static fruit: Fruit = Fruit.Apple }
+   4 | class Child extends Base { static fruit = 1 }
+     |                            ~~~~~~~~~~~~~~~~
+   5 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-138 - 1]
+Diagnostic 1: unsafeEnumAssignment (5:28 - 5:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   4 | class Base { static fruit: Fruit = Fruit.Apple }
+   5 | class Child extends Base { static [key] = 1 }
+     |                            ~~~~~~~~~~~~~~~~
+   6 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-139 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:16 - 3:38)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   2 | enum Fruit { Apple }
+   3 | class Basket { static fruit: Fruit = 1 }
+     |                ~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---

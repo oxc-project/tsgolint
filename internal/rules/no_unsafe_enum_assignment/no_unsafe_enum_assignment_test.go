@@ -1274,6 +1274,33 @@ class TestBasket implements Basket {
   [fruit] = 1;
 }
 `},
+		{Code: `
+enum Fruit { Apple }
+interface Basket { fruit: Fruit }
+class TestBasket implements Basket {
+  static fruit = 1;
+  fruit = Fruit.Apple;
+}
+`},
+		{Code: `
+enum Fruit { Apple }
+class Base { fruit: Fruit = Fruit.Apple }
+class Child extends Base { static fruit = 1 }
+`},
+		{Code: `
+enum Fruit { Apple }
+interface Basket { fruit: Fruit }
+class Base { static fruit = 0 }
+class Child extends Base implements Basket {
+  static fruit = 1;
+  fruit = Fruit.Apple;
+}
+`},
+		{Code: `
+enum Fruit { Apple }
+class Base { static fruit: Fruit = Fruit.Apple }
+class Child extends Base { fruit = 1 }
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 enum Fruit {
@@ -2594,6 +2621,21 @@ interface TargetDeep<T> { box: TargetBox<T> }
 function convert<T>(source: { deep: SourceDeep<T>; shallow: SourceBox<T> }) {
   const target: { deep: TargetDeep<T>; shallow: TargetBox<T> } = source;
 }
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+class Base { static fruit: Fruit = Fruit.Apple }
+class Child extends Base { static fruit = 1 }
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+const key = 'fruit';
+class Base { static fruit: Fruit = Fruit.Apple }
+class Child extends Base { static [key] = 1 }
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+class Basket { static fruit: Fruit = 1 }
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
 	})
 }
