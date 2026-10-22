@@ -1225,3 +1225,30 @@ Message: The value assigned here does not have a shared enum type with the expec
      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    9 | 
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-134 - 1]
+Diagnostic 1: unsafeEnumAssignment (14:7 - 14:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  13 | declare const source: Source;
+  14 | const target: Target = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+  15 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-135 - 1]
+Diagnostic 1: unsafeEnumAssignment (14:7 - 14:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  13 | declare const source: Source;
+  14 | const target: Target = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+  15 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-136 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:9 - 8:71)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | function convert<T>(source: { deep: SourceDeep<T>; shallow: SourceBox<T> }) {
+   8 |   const target: { deep: TargetDeep<T>; shallow: TargetBox<T> } = source;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 | }
+---

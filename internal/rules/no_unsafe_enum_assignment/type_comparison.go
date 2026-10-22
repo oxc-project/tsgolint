@@ -11,6 +11,11 @@ import (
 
 type typePair struct{ sender, receiver *checker.Type }
 
+type comparisonVisit struct {
+	typePair
+	withinGenericMembers bool
+}
+
 const maximumTypeComparisonDepth = 5
 
 type enumTypeChecker struct {
@@ -57,12 +62,12 @@ func (c *enumTypeChecker) mismatch(sender, receiver *checker.Type) bool {
 	if mismatch, ok := c.mismatches[pair]; ok {
 		return mismatch
 	}
-	mismatch := c.deepMismatch(sender, receiver, make(map[typePair]bool), 0, false)
+	mismatch := c.deepMismatch(sender, receiver, make(map[comparisonVisit]int), 0, false)
 	c.mismatches[pair] = mismatch
 	return mismatch
 }
 
-func (c *enumTypeChecker) deepMismatch(sender, receiver *checker.Type, visited map[typePair]bool, depth int, withinGenericMembers bool) bool {
+func (c *enumTypeChecker) deepMismatch(sender, receiver *checker.Type, visited map[comparisonVisit]int, depth int, withinGenericMembers bool) bool {
 	if depth > maximumTypeComparisonDepth {
 		return false
 	}
@@ -70,11 +75,11 @@ func (c *enumTypeChecker) deepMismatch(sender, receiver *checker.Type, visited m
 	if sender == receiver {
 		return false
 	}
-	pair := typePair{sender, receiver}
-	if visited[pair] {
+	visit := comparisonVisit{typePair{sender, receiver}, withinGenericMembers}
+	if previousDepth, ok := visited[visit]; ok && previousDepth <= depth {
 		return false
 	}
-	visited[pair] = true
+	visited[visit] = depth
 	if c.directMismatch(sender, receiver) {
 		return true
 	}

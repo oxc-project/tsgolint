@@ -2555,5 +2555,45 @@ interface Basket<T> {
 declare const source: { fruit: number; next: never };
 const target: Basket<number> = source;
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+interface NumberBox { fruit: number }
+interface FruitBox { fruit: Fruit }
+interface Source {
+  deep: { a: { b: { c: { d: NumberBox } } } };
+  shallow: NumberBox;
+}
+interface Target {
+  deep: { a: { b: { c: { d: FruitBox } } } };
+  shallow: FruitBox;
+}
+declare const source: Source;
+const target: Target = source;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+interface NumberBox { fruit: number }
+interface FruitBox { fruit: Fruit }
+interface Source {
+  shallow: NumberBox;
+  deep: { a: { b: { c: { d: NumberBox } } } };
+}
+interface Target {
+  shallow: FruitBox;
+  deep: { a: { b: { c: { d: FruitBox } } } };
+}
+declare const source: Source;
+const target: Target = source;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+interface SourceBox<T> { fruit: number; value: T }
+interface TargetBox<T> { fruit: Fruit; value: T }
+interface SourceDeep<T> { box: SourceBox<T> }
+interface TargetDeep<T> { box: TargetBox<T> }
+function convert<T>(source: { deep: SourceDeep<T>; shallow: SourceBox<T> }) {
+  const target: { deep: TargetDeep<T>; shallow: TargetBox<T> } = source;
+}
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
 	})
 }
