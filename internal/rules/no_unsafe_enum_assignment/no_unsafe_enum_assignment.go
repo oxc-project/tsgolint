@@ -241,6 +241,11 @@ var NoUnsafeEnumAssignmentRule = rule.Rule{
 			ast.KindPostfixUnaryExpression:  func(node *ast.Node) { checkMutation(node.AsPostfixUnaryExpression().Operand, node) },
 			ast.KindAsExpression:            checkAssertion,
 			ast.KindTypeAssertionExpression: checkAssertion,
+			ast.KindSatisfiesExpression: func(node *ast.Node) {
+				if !checked[node] {
+					checkAssignment(ctx.TypeChecker.GetTypeAtLocation(node.Type()), node.Expression(), node, "unsafeEnumAssignment", nil)
+				}
+			},
 			ast.KindReturnStatement: func(node *ast.Node) {
 				if expr := node.Expression(); expr != nil {
 					checkReturn(expr, node)

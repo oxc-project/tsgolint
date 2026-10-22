@@ -1279,3 +1279,39 @@ Message: The value assigned here does not have a shared enum type with the expec
      |                ~~~~~~~~~~~~~~~~~~~~~~~
    4 | 
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-140 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:15 - 3:31)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   2 | enum Fruit { Apple }
+   3 | const fruit = 0 satisfies Fruit;
+     |               ~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-141 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:19 - 3:49)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Vegetable'.
+   2 | enum Vegetable { Asparagus = 'asparagus' }
+   3 | const vegetable = 'asparagus' satisfies Vegetable;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-142 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:7 - 3:38)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   2 | enum Fruit { Apple }
+   3 | const fruit: Fruit = 0 satisfies Fruit;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-143 - 1]
+Diagnostic 1: unsafeEnumReturn (4:3 - 4:27)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   3 | function getFruit(): Fruit {
+   4 |   return 0 satisfies Fruit;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | }
+---

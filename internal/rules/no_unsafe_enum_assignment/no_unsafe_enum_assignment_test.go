@@ -1301,6 +1301,15 @@ enum Fruit { Apple }
 class Base { static fruit: Fruit = Fruit.Apple }
 class Child extends Base { fruit = 1 }
 `},
+		{Code: `
+enum Fruit { Apple }
+const fruit = Fruit.Apple satisfies Fruit;
+const value = 0 satisfies number;
+`},
+		{Code: `
+enum Flags { Read = 1, Write = 2 }
+const flags = (Flags.Read | Flags.Write) satisfies Flags;
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 enum Fruit {
@@ -2637,5 +2646,23 @@ class Child extends Base { static [key] = 1 }
 enum Fruit { Apple }
 class Basket { static fruit: Fruit = 1 }
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+const fruit = 0 satisfies Fruit;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment", Line: 3, Column: 15, EndLine: 3, EndColumn: 32}}},
+		{Code: `
+enum Vegetable { Asparagus = 'asparagus' }
+const vegetable = 'asparagus' satisfies Vegetable;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+const fruit: Fruit = 0 satisfies Fruit;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+function getFruit(): Fruit {
+  return 0 satisfies Fruit;
+}
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumReturn"}}},
 	})
 }
