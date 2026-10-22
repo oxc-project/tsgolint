@@ -2229,6 +2229,97 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unsafe-member-access",
   },
   {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The value assigned here does not have a shared enum type with the expected enum 'Fruit'.",
+      "id": "unsafeEnumAssignment",
+    },
+    "range": {
+      "end": 57,
+      "pos": 41,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The value assigned here does not have a shared enum type with the expected enum 'Fruit'.",
+      "id": "unsafeEnumAssignment",
+    },
+    "range": {
+      "end": 85,
+      "pos": 84,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The argument passed here does not have a shared enum type with the expected enum 'Fruit'.",
+      "id": "unsafeEnumArgument",
+    },
+    "range": {
+      "end": 157,
+      "pos": 156,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The value returned here does not have a shared enum type with the expected enum 'Fruit'.",
+      "id": "unsafeEnumReturn",
+    },
+    "range": {
+      "end": 201,
+      "pos": 192,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The value asserted here does not have a shared enum type with the expected enum 'Fruit'.",
+      "id": "unsafeEnumAssertion",
+    },
+    "range": {
+      "end": 232,
+      "pos": 222,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This mutation can produce a value outside of the expected enum 'Fruit'.",
+      "id": "unsafeEnumMutation",
+    },
+    "range": {
+      "end": 270,
+      "pos": 261,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "The computed key used here does not have a shared enum type with the expected enum 'Fruit'.",
+      "id": "unsafeEnumAccess",
+    },
+    "range": {
+      "end": 329,
+      "pos": 328,
+    },
+    "rule": "no-unsafe-enum-assignment",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-comparison/index.ts",
     "kind": 0,
     "message": {
