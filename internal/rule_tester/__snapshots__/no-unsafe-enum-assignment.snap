@@ -1315,3 +1315,39 @@ Message: The value returned here does not have a shared enum type with the expec
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~
    5 | }
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-144 - 1]
+Diagnostic 1: unsafeEnumAccess (5:5 - 5:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   4 | declare const map: FruitMap;
+   5 | map[0];
+     |     ~
+   6 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-145 - 1]
+Diagnostic 1: unsafeEnumAccess (6:7 - 6:7)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | declare const map: Alias;
+   6 | map?.[0];
+     |       ~
+   7 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-146 - 1]
+Diagnostic 1: unsafeEnumAccess (5:5 - 5:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   4 | declare const map: EnumMap<Fruit>;
+   5 | map[0];
+     |     ~
+   6 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-147 - 1]
+Diagnostic 1: unsafeEnumAccess (4:5 - 4:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   3 | declare const map: Record<Fruit, string>;
+   4 | map[0];
+     |     ~
+   5 | 
+---

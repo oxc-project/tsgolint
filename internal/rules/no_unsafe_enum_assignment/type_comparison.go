@@ -197,6 +197,29 @@ func mappedKeyConstraintTypes(typeChecker *checker.Checker, declaration *ast.Nod
 	if typeNode == nil {
 		return nil
 	}
+	if ast.IsTypeReferenceNode(typeNode) {
+		t := checker.Checker_getTypeFromTypeNode(typeChecker, typeNode)
+		if utils.IsObjectType(t) && checker.Type_objectFlags(t)&checker.ObjectFlagsMapped != 0 {
+			if symbol := checker.Type_symbol(t); symbol != nil {
+				for _, declaration := range symbol.Declarations {
+					if ast.IsMappedTypeNode(declaration) && declaration.AsMappedTypeNode().NameType != nil {
+						return nil
+					}
+				}
+			}
+			checker.Checker_getPropertiesOfType(typeChecker, t)
+			constraint := checker.MappedType_constraintType(t.AsMappedType())
+			if constraint != nil {
+				constrained := checker.Checker_getBaseConstraintOfType(typeChecker, constraint)
+				if constrained == nil {
+					constrained = constraint
+				}
+				if len(utils.GetEnumTypes(typeChecker, constrained)) > 0 {
+					return []*checker.Type{constraint}
+				}
+			}
+		}
+	}
 	if ast.IsMappedTypeNode(typeNode) {
 		constraint := typeNode.AsMappedTypeNode().TypeParameter.AsTypeParameterDeclaration().Constraint
 		if constraint != nil {

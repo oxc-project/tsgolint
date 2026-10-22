@@ -1310,6 +1310,37 @@ const value = 0 satisfies number;
 enum Flags { Read = 1, Write = 2 }
 const flags = (Flags.Read | Flags.Write) satisfies Flags;
 `},
+		{Code: `
+enum Fruit { Apple }
+type FruitMap = { [K in Fruit]: string };
+declare const map: FruitMap;
+map[Fruit.Apple];
+map?.[Fruit.Apple];
+`},
+		{Code: `
+enum Fruit { Apple }
+type StringMap = { [K in string]: string };
+declare const map: StringMap;
+map[0];
+`},
+		{Code: `
+enum Fruit { Apple }
+type EnumMap<K extends PropertyKey> = { [P in K]: string };
+declare const map: EnumMap<Fruit>;
+map[Fruit.Apple];
+`},
+		{Code: `
+enum Fruit { Apple }
+type FruitMap = { [K in Fruit as 'key']: string };
+declare const map: FruitMap;
+map['key'];
+`},
+		{Code: `
+declare const stringMap: Record<string, string>;
+declare const numberMap: Record<number, string>;
+stringMap[0];
+numberMap[0];
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 enum Fruit {
@@ -2664,5 +2695,29 @@ function getFruit(): Fruit {
   return 0 satisfies Fruit;
 }
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumReturn"}}},
+		{Code: `
+enum Fruit { Apple }
+type FruitMap = { [K in Fruit]: string };
+declare const map: FruitMap;
+map[0];
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAccess", Line: 5, Column: 5, EndLine: 5, EndColumn: 6}}},
+		{Code: `
+enum Fruit { Apple }
+type FruitMap = { [K in Fruit]: string };
+type Alias = FruitMap;
+declare const map: Alias;
+map?.[0];
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAccess"}}},
+		{Code: `
+enum Fruit { Apple }
+type EnumMap<K extends PropertyKey> = { [P in K]: string };
+declare const map: EnumMap<Fruit>;
+map[0];
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAccess"}}},
+		{Code: `
+enum Fruit { Apple }
+declare const map: Record<Fruit, string>;
+map[0];
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAccess"}}},
 	})
 }
