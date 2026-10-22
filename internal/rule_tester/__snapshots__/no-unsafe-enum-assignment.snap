@@ -1216,3 +1216,12 @@ Message: The value assigned here does not have a shared enum type with the expec
      |   ~~~~~~~~~~
    7 | }
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-133 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:37)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | declare const source: { fruit: number; next: never };
+   8 | const target: Basket<number> = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 | 
+---

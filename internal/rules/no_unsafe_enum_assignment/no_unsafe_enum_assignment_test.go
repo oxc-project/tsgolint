@@ -2546,5 +2546,14 @@ class TestBasket implements Basket {
   [key] = 1;
 }
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit { Apple }
+interface Basket<T> {
+  fruit: Fruit;
+  next: Basket<T[]>;
+}
+declare const source: { fruit: number; next: never };
+const target: Basket<number> = source;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
 	})
 }

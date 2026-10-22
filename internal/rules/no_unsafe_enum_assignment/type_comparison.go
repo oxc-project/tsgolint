@@ -147,29 +147,32 @@ func (c *enumTypeChecker) directMismatch(sender, receiver *checker.Type) bool {
 
 func (c *enumTypeChecker) describe(types []*checker.Type) string {
 	names := make(map[string]bool)
-	visited := make(map[*checker.Type]bool)
-	var visit func(*checker.Type)
-	visit = func(t *checker.Type) {
-		t = c.constraint(t)
-		if visited[t] {
+	visited := make(map[*checker.Type]int)
+	var visit func(*checker.Type, int)
+	visit = func(t *checker.Type, depth int) {
+		if depth > maximumTypeComparisonDepth {
 			return
 		}
-		visited[t] = true
+		t = c.constraint(t)
+		if previousDepth, ok := visited[t]; ok && previousDepth <= depth {
+			return
+		}
+		visited[t] = depth
 		for _, enum := range utils.GetEnumTypes(c.checker, t) {
 			names[c.checker.TypeToString(enum)] = true
 		}
 		for _, argument := range c.typeArguments(t) {
-			visit(argument)
+			visit(argument, depth+1)
 		}
 		if element := c.checker.GetNumberIndexType(t); element != nil {
-			visit(element)
+			visit(element, depth+1)
 		}
 		for _, property := range checker.Checker_getPropertiesOfType(c.checker, t) {
-			visit(checker.Checker_getTypeOfSymbol(c.checker, property))
+			visit(checker.Checker_getTypeOfSymbol(c.checker, property), depth+1)
 		}
 	}
 	for _, t := range types {
-		visit(t)
+		visit(t, 0)
 	}
 	result := make([]string, 0, len(names))
 	for name := range names {
