@@ -3427,13 +3427,12 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 
 	trailingPlainOperand := ""
 	chainForOptional := chain
-	if len(chain) >= 3 && chain[len(chain)-1].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
+	if len(chain) >= 2 && chain[len(chain)-1].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
 		lastOp := chain[len(chain)-1]
 		secondLastOp := chain[len(chain)-2]
-		if isNullishCheckOperand(secondLastOp) && lastOp.comparedExpr != nil && secondLastOp.comparedExpr != nil {
-			lastParts := processor.flattenForFix(lastOp.comparedExpr)
-			secondLastParts := processor.flattenForFix(secondLastOp.comparedExpr)
-			if len(lastParts) > len(secondLastParts) {
+		if (isNullishCheckOperand(secondLastOp) || secondLastOp.typ == OperandTypeNot) && lastOp.comparedExpr != nil && secondLastOp.comparedExpr != nil {
+			if isNodePrefixOf(secondLastOp.comparedExpr, lastOp.comparedExpr) &&
+				!areNodesStructurallyEqual(unwrapForComparison(secondLastOp.comparedExpr), unwrapForComparison(lastOp.comparedExpr)) {
 				trailingPlainOperand = processor.getNodeText(lastOp.node)
 				chainForOptional = chain[:len(chain)-1]
 			}
@@ -3441,12 +3440,7 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 	}
 
 	if len(chainForOptional) == 1 && trailingPlainOperand != "" {
-		singleOp := chainForOptional[0]
-		if singleOp.comparedExpr != nil {
-			if processor.containsOptionalChain(singleOp.comparedExpr) {
-				return
-			}
-		}
+		return
 	}
 
 	if len(chain) == 2 && trailingPlainOperand == "" {

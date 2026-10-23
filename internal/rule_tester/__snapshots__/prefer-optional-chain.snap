@@ -5444,3 +5444,17 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    1 | declare const x: false | { y: { z: string } | undefined } | null; x && x.y && x.y.z;
      |                                                                   ~~~~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-608 - 1]
+Diagnostic 1: preferOptionalChain (1:52 - 1:65)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const a: { b: { c: Date | null } | null }; !a.b || !a.b.c;
+     |                                                    ~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-609 - 1]
+Diagnostic 1: preferOptionalChain (1:52 - 1:73)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const a: { b: { c: Date | null } | null }; !a.b || a.b.c !== null;
+     |                                                    ~~~~~~~~~~~~~~~~~~~~~~
+---
