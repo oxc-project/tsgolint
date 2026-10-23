@@ -5444,3 +5444,18 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    1 | declare const x: false | { y: { z: string } | undefined } | null; x && x.y && x.y.z;
      |                                                                   ~~~~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-608 - 1]
+Diagnostic 1: preferOptionalChain (1:64 - 1:103)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const a: { p: { q: number | undefined } | undefined }; a.p === undefined || a.p.q === undefined;
+     |                                                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-609 - 1]
+Diagnostic 1: preferOptionalChain (1:54 - 1:81)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const a: { p: { q: number | null } | null }; a.p == null || a.p.q == null;
+     |                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
