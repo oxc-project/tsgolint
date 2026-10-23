@@ -837,6 +837,14 @@ func TestPreferOptionalChainRule(t *testing.T) {
         !x || x.a;
       `},
 		{Code: `typeof globalThis !== 'undefined' && globalThis.Array();`},
+		// A typeof guard on a global reference (lib, ambient or undeclared) is
+		// not a nullish check: `window?.x` would throw a ReferenceError where
+		// the guard returns false. oxc-project/tsgolint#1278
+		{Code: `typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;`},
+		{Code: `typeof document !== 'undefined' && document.hidden;`},
+		{Code: `typeof navigator === 'undefined' || navigator.locks == null;`},
+		{Code: `typeof someUndeclaredGlobal !== 'undefined' && someUndeclaredGlobal.flag;`},
+		{Code: `export {}; declare global { var ambientFlag: { on: boolean } | undefined; } typeof ambientFlag !== 'undefined' && ambientFlag.on;`},
 		{Code: `
         declare const x: void | (() => void);
         x && x();
