@@ -905,9 +905,8 @@ func (processor *chainProcessor) isInvalidOrChainStartingOperand(op Operand) boo
 	// Pattern: `foo.bar === false || foo.bar === undefined` should NOT be flagged.
 	// Reference: typescript-eslint's isValidOrLastChainOperand for ComparisonType.StrictEqual
 	// returns true only if the comparison value's type is undefined.
-	if bin.operator == ast.KindEqualsEqualsEqualsToken {
-		// For ===, only comparisons against undefined are valid for optional chaining.
-		// If neither side is nullish, this is an invalid starting operand.
+	if bin.operator == ast.KindEqualsEqualsEqualsToken || bin.operator == ast.KindExclamationEqualsEqualsToken {
+		// For === and !==, a comparison where neither side is nullish cannot start an optional chain.
 		if !isLeftNullish && !isRightNullish {
 			return true
 		}

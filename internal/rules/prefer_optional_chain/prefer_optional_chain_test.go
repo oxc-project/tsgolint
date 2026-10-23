@@ -11,6 +11,9 @@ import (
 func TestPreferOptionalChainRule(t *testing.T) {
 	t.Parallel()
 	validCases := []rule_tester.ValidTestCase{
+		{Code: `declare const a: { p: string }; declare const p: string; a.p !== p || a.p.length === 0;`},
+		{Code: `declare const a: { p: string | null }; declare const p: string; a.p !== p || a.p.length === 0;`},
+		{Code: `declare const a: { p: { q: number } | null }; a.p !== a || a.p.q === 0;`},
 		{Code: `foo || {};`},
 		{Code: `foo || ({} as any);`},
 		{Code: `(foo || {})?.bar;`},
@@ -4381,6 +4384,15 @@ if (!item?.myField) {
             return el.textContent.trim();
           }
         `})
+
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code:   `declare const a: { p: { q: number | undefined } | undefined }; a.p === undefined || a.p.q === undefined;`,
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "optionalChainSuggest", Output: `declare const a: { p: { q: number | undefined } | undefined }; a.p?.q === undefined;`}}}},
+	}, rule_tester.InvalidTestCase{
+		Code:   `declare const a: { p: { q: number | null } | null }; a.p == null || a.p.q == null;`,
+		Output: []string{`declare const a: { p: { q: number | null } | null }; a.p?.q == null;`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
