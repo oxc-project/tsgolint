@@ -5444,3 +5444,31 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    1 | declare const x: false | { y: { z: string } | undefined } | null; x && x.y && x.y.z;
      |                                                                   ~~~~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-608 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:43)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const c: { kind: string } | null | undefined;
+   3 |           c != null && c.kind === "refused";
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         
+---
+
+[TestPreferOptionalChainRule/invalid-609 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const b: { kind: string } | null;
+   3 |           b !== null && b.kind;
+     |           ~~~~~~~~~~~~~~~~~~~~
+   4 |         
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-610 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:63)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const c: { kind: string } | null | undefined;
+   3 |           c !== null && c !== undefined && c.kind === "refused";
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         
+---

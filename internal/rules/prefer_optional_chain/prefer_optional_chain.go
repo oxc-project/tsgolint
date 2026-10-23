@@ -2233,6 +2233,10 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 		}
 	}
 
+	if processor.hasStrictNullishCheckBeforeTrailingComparison(chain) {
+		return nil
+	}
+
 	for i, op := range chain {
 		if op.typ == OperandTypePlain {
 			if i == 0 {
@@ -2267,6 +2271,36 @@ func (processor *chainProcessor) validateAndChainForReporting(chain []Operand) [
 	}
 
 	return chain
+}
+
+// hasStrictNullishCheckBeforeTrailingComparison reports whether the operand right before a
+// trailing comparison is a lone strict nullish check, e.g. `x !== null && x.kind === "a"`.
+//
+// typescript-eslint gathers the trailing comparison separately from the chain, and only keeps a
+// `!== null` / `!== undefined` operand when another chain operand follows it, so it does not
+// report these chains. A complementary pair (`x !== null && x !== undefined && x.y === 1`) is
+// still allowed.
+func (processor *chainProcessor) hasStrictNullishCheckBeforeTrailingComparison(chain []Operand) bool {
+	if len(chain) < 2 {
+		return false
+	}
+	lastOp := chain[len(chain)-1]
+	if lastOp.typ != OperandTypeComparison || isNullishComparison(lastOp) {
+		return false
+	}
+	prevOp := chain[len(chain)-2]
+	if !prevOp.typ.IsStrictNullishCheck() {
+		return false
+	}
+	if len(chain) >= 3 {
+		pairOp := chain[len(chain)-3]
+		if pairOp.typ.IsStrictNullishCheck() && pairOp.typ != prevOp.typ &&
+			pairOp.comparedExpr != nil && prevOp.comparedExpr != nil &&
+			processor.compareNodes(pairOp.comparedExpr, prevOp.comparedExpr) == NodeEqual {
+			return false
+		}
+	}
+	return true
 }
 
 // Optional chaining checks for BOTH null AND undefined, so if the chain only checks
