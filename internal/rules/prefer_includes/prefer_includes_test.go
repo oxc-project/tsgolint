@@ -114,6 +114,28 @@ func TestPreferIncludesRule(t *testing.T) {
         /\s/.test(text);
       }
     `},
+		// An escaped backslash followed by a quantifier is a real regex
+		// (an optional backslash), not a plain string. oxc-project/tsgolint#1281
+		{Code: `
+      function f(body: string): void {
+        /scopeName\\?":\\?"source\./.test(body);
+      }
+    `},
+		{Code: `
+      function f(body: string): void {
+        /a\\?b/.test(body);
+      }
+    `},
+		{Code: `
+      function f(body: string): void {
+        /a\\+/.test(body);
+      }
+    `},
+		{Code: `
+      function f(body: string): void {
+        /a\\\d/.test(body);
+      }
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -1072,6 +1094,24 @@ func TestPreferIncludesRule(t *testing.T) {
 					MessageId: "preferStringIncludes",
 					Line:      3,
 					Column:    11,
+				},
+			},
+		},
+		// An escaped backslash alone is a literal backslash: still a plain string.
+		{
+			Code: `
+        function f(a: string): void {
+          /a\\b\.c/.test(a);
+        }
+      `,
+			Output: []string{`
+        function f(a: string): void {
+          a.includes('a\\b\.c');
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
 				},
 			},
 		},
