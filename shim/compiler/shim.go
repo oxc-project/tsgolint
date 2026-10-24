@@ -47,6 +47,10 @@ func Program_ForEachCheckerParallel(recv *compiler.Program, cb func(idx int, c *
 func Program_GetSyntacticDiagnostics(recv *compiler.Program, ctx context.Context, sourceFile *ast.SourceFile) []*ast.Diagnostic
 //go:linkname Program_GetSemanticDiagnostics github.com/microsoft/typescript-go/internal/compiler.(*Program).GetSemanticDiagnostics
 func Program_GetSemanticDiagnostics(recv *compiler.Program, ctx context.Context, sourceFile *ast.SourceFile) []*ast.Diagnostic
+//go:linkname Program_GetGlobalDiagnostics github.com/microsoft/typescript-go/internal/compiler.(*Program).GetGlobalDiagnostics
+func Program_GetGlobalDiagnostics(recv *compiler.Program, ctx context.Context) []*ast.Diagnostic
+//go:linkname Program_GetDeclarationDiagnosticsForFiles github.com/microsoft/typescript-go/internal/compiler.(*Program).GetDeclarationDiagnosticsForFiles
+func Program_GetDeclarationDiagnosticsForFiles(recv *compiler.Program, ctx context.Context, sourceFiles []*ast.SourceFile) [][]*ast.Diagnostic
 type ProgramLike = compiler.ProgramLike
 type ProgramOptions = compiler.ProgramOptions
 //go:linkname SortAndDeduplicateDiagnostics github.com/microsoft/typescript-go/internal/compiler.SortAndDeduplicateDiagnostics

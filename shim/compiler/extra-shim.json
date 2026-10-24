@@ -2,6 +2,8 @@
   "ExtraMethods": {
     "Program": [
       "ForEachCheckerParallel",
+      "GetDeclarationDiagnosticsForFiles",
+      "GetGlobalDiagnostics",
       "GetSemanticDiagnostics",
       "GetSyntacticDiagnostics"
     ]
