@@ -131,6 +131,8 @@ func Checker_isArrayType(recv *checker.Checker, t *checker.Type) bool
 func Checker_isArrayOrTupleType(recv *checker.Checker, t *checker.Type) bool
 //go:linkname Checker_getDeclaredTypeOfSymbol github.com/microsoft/typescript-go/internal/checker.(*Checker).getDeclaredTypeOfSymbol
 func Checker_getDeclaredTypeOfSymbol(recv *checker.Checker, symbol *ast.Symbol) *checker.Type
+//go:linkname Checker_isGenericMappedType github.com/microsoft/typescript-go/internal/checker.(*Checker).isGenericMappedType
+func Checker_isGenericMappedType(recv *checker.Checker, t *checker.Type) bool
 //go:linkname Checker_getBaseTypeOfLiteralType github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseTypeOfLiteralType
 func Checker_getBaseTypeOfLiteralType(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_getUnionTypeEx github.com/microsoft/typescript-go/internal/checker.(*Checker).getUnionTypeEx
