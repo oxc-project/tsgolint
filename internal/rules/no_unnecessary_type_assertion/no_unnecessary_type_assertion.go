@@ -268,11 +268,6 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return true
 		}
 
-		areMutuallyAssignable := func(a, b *checker.Type) bool {
-			return checker.Checker_isTypeAssignableTo(ctx.TypeChecker, a, b) &&
-				checker.Checker_isTypeAssignableTo(ctx.TypeChecker, b, a)
-		}
-
 		areUnionPartsEquivalentIgnoringUndefined := func(uncast, cast *checker.Type) bool {
 			uncastParts := utils.Set[*checker.Type]{}
 			for _, part := range utils.UnionTypeParts(uncast) {
@@ -447,11 +442,15 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return false
 			}
 
-			// Check shape and assignability before recursively walking nested types. Assertions between
+			// Check shape and identity before recursively walking nested types. Assertions between
 			// incompatible callable types can otherwise traverse very large generic parameter graphs.
+			// Mutual assignability is not enough: types that differ only in optional properties or
+			// optional parameters are assignable both ways, but the assertion still changes which
+			// members and call arities are available. A union with null or undefined has no
+			// common properties, so hasSameProperties cannot tell those types apart either.
 			if !hasSameProperties(uncast, cast) ||
 				!haveSameTypeArguments(uncastTypeArguments, castTypeArguments) ||
-				!areMutuallyAssignable(uncast, cast) {
+				!checker.Checker_isTypeIdenticalTo(ctx.TypeChecker, uncast, cast) {
 				return false
 			}
 

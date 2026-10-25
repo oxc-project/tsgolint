@@ -1563,7 +1563,7 @@ interface Target<T> {
 declare const source: Source<any>;
 const result = source as Target<any>;
     `},
-		// Matching type arguments and property names ensure this pair reaches mutual assignability.
+		// Matching type arguments and property names ensure this pair reaches the type identity check.
 		// The nested callable layers make recursive type inspection nontrivial.
 		{Code: `
 type Layer0<T> = T;
@@ -1577,6 +1577,50 @@ type Subscription<T> = ((handler: T) => void) & { readonly kind: 'subscription' 
 
 declare const watcher: Watcher<string>;
 const subscription = watcher as Subscription<string>;
+    `},
+		// https://github.com/oxc-project/tsgolint/issues/1212
+		// A zero-parameter function and an optional-parameter signature are mutually assignable,
+		// but removing the assertion makes the call below a TS2554.
+		{Code: `
+type ActionReturn<P, R> = P extends void ? () => Promise<R> : (payload: P) => Promise<R>;
+declare function memberAction<P = void, R = object>(options: { path: string }): ActionReturn<P, R>;
+
+class Model {
+  start = memberAction({ path: 'start' }) as (payload?: { flag?: boolean }) => Promise<object>;
+}
+function callIt(m: Model) {
+  return m.start({ flag: true });
+}
+    `},
+		{Code: `
+interface WidgetMetrics {
+  fetch(): void;
+}
+declare function requestsFor(): object | null;
+
+const requests = requestsFor() as { widgetMetrics?: WidgetMetrics } | null;
+requests?.widgetMetrics?.fetch();
+    `},
+		// Widening to extra optional properties inside a nullable union.
+		{Code: `
+type Stored = { default?: string; stateOverrides?: Record<string, string> };
+declare const stored: Stored | null;
+declare const key: 'ir' | 'footage';
+
+const templates = stored as {
+  default?: string;
+  stateOverrides?: Record<string, string>;
+  ir?: { default?: string };
+  footage?: { default?: string };
+} | null;
+const nested = templates?.[key];
+    `},
+		// A nested property type that differs only by an empty object union member.
+		{Code: `
+declare const data: { byStatus: Record<string, number> | {} } | undefined;
+
+const stats = data as { byStatus: Record<string, number> } | undefined;
+Object.entries(stats?.byStatus ?? {}).filter(([, count]) => count > 0);
     `},
 	}, []rule_tester.InvalidTestCase{
 		{
@@ -4612,6 +4656,25 @@ value = 1;`},
 					Column:    21,
 					EndLine:   2,
 					EndColumn: 36,
+				},
+			},
+		},
+		// Separately written but identical types are still unnecessary.
+		{
+			Code: `
+declare const stored: { a?: string; b?: number } | null;
+const same = stored as { a?: string; b?: number } | null;`,
+			Output: []string{`
+declare const stored: { a?: string; b?: number } | null;
+const same = stored;`,
+			},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    14,
+					EndLine:   3,
+					EndColumn: 57,
 				},
 			},
 		},
