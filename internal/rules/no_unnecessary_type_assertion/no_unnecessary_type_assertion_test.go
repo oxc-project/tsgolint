@@ -1593,6 +1593,16 @@ function callIt(m: Model) {
 }
     `},
 		{Code: `
+declare function makeAction(options: { path: string }): () => Promise<object>;
+
+class Model {
+  start = makeAction({ path: 'start' }) as (payload?: { flag?: boolean }) => Promise<object>;
+}
+function callIt(m: Model) {
+  return m.start({ flag: true });
+}
+    `},
+		{Code: `
 interface WidgetMetrics {
   fetch(): void;
 }
@@ -1621,6 +1631,12 @@ declare const data: { byStatus: Record<string, number> | {} } | undefined;
 
 const stats = data as { byStatus: Record<string, number> } | undefined;
 Object.entries(stats?.byStatus ?? {}).filter(([, count]) => count > 0);
+    `},
+		// Conservative: an intersection and its flattened object type are mutually assignable
+		// but not identical, so this assertion is kept even though removing it is harmless.
+		{Code: `
+declare const parts: { a: string } & { b: number };
+const flattened = parts as { a: string; b: number };
     `},
 	}, []rule_tester.InvalidTestCase{
 		{
