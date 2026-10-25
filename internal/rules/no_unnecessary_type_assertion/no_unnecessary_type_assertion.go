@@ -355,24 +355,10 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				parent.AsElementAccessExpression().ArgumentExpression == current
 		}
 
-		var hasEnumType func(t *checker.Type) bool
-		hasEnumType = func(t *checker.Type) bool {
-			if utils.IsTypeFlagSet(t, checker.TypeFlagsEnumLike) {
-				return true
-			}
-			return (utils.IsUnionType(t) || utils.IsIntersectionType(t)) && slices.ContainsFunc(t.Types(), hasEnumType)
-		}
-
 		isTypeUnchanged := func(node *ast.Node, expression *ast.Node, uncast, cast *checker.Type) bool {
 			expression = ast.SkipParentheses(expression)
 			if uncast == cast {
 				return true
-			}
-			// Numeric enums and number are mutually assignable, but assertions
-			// between them still change the type, including within unions and intersections.
-			if (hasEnumType(uncast) || hasEnumType(cast)) &&
-				!checker.Checker_isTypeIdenticalTo(ctx.TypeChecker, uncast, cast) {
-				return false
 			}
 			if utils.IsTypeParameter(uncast) && isReceiverOfWriteAccess(node) {
 				// Local safeguard: widening a generic write receiver can make the write legal.
@@ -444,10 +430,10 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 			// Check shape and identity before recursively walking nested types. Assertions between
 			// incompatible callable types can otherwise traverse very large generic parameter graphs.
-			// Mutual assignability is not enough: types that differ only in optional properties or
-			// optional parameters are assignable both ways, but the assertion still changes which
-			// members and call arities are available. A union with null or undefined has no
-			// common properties, so hasSameProperties cannot tell those types apart either.
+			// Mutual assignability is not enough: numeric enums and number, and types that differ
+			// only in optional properties or optional parameters, are assignable both ways, but the
+			// assertion still changes the type. A union with null or undefined has no common
+			// properties, so hasSameProperties is only a cheap pre-filter and cannot tell those apart.
 			if !hasSameProperties(uncast, cast) ||
 				!haveSameTypeArguments(uncastTypeArguments, castTypeArguments) ||
 				!checker.Checker_isTypeIdenticalTo(ctx.TypeChecker, uncast, cast) {
