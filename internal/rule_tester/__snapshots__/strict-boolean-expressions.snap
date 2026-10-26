@@ -1230,3 +1230,50 @@ Message: Unexpected string value in conditional. A string can be falsy (empty st
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
 ---
+
+[TestStrictBooleanExpressionsRule/invalid-117 - 1]
+Diagnostic 1: conditionErrorNumber (3:5 - 3:7)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   2 | declare const foo: number & { __BRAND: 'Foo' };
+   3 | if (foo) {
+     |     ~~~
+   4 | }
+---
+
+[TestStrictBooleanExpressionsRule/invalid-118 - 1]
+Diagnostic 1: conditionErrorNullableNumber (3:5 - 3:7)
+Message: Unexpected nullable number value in conditional.
+Help: Handle the nullish and zero cases explicitly.
+   2 | declare const foo: (number & { __BRAND: 'Foo' }) | null;
+   3 | if (foo) {
+     |     ~~~
+   4 | }
+---
+
+[TestStrictBooleanExpressionsRule/invalid-119 - 1]
+Diagnostic 1: conditionErrorString (3:5 - 3:7)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   2 | declare const foo: string & { __BRAND: 'Foo' };
+   3 | if (foo) {
+     |     ~~~
+   4 | }
+---
+
+[TestStrictBooleanExpressionsRule/invalid-120 - 1]
+Diagnostic 1: conditionErrorNullableString (3:5 - 3:7)
+Message: Unexpected nullable string value in conditional.
+Help: Handle the nullish and empty string cases explicitly.
+   2 | declare const foo: (string & { __BRAND: 'Foo' }) | null;
+   3 | if (foo) {
+     |     ~~~
+   4 | }
+---
+
+[TestStrictBooleanExpressionsRule/invalid-121 - 1]
+Diagnostic 1: conditionErrorObject (3:5 - 3:7)
+Message: Unexpected object value in conditional. An object is always truthy.
+   2 | declare const foo: { a: string } & { b: number };
+   3 | if (foo) {
+     |     ~~~
+   4 | }
+---
