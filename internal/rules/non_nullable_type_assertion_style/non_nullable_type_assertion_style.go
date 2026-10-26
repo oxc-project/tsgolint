@@ -45,6 +45,12 @@ var NonNullableTypeAssertionStyleRule = rule.Rule{
 			if ast.IsConstAssertion(node) {
 				return
 			}
+			// A JSDoc cast in a JavaScript file (`/** @type {T} */ (x)`, reparsed as an
+			// as-expression) has no non-null assertion to prefer: `x!` is not JavaScript.
+			// typescript-eslint never sees these casts at all.
+			if ast.IsInJSFile(node) {
+				return
+			}
 
 			expression := node.Expression()
 			originalTypes := getTypesIfNotLoose(expression)
