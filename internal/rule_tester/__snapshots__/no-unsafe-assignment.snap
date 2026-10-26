@@ -506,3 +506,13 @@ Help: Assigned value has type `any`; the target has type `{ foo: 1; }`. Use a sa
      | ~~~~~~~~~~~~~~~~~~~~~~~
    5 |       
 ---
+
+[TestNoUnsafeAssignmentRule/invalid-58 - 1]
+Diagnostic 1: anyAssignment (8:9 - 8:9)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   7 | declare const v: any;
+   8 | <Foo a={v} b="x" />;
+     |         ~
+   9 |       
+---
