@@ -40,25 +40,33 @@ var PreferIncludesRule = rule.Rule{
 		// The TypeScript version uses a proper ECMAScript regex parser (@eslint-community/regexpp),
 		// but we just check for unescaped metacharacters and escaped special sequences.
 		isSimpleLiteralPattern := func(pattern string) bool {
-			prevRune := rune(0)
+			// A backslash escapes exactly the next character, and an escaped
+			// backslash is a literal one: in `a\\?b` the `?` quantifies the
+			// backslash, so tracking "the previous rune was a backslash" would
+			// read it as an escaped `?` and call the pattern a plain string.
+			escaped := false
 			for _, ch := range pattern {
-				if prevRune != '\\' {
-					// Unescaped regex metacharacters
-					switch ch {
-					case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
-						return false
-					}
-				} else {
+				if escaped {
+					escaped = false
 					// Escaped sequences that are regex metacharacters (not simple literals)
-					// \d, \D, \w, \W, \s, \S, \b, \B, \0, \n, \r, \t, \v, \f, \cX, \xHH, \uHHHH, \u{HHHH}
+					// \d, \D, \w, \W, \s, \S, \b, \B, \cX, \xHH, \uHHHH, \u{HHHH}
 					switch ch {
 					case 'd', 'D', 'w', 'W', 's', 'S', 'b', 'B', 'c', 'x', 'u':
 						return false
 					}
+					continue
 				}
-				prevRune = ch
+				if ch == '\\' {
+					escaped = true
+					continue
+				}
+				// Unescaped regex metacharacters
+				switch ch {
+				case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
+					return false
+				}
 			}
-			return true
+			return !escaped
 		}
 
 		// Extract pattern from regex literal: /bar/ -> "bar"

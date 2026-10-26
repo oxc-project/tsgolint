@@ -430,3 +430,12 @@ Message: Use `String#includes()` method with a string instead.
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
 ---
+
+[TestPreferIncludesRule/invalid-48 - 1]
+Diagnostic 1: preferStringIncludes (3:11 - 3:27)
+Message: Use `String#includes()` method with a string instead.
+   2 |         function f(a: string): void {
+   3 |           /a\\b\.c/.test(a);
+     |           ~~~~~~~~~~~~~~~~~
+   4 |         }
+---
