@@ -525,9 +525,14 @@ func isNodePrefixOf(shorter, longer *ast.Node) bool {
 
 // In JSX, foo && foo.bar has different semantics than foo?.bar:
 // foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined.
+// The search stops at the nearest function, because code inside a function passed
+// to JSX (for example an event handler) is not rendered.
 func isInsideJSX(node *ast.Node) bool {
 	current := node
 	for current != nil {
+		if ast.IsFunctionLike(current) {
+			return false
+		}
 		if ast.IsJsxExpression(current) ||
 			ast.IsJsxAttribute(current) ||
 			ast.IsJsxAttributes(current) ||

@@ -5444,3 +5444,20 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    1 | declare const x: false | { y: { z: string } | undefined } | null; x && x.y && x.y.z;
      |                                                                   ~~~~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-608 - 1]
+Diagnostic 1: preferOptionalChain (7:11 - 7:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   6 |       const g = ref.current;
+   7 |       if (g && g.parentNode) g.remove();
+     |           ~~~~~~~~~~~~~~~~~
+   8 |     }}
+---
+
+[TestPreferOptionalChainRule/invalid-609 - 1]
+Diagnostic 1: preferOptionalChain (1:90 - 1:103)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { bar: string } | null; const el = <div onClick={function () { return foo && foo.bar; }} />;
+     |                                                                                          ~~~~~~~~~~~~~~
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
