@@ -610,6 +610,16 @@ var NoMisusedPromisesRule = rule.Rule{
 		checkArguments := func(
 			node *ast.Expression,
 		) {
+			if ast.IsCallExpression(node) {
+				callee := ast.SkipParentheses(node.Expression())
+				if ast.IsAccessExpression(callee) {
+					name, _ := checker.Checker_getAccessedPropertyName(ctx.TypeChecker, callee)
+					if name == "finally" && utils.IsPromiseLike(ctx.Program, ctx.TypeChecker, utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, callee.Expression())) {
+						// Promise.finally waits for a returned promise despite its void callback type.
+						return
+					}
+				}
+			}
 			voidArgs, expectations := voidFunctionArguments(node)
 			if len(voidArgs) == 0 {
 				return

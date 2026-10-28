@@ -1,4 +1,43 @@
 
+[TestNoMisusedPromisesFinallyControls/invalid-0 - 1]
+Diagnostic 1: voidReturnArgument (1:86 - 1:87)
+Message: Promise returned in function argument where a void return was expected.
+   1 | declare const value: { finally(callback: () => void): void }; value.finally(async () => {});
+     |                                                                                      ~~
+  Label: This callback has type `() => Promise<void>`. (1:86 - 1:87)
+   1 | declare const value: { finally(callback: () => void): void }; value.finally(async () => {});
+     |                                                                                      ^^ This callback has type `() => Promise<void>`.
+  Label: This context accepts a `void`-returning callback through type `() => void`. (1:42 - 1:51)
+   1 | declare const value: { finally(callback: () => void): void }; value.finally(async () => {});
+     |                                          ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+---
+
+[TestNoMisusedPromisesFinallyControls/invalid-1 - 1]
+Diagnostic 1: voidReturnArgument (1:116 - 1:117)
+Message: Promise returned in function argument where a void return was expected.
+   1 | namespace Local { export class Promise { finally(callback: () => void) {} } } new Local.Promise().finally(async () => {});
+     |                                                                                                                    ~~
+  Label: This callback has type `() => Promise<void>`. (1:116 - 1:117)
+   1 | namespace Local { export class Promise { finally(callback: () => void) {} } } new Local.Promise().finally(async () => {});
+     |                                                                                                                    ^^ This callback has type `() => Promise<void>`.
+  Label: This context accepts a `void`-returning callback through type `() => void`. (1:60 - 1:69)
+   1 | namespace Local { export class Promise { finally(callback: () => void) {} } } new Local.Promise().finally(async () => {});
+     |                                                            ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+---
+
+[TestNoMisusedPromisesFinallyControls/invalid-2 - 1]
+Diagnostic 1: voidReturnArgument (1:104 - 1:105)
+Message: Promise returned in function argument where a void return was expected.
+   1 | declare function accept(callback: () => void): void; Promise.resolve().finally(() => { accept(async () => {}); });
+     |                                                                                                        ~~
+  Label: This callback has type `() => Promise<void>`. (1:104 - 1:105)
+   1 | declare function accept(callback: () => void): void; Promise.resolve().finally(() => { accept(async () => {}); });
+     |                                                                                                        ^^ This callback has type `() => Promise<void>`.
+  Label: This context accepts a `void`-returning callback through type `() => void`. (1:35 - 1:44)
+   1 | declare function accept(callback: () => void): void; Promise.resolve().finally(() => { accept(async () => {}); });
+     |                                   ^^^^^^^^^^ This context accepts a `void`-returning callback through type `() => void`.
+---
+
 [TestNoMisusedPromisesRule/invalid-0 - 1]
 Diagnostic 1: conditional (2:5 - 2:21)
 Message: Expected non-Promise value in a boolean conditional.
