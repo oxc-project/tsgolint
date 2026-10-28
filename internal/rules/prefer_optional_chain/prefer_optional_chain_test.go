@@ -4382,5 +4382,20 @@ if (!item?.myField) {
           }
         `})
 
+	validCases = append(validCases,
+		rule_tester.ValidTestCase{Code: `declare const a: { b: "x" | null } | null; a == null || a.b;`},
+		rule_tester.ValidTestCase{Code: `declare const a: { b: { c: Date | null } | null }; !a.b || a.b.c;`},
+		rule_tester.ValidTestCase{Code: `declare const a: { b?: boolean } | undefined; a == null || a.b;`},
+	)
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code:   `declare const a: { b: { c: Date | null } | null }; !a.b || !a.b.c;`,
+		Output: []string{`declare const a: { b: { c: Date | null } | null }; !a.b?.c;`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	}, rule_tester.InvalidTestCase{
+		Code:   `declare const a: { b: { c: Date | null } | null }; !a.b || a.b.c !== null;`,
+		Output: []string{`declare const a: { b: { c: Date | null } | null }; a.b?.c !== null;`},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
