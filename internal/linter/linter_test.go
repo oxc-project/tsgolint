@@ -1,6 +1,8 @@
 package linter
 
 import (
+	"os"
+	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -367,4 +369,63 @@ function greet() {
 	assert.Equal(t, recordsByRule[ruleA].Calls, uint64(2), "rule A should count Run plus its variable listener")
 	assert.Equal(t, recordsByRule[ruleB].Calls, uint64(2), "rule B should count Run plus its function listener")
 	assert.Equal(t, recordsByRule[ruleC].Calls, uint64(1), "rule C should count its Run call")
+}
+
+func TestRunLinter_ProgramsSharingAFileParseItSeparately(t *testing.T) {
+	// RunLinter clears the parse cache after each program, so a finished program's files are not kept alive by the
+	// cache; a later program that includes the same file parses it again and must lint it the same way.
+	dir := filepath.ToSlash(t.TempDir())
+	write := func(name string, text string) string {
+		path := dir + "/" + name
+		assert.NilError(t, os.MkdirAll(filepath.Dir(path), 0o755))
+		assert.NilError(t, os.WriteFile(path, []byte(text), 0o644))
+		return path
+	}
+	shared := write("shared.ts", "export const shared: Promise<number> = Promise.resolve(1);\n")
+	programs := map[string][]string{}
+	for _, name := range []string{"a", "b"} {
+		config := write(name+"/tsconfig.json", `{"compilerOptions":{"strict":true,"target":"es2022","lib":["es2022"],"types":[]},"files":["../shared.ts"]}`)
+		programs[config] = []string{shared}
+	}
+
+	var mu sync.Mutex
+	var diagnostics []rule.RuleDiagnostic
+	var internal []diagnostic.Internal
+	err := RunLinter(RunLinterOptions{
+		LogLevel:         utils.LogLevelNormal,
+		CurrentDirectory: dir,
+		Workload:         Workload{Programs: programs},
+		Workers:          1,
+		FS:               bundled.WrapFS(cachedvfs.From(osvfs.FS())),
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []ConfiguredRule {
+			return []ConfiguredRule{{
+				Name: "declared-type",
+				Run: func(ctx rule.RuleContext) rule.RuleListeners {
+					return rule.RuleListeners{
+						ast.KindVariableDeclaration: func(node *ast.Node) {
+							declared := ctx.TypeChecker.GetTypeAtLocation(node.Name())
+							ctx.ReportNode(node, rule.RuleMessage{Id: "declaredType", Description: ctx.TypeChecker.TypeToString(declared)})
+						},
+					}
+				},
+			}}
+		},
+		OnRuleDiagnostic: func(d rule.RuleDiagnostic) {
+			mu.Lock()
+			defer mu.Unlock()
+			diagnostics = append(diagnostics, d)
+		},
+		OnInternalDiagnostic: func(d diagnostic.Internal) { internal = append(internal, d) },
+		Fixes:                Fixes{},
+		TypeErrors:           TypeErrors{},
+	})
+	assert.NilError(t, err)
+	assert.Equal(t, len(internal), 0)
+	assert.Equal(t, len(diagnostics), 2, "one diagnostic per program")
+	assert.Assert(t, diagnostics[0].SourceFile != diagnostics[1].SourceFile, "the second program parsed the shared file again")
+	for _, d := range diagnostics {
+		assert.Equal(t, d.SourceFile.FileName(), shared)
+		assert.Equal(t, d.Message.Description, "Promise<number>")
+		assert.Equal(t, d.Range, diagnostics[0].Range)
+	}
 }

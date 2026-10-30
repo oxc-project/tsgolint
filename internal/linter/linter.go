@@ -157,6 +157,8 @@ func RunLinter(options RunLinterOptions) error {
 			return err
 		}
 
+		// Later programs re-parse what they share with this one, instead of every program's files staying alive.
+		utils.ClearSourceFileCache()
 		idx++
 	}
 
