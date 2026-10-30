@@ -560,21 +560,32 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return slices.ContainsFunc(utils.GetCallSignatures(ctx.TypeChecker, t), hasTypeParams)
 		}
 
-		hasGenericInferenceParameterAtArgument := func(callOrNew *ast.Node, argIndex int, elementPath []int) bool {
+		getGenericInferenceParameterTypeAtArgument := func(callOrNew *ast.Node, argIndex int, elementPath []int) *checker.Type {
+			calleeType := ctx.TypeChecker.GetTypeAtLocation(callOrNew.Expression())
+			var calleeSignatures []*checker.Signature
+			if ast.IsCallExpression(callOrNew) {
+				calleeSignatures = ctx.TypeChecker.GetCallSignatures(calleeType)
+			} else {
+				calleeSignatures = ctx.TypeChecker.GetConstructSignatures(calleeType)
+			}
+			if !slices.ContainsFunc(calleeSignatures, hasTypeParams) {
+				return nil
+			}
+
 			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callOrNew, nil, checker.CheckModeNormal)
 			if signature == nil {
-				return false
+				return nil
 			}
 			for signature.Target() != nil {
 				signature = signature.Target()
 			}
 			if len(signature.TypeParameters()) == 0 {
-				return false
+				return nil
 			}
 
 			params := checker.Signature_parameters(signature)
 			if len(params) == 0 {
-				return false
+				return nil
 			}
 
 			paramIndex := argIndex
@@ -610,7 +621,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				paramType = elementType
 			}
 
-			return containsTypeVariable(paramType)
+			return paramType
 		}
 
 		genericsMismatch := func(uncast, contextual *checker.Type) bool {
@@ -781,7 +792,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				if ast.IsSpreadElement(callArgument) {
 					parameterElementPath = parameterElementPath[1:]
 				}
-				return hasGenericInferenceParameterAtArgument(parent, argIndex+spreadOffset, parameterElementPath)
+				return containsTypeVariable(getGenericInferenceParameterTypeAtArgument(parent, argIndex+spreadOffset, parameterElementPath))
 			}
 			return false
 		}
@@ -849,6 +860,115 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 					ast.IsSatisfiesExpression(parent))
 		}
 
+		var hasDirectTypeParameter func(t *checker.Type) bool
+		hasDirectTypeParameter = func(t *checker.Type) bool {
+			if utils.IsTypeParameter(t) {
+				return true
+			}
+			return (utils.IsUnionType(t) || utils.IsIntersectionType(t)) &&
+				slices.ContainsFunc(t.Types(), hasDirectTypeParameter)
+		}
+
+		isInGenericInferenceArgument := func(node *ast.Node) bool {
+			type inferencePathStep struct {
+				propertyName   string
+				elementIndex   int
+				isArrayElement bool
+			}
+			path := []inferencePathStep{}
+			for child, current := node, node.Parent; current != nil; child, current = current, current.Parent {
+				if current.Kind == ast.KindFunctionDeclaration ||
+					((ast.IsFunctionExpression(current) || ast.IsArrowFunction(current)) &&
+						current.Body() != nil && current.Body().Kind == ast.KindBlock) {
+					return false
+				}
+				if ast.IsPropertyAssignment(current) &&
+					ast.SkipParentheses(current.Initializer()) == ast.SkipParentheses(child) {
+					name := current.Name()
+					if name != nil && ast.IsComputedPropertyName(name) {
+						name = ast.SkipParentheses(name.AsComputedPropertyName().Expression)
+					}
+					if name == nil || (!ast.IsIdentifier(name) && !ast.IsStringLiteral(name) && !ast.IsNumericLiteral(name) && name.Kind != ast.KindNoSubstitutionTemplateLiteral) {
+						return false
+					}
+					path = append(path, inferencePathStep{propertyName: name.Text()})
+				}
+				if ast.IsArrayLiteralExpression(current) {
+					elementIndex := slices.IndexFunc(current.AsArrayLiteralExpression().Elements.Nodes, func(element *ast.Node) bool {
+						return element == child || ast.SkipParentheses(element) == ast.SkipParentheses(child)
+					})
+					if elementIndex < 0 {
+						return false
+					}
+					path = append(path, inferencePathStep{elementIndex: elementIndex, isArrayElement: true})
+				}
+				if !ast.IsCallExpression(current) && !ast.IsNewExpression(current) {
+					continue
+				}
+				if current.TypeArguments() != nil {
+					return false
+				}
+				argIndex := slices.IndexFunc(current.Arguments(), func(argument *ast.Node) bool {
+					return argument == child || ast.SkipParentheses(argument) == ast.SkipParentheses(child)
+				})
+				if argIndex < 0 {
+					return false
+				}
+				paramType := getGenericInferenceParameterTypeAtArgument(current, argIndex, nil)
+				if paramType == nil {
+					return false
+				}
+				// Property and array steps were collected from the assertion outward.
+				for i := len(path) - 1; i >= 0; i-- {
+					if hasDirectTypeParameter(paramType) {
+						return true
+					}
+					paramType = checker.Checker_GetNonNullableType(ctx.TypeChecker, paramType)
+					if path[i].isArrayElement {
+						if checker.IsTupleType(paramType) {
+							typeArguments := checker.Checker_getTypeArguments(ctx.TypeChecker, paramType)
+							if len(typeArguments) == 0 {
+								return false
+							}
+							paramType = typeArguments[min(path[i].elementIndex, len(typeArguments)-1)]
+						} else {
+							paramType = utils.GetNumberIndexType(ctx.TypeChecker, paramType)
+						}
+					} else {
+						paramType = checker.Checker_getTypeOfPropertyOrIndexSignatureOfType(ctx.TypeChecker, paramType, path[i].propertyName)
+					}
+					if paramType == nil {
+						return false
+					}
+				}
+				return containsTypeVariable(paramType)
+			}
+			return false
+		}
+
+		isEmptyObjectAssertedToBrandedIndexType := func(node *ast.Node, castType *checker.Type) bool {
+			expression := ast.SkipParentheses(node.Expression())
+			if !ast.IsObjectLiteralExpression(expression) ||
+				len(expression.AsObjectLiteralExpression().Properties.Nodes) != 0 {
+				return false
+			}
+
+			// Alias arguments and intersection wrappers do not identify the actual index key.
+			return slices.ContainsFunc(checker.Checker_getIndexInfosOfType(ctx.TypeChecker, castType), func(info *checker.IndexInfo) bool {
+				keyType := info.KeyType()
+				if !utils.IsIntersectionType(keyType) {
+					return false
+				}
+				keyParts := keyType.Types()
+				return slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
+					return utils.IsTypeFlagSet(part, checker.TypeFlagsStringLike|checker.TypeFlagsNumberLike|checker.TypeFlagsESSymbolLike)
+				}) && slices.ContainsFunc(keyParts, func(part *checker.Type) bool {
+					return utils.IsTypeFlagSet(part, checker.TypeFlagsObject) &&
+						len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, part)) > 0
+				})
+			})
+		}
+
 		shouldSkipContextualTypeFallback := func(node *ast.Node, castIsAny bool, uncastType, castType *checker.Type) bool {
 			parent := parentThroughParens(node)
 			// An assignment can narrow the receiver for subsequent statements.
@@ -868,8 +988,11 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return true
 			}
 
+			// The assertion can determine a generic accumulator's branded key type,
+			// even when the inferred contextual type accepts the empty object.
 			if isSkipParentType(node) ||
 				ast.IsArrayLiteralExpression(ast.SkipParentheses(node.Expression())) ||
+				(isInGenericInferenceArgument(node) && isEmptyObjectAssertedToBrandedIndexType(node, castType)) ||
 				isNestedInArrayLiteralArgumentToGenericCall(node) ||
 				isInDestructuringDeclaration(node) ||
 				isPropertyInProblematicContext(node) ||
