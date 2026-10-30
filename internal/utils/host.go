@@ -71,6 +71,12 @@ func (h *compilerHost) Trace(msg *ast.DiagnosticsMessage, args ...any) {
 
 var sourceFileCache collections.SyncMap[SourceFileCacheKey, *ast.SourceFile]
 
+// ClearSourceFileCache drops every cached parse, so a finished program's files can be collected. RunLinter lints one
+// program at a time and calls this after each.
+func ClearSourceFileCache() {
+	sourceFileCache.Clear()
+}
+
 type SourceFileCacheKey struct {
 	opts       ast.SourceFileParseOptions
 	text       string
