@@ -27,7 +27,7 @@ func newFunctionSignature(c *enumTypeChecker, node *ast.Node) *functionSignature
 			result.restIndex = i
 			if checker.IsTupleType(constrained) {
 				result.rest = c.typeArguments(constrained)
-			} else if element := c.checker.GetNumberIndexType(constrained); element != nil {
+			} else if element := c.numberIndexType(constrained); element != nil {
 				result.rest = []*checker.Type{element}
 			} else {
 				result.rest = []*checker.Type{constrained}
