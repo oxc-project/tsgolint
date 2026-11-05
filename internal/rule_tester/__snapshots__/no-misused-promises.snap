@@ -1,4 +1,55 @@
 
+[TestNoMisusedPromisesGenericOverloads/invalid-0 - 1]
+Diagnostic 1: voidReturnArgument (27:22 - 27:23)
+Message: Promise returned in function argument where a void return was expected.
+  26 | declare const newOn: NewOn;
+  27 | on('start', async () => {});
+     |                      ~~
+  Label: This callback has type `() => Promise<void>`. (27:22 - 27:23)
+  26 | declare const newOn: NewOn;
+  27 | on('start', async () => {});
+     |                      ^^ This callback has type `() => Promise<void>`.
+  Label: This context accepts a `void`-returning callback through type `M`. (9:59 - 9:59)
+   8 |   (pattern: 'start', hook: () => void): void;
+   9 |   <P extends string, M extends Hook>(pattern: P, matcher: M, hook: NoInfer<M>): void;
+     |                                                           ^ This context accepts a `void`-returning callback through type `M`.
+  10 | }
+---
+
+[TestNoMisusedPromisesGenericOverloads/invalid-1 - 1]
+Diagnostic 1: voidReturnArgument (27:30 - 27:31)
+Message: Promise returned in function argument where a void return was expected.
+  26 | declare const newOn: NewOn;
+  27 | optionalOn('start', async () => {});
+     |                              ~~
+  Label: This callback has type `() => Promise<void>`. (27:30 - 27:31)
+  26 | declare const newOn: NewOn;
+  27 | optionalOn('start', async () => {});
+     |                              ^^ This callback has type `() => Promise<void>`.
+  Label: This context accepts a `void`-returning callback through type `M | undefined`. (14:59 - 14:71)
+  13 |   (pattern: 'start', hook: () => void): void;
+  14 |   <P extends string, M extends Hook>(pattern: P, matcher: M | undefined, hook: NoInfer<M>): void;
+     |                                                           ^^^^^^^^^^^^^ This context accepts a `void`-returning callback through type `M | undefined`.
+  15 | }
+---
+
+[TestNoMisusedPromisesGenericOverloads/invalid-2 - 1]
+Diagnostic 1: voidReturnArgument (27:29 - 27:30)
+Message: Promise returned in function argument where a void return was expected.
+  26 | declare const newOn: NewOn;
+  27 | new newOn('start', async () => {});
+     |                             ~~
+  Label: This callback has type `() => Promise<void>`. (27:29 - 27:30)
+  26 | declare const newOn: NewOn;
+  27 | new newOn('start', async () => {});
+     |                             ^^ This callback has type `() => Promise<void>`.
+  Label: This context accepts a `void`-returning callback through type `M`. (24:63 - 24:63)
+  23 |   new (pattern: 'start', hook: () => void): object;
+  24 |   new <P extends string, M extends Hook>(pattern: P, matcher: M, hook: NoInfer<M>): object;
+     |                                                               ^ This context accepts a `void`-returning callback through type `M`.
+  25 | }
+---
+
 [TestNoMisusedPromisesRule/invalid-0 - 1]
 Diagnostic 1: conditional (2:5 - 2:21)
 Message: Expected non-Promise value in a boolean conditional.
