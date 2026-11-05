@@ -1341,6 +1341,24 @@ declare const numberMap: Record<number, string>;
 stringMap[0];
 numberMap[0];
 `},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+declare const fruits: Fruit[];
+const maybeFruits: Fruit[] | undefined = fruits;
+    `},
+		{Code: `
+type Delegate<T> = {
+  findMany(args: T): T[];
+  count(args: T): number;
+  [index: number]: T;
+};
+
+declare const client: Delegate<{ a: 1 }> | Delegate<{ b: 2 }>;
+const same: Delegate<{ a: 1 }> | Delegate<{ b: 2 }> = client;
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 enum Fruit {
@@ -2719,5 +2737,21 @@ enum Fruit { Apple }
 declare const map: Record<Fruit, string>;
 map[0];
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAccess"}}},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+declare const numbers: number[];
+const fruits: Fruit[] | undefined = numbers;
+      `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+declare const numbers: number[] | string[];
+const fruits: Fruit[] | undefined = numbers;
+      `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment"}}},
 	})
 }
