@@ -381,7 +381,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 			getReceiverType := func() *checker.Type {
 				if compType == comparisonTypeContextual {
-					if receiverType := utils.GetContextualType(ctx.TypeChecker, senderNode); receiverType != nil {
+					if receiverType := checker.Checker_getContextualType(ctx.TypeChecker, senderNode, checker.ContextFlagsNone); receiverType != nil {
 						return receiverType
 					}
 					if receiverType := utils.GetContextualType(ctx.TypeChecker, receiverNode); receiverType != nil {

@@ -146,6 +146,29 @@ type Foo = { bar: unknown };
 const bar: any = 1;
 const foo: Foo = { bar };
     `},
+		{Code: `
+declare function getValue(): any;
+export const plain = { value: getValue() } satisfies Record<string, unknown>;
+export const quoted = { "value": getValue() } satisfies Record<string, unknown>;
+export const dotted = { "example.key": getValue() } satisfies Record<string, unknown>;
+export const annotated: Record<string, unknown> = { "example.key": getValue() };
+const opaque: unknown = getValue();
+export const held = { "example.key": opaque };
+    `},
+		{Code: `
+declare function getValue(): any;
+const quoted: { "value": unknown } = { "value": getValue() };
+const numeric: { 0: unknown } = { 0: getValue() };
+const computed = { ["example.key"]: getValue() } satisfies Record<string, unknown>;
+const parenthesized = { "example.key": (getValue()) } satisfies Record<string, unknown>;
+    `},
+		{Code: `
+declare const value: any;
+declare const source: { value: any };
+const identifier = { "example.key": value } satisfies Record<string, unknown>;
+const member = { "example.key": source.value } satisfies Record<string, unknown>;
+const assertion = { "example.key": 1 as any } satisfies Record<string, unknown>;
+    `},
 
 		{Code: `
 declare const foo: any;
@@ -526,6 +549,21 @@ foo = { bar: 2 } as any;
 						Column:    1,
 						EndColumn: 24,
 					},
+				},
+			},
+			{
+				Code: `
+declare function getValue(): any;
+const inferred = { "value": getValue() };
+const satisfies = { "example.key": getValue() } satisfies Record<string, string>;
+const annotated: Record<string, string> = { "example.key": getValue() };
+declare function getSet(): Set<any>;
+const generic = { "example.key": getSet() } satisfies Record<string, Set<string>>;`,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 3},
+					{MessageId: "anyAssignment", Line: 4},
+					{MessageId: "anyAssignment", Line: 5},
+					{MessageId: "unsafeAssignment", Line: 7},
 				},
 			},
 		}))

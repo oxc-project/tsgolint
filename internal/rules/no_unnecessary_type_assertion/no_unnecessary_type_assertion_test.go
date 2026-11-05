@@ -1585,6 +1585,10 @@ export function chip(el: HTMLElement) {
 `,
 			TSConfig: "tsconfig.lib-dom.json",
 		},
+		{Code: `
+declare const nullable: string | null;
+const satisfying = { value: nullable! } satisfies { value: string | null };
+satisfying.value.toUpperCase();`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",

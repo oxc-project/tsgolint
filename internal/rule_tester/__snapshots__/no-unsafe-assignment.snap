@@ -506,3 +506,36 @@ Help: Assigned value has type `any`; the target has type `{ foo: 1; }`. Use a sa
      | ~~~~~~~~~~~~~~~~~~~~~~~
    5 |       
 ---
+
+[TestNoUnsafeAssignmentRule/invalid-58 - 1]
+Diagnostic 1: anyAssignment (3:20 - 3:38)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   2 | declare function getValue(): any;
+   3 | const inferred = { "value": getValue() };
+     |                    ~~~~~~~~~~~~~~~~~~~
+   4 | const satisfies = { "example.key": getValue() } satisfies Record<string, string>;
+
+Diagnostic 2: anyAssignment (4:21 - 4:45)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `string`. Use a safely typed value or `unknown`, and narrow it before use.
+   3 | const inferred = { "value": getValue() };
+   4 | const satisfies = { "example.key": getValue() } satisfies Record<string, string>;
+     |                     ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | const annotated: Record<string, string> = { "example.key": getValue() };
+
+Diagnostic 3: anyAssignment (5:45 - 5:69)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `string`. Use a safely typed value or `unknown`, and narrow it before use.
+   4 | const satisfies = { "example.key": getValue() } satisfies Record<string, string>;
+   5 | const annotated: Record<string, string> = { "example.key": getValue() };
+     |                                             ~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | declare function getSet(): Set<any>;
+
+Diagnostic 4: unsafeAssignment (7:19 - 7:41)
+Message: Unsafe assignment between incompatible types.
+Help: Assigned value has type `Set<any>`; the target has type `Set<string>`. Use a safely typed value or `unknown`, and narrow it before use.
+   6 | declare function getSet(): Set<any>;
+   7 | const generic = { "example.key": getSet() } satisfies Record<string, Set<string>>;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~
+---
