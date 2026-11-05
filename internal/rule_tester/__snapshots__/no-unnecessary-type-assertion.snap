@@ -1325,6 +1325,148 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
+[TestNoUnnecessaryTypeAssertion/invalid-150 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:60)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   5 | declare const db: Storage;
+   6 | const results = (await db.list()) as Map<string, Uint8Array>;
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-151 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:72)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   5 | declare const db: Storage;
+   6 | const results = (alert(), db.list()) as Promise<Map<string, Uint8Array>>;
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-152 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:62)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   5 | declare const db: Storage;
+   6 | const results = db?.list() as Promise<Map<string, Uint8Array>>;
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-153 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:61)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   5 | declare const db: Storage;
+   6 | const results = (await db?.list()) as Map<string, Uint8Array>;
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-154 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:62)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   5 | declare const db: Storage;
+   6 | const results = db.list()! as Promise<Map<string, Uint8Array>>;
+     |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-155 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:37)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function get<T>(): T;
+   3 | const value = get<string>() as string;
+     |               ~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-156 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (19:18 - 19:75)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+  18 | 
+  19 | export const a = document.querySelector('.foo') as HTMLCanvasElement | null;
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  20 |         
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-157 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (5:18 - 5:58)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   4 | export async function main() {
+   5 |   const actual = (await load()) as Record<string, unknown>;
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |   return { ...actual };
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-158 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (4:18 - 4:56)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   3 | export async function main() {
+   4 |   const actual = <Record<string, unknown>>(await load());
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   return { ...actual };
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-159 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (3:15 - 3:35)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   2 | function get() { throw new Error(); }
+   3 | const value = /** @type {string} */ (get());
+     |               ~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-160 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (3:10 - 5:26)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   2 | export function buttons() {
+   3 |   return Array.from(
+     |          ~~~~~~~~~~~
+   4 |     document.querySelectorAll('[aria-label="Next"]'),
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |   ) as HTMLButtonElement[];
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 | }
+
+Diagnostic 2: contextuallyInferredTypeArguments (9:10 - 9:54)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   8 | export function chip(el: HTMLElement) {
+   9 |   return el.closest('[data-id]') as HTMLElement | null;
+     |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-161 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:27)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function f<T>(x: T): T;
+   3 | const value = f() as string;
+     |               ~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-162 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:27)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function f(): string;
+   3 | const value = f() as string;
+     |               ~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-163 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:35)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function f<T>(x: T): Promise<T>;
+   3 | const value = (await f()) as string;
+     |               ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-164 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (3:15 - 3:34)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   2 | declare function f<T>(key: string): T;
+   3 | const value = f('value') as string;
+     |               ~~~~~~~~~~~~~~~~~~~~
+---
+
 [TestNoUnnecessaryTypeAssertionAsyncFunctionFix/invalid-0 - 1]
 Diagnostic 1: unnecessaryAssertion (1:1 - 1:34)
 Message: This assertion is unnecessary since it does not change the type of the expression.

@@ -471,28 +471,6 @@ function unwrap<T>(input: number | string | Wrapper<T>): number {
 const value = ((<T>(input: T): T | undefined => input)(1)) as number;
 		`},
 		{
-			// https://github.com/oxc-project/oxc/issues/20656
-			Code: `
-interface Element {
-  tagName: string;
-}
-
-interface HTMLCanvasElement extends Element {
-  getContext(contextId: string): unknown;
-}
-
-interface HTMLElementTagNameMap {
-  canvas: HTMLCanvasElement;
-}
-
-declare const document: {
-  querySelector<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] | null;
-  querySelector<E extends Element = Element>(selectors: string): E | null;
-};
-
-export const a = document.querySelector('.foo') as HTMLCanvasElement | null;
-		`},
-		{
 			Code: `
 interface Element { tagName: string; }
 
@@ -515,25 +493,10 @@ declare const query: { <E extends Element = Element>(strings: TemplateStringsArr
 export const a = query` + "`" + `.foo` + "`" + ` as HTMLCanvasElement | null;
 		`},
 		{Code: `
-declare function load<T = unknown>(): Promise<T>;
-
-export async function main() {
-  const actual = (await load()) as Record<string, unknown>;
-  return { ...actual };
-}
-		`},
-		{Code: `
 declare function load<T = unknown>(): Promise<Promise<T>>;
 
 export async function main() {
   const actual = (await await load()) as Record<string, unknown>;
-  return { ...actual };
-}
-		`},
-		{Code: `
-declare function load<T = unknown>(): Promise<T>;
-export async function main() {
-  const actual = <Record<string, unknown>>(await load());
   return { ...actual };
 }
 		`},
@@ -1578,6 +1541,50 @@ type Subscription<T> = ((handler: T) => void) & { readonly kind: 'subscription' 
 declare const watcher: Watcher<string>;
 const subscription = watcher as Subscription<string>;
     `},
+		{
+			Code: `
+declare function get<T = unknown>(): T;
+const value = get() as string;
+`,
+			Options: rule_tester.OptionsFromJSON[NoUnnecessaryTypeAssertionOptions](`{"typesToIgnore": ["string"]}`),
+		},
+		{
+			Code: `
+declare function get<T>(value: T): T;
+const value = get(1) as number;
+`,
+		},
+		{
+			Code: `
+declare function get<T = unknown>(): T;
+const value = (get(), 1) as string | number;
+`,
+		},
+		{
+			Code: `
+declare function get<T = unknown>(): T;
+const value = get<unknown>() as string;
+`,
+		},
+		{
+			Code: `
+declare function get<T>(): T | null;
+let value: number | null = get() as number;
+value.toFixed();
+`,
+		},
+		{
+			Code: `
+export function buttons() {
+  return Array.from(document.querySelectorAll<HTMLButtonElement>('[aria-label="Next"]'));
+}
+
+export function chip(el: HTMLElement) {
+  return el.closest<HTMLElement>('[data-id]');
+}
+`,
+			TSConfig: "tsconfig.lib-dom.json",
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code:   "const foo = <3>3;",
@@ -4612,6 +4619,268 @@ value = 1;`},
 					Column:    21,
 					EndLine:   2,
 					EndColumn: 36,
+				},
+			},
+		},
+		{
+			Code: `
+type Storage = {
+  list<T = unknown>(): Promise<Map<string, T>>;
+};
+declare const db: Storage;
+const results = (await db.list()) as Map<string, Uint8Array>;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      6,
+					Column:    17,
+					EndLine:   6,
+					EndColumn: 61,
+				},
+			},
+		},
+		{
+			Code: `
+type Storage = {
+  list<T = unknown>(): Promise<Map<string, T>>;
+};
+declare const db: Storage;
+const results = (alert(), db.list()) as Promise<Map<string, Uint8Array>>;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      6,
+					Column:    17,
+					EndLine:   6,
+					EndColumn: 73,
+				},
+			},
+		},
+		{
+			Code: `
+type Storage = {
+  list<T = unknown>(): Promise<Map<string, T>>;
+};
+declare const db: Storage;
+const results = db?.list() as Promise<Map<string, Uint8Array>>;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      6,
+					Column:    17,
+					EndLine:   6,
+					EndColumn: 63,
+				},
+			},
+		},
+		{
+			Code: `
+type Storage = {
+  list<T = unknown>(): Promise<Map<string, T>>;
+};
+declare const db: Storage;
+const results = (await db?.list()) as Map<string, Uint8Array>;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      6,
+					Column:    17,
+					EndLine:   6,
+					EndColumn: 62,
+				},
+			},
+		},
+		{
+			Code: `
+type Storage = {
+  list<T = unknown>(): Promise<Map<string, T>> | undefined;
+};
+declare const db: Storage;
+const results = db.list()! as Promise<Map<string, Uint8Array>>;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      6,
+					Column:    17,
+					EndLine:   6,
+					EndColumn: 63,
+				},
+			},
+		},
+		{
+			Code: `
+declare function get<T>(): T;
+const value = get<string>() as string;
+      `,
+			Output: []string{`
+declare function get<T>(): T;
+const value = get<string>();
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+					Line:      3,
+					Column:    15,
+					EndLine:   3,
+					EndColumn: 38,
+				},
+			},
+		},
+		{
+			// https://github.com/oxc-project/oxc/issues/20656
+			Code: `
+interface Element {
+  tagName: string;
+}
+
+interface HTMLCanvasElement extends Element {
+  getContext(contextId: string): unknown;
+}
+
+interface HTMLElementTagNameMap {
+  canvas: HTMLCanvasElement;
+}
+
+declare const document: {
+  querySelector<K extends keyof HTMLElementTagNameMap>(selectors: K): HTMLElementTagNameMap[K] | null;
+  querySelector<E extends Element = Element>(selectors: string): E | null;
+};
+
+export const a = document.querySelector('.foo') as HTMLCanvasElement | null;
+		`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+				},
+			},
+		},
+		{
+			Code: `
+declare function load<T = unknown>(): Promise<T>;
+
+export async function main() {
+  const actual = (await load()) as Record<string, unknown>;
+  return { ...actual };
+}
+		`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+				},
+			},
+		},
+		{
+			Code: `
+declare function load<T = unknown>(): Promise<T>;
+export async function main() {
+  const actual = <Record<string, unknown>>(await load());
+  return { ...actual };
+}
+		`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+				},
+			},
+		},
+		{
+			Code: `/** @template T @returns {T} */
+function get() { throw new Error(); }
+const value = /** @type {string} */ (get());
+`,
+			FileName: "generic.js",
+			TSConfig: "tsconfig.checkJs.json",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      3,
+					Column:    15,
+					EndLine:   3,
+					EndColumn: 36,
+				},
+			},
+		},
+		{
+			Code: `
+export function buttons() {
+  return Array.from(
+    document.querySelectorAll('[aria-label="Next"]'),
+  ) as HTMLButtonElement[];
+}
+
+export function chip(el: HTMLElement) {
+  return el.closest('[data-id]') as HTMLElement | null;
+}
+`,
+			TSConfig: "tsconfig.lib-dom.json",
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      3,
+					Column:    10,
+					EndLine:   5,
+					EndColumn: 27,
+				},
+				{
+					MessageId: "contextuallyInferredTypeArguments",
+					Line:      9,
+					Column:    10,
+					EndLine:   9,
+					EndColumn: 55,
+				},
+			},
+		},
+		{
+			Code: `declare function f(): string;
+declare function f<T>(x: T): T;
+const value = f() as string;`,
+			Output: []string{`declare function f(): string;
+declare function f<T>(x: T): T;
+const value = f();`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `declare function f<T>(x: T): T;
+declare function f(): string;
+const value = f() as string;`,
+			Output: []string{`declare function f<T>(x: T): T;
+declare function f(): string;
+const value = f();`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `declare function f(): Promise<string>;
+declare function f<T>(x: T): Promise<T>;
+const value = (await f()) as string;`,
+			Output: []string{`declare function f(): Promise<string>;
+declare function f<T>(x: T): Promise<T>;
+const value = (await f());`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "unnecessaryAssertion",
+				},
+			},
+		},
+		{
+			Code: `declare function f(): number;
+declare function f<T>(key: string): T;
+const value = f('value') as string;`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyInferredTypeArguments",
 				},
 			},
 		},
