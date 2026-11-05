@@ -3,19 +3,19 @@
 
 package scanner
 
-import "github.com/microsoft/typescript-go/internal/ast"
-import "github.com/microsoft/typescript-go/internal/core"
-import "github.com/microsoft/typescript-go/internal/scanner"
+import "github.com/microsoft/TypeScript/tsc/internal/ast"
+import "github.com/microsoft/TypeScript/tsc/internal/core"
+import "github.com/microsoft/TypeScript/tsc/internal/scanner"
 import "iter"
 import _ "unsafe"
 
-//go:linkname ComputeLineOfPosition github.com/microsoft/typescript-go/internal/scanner.ComputeLineOfPosition
+//go:linkname ComputeLineOfPosition github.com/microsoft/TypeScript/tsc/internal/scanner.ComputeLineOfPosition
 func ComputeLineOfPosition(lineStarts []core.TextPos, pos int) int
-//go:linkname ComputePositionOfLineAndByteOffset github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndByteOffset
+//go:linkname ComputePositionOfLineAndByteOffset github.com/microsoft/TypeScript/tsc/internal/scanner.ComputePositionOfLineAndByteOffset
 func ComputePositionOfLineAndByteOffset(lineStarts []core.TextPos, line int, byteOffset int) int
-//go:linkname ComputePositionOfLineAndUTF16Character github.com/microsoft/typescript-go/internal/scanner.ComputePositionOfLineAndUTF16Character
+//go:linkname ComputePositionOfLineAndUTF16Character github.com/microsoft/TypeScript/tsc/internal/scanner.ComputePositionOfLineAndUTF16Character
 func ComputePositionOfLineAndUTF16Character(lineStarts []core.TextPos, line int, character core.UTF16Offset, text string, allowEdits bool) int
-//go:linkname DeclarationNameToString github.com/microsoft/typescript-go/internal/scanner.DeclarationNameToString
+//go:linkname DeclarationNameToString github.com/microsoft/TypeScript/tsc/internal/scanner.DeclarationNameToString
 func DeclarationNameToString(name *ast.Node) string
 type ErrorCallback = scanner.ErrorCallback
 type EscapeSequenceScanningFlags = scanner.EscapeSequenceScanningFlags
@@ -27,72 +27,72 @@ const EscapeSequenceScanningFlagsRegularExpression = scanner.EscapeSequenceScann
 const EscapeSequenceScanningFlagsReportErrors = scanner.EscapeSequenceScanningFlagsReportErrors
 const EscapeSequenceScanningFlagsReportInvalidEscapeErrors = scanner.EscapeSequenceScanningFlagsReportInvalidEscapeErrors
 const EscapeSequenceScanningFlagsString = scanner.EscapeSequenceScanningFlagsString
-//go:linkname GetECMAEndLinePosition github.com/microsoft/typescript-go/internal/scanner.GetECMAEndLinePosition
+//go:linkname GetECMAEndLinePosition github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMAEndLinePosition
 func GetECMAEndLinePosition(sourceFile *ast.SourceFile, line int) int
-//go:linkname GetECMALineAndByteOffsetOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndByteOffsetOfPosition
+//go:linkname GetECMALineAndByteOffsetOfPosition github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMALineAndByteOffsetOfPosition
 func GetECMALineAndByteOffsetOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, byteOffset int)
-//go:linkname GetECMALineAndUTF16CharacterOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineAndUTF16CharacterOfPosition
+//go:linkname GetECMALineAndUTF16CharacterOfPosition github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMALineAndUTF16CharacterOfPosition
 func GetECMALineAndUTF16CharacterOfPosition(sourceFile ast.SourceFileLike, pos int) (line int, character core.UTF16Offset)
-//go:linkname GetECMALineOfPosition github.com/microsoft/typescript-go/internal/scanner.GetECMALineOfPosition
+//go:linkname GetECMALineOfPosition github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMALineOfPosition
 func GetECMALineOfPosition(sourceFile ast.SourceFileLike, pos int) int
-//go:linkname GetECMALineStarts github.com/microsoft/typescript-go/internal/scanner.GetECMALineStarts
+//go:linkname GetECMALineStarts github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMALineStarts
 func GetECMALineStarts(sourceFile ast.SourceFileLike) []core.TextPos
-//go:linkname GetECMAPositionOfLineAndByteOffset github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndByteOffset
+//go:linkname GetECMAPositionOfLineAndByteOffset github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMAPositionOfLineAndByteOffset
 func GetECMAPositionOfLineAndByteOffset(sourceFile ast.SourceFileLike, line int, byteOffset int) int
-//go:linkname GetECMAPositionOfLineAndUTF16Character github.com/microsoft/typescript-go/internal/scanner.GetECMAPositionOfLineAndUTF16Character
+//go:linkname GetECMAPositionOfLineAndUTF16Character github.com/microsoft/TypeScript/tsc/internal/scanner.GetECMAPositionOfLineAndUTF16Character
 func GetECMAPositionOfLineAndUTF16Character(sourceFile ast.SourceFileLike, line int, character core.UTF16Offset) int
-//go:linkname GetErrorRangeForNode github.com/microsoft/typescript-go/internal/scanner.GetErrorRangeForNode
+//go:linkname GetErrorRangeForNode github.com/microsoft/TypeScript/tsc/internal/scanner.GetErrorRangeForNode
 func GetErrorRangeForNode(sourceFile *ast.SourceFile, node *ast.Node) core.TextRange
-//go:linkname GetIdentifierToken github.com/microsoft/typescript-go/internal/scanner.GetIdentifierToken
+//go:linkname GetIdentifierToken github.com/microsoft/TypeScript/tsc/internal/scanner.GetIdentifierToken
 func GetIdentifierToken(str string) ast.Kind
-//go:linkname GetLeadingCommentRanges github.com/microsoft/typescript-go/internal/scanner.GetLeadingCommentRanges
+//go:linkname GetLeadingCommentRanges github.com/microsoft/TypeScript/tsc/internal/scanner.GetLeadingCommentRanges
 func GetLeadingCommentRanges(f *ast.NodeFactory, text string, pos int) iter.Seq[ast.CommentRange]
-//go:linkname GetRangeOfTokenAtPosition github.com/microsoft/typescript-go/internal/scanner.GetRangeOfTokenAtPosition
+//go:linkname GetRangeOfTokenAtPosition github.com/microsoft/TypeScript/tsc/internal/scanner.GetRangeOfTokenAtPosition
 func GetRangeOfTokenAtPosition(sourceFile *ast.SourceFile, pos int) core.TextRange
-//go:linkname GetScannerForSourceFile github.com/microsoft/typescript-go/internal/scanner.GetScannerForSourceFile
+//go:linkname GetScannerForSourceFile github.com/microsoft/TypeScript/tsc/internal/scanner.GetScannerForSourceFile
 func GetScannerForSourceFile(sourceFile *ast.SourceFile, pos int) *scanner.Scanner
-//go:linkname GetShebang github.com/microsoft/typescript-go/internal/scanner.GetShebang
+//go:linkname GetShebang github.com/microsoft/TypeScript/tsc/internal/scanner.GetShebang
 func GetShebang(text string) string
-//go:linkname GetSourceTextOfNodeFromSourceFile github.com/microsoft/typescript-go/internal/scanner.GetSourceTextOfNodeFromSourceFile
+//go:linkname GetSourceTextOfNodeFromSourceFile github.com/microsoft/TypeScript/tsc/internal/scanner.GetSourceTextOfNodeFromSourceFile
 func GetSourceTextOfNodeFromSourceFile(sourceFile *ast.SourceFile, node *ast.Node, includeTrivia bool) string
-//go:linkname GetTextOfJSDocComment github.com/microsoft/typescript-go/internal/scanner.GetTextOfJSDocComment
+//go:linkname GetTextOfJSDocComment github.com/microsoft/TypeScript/tsc/internal/scanner.GetTextOfJSDocComment
 func GetTextOfJSDocComment(comment *ast.NodeList) string
-//go:linkname GetTextOfNode github.com/microsoft/typescript-go/internal/scanner.GetTextOfNode
+//go:linkname GetTextOfNode github.com/microsoft/TypeScript/tsc/internal/scanner.GetTextOfNode
 func GetTextOfNode(node *ast.Node) string
-//go:linkname GetTextOfNodeFromSourceText github.com/microsoft/typescript-go/internal/scanner.GetTextOfNodeFromSourceText
+//go:linkname GetTextOfNodeFromSourceText github.com/microsoft/TypeScript/tsc/internal/scanner.GetTextOfNodeFromSourceText
 func GetTextOfNodeFromSourceText(sourceText string, node *ast.Node, includeTrivia bool) string
-//go:linkname GetTokenPosOfNode github.com/microsoft/typescript-go/internal/scanner.GetTokenPosOfNode
+//go:linkname GetTokenPosOfNode github.com/microsoft/TypeScript/tsc/internal/scanner.GetTokenPosOfNode
 func GetTokenPosOfNode(node *ast.Node, sourceFile *ast.SourceFile, includeJSDoc bool) int
-//go:linkname GetTrailingCommentRanges github.com/microsoft/typescript-go/internal/scanner.GetTrailingCommentRanges
+//go:linkname GetTrailingCommentRanges github.com/microsoft/TypeScript/tsc/internal/scanner.GetTrailingCommentRanges
 func GetTrailingCommentRanges(f *ast.NodeFactory, text string, pos int) iter.Seq[ast.CommentRange]
-//go:linkname GetViableKeywordSuggestions github.com/microsoft/typescript-go/internal/scanner.GetViableKeywordSuggestions
+//go:linkname GetViableKeywordSuggestions github.com/microsoft/TypeScript/tsc/internal/scanner.GetViableKeywordSuggestions
 func GetViableKeywordSuggestions() []string
-//go:linkname IdentifierToKeywordKind github.com/microsoft/typescript-go/internal/scanner.IdentifierToKeywordKind
+//go:linkname IdentifierToKeywordKind github.com/microsoft/TypeScript/tsc/internal/scanner.IdentifierToKeywordKind
 func IdentifierToKeywordKind(node *ast.Identifier) ast.Kind
-//go:linkname IsIdentifierPart github.com/microsoft/typescript-go/internal/scanner.IsIdentifierPart
+//go:linkname IsIdentifierPart github.com/microsoft/TypeScript/tsc/internal/scanner.IsIdentifierPart
 func IsIdentifierPart(ch rune) bool
-//go:linkname IsIdentifierPartEx github.com/microsoft/typescript-go/internal/scanner.IsIdentifierPartEx
+//go:linkname IsIdentifierPartEx github.com/microsoft/TypeScript/tsc/internal/scanner.IsIdentifierPartEx
 func IsIdentifierPartEx(ch rune, languageVariant core.LanguageVariant) bool
-//go:linkname IsIdentifierStart github.com/microsoft/typescript-go/internal/scanner.IsIdentifierStart
+//go:linkname IsIdentifierStart github.com/microsoft/TypeScript/tsc/internal/scanner.IsIdentifierStart
 func IsIdentifierStart(ch rune) bool
-//go:linkname IsIdentifierText github.com/microsoft/typescript-go/internal/scanner.IsIdentifierText
+//go:linkname IsIdentifierText github.com/microsoft/TypeScript/tsc/internal/scanner.IsIdentifierText
 func IsIdentifierText(name string, languageVariant core.LanguageVariant) bool
-//go:linkname IsIntrinsicJsxName github.com/microsoft/typescript-go/internal/scanner.IsIntrinsicJsxName
+//go:linkname IsIntrinsicJsxName github.com/microsoft/TypeScript/tsc/internal/scanner.IsIntrinsicJsxName
 func IsIntrinsicJsxName(name string) bool
-//go:linkname IsValidIdentifier github.com/microsoft/typescript-go/internal/scanner.IsValidIdentifier
+//go:linkname IsValidIdentifier github.com/microsoft/TypeScript/tsc/internal/scanner.IsValidIdentifier
 func IsValidIdentifier(s string) bool
-//go:linkname NewScanner github.com/microsoft/typescript-go/internal/scanner.NewScanner
+//go:linkname NewScanner github.com/microsoft/TypeScript/tsc/internal/scanner.NewScanner
 func NewScanner() *scanner.Scanner
-//go:linkname ScanTokenAtPosition github.com/microsoft/typescript-go/internal/scanner.ScanTokenAtPosition
+//go:linkname ScanTokenAtPosition github.com/microsoft/TypeScript/tsc/internal/scanner.ScanTokenAtPosition
 func ScanTokenAtPosition(sourceFile *ast.SourceFile, pos int) ast.Kind
 type Scanner = scanner.Scanner
 type ScannerState = scanner.ScannerState
-//go:linkname SkipTrivia github.com/microsoft/typescript-go/internal/scanner.SkipTrivia
+//go:linkname SkipTrivia github.com/microsoft/TypeScript/tsc/internal/scanner.SkipTrivia
 func SkipTrivia(text string, pos int) int
-//go:linkname SkipTriviaEx github.com/microsoft/typescript-go/internal/scanner.SkipTriviaEx
+//go:linkname SkipTriviaEx github.com/microsoft/TypeScript/tsc/internal/scanner.SkipTriviaEx
 func SkipTriviaEx(text string, pos int, options *scanner.SkipTriviaOptions) int
 type SkipTriviaOptions = scanner.SkipTriviaOptions
-//go:linkname StringToToken github.com/microsoft/typescript-go/internal/scanner.StringToToken
+//go:linkname StringToToken github.com/microsoft/TypeScript/tsc/internal/scanner.StringToToken
 func StringToToken(s string) ast.Kind
-//go:linkname TokenToString github.com/microsoft/typescript-go/internal/scanner.TokenToString
+//go:linkname TokenToString github.com/microsoft/TypeScript/tsc/internal/scanner.TokenToString
 func TokenToString(token ast.Kind) string

@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/microsoft/typescript-go/shim/ast"
+import "github.com/microsoft/TypeScript/tsc/shim/ast"
 
 // Matching start positions limits traversal to the beginning of a statement
 // and stops at existing parentheses.
