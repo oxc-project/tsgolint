@@ -2,6 +2,7 @@ package utils
 
 import (
 	"io/fs"
+	"slices"
 	"strings"
 	"time"
 
@@ -52,6 +53,8 @@ func (vfs *OverlayVFS) DirectoryExists(path string) bool {
 
 func (vfs *OverlayVFS) GetAccessibleEntries(path string) (result vfs.Entries) {
 	result = vfs.fs.GetAccessibleEntries(path)
+	result.Files = slices.Clone(result.Files)
+	result.Directories = slices.Clone(result.Directories)
 
 	normalizedPath := tspath.NormalizePath(path)
 	if !strings.HasSuffix(normalizedPath, "/") {
