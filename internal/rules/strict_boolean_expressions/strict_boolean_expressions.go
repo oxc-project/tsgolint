@@ -178,7 +178,7 @@ var StrictBooleanExpressionsRule = rule.Rule{
 
 							types = append(types, utils.UnionTypeParts(returnType)...)
 						}
-						checkCondition(ctx, node, types, opts)
+						checkCondition(ctx, node, types, opts, false)
 					}
 				}
 			},
@@ -265,7 +265,7 @@ func findTruthinessAssertedArgumentInPredicate(typePredicate *checker.TypePredic
 
 func checkNode(ctx rule.RuleContext, node *ast.Node, opts StrictBooleanExpressionsOptions) {
 	nodeType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, node)
-	checkCondition(ctx, node, utils.UnionTypeParts(nodeType), opts)
+	checkCondition(ctx, node, utils.UnionTypeParts(nodeType), opts, true)
 }
 
 func traverseLogicalExpression(ctx rule.RuleContext, binExpr *ast.BinaryExpression, opts StrictBooleanExpressionsOptions, traversedNodes *utils.Set[*ast.Node], isCondition bool) {
@@ -476,7 +476,7 @@ func analyzeTypePart(_typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	return info
 }
 
-func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type, opts StrictBooleanExpressionsOptions) {
+func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type, opts StrictBooleanExpressionsOptions, suggest bool) {
 	info := analyzeTypeParts(ctx.TypeChecker, types)
 
 	switch info.variant {
@@ -506,7 +506,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 				}
 			}
 		} else if !opts.AllowString {
-			ctx.ReportNode(node, buildConditionErrorStringMessage())
+			reportPrimitiveCondition(ctx, node, buildConditionErrorStringMessage(), info.variant, suggest)
 		}
 	case typeVariantNumber:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
@@ -525,7 +525,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 				}
 			}
 		} else if !opts.AllowNumber {
-			ctx.ReportNode(node, buildConditionErrorNumberMessage())
+			reportPrimitiveCondition(ctx, node, buildConditionErrorNumberMessage(), info.variant, suggest)
 		}
 	case typeVariantBoolean:
 		// Known edge case: truthy primitives and nullish values are always valid boolean expressions
@@ -554,7 +554,7 @@ func checkCondition(ctx rule.RuleContext, node *ast.Node, types []*checker.Type,
 		if info.isNullable && !opts.AllowNullableNumber {
 			ctx.ReportNode(node, buildConditionErrorNullableNumberMessage())
 		} else if !info.isNullable && !opts.AllowNumber {
-			ctx.ReportNode(node, buildConditionErrorNumberMessage())
+			reportPrimitiveCondition(ctx, node, buildConditionErrorNumberMessage(), info.variant, suggest)
 		}
 	}
 }

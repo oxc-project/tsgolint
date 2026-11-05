@@ -679,29 +679,29 @@ if (true && 1 + 1) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareZero",
-						// 							Output: `
-						// if (true && ((1 + 1) !== 0)) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareNaN",
-						// 							Output: `
-						// if (true && (!Number.isNaN((1 + 1)))) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// if (true && (Boolean((1 + 1)))) {
-						// }
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output: `
+if (true && ((1 + 1) !== 0)) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output: `
+if (true && (!Number.isNaN((1 + 1)))) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+if (true && (Boolean((1 + 1)))) {
+}
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -711,20 +711,20 @@ if (true && 1 + 1) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `while (false || (('a' + 'b').length > 0)) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `while (false || (('a' + 'b') !== "")) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `while (false || (Boolean(('a' + 'b')))) {}`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `while (false || (('a' + 'b').length > 0)) {}`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `while (false || (('a' + 'b') !== "")) {}`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `while (false || (Boolean(('a' + 'b')))) {}`,
+							},
+						},
 					},
 				},
 			},
@@ -743,40 +743,40 @@ if (true && 1 + 1) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `if (((''.length > 0) && {}) || (0 && void 0)) { }`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `if ((('' !== "") && {}) || (0 && void 0)) { }`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `if (((Boolean('')) && {}) || (0 && void 0)) { }`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `if (((''.length > 0) && {}) || (0 && void 0)) { }`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `if ((('' !== "") && {}) || (0 && void 0)) { }`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `if (((Boolean('')) && {}) || (0 && void 0)) { }`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `if (('' && {}) || ((0 !== 0) && void 0)) { }`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `if (('' && {}) || ((!Number.isNaN(0)) && void 0)) { }`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `if (('' && {}) || ((Boolean(0)) && void 0)) { }`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `if (('' && {}) || ((0 !== 0) && void 0)) { }`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `if (('' && {}) || ((!Number.isNaN(0)) && void 0)) { }`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `if (('' && {}) || ((Boolean(0)) && void 0)) { }`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNullish",
@@ -834,9 +834,55 @@ if (('' && foo) || (0 && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output: `
+declare const foo: true & { __BRAND: 'Foo' };
+if (((''.length > 0) && foo) || (0 && void 0)) { }
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output: `
+declare const foo: true & { __BRAND: 'Foo' };
+if ((('' !== "") && foo) || (0 && void 0)) { }
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+declare const foo: true & { __BRAND: 'Foo' };
+if (((Boolean('')) && foo) || (0 && void 0)) { }
+      `,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNumber",
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output: `
+declare const foo: true & { __BRAND: 'Foo' };
+if (('' && foo) || ((0 !== 0) && void 0)) { }
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output: `
+declare const foo: true & { __BRAND: 'Foo' };
+if (('' && foo) || ((!Number.isNaN(0)) && void 0)) { }
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+declare const foo: true & { __BRAND: 'Foo' };
+if (('' && foo) || ((Boolean(0)) && void 0)) { }
+      `,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNullish",
@@ -852,6 +898,29 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output: `
+declare const foo: false & { __BRAND: 'Foo' };
+if (((''.length > 0) && {}) || (foo && void 0)) { }
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output: `
+declare const foo: false & { __BRAND: 'Foo' };
+if ((('' !== "") && {}) || (foo && void 0)) { }
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+declare const foo: false & { __BRAND: 'Foo' };
+if (((Boolean('')) && {}) || (foo && void 0)) { }
+      `,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -867,37 +936,37 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `('asd'.length > 0) && 123 && [] && null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `('asd' !== "") && 123 && [] && null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `(Boolean('asd')) && 123 && [] && null;`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `('asd'.length > 0) && 123 && [] && null;`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `('asd' !== "") && 123 && [] && null;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `(Boolean('asd')) && 123 && [] && null;`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `'asd' && (123 !== 0) && [] && null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `'asd' && (!Number.isNaN(123)) && [] && null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `'asd' && (Boolean(123)) && [] && null;`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `'asd' && (123 !== 0) && [] && null;`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `'asd' && (!Number.isNaN(123)) && [] && null;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `'asd' && (Boolean(123)) && [] && null;`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -910,37 +979,37 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `('asd'.length > 0) || 123 || [] || null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `('asd' !== "") || 123 || [] || null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `(Boolean('asd')) || 123 || [] || null;`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `('asd'.length > 0) || 123 || [] || null;`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `('asd' !== "") || 123 || [] || null;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `(Boolean('asd')) || 123 || [] || null;`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `'asd' || (123 !== 0) || [] || null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `'asd' || (!Number.isNaN(123)) || [] || null;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `'asd' || (Boolean(123)) || [] || null;`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `'asd' || (123 !== 0) || [] || null;`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `'asd' || (!Number.isNaN(123)) || [] || null;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `'asd' || (Boolean(123)) || [] || null;`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -953,74 +1022,74 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `let x = ((1 !== 0) && 'a' && null) || 0 || '' || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `let x = ((!Number.isNaN(1)) && 'a' && null) || 0 || '' || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `let x = ((Boolean(1)) && 'a' && null) || 0 || '' || {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `let x = ((1 !== 0) && 'a' && null) || 0 || '' || {};`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `let x = ((!Number.isNaN(1)) && 'a' && null) || 0 || '' || {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `let x = ((Boolean(1)) && 'a' && null) || 0 || '' || {};`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `let x = (1 && ('a'.length > 0) && null) || 0 || '' || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `let x = (1 && ('a' !== "") && null) || 0 || '' || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `let x = (1 && (Boolean('a')) && null) || 0 || '' || {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `let x = (1 && ('a'.length > 0) && null) || 0 || '' || {};`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `let x = (1 && ('a' !== "") && null) || 0 || '' || {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `let x = (1 && (Boolean('a')) && null) || 0 || '' || {};`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNullish",
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `let x = (1 && 'a' && null) || (0 !== 0) || '' || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `let x = (1 && 'a' && null) || (!Number.isNaN(0)) || '' || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `let x = (1 && 'a' && null) || (Boolean(0)) || '' || {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `let x = (1 && 'a' && null) || (0 !== 0) || '' || {};`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `let x = (1 && 'a' && null) || (!Number.isNaN(0)) || '' || {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `let x = (1 && 'a' && null) || (Boolean(0)) || '' || {};`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `let x = (1 && 'a' && null) || 0 || (''.length > 0) || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `let x = (1 && 'a' && null) || 0 || ('' !== "") || {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `let x = (1 && 'a' && null) || 0 || (Boolean('')) || {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `let x = (1 && 'a' && null) || 0 || (''.length > 0) || {};`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `let x = (1 && 'a' && null) || 0 || ('' !== "") || {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `let x = (1 && 'a' && null) || 0 || (Boolean('')) || {};`,
+							},
+						},
 					},
 				},
 			},
@@ -1030,74 +1099,74 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `return ((1 !== 0) || 'a' || null) && 0 && '' && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `return ((!Number.isNaN(1)) || 'a' || null) && 0 && '' && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `return ((Boolean(1)) || 'a' || null) && 0 && '' && {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `return ((1 !== 0) || 'a' || null) && 0 && '' && {};`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `return ((!Number.isNaN(1)) || 'a' || null) && 0 && '' && {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `return ((Boolean(1)) || 'a' || null) && 0 && '' && {};`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `return (1 || ('a'.length > 0) || null) && 0 && '' && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `return (1 || ('a' !== "") || null) && 0 && '' && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `return (1 || (Boolean('a')) || null) && 0 && '' && {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `return (1 || ('a'.length > 0) || null) && 0 && '' && {};`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `return (1 || ('a' !== "") || null) && 0 && '' && {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `return (1 || (Boolean('a')) || null) && 0 && '' && {};`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorNullish",
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `return (1 || 'a' || null) && (0 !== 0) && '' && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `return (1 || 'a' || null) && (!Number.isNaN(0)) && '' && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `return (1 || 'a' || null) && (Boolean(0)) && '' && {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `return (1 || 'a' || null) && (0 !== 0) && '' && {};`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `return (1 || 'a' || null) && (!Number.isNaN(0)) && '' && {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `return (1 || 'a' || null) && (Boolean(0)) && '' && {};`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `return (1 || 'a' || null) && 0 && (''.length > 0) && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `return (1 || 'a' || null) && 0 && ('' !== "") && {};`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `return (1 || 'a' || null) && 0 && (Boolean('')) && {};`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `return (1 || 'a' || null) && 0 && (''.length > 0) && {};`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `return (1 || 'a' || null) && 0 && ('' !== "") && {};`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `return (1 || 'a' || null) && 0 && (Boolean('')) && {};`,
+							},
+						},
 					},
 				},
 			},
@@ -1107,40 +1176,40 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `console.log(((1 !== 0) && []) || ('a' && {}));`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `console.log(((!Number.isNaN(1)) && []) || ('a' && {}));`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `console.log(((Boolean(1)) && []) || ('a' && {}));`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `console.log(((1 !== 0) && []) || ('a' && {}));`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `console.log(((!Number.isNaN(1)) && []) || ('a' && {}));`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `console.log(((Boolean(1)) && []) || ('a' && {}));`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `console.log((1 && []) || (('a'.length > 0) && {}));`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `console.log((1 && []) || (('a' !== "") && {}));`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `console.log((1 && []) || ((Boolean('a')) && {}));`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `console.log((1 && []) || (('a'.length > 0) && {}));`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `console.log((1 && []) || (('a' !== "") && {}));`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `console.log((1 && []) || ((Boolean('a')) && {}));`,
+							},
+						},
 					},
 				},
 			},
@@ -1150,12 +1219,22 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{MessageId: "conditionFixCompareZero", Output: `if (((1 !== 0) && []) || ('a' && {})) void 0;`},
+							{MessageId: "conditionFixCompareNaN", Output: `if (((!Number.isNaN(1)) && []) || ('a' && {})) void 0;`},
+							{MessageId: "conditionFixCastBoolean", Output: `if (((Boolean(1)) && []) || ('a' && {})) void 0;`},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
 					},
 					{
 						MessageId: "conditionErrorString",
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{MessageId: "conditionFixCompareStringLength", Output: `if ((1 && []) || (('a'.length > 0) && {})) void 0;`},
+							{MessageId: "conditionFixCompareEmptyString", Output: `if ((1 && []) || (('a' !== "") && {})) void 0;`},
+							{MessageId: "conditionFixCastBoolean", Output: `if ((1 && []) || ((Boolean('a')) && {})) void 0;`},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -1171,37 +1250,37 @@ if (('' && {}) || (foo && void 0)) { }
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `let x = null || (0 !== 0) || 'a' || [] ? {} : undefined;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `let x = null || (!Number.isNaN(0)) || 'a' || [] ? {} : undefined;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `let x = null || (Boolean(0)) || 'a' || [] ? {} : undefined;`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `let x = null || (0 !== 0) || 'a' || [] ? {} : undefined;`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `let x = null || (!Number.isNaN(0)) || 'a' || [] ? {} : undefined;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `let x = null || (Boolean(0)) || 'a' || [] ? {} : undefined;`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `let x = null || 0 || ('a'.length > 0) || [] ? {} : undefined;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `let x = null || 0 || ('a' !== "") || [] ? {} : undefined;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `let x = null || 0 || (Boolean('a')) || [] ? {} : undefined;`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `let x = null || 0 || ('a'.length > 0) || [] ? {} : undefined;`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `let x = null || 0 || ('a' !== "") || [] ? {} : undefined;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `let x = null || 0 || (Boolean('a')) || [] ? {} : undefined;`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -1217,37 +1296,37 @@ if (('' && {}) || (foo && void 0)) { }
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `return !(null || (0 !== 0) || 'a' || []);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `return !(null || (!Number.isNaN(0)) || 'a' || []);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `return !(null || (Boolean(0)) || 'a' || []);`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `return !(null || (0 !== 0) || 'a' || []);`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `return !(null || (!Number.isNaN(0)) || 'a' || []);`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `return !(null || (Boolean(0)) || 'a' || []);`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `return !(null || 0 || ('a'.length > 0) || []);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `return !(null || 0 || ('a' !== "") || []);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `return !(null || 0 || (Boolean('a')) || []);`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `return !(null || 0 || ('a'.length > 0) || []);`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `return !(null || 0 || ('a' !== "") || []);`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `return !(null || 0 || (Boolean('a')) || []);`,
+							},
+						},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -1388,20 +1467,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `while (''.length > 0) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `while ('' !== "") {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `while (Boolean('')) {}`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `while (''.length > 0) {}`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `while ('' !== "") {}`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `while (Boolean('')) {}`,
+							},
+						},
 					},
 				},
 			},
@@ -1411,20 +1490,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `for (; 'foo'.length > 0; ) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `for (; 'foo' !== ""; ) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `for (; Boolean('foo'); ) {}`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `for (; 'foo'.length > 0; ) {}`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `for (; 'foo' !== ""; ) {}`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `for (; Boolean('foo'); ) {}`,
+							},
+						},
 					},
 				},
 			},
@@ -1438,32 +1517,32 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareStringLength",
-						// 							Output: `
-						// declare const x: string;
-						// if (x.length > 0) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareEmptyString",
-						// 							Output: `
-						// declare const x: string;
-						// if (x !== "") {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// declare const x: string;
-						// if (Boolean(x)) {
-						// }
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output: `
+declare const x: string;
+if (x.length > 0) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output: `
+declare const x: string;
+if (x !== "") {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+declare const x: string;
+if (Boolean(x)) {
+}
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -1473,20 +1552,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `(x: string) => x.length === 0;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `(x: string) => x === "";`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `(x: string) => !Boolean(x);`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `(x: string) => x.length === 0;`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `(x: string) => x === "";`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `(x: string) => !Boolean(x);`,
+							},
+						},
 					},
 				},
 			},
@@ -1496,20 +1575,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareStringLength",
-						// 		Output: `<T extends string>(x: T) => ((x.length > 0) ? 1 : 0);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareEmptyString",
-						// 		Output: `<T extends string>(x: T) => ((x !== "") ? 1 : 0);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `<T extends string>(x: T) => ((Boolean(x)) ? 1 : 0);`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareStringLength",
+								Output:    `<T extends string>(x: T) => ((x.length > 0) ? 1 : 0);`,
+							},
+							{
+								MessageId: "conditionFixCompareEmptyString",
+								Output:    `<T extends string>(x: T) => ((x !== "") ? 1 : 0);`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `<T extends string>(x: T) => ((Boolean(x)) ? 1 : 0);`,
+							},
+						},
 					},
 				},
 			},
@@ -1519,20 +1598,16 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `while (0n !== 0) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `while (!Number.isNaN(0n)) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `while (Boolean(0n)) {}`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `while (0n !== 0n) {}`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `while (Boolean(0n)) {}`,
+							},
+						},
 					},
 				},
 			},
@@ -1542,20 +1617,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `for (; 123 !== 0; ) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `for (; !Number.isNaN(123); ) {}`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `for (; Boolean(123); ) {}`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `for (; 123 !== 0; ) {}`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `for (; !Number.isNaN(123); ) {}`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `for (; Boolean(123); ) {}`,
+							},
+						},
 					},
 				},
 			},
@@ -1569,32 +1644,32 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareZero",
-						// 							Output: `
-						// declare const x: number;
-						// if (x !== 0) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareNaN",
-						// 							Output: `
-						// declare const x: number;
-						// if (!Number.isNaN(x)) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// declare const x: number;
-						// if (Boolean(x)) {
-						// }
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output: `
+declare const x: number;
+if (x !== 0) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output: `
+declare const x: number;
+if (!Number.isNaN(x)) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+declare const x: number;
+if (Boolean(x)) {
+}
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -1604,20 +1679,16 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `(x: bigint) => x === 0;`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `(x: bigint) => Number.isNaN(x);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `(x: bigint) => !Boolean(x);`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `(x: bigint) => x === 0n;`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `(x: bigint) => !Boolean(x);`,
+							},
+						},
 					},
 				},
 			},
@@ -1627,20 +1698,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `<T extends number>(x: T) => ((x !== 0) ? 1 : 0);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `<T extends number>(x: T) => ((!Number.isNaN(x)) ? 1 : 0);`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `<T extends number>(x: T) => ((Boolean(x)) ? 1 : 0);`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `<T extends number>(x: T) => ((x !== 0) ? 1 : 0);`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `<T extends number>(x: T) => ((!Number.isNaN(x)) ? 1 : 0);`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `<T extends number>(x: T) => ((Boolean(x)) ? 1 : 0);`,
+							},
+						},
 					},
 				},
 			},
@@ -1650,20 +1721,20 @@ if (x) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 	{
-						// 		MessageId: "conditionFixCompareZero",
-						// 		Output: `[]['length'] === 0; // doesn't count as array.length when computed`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCompareNaN",
-						// 		Output: `Number.isNaN([]['length']); // doesn't count as array.length when computed`,
-						// 	},
-						// 	{
-						// 		MessageId: "conditionFixCastBoolean",
-						// 		Output: `!Boolean([]['length']); // doesn't count as array.length when computed`,
-						// 	},
-						// },
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output:    `[]['length'] === 0; // doesn't count as array.length when computed`,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output:    `Number.isNaN([]['length']); // doesn't count as array.length when computed`,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output:    `!Boolean([]['length']); // doesn't count as array.length when computed`,
+							},
+						},
 					},
 				},
 			},
@@ -1677,32 +1748,32 @@ if (a.notLength) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareZero",
-						// 							Output: `
-						// declare const a: any[] & { notLength: number };
-						// if (a.notLength !== 0) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareNaN",
-						// 							Output: `
-						// declare const a: any[] & { notLength: number };
-						// if (!Number.isNaN(a.notLength)) {
-						// }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// declare const a: any[] & { notLength: number };
-						// if (Boolean(a.notLength)) {
-						// }
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareZero",
+								Output: `
+declare const a: any[] & { notLength: number };
+if (a.notLength !== 0) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCompareNaN",
+								Output: `
+declare const a: any[] & { notLength: number };
+if (!Number.isNaN(a.notLength)) {
+}
+      `,
+							},
+							{
+								MessageId: "conditionFixCastBoolean",
+								Output: `
+declare const a: any[] & { notLength: number };
+if (Boolean(a.notLength)) {
+}
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -1715,15 +1786,15 @@ if (![].length) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareArrayLengthZero",
-						// 							Output: `
-						// if ([].length === 0) {
-						// }
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareArrayLengthZero",
+								Output: `
+if ([].length === 0) {
+}
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -1735,14 +1806,14 @@ if (![].length) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareArrayLengthNonzero",
-						// 							Output: `
-						// (a: number[]) => (a.length > 0) && '...';
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareArrayLengthNonzero",
+								Output: `
+(a: number[]) => (a.length > 0) && '...';
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -1754,14 +1825,14 @@ if (![].length) {
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareArrayLengthNonzero",
-						// 							Output: `
-						// <T extends unknown[]>(...a: T) => (a.length > 0) || 'empty';
-						//       `,
-						// 						},
-						// 					},
+						Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+							{
+								MessageId: "conditionFixCompareArrayLengthNonzero",
+								Output: `
+<T extends unknown[]>(...a: T) => (a.length > 0) || 'empty';
+      `,
+							},
+						},
 					},
 				},
 			},
@@ -3845,5 +3916,70 @@ declare function predicate<T extends Branded | null, U extends T>(x: number): U;
 					},
 				},
 			},
+			{
+				Code:    `function check(x: number) { return !(/* keep */ (x + 1)); }`,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{MessageId: "conditionFixCompareZero", Output: `function check(x: number) { return (/* keep */ (x + 1)) === 0; }`},
+					{MessageId: "conditionFixCompareNaN", Output: `function check(x: number) { return Number.isNaN((/* keep */ (x + 1))); }`},
+					{MessageId: "conditionFixCastBoolean", Output: `function check(x: number) { return !Boolean((/* keep */ (x + 1))); }`},
+				}}},
+			},
+			{
+				Code: `let count = 1
+!(count + 1)`,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{MessageId: "conditionFixCompareZero", Output: `let count = 1
+;(count + 1) === 0`},
+					{MessageId: "conditionFixCompareNaN", Output: `let count = 1
+Number.isNaN((count + 1))`},
+					{MessageId: "conditionFixCastBoolean", Output: `let count = 1
+!Boolean((count + 1))`},
+				}}},
+			},
+			{
+				Code:    `(values: readonly string[] | number[]) => !values.length;`,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{MessageId: "conditionFixCompareArrayLengthZero", Output: `(values: readonly string[] | number[]) => values.length === 0;`},
+				}}},
+			},
+			{
+				Code:    `(value: { length: number }) => !value.length;`,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{MessageId: "conditionFixCompareZero", Output: `(value: { length: number }) => value.length === 0;`},
+					{MessageId: "conditionFixCompareNaN", Output: `(value: { length: number }) => Number.isNaN(value.length);`},
+					{MessageId: "conditionFixCastBoolean", Output: `(value: { length: number }) => !Boolean(value.length);`},
+				}}},
+			},
+			{
+				Code: `declare function assert(value: unknown): asserts value;
+function check(value: string) { assert(value); }`,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+					{MessageId: "conditionFixCompareStringLength", Output: `declare function assert(value: unknown): asserts value;
+function check(value: string) { assert(value.length > 0); }`},
+					{MessageId: "conditionFixCompareEmptyString", Output: `declare function assert(value: unknown): asserts value;
+function check(value: string) { assert(value !== ""); }`},
+					{MessageId: "conditionFixCastBoolean", Output: `declare function assert(value: unknown): asserts value;
+function check(value: string) { assert(Boolean(value)); }`},
+				}}},
+			},
+			{Code: `switch (0) { default: Math.random()
+!(1 + 1); }`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareZero", Output: `switch (0) { default: Math.random()
+;(1 + 1) === 0; }`},
+				{MessageId: "conditionFixCompareNaN", Output: `switch (0) { default: Math.random()
+Number.isNaN((1 + 1)); }`},
+				{MessageId: "conditionFixCastBoolean", Output: `switch (0) { default: Math.random()
+!Boolean((1 + 1)); }`},
+			}}}},
+			{Code: `(value: string) => !!value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(value: string) => !(value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => !(value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => !(!Boolean(value));`},
+			}}}},
 		})
 }
