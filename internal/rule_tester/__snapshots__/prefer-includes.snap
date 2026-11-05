@@ -430,3 +430,75 @@ Message: Use `String#includes()` method with a string instead.
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
 ---
+
+[TestPreferIncludesRule/invalid-48 - 1]
+Diagnostic 1: preferStringIncludes (3:11 - 3:27)
+Message: Use `String#includes()` method with a string instead.
+   2 |         function f(a: string): void {
+   3 |           /a\\b\.c/.test(a);
+     |           ~~~~~~~~~~~~~~~~~
+   4 |         }
+---
+
+[TestPreferIncludesRule/invalid-49 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:41)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\'c/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-50 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:42)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\\'c/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-51 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:40)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\1/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-52 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:40)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\8/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-53 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:42)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\377/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-54 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:42)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\400/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-55 - 1]
+Diagnostic 1: preferStringIncludes (1:25 - 1:41)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { /a\\b\08/.test(a); }
+     |                         ~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-56 - 1]
+Diagnostic 1: preferStringIncludes (1:59 - 1:67)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { const p = new RegExp('a\\\\b\n'); p.test(a); }
+     |                                                           ~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-57 - 1]
+Diagnostic 1: preferStringIncludes (1:63 - 1:71)
+Message: Use `String#includes()` method with a string instead.
+   1 | function f(a: string) { const p = new RegExp('a\\\\b\uD800'); p.test(a); }
+     |                                                               ~~~~~~~~~
+---

@@ -114,6 +114,26 @@ func TestPreferIncludesRule(t *testing.T) {
         /\s/.test(text);
       }
     `},
+		{Code: `
+      function f(body: string): void {
+        /scopeName\\?":\\?"source\./.test(body);
+      }
+    `},
+		{Code: `
+      function f(body: string): void {
+        /a\\?b/.test(body);
+      }
+    `},
+		{Code: `
+      function f(body: string): void {
+        /a\\+/.test(body);
+      }
+    `},
+		{Code: `
+      function f(body: string): void {
+        /a\\\d/.test(body);
+      }
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -874,7 +894,7 @@ func TestPreferIncludesRule(t *testing.T) {
       `,
 			Output: []string{`
         function f(a: string): void {
-          a.includes('\0\'\\n\r\v\t\f');
+          a.includes('\u0000\'\\n\r\v\t\f');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -1074,6 +1094,67 @@ func TestPreferIncludesRule(t *testing.T) {
 					Column:    11,
 				},
 			},
+		},
+		{
+			Code: `
+        function f(a: string): void {
+          /a\\b\.c/.test(a);
+        }
+      `,
+			Output: []string{`
+        function f(a: string): void {
+          a.includes('a\\b.c');
+        }
+      `},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "preferStringIncludes",
+				},
+			},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\'c/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\'c'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\\'c/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\\\'c'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\1/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\u0001'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\8/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b8'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\377/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\bÿ'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\400/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b 0'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\08/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\u00008'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { const p = new RegExp('a\\\\b\n'); p.test(a); }`,
+			Output: []string{`function f(a: string) { const p = new RegExp('a\\\\b\n'); a.includes('a\\b\n'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { const p = new RegExp('a\\\\b\uD800'); p.test(a); }`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
 		},
 	})
 }
