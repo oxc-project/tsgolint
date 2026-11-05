@@ -523,11 +523,13 @@ func isNodePrefixOf(shorter, longer *ast.Node) bool {
 	return isNodePrefixOf(shorter, base)
 }
 
-// In JSX, foo && foo.bar has different semantics than foo?.bar:
-// foo && foo.bar returns false/null/undefined, while foo?.bar returns undefined.
+// JSX rendering can distinguish the falsy value returned by && from undefined.
 func isInsideJSX(node *ast.Node) bool {
 	current := node
 	for current != nil {
+		if ast.IsFunctionLikeDeclaration(current) {
+			return false
+		}
 		if ast.IsJsxExpression(current) ||
 			ast.IsJsxAttribute(current) ||
 			ast.IsJsxAttributes(current) ||
