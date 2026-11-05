@@ -1,5 +1,12 @@
 # Patches
 
+`0007-perf-batch-selected-file-declaration-diagnostics.patch` adds a compiler API
+for collecting declaration diagnostics for selected files after semantic checking.
+It runs one task per compiler-owned checker without holding the checker mutex,
+which declaration emit resolvers acquire internally. External checker pools retain
+sequential collection. TSGolint calls this API only when type checking and
+declaration output are enabled.
+
 `0006-perf-add-opt-in-node-count-checker-assignment.patch` enables descending
 node-count round-robin assignment only when `OXLINT_TSGOLINT_CHECKER_SCHEDULING=sorted`.
 It sorts a stable copy of the program files, including declarations, before
