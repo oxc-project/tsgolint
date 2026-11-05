@@ -539,3 +539,109 @@ Help: Assigned value has type `Set<any>`; the target has type `Set<string>`. Use
    7 | const generic = { "example.key": getSet() } satisfies Record<string, Set<string>>;
      |                   ~~~~~~~~~~~~~~~~~~~~~~~
 ---
+
+[TestNoUnsafeAssignmentRule/invalid-59 - 1]
+Diagnostic 1: anyAssignment (8:9 - 8:9)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   7 | declare const v: any;
+   8 | <Foo a={v} b="x" />;
+     |         ~
+   9 | <Foo a={1} b={v} />;
+
+Diagnostic 2: anyAssignment (9:15 - 9:15)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `string`. Use a safely typed value or `unknown`, and narrow it before use.
+   8 | <Foo a={v} b="x" />;
+   9 | <Foo a={1} b={v} />;
+     |               ~
+  10 | const x: any = v;
+
+Diagnostic 3: anyAssignment (10:7 - 10:16)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   9 | <Foo a={1} b={v} />;
+  10 | const x: any = v;
+     |       ~~~~~~~~~~
+  11 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-60 - 1]
+Diagnostic 1: anyAssignment (3:9 - 3:16)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   2 | declare function Foo(props: { a: any }): never;
+   3 | <Foo a={1 as any} />;
+     |         ~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-61 - 1]
+Diagnostic 1: anyAssignment (4:9 - 4:13)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `unknown`. Use a safely typed value or `unknown`, and narrow it before use.
+   3 | declare const value: any;
+   4 | <Foo a={value} />;
+     |         ~~~~~
+   5 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-62 - 1]
+Diagnostic 1: anyAssignment (6:9 - 6:13)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   5 | declare const value: any;
+   6 | <foo a={value} />;
+     |         ~~~~~
+   7 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-63 - 1]
+Diagnostic 1: anyAssignment (4:9 - 4:13)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `string`. Use a safely typed value or `unknown`, and narrow it before use.
+   3 | declare const value: any;
+   4 | <Foo a={value} />;
+     |         ~~~~~
+   5 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-64 - 1]
+Diagnostic 1: anyAssignment (7:18 - 7:22)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `string`. Use a safely typed value or `unknown`, and narrow it before use.
+   6 | declare const value: any;
+   7 | <Foo kind="a" a={value} />;
+     |                  ~~~~~
+   8 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-65 - 1]
+Diagnostic 1: anyAssignment (7:18 - 7:22)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   6 | declare const value: any;
+   7 | <Foo kind="a" a={value} />;
+     |                  ~~~~~
+   8 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-66 - 1]
+Diagnostic 1: anyAssignment (7:9 - 7:13)
+Message: Unsafe assignment of an any value.
+Help: Assigned value has type `any`; the target has type `any`. Use a safely typed value or `unknown`, and narrow it before use.
+   6 | declare const value: any;
+   7 | <Foo a={value} />;
+     |         ~~~~~
+   8 | 
+---
+
+[TestNoUnsafeAssignmentRule/invalid-67 - 1]
+Diagnostic 1: unsafeAssignment (4:9 - 4:13)
+Message: Unsafe assignment between incompatible types.
+Help: Assigned value has type `Set<any>`; the target has type `Set<string>`. Use a safely typed value or `unknown`, and narrow it before use.
+   3 | declare const value: Set<any>;
+   4 | <Foo a={value} />;
+     |         ~~~~~
+   5 | 
+---

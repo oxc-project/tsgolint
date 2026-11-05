@@ -176,6 +176,38 @@ let a = 1;
 
 a+= foo;
 		`},
+		{
+			Code: `
+declare function Foo(props: { a: any }): never;
+<Foo a={"safe"} />;
+`,
+			Tsx: true,
+		},
+		{
+			Code: `
+declare function Foo(props: { a: unknown }): never;
+declare const value: unknown;
+<Foo a={value} />;
+`,
+			Tsx: true,
+		},
+		{
+			Code: `
+declare namespace JSX {
+  interface IntrinsicElements { foo: { a: any }; }
+}
+<foo a={"safe"} />;
+`,
+			Tsx: true,
+		},
+		{Code: `
+declare const value: any;
+const x: { p: unknown } = { 'p': value };
+`},
+		{Code: `
+declare const value: any;
+const x: { p: unknown } = { ['p']: value };
+`},
 	}, slices.Concat([]rule_tester.InvalidTestCase{
 		{
 			Code: "const x = 1 as any;",
@@ -564,6 +596,123 @@ const generic = { "example.key": getSet() } satisfies Record<string, Set<string>
 					{MessageId: "anyAssignment", Line: 4},
 					{MessageId: "anyAssignment", Line: 5},
 					{MessageId: "unsafeAssignment", Line: 7},
+				},
+			},
+			{
+				Code: `
+declare namespace JSX {
+  interface Element {}
+  interface IntrinsicAttributes { key?: string; }
+}
+declare function Foo(props: { a: any; b: string }): never;
+declare const v: any;
+<Foo a={v} b="x" />;
+<Foo a={1} b={v} />;
+const x: any = v;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 8, Column: 9, EndColumn: 10},
+					{MessageId: "anyAssignment", Line: 9, Column: 15, EndColumn: 16},
+					{MessageId: "anyAssignment", Line: 10, Column: 7, EndColumn: 17},
+				},
+			},
+			{
+				Code: `
+declare function Foo(props: { a: any }): never;
+<Foo a={1 as any} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 3, Column: 9, EndColumn: 17},
+				},
+			},
+			{
+				Code: `
+declare function Foo(props: { a: unknown }): never;
+declare const value: any;
+<Foo a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 4, Column: 9, EndColumn: 14},
+				},
+			},
+			{
+				Code: `
+declare namespace JSX {
+  interface IntrinsicElements { foo: { a: any }; }
+}
+declare const value: any;
+<foo a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 6, Column: 9, EndColumn: 14},
+				},
+			},
+			{
+				Code: `
+declare function Foo(props: { [key: string]: string }): never;
+declare const value: any;
+<Foo a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 4, Column: 9, EndColumn: 14},
+				},
+			},
+			{
+				Code: `
+declare namespace JSX {
+  interface IntrinsicAttributes { key?: string; }
+}
+declare function Foo(props: { kind: "a"; a: string } | { kind: "b"; b: number }): never;
+declare const value: any;
+<Foo kind="a" a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 7, Column: 18, EndColumn: 23},
+				},
+			},
+			{
+				Code: `
+declare namespace JSX {
+  interface IntrinsicAttributes { key?: string; }
+}
+declare function Foo(props: { kind: "a"; a: any } | { kind: "b"; b: number }): never;
+declare const value: any;
+<Foo kind="a" a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 7, Column: 18, EndColumn: 23},
+				},
+			},
+			{
+				Code: `
+declare namespace JSX {
+  interface IntrinsicAttributes { key?: string; }
+}
+declare function Foo(props: { [key: string]: any }): never;
+declare const value: any;
+<Foo a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "anyAssignment", Line: 7, Column: 9, EndColumn: 14},
+				},
+			},
+			{
+				Code: `
+declare function Foo(props: { a: Set<string> }): never;
+declare const value: Set<any>;
+<Foo a={value} />;
+`,
+				Tsx: true,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{MessageId: "unsafeAssignment", Line: 4, Column: 9, EndColumn: 14},
 				},
 			},
 		}))
