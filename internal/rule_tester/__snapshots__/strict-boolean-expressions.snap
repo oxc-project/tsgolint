@@ -1428,3 +1428,74 @@ Message: Unexpected string value in conditional. A string can be falsy (empty st
   Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
   Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
 ---
+
+[TestStrictBooleanExpressionsRule/invalid-125 - 1]
+Diagnostic 1: conditionErrorString (1:2 - 1:21)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | !{ value: "x" }.value;
+     |  ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-126 - 1]
+Diagnostic 1: conditionErrorString (1:8 - 1:27)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | () => !{ value: "x" }.value;
+     |        ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-127 - 1]
+Diagnostic 1: conditionErrorString (1:13 - 1:32)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | !/* keep */ { value: "x" }.value;
+     |             ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-128 - 1]
+Diagnostic 1: conditionErrorString (2:2 - 2:21)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | Math.random()
+   2 | !{ value: "x" }.value;
+     |  ~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-129 - 1]
+Diagnostic 1: conditionErrorString (1:2 - 1:36)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | !class { static value = "x"; }.value;
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-130 - 1]
+Diagnostic 1: conditionErrorNumber (1:2 - 1:28)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | !function () { return 1; }();
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareZero] Change condition to check for 0 (`value !== 0`)
+  Suggestion 2: [conditionFixCompareNaN] Change condition to check for NaN (`!Number.isNaN(value)`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-131 - 1]
+Diagnostic 1: conditionErrorNumber (1:2 - 1:28)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | !async function () {}.length;
+     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareZero] Change condition to check for 0 (`value !== 0`)
+  Suggestion 2: [conditionFixCompareNaN] Change condition to check for NaN (`!Number.isNaN(value)`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---

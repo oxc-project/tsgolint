@@ -3981,5 +3981,44 @@ Number.isNaN((1 + 1)); }`},
 				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => !(value === "");`},
 				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => !(!Boolean(value));`},
 			}}}},
+			{Code: `!{ value: "x" }.value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `({ value: "x" }.value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `({ value: "x" }.value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `!Boolean({ value: "x" }.value);`},
+			}}}},
+			{Code: `() => !{ value: "x" }.value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `() => ({ value: "x" }.value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `() => ({ value: "x" }.value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `() => !Boolean({ value: "x" }.value);`},
+			}}}},
+			{Code: `!/* keep */ { value: "x" }.value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(/* keep */ { value: "x" }.value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(/* keep */ { value: "x" }.value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `!Boolean(/* keep */ { value: "x" }.value);`},
+			}}}},
+			{Code: `Math.random()
+!{ value: "x" }.value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `Math.random()
+;({ value: "x" }.value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `Math.random()
+;({ value: "x" }.value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `Math.random()
+!Boolean({ value: "x" }.value);`},
+			}}}},
+			{Code: `!class { static value = "x"; }.value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(class { static value = "x"; }.value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(class { static value = "x"; }.value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `!Boolean(class { static value = "x"; }.value);`},
+			}}}},
+			{Code: `!function () { return 1; }();`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareZero", Output: `(function () { return 1; }() === 0);`},
+				{MessageId: "conditionFixCompareNaN", Output: `Number.isNaN(function () { return 1; }());`},
+				{MessageId: "conditionFixCastBoolean", Output: `!Boolean(function () { return 1; }());`},
+			}}}},
+			{Code: `!async function () {}.length;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false, "allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareZero", Output: `(async function () {}.length === 0);`},
+				{MessageId: "conditionFixCompareNaN", Output: `Number.isNaN(async function () {}.length);`},
+				{MessageId: "conditionFixCastBoolean", Output: `!Boolean(async function () {}.length);`},
+			}}}},
 		})
 }

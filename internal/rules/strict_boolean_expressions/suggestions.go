@@ -43,11 +43,20 @@ func buildPrimitiveConditionSuggestions(ctx rule.RuleContext, node *ast.Node, va
 
 	var suggestions []rule.RuleSuggestion
 	add := func(id, description, replacement string) {
-		if conditionNeedsParentheses(target) {
+		s := scanner.NewScanner()
+		s.SetText(replacement)
+		firstToken := s.Scan()
+		statementStartToken := firstToken
+		if firstToken == ast.KindAsyncKeyword && s.Scan() == ast.KindFunctionKeyword && !s.HasPrecedingLineBreak() {
+			statementStartToken = ast.KindFunctionKeyword
+		}
+		if conditionNeedsParentheses(target) ||
+			utils.IsStartOfExpressionStatementNeedingParentheses(ctx.SourceFile, target, statementStartToken) ||
+			utils.IsStartOfArrowFunctionBodyNeedingParentheses(ctx.SourceFile, target, firstToken) {
 			replacement = "(" + replacement + ")"
 		}
-		firstToken := scanner.SkipTrivia(replacement, 0)
-		if firstToken < len(replacement) && strings.IndexByte("([`", replacement[firstToken]) >= 0 && conditionNeedsSemicolon(ctx.SourceFile, target) {
+		firstTokenPos := scanner.SkipTrivia(replacement, 0)
+		if firstTokenPos < len(replacement) && strings.IndexByte("([`", replacement[firstTokenPos]) >= 0 && conditionNeedsSemicolon(ctx.SourceFile, target) {
 			replacement = ";" + replacement
 		}
 		suggestions = append(suggestions, rule.RuleSuggestion{
