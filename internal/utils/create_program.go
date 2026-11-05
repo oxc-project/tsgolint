@@ -73,6 +73,10 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		return nil, internalDiags, nil
 	}
 
+	if checkers := checkerCountFromEnvironment(); checkers != nil {
+		configParseResult.CompilerOptions().Checkers = checkers
+	}
+
 	opts := compiler.ProgramOptions{
 		Config:                      configParseResult,
 		SingleThreaded:              core.TSTrue,
@@ -134,6 +138,7 @@ func CreateInferredProjectProgram(singleThreaded bool, fs vfs.FS, cwd string, ho
 					ESModuleInterop:            core.TSTrue,
 					AllowNonTsExtensions:       core.TSTrue,
 					ResolveJsonModule:          core.TSTrue,
+					Checkers:                   checkerCountFromEnvironment(),
 				},
 				FileNames: fileNames,
 			},
