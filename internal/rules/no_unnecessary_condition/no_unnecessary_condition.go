@@ -412,6 +412,12 @@ var NoUnnecessaryConditionRule = rule.Rule{
 			if isTypeParameter {
 				return resolveIndexedAccessType(constraintType)
 			}
+
+			if checker.Type_flags(nodeType)&checker.TypeFlagsConditional != 0 {
+				if constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, nodeType); constraint != nil {
+					nodeType = constraint
+				}
+			}
 			return resolveIndexedAccessType(nodeType)
 		}
 
@@ -468,7 +474,7 @@ var NoUnnecessaryConditionRule = rule.Rule{
 		isConditionalAlwaysNecessary := func(t *checker.Type) bool {
 			for _, part := range utils.UnionTypeParts(t) {
 				flags := checker.Type_flags(part)
-				if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeVariable) != 0 {
+				if flags&(checker.TypeFlagsAny|checker.TypeFlagsUnknown|checker.TypeFlagsTypeVariable|checker.TypeFlagsConditional) != 0 {
 					return true
 				}
 			}

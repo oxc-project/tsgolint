@@ -2212,6 +2212,46 @@ Message: Unnecessary conditional, value is always truthy.
      |                      ~~~
 ---
 
+[TestNoUnnecessaryConditionRule/invalid-164 - 1]
+Diagnostic 1: neverNullish (3:10 - 3:10)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+Help: The checked value has type `string`.
+   2 | function test<T extends string>(a: Awaited<T>) {
+   3 |   return a ?? 'default';
+     |          ~
+   4 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-165 - 1]
+Diagnostic 1: alwaysTruthy (3:10 - 3:10)
+Message: Unnecessary conditional, value is always truthy.
+Help: The checked value has type `object`.
+   2 | function test<T extends Promise<object>>(a: Awaited<T>) {
+   3 |   return a ? 'yes' : 'no';
+     |          ~
+   4 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-166 - 1]
+Diagnostic 1: alwaysTruthy (3:10 - 3:10)
+Message: Unnecessary conditional, value is always truthy.
+Help: The checked value has type `"a" | "b"`.
+   2 | function test<T>(a: T extends string ? 'a' : 'b') {
+   3 |   return a ? 'yes' : 'no';
+     |          ~
+   4 | }
+---
+
+[TestNoUnnecessaryConditionRule/invalid-167 - 1]
+Diagnostic 1: neverNullish (3:10 - 3:10)
+Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
+Help: The checked value has type `"a" | "b"`.
+   2 | function test<T>(a: T extends string ? 'a' : 'b') {
+   3 |   return a ?? 'default';
+     |          ~
+   4 | }
+---
+
 [TestNullishRecordAssignment/invalid-0 - 1]
 Diagnostic 1: neverNullish (4:5 - 4:19)
 Message: Unnecessary conditional, expected left-hand side of `??` operator to be possibly null or undefined.
