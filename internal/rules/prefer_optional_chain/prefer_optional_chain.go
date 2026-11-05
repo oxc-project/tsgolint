@@ -1454,6 +1454,32 @@ func (processor *chainProcessor) allSubsequentHaveOptionalChaining(chain []Opera
 	return true
 }
 
+// isReferenceToGlobal reports whether node is an identifier whose symbol has no
+// local declaration in the file being linted: a lib global such as window, an
+// ambient global (declared elsewhere, or in a `declare global` block here), or
+// nothing at all. typescript-eslint treats `typeof x === 'undefined'` on such a
+// reference as an invalid operand (gatherLogicalOperands,
+// isReferenceToGlobalFunction): `x?.y` throws a ReferenceError where the typeof
+// guard returns false when x is not declared.
+func (processor *chainProcessor) isReferenceToGlobal(node *ast.Node) bool {
+	if node == nil || !ast.IsIdentifier(node) {
+		return false
+	}
+	symbol := processor.ctx.TypeChecker.GetSymbolAtLocation(node)
+	if symbol == nil {
+		return true
+	}
+	for _, decl := range symbol.Declarations {
+		if ast.GetSourceFileOfNode(decl) != processor.ctx.SourceFile {
+			continue
+		}
+		if ast.FindAncestor(decl, ast.IsGlobalScopeAugmentation) == nil {
+			return false
+		}
+	}
+	return true
+}
+
 func (processor *chainProcessor) parseOperand(node *ast.Node, operatorKind ast.Kind) Operand {
 	isAndChain := isAndOperator(operatorKind)
 	unwrapped := unwrapForComparison(node)
@@ -1514,6 +1540,11 @@ outer3:
 			if ast.IsTypeOfExpression(expr) {
 				typeofExpr := expr.AsTypeOfExpression()
 				if ast.IsStringLiteral(value) && value.AsStringLiteral().Text == "undefined" {
+					// typeof window === 'undefined': the guard is for an undeclared
+					// global, which no optional chain can stand in for.
+					if processor.isReferenceToGlobal(ast.SkipParentheses(typeofExpr.Expression)) {
+						return Operand{typ: OperandTypeInvalid, node: node}
+					}
 					if (op == ast.KindExclamationEqualsEqualsToken || op == ast.KindExclamationEqualsToken) && isAndChain {
 						return Operand{typ: OperandTypeTypeofCheck, node: node, comparedExpr: typeofExpr.Expression}
 					}
