@@ -114,8 +114,6 @@ func TestPreferIncludesRule(t *testing.T) {
         /\s/.test(text);
       }
     `},
-		// An escaped backslash followed by a quantifier is a real regex
-		// (an optional backslash), not a plain string. oxc-project/tsgolint#1281
 		{Code: `
       function f(body: string): void {
         /scopeName\\?":\\?"source\./.test(body);
@@ -896,7 +894,7 @@ func TestPreferIncludesRule(t *testing.T) {
       `,
 			Output: []string{`
         function f(a: string): void {
-          a.includes('\0\'\\n\r\v\t\f');
+          a.includes('\u0000\'\\n\r\v\t\f');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -1097,7 +1095,6 @@ func TestPreferIncludesRule(t *testing.T) {
 				},
 			},
 		},
-		// An escaped backslash alone is a literal backslash: still a plain string.
 		{
 			Code: `
         function f(a: string): void {
@@ -1106,7 +1103,7 @@ func TestPreferIncludesRule(t *testing.T) {
       `,
 			Output: []string{`
         function f(a: string): void {
-          a.includes('a\\b\.c');
+          a.includes('a\\b.c');
         }
       `},
 			Errors: []rule_tester.InvalidTestCaseError{
@@ -1114,6 +1111,50 @@ func TestPreferIncludesRule(t *testing.T) {
 					MessageId: "preferStringIncludes",
 				},
 			},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\'c/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\'c'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\\'c/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\\\'c'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\1/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\u0001'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\8/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b8'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\377/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\bÿ'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\400/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b 0'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { /a\\b\08/.test(a); }`,
+			Output: []string{`function f(a: string) { a.includes('a\\b\u00008'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { const p = new RegExp('a\\\\b\n'); p.test(a); }`,
+			Output: []string{`function f(a: string) { const p = new RegExp('a\\\\b\n'); a.includes('a\\b\n'); }`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
+		},
+		{
+			Code:   `function f(a: string) { const p = new RegExp('a\\\\b\uD800'); p.test(a); }`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferStringIncludes"}},
 		},
 	})
 }
