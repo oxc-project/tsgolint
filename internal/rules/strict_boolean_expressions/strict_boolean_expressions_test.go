@@ -634,6 +634,35 @@ declare function predicate<T extends boolean>(x: string | null): T;
 			},
 			{
 				Code: `
+type Branded = boolean & { readonly __brand: unique symbol };
+declare function predicate<T extends Branded, U extends T>(x: number): U;
+[1].filter(predicate);
+    `,
+			},
+			{
+				Code: `
+type Branded = boolean & { readonly __brand: unique symbol };
+function check<T extends Branded, U extends T>(value: U): void {
+  [1].filter(() => value);
+}
+    `,
+			},
+			{
+				Code: `
+declare function predicate<T extends boolean>(x: number): T & { readonly __brand: unique symbol };
+[1].filter(predicate);
+    `,
+			},
+			{
+				Code: `
+type Branded = boolean & { readonly __brand: unique symbol };
+declare function predicate<T extends Branded | null, U extends T>(x: number): U;
+[1].filter(predicate);
+    `,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableBoolean": true, "allowNullableObject": false}`),
+			},
+			{
+				Code: `
 declare function f(x: number): boolean;
 declare function f(x: string | null): boolean;
 
@@ -805,55 +834,9 @@ if (('' && foo) || (0 && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareStringLength",
-						// 							Output: `
-						// declare const foo: true & { __BRAND: 'Foo' };
-						// if (((''.length > 0) && foo) || (0 && void 0)) { }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareEmptyString",
-						// 							Output: `
-						// declare const foo: true & { __BRAND: 'Foo' };
-						// if ((('' !== "") && foo) || (0 && void 0)) { }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// declare const foo: true & { __BRAND: 'Foo' };
-						// if (((Boolean('')) && foo) || (0 && void 0)) { }
-						//       `,
-						// 						},
-						// 					},
 					},
 					{
 						MessageId: "conditionErrorNumber",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareZero",
-						// 							Output: `
-						// declare const foo: true & { __BRAND: 'Foo' };
-						// if (('' && foo) || ((0 !== 0) && void 0)) { }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareNaN",
-						// 							Output: `
-						// declare const foo: true & { __BRAND: 'Foo' };
-						// if (('' && foo) || ((!Number.isNaN(0)) && void 0)) { }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// declare const foo: true & { __BRAND: 'Foo' };
-						// if (('' && foo) || ((Boolean(0)) && void 0)) { }
-						//       `,
-						// 						},
-						// 					},
 					},
 					{
 						MessageId: "conditionErrorNullish",
@@ -869,29 +852,6 @@ if (('' && {}) || (foo && void 0)) { }
 				Errors: []rule_tester.InvalidTestCaseError{
 					{
 						MessageId: "conditionErrorString",
-						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
-						// 						{
-						// 							MessageId: "conditionFixCompareStringLength",
-						// 							Output: `
-						// declare const foo: false & { __BRAND: 'Foo' };
-						// if (((''.length > 0) && {}) || (foo && void 0)) { }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCompareEmptyString",
-						// 							Output: `
-						// declare const foo: false & { __BRAND: 'Foo' };
-						// if ((('' !== "") && {}) || (foo && void 0)) { }
-						//       `,
-						// 						},
-						// 						{
-						// 							MessageId: "conditionFixCastBoolean",
-						// 							Output: `
-						// declare const foo: false & { __BRAND: 'Foo' };
-						// if (((Boolean('')) && {}) || (foo && void 0)) { }
-						//       `,
-						// 						},
-						// 					},
 					},
 					{
 						MessageId: "conditionErrorObject",
@@ -3870,6 +3830,18 @@ const stringValue: string = 'hoge';
 						//       `,
 						// 						},
 						// 					},
+					},
+				},
+			},
+			{
+				Code: `
+type Branded = boolean & { readonly __brand: unique symbol };
+declare function predicate<T extends Branded | null, U extends T>(x: number): U;
+[1].filter(predicate);`,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowAny": true}`),
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorNullableBoolean",
 					},
 				},
 			},

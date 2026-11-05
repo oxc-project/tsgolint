@@ -172,12 +172,8 @@ var StrictBooleanExpressionsRule = rule.Rule{
 						var types []*checker.Type
 						for _, signature := range signatures {
 							returnType := ctx.TypeChecker.GetReturnTypeOfSignature(signature)
-							typeFlags := checker.Type_flags(returnType)
-							if typeFlags&checker.TypeFlagsTypeParameter != 0 {
-								constraint := ctx.TypeChecker.GetConstraintOfTypeParameter(returnType)
-								if constraint != nil {
-									returnType = constraint
-								}
+							if constraint := checker.Checker_getBaseConstraintOfType(ctx.TypeChecker, returnType); constraint != nil {
+								returnType = constraint
 							}
 
 							types = append(types, utils.UnionTypeParts(returnType)...)

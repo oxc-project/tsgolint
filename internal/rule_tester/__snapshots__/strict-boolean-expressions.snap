@@ -1230,3 +1230,12 @@ Message: Unexpected string value in conditional. A string can be falsy (empty st
      | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
 ---
+
+[TestStrictBooleanExpressionsRule/invalid-117 - 1]
+Diagnostic 1: conditionErrorNullableBoolean (4:1 - 4:21)
+Message: Unexpected nullable boolean value in conditional.
+Help: Handle the nullish case explicitly.
+   3 | declare function predicate<T extends Branded | null, U extends T>(x: number): U;
+   4 | [1].filter(predicate);
+     | ~~~~~~~~~~~~~~~~~~~~~
+---
