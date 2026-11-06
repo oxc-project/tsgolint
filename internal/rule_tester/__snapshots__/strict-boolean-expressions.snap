@@ -1499,3 +1499,74 @@ Message: Unexpected number value in conditional. A number can be falsy (0, NaN) 
   Suggestion 2: [conditionFixCompareNaN] Change condition to check for NaN (`!Number.isNaN(value)`)
   Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
 ---
+
+[TestStrictBooleanExpressionsRule/invalid-132 - 1]
+Diagnostic 1: conditionErrorString (1:28 - 1:32)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | (value: string) => typeof !value;
+     |                            ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-133 - 1]
+Diagnostic 1: conditionErrorNumber (1:26 - 1:30)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | (value: number) => void !value;
+     |                          ~~~~~
+  Suggestion 1: [conditionFixCompareZero] Change condition to check for 0 (`value !== 0`)
+  Suggestion 2: [conditionFixCompareNaN] Change condition to check for NaN (`!Number.isNaN(value)`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-134 - 1]
+Diagnostic 1: conditionErrorString (1:28 - 1:32)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | (value: string) => delete !value;
+     |                            ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-135 - 1]
+Diagnostic 1: conditionErrorNumber (1:31 - 1:43)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | (values: number[]) => typeof !values.length;
+     |                               ~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareArrayLengthZero] Change condition to check array's length (`value.length === 0`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-136 - 1]
+Diagnostic 1: conditionErrorString (2:2 - 2:11)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | Math.random()
+   2 | !/a/.source;
+     |  ~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-137 - 1]
+Diagnostic 1: conditionErrorNumber (2:13 - 2:25)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | Math.random()
+   2 | !/* keep */ /a/.lastIndex;
+     |             ~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareZero] Change condition to check for 0 (`value !== 0`)
+  Suggestion 2: [conditionFixCompareNaN] Change condition to check for NaN (`!Number.isNaN(value)`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-138 - 1]
+Diagnostic 1: conditionErrorString (2:2 - 2:11)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | Math.random();
+   2 | !/a/.source;
+     |  ~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---

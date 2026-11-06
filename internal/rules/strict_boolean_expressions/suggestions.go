@@ -56,7 +56,7 @@ func buildPrimitiveConditionSuggestions(ctx rule.RuleContext, node *ast.Node, va
 			replacement = "(" + replacement + ")"
 		}
 		firstTokenPos := scanner.SkipTrivia(replacement, 0)
-		if firstTokenPos < len(replacement) && strings.IndexByte("([`", replacement[firstTokenPos]) >= 0 && conditionNeedsSemicolon(ctx.SourceFile, target) {
+		if firstTokenPos < len(replacement) && strings.IndexByte("([`/", replacement[firstTokenPos]) >= 0 && conditionNeedsSemicolon(ctx.SourceFile, target) {
 			replacement = ";" + replacement
 		}
 		suggestions = append(suggestions, rule.RuleSuggestion{
@@ -126,7 +126,8 @@ func conditionNeedsParentheses(node *ast.Node) bool {
 		return false
 	}
 	switch parent.Kind {
-	case ast.KindPostfixUnaryExpression, ast.KindPrefixUnaryExpression, ast.KindBinaryExpression, ast.KindConditionalExpression, ast.KindAwaitExpression:
+	case ast.KindPostfixUnaryExpression, ast.KindPrefixUnaryExpression, ast.KindTypeOfExpression, ast.KindVoidExpression, ast.KindDeleteExpression,
+		ast.KindBinaryExpression, ast.KindConditionalExpression, ast.KindAwaitExpression:
 		return true
 	case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression, ast.KindCallExpression, ast.KindNewExpression:
 		return parent.Expression() == node

@@ -4020,5 +4020,50 @@ Number.isNaN((1 + 1)); }`},
 				{MessageId: "conditionFixCompareNaN", Output: `Number.isNaN(async function () {}.length);`},
 				{MessageId: "conditionFixCastBoolean", Output: `!Boolean(async function () {}.length);`},
 			}}}},
+			{Code: `(value: string) => typeof !value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(value: string) => typeof (value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => typeof (value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => typeof (!Boolean(value));`},
+			}}}},
+			{Code: `(value: number) => void !value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareZero", Output: `(value: number) => void (value === 0);`},
+				{MessageId: "conditionFixCompareNaN", Output: `(value: number) => void (Number.isNaN(value));`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: number) => void (!Boolean(value));`},
+			}}}},
+			{Code: `(value: string) => delete !value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(value: string) => delete (value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => delete (value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => delete (!Boolean(value));`},
+			}}}},
+			{Code: `(values: number[]) => typeof !values.length;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareArrayLengthZero", Output: `(values: number[]) => typeof (values.length === 0);`},
+			}}}},
+			{Code: `Math.random()
+!/a/.source;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `Math.random()
+;/a/.source.length === 0;`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `Math.random()
+;/a/.source === "";`},
+				{MessageId: "conditionFixCastBoolean", Output: `Math.random()
+!Boolean(/a/.source);`},
+			}}}},
+			{Code: `Math.random()
+!/* keep */ /a/.lastIndex;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareZero", Output: `Math.random()
+;/* keep */ /a/.lastIndex === 0;`},
+				{MessageId: "conditionFixCompareNaN", Output: `Math.random()
+Number.isNaN(/* keep */ /a/.lastIndex);`},
+				{MessageId: "conditionFixCastBoolean", Output: `Math.random()
+!Boolean(/* keep */ /a/.lastIndex);`},
+			}}}},
+			{Code: `Math.random();
+!/a/.source;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `Math.random();
+/a/.source.length === 0;`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `Math.random();
+/a/.source === "";`},
+				{MessageId: "conditionFixCastBoolean", Output: `Math.random();
+!Boolean(/a/.source);`},
+			}}}},
 		})
 }
