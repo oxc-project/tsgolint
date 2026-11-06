@@ -4065,5 +4065,61 @@ Number.isNaN(/* keep */ /a/.lastIndex);`},
 				{MessageId: "conditionFixCastBoolean", Output: `Math.random();
 !Boolean(/a/.source);`},
 			}}}},
+			{Code: `(value: string) => !value satisfies boolean;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(value: string) => (value.length === 0) satisfies boolean;`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => (value === "") satisfies boolean;`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => (!Boolean(value)) satisfies boolean;`},
+			}}}},
+			{Code: `(value: string) => !value as boolean;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(value: string) => (value.length === 0) as boolean;`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => (value === "") as boolean;`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => (!Boolean(value)) as boolean;`},
+			}}}},
+			{Code: `(value: string) => <boolean>!value;`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `(value: string) => <boolean>(value.length === 0);`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `(value: string) => <boolean>(value === "");`},
+				{MessageId: "conditionFixCastBoolean", Output: `(value: string) => <boolean>(!Boolean(value));`},
+			}}}},
+			{Code: `function check(value: string) { return ! // keep
+value; }`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `function check(value: string) { return (// keep
+value.length === 0); }`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `function check(value: string) { return (// keep
+value === ""); }`},
+				{MessageId: "conditionFixCastBoolean", Output: `function check(value: string) { return !Boolean(// keep
+value); }`},
+			}}}},
+			{Code: `function check(value: number) { return !/* keep
+*/value; }`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareZero", Output: `function check(value: number) { return (/* keep
+*/value === 0); }`},
+				{MessageId: "conditionFixCompareNaN", Output: `function check(value: number) { return Number.isNaN(/* keep
+*/value); }`},
+				{MessageId: "conditionFixCastBoolean", Output: `function check(value: number) { return !Boolean(/* keep
+*/value); }`},
+			}}}},
+			{Code: `function check(value: string) { throw ! // keep
+value; }`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `function check(value: string) { throw (// keep
+value.length === 0); }`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `function check(value: string) { throw (// keep
+value === ""); }`},
+				{MessageId: "conditionFixCastBoolean", Output: `function check(value: string) { throw !Boolean(// keep
+value); }`},
+			}}}},
+			{Code: `function* check(value: string) { yield !/* keep
+*/value; }`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorString", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareStringLength", Output: `function* check(value: string) { yield (/* keep
+*/value.length === 0); }`},
+				{MessageId: "conditionFixCompareEmptyString", Output: `function* check(value: string) { yield (/* keep
+*/value === ""); }`},
+				{MessageId: "conditionFixCastBoolean", Output: `function* check(value: string) { yield !Boolean(/* keep
+*/value); }`},
+			}}}},
+			{Code: `function check(values: number[]) { return ! // keep
+values.length; }`, Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`), Errors: []rule_tester.InvalidTestCaseError{{MessageId: "conditionErrorNumber", Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+				{MessageId: "conditionFixCompareArrayLengthZero", Output: `function check(values: number[]) { return (// keep
+values.length === 0); }`},
+			}}}},
 		})
 }

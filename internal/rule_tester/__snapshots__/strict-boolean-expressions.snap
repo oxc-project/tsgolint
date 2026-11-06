@@ -1570,3 +1570,86 @@ Message: Unexpected string value in conditional. A string can be falsy (empty st
   Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
   Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
 ---
+
+[TestStrictBooleanExpressionsRule/invalid-139 - 1]
+Diagnostic 1: conditionErrorString (1:21 - 1:25)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | (value: string) => !value satisfies boolean;
+     |                     ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-140 - 1]
+Diagnostic 1: conditionErrorString (1:21 - 1:25)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | (value: string) => !value as boolean;
+     |                     ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-141 - 1]
+Diagnostic 1: conditionErrorString (1:30 - 1:34)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | (value: string) => <boolean>!value;
+     |                              ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-142 - 1]
+Diagnostic 1: conditionErrorString (2:1 - 2:5)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | function check(value: string) { return ! // keep
+   2 | value; }
+     | ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-143 - 1]
+Diagnostic 1: conditionErrorNumber (2:3 - 2:7)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | function check(value: number) { return !/* keep
+   2 | */value; }
+     |   ~~~~~
+  Suggestion 1: [conditionFixCompareZero] Change condition to check for 0 (`value !== 0`)
+  Suggestion 2: [conditionFixCompareNaN] Change condition to check for NaN (`!Number.isNaN(value)`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-144 - 1]
+Diagnostic 1: conditionErrorString (2:1 - 2:5)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | function check(value: string) { throw ! // keep
+   2 | value; }
+     | ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-145 - 1]
+Diagnostic 1: conditionErrorString (2:3 - 2:7)
+Message: Unexpected string value in conditional. A string can be falsy (empty string) or truthy.
+   1 | function* check(value: string) { yield !/* keep
+   2 | */value; }
+     |   ~~~~~
+  Suggestion 1: [conditionFixCompareStringLength] Change condition to check string's length (`value.length !== 0`)
+  Suggestion 2: [conditionFixCompareEmptyString] Change condition to check for empty string (`value !== ""`)
+  Suggestion 3: [conditionFixCastBoolean] Explicitly convert value to a boolean (`Boolean(value)`)
+---
+
+[TestStrictBooleanExpressionsRule/invalid-146 - 1]
+Diagnostic 1: conditionErrorNumber (2:1 - 2:13)
+Message: Unexpected number value in conditional. A number can be falsy (0, NaN) or truthy.
+   1 | function check(values: number[]) { return ! // keep
+   2 | values.length; }
+     | ~~~~~~~~~~~~~
+  Suggestion 1: [conditionFixCompareArrayLengthZero] Change condition to check array's length (`value.length === 0`)
+---

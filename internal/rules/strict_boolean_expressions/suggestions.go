@@ -46,11 +46,12 @@ func buildPrimitiveConditionSuggestions(ctx rule.RuleContext, node *ast.Node, va
 		s := scanner.NewScanner()
 		s.SetText(replacement)
 		firstToken := s.Scan()
+		hasLeadingLineBreak := s.HasPrecedingLineBreak()
 		statementStartToken := firstToken
 		if firstToken == ast.KindAsyncKeyword && s.Scan() == ast.KindFunctionKeyword && !s.HasPrecedingLineBreak() {
 			statementStartToken = ast.KindFunctionKeyword
 		}
-		if conditionNeedsParentheses(target) ||
+		if hasLeadingLineBreak || conditionNeedsParentheses(target) ||
 			utils.IsStartOfExpressionStatementNeedingParentheses(ctx.SourceFile, target, statementStartToken) ||
 			utils.IsStartOfArrowFunctionBodyNeedingParentheses(ctx.SourceFile, target, firstToken) {
 			replacement = "(" + replacement + ")"
@@ -127,7 +128,8 @@ func conditionNeedsParentheses(node *ast.Node) bool {
 	}
 	switch parent.Kind {
 	case ast.KindPostfixUnaryExpression, ast.KindPrefixUnaryExpression, ast.KindTypeOfExpression, ast.KindVoidExpression, ast.KindDeleteExpression,
-		ast.KindBinaryExpression, ast.KindConditionalExpression, ast.KindAwaitExpression:
+		ast.KindBinaryExpression, ast.KindConditionalExpression, ast.KindAwaitExpression,
+		ast.KindAsExpression, ast.KindSatisfiesExpression, ast.KindTypeAssertionExpression:
 		return true
 	case ast.KindPropertyAccessExpression, ast.KindElementAccessExpression, ast.KindCallExpression, ast.KindNewExpression:
 		return parent.Expression() == node
