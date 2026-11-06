@@ -13,6 +13,9 @@ var NoGeneratedEmptyObjectTypeRule = rule.Rule{
 		isEmptyObjectType := func(t *checker.Type) bool {
 			return utils.IsObjectType(t) &&
 				checker.Type_objectFlags(t)&checker.ObjectFlagsClassOrInterface == 0 &&
+				// A mapped type over generic keys, such as `Partial<T["row"]>`,
+				// has no members until it is instantiated.
+				!checker.Checker_isGenericMappedType(ctx.TypeChecker, t) &&
 				len(checker.Checker_getPropertiesOfType(ctx.TypeChecker, t)) == 0 &&
 				len(checker.Checker_getIndexInfosOfType(ctx.TypeChecker, t)) == 0 &&
 				len(checker.Checker_getSignaturesOfType(ctx.TypeChecker, t, checker.SignatureKindCall)) == 0 &&
