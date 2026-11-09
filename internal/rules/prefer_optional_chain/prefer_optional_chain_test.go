@@ -11,6 +11,20 @@ import (
 func TestPreferOptionalChainRule(t *testing.T) {
 	t.Parallel()
 	validCases := []rule_tester.ValidTestCase{
+		{Code: `
+declare const input: { text: string; ctrl: boolean };
+if (input.ctrl || input.text === ' ' || input.text.length !== 1) {}
+`},
+		{Code: `
+declare const skip: boolean;
+declare const input: { text: string };
+if (skip || input.text === ' ' || input.text.length !== 1) {}
+`},
+		{Code: `
+declare const skip: boolean;
+declare const input: { text: string };
+if (skip || ' ' === input.text || input.text.length !== 1) {}
+`},
 		{Code: `foo || {};`},
 		{Code: `foo || ({} as any);`},
 		{Code: `(foo || {})?.bar;`},
