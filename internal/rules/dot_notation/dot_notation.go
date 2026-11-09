@@ -309,17 +309,11 @@ var DotNotationRule = rule.Rule{
 			}
 
 			if (propertySymbol == nil || len(propertySymbol.Declarations) == 0) && allowIndexSignaturePropertyAccess {
-				if ctx.Program.Options().NoPropertyAccessFromIndexSignature.IsTrue() {
-					return true
-				}
-
 				objectType := utils.GetNonNullableType(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(node.Expression()))
 				if objectType != nil {
 					objectType = checker.Checker_getApparentType(ctx.TypeChecker, objectType)
 					keyType := ctx.TypeChecker.GetTypeAtLocation(property)
-					baseKeyType := checker.Checker_getBaseTypeOfLiteralType(ctx.TypeChecker, keyType)
-					if checker.Checker_getIndexTypeOfType(ctx.TypeChecker, objectType, keyType) != nil ||
-						(baseKeyType != nil && checker.Checker_getIndexTypeOfType(ctx.TypeChecker, objectType, baseKeyType) != nil) {
+					if checker.Checker_getApplicableIndexInfo(ctx.TypeChecker, objectType, keyType) != nil {
 						return true
 					}
 				}
