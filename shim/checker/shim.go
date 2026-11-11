@@ -121,6 +121,8 @@ func Checker_getBaseTypes(recv *checker.Checker, t *checker.Type) []*checker.Typ
 func Checker_getReturnTypeOfSignature(recv *checker.Checker, sig *checker.Signature) *checker.Type
 //go:linkname Checker_getApparentType github.com/microsoft/typescript-go/internal/checker.(*Checker).getApparentType
 func Checker_getApparentType(recv *checker.Checker, t *checker.Type) *checker.Type
+//go:linkname Checker_getReducedApparentType github.com/microsoft/typescript-go/internal/checker.(*Checker).getReducedApparentType
+func Checker_getReducedApparentType(recv *checker.Checker, t *checker.Type) *checker.Type
 //go:linkname Checker_getTypeArguments github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeArguments
 func Checker_getTypeArguments(recv *checker.Checker, t *checker.Type) []*checker.Type
 //go:linkname Checker_getTypeFromTypeNode github.com/microsoft/typescript-go/internal/checker.(*Checker).getTypeFromTypeNode

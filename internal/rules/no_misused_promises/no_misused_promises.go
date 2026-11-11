@@ -360,12 +360,27 @@ var NoMisusedPromisesRule = rule.Rule{
 			return checker.Checker_getPropertyOfType(ctx.TypeChecker, t, memberName)
 		}
 
+		// Synthesizing signatures for a union constraint can cause exponential intersections of callback parameters.
+		var visitFunctionTypeParts func(*checker.Type, func(*checker.Type) bool) bool
+		visitFunctionTypeParts = func(t *checker.Type, visit func(*checker.Type) bool) bool {
+			t = checker.Checker_getReducedApparentType(ctx.TypeChecker, t)
+			if utils.IsUnionType(t) {
+				for _, part := range t.Types() {
+					if !visitFunctionTypeParts(part, visit) {
+						return false
+					}
+				}
+				return true
+			}
+			return visit(t)
+		}
+
 		isVoidReturningFunctionType := func(
 			node *ast.Node,
 			t *checker.Type,
 		) bool {
 			hadVoidReturn := false
-			if !utils.VisitUnionTypeParts(t, func(part *checker.Type) bool {
+			if !visitFunctionTypeParts(t, func(part *checker.Type) bool {
 				for _, sig := range utils.GetCallSignatures(ctx.TypeChecker, part) {
 					returnType := checker.Checker_getReturnTypeOfSignature(ctx.TypeChecker, sig)
 					// If a certain positional argument accepts both thenable and void returns,
@@ -452,8 +467,8 @@ var NoMisusedPromisesRule = rule.Rule{
 			node *ast.Node,
 			t *checker.Type,
 		) bool {
-			return utils.SomeUnionTypePart(t, func(t *checker.Type) bool {
-				return anySignatureIsThenableType(node, t)
+			return !visitFunctionTypeParts(t, func(t *checker.Type) bool {
+				return !anySignatureIsThenableType(node, t)
 			})
 		}
 
@@ -516,9 +531,7 @@ var NoMisusedPromisesRule = rule.Rule{
 		voidFunctionArguments := func(
 			node *ast.Expression,
 		) ([]int, map[int]*voidExpectation) {
-			// 'new' can be used without any arguments, as in 'let b = new Object;'
-			// In this case, there are no argument positions to check, so return early.
-			if node.Arguments() == nil {
+			if len(node.Arguments()) == 0 {
 				return []int{}, nil
 			}
 			thenableReturnIndices := []int{}
@@ -539,6 +552,9 @@ var NoMisusedPromisesRule = rule.Rule{
 				}
 				for _, signature := range signatures {
 					for index, parameter := range checker.Signature_parameters(signature) {
+						if index >= len(node.Arguments()) {
+							break
+						}
 						parameterDeclaration := parameter.ValueDeclaration
 						t := ctx.TypeChecker.GetTypeOfSymbolAtLocation(parameter, node.Expression())
 

@@ -192,6 +192,9 @@ const f = function () {
 /** @type {Fn} */
 const f = () => 1;`,
 		},
+		{Code: `
+declare const unsafe: any;
+const property: { f: () => number } = { f: (): any => unsafe };`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -718,6 +721,12 @@ const f = value => value;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "unsafeReturn", Line: 9, Column: 20},
 			},
+		},
+		{
+			Code: `
+declare const unsafe: any;
+const property: { f: () => unknown } = { f: (): number => unsafe };`,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeReturn", Line: 3}},
 		},
 	})
 }

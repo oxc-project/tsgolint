@@ -5472,3 +5472,53 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |         
 ---
+
+[TestPreferOptionalChainRule/invalid-611 - 1]
+Diagnostic 1: preferOptionalChain (7:11 - 7:27)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   6 |       const g = ref.current;
+   7 |       if (g && g.parentNode) g.remove();
+     |           ~~~~~~~~~~~~~~~~~
+   8 |     }}
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+
+Diagnostic 2: preferOptionalChain (13:7 - 13:23)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+  12 |   const g = ref.current;
+  13 |   if (g && g.parentNode) g.remove();
+     |       ~~~~~~~~~~~~~~~~~
+  14 | };
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-612 - 1]
+Diagnostic 1: preferOptionalChain (2:37 - 2:50)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { bar: string } | undefined;
+   2 | const element = <div onClick={() => foo && foo.bar} />;
+     |                                     ~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-613 - 1]
+Diagnostic 1: preferOptionalChain (2:52 - 2:65)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { bar: string } | undefined;
+   2 | const element = <div onClick={function () { return foo && foo.bar; }} />;
+     |                                                    ~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-614 - 1]
+Diagnostic 1: preferOptionalChain (2:59 - 2:72)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { bar: string } | undefined;
+   2 | const element = <Component handlers={{ onClick() { return foo && foo.bar; } }} />;
+     |                                                           ~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-615 - 1]
+Diagnostic 1: preferOptionalChain (2:35 - 2:48)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { bar: string } | undefined;
+   2 | const element = <Component>{() => foo && foo.bar}</Component>;
+     |                                   ~~~~~~~~~~~~~~
+---

@@ -560,6 +560,37 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			return slices.ContainsFunc(utils.GetCallSignatures(ctx.TypeChecker, t), hasTypeParams)
 		}
 
+		isGenericCallWithInferredTypeArguments := func(expression *ast.Node) bool {
+			for {
+				expression = ast.SkipParentheses(expression)
+				switch expression.Kind {
+				case ast.KindCallExpression:
+					if expression.TypeArguments() != nil ||
+						!hasGenericCallSignature(ctx.TypeChecker.GetTypeAtLocation(expression.Expression())) {
+						return false
+					}
+					signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, expression, nil, checker.CheckModeNormal)
+					if signature == nil {
+						return false
+					}
+					for signature.Target() != nil {
+						signature = signature.Target()
+					}
+					return hasTypeParams(signature)
+				case ast.KindAwaitExpression, ast.KindNonNullExpression:
+					expression = expression.Expression()
+				case ast.KindBinaryExpression:
+					binary := expression.AsBinaryExpression()
+					if binary.OperatorToken.Kind != ast.KindCommaToken {
+						return false
+					}
+					expression = binary.Right
+				default:
+					return false
+				}
+			}
+		}
+
 		hasGenericInferenceParameterAtArgument := func(callOrNew *ast.Node, argIndex int, elementPath []int) bool {
 			signature := checker.Checker_getResolvedSignature(ctx.TypeChecker, callOrNew, nil, checker.CheckModeNormal)
 			if signature == nil {
@@ -1002,7 +1033,13 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			}
 
 			expression := node.Expression()
-			uncastType := getUncastType(node)
+			genericCallWithInferredTypeArguments := isGenericCallWithInferredTypeArguments(expression)
+			var uncastType *checker.Type
+			if genericCallWithInferredTypeArguments {
+				uncastType = ctx.TypeChecker.GetTypeAtLocation(expression)
+			} else {
+				uncastType = getUncastType(node)
+			}
 
 			expressionForType := ast.SkipParentheses(expression)
 			if uncastType == castType && ast.IsIdentifier(expressionForType) {
@@ -1025,10 +1062,25 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				wouldSameTypeBeInferred = !typeAnnotationIsConstAssertion
 			}
 
+			if typeIsUnchanged && wouldSameTypeBeInferred && genericCallWithInferredTypeArguments {
+				ctx.ReportDiagnostic(rule.RuleDiagnostic{
+					Range: assertionRange(ctx, node),
+					Message: rule.RuleMessage{
+						Id:          "contextuallyInferredTypeArguments",
+						Description: "The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.",
+					},
+				})
+				return
+			}
+
 			if typeIsUnchanged && wouldSameTypeBeInferred {
 				ctx.ReportDiagnosticWithFixes(buildUnnecessaryAssertionDiagnostic(assertionRange(ctx, node)), func() []rule.RuleFix {
 					return createAssertionFixer(ctx, node)
 				})
+				return
+			}
+
+			if genericCallWithInferredTypeArguments {
 				return
 			}
 

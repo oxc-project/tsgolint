@@ -3,9 +3,105 @@ package no_misused_promises
 import (
 	"testing"
 
+	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/rule_tester"
 	"github.com/typescript-eslint/tsgolint/internal/rules/fixtures"
 )
+
+func TestNoMisusedPromisesGenericOverloads(t *testing.T) {
+	t.Parallel()
+	const maxCreatedTypes = 4096
+	checkedRule := NoMisusedPromisesRule
+	checkedRule.Run = func(ctx rule.RuleContext, options any) rule.RuleListeners {
+		listeners := NoMisusedPromisesRule.Run(ctx, options)
+		for _, kind := range []ast.Kind{ast.KindCallExpression, ast.KindNewExpression} {
+			listener := listeners[kind]
+			listeners[kind] = func(node *ast.Node) {
+				before := ctx.TypeChecker.TypeCount
+				listener(node)
+				if created := ctx.TypeChecker.TypeCount - before; created > maxCreatedTypes {
+					t.Errorf("checking a call created %d types; expected at most %d", created, maxCreatedTypes)
+				}
+			}
+		}
+		return listeners
+	}
+	const declarations = `
+type EventName = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p';
+type Hook = {
+  [K in EventName]: (event: Record<K, 1> | Record<K, 2>) => void;
+}[EventName];
+interface On {
+  (): void;
+  (pattern: 'start', hook: () => void): void;
+  <P extends string, M extends Hook>(pattern: P, matcher: M, hook: NoInfer<M>): void;
+}
+declare const on: On;
+interface OptionalOn {
+  (pattern: 'start', hook: () => void): void;
+  <P extends string, M extends Hook>(pattern: P, matcher: M | undefined, hook: NoInfer<M>): void;
+}
+declare const optionalOn: OptionalOn;
+interface AsyncOn {
+  (pattern: 'start', hook: () => void): void;
+  <P extends string, M extends Hook | (() => Promise<void>)>(pattern: P, matcher: M, hook?: NoInfer<M>): void;
+}
+declare const asyncOn: AsyncOn;
+interface NewOn {
+  new (pattern: 'start', hook: () => void): object;
+  new <P extends string, M extends Hook>(pattern: P, matcher: M, hook: NoInfer<M>): object;
+}
+declare const newOn: NewOn;
+`
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &checkedRule, []rule_tester.ValidTestCase{
+		{Code: declarations + `on('start', () => {});`},
+		{Code: declarations + `on('start', () => {}, () => {});`},
+		{Code: declarations + `on();`},
+		{Code: declarations + `asyncOn('start', async () => {});`},
+		{Code: declarations + `new newOn('start', () => {});`},
+		{Code: `
+type Choice<K extends string> = (Record<K, 0> & (() => void)) | (Record<K, 1> & (() => void));
+declare function use(callback: () => void): void;
+declare function use<
+  A extends Choice<'a'>,
+  B extends Choice<'b'>,
+  C extends Choice<'c'>,
+  D extends Choice<'d'>,
+  E extends Choice<'e'>,
+  F extends Choice<'f'>,
+  G extends Choice<'g'>,
+  H extends Choice<'h'>,
+  I extends Choice<'i'>,
+  J extends Choice<'j'>,
+  K extends Choice<'k'>,
+  L extends Choice<'l'>,
+  M extends Choice<'m'>,
+  N extends Choice<'n'>
+>(callback: A & { kind: 'a' } & B & C & D & E & F & G & H & I & J & K & L & M & N & { kind: 'b' }): void;
+use(() => {});
+`},
+	}, []rule_tester.InvalidTestCase{
+		{
+			Code: declarations + `on('start', async () => {});`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "voidReturnArgument"},
+			},
+		},
+		{
+			Code: declarations + `optionalOn('start', async () => {});`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "voidReturnArgument"},
+			},
+		},
+		{
+			Code: declarations + `new newOn('start', async () => {});`,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "voidReturnArgument"},
+			},
+		},
+	})
+}
 
 func TestNoMisusedPromisesRule(t *testing.T) {
 	t.Parallel()

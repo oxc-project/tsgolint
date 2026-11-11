@@ -3,6 +3,7 @@ package prefer_includes
 import (
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/dlclark/regexp2/v2"
 	"github.com/microsoft/typescript-go/shim/ast"
@@ -30,35 +31,74 @@ var PreferIncludesRule = rule.Rule{
 	Name: "prefer-includes",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
 
-		// Escape special characters for string literal
-		// The pattern from regex already has escape sequences, we only need to escape apostrophes
-		escapeString := func(s string) string {
-			return strings.ReplaceAll(s, "'", "\\'")
+		patternStringLiteral := func(pattern string) string {
+			var decoded strings.Builder
+			decoded.Grow(len(pattern))
+			for i := 0; i < len(pattern); i++ {
+				ch := pattern[i]
+				if ch != '\\' {
+					decoded.WriteByte(ch)
+					continue
+				}
+				i++
+				ch = pattern[i]
+				switch ch {
+				case 'n':
+					decoded.WriteByte('\n')
+				case 'r':
+					decoded.WriteByte('\r')
+				case 't':
+					decoded.WriteByte('\t')
+				case 'v':
+					decoded.WriteByte('\v')
+				case 'f':
+					decoded.WriteByte('\f')
+				case '0', '1', '2', '3', '4', '5', '6', '7':
+					value := rune(ch - '0')
+					maxDigits := 2
+					if ch <= '3' {
+						maxDigits = 3
+					}
+					for digits := 1; digits < maxDigits && i+1 < len(pattern); digits++ {
+						next := pattern[i+1]
+						if next < '0' || next > '7' {
+							break
+						}
+						i++
+						value = value*8 + rune(next-'0')
+					}
+					decoded.WriteRune(value)
+				default:
+					decoded.WriteByte(ch)
+				}
+			}
+			return utils.QuoteSingleStringLiteral(decoded.String())
 		}
 
 		// Check if a pattern string contains only simple literal characters
 		// The TypeScript version uses a proper ECMAScript regex parser (@eslint-community/regexpp),
 		// but we just check for unescaped metacharacters and escaped special sequences.
 		isSimpleLiteralPattern := func(pattern string) bool {
-			prevRune := rune(0)
+			escaped := false
 			for _, ch := range pattern {
-				if prevRune != '\\' {
-					// Unescaped regex metacharacters
-					switch ch {
-					case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
-						return false
-					}
-				} else {
-					// Escaped sequences that are regex metacharacters (not simple literals)
-					// \d, \D, \w, \W, \s, \S, \b, \B, \0, \n, \r, \t, \v, \f, \cX, \xHH, \uHHHH, \u{HHHH}
+				if escaped {
+					escaped = false
 					switch ch {
 					case 'd', 'D', 'w', 'W', 's', 'S', 'b', 'B', 'c', 'x', 'u':
 						return false
 					}
+					continue
 				}
-				prevRune = ch
+				if ch == '\\' {
+					escaped = true
+					continue
+				}
+				switch ch {
+				case '.', '*', '+', '?', '|', '^', '$', '[', ']', '(', ')', '{', '}':
+					return false
+				}
 			}
-			return true
+			return !escaped
 		}
 
 		// Extract pattern from regex literal: /bar/ -> "bar"
@@ -365,6 +405,11 @@ var PreferIncludesRule = rule.Rule{
 					return
 				}
 
+				if !utf8.ValidString(pattern) {
+					ctx.ReportNode(node, buildPreferStringIncludesMessage())
+					return
+				}
+
 				fixes := []rule.RuleFix{}
 
 				// Check if argument needs wrapping in parentheses for .includes() call
@@ -400,11 +445,9 @@ var PreferIncludesRule = rule.Rule{
 					})
 				}
 
-				// Add .includes('pattern') after the argument
-				escapedPattern := escapeString(pattern)
 				fixes = append(fixes, rule.RuleFix{
 					Range: core.NewTextRange(argument.End(), argument.End()),
-					Text:  ".includes('" + escapedPattern + "')",
+					Text:  ".includes(" + patternStringLiteral(pattern) + ")",
 				})
 
 				ctx.ReportNodeWithFixes(node, buildPreferStringIncludesMessage(), func() []rule.RuleFix { return fixes })

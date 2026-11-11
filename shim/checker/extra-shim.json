@@ -17,6 +17,7 @@
       "getBaseTypes",
       "getSignaturesOfType",
       "getApparentType",
+      "getReducedApparentType",
       "getIndexTypeOfType",
       "getPropertyOfType",
       "getPropertiesOfType",

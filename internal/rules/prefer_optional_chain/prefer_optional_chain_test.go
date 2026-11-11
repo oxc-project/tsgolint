@@ -4448,5 +4448,72 @@ if (!item?.myField) {
 		},
 	)
 
+	validCases = append(validCases,
+		rule_tester.ValidTestCase{
+			Code: `declare const foo: { bar: string } | undefined;
+const element = <div value={foo && foo.bar} />;`,
+			Tsx: true,
+		},
+		rule_tester.ValidTestCase{
+			Code: `declare const foo: { bar: string } | undefined;
+const element = <div>{foo && foo.bar}</div>;`,
+			Tsx: true,
+		},
+		rule_tester.ValidTestCase{
+			Code: `declare const foo: { bar: string } | undefined;
+const element = <Component render={() => <div>{foo && foo.bar}</div>} />;`,
+			Tsx: true,
+		},
+	)
+	code := `
+declare const ref: { current: HTMLDivElement | null };
+export const inJsx = (
+  <div
+    onClick={() => {
+      const g = ref.current;
+      if (g && g.parentNode) g.remove();
+    }}
+  />
+);
+export const outsideJsx = () => {
+  const g = ref.current;
+  if (g && g.parentNode) g.remove();
+};
+`
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: code,
+		Errors: []rule_tester.InvalidTestCaseError{
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "optionalChainSuggest",
+					Output:    strings.Replace(code, "\n      if (g && g.parentNode)", "\n      if (g?.parentNode)", 1),
+				}},
+			},
+			{
+				MessageId: "preferOptionalChain",
+				Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+					MessageId: "optionalChainSuggest",
+					Output:    strings.Replace(code, "\n  if (g && g.parentNode)", "\n  if (g?.parentNode)", 1),
+				}},
+			},
+		},
+		Tsx: true,
+	})
+	for _, expression := range []string{
+		`<div onClick={() => foo && foo.bar} />`,
+		`<div onClick={function () { return foo && foo.bar; }} />`,
+		`<Component handlers={{ onClick() { return foo && foo.bar; } }} />`,
+		`<Component>{() => foo && foo.bar}</Component>`,
+	} {
+		code := "declare const foo: { bar: string } | undefined;\nconst element = " + expression + ";"
+		invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+			Code:   code,
+			Output: []string{strings.ReplaceAll(code, "foo && foo.bar", "foo?.bar")},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+			Tsx:    true,
+		})
+	}
+
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }

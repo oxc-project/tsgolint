@@ -201,6 +201,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [x] [no-unsafe-argument](https://typescript-eslint.io/rules/no-unsafe-argument)
 - [x] [no-unsafe-assignment](https://typescript-eslint.io/rules/no-unsafe-assignment)
 - [x] [no-unsafe-call](https://typescript-eslint.io/rules/no-unsafe-call)
+- [x] [no-unsafe-enum-assignment](https://typescript-eslint.io/rules/no-unsafe-enum-assignment)
 - [x] [no-unsafe-enum-comparison](https://typescript-eslint.io/rules/no-unsafe-enum-comparison)
 - [x] [no-unsafe-member-access](https://typescript-eslint.io/rules/no-unsafe-member-access)
 - [x] [no-unsafe-return](https://typescript-eslint.io/rules/no-unsafe-return)

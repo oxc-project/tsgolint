@@ -108,7 +108,6 @@ const (
 	comparisonTypeNone comparisonType = iota
 	/** Use the receiver's type for comparison */
 	comparisonTypeBasic
-	/** Use the sender's contextual type for comparison */
 	comparisonTypeContextual
 )
 
@@ -381,8 +380,10 @@ var NoUnsafeAssignmentRule = rule.Rule{
 
 			getReceiverType := func() *checker.Type {
 				if compType == comparisonTypeContextual {
-					if receiverType := utils.GetContextualType(ctx.TypeChecker, senderNode); receiverType != nil {
-						return receiverType
+					if !ast.IsJsxAttribute(receiverNode.Parent) || !utils.IsTypeAnyType(senderType) {
+						if receiverType := checker.Checker_getContextualType(ctx.TypeChecker, senderNode, checker.ContextFlagsNone); receiverType != nil {
+							return receiverType
+						}
 					}
 					if receiverType := utils.GetContextualType(ctx.TypeChecker, receiverNode); receiverType != nil {
 						return receiverType
@@ -399,6 +400,21 @@ var NoUnsafeAssignmentRule = rule.Rule{
 					return false
 				}
 
+				diagnosticReceiverType := receiverType
+				if ast.IsJsxAttribute(receiverNode.Parent) {
+					if contextualType := utils.GetContextualType(ctx.TypeChecker, senderNode); contextualType != nil {
+						diagnosticReceiverType = contextualType
+					}
+					if utils.IsTypeUnknownType(diagnosticReceiverType) {
+						attributesType := checker.Checker_getApparentTypeOfContextualType(ctx.TypeChecker, receiverNode.Parent.Parent, checker.ContextFlagsNone)
+						if attributesType != nil {
+							if propType := checker.Checker_getTypeOfPropertyOrIndexSignatureOfType(ctx.TypeChecker, attributesType, receiverNode.Text()); propType != nil {
+								diagnosticReceiverType = propType
+							}
+						}
+					}
+				}
+
 				if !isNoImplicitThis {
 					// `var foo = this`
 					thisExpression := utils.GetThisExpression(senderNode)
@@ -408,7 +424,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 							ctx.ReportDiagnostic(buildAssignmentDiagnostic(
 								utils.TrimNodeTextRange(ctx.SourceFile, reportingNode),
 								diagnosticTypeText(ctx.TypeChecker, senderType),
-								diagnosticTypeText(ctx.TypeChecker, receiverType),
+								diagnosticTypeText(ctx.TypeChecker, diagnosticReceiverType),
 								compType == comparisonTypeNone,
 								buildAnyAssignmentThisMessage(senderType),
 							))
@@ -420,7 +436,7 @@ var NoUnsafeAssignmentRule = rule.Rule{
 				ctx.ReportDiagnostic(buildAssignmentDiagnostic(
 					utils.TrimNodeTextRange(ctx.SourceFile, reportingNode),
 					diagnosticTypeText(ctx.TypeChecker, senderType),
-					diagnosticTypeText(ctx.TypeChecker, receiverType),
+					diagnosticTypeText(ctx.TypeChecker, diagnosticReceiverType),
 					compType == comparisonTypeNone,
 					buildAnyAssignmentMessage(senderType),
 				))

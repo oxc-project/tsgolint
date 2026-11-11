@@ -1,0 +1,1353 @@
+
+[TestNoUnsafeEnumAssignmentRule/invalid-0 - 1]
+Diagnostic 1: unsafeEnumMutation (7:1 - 7:7)
+Message: This mutation can produce a value outside of the expected enum 'Fruit'.
+   6 | let fruit: Fruit = Fruit.Apple;
+   7 | fruit++;
+     | ~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-1 - 1]
+Diagnostic 1: unsafeEnumMutation (7:1 - 7:10)
+Message: This mutation can produce a value outside of the expected enum 'Fruit'.
+   6 | let fruit: Fruit = Fruit.Apple;
+   7 | fruit += 1;
+     | ~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-2 - 1]
+Diagnostic 1: unsafeEnumMutation (7:1 - 7:14)
+Message: This mutation can produce a value outside of the expected enum 'Fruit'.
+   6 | declare const basket: { fruit: Fruit };
+   7 | basket.fruit++;
+     | ~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-3 - 1]
+Diagnostic 1: unsafeEnumAssignment (10:1 - 10:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   9 | let flags: Flags = Flags.Read;
+  10 | flags |= someNumber;
+     | ~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-4 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:1 - 7:11)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | let fruit: Fruit | undefined;
+   7 | fruit ??= 1;
+     | ~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-5 - 1]
+Diagnostic 1: unsafeEnumArgument (8:18 - 8:18)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | declare const spread: [Fruit, ...Fruit[]];
+   8 | takes(...spread, 1);
+     |                  ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-6 - 1]
+Diagnostic 1: unsafeEnumArgument (8:33 - 8:33)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takes(Fruit.Apple, Fruit.Apple, 1);
+     |                                 ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-7 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:7 - 6:22)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const fruit: Fruit = 1;
+     |       ~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-8 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:1 - 7:9)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | let fruit = Fruit.Apple;
+   7 | fruit = 1;
+     | ~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-9 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:21 - 6:36)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | function takesFruit(fruit: Fruit = 1) {}
+     |                     ~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-10 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:3 - 7:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | class Basket {
+   7 |   fruit: Fruit = 1;
+     |   ~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-11 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class TestBasket implements Basket {
+  11 |   fruit = 1;
+     |   ~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-12 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:33 - 6:40)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const box: { fruit: Fruit } = { fruit: 1 };
+     |                                 ~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-13 - 1]
+Diagnostic 1: unsafeEnumArgument (8:12 - 8:12)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesFruit(1);
+     |            ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-14 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:31)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruit: Fruit = maybeFruit;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-15 - 1]
+Diagnostic 1: unsafeEnumReturn (7:3 - 7:11)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function getFruit(): Fruit {
+   7 |   return 1;
+     |   ~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-16 - 1]
+Diagnostic 1: unsafeEnumReturn (6:39 - 6:49)
+Message: The value returned here does not have a shared enum type with the expected enum 'Vegetable'.
+   5 | 
+   6 | const getVegetable = (): Vegetable => 'asparagus';
+     |                                       ~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-17 - 1]
+Diagnostic 1: unsafeEnumAssertion (6:15 - 6:24)
+Message: The value asserted here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const fruit = 1 as Fruit;
+     |               ~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-18 - 1]
+Diagnostic 1: unsafeEnumAssertion (6:15 - 6:22)
+Message: The value asserted here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const fruit = <Fruit>1;
+     |               ~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-19 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:7 - 6:40)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Vegetable'.
+   5 | 
+   6 | const vegetable: Vegetable = 'asparagus';
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-20 - 1]
+Diagnostic 1: unsafeEnumArgument (8:12 - 8:28)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesFruit(...([1] as const));
+     |            ~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-21 - 1]
+Diagnostic 1: unsafeEnumArgument (8:12 - 8:17)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesFruit(...[1]);
+     |            ~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-22 - 1]
+Diagnostic 1: unsafeEnumArgument (9:13 - 9:31)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   8 | 
+   9 | takesFruits(...[Fruit.Apple, 1]);
+     |             ~~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-23 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:26 - 7:26)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | 
+   7 | const fruits: Fruit[] = [1, 2];
+     |                          ~
+   8 |       
+
+Diagnostic 2: unsafeEnumAssignment (7:29 - 7:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | 
+   7 | const fruits: Fruit[] = [1, 2];
+     |                             ~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-24 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:14 - 8:14)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesFruits([1]);
+     |              ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-25 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:1 - 8:16)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | basket.fruit = 1;
+     | ~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-26 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:20 - 8:30)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Vegetable'.
+   7 | 
+   8 | <Basket vegetable={'asparagus'} />;
+     |                    ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-27 - 1]
+Diagnostic 1: unsafeEnumAccess (8:5 - 8:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | foo[0];
+     |     ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-28 - 1]
+Diagnostic 1: unsafeEnumAccess (8:7 - 8:17)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Vegetable'.
+   7 | 
+   8 | foo?.['asparagus'];
+     |       ~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-29 - 1]
+Diagnostic 1: unsafeEnumAccess (8:5 - 8:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | bar[0];
+     |     ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-30 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:24)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Direction'.
+   6 | 
+   7 | const dir: Direction = 0;
+     |       ~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-31 - 1]
+Diagnostic 1: unsafeEnumAssignment (10:7 - 10:40)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | const fruit: Fruit = Vegetable.Asparagus;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-32 - 1]
+Diagnostic 1: unsafeEnumReturn (7:3 - 7:11)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | async function getFruit(): Promise<Fruit> {
+   7 |   return 1;
+     |   ~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-33 - 1]
+Diagnostic 1: unsafeEnumArgument (8:7 - 8:7)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | tag`${1}`;
+     |       ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-34 - 1]
+Diagnostic 1: unsafeEnumArgument (10:12 - 10:12)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | new Basket(1);
+     |            ~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-35 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:24)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruit: Fruit = num;
+     |       ~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-36 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:23 - 7:38)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | class Basket {
+   7 |   constructor(private fruit: Fruit = 1) {}
+     |                       ~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-37 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:33 - 8:37)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const box: { fruit: Fruit } = { fruit };
+     |                                 ~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-38 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:27 - 6:27)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const [fruit]: [Fruit] = [1];
+     |                           ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-39 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:9 - 6:17)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const { fruit = 1 }: { fruit?: Fruit } = {};
+     |         ~~~~~~~~~
+   7 | void fruit;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-40 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:41 - 6:41)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | function takesFruit([fruit]: [Fruit] = [1]): void {}
+     |                                         ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-41 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:39 - 6:46)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const { fruit }: { fruit: Fruit } = { fruit: 1 };
+     |                                       ~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-42 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:51 - 6:58)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | function takesBox({ fruit }: { fruit: Fruit } = { fruit: 1 }): void {}
+     |                                                   ~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-43 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:7 - 6:42)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const fruits: Set<Fruit> = new Set([1, 2]);
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-44 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruit: Fruit = cond ? 1 : Fruit.Apple;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-45 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:3 - 7:28)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | class Basket {
+   7 |   accessor fruit: Fruit = 1;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-46 - 1]
+Diagnostic 1: unsafeEnumArgument (8:12 - 8:12)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesFruit(1);
+     |            ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-47 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | const x = [1, Fruit.Apple, 2] as const;
+   7 | const y: readonly Fruit[] = x;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-48 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   6 | 
+   7 | const combined: Flags = 1 | 2;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-49 - 1]
+Diagnostic 1: unsafeEnumArgument (8:24 - 8:24)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesRest(Fruit.Apple, 1);
+     |                        ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-50 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:48)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   6 | 
+   7 | const combined: Flags = Flags.Read + Flags.Write;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-51 - 1]
+Diagnostic 1: unsafeEnumArgument (9:13 - 9:30)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   8 | 
+   9 | takesFruits(...[1, ...numbers]);
+     |             ~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-52 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:21)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class TestBasket implements Basket {
+  11 |   accessor fruit = 1;
+     |   ~~~~~~~~~~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-53 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:9 - 7:20)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignFruit<T extends Fruit>(): void {
+   7 |   const fruit: T = 1;
+     |         ~~~~~~~~~~~~
+   8 |   void fruit;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-54 - 1]
+Diagnostic 1: unsafeEnumReturn (7:3 - 7:11)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function getFruit<T extends Fruit>(): T {
+   7 |   return 1;
+     |   ~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-55 - 1]
+Diagnostic 1: unsafeEnumAssertion (7:10 - 7:15)
+Message: The value asserted here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function castFruit<T extends Fruit>(): T {
+   7 |   return 1 as T;
+     |          ~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-56 - 1]
+Diagnostic 1: unsafeEnumArgument (10:9 - 10:9)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | new Box(1);
+     |         ~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-57 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:16 - 8:16)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | <Basket fruit={1} />;
+     |                ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-58 - 1]
+Diagnostic 1: unsafeEnumReturn (7:3 - 7:11)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignFruit<T extends Fruit, V extends T>(): V {
+   7 |   return 1;
+     |   ~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-59 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:12 - 8:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesBox({ fruit: 1 });
+     |            ~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-60 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:20 - 7:27)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignBox<T extends { fruit: Fruit }>(): void {
+   7 |   const box: T = { fruit: 1 };
+     |                    ~~~~~~~~
+   8 |   void box;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-61 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:12 - 7:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function getBox<T extends { fruit: Fruit }>(): T {
+   7 |   return { fruit: 1 };
+     |            ~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-62 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:12 - 7:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function castBox<T extends { fruit: Fruit }>(): T {
+   7 |   return { fruit: 1 } as T;
+     |            ~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-63 - 1]
+Diagnostic 1: unsafeEnumAssignment (10:11 - 10:18)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | new Box({ fruit: 1 });
+     |           ~~~~~~~~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-64 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:16 - 8:16)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | <Basket fruit={1} />;
+     |                ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-65 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:25 - 8:32)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesNestedBox({ box: { fruit: 1 } });
+     |                         ~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-66 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:13 - 8:13)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesArray([1]);
+     |             ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-67 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:22 - 7:22)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignArray<T extends Fruit[]>(): void {
+   7 |   const fruits: T = [1];
+     |                      ~
+   8 |   void fruits;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-68 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:11 - 7:11)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function getArray<T extends Fruit[]>(): T {
+   7 |   return [1];
+     |           ~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-69 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:11 - 7:11)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function castArray<T extends Fruit[]>(): T {
+   7 |   return [1] as T;
+     |           ~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-70 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:15 - 8:22)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesBoxes([{ fruit: 1 }]);
+     |               ~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-71 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:9 - 7:42)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignBoxes<T extends readonly { fruit: Fruit }[]>(): void {
+   7 |   const boxes: T = [{ fruit: 1 }] as const;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   void boxes;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-72 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:9 - 8:44)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | function assignReadonlyTuple<T extends readonly [Fruit, Fruit]>(): void {
+   8 |   const value: T = [Fruit.Apple, 1] as const;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |   void value;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-73 - 1]
+Diagnostic 1: unsafeEnumAssignment (10:17 - 10:24)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | takesAliasBox({ fruit: 1 });
+     |                 ~~~~~~~~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-74 - 1]
+Diagnostic 1: unsafeEnumAssignment (10:27 - 10:34)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | const box: Box<Fruit> = { fruit: 1 };
+     |                           ~~~~~~~~
+  11 | void box;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-75 - 1]
+Diagnostic 1: unsafeEnumAssignment (10:7 - 10:34)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | const box: Box<Fruit> = new Box(1);
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  11 | void box;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-76 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:12 - 7:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | async function getBox<T extends { fruit: Fruit }>(): Promise<T> {
+   7 |   return { fruit: 1 };
+     |            ~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-77 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class BasketImpl implements Basket<Fruit> {
+  11 |   fruit = 1;
+     |   ~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-78 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class BasketImpl extends Base<Fruit> {
+  11 |   fruit = 1;
+     |   ~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-79 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class BasketImpl<T extends Fruit> implements Basket<T> {
+  11 |   fruit = 1;
+     |   ~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-80 - 1]
+Diagnostic 1: unsafeEnumAccess (9:14 - 9:16)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   8 | function readValue<K extends number>(key: K): string {
+   9 |   return foo[key];
+     |              ~~~
+  10 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-81 - 1]
+Diagnostic 1: unsafeEnumAccess (10:14 - 10:16)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | ): string {
+  10 |   return foo[key];
+     |              ~~~
+  11 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-82 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:54)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   6 | 
+   7 | const combined: Flags = Flags.Read | (Flags.Write | 1);
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-83 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:34)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   6 | 
+   7 | const negated: Flags = -Flags.Read;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-84 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:48)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   6 | 
+   7 | const shifted: Flags = Flags.Read << Flags.Write;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-85 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:1 - 8:24)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   7 | let flags: Flags = Flags.Read;
+   8 | flags |= Flags.Write | 4;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-86 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:1 - 8:10)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   7 | let flags: Flags = Flags.Read;
+   8 | flags &= 1;
+     | ~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-87 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:1 - 8:10)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Flags'.
+   7 | let flags: Flags = Flags.Read;
+   8 | flags ^= 1;
+     | ~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-88 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:1 - 7:11)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | let fruit: Fruit | undefined;
+   7 | fruit ||= 1;
+     | ~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-89 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:1 - 7:11)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | let fruit: Fruit | undefined;
+   7 | fruit &&= 1;
+     | ~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-90 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:39 - 8:48)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruits: Fruit[] = [Fruit.Apple, ...numbers];
+     |                                       ~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-91 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:32 - 6:32)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const pair: [Fruit, number] = [1, 2];
+     |                                ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-92 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:41 - 6:41)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const fruitOrFruits: Fruit | Fruit[] = [1];
+     |                                         ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-93 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:29 - 6:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const nested: Fruit[][] = [[1]];
+     |                             ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-94 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:49 - 6:52)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const box: { 0: Fruit; 'the-fruit': Fruit } = { 0: 1, 'the-fruit': 1 };
+     |                                                 ~~~~
+   7 |       
+
+Diagnostic 2: unsafeEnumAssignment (6:55 - 6:68)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const box: { 0: Fruit; 'the-fruit': Fruit } = { 0: 1, 'the-fruit': 1 };
+     |                                                       ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-95 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:45 - 6:45)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const box: { fruits: Fruit[] } = { fruits: [1] };
+     |                                             ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-96 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:12 - 7:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | let fruit: Fruit;
+   7 | [fruit] = [1];
+     |            ~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-97 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:16 - 7:23)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | let fruit: Fruit;
+   7 | ({ fruit } = { fruit: 1 });
+     |                ~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-98 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const [fruit]: [Fruit] = pair;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-99 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:42)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const { fruit }: { fruit: Fruit } = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-100 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:33 - 8:41)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const box: { fruit: Fruit } = { ...source };
+     |                                 ~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-101 - 1]
+Diagnostic 1: unsafeEnumArgument (10:13 - 10:22)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | takesFruits(...numbers);
+     |             ~~~~~~~~~~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-102 - 1]
+Diagnostic 1: unsafeEnumArgument (10:26 - 10:35)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | takesFruits(Fruit.Apple, ...numbers, 1);
+     |                          ~~~~~~~~~~
+  11 |       
+
+Diagnostic 2: unsafeEnumArgument (10:38 - 10:38)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | takesFruits(Fruit.Apple, ...numbers, 1);
+     |                                      ~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-103 - 1]
+Diagnostic 1: unsafeEnumReturn (7:3 - 7:28)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | async function getFruit(): Promise<Fruit> {
+   7 |   return Promise.resolve(1);
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-104 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:15 - 8:22)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | takesBoxes([{ fruit: 1 }]);
+     |               ~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-105 - 1]
+Diagnostic 1: unsafeEnumAccess (10:24 - 10:24)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   9 |   getFirst(): string {
+  10 |     return this.fruits[0];
+     |                        ~
+  11 |   }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-106 - 1]
+Diagnostic 1: unsafeEnumAccess (8:15 - 8:15)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | basket.fruits[0];
+     |               ~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-107 - 1]
+Diagnostic 1: unsafeEnumAssignment (15:3 - 15:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  14 | class Basket implements HasFruit, AlsoHasFruit {
+  15 |   fruit = 1;
+     |   ~~~~~~~~~~
+  16 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-108 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:19)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class Basket implements HasNumber {
+  11 |   fruit: Fruit = 1;
+     |   ~~~~~~~~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-109 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:11 - 7:11)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function getFruits(): Fruit[] {
+   7 |   return [1];
+     |           ~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-110 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:35 - 6:35)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const getFruits = (): Fruit[] => [1];
+     |                                   ~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-111 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:15 - 6:22)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const box = { fruit: 1 } satisfies { fruit: Fruit };
+     |               ~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-112 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:7 - 6:60)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | 
+   6 | const fruits: Map<string, Fruit> = new Map<string, number>();
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-113 - 1]
+Diagnostic 1: unsafeEnumAssignment (18:7 - 18:39)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  17 | 
+  18 | const fruitNode: FruitNode = numberNode;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  19 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-114 - 1]
+Diagnostic 1: unsafeEnumMutation (7:3 - 7:9)
+Message: This mutation can produce a value outside of the expected enum 'Fruit'.
+   6 | function increment<T extends Fruit>(fruit: T): void {
+   7 |   fruit++;
+     |   ~~~~~~~
+   8 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-115 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:26 - 8:37)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruits: Fruit[] = [...numberSet];
+     |                          ~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-116 - 1]
+Diagnostic 1: unsafeEnumArgument (10:13 - 10:24)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+   9 | 
+  10 | takesFruits(...numberSet);
+     |             ~~~~~~~~~~~~
+  11 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-117 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:50)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruits: { [index: number]: Fruit } = numbers;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-118 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:50)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruitPair: { [index: number]: Fruit } = pair;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-119 - 1]
+Diagnostic 1: unsafeEnumAccess (16:5 - 16:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit', 'Vegetable'.
+  15 | 
+  16 | bar[0];
+     |     ~
+  17 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-120 - 1]
+Diagnostic 1: unsafeEnumAccess (16:5 - 16:15)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit', 'Vegetable'.
+  15 | 
+  16 | bar['asparagus'];
+     |     ~~~~~~~~~~~
+  17 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-121 - 1]
+Diagnostic 1: unsafeEnumArgument (15:18 - 15:18)
+Message: The argument passed here does not have a shared enum type with the expected enum 'Fruit'.
+  14 | 
+  15 | takes(...spread, 1);
+     |                  ~
+  16 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-122 - 1]
+Diagnostic 1: unsafeEnumReturn (19:3 - 19:24)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+  18 | function getThenable(): FruitThenable {
+  19 |   return numberThenable;
+     |   ~~~~~~~~~~~~~~~~~~~~~~
+  20 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-123 - 1]
+Diagnostic 1: unsafeEnumAccess (12:24 - 12:24)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+  11 |   getFirst(): string {
+  12 |     return this.fruits[0];
+     |                        ~
+  13 |   }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-124 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:9 - 7:49)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignNestedBox<T extends { box: { fruit: Fruit } }>(): void {
+   7 |   const value: T = { box: { fruit: 1 } } as const;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   void value;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-125 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:9 - 7:47)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | function assignSpreadBox<T extends { fruit: Fruit }>(): void {
+   7 |   const value: T = { ...{ fruit: 1 } } as const;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |   void value;
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-126 - 1]
+Diagnostic 1: unsafeEnumAssignment (11:3 - 11:39)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  10 | class Basket implements HasBox {
+  11 |   box: { fruit: Fruit } = { fruit: 1 };
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-127 - 1]
+Diagnostic 1: unsafeEnumAssignment (9:7 - 9:58)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   8 | 
+   9 | const box: { fruit: Fruit } = cond ? { fruit: 1 } : source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-128 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:52)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const box: { fruit: Fruit } = source ?? { fruit: 1 };
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-129 - 1]
+Diagnostic 1: unsafeEnumReturn (17:3 - 17:13)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+  16 | function getFruitBox<T>(box: NumberBox<T>): FruitBox<T> {
+  17 |   return box;
+     |   ~~~~~~~~~~~
+  18 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-130 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:58)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruits: Promise<Map<string, Set<Fruit>[]>> = numbers;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-131 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:72)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | 
+   8 | const fruitConfig: { a: { b: { c: { d: { fruit: Fruit } } } } } = config;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-132 - 1]
+Diagnostic 1: unsafeEnumAssignment (6:3 - 6:12)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | class TestBasket implements Basket {
+   6 |   [key] = 1;
+     |   ~~~~~~~~~~
+   7 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-133 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:7 - 8:37)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | declare const source: { fruit: number; next: never };
+   8 | const target: Basket<number> = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-134 - 1]
+Diagnostic 1: unsafeEnumAssignment (14:7 - 14:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  13 | declare const source: Source;
+  14 | const target: Target = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+  15 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-135 - 1]
+Diagnostic 1: unsafeEnumAssignment (14:7 - 14:29)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  13 | declare const source: Source;
+  14 | const target: Target = source;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~
+  15 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-136 - 1]
+Diagnostic 1: unsafeEnumAssignment (8:9 - 8:71)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   7 | function convert<T>(source: { deep: SourceDeep<T>; shallow: SourceBox<T> }) {
+   8 |   const target: { deep: TargetDeep<T>; shallow: TargetBox<T> } = source;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-137 - 1]
+Diagnostic 1: unsafeEnumAssignment (4:28 - 4:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   3 | class Base { static fruit: Fruit = Fruit.Apple }
+   4 | class Child extends Base { static fruit = 1 }
+     |                            ~~~~~~~~~~~~~~~~
+   5 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-138 - 1]
+Diagnostic 1: unsafeEnumAssignment (5:28 - 5:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   4 | class Base { static fruit: Fruit = Fruit.Apple }
+   5 | class Child extends Base { static [key] = 1 }
+     |                            ~~~~~~~~~~~~~~~~
+   6 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-139 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:16 - 3:38)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   2 | enum Fruit { Apple }
+   3 | class Basket { static fruit: Fruit = 1 }
+     |                ~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-140 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:15 - 3:31)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   2 | enum Fruit { Apple }
+   3 | const fruit = 0 satisfies Fruit;
+     |               ~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-141 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:19 - 3:49)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Vegetable'.
+   2 | enum Vegetable { Asparagus = 'asparagus' }
+   3 | const vegetable = 'asparagus' satisfies Vegetable;
+     |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-142 - 1]
+Diagnostic 1: unsafeEnumAssignment (3:7 - 3:38)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   2 | enum Fruit { Apple }
+   3 | const fruit: Fruit = 0 satisfies Fruit;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-143 - 1]
+Diagnostic 1: unsafeEnumReturn (4:3 - 4:27)
+Message: The value returned here does not have a shared enum type with the expected enum 'Fruit'.
+   3 | function getFruit(): Fruit {
+   4 |   return 0 satisfies Fruit;
+     |   ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 | }
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-144 - 1]
+Diagnostic 1: unsafeEnumAccess (5:5 - 5:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   4 | declare const map: FruitMap;
+   5 | map[0];
+     |     ~
+   6 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-145 - 1]
+Diagnostic 1: unsafeEnumAccess (6:7 - 6:7)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   5 | declare const map: Alias;
+   6 | map?.[0];
+     |       ~
+   7 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-146 - 1]
+Diagnostic 1: unsafeEnumAccess (5:5 - 5:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   4 | declare const map: EnumMap<Fruit>;
+   5 | map[0];
+     |     ~
+   6 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-147 - 1]
+Diagnostic 1: unsafeEnumAccess (4:5 - 4:5)
+Message: The computed key used here does not have a shared enum type with the expected enum 'Fruit'.
+   3 | declare const map: Record<Fruit, string>;
+   4 | map[0];
+     |     ~
+   5 | 
+---

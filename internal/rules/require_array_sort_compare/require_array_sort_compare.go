@@ -49,7 +49,7 @@ var RequireArraySortCompareRule = rule.Rule{
 				}
 
 				if utils.Every(utils.UnionTypeParts(calleeObjType), func(t *checker.Type) bool {
-					return checker.Checker_isArrayType(ctx.TypeChecker, t)
+					return checker.Checker_isArrayType(ctx.TypeChecker, t) || checker.IsTupleType(t)
 				}) {
 					ctx.ReportNode(node, buildRequireCompareMessage())
 				}

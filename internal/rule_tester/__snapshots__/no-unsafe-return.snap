@@ -386,6 +386,15 @@ Help: Returned expression has type `any`; the function return type is `number`. 
      |                    ~~~~~
 ---
 
+[TestNoUnsafeReturnRule/invalid-37 - 1]
+Diagnostic 1: unsafeReturn (3:59 - 3:64)
+Message: Unsafe return of a value of type `any`.
+Help: Returned expression has type `any`; the function return type is `number`. Return a safely typed value or narrow the value before returning it.
+   2 | declare const unsafe: any;
+   3 | const property: { f: () => unknown } = { f: (): number => unsafe };
+     |                                                           ~~~~~~
+---
+
 [TestNoUnsafeReturnRule_ReturnTypeHelp/invalid-0 - 1]
 Diagnostic 1: unsafeReturn (1:19 - 1:26)
 Message: Unsafe return of a value of type `any`.

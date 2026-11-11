@@ -206,6 +206,45 @@ function test<T>(t: T | []) {
 }
     `},
 		{Code: `
+const truthy = <T,>(value: Awaited<T>) => (value ? 1 : 2);
+    `},
+		{Code: `
+const nullish = <T,>(value: Awaited<T>) => value ?? 1;
+    `},
+		{Code: `
+const fromPromise = async <T,>(promise: Promise<T>) => {
+  const value = await promise;
+  return value ? 1 : 2;
+};
+    `},
+		{Code: `
+type Id<T> = T extends unknown ? T : never;
+function test<T>(t: Id<T>) {
+  return t ? 'yes' : 'no';
+}
+    `},
+		{Code: `
+const truthyUnion = <T,>(value: Awaited<T> | string) => (value ? 1 : 2);
+    `},
+		{Code: `
+const truthy = <T extends string>(value: Awaited<T>) => (value ? 1 : 2);
+    `},
+		{Code: `
+const nullish = <T extends Promise<string | null>>(value: Awaited<T>) =>
+  value ?? 1;
+    `},
+		{Code: `
+const isUndefined = <T,>(value: Awaited<T>) => value === undefined;
+    `},
+		{Code: `
+const isNull = <T,>(value: Awaited<T>) => value === null;
+    `},
+		{Code: `
+function test<T, K extends keyof T>(value: Awaited<T[K]>) {
+  return value ?? 1;
+}
+    `},
+		{Code: `
 function test<T>(arg: T, key: keyof T) {
   if (arg[key]?.toString()) {
   }
@@ -3470,6 +3509,38 @@ declare const b: boolean;
 assertSecond(b, b && 'b');`,
 			Options: NoUnnecessaryConditionOptions{CheckTypePredicates: true},
 			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy"}},
+		},
+		{
+			Code: `
+function test<T extends string>(a: Awaited<T>) {
+  return a ?? 'default';
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish", Line: 3, Column: 10, EndLine: 3, EndColumn: 11}},
+		},
+		{
+			Code: `
+function test<T extends Promise<object>>(a: Awaited<T>) {
+  return a ? 'yes' : 'no';
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy", Line: 3, Column: 10, EndLine: 3, EndColumn: 11}},
+		},
+		{
+			Code: `
+function test<T>(a: T extends string ? 'a' : 'b') {
+  return a ? 'yes' : 'no';
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "alwaysTruthy", Line: 3, Column: 10, EndLine: 3, EndColumn: 11}},
+		},
+		{
+			Code: `
+function test<T>(a: T extends string ? 'a' : 'b') {
+  return a ?? 'default';
+}
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "neverNullish", Line: 3, Column: 10, EndLine: 3, EndColumn: 11}},
 		},
 	})
 }

@@ -135,48 +135,6 @@ func TestRequireArraySortCompare(t *testing.T) {
 			Code:    `enum Fruit { Apple = 'apple', Banana = 'banana' }; declare const fruits: Fruit[]; fruits.sort();`,
 			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
 		},
-		{
-			Code: `
-        function f(a: [string, number]) {
-          a.sort();
-        }
-      `,
-		},
-		{
-			Code: `
-        function f(a: [number, string]) {
-          a.sort();
-        }
-      `,
-		},
-		{
-			Code: `
-        function f(a: readonly [string, number]) {
-          a.sort();
-        }
-      `,
-		},
-		{
-			Code: `
-        function f(a: [string, ...number[]]) {
-          a.sort();
-        }
-      `,
-		},
-		{
-			Code: `
-        function f(a: [string, number?]) {
-          a.sort();
-        }
-      `,
-		},
-		{
-			Code: `
-        function f(a: [string, number] | number[]) {
-          a.sort();
-        }
-      `,
-		},
 		{Code: `
       function sort<T>(values: (T extends 0 ? string : string)[]) {
         values.sort();
@@ -198,7 +156,166 @@ func TestRequireArraySortCompare(t *testing.T) {
         }
       }
     `},
+		{
+			Code: `
+        function f(a: [string, string]) {
+          a.sort();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+		},
+		{
+			Code: `
+        function f<T extends [string, string]>(a: T) {
+          a.sort();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+		},
+		{
+			Code: `
+        function f(a: readonly [string, ...string[]]) {
+          a.toSorted();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+		},
 	}, []rule_tester.InvalidTestCase{
+		{
+			Code: `
+        function f(a: [string, number]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: [number, string]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: readonly [string, number]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: [string, ...number[]]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: [string, number?]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: [string, number] | number[]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: [number, number]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: [string, string]) {
+          a.sort();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": false}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f<T extends [string, number]>(a: T) {
+          a.sort();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: readonly [string, ...number[]]) {
+          a.toSorted();
+        }
+      `,
+			Options: rule_tester.OptionsFromJSON[RequireArraySortCompareOptions](`{"ignoreStringArrays": true}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
+		{
+			Code: `
+        function f(a: number[] | [string, string]) {
+          a.sort();
+        }
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "requireCompare",
+				},
+			},
+		},
 		{
 			Code: `
         function f(a: Array<any>) {
