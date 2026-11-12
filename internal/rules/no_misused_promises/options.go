@@ -3,6 +3,63 @@
 package no_misused_promises
 
 import "github.com/go-json-experiment/json"
+import "fmt"
+import "reflect"
+
+type ChecksConditionalsOptions struct {
+	// FlagUnions corresponds to the JSON schema field "flagUnions".
+	FlagUnions ChecksConditionalsOptionsFlagUnions `json:"flagUnions,omitempty"`
+}
+
+type ChecksConditionalsOptionsFlagUnions string
+
+const ChecksConditionalsOptionsFlagUnionsAll ChecksConditionalsOptionsFlagUnions = "all"
+const ChecksConditionalsOptionsFlagUnionsNone ChecksConditionalsOptionsFlagUnions = "none"
+const ChecksConditionalsOptionsFlagUnionsStrict ChecksConditionalsOptionsFlagUnions = "strict"
+
+var enumValues_ChecksConditionalsOptionsFlagUnions = []interface{}{
+	"all",
+	"strict",
+	"none",
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ChecksConditionalsOptionsFlagUnions) UnmarshalJSON(value []byte) error {
+	var v string
+	if err := json.Unmarshal(value, &v); err != nil {
+		return err
+	}
+	var ok bool
+	for _, expected := range enumValues_ChecksConditionalsOptionsFlagUnions {
+		if reflect.DeepEqual(v, expected) {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return fmt.Errorf("invalid value (expected one of %#v): %#v", enumValues_ChecksConditionalsOptionsFlagUnions, v)
+	}
+	*j = ChecksConditionalsOptionsFlagUnions(v)
+	return nil
+}
+
+// UnmarshalJSON implements json.Unmarshaler.
+func (j *ChecksConditionalsOptions) UnmarshalJSON(value []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(value, &raw); err != nil {
+		return err
+	}
+	type Plain ChecksConditionalsOptions
+	var plain Plain
+	if err := json.Unmarshal(value, &plain); err != nil {
+		return err
+	}
+	if v, ok := raw["flagUnions"]; !ok || v == nil {
+		plain.FlagUnions = "none"
+	}
+	*j = ChecksConditionalsOptions(plain)
+	return nil
+}
 
 type ChecksVoidReturnOptions struct {
 	// Arguments corresponds to the JSON schema field "arguments".
@@ -59,7 +116,7 @@ func (j *ChecksVoidReturnOptions) UnmarshalJSON(value []byte) error {
 
 type NoMisusedPromisesOptions struct {
 	// ChecksConditionals corresponds to the JSON schema field "checksConditionals".
-	ChecksConditionals bool `json:"checksConditionals,omitempty"`
+	ChecksConditionals interface{} `json:"checksConditionals,omitempty"`
 
 	// ChecksSpreads corresponds to the JSON schema field "checksSpreads".
 	ChecksSpreads bool `json:"checksSpreads,omitempty"`

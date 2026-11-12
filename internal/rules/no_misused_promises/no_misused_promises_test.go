@@ -1176,6 +1176,128 @@ declare const useCallback: <T extends (...args: unknown[]) => unknown>(
 ) => T;
 useCallback<ReturnsVoid | ReturnsPromiseVoid>(async () => {});
     `},
+		{Code: `
+declare const f: () => number | Promise<void>;
+if (f()) {
+}
+    `},
+		{
+			Code: `
+declare const f: () => boolean | Promise<boolean>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"none"}}`),
+		},
+		{
+			Code: `
+declare const f: () => boolean | Promise<void>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"none"}}`),
+		},
+		{
+			Code: `
+declare const f: () => boolean | Promise<void>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+type MyUnion = number | string | undefined;
+type PromiseUnion = string | number;
+declare const f: () => MyUnion | Promise<PromiseUnion>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+declare const f: () => number | string | Promise<number> | Promise<boolean>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+declare const f: () => string[] | Promise<number[]>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+declare const f: () => [number, string] | Promise<[string, number]>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+declare const f: () => (() => void) | Promise<() => number>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+interface MyInterface {
+  name: string;
+}
+
+interface PromiseInterface {
+  age: string;
+}
+
+declare const f: () => MyInterface | Promise<PromiseInterface>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+type Recursive = Promise<Recursive>;
+declare const f: () => boolean | Recursive;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
+		{
+			Code: `
+declare const f: boolean | string;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"all"}}`),
+		},
+		{
+			Code: `
+const fn: () => Promise<boolean> | boolean = () => Promise.resolve(true);
+if (await fn()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"all"}}`),
+		},
+		{
+			Code: `
+type MyUnion = number | string;
+type PromiseUnion = string | number | undefined;
+declare const f: () => MyUnion | Promise<PromiseUnion>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+		},
 		{Code: `if (process.env.SKIP) { return x; }`},
 		{Code: `
 const sent: string[] = [];
@@ -2819,6 +2941,201 @@ const obj: O = {
 		},
 		{
 			Code: `
+declare const f: () => number | Promise<number>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    5,
+					EndLine:   3,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+declare const f: () => number | string | Promise<number> | Promise<string>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    5,
+					EndLine:   3,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+type MyUnion = number | string | undefined;
+declare const f: () => MyUnion | Promise<MyUnion>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      4,
+					Column:    5,
+					EndLine:   4,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+declare const f: () => string[] | Promise<string[]>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    5,
+					EndLine:   3,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+declare const f: () => [number, string] | Promise<[number, string]>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    5,
+					EndLine:   3,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+declare const f: () => (() => void) | Promise<() => void>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    5,
+					EndLine:   3,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+interface MyInterface {
+  name: string;
+}
+declare const f: () => MyInterface | Promise<MyInterface>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      6,
+					Column:    5,
+					EndLine:   6,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+type MyType<T> = { value: T };
+declare const f: () => MyType<number> | Promise<MyType<number>>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      4,
+					Column:    5,
+					EndLine:   4,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+type T = number | string | undefined;
+declare const f: () => T | Promise<T>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      4,
+					Column:    5,
+					EndLine:   4,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+type MyType<T> = { value: T };
+type PromiseType<T> = { value: T };
+declare const f: () => MyType<number> | Promise<PromiseType<number>>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"strict"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      5,
+					Column:    5,
+					EndLine:   5,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
+declare const f: () => boolean | Promise<void>;
+if (f()) {
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"all"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    5,
+					EndLine:   3,
+					EndColumn: 8,
+				},
+			},
+		},
+		{
+			Code: `
 declare function on(this: void, ...callbacks: Array<() => void>): void;
 on(async () => {}, async () => {});
       `,
@@ -2979,6 +3296,24 @@ if (sent.push('a'), pending) {}
 				{MessageId: "conditional", Line: 4},
 				{MessageId: "conditional", Line: 5},
 				{MessageId: "conditional", Line: 6},
+			},
+		},
+		{
+			Code: `
+function f<T extends Promise<number> | string>(x: T | undefined) {
+  if (x) {
+  }
+}
+      `,
+			Options: rule_tester.OptionsFromJSON[NoMisusedPromisesOptions](`{"checksConditionals":{"flagUnions":"all"}}`),
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "conditional",
+					Line:      3,
+					Column:    7,
+					EndLine:   3,
+					EndColumn: 8,
+				},
 			},
 		},
 	})

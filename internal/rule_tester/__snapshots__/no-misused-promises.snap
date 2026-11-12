@@ -1862,6 +1862,160 @@ Message: Promise-returning function provided to property where a void return was
 ---
 
 [TestNoMisusedPromisesRule/invalid-90 - 1]
+Diagnostic 1: conditional (3:5 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | declare const f: () => number | Promise<number>;
+   3 | if (f()) {
+     |     ~~~
+   4 | }
+  Label: This expression has type `number | Promise<number>`. (3:5 - 3:7)
+   2 | declare const f: () => number | Promise<number>;
+   3 | if (f()) {
+     |     ^^^ This expression has type `number | Promise<number>`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-91 - 1]
+Diagnostic 1: conditional (3:5 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | declare const f: () => number | string | Promise<number> | Promise<string>;
+   3 | if (f()) {
+     |     ~~~
+   4 | }
+  Label: This expression has type `string | number | Promise<string> | Promise<number>`. (3:5 - 3:7)
+   2 | declare const f: () => number | string | Promise<number> | Promise<string>;
+   3 | if (f()) {
+     |     ^^^ This expression has type `string | number | Promise<string> | Promise<number>`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-92 - 1]
+Diagnostic 1: conditional (4:5 - 4:7)
+Message: Expected non-Promise value in a boolean conditional.
+   3 | declare const f: () => MyUnion | Promise<MyUnion>;
+   4 | if (f()) {
+     |     ~~~
+   5 | }
+  Label: This expression has type `Promise<MyUnion> | MyUnion`. (4:5 - 4:7)
+   3 | declare const f: () => MyUnion | Promise<MyUnion>;
+   4 | if (f()) {
+     |     ^^^ This expression has type `Promise<MyUnion> | MyUnion`.
+   5 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-93 - 1]
+Diagnostic 1: conditional (3:5 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | declare const f: () => string[] | Promise<string[]>;
+   3 | if (f()) {
+     |     ~~~
+   4 | }
+  Label: This expression has type `string[] | Promise<string[]>`. (3:5 - 3:7)
+   2 | declare const f: () => string[] | Promise<string[]>;
+   3 | if (f()) {
+     |     ^^^ This expression has type `string[] | Promise<string[]>`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-94 - 1]
+Diagnostic 1: conditional (3:5 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | declare const f: () => [number, string] | Promise<[number, string]>;
+   3 | if (f()) {
+     |     ~~~
+   4 | }
+  Label: This expression has type `Promise<[number, string]> | [number, string]`. (3:5 - 3:7)
+   2 | declare const f: () => [number, string] | Promise<[number, string]>;
+   3 | if (f()) {
+     |     ^^^ This expression has type `Promise<[number, string]> | [number, string]`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-95 - 1]
+Diagnostic 1: conditional (3:5 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | declare const f: () => (() => void) | Promise<() => void>;
+   3 | if (f()) {
+     |     ~~~
+   4 | }
+  Label: This expression has type `Promise<() => void> | (() => void)`. (3:5 - 3:7)
+   2 | declare const f: () => (() => void) | Promise<() => void>;
+   3 | if (f()) {
+     |     ^^^ This expression has type `Promise<() => void> | (() => void)`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-96 - 1]
+Diagnostic 1: conditional (6:5 - 6:7)
+Message: Expected non-Promise value in a boolean conditional.
+   5 | declare const f: () => MyInterface | Promise<MyInterface>;
+   6 | if (f()) {
+     |     ~~~
+   7 | }
+  Label: This expression has type `MyInterface | Promise<MyInterface>`. (6:5 - 6:7)
+   5 | declare const f: () => MyInterface | Promise<MyInterface>;
+   6 | if (f()) {
+     |     ^^^ This expression has type `MyInterface | Promise<MyInterface>`.
+   7 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-97 - 1]
+Diagnostic 1: conditional (4:5 - 4:7)
+Message: Expected non-Promise value in a boolean conditional.
+   3 | declare const f: () => MyType<number> | Promise<MyType<number>>;
+   4 | if (f()) {
+     |     ~~~
+   5 | }
+  Label: This expression has type `MyType<number> | Promise<MyType<number>>`. (4:5 - 4:7)
+   3 | declare const f: () => MyType<number> | Promise<MyType<number>>;
+   4 | if (f()) {
+     |     ^^^ This expression has type `MyType<number> | Promise<MyType<number>>`.
+   5 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-98 - 1]
+Diagnostic 1: conditional (4:5 - 4:7)
+Message: Expected non-Promise value in a boolean conditional.
+   3 | declare const f: () => T | Promise<T>;
+   4 | if (f()) {
+     |     ~~~
+   5 | }
+  Label: This expression has type `Promise<T> | T`. (4:5 - 4:7)
+   3 | declare const f: () => T | Promise<T>;
+   4 | if (f()) {
+     |     ^^^ This expression has type `Promise<T> | T`.
+   5 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-99 - 1]
+Diagnostic 1: conditional (5:5 - 5:7)
+Message: Expected non-Promise value in a boolean conditional.
+   4 | declare const f: () => MyType<number> | Promise<PromiseType<number>>;
+   5 | if (f()) {
+     |     ~~~
+   6 | }
+  Label: This expression has type `MyType<number> | Promise<PromiseType<number>>`. (5:5 - 5:7)
+   4 | declare const f: () => MyType<number> | Promise<PromiseType<number>>;
+   5 | if (f()) {
+     |     ^^^ This expression has type `MyType<number> | Promise<PromiseType<number>>`.
+   6 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-100 - 1]
+Diagnostic 1: conditional (3:5 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | declare const f: () => boolean | Promise<void>;
+   3 | if (f()) {
+     |     ~~~
+   4 | }
+  Label: This expression has type `boolean | Promise<void>`. (3:5 - 3:7)
+   2 | declare const f: () => boolean | Promise<void>;
+   3 | if (f()) {
+     |     ^^^ This expression has type `boolean | Promise<void>`.
+   4 | }
+---
+
+[TestNoMisusedPromisesRule/invalid-101 - 1]
 Diagnostic 1: voidReturnArgument (3:13 - 3:14)
 Message: Promise returned in function argument where a void return was expected.
    2 | declare function on(this: void, ...callbacks: Array<() => void>): void;
@@ -1897,7 +2051,7 @@ Message: Promise returned in function argument where a void return was expected.
    3 | on(async () => {}, async () => {});
 ---
 
-[TestNoMisusedPromisesRule/invalid-91 - 1]
+[TestNoMisusedPromisesRule/invalid-102 - 1]
 Diagnostic 1: voidReturnReturnValue (10:12 - 10:24)
 Message: Promise-returning function provided to return value where a void return was expected.
    9 |   get handler() {
@@ -1911,7 +2065,7 @@ Message: Promise-returning function provided to return value where a void return
   11 |   }
 ---
 
-[TestNoMisusedPromisesRule/invalid-92 - 1]
+[TestNoMisusedPromisesRule/invalid-103 - 1]
 Diagnostic 1: voidReturnArgument (4:11 - 4:18)
 Message: Promise returned in function argument where a void return was expected.
    3 | function f<T extends () => Promise<void>>(t: T) {
@@ -1930,7 +2084,7 @@ Message: Promise returned in function argument where a void return was expected.
    3 | function f<T extends () => Promise<void>>(t: T) {
 ---
 
-[TestNoMisusedPromisesRule/invalid-93 - 1]
+[TestNoMisusedPromisesRule/invalid-104 - 1]
 Diagnostic 1: voidReturnVariable (3:26 - 3:33)
 Message: Promise-returning function provided to variable where a void return was expected.
    2 | function f<T extends () => Promise<void>>(t: T) {
@@ -1949,7 +2103,7 @@ Message: Promise-returning function provided to variable where a void return was
    4 | }
 ---
 
-[TestNoMisusedPromisesRule/invalid-94 - 1]
+[TestNoMisusedPromisesRule/invalid-105 - 1]
 Diagnostic 1: voidReturnArgument (6:9 - 6:17)
 Message: Promise returned in function argument where a void return was expected.
    5 | declare function takesCb(cb: () => void): void;
@@ -2002,7 +2156,7 @@ Message: Promise-returning function provided to variable where a void return was
    9 |       
 ---
 
-[TestNoMisusedPromisesRule/invalid-95 - 1]
+[TestNoMisusedPromisesRule/invalid-106 - 1]
 Diagnostic 1: voidReturnArgument (6:9 - 6:11)
 Message: Promise returned in function argument where a void return was expected.
    5 | declare function takesCb(cb: () => void): void;
@@ -2021,7 +2175,7 @@ Message: Promise returned in function argument where a void return was expected.
    6 | takesCb(123);
 ---
 
-[TestNoMisusedPromisesRule/invalid-96 - 1]
+[TestNoMisusedPromisesRule/invalid-107 - 1]
 Diagnostic 1: voidReturnArgument (6:9 - 6:14)
 Message: Promise returned in function argument where a void return was expected.
    5 | declare function takesCb(cb: () => void): void;
@@ -2057,7 +2211,7 @@ Message: Promise-returning function provided to variable where a void return was
    8 |       
 ---
 
-[TestNoMisusedPromisesRule/invalid-97 - 1]
+[TestNoMisusedPromisesRule/invalid-108 - 1]
 Diagnostic 1: conditional (4:2 - 4:24)
 Message: Expected non-Promise value in a boolean conditional.
    3 | declare const pending: Promise<void>;
@@ -2071,7 +2225,7 @@ Message: Expected non-Promise value in a boolean conditional.
    5 |       
 ---
 
-[TestNoMisusedPromisesRule/invalid-98 - 1]
+[TestNoMisusedPromisesRule/invalid-109 - 1]
 Diagnostic 1: conditional (4:2 - 4:24)
 Message: Expected non-Promise value in a boolean conditional.
    3 | declare const pending: Promise<void>;
@@ -2085,7 +2239,7 @@ Message: Expected non-Promise value in a boolean conditional.
    5 |       
 ---
 
-[TestNoMisusedPromisesRule/invalid-99 - 1]
+[TestNoMisusedPromisesRule/invalid-110 - 1]
 Diagnostic 1: conditional (4:5 - 4:27)
 Message: Expected non-Promise value in a boolean conditional.
    3 | declare const pending: Promise<void>;
@@ -2119,4 +2273,18 @@ Message: Expected non-Promise value in a boolean conditional.
    5 | !(sent.push('b'), pending);
    6 | (sent.push('c'), pending) && true;
      |  ^^^^^^^^^^^^^^^^^^^^^^^ This expression has type `Promise<void>`.
+---
+
+[TestNoMisusedPromisesRule/invalid-111 - 1]
+Diagnostic 1: conditional (3:7 - 3:7)
+Message: Expected non-Promise value in a boolean conditional.
+   2 | function f<T extends Promise<number> | string>(x: T | undefined) {
+   3 |   if (x) {
+     |       ~
+   4 |   }
+  Label: This expression has type `T | undefined`. (3:7 - 3:7)
+   2 | function f<T extends Promise<number> | string>(x: T | undefined) {
+   3 |   if (x) {
+     |       ^ This expression has type `T | undefined`.
+   4 |   }
 ---
