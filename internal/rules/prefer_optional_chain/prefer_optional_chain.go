@@ -2617,14 +2617,21 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 	// Note: chain length >= 2, hasSameBaseIdentifier, and hasPropertyAccessInChain are already
 	// validated by validateChain() which is called before this function.
 
-	hasExplicitCheck := false
-	for _, op := range chain {
+	// A plain operand is true for any truthy value, but inside an optional chain it is
+	// falsy when the base is nullish, so `foo == null || foo.bar` is not `foo?.bar`.
+	// The only plain operand that can stay is a trailing one that the fix leaves outside the chain.
+	for i, op := range chain {
 		if op.typ != OperandTypePlain {
-			hasExplicitCheck = true
-			break
+			continue
 		}
+		if processor.keepsTrailingPlainOperand(chain[:i+1]) {
+			chain = chain[:i+1]
+		} else {
+			chain = chain[:i]
+		}
+		break
 	}
-	if !hasExplicitCheck {
+	if len(chain) < 2 {
 		return nil
 	}
 
@@ -2760,32 +2767,6 @@ func (processor *chainProcessor) validateOrChainForReporting(chain []Operand) []
 							return nil
 						}
 					} else if !isNullishComparison(chain[i]) {
-						return nil
-					}
-				}
-			}
-		}
-	}
-
-	if chain[0].typ == OperandTypePlain {
-		firstExpr := chain[0].comparedExpr
-		if firstExpr != nil {
-			unwrapped := ast.SkipParentheses(firstExpr)
-			if unwrapped.Kind == ast.KindMetaProperty {
-				return nil
-			}
-		}
-	}
-
-	if chain[0].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-		firstExpr := chain[0].comparedExpr
-		if firstExpr != nil {
-			unwrappedFirst := ast.SkipParentheses(firstExpr)
-			isFirstSimplePlain := !utils.IsAccessExpression(unwrappedFirst)
-
-			if isFirstSimplePlain {
-				for i := 1; i < len(chain); i++ {
-					if chain[i].typ == OperandTypeComparison {
 						return nil
 					}
 				}
@@ -3420,6 +3401,22 @@ func (processor *chainProcessor) generateAndChainFixAndReport(node *ast.Node, ch
 	processor.reportChainWithFixes(node, fixes, useSuggestion)
 }
 
+// keepsTrailingPlainOperand reports whether the plain operand that ends an OR chain goes
+// deeper than the nullish check before it, so the fix can leave it as is:
+// `foo == null || foo.bar == null || foo.bar.baz` to `foo?.bar == null || foo.bar.baz`.
+func (processor *chainProcessor) keepsTrailingPlainOperand(chain []Operand) bool {
+	if len(chain) < 3 {
+		return false
+	}
+	lastOp := chain[len(chain)-1]
+	secondLastOp := chain[len(chain)-2]
+	if lastOp.typ != OperandTypePlain || !isNullishCheckOperand(secondLastOp) ||
+		lastOp.comparedExpr == nil || secondLastOp.comparedExpr == nil {
+		return false
+	}
+	return len(processor.flattenForFix(lastOp.comparedExpr)) > len(processor.flattenForFix(secondLastOp.comparedExpr))
+}
+
 func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, chain []Operand, operandNodes []*ast.Node) {
 	hasTrailingComparison := false
 	if len(chain) > 0 {
@@ -3429,17 +3426,9 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 
 	trailingPlainOperand := ""
 	chainForOptional := chain
-	if len(chain) >= 3 && chain[len(chain)-1].typ == OperandTypePlain && !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing {
-		lastOp := chain[len(chain)-1]
-		secondLastOp := chain[len(chain)-2]
-		if isNullishCheckOperand(secondLastOp) && lastOp.comparedExpr != nil && secondLastOp.comparedExpr != nil {
-			lastParts := processor.flattenForFix(lastOp.comparedExpr)
-			secondLastParts := processor.flattenForFix(secondLastOp.comparedExpr)
-			if len(lastParts) > len(secondLastParts) {
-				trailingPlainOperand = processor.getNodeText(lastOp.node)
-				chainForOptional = chain[:len(chain)-1]
-			}
-		}
+	if !processor.opts.AllowPotentiallyUnsafeFixesThatModifyTheReturnTypeIKnowWhatImDoing && processor.keepsTrailingPlainOperand(chain) {
+		trailingPlainOperand = processor.getNodeText(chain[len(chain)-1].node)
+		chainForOptional = chain[:len(chain)-1]
 	}
 
 	if len(chainForOptional) == 1 && trailingPlainOperand != "" {
