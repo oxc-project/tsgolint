@@ -1,5 +1,14 @@
 # Patches
 
+`0007-Fix-tests-for-TSGolint-patches.patch` updates snapshot filesystem tests to
+use the project types exported by patch `0002`. Checker-pool constructor defaults
+are tested separately from the session sizing override in patch `0001`. It also
+updates `ReadFile` tests for patch `0005`, covering present, empty, and missing
+files, content changes, cache clearing, and disabled caching. This keeps the
+affected upstream test packages runnable after applying the patch stack. It
+removes a redundant comment from patch `0003` without changing the config parser's
+behavior.
+
 `0006-perf-add-opt-in-node-count-checker-assignment.patch` enables descending
 node-count round-robin assignment only when `OXLINT_TSGOLINT_CHECKER_SCHEDULING=sorted`.
 It sorts a stable copy of the program files, including declarations, before
