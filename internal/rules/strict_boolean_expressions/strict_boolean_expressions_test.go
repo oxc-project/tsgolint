@@ -438,6 +438,50 @@ if (foo) {
 			},
 			{
 				Code: `
+declare const foo: number & { __BRAND: 'Foo' };
+if (foo) {
+}
+    `,
+			},
+			{
+				Code: `
+declare const foo: string & { __BRAND: 'Foo' };
+if (foo) {
+}
+    `,
+			},
+			{
+				Code: `
+declare const foo: bigint & { __BRAND: 'Foo' };
+if (foo) {
+}
+    `,
+			},
+			{
+				Code: `
+declare const foo: 'a' | 'b' | (string & {});
+if (foo) {
+}
+    `,
+			},
+			{
+				Code: `
+declare const foo: (number & { __BRAND: 'Foo' }) | null;
+if (foo) {
+}
+      `,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableNumber": true}`),
+			},
+			{
+				Code: `
+declare const foo: (string & { __BRAND: 'Foo' }) | null;
+if (foo) {
+}
+      `,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNullableString": true}`),
+			},
+			{
+				Code: `
 declare function assert(a: number, b: unknown): asserts a;
 declare const nullableString: string | null;
 declare const boo: boolean;
@@ -3870,6 +3914,172 @@ const stringValue: string = 'hoge';
 						//       `,
 						// 						},
 						// 					},
+					},
+				},
+			},
+			{
+				Code: `
+declare const foo: number & { __BRAND: 'Foo' };
+if (foo) {
+}
+      `,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowNumber": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorNumber",
+						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						// 						{
+						// 							MessageId: "conditionFixCompareZero",
+						// 							Output: `
+						// declare const foo: number & { __BRAND: 'Foo' };
+						// if (foo !== 0) {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCompareNaN",
+						// 							Output: `
+						// declare const foo: number & { __BRAND: 'Foo' };
+						// if (!Number.isNaN(foo)) {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCastBoolean",
+						// 							Output: `
+						// declare const foo: number & { __BRAND: 'Foo' };
+						// if (Boolean(foo)) {
+						// }
+						//       `,
+						// 						},
+						// 					},
+					},
+				},
+			},
+			{
+				Code: `
+declare const foo: (number & { __BRAND: 'Foo' }) | null;
+if (foo) {
+}
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorNullableNumber",
+						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						// 						{
+						// 							MessageId: "conditionFixCompareNullish",
+						// 							Output: `
+						// declare const foo: (number & { __BRAND: 'Foo' }) | null;
+						// if (foo != null) {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixDefaultZero",
+						// 							Output: `
+						// declare const foo: (number & { __BRAND: 'Foo' }) | null;
+						// if (foo ?? 0) {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCastBoolean",
+						// 							Output: `
+						// declare const foo: (number & { __BRAND: 'Foo' }) | null;
+						// if (Boolean(foo)) {
+						// }
+						//       `,
+						// 						},
+						// 					},
+					},
+				},
+			},
+			{
+				Code: `
+declare const foo: string & { __BRAND: 'Foo' };
+if (foo) {
+}
+      `,
+				Options: rule_tester.OptionsFromJSON[StrictBooleanExpressionsOptions](`{"allowString": false}`),
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorString",
+						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						// 						{
+						// 							MessageId: "conditionFixCompareStringLength",
+						// 							Output: `
+						// declare const foo: string & { __BRAND: 'Foo' };
+						// if (foo.length > 0) {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCompareEmptyString",
+						// 							Output: `
+						// declare const foo: string & { __BRAND: 'Foo' };
+						// if (foo !== "") {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCastBoolean",
+						// 							Output: `
+						// declare const foo: string & { __BRAND: 'Foo' };
+						// if (Boolean(foo)) {
+						// }
+						//       `,
+						// 						},
+						// 					},
+					},
+				},
+			},
+			{
+				Code: `
+declare const foo: (string & { __BRAND: 'Foo' }) | null;
+if (foo) {
+}
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorNullableString",
+						// 					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						// 						{
+						// 							MessageId: "conditionFixCompareNullish",
+						// 							Output: `
+						// declare const foo: (string & { __BRAND: 'Foo' }) | null;
+						// if (foo != null) {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixDefaultEmptyString",
+						// 							Output: `
+						// declare const foo: (string & { __BRAND: 'Foo' }) | null;
+						// if (foo ?? "") {
+						// }
+						//       `,
+						// 						},
+						// 						{
+						// 							MessageId: "conditionFixCastBoolean",
+						// 							Output: `
+						// declare const foo: (string & { __BRAND: 'Foo' }) | null;
+						// if (Boolean(foo)) {
+						// }
+						//       `,
+						// 						},
+						// 					},
+					},
+				},
+			},
+			{
+				Code: `
+declare const foo: { a: string } & { b: number };
+if (foo) {
+}
+      `,
+				Errors: []rule_tester.InvalidTestCaseError{
+					{
+						MessageId: "conditionErrorObject",
 					},
 				},
 			},

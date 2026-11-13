@@ -372,21 +372,19 @@ func analyzeTypePart(_typeChecker *checker.Checker, t *checker.Type) typeInfo {
 	info := typeInfo{}
 	flags := checker.Type_flags(t)
 
+	// A primitive intersected with an object type, such as a branded primitive
+	// (`number & { __brand: 'Foo' }`) or `string & {}`, is truthy as the primitive is.
 	if utils.IsIntersectionType(t) {
-		info.isIntersection = true
-		types := t.Types()
-		isBoolean := false
-		for _, t2 := range types {
-			if analyzeTypePart(_typeChecker, t2).variant == typeVariantBoolean {
-				isBoolean = true
-				break
+		for _, part := range t.Types() {
+			partInfo := analyzeTypePart(_typeChecker, part)
+			switch partInfo.variant {
+			case typeVariantBoolean, typeVariantString, typeVariantNumber, typeVariantBigInt:
+				partInfo.isIntersection = true
+				return partInfo
 			}
 		}
-		if isBoolean {
-			info.variant = typeVariantBoolean
-		} else {
-			info.variant = typeVariantObject
-		}
+		info.isIntersection = true
+		info.variant = typeVariantObject
 		return info
 	}
 
