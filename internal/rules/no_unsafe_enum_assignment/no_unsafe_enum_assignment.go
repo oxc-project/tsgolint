@@ -12,7 +12,7 @@ import (
 var NoUnsafeEnumAssignmentRule = rule.Rule{
 	Name: "no-unsafe-enum-assignment",
 	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		c := &enumTypeChecker{checker: ctx.TypeChecker, genericTypes: make(map[*checker.Type]bool), mismatches: make(map[typePair]bool)}
+		c := &enumTypeChecker{checker: ctx.TypeChecker, genericTypes: make(map[*checker.Type]bool), mismatches: make(map[typePair]bool), alignedTargets: make(map[typePair]bool)}
 		checked := make(map[*ast.Node]bool)
 		report := func(node *ast.Node, messageID string, types []*checker.Type) {
 			var description string

@@ -1341,6 +1341,49 @@ declare const numberMap: Record<number, string>;
 stringMap[0];
 numberMap[0];
 `},
+		{Code: `
+enum Kind {
+  A = 'A',
+  B = 'B',
+}
+
+interface Target<O, I> {
+  out: O;
+  in: I;
+}
+
+interface Holder<S extends { type: string; parsed: unknown }, I> {
+  out: S['parsed'];
+  in: I;
+}
+
+type Schema = { type: 'object'; parsed: { type: Kind } };
+type SchemaKindKey = { type: 'object'; parsed: { kind: Kind } };
+
+declare const holder: Holder<Schema, number>;
+declare const holderKindKey: Holder<SchemaKindKey, number>;
+
+export const flagged: Target<{ type: Kind }, number> = holder;
+export const notFlagged: Target<{ kind: Kind }, number> = holderKindKey;
+`},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+interface Pair<A, B> {
+  first: A;
+  second: B;
+}
+
+interface SwappedPair<B, A> {
+  first: A;
+  second: B;
+}
+
+declare const swapped: SwappedPair<number, Fruit>;
+const pair: Pair<Fruit, number> = swapped;
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 enum Fruit {
@@ -2719,5 +2762,39 @@ enum Fruit { Apple }
 declare const map: Record<Fruit, string>;
 map[0];
 `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAccess"}}},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+interface Pair<A, B> {
+  first: A;
+  second: B;
+}
+
+interface SwappedPair<B, A> {
+  first: A;
+  second: B;
+}
+
+declare const swapped: SwappedPair<Fruit, number>;
+const pair: Pair<Fruit, number> = swapped;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment", Line: 17}}},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+declare const numbers: Set<number>;
+const fruits: ReadonlySet<Fruit> = numbers;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment", Line: 7}}},
+		{Code: `
+enum Fruit {
+  Apple,
+}
+
+declare const number: Promise<number>;
+const fruit: PromiseLike<Fruit> = number;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unsafeEnumAssignment", Line: 7}}},
 	})
 }

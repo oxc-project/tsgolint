@@ -19,9 +19,10 @@ type comparisonVisit struct {
 const maximumTypeComparisonDepth = 5
 
 type enumTypeChecker struct {
-	checker      *checker.Checker
-	genericTypes map[*checker.Type]bool
-	mismatches   map[typePair]bool
+	checker        *checker.Checker
+	genericTypes   map[*checker.Type]bool
+	mismatches     map[typePair]bool
+	alignedTargets map[typePair]bool
 }
 
 func (c *enumTypeChecker) constraint(t *checker.Type) *checker.Type {
@@ -57,6 +58,36 @@ func (c *enumTypeChecker) isGeneric(t *checker.Type) bool {
 	return generic
 }
 
+// typeArgumentsAligned reports whether the type arguments of instances of two
+// generic types can be compared by position. For different generic types, a
+// property that the receiver declares with its i-th type parameter must be
+// declared with the i-th type parameter by the sender as well.
+func (c *enumTypeChecker) typeArgumentsAligned(senderTarget, receiverTarget *checker.Type) bool {
+	if senderTarget == receiverTarget {
+		return true
+	}
+	pair := typePair{senderTarget, receiverTarget}
+	if aligned, ok := c.alignedTargets[pair]; ok {
+		return aligned
+	}
+	aligned := true
+	senderParameters := senderTarget.AsInterfaceType().TypeParameters()
+	receiverParameters := receiverTarget.AsInterfaceType().TypeParameters()
+	for _, receiverProperty := range checker.Checker_getPropertiesOfType(c.checker, receiverTarget) {
+		index := slices.Index(receiverParameters, checker.Checker_getTypeOfSymbol(c.checker, receiverProperty))
+		if index < 0 {
+			continue
+		}
+		senderProperty := checker.Checker_getPropertyOfType(c.checker, senderTarget, receiverProperty.Name)
+		if senderProperty != nil && slices.Index(senderParameters, checker.Checker_getTypeOfSymbol(c.checker, senderProperty)) != index {
+			aligned = false
+			break
+		}
+	}
+	c.alignedTargets[pair] = aligned
+	return aligned
+}
+
 func (c *enumTypeChecker) mismatch(sender, receiver *checker.Type) bool {
 	pair := typePair{sender, receiver}
 	if mismatch, ok := c.mismatches[pair]; ok {
@@ -84,7 +115,7 @@ func (c *enumTypeChecker) deepMismatch(sender, receiver *checker.Type, visited m
 		return true
 	}
 	senderArgs, receiverArgs := c.typeArguments(sender), c.typeArguments(receiver)
-	if len(senderArgs) == len(receiverArgs) {
+	if len(senderArgs) > 0 && len(senderArgs) == len(receiverArgs) && c.typeArgumentsAligned(sender.Target(), receiver.Target()) {
 		for i, argument := range senderArgs {
 			if c.deepMismatch(argument, receiverArgs[i], visited, depth+1, withinGenericMembers) {
 				return true
