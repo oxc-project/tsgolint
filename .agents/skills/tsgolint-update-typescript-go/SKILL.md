@@ -78,7 +78,6 @@ For this repo, the relevant PR checks usually include:
 - `test-go`
 - `test-e2e`
 - `lint`
-- `Typos`
 - `autofix`
 - `check-schemas`
 - `test-windows` may be skipped on PRs

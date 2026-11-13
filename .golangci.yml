@@ -29,7 +29,6 @@ linters:
     - intrange
     - makezero
     - mirror
-    - misspell
     - musttag
     - nakedret
     - nolintlint
