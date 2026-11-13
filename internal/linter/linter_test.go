@@ -7,6 +7,7 @@ import (
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/bundled"
+	"github.com/microsoft/typescript-go/shim/compiler"
 	"github.com/microsoft/typescript-go/shim/tspath"
 	"github.com/microsoft/typescript-go/shim/vfs/cachedvfs"
 	"github.com/microsoft/typescript-go/shim/vfs/osvfs"
@@ -367,4 +368,117 @@ function greet() {
 	assert.Equal(t, recordsByRule[ruleA].Calls, uint64(2), "rule A should count Run plus its variable listener")
 	assert.Equal(t, recordsByRule[ruleB].Calls, uint64(2), "rule B should count Run plus its function listener")
 	assert.Equal(t, recordsByRule[ruleC].Calls, uint64(1), "rule C should count its Run call")
+}
+
+// setupTypeErrorProgram creates a program containing two files that each have a
+// semantic error, and returns the source files in the given order.
+func setupTypeErrorProgram(t *testing.T) (*compiler.Program, []*ast.SourceFile) {
+	t.Helper()
+
+	rootDir := fixtures.GetRootDir()
+	filePathA := tspath.ResolvePath(rootDir, "type-errors-a.ts")
+	filePathB := tspath.ResolvePath(rootDir, "type-errors-b.ts")
+
+	fs := utils.NewOverlayVFS(
+		cachedBaseFS,
+		map[string]string{
+			filePathA: "const a: number = \"not a number\";\n",
+			filePathB: "const b: number = \"not a number\";\n",
+		},
+	)
+	host := utils.CreateCompilerHost(rootDir, fs)
+
+	program, _, err := utils.CreateProgram(true, fs, rootDir, "tsconfig.minimal.json", host, false)
+	assert.NilError(t, err, "couldn't create program")
+
+	sourceFileA := program.GetSourceFile(filePathA)
+	assert.Assert(t, sourceFileA != nil, "expected %s to be in the program", filePathA)
+	sourceFileB := program.GetSourceFile(filePathB)
+	assert.Assert(t, sourceFileB != nil, "expected %s to be in the program", filePathB)
+
+	return program, []*ast.SourceFile{sourceFileA, sourceFileB}
+}
+
+// runLinterCollectingInternalDiagnostics lints the given files and returns the
+// file names the internal diagnostics were reported for.
+func runLinterCollectingInternalDiagnostics(t *testing.T, program *compiler.Program, files []*ast.SourceFile, typeErrors TypeErrors) []string {
+	t.Helper()
+
+	var mu sync.Mutex
+	var fileNames []string
+
+	err := RunLinterOnProgram(RunLinterOnProgramOptions{
+		LogLevel: utils.LogLevelNormal,
+		Program:  program,
+		Files:    files,
+		Workers:  1,
+		GetRulesForFile: func(sourceFile *ast.SourceFile) []ConfiguredRule {
+			return nil
+		},
+		OnDiagnostic: func(d rule.RuleDiagnostic) {},
+		OnInternalDiagnostic: func(d diagnostic.Internal) {
+			mu.Lock()
+			defer mu.Unlock()
+			if d.FilePath != nil {
+				fileNames = append(fileNames, *d.FilePath)
+			}
+		},
+		Fixes:      Fixes{Fix: false, FixSuggestions: false},
+		TypeErrors: typeErrors,
+	})
+	assert.NilError(t, err, "unexpected error from RunLinterOnProgram")
+
+	return fileNames
+}
+
+func TestRunLinterOnProgram_TypeErrorsReportedForEveryFileByDefault(t *testing.T) {
+	program, files := setupTypeErrorProgram(t)
+
+	// A nil callback reports the diagnostics for every linted file.
+	fileNames := runLinterCollectingInternalDiagnostics(t, program, files, TypeErrors{
+		ReportSemantic: true,
+	})
+
+	reportedFiles := make(map[string]struct{}, len(fileNames))
+	for _, fileName := range fileNames {
+		reportedFiles[fileName] = struct{}{}
+	}
+
+	assert.Equal(t, len(reportedFiles), 2, "expected type errors for both files, got %v", fileNames)
+	for _, file := range files {
+		_, ok := reportedFiles[file.FileName()]
+		assert.Assert(t, ok, "expected a type error for %s, got %v", file.FileName(), fileNames)
+	}
+}
+
+func TestRunLinterOnProgram_TypeErrorsReportedForAcceptedFilesOnly(t *testing.T) {
+	program, files := setupTypeErrorProgram(t)
+
+	fileNames := runLinterCollectingInternalDiagnostics(t, program, files, TypeErrors{
+		ReportSemantic: true,
+		ReportTypeErrorsForFile: func(sourceFile *ast.SourceFile) bool {
+			return sourceFile == files[0]
+		},
+	})
+
+	assert.Assert(t, len(fileNames) > 0, "expected type errors for the accepted file")
+	for _, fileName := range fileNames {
+		assert.Equal(t, fileName, files[0].FileName(), "type errors should only be reported for the accepted file")
+	}
+}
+
+func TestRunLinterOnProgram_TypeErrorsRejectedForEveryFile(t *testing.T) {
+	program, files := setupTypeErrorProgram(t)
+
+	// A callback rejecting every file reports nothing, the behavior of a
+	// payload opting every config group out of type checking.
+	fileNames := runLinterCollectingInternalDiagnostics(t, program, files, TypeErrors{
+		ReportSemantic:  true,
+		ReportSyntactic: true,
+		ReportTypeErrorsForFile: func(sourceFile *ast.SourceFile) bool {
+			return false
+		},
+	})
+
+	assert.Equal(t, len(fileNames), 0, "expected no type errors, got %v", fileNames)
 }

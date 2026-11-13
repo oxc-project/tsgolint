@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"maps"
 	"os"
 	"runtime"
 	"slices"
@@ -211,6 +212,95 @@ func writeErrorMessage(text string) error {
 	})
 }
 
+// resolvedConfigFiles holds the per-file state derived from the payload's
+// config groups. A file listed by several config groups is linted with the
+// rules and `type_check` of the last config group listing it.
+type resolvedConfigFiles struct {
+	// normalizedFiles are the payload file paths made absolute, in payload
+	// order and without the duplicates several config groups can list.
+	normalizedFiles []string
+	// fileConfigs maps each file to its config group.
+	fileConfigs map[tspath.Path]fileConfig
+	// skippedTypeCheckFiles are the files whose config group set
+	// `type_check: false`.
+	skippedTypeCheckFiles map[tspath.Path]struct{}
+	// filesInSeveralConfigs are the files more than one config group listed,
+	// one entry per file.
+	filesInSeveralConfigs map[tspath.Path]string
+}
+
+// fileConfig is the config group a file is linted with.
+type fileConfig struct {
+	rules []headlessRule
+	// configIndex is the index of the config group in the payload.
+	configIndex int
+}
+
+// resolveConfigFiles normalizes the payload's file paths and resolves the rules
+// and `type_check` state of every file. See the payload schema in payload.go.
+func resolveConfigFiles(configs []headlessConfig, cwd string, useCaseSensitiveFileNames bool) resolvedConfigFiles {
+	totalFileCount := 0
+	for _, config := range configs {
+		totalFileCount += len(config.FilePaths)
+	}
+
+	resolved := resolvedConfigFiles{
+		normalizedFiles:       make([]string, 0, totalFileCount),
+		fileConfigs:           make(map[tspath.Path]fileConfig, totalFileCount),
+		skippedTypeCheckFiles: make(map[tspath.Path]struct{}),
+		filesInSeveralConfigs: make(map[tspath.Path]string),
+	}
+
+	for configIndex, config := range configs {
+		typeChecks := config.TypeCheck == nil || *config.TypeCheck
+
+		for _, filePath := range config.FilePaths {
+			// Relative paths are resolved here so that the keys below match the
+			// paths the programs give their source files.
+			normalized := tspath.GetNormalizedAbsolutePath(filePath, cwd)
+
+			path := tspath.Path(tspath.GetCanonicalFileName(normalized, useCaseSensitiveFileNames))
+			// Only a file listed by more than one config group is recorded; a
+			// config group listing the same file twice, or in two spellings, is
+			// not.
+			if previous, seen := resolved.fileConfigs[path]; !seen {
+				resolved.normalizedFiles = append(resolved.normalizedFiles, normalized)
+			} else if previous.configIndex != configIndex {
+				resolved.filesInSeveralConfigs[path] = normalized
+			}
+			resolved.fileConfigs[path] = fileConfig{rules: config.Rules, configIndex: configIndex}
+			if typeChecks {
+				// The last config group listing the file decides, so this
+				// clears a `type_check: false` set by an earlier one.
+				delete(resolved.skippedTypeCheckFiles, path)
+			} else {
+				resolved.skippedTypeCheckFiles[path] = struct{}{}
+			}
+		}
+	}
+
+	return resolved
+}
+
+// rulesForFile returns the rules a source file is linted with. The resolved
+// state is keyed by `tspath.Path`, like the program keys its source files.
+func (r resolvedConfigFiles) rulesForFile(sourceFile *ast.SourceFile) []headlessRule {
+	return r.fileConfigs[sourceFile.Path()].rules
+}
+
+// reportTypeErrorsForFile returns the callback selecting the files TypeScript
+// diagnostics are reported for, or nil when every file reports them.
+func (r resolvedConfigFiles) reportTypeErrorsForFile() func(sourceFile *ast.SourceFile) bool {
+	skipped := r.skippedTypeCheckFiles
+	if len(skipped) == 0 {
+		return nil
+	}
+	return func(sourceFile *ast.SourceFile) bool {
+		_, ok := skipped[sourceFile.Path()]
+		return !ok
+	}
+}
+
 func runHeadless(args []string) int {
 	logLevel := utils.GetLogLevel()
 	log.SetOutput(os.Stderr)
@@ -253,7 +343,7 @@ func runHeadless(args []string) int {
 
 	baseFS := osvfs.FS()
 	if len(payload.SourceOverrides) > 0 {
-		baseFS = newOverlayFS(baseFS, payload.SourceOverrides)
+		baseFS = newOverlayFS(baseFS, payload.SourceOverrides, cwd)
 	}
 	fs := bundled.WrapFS(cachedvfs.From(baseFS))
 
@@ -262,28 +352,18 @@ func runHeadless(args []string) int {
 		UnmatchedFiles: []string{},
 	}
 
-	totalFileCount := 0
-	for _, config := range payload.Configs {
-		totalFileCount += len(config.FilePaths)
-	}
+	resolved := resolveConfigFiles(payload.Configs, cwd, fs.UseCaseSensitiveFileNames())
+
 	if logLevel == utils.LogLevelDebug {
-		log.Printf("Starting to assign files to programs. Total files: %d", totalFileCount)
+		log.Printf("Starting to assign files to programs. Total files: %d", len(resolved.normalizedFiles))
+		for _, file := range slices.Sorted(maps.Values(resolved.filesInSeveralConfigs)) {
+			log.Printf("File %s is listed by several config groups: the last one wins", file)
+		}
 	}
 
 	tsConfigResolver := utils.NewTsConfigResolver(fs, cwd)
 
-	normalizedFiles := make([]string, 0, totalFileCount)
-	fileConfigs := make(map[tspath.Path][]headlessRule, totalFileCount)
-	for _, config := range payload.Configs {
-		for _, filePath := range config.FilePaths {
-			normalized := tspath.NormalizeSlashes(filePath)
-			normalizedFiles = append(normalizedFiles, normalized)
-
-			fileConfigs[tspath.ToPath(normalized, cwd, fs.UseCaseSensitiveFileNames())] = config.Rules
-		}
-	}
-
-	result := tsConfigResolver.FindTsConfigParallel(normalizedFiles)
+	result := tsConfigResolver.FindTsConfigParallel(resolved.normalizedFiles)
 	for file, tsconfig := range result {
 		if tsconfig == "" {
 			workload.UnmatchedFiles = append(workload.UnmatchedFiles, file)
@@ -417,7 +497,7 @@ func runHeadless(args []string) int {
 		Workers:          runtime.GOMAXPROCS(0),
 		FS:               fs,
 		GetRulesForFile: func(sourceFile *ast.SourceFile) []linter.ConfiguredRule {
-			cfg := fileConfigs[sourceFile.Path()]
+			cfg := resolved.rulesForFile(sourceFile)
 			rules := make([]linter.ConfiguredRule, len(cfg))
 
 			for i, headlessRule := range cfg {
@@ -442,8 +522,9 @@ func runHeadless(args []string) int {
 			FixSuggestions: opts.fixSuggestions,
 		},
 		TypeErrors: linter.TypeErrors{
-			ReportSyntactic: payload.ReportSyntactic,
-			ReportSemantic:  payload.ReportSemantic,
+			ReportSyntactic:         payload.ReportSyntactic,
+			ReportSemantic:          payload.ReportSemantic,
+			ReportTypeErrorsForFile: resolved.reportTypeErrorsForFile(),
 		},
 		SuppressProgramDiagnostics: suppressProgramDiagnostics(),
 		TimingStore:                timingStore,
