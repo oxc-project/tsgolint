@@ -3511,7 +3511,13 @@ func (processor *chainProcessor) generateOrChainFixAndReport(node *ast.Node, cha
 
 	if hasTrailingComparisonForFix {
 		lastOpForFix := chainForOptional[len(chainForOptional)-1]
-		if ast.IsBinaryExpression(lastOpForFix.node) {
+		if lastOpForFix.typ == OperandTypeTypeofCheck {
+			comparisonRange := processor.getNodeRange(lastOpForFix.node)
+			comparedExprRange := processor.getNodeRange(lastOpForFix.comparedExpr)
+			prefix := processor.sourceText[comparisonRange.Pos():comparedExprRange.Pos()]
+			suffix := processor.sourceText[comparedExprRange.End():comparisonRange.End()]
+			newCode = prefix + optionalChainCode + suffix
+		} else if ast.IsBinaryExpression(lastOpForFix.node) {
 			binExpr := lastOpForFix.node.AsBinaryExpression()
 			comparedExprRange := processor.getNodeRange(lastOpForFix.comparedExpr)
 			leftRange := processor.getNodeRange(binExpr.Left)
