@@ -38,6 +38,42 @@ func (c *enumTypeChecker) typeArguments(t *checker.Type) []*checker.Type {
 	return nil
 }
 
+// numberIndexType is the type t holds at a numeric index.
+//
+// For a union or an intersection it is read from the parts that are arrays or
+// tuples only. Asking the checker for the index type of the whole union
+// resolves its members (resolveUnionTypeMembers -> getUnionSignatures), which
+// compares every signature of every member. On large generated types (an ORM
+// client, say) that comparison exhausts the checker's instantiation budget,
+// which only checkSourceElement and checkExpression reset, so every later
+// instantiation returns the error type and the checker caches it: unrelated
+// nodes linted afterwards read as `error`, and which ones depends on how files
+// were spread across checkers. The other parts of a union are compared one by
+// one in directMismatch, so nothing the rule reports is lost.
+func (c *enumTypeChecker) numberIndexType(t *checker.Type) *checker.Type {
+	if !utils.IsTypeFlagSet(t, checker.TypeFlagsUnionOrIntersection) {
+		return c.checker.GetNumberIndexType(t)
+	}
+	var elements []*checker.Type
+	for _, part := range t.Types() {
+		if !checker.Checker_isArrayOrTupleType(c.checker, part) {
+			continue
+		}
+		if element := c.checker.GetNumberIndexType(part); element != nil {
+			elements = append(elements, element)
+		}
+	}
+	switch {
+	case len(elements) == 0:
+		return nil
+	case len(elements) == 1:
+		return elements[0]
+	case utils.IsTypeFlagSet(t, checker.TypeFlagsIntersection):
+		return nil
+	}
+	return checker.Checker_getUnionTypeEx(c.checker, elements, checker.UnionReductionLiteral, nil, nil)
+}
+
 func (c *enumTypeChecker) isGeneric(t *checker.Type) bool {
 	if generic, ok := c.genericTypes[t]; ok {
 		return generic
@@ -95,7 +131,7 @@ func (c *enumTypeChecker) deepMismatch(sender, receiver *checker.Type, visited m
 	if generic && withinGenericMembers {
 		return false
 	}
-	senderElement, receiverElement := c.checker.GetNumberIndexType(sender), c.checker.GetNumberIndexType(receiver)
+	senderElement, receiverElement := c.numberIndexType(sender), c.numberIndexType(receiver)
 	if senderElement != nil && receiverElement != nil && c.deepMismatch(senderElement, receiverElement, visited, depth+1, generic || withinGenericMembers) {
 		return true
 	}
@@ -169,7 +205,7 @@ func (c *enumTypeChecker) describe(types []*checker.Type) string {
 		for _, argument := range c.typeArguments(t) {
 			visit(argument, depth+1)
 		}
-		if element := c.checker.GetNumberIndexType(t); element != nil {
+		if element := c.numberIndexType(t); element != nil {
 			visit(element, depth+1)
 		}
 		for _, property := range checker.Checker_getPropertiesOfType(c.checker, t) {
