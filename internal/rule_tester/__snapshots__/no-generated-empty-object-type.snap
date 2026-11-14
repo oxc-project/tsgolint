@@ -79,3 +79,12 @@ Message: This type resolves to `{}`, the empty object type. This was likely not 
      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    4 |       
 ---
+
+[TestNoGeneratedEmptyObjectTypeRule/invalid-9 - 1]
+Diagnostic 1: noGeneratedEmptyObjectType (2:37 - 2:50)
+Message: This type resolves to `{}`, the empty object type. This was likely not intentional.
+   1 | 
+   2 | declare function pickNone<T>(value: Pick<T, never>): void;
+     |                                     ~~~~~~~~~~~~~~
+   3 |       
+---
