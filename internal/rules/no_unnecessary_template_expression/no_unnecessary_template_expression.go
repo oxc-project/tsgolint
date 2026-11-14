@@ -18,6 +18,13 @@ func buildNoUnnecessaryTemplateExpressionMessage() rule.RuleMessage {
 	}
 }
 
+func buildRemoveTemplateExpressionMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "removeTemplateExpression",
+		Description: "Remove the template literal and use the interpolated expression directly.",
+	}
+}
+
 func isUnderlyingTypeString(t *checker.Type) bool {
 	return utils.Every(utils.UnionTypeParts(t), func(t *checker.Type) bool {
 		return utils.Some(utils.IntersectionTypeParts(t), func(t *checker.Type) bool {
@@ -108,11 +115,12 @@ var NoUnnecessaryTemplateExpressionRule = rule.Rule{
 			return sourceText[textRange.Pos():textRange.End()]
 		}
 
-		reportSingleInterpolation := func(template *ast.Node, interpolation *ast.Node, spanLiteral *ast.Node) {
-			ctx.ReportDiagnosticWithFixes(rule.RuleDiagnostic{
+		reportSingleInterpolation := func(template *ast.Node, interpolation *ast.Node, spanLiteral *ast.Node, safeFix bool) {
+			diagnostic := rule.RuleDiagnostic{
 				Range:   core.NewTextRange(interpolation.Pos()-2, spanLiteral.Pos()+1),
 				Message: buildNoUnnecessaryTemplateExpressionMessage(),
-			}, func() []rule.RuleFix {
+			}
+			getFixes := func() []rule.RuleFix {
 				text := nodeText(interpolation)
 				parentIsNullishCoalescing := ast.IsBinaryExpression(template.Parent) &&
 					template.Parent.AsBinaryExpression().OperatorToken.Kind == ast.KindQuestionQuestionToken
@@ -127,7 +135,14 @@ var NoUnnecessaryTemplateExpressionRule = rule.Rule{
 				}
 
 				return []rule.RuleFix{rule.RuleFixReplace(ctx.SourceFile, template, text)}
-			})
+			}
+			if safeFix {
+				ctx.ReportDiagnosticWithFixes(diagnostic, getFixes)
+			} else {
+				ctx.ReportDiagnosticWithSuggestions(diagnostic, func() []rule.RuleSuggestion {
+					return []rule.RuleSuggestion{{Message: buildRemoveTemplateExpressionMessage(), FixesArr: getFixes()}}
+				})
+			}
 		}
 
 		isUnnecessaryValueInterpolation := func(expression *ast.Node, prevQuasiEnd int, nextQuasiLiteral *ast.TemplateMiddleOrTail) bool {
@@ -321,10 +336,13 @@ var NoUnnecessaryTemplateExpressionRule = rule.Rule{
 				firstSpan := expr.TemplateSpans.Nodes[0].AsTemplateSpan()
 
 				if isTrivialInterpolation(expr.TemplateSpans, expr.Head, firstSpan.Literal) {
-					constraintType, _ := utils.GetConstraintInfo(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(firstSpan.Expression))
+					interpolationType := ctx.TypeChecker.GetTypeAtLocation(firstSpan.Expression)
+					constraintType, _ := utils.GetConstraintInfo(ctx.TypeChecker, interpolationType)
 
 					if constraintType != nil && isUnderlyingTypeString(constraintType) {
-						reportSingleInterpolation(node, firstSpan.Expression, firstSpan.Literal)
+						// A template widens literals, brands, and type parameters to string.
+						// Removing it can change inference and invalidate later assignments.
+						reportSingleInterpolation(node, firstSpan.Expression, firstSpan.Literal, checker.Type_flags(interpolationType) == checker.TypeFlagsString)
 						return
 					}
 				}
@@ -339,7 +357,7 @@ var NoUnnecessaryTemplateExpressionRule = rule.Rule{
 					constraintType, isTypeParameter := utils.GetConstraintInfo(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(firstSpan.Type))
 
 					if constraintType != nil && !isTypeParameter && isUnderlyingTypeString(constraintType) && !isEnumMemberType(constraintType) {
-						reportSingleInterpolation(node, firstSpan.Type, firstSpan.Literal)
+						reportSingleInterpolation(node, firstSpan.Type, firstSpan.Literal, true)
 						return
 					}
 				}

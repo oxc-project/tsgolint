@@ -1,4 +1,40 @@
 
+[TestPreferIncludesPreservesComparisonSemantics/invalid-0 - 1]
+Diagnostic 1: preferIncludes (2:1 - 2:22)
+Message: Use 'includes()' method instead.
+   1 | const xs: number[] = [NaN];
+   2 | xs.indexOf(NaN) !== -1;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
+---
+
+[TestPreferIncludesPreservesComparisonSemantics/invalid-1 - 1]
+Diagnostic 1: preferIncludes (2:1 - 2:22)
+Message: Use 'includes()' method instead.
+   1 | const xs: number[] = [NaN];
+   2 | xs.indexOf(NaN) === -1;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
+---
+
+[TestPreferIncludesPreservesComparisonSemantics/invalid-2 - 1]
+Diagnostic 1: preferIncludes (2:1 - 2:28)
+Message: Use 'includes()' method instead.
+   1 | const xs: (string | undefined)[] = [, 'a'];
+   2 | xs.indexOf(undefined) !== -1;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
+---
+
+[TestPreferIncludesPreservesComparisonSemantics/invalid-3 - 1]
+Diagnostic 1: preferIncludes (2:1 - 2:22)
+Message: Use 'includes()' method instead.
+   1 | const xs = new Float64Array([NaN]);
+   2 | xs.indexOf(NaN) !== -1;
+     | ~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
+---
+
 [TestPreferIncludesRule/invalid-0 - 1]
 Diagnostic 1: preferIncludes (3:11 - 3:29)
 Message: Use 'includes()' method instead.
@@ -6,6 +42,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-1 - 1]
@@ -15,6 +52,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) != -1;
      |           ~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-2 - 1]
@@ -24,6 +62,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) > -1;
      |           ~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-3 - 1]
@@ -33,6 +72,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) >= 0;
      |           ~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-4 - 1]
@@ -42,6 +82,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) === -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-5 - 1]
@@ -51,6 +92,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) == -1;
      |           ~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-6 - 1]
@@ -60,6 +102,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) <= -1;
      |           ~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-7 - 1]
@@ -69,6 +112,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) < 0;
      |           ~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-8 - 1]
@@ -78,6 +122,7 @@ Message: Use 'includes()' method instead.
    3 |           a?.indexOf(b) === -1;
      |           ~~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-9 - 1]
@@ -87,6 +132,7 @@ Message: Use 'includes()' method instead.
    3 |           a?.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-10 - 1]
@@ -141,6 +187,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-16 - 1]
@@ -150,6 +197,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-17 - 1]
@@ -159,6 +207,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-18 - 1]
@@ -168,6 +217,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-19 - 1]
@@ -177,6 +227,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-20 - 1]
@@ -186,6 +237,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-21 - 1]
@@ -195,6 +247,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-22 - 1]
@@ -204,6 +257,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-23 - 1]
@@ -213,6 +267,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-24 - 1]
@@ -222,6 +277,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-25 - 1]
@@ -231,6 +287,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-26 - 1]
@@ -240,6 +297,7 @@ Message: Use 'includes()' method instead.
   16 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
   17 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-27 - 1]
@@ -249,6 +307,7 @@ Message: Use 'includes()' method instead.
    7 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    8 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-28 - 1]
@@ -258,6 +317,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-29 - 1]
@@ -267,6 +327,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-30 - 1]
@@ -276,6 +337,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-31 - 1]
@@ -285,6 +347,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-32 - 1]
@@ -294,6 +357,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-33 - 1]
@@ -303,6 +367,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-34 - 1]
@@ -312,6 +377,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-35 - 1]
@@ -321,6 +387,7 @@ Message: Use 'includes()' method instead.
    8 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    9 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-36 - 1]
@@ -330,6 +397,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [useIncludes] Use includes() to check whether the value is present.
 ---
 
 [TestPreferIncludesRule/invalid-37 - 1]

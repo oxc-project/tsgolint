@@ -355,19 +355,25 @@ function foo<T extends string>() {
 			},
 		},
 		{
-			Code:   "`${    'a'    }`;",
-			Output: []string{"'a';"},
+			Code: "`${    'a'    }`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "'a';",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
 		},
 		{
-			Code:   "`${    \"a\"    }`;",
-			Output: []string{"\"a\";"},
+			Code: "`${    \"a\"    }`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "\"a\";",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
@@ -629,10 +635,13 @@ function foo<T extends string>() {
 			},
 		},
 		{
-			Code:   "`${'`'}`;",
-			Output: []string{"'`';"},
+			Code: "`${'`'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "'`';",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
@@ -1147,6 +1156,10 @@ function foo<T extends string>() {
 				},
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "` $${`${''}${``}`}${`{a}`} `;",
+					}},
 				},
 			},
 		},
@@ -1246,19 +1259,25 @@ function foo<T extends string>() {
 			},
 		},
 		{
-			Code:   "`${'\\u00E5'}`;",
-			Output: []string{"'\\u00E5';"},
+			Code: "`${'\\u00E5'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "'\\u00E5';",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
 		},
 		{
-			Code:   "`${'\\n'}`;",
-			Output: []string{"'\\n';"},
+			Code: "`${'\\n'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "'\\n';",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
@@ -1403,14 +1422,16 @@ this code has trailing position template expression but it isn\'t whitespace
           ` + "`" + `${arg}` + "`" + `;
         }
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output: `
         function func<T extends string>(arg: T) {
           arg;
         }
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 					Line:      3,
 					Column:    12,
@@ -1458,13 +1479,15 @@ declare const nested: string, interpolation: string;
         declare const string: 'a';
         ` + "`" + `${   string   }` + "`" + `;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output: `
         declare const string: 'a';
         string;
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
@@ -1474,13 +1497,15 @@ declare const nested: string, interpolation: string;
         declare const string: 'a';
         ` + "`" + `${string}` + "`" + `;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output: `
         declare const string: 'a';
         string;
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 					Line:      3,
 					Column:    10,
@@ -1493,13 +1518,15 @@ declare const nested: string, interpolation: string;
         declare const intersection: string & { _brand: 'test-brand' };
         ` + "`" + `${intersection}` + "`" + `;
       `,
-			Output: []string{`
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output: `
         declare const intersection: string & { _brand: 'test-brand' };
         intersection;
       `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 					Line:      3,
 					Column:    10,
@@ -1508,10 +1535,13 @@ declare const nested: string, interpolation: string;
 			},
 		},
 		{
-			Code:   "true ? `${'test' || ''}`.trim() : undefined;",
-			Output: []string{"true ? ('test' || '').trim() : undefined;"},
+			Code: "true ? `${'test' || ''}`.trim() : undefined;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "true ? ('test' || '').trim() : undefined;",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
@@ -1658,19 +1688,25 @@ type Bar = Foo;
 			},
 		},
 		{
-			Code:   "`${'abc' || 'def'}`[0];",
-			Output: []string{"('abc' || 'def')[0];"},
+			Code: "`${'abc' || 'def'}`[0];",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "('abc' || 'def')[0];",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
 		},
 		{
-			Code:   `const value = "foo" + ` + "`" + `${cond ? "bar" : "baz"}` + "`" + `;`,
-			Output: []string{`const value = "foo" + (cond ? "bar" : "baz");`},
+			Code: `const value = "foo" + ` + "`" + `${cond ? "bar" : "baz"}` + "`" + `;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    `const value = "foo" + (cond ? "bar" : "baz");`,
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},
@@ -1685,10 +1721,13 @@ type Bar = Foo;
 			},
 		},
 		{
-			Code:   "declare const b: string;\n'a' ?? `${b && 'c'}`;",
-			Output: []string{"declare const b: string;\n'a' ?? (b && 'c');"},
+			Code: "declare const b: string;\n'a' ?? `${b && 'c'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+						MessageId: "removeTemplateExpression",
+						Output:    "declare const b: string;\n'a' ?? (b && 'c');",
+					}},
 					MessageId: "noUnnecessaryTemplateExpression",
 				},
 			},

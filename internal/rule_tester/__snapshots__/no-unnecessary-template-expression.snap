@@ -1,4 +1,51 @@
 
+[TestNoUnnecessaryTemplateExpressionPreservesWidening/invalid-0 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:14 - 2:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | declare const mode: 'light' | 'dark';
+   2 | let label = `${mode}`;
+     |              ~~~~~~~
+   3 | label = 'auto';
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
+---
+
+[TestNoUnnecessaryTemplateExpressionPreservesWidening/invalid-1 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (3:14 - 3:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   2 | declare const id: UserId;
+   3 | let label = `${id}`;
+     |              ~~~~~
+   4 | label = 'guest';
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
+---
+
+[TestNoUnnecessaryTemplateExpressionPreservesWidening/invalid-2 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (1:55 - 1:62)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | function f<T extends string>(value: T) { let label = `${value}`; label = 'other'; return label; }
+     |                                                       ~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
+---
+
+[TestNoUnnecessaryTemplateExpressionPreservesWidening/invalid-3 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:14 - 2:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | declare const value: `prefix-${string}`;
+   2 | let label = `${value}`;
+     |              ~~~~~~~~
+   3 | label = 'other';
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
+---
+
+[TestNoUnnecessaryTemplateExpressionPreservesWidening/invalid-4 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (2:14 - 2:21)
+Message: Template literal expression is unnecessary and can be simplified.
+   1 | declare const value: string;
+   2 | let label = `${value}`;
+     |              ~~~~~~~~
+   3 | label = 'other';
+---
+
 [TestNoUnnecessaryTemplateExpressionRule/invalid-0 - 1]
 Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:5)
 Message: Template literal expression is unnecessary and can be simplified.
@@ -65,6 +112,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:11)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${    'a'    }`;
      |  ~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-9 - 1]
@@ -72,6 +120,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:11)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${    "a"    }`;
      |  ~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-10 - 1]
@@ -244,6 +293,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:7)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'`'}`;
      |  ~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-29 - 1]
@@ -686,6 +736,7 @@ Diagnostic 5: noUnnecessaryTemplateExpression (1:15 - 1:19)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
      |               ~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-80 - 1]
@@ -788,6 +839,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:12)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'\u00E5'}`;
      |  ~~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-89 - 1]
@@ -795,6 +847,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'\n'}`;
      |  ~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-90 - 1]
@@ -896,6 +949,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |           `${arg}`;
      |            ~~~~~~
    4 |         }
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-102 - 1]
@@ -923,6 +977,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |         `${   string   }`;
      |          ~~~~~~~~~~~~
    4 |       
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-105 - 1]
@@ -932,6 +987,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |         `${string}`;
      |          ~~~~~~~~~
    4 |       
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-106 - 1]
@@ -941,6 +997,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |         `${intersection}`;
      |          ~~~~~~~~~~~~~~~
    4 |       
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-107 - 1]
@@ -948,6 +1005,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:23)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | true ? `${'test' || ''}`.trim() : undefined;
      |         ~~~~~~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-108 - 1]
@@ -1050,6 +1108,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:18)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'abc' || 'def'}`[0];
      |  ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-121 - 1]
@@ -1057,6 +1116,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:24 - 1:46)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | const value = "foo" + `${cond ? "bar" : "baz"}`;
      |                        ~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-122 - 1]
@@ -1073,4 +1133,5 @@ Message: Template literal expression is unnecessary and can be simplified.
    1 | declare const b: string;
    2 | 'a' ?? `${b && 'c'}`;
      |         ~~~~~~~~~~~
+  Suggestion 1: [removeTemplateExpression] Remove the template literal and use the interpolated expression directly.
 ---

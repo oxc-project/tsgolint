@@ -1146,6 +1146,9 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 				constrainedType := utils.GetConstrainedTypeAtLocation(ctx.TypeChecker, expression)
 				actualType := ctx.TypeChecker.GetTypeAtLocation(expression)
+				if isInNarrowingAssignment(ctx, node, actualType, ctx.TypeChecker.GetTypeAtLocation(node)) {
+					return
+				}
 
 				constrainedTypeIsNullable := isNullableForNonNullAssertion(constrainedType)
 				actualTypeIsNullable := isNullableForNonNullAssertion(actualType)

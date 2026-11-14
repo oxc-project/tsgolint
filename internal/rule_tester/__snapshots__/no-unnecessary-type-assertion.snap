@@ -192,15 +192,6 @@ Message: This assertion is unnecessary since the receiver accepts the original t
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-22 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:26 - 3:27)
-Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
-   2 | const x: number | null = null;
-   3 | const y: number | null = x!;
-     |                          ~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-23 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:25 - 4:26)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | class Foo {
@@ -209,7 +200,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    5 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-24 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-23 - 1]
 Diagnostic 1: unnecessaryAssertion (5:6 - 5:7)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | class Mx {
@@ -218,7 +209,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |   private prop = 1;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-25 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-24 - 1]
 Diagnostic 1: contextuallyUnnecessary (9:20 - 9:28)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    8 | function Test(props: { id?: string | number }) {
@@ -227,7 +218,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
   10 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-26 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-25 - 1]
 Diagnostic 1: contextuallyUnnecessary (5:1 - 5:2)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    4 | y = x!;
@@ -236,16 +227,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    6 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-27 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:28 - 3:33)
-Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
-   2 | declare function foo(arg?: number): number | void;
-   3 | const bar: number | void = foo()!;
-     |                            ~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-28 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-26 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:16)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function foo(): number;
@@ -254,7 +236,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-29 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-27 - 1]
 Diagnostic 1: unnecessaryAssertion (2:11 - 2:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -263,7 +245,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-30 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-28 - 1]
 Diagnostic 1: unnecessaryAssertion (2:11 - 2:18)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -272,7 +254,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-31 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-29 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:25)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function foo(): number;
@@ -281,7 +263,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-32 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-30 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function foo(): number;
@@ -290,7 +272,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-33 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-31 - 1]
 Diagnostic 1: unnecessaryAssertion (4:2 - 4:12)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | declare function foo(): RT;
@@ -299,7 +281,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    5 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-34 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-32 - 1]
 Diagnostic 1: unnecessaryAssertion (3:14 - 3:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare const arr: object[];
@@ -308,7 +290,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-35 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-33 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:33)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -317,7 +299,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-36 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-34 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:40)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -326,7 +308,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-37 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-35 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 6:3)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | // Preserve the comment before as.
@@ -343,7 +325,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-38 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-36 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:42)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -352,7 +334,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-39 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-37 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:33)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -361,7 +343,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-40 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-38 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:38)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -370,7 +352,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-41 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-39 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:29)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -379,7 +361,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-42 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-40 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:35)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -388,7 +370,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-43 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-41 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:36)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -397,7 +379,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-44 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-42 - 1]
 Diagnostic 1: unnecessaryAssertion (2:13 - 2:35)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -406,7 +388,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-45 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-43 - 1]
 Diagnostic 1: unnecessaryAssertion (5:9 - 5:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 |   for (let i = 0; i < items.length; i++) {
@@ -415,25 +397,25 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |   }
 ---
 
+[TestNoUnnecessaryTypeAssertion/invalid-44 - 1]
+Diagnostic 1: unnecessaryAssertion (5:13 - 5:39)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | };
+   5 | const bar = foo.a as string | undefined;
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-45 - 1]
+Diagnostic 1: unnecessaryAssertion (5:13 - 5:39)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   4 | };
+   5 | const bar = foo.a as string | undefined;
+     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
 [TestNoUnnecessaryTypeAssertion/invalid-46 - 1]
-Diagnostic 1: unnecessaryAssertion (5:13 - 5:39)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   4 | };
-   5 | const bar = foo.a as string | undefined;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-47 - 1]
-Diagnostic 1: unnecessaryAssertion (5:13 - 5:39)
-Message: This assertion is unnecessary since it does not change the type of the expression.
-   4 | };
-   5 | const bar = foo.a as string | undefined;
-     |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   6 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-48 - 1]
 Diagnostic 1: unnecessaryAssertion (2:1 - 2:26)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -442,7 +424,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-49 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-47 - 1]
 Diagnostic 1: unnecessaryAssertion (3:1 - 3:2)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | var x = 1;
@@ -451,7 +433,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-50 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-48 - 1]
 Diagnostic 1: unnecessaryAssertion (4:3 - 4:4)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | {
@@ -460,7 +442,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    5 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-51 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-49 - 1]
 Diagnostic 1: unnecessaryAssertion (3:16 - 3:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | class T {
@@ -469,7 +451,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-52 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-50 - 1]
 Diagnostic 1: unnecessaryAssertion (5:16 - 5:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | class T {
@@ -478,7 +460,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-53 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-51 - 1]
 Diagnostic 1: unnecessaryAssertion (3:16 - 3:32)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | class T {
@@ -487,16 +469,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-54 - 1]
-Diagnostic 1: contextuallyUnnecessary (3:31 - 3:50)
-Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
-   2 | const a = '';
-   3 | const b: string | undefined = (a ? undefined : a)!;
-     |                               ~~~~~~~~~~~~~~~~~~~~
-   4 |       
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-55 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-52 - 1]
 Diagnostic 1: unnecessaryAssertion (8:11 - 8:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    7 | declare const a: T.Value1;
@@ -505,7 +478,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    9 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-56 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-53 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:22 - 3:25)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | const foo: unknown = {};
@@ -514,7 +487,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-57 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-54 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:5 - 4:8)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | const baz: unknown = {};
@@ -523,7 +496,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    5 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-58 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-55 - 1]
 Diagnostic 1: unnecessaryAssertion (7:3 - 7:13)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    6 | if (isString(foo)) {
@@ -532,7 +505,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    8 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-59 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-56 - 1]
 Diagnostic 1: unnecessaryAssertion (4:1 - 4:17)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | declare const bar: Promise<Foo>;
@@ -541,70 +514,70 @@ Message: This assertion is unnecessary since it does not change the type of the 
    5 |             
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-60 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-57 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = true as const;
      |           ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-61 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-58 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>true;
      |           ~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-62 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-59 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = 1 as const;
      |           ~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-63 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-60 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:18)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>1;
      |           ~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-64 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-61 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = 1n as const;
      |           ~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-65 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-62 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:19)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>1n;
      |           ~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-66 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-63 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = `a` as const;
      |           ~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-67 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-64 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:22)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = 'a' as const;
      |           ~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-68 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-65 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const a = <const>'a';
      |           ~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-69 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-66 - 1]
 Diagnostic 1: unnecessaryAssertion (3:16 - 3:27)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | class T {
@@ -613,7 +586,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-70 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-67 - 1]
 Diagnostic 1: unnecessaryAssertion (8:11 - 8:20)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    7 | declare const a: T.Value1;
@@ -622,7 +595,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    9 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-71 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-68 - 1]
 Diagnostic 1: unnecessaryAssertion (4:12 - 4:32)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | 
@@ -631,7 +604,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    5 | 
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-72 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-69 - 1]
 Diagnostic 1: unnecessaryAssertion (2:1 - 2:36)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -640,7 +613,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-73 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-70 - 1]
 Diagnostic 1: unnecessaryAssertion (2:1 - 2:21)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -649,7 +622,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-74 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-71 - 1]
 Diagnostic 1: unnecessaryAssertion (7:1 - 7:46)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    6 | 
@@ -658,7 +631,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    8 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-75 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-72 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:9 - 3:16)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | function doThing(a: number) {}
@@ -667,7 +640,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-76 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-73 - 1]
 Diagnostic 1: contextuallyUnnecessary (7:9 - 7:51)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    6 | function doThing(a: A) {}
@@ -676,14 +649,14 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    8 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-77 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-74 - 1]
 Diagnostic 1: unnecessaryAssertion (1:11 - 1:23)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | const x = 5 as any as 5;
      |           ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-78 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-75 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:32)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const v: number = 5;
@@ -692,7 +665,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-79 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-76 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:28)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const v: number = 5;
@@ -701,7 +674,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-80 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-77 - 1]
 Diagnostic 1: unnecessaryAssertion (2:11 - 2:34)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -710,7 +683,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-81 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-78 - 1]
 Diagnostic 1: unnecessaryAssertion (2:16 - 2:39)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    1 | 
@@ -719,7 +692,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    3 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-82 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-79 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:26)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const v: number = 5;
@@ -728,7 +701,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-83 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-80 - 1]
 Diagnostic 1: unnecessaryAssertion (3:14 - 3:34)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const obj = { id: '' };
@@ -737,7 +710,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-84 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-81 - 1]
 Diagnostic 1: unnecessaryAssertion (3:14 - 3:41)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const obj = { id: '' };
@@ -746,7 +719,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-85 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-82 - 1]
 Diagnostic 1: unnecessaryAssertion (3:14 - 3:45)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const obj = { id: '' };
@@ -755,7 +728,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-86 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-83 - 1]
 Diagnostic 1: unnecessaryAssertion (3:16 - 3:39)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const array = ['a', 'b'];
@@ -764,7 +737,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-87 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-84 - 1]
 Diagnostic 1: unnecessaryAssertion (3:16 - 3:43)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const array = ['a', 'b'];
@@ -773,7 +746,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-88 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-85 - 1]
 Diagnostic 1: contextuallyUnnecessary (7:4 - 7:12)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    6 | const a: A = 'a';
@@ -782,7 +755,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    8 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-89 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-86 - 1]
 Diagnostic 1: unnecessaryAssertion (5:11 - 5:38)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | }
@@ -791,7 +764,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-90 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-87 - 1]
 Diagnostic 1: unnecessaryAssertion (5:11 - 5:27)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | }
@@ -800,7 +773,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-91 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-88 - 1]
 Diagnostic 1: unnecessaryAssertion (5:25 - 5:54)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | }
@@ -809,7 +782,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-92 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-89 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:26)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(param: number): void;
@@ -818,7 +791,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-93 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-90 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:22)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(param: number): void;
@@ -827,7 +800,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-94 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-91 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:13 - 3:24)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(params: { param: number });
@@ -836,7 +809,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-95 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-92 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:13 - 3:21)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(params: { param: number });
@@ -845,7 +818,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-96 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-93 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:4 - 4:30)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | declare function fn(param: StringOrNumber);
@@ -854,7 +827,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    5 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-97 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-94 - 1]
 Diagnostic 1: contextuallyUnnecessary (5:12 - 5:32)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    4 | const data = { a: 1 };
@@ -863,7 +836,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    6 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-98 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-95 - 1]
 Diagnostic 1: contextuallyUnnecessary (5:9 - 7:20)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    4 | fn({
@@ -876,7 +849,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    8 | });
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-99 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-96 - 1]
 Diagnostic 1: unnecessaryAssertion (5:16 - 5:74)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    4 | declare const updatedColumn: Json;
@@ -885,7 +858,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    6 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-100 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-97 - 1]
 Diagnostic 1: contextuallyUnnecessary (6:12 - 6:23)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    5 | declare function fn<U extends T>(args: Pick<U, 'a'>): void;
@@ -894,7 +867,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-101 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-98 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:8 - 3:32)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function update<T extends string>(value: T): void;
@@ -903,7 +876,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-102 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-99 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:8 - 3:21)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function update<T extends string>(value: T): void;
@@ -912,7 +885,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-103 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-100 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:19)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(x: string[]): void;
@@ -921,7 +894,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-104 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-101 - 1]
 Diagnostic 1: contextuallyUnnecessary (6:16 - 6:29)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    5 | declare const chat: ChatMessage[];
@@ -930,7 +903,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-105 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-102 - 1]
 Diagnostic 1: contextuallyUnnecessary (6:16 - 6:29)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    5 | declare const chat: ChatMessage[];
@@ -939,7 +912,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-106 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-103 - 1]
 Diagnostic 1: unnecessaryAssertion (7:6 - 7:27)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    6 | function fn2<T extends Node>(node: T): void {
@@ -948,7 +921,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    8 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-107 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-104 - 1]
 Diagnostic 1: contextuallyUnnecessary (11:4 - 11:9)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
   10 | declare const a: A;
@@ -957,7 +930,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
   12 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-108 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-105 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:38 - 4:50)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | declare const b: readonly string[];
@@ -966,7 +939,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    5 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-109 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-106 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:4 - 4:18)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | declare const value: string | number;
@@ -975,7 +948,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    5 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-110 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-107 - 1]
 Diagnostic 1: contextuallyUnnecessary (12:6 - 12:16)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
   11 |   type: 'a',
@@ -984,7 +957,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
   13 | };
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-111 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-108 - 1]
 Diagnostic 1: contextuallyUnnecessary (12:6 - 12:16)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
   11 |   type: 'a',
@@ -993,7 +966,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
   13 | };
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-112 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-109 - 1]
 Diagnostic 1: contextuallyUnnecessary (5:7 - 5:17)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    4 | fn1(() => {
@@ -1002,7 +975,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    6 | });
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-113 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-110 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:4 - 4:22)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | declare function fn(value: Empty<string>): void;
@@ -1011,7 +984,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    5 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-114 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-111 - 1]
 Diagnostic 1: contextuallyUnnecessary (7:9 - 7:34)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    6 | const result: { item: Box<Empty<string>> } = identity({
@@ -1020,7 +993,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    8 | });
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-115 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-112 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:3 - 4:33)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | const callback: <T extends string>(value: T) => void =
@@ -1028,7 +1001,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-116 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-113 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:26 - 3:35)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | function f<T extends string>(value: string) {
@@ -1037,7 +1010,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-117 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-114 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:43)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(value: {}): void;
@@ -1046,7 +1019,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-118 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-115 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:28)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(value: void): void;
@@ -1055,7 +1028,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-119 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-116 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:28)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function fn(value: unknown): void;
@@ -1063,15 +1036,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |    ~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-120 - 1]
-Diagnostic 1: contextuallyUnnecessary (1:26 - 1:45)
-Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
-   1 | const x: string | null = 'a' as string | null;
-     |                          ~~~~~~~~~~~~~~~~~~~~
-   2 | void x;
----
-
-[TestNoUnnecessaryTypeAssertion/invalid-121 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-117 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:9 - 3:21)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function consume(value: unknown): void;
@@ -1086,7 +1051,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |                        ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-122 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-118 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:4 - 2:16)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | declare function f<T>(xs: string[], tag: T): void;
@@ -1094,7 +1059,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |    ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-123 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-119 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:4 - 3:16)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function f<T>(xs: StringsWithMeta<T>, tag: T): void;
@@ -1102,7 +1067,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |    ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-124 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-120 - 1]
 Diagnostic 1: contextuallyUnnecessary (4:4 - 4:16)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    3 | declare function f<T>(value: T): void;
@@ -1110,7 +1075,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |    ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-125 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-121 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:7 - 3:19)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | declare function f<T>(pair: readonly [T, string], tag: T): void;
@@ -1118,7 +1083,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |       ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-126 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-122 - 1]
 Diagnostic 1: unnecessaryAssertion (4:2 - 4:19)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | declare const value: AnyRecord;
@@ -1126,7 +1091,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |  ~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-127 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-123 - 1]
 Diagnostic 1: unnecessaryAssertion (3:10 - 3:30)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | function identity<T>(value: T): T {
@@ -1135,7 +1100,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-128 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-124 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:10 - 3:30)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | function upcast<T, U extends T>(value: U): T {
@@ -1144,7 +1109,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-129 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-125 - 1]
 Diagnostic 1: contextuallyUnnecessary (3:10 - 3:30)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    2 | function upcast<T, U extends T & { id: string }>(value: U): T {
@@ -1153,7 +1118,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    4 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-130 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-126 - 1]
 Diagnostic 1: unnecessaryAssertion (3:28 - 3:50)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | const alreadyNumber: number = 1;
@@ -1161,7 +1126,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |                            ~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-131 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-127 - 1]
 Diagnostic 1: unnecessaryAssertion (3:11 - 3:25)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | function unchanged(value: string) {
@@ -1170,7 +1135,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |   return value.length;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-132 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-128 - 1]
 Diagnostic 1: unnecessaryAssertion (4:27 - 4:48)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | const value = NumericEnum.a;
@@ -1178,7 +1143,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |                           ~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-133 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-129 - 1]
 Diagnostic 1: unnecessaryAssertion (4:25 - 4:56)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    3 | declare const value: NumericEnum | undefined;
@@ -1186,7 +1151,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-134 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-130 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:9 - 2:19)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | let value: number;
@@ -1194,7 +1159,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |         ~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-135 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-131 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:9 - 2:21)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | let value: string | undefined;
@@ -1203,7 +1168,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | console.log(value.length);
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-136 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-132 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:9 - 2:19)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | let value: unknown;
@@ -1211,7 +1176,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |         ~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-137 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-133 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:12 - 2:24)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | let value: string | undefined;
@@ -1219,7 +1184,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |            ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-138 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-134 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:23 - 2:35)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | let value: string | undefined;
@@ -1227,7 +1192,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |                       ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-139 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-135 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:12 - 2:26)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined) {
@@ -1236,7 +1201,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 |   return value.length;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-140 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-136 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:12 - 2:26)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined) {
@@ -1245,7 +1210,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 |   return value.length;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-141 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-137 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:23 - 2:37)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined, condition: boolean) {
@@ -1254,7 +1219,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-142 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-138 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:35 - 2:49)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined, condition: boolean) {
@@ -1263,7 +1228,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-143 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-139 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:28 - 2:40)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | let value: string | undefined;
@@ -1271,7 +1236,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
      |                            ~~~~~~~~~~~~~
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-144 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-140 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:30 - 2:44)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined) {
@@ -1280,7 +1245,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 |   return value.length;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-145 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-141 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:37 - 2:51)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined, condition: boolean) {
@@ -1289,7 +1254,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-146 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-142 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:26 - 2:40)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined, condition: boolean) {
@@ -1298,7 +1263,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-147 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-143 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:30 - 2:44)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined) {
@@ -1307,7 +1272,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 |   return value.length;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-148 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-144 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:30 - 2:44)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined) {
@@ -1316,7 +1281,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 |   return value.length;
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-149 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-145 - 1]
 Diagnostic 1: contextuallyUnnecessary (2:21 - 2:35)
 Message: This assertion is unnecessary since the receiver accepts the original type of the expression.
    1 | function narrow(value: string | undefined, other: string | undefined) {
@@ -1325,7 +1290,7 @@ Message: This assertion is unnecessary since the receiver accepts the original t
    3 | }
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-150 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-146 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:60)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    5 | declare const db: Storage;
@@ -1334,7 +1299,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-151 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-147 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:72)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    5 | declare const db: Storage;
@@ -1343,7 +1308,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-152 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-148 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:62)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    5 | declare const db: Storage;
@@ -1352,7 +1317,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-153 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-149 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:61)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    5 | declare const db: Storage;
@@ -1361,7 +1326,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-154 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-150 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (6:17 - 6:62)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    5 | declare const db: Storage;
@@ -1370,7 +1335,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    7 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-155 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-151 - 1]
 Diagnostic 1: unnecessaryAssertion (3:15 - 3:37)
 Message: This assertion is unnecessary since it does not change the type of the expression.
    2 | declare function get<T>(): T;
@@ -1379,7 +1344,7 @@ Message: This assertion is unnecessary since it does not change the type of the 
    4 |       
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-156 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-152 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (19:18 - 19:75)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
   18 | 
@@ -1388,7 +1353,7 @@ Message: The type arguments for this generic call may be inferred from the asser
   20 |         
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-157 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-153 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (5:18 - 5:58)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    4 | export async function main() {
@@ -1397,7 +1362,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    6 |   return { ...actual };
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-158 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-154 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (4:18 - 4:56)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    3 | export async function main() {
@@ -1406,7 +1371,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    5 |   return { ...actual };
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-159 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-155 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (3:15 - 3:35)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    2 | function get() { throw new Error(); }
@@ -1415,7 +1380,7 @@ Message: The type arguments for this generic call may be inferred from the asser
    4 | 
 ---
 
-[TestNoUnnecessaryTypeAssertion/invalid-160 - 1]
+[TestNoUnnecessaryTypeAssertion/invalid-156 - 1]
 Diagnostic 1: contextuallyInferredTypeArguments (3:10 - 5:26)
 Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
    2 | export function buttons() {
@@ -1433,6 +1398,38 @@ Message: The type arguments for this generic call may be inferred from the asser
    9 |   return el.closest('[data-id]') as HTMLElement | null;
      |          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   10 | }
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-157 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:27)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function f<T>(x: T): T;
+   3 | const value = f() as string;
+     |               ~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-158 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:27)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function f(): string;
+   3 | const value = f() as string;
+     |               ~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-159 - 1]
+Diagnostic 1: unnecessaryAssertion (3:15 - 3:35)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   2 | declare function f<T>(x: T): Promise<T>;
+   3 | const value = (await f()) as string;
+     |               ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertion/invalid-160 - 1]
+Diagnostic 1: contextuallyInferredTypeArguments (3:15 - 3:34)
+Message: The type arguments for this generic call may be inferred from the assertion. Specify them explicitly instead.
+   2 | declare function f<T>(key: string): T;
+   3 | const value = f('value') as string;
+     |               ~~~~~~~~~~~~~~~~~~~~
 ---
 
 [TestNoUnnecessaryTypeAssertion/invalid-161 - 1]
@@ -1538,6 +1535,22 @@ Message: This assertion is unnecessary since it does not change the type of the 
    2 | <number>async
      | ~~~~~~~~~~~~~
    3 | function named() {}
+---
+
+[TestNoUnnecessaryTypeAssertionDeclarationNarrowing/invalid-0 - 1]
+Diagnostic 1: unnecessaryAssertion (2:35 - 2:40)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | declare const value: string;
+   2 | const label: string | undefined = value!;
+     |                                   ~~~~~~
+---
+
+[TestNoUnnecessaryTypeAssertionDeclarationNarrowing/invalid-1 - 1]
+Diagnostic 1: unnecessaryAssertion (2:35 - 2:49)
+Message: This assertion is unnecessary since it does not change the type of the expression.
+   1 | declare const value: string;
+   2 | const label: string | undefined = value as string;
+     |                                   ~~~~~~~~~~~~~~~
 ---
 
 [TestNoUnnecessaryTypeAssertionUpstreamReporting/invalid-0 - 1]

@@ -183,11 +183,19 @@ func isInNarrowingAssignment(ctx rule.RuleContext, node *ast.Node, uncastType, c
 			}
 			continue
 		}
-		if !ast.IsAssignmentExpression(parent, true) || parent.AsBinaryExpression().Right != current {
+		var left *ast.Node
+		if ast.IsVariableDeclaration(parent) && parent.Initializer() == current {
+			if inLiteral || parent.Type() == nil {
+				return false
+			}
+			// An annotated declaration narrows its binding just like an assignment.
+			left = parent.Type()
+		} else if ast.IsAssignmentExpression(parent, true) && parent.AsBinaryExpression().Right == current {
+			left = ast.SkipParentheses(parent.AsBinaryExpression().Left)
+		} else {
 			return false
 		}
 
-		left := ast.SkipParentheses(parent.AsBinaryExpression().Left)
 		var receiverType *checker.Type
 		if inLiteral {
 			if !ast.IsAssignmentPattern(left) {
