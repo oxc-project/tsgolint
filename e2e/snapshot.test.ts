@@ -356,6 +356,71 @@ describe('TSGoLint E2E Snapshot Tests', () => {
     expect(diagnostics.length).toBe(0);
   });
 
+  it('preserves inferred types and comparison results when applying safe fixes', async () => {
+    const directory = await fs.mkdtemp(join(tmpdir(), 'tsgolint-fix-safety-'));
+    try {
+      const file = join(directory, 'index.ts');
+      const source = `
+type UserId = string & { readonly __brand: 'UserId' };
+export function labels(mode: 'light' | 'dark', id: UserId, maybe: string | undefined) {
+  let label = \`\${mode}\`;
+  label = 'auto';
+  let userLabel = \`\${id}\`;
+  userLabel = 'guest';
+  const name: string | undefined = maybe!;
+  const other: string | undefined = maybe as string;
+  return [label, userLabel, name.length, other.length];
+}
+const xs: number[] = [NaN];
+const ys: (string | undefined)[] = [, 'a'];
+console.log(xs.indexOf(NaN) !== -1);
+console.log(ys.indexOf(undefined) !== -1);
+export function unchanged(value: string) { return value as string; }
+`;
+      await fs.writeFile(file, source);
+      await fs.writeFile(
+        join(directory, 'tsconfig.json'),
+        JSON.stringify({ compilerOptions: { strict: true, noEmit: true, target: 'esnext', module: 'nodenext' } }),
+      );
+      const typeCheck = () =>
+        execFileSync(process.execPath, [join(E2E_DIR, 'node_modules/typescript/bin/tsc'), '-p', directory]);
+      const run = () => execFileSync(process.execPath, [file], { encoding: 'utf8' });
+      typeCheck();
+      expect(run()).toBe('false\nfalse\n');
+
+      const config = generateConfig([file], [
+        'no-unnecessary-template-expression',
+        'no-unnecessary-type-assertion',
+        'prefer-includes',
+      ]);
+      const diagnostics = parseHeadlessOutput(execFileSync(TSGOLINT_BIN, ['headless', '-fix'], { input: config }));
+      const fixes = diagnostics.flatMap(diagnostic =>
+        diagnostic.kind === DiagnosticKind.Rule ? diagnostic.fixes ?? [] : []
+      );
+      expect(fixes).toHaveLength(1);
+      let fixed = source;
+      for (const fix of fixes.toSorted((a, b) => b.range.pos - a.range.pos)) {
+        fixed = fixed.slice(0, fix.range.pos) + fix.text + fixed.slice(fix.range.end);
+      }
+      expect(fixed).toBe(source.replace('return value as string;', 'return value;'));
+      await fs.writeFile(file, fixed);
+      typeCheck();
+      expect(run()).toBe('false\nfalse\n');
+
+      const suggestions = parseHeadlessOutput(
+        execFileSync(TSGOLINT_BIN, ['headless', '-fix-suggestions'], { input: config }),
+      );
+      expect(suggestions).toHaveLength(4);
+      for (const diagnostic of suggestions) {
+        expect(diagnostic.kind).toBe(DiagnosticKind.Rule);
+        expect(diagnostic).not.toHaveProperty('fixes');
+        expect((diagnostic as RuleDiagnostic).suggestions).toHaveLength(1);
+      }
+    } finally {
+      await fs.rm(directory, { recursive: true, force: true });
+    }
+  });
+
   it.runIf(process.platform === 'win32')(
     'should not panic with mixed forward/backslash paths from Rust (issue #143)',
     async () => {

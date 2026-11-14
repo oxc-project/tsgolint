@@ -11,6 +11,19 @@ func TestNoUnnecessaryTypeAssertion(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnnecessaryTypeAssertionRule, []rule_tester.ValidTestCase{
 		{Code: `
+const x: number | null = null;
+const y: number | null = x!;
+`},
+		{Code: `
+declare function foo(arg?: number): number | void;
+const bar: number | void = foo()!;
+`},
+		{Code: `
+const a = '';
+const b: string | undefined = (a ? undefined : a)!;
+`},
+		{Code: "const x: string | null = 'a' as string | null;\nvoid x;"},
+		{Code: `
 import { TSESTree } from '@typescript-eslint/utils';
 declare const member: TSESTree.TSEnumMember;
 if (
@@ -2020,26 +2033,6 @@ nonNull(s);
 		{
 			Code: `
 const x: number | null = null;
-const y: number | null = x!;
-      `,
-			Output: []string{`
-const x: number | null = null;
-const y: number | null = x;
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      3,
-					Column:    26,
-					EndLine:   3,
-					EndColumn: 28,
-				},
-			},
-		},
-		{
-			Code: `
-const x: number | null = null;
 class Foo {
   prop: number | null = x!;
 }
@@ -2145,26 +2138,6 @@ y = 0;
 					Column:    1,
 					EndLine:   5,
 					EndColumn: 3,
-				},
-			},
-		},
-		{
-			Code: `
-declare function foo(arg?: number): number | void;
-const bar: number | void = foo()!;
-      `,
-			Output: []string{`
-declare function foo(arg?: number): number | void;
-const bar: number | void = foo();
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      3,
-					Column:    28,
-					EndLine:   3,
-					EndColumn: 34,
 				},
 			},
 		},
@@ -2695,26 +2668,6 @@ class T {
 					Column:    16,
 					EndLine:   3,
 					EndColumn: 33,
-				},
-			},
-		},
-		{
-			Code: `
-const a = '';
-const b: string | undefined = (a ? undefined : a)!;
-      `,
-			Output: []string{`
-const a = '';
-const b: string | undefined = (a ? undefined : a);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      3,
-					Column:    31,
-					EndLine:   3,
-					EndColumn: 51,
 				},
 			},
 		},
@@ -4098,19 +4051,6 @@ fn((() => {})());`},
 					Column:    4,
 					EndLine:   3,
 					EndColumn: 29,
-				},
-			},
-		},
-		{
-			Code:   "const x: string | null = 'a' as string | null;\nvoid x;",
-			Output: []string{"const x: string | null = 'a';\nvoid x;"},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      1,
-					Column:    26,
-					EndLine:   1,
-					EndColumn: 46,
 				},
 			},
 		},

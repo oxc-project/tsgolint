@@ -518,7 +518,16 @@ var PreferIncludesRule = rule.Rule{
 					})
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferIncludesMessage(), func() []rule.RuleFix { return fixes })
+				// Unlike indexOf, includes finds NaN and treats array holes as undefined.
+				ctx.ReportNodeWithSuggestions(node, buildPreferIncludesMessage(), func() []rule.RuleSuggestion {
+					return []rule.RuleSuggestion{{
+						Message: rule.RuleMessage{
+							Id:          "useIncludes",
+							Description: "Use includes() to check whether the value is present.",
+						},
+						FixesArr: fixes,
+					}}
+				})
 			},
 		}
 	},
