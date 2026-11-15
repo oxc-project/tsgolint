@@ -5446,6 +5446,34 @@ Message: Prefer using an optional chain expression instead, as it's more concise
 ---
 
 [TestPreferOptionalChainRule/invalid-608 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:43)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const c: { kind: string } | null | undefined;
+   3 |           c != null && c.kind === "refused";
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         
+---
+
+[TestPreferOptionalChainRule/invalid-609 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:30)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const b: { kind: string } | null;
+   3 |           b !== null && b.kind;
+     |           ~~~~~~~~~~~~~~~~~~~~
+   4 |         
+  Suggestion 1: [optionalChainSuggest] Change to an optional chain.
+---
+
+[TestPreferOptionalChainRule/invalid-610 - 1]
+Diagnostic 1: preferOptionalChain (3:11 - 3:63)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   2 |           declare const c: { kind: string } | null | undefined;
+   3 |           c !== null && c !== undefined && c.kind === "refused";
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         
+---
+
+[TestPreferOptionalChainRule/invalid-611 - 1]
 Diagnostic 1: preferOptionalChain (7:11 - 7:27)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    6 |       const g = ref.current;
@@ -5463,7 +5491,7 @@ Message: Prefer using an optional chain expression instead, as it's more concise
   Suggestion 1: [optionalChainSuggest] Change to an optional chain.
 ---
 
-[TestPreferOptionalChainRule/invalid-609 - 1]
+[TestPreferOptionalChainRule/invalid-612 - 1]
 Diagnostic 1: preferOptionalChain (2:37 - 2:50)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | declare const foo: { bar: string } | undefined;
@@ -5471,7 +5499,7 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      |                                     ~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-610 - 1]
+[TestPreferOptionalChainRule/invalid-613 - 1]
 Diagnostic 1: preferOptionalChain (2:52 - 2:65)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | declare const foo: { bar: string } | undefined;
@@ -5479,7 +5507,7 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      |                                                    ~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-611 - 1]
+[TestPreferOptionalChainRule/invalid-614 - 1]
 Diagnostic 1: preferOptionalChain (2:59 - 2:72)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | declare const foo: { bar: string } | undefined;
@@ -5487,7 +5515,7 @@ Message: Prefer using an optional chain expression instead, as it's more concise
      |                                                           ~~~~~~~~~~~~~~
 ---
 
-[TestPreferOptionalChainRule/invalid-612 - 1]
+[TestPreferOptionalChainRule/invalid-615 - 1]
 Diagnostic 1: preferOptionalChain (2:35 - 2:48)
 Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
    1 | declare const foo: { bar: string } | undefined;
