@@ -65,6 +65,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:11)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${    'a'    }`;
      |  ~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-9 - 1]
@@ -72,6 +73,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:11)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${    "a"    }`;
      |  ~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-10 - 1]
@@ -244,6 +246,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:7)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'`'}`;
      |  ~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-29 - 1]
@@ -686,6 +689,7 @@ Diagnostic 5: noUnnecessaryTemplateExpression (1:15 - 1:19)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | ` $${`${''}${`${``}`}`}${`{a}`} `;
      |               ~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-80 - 1]
@@ -788,6 +792,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:12)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'\u00E5'}`;
      |  ~~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-89 - 1]
@@ -795,6 +800,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:8)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'\n'}`;
      |  ~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-90 - 1]
@@ -896,6 +902,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |           `${arg}`;
      |            ~~~~~~
    4 |         }
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-102 - 1]
@@ -923,6 +930,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |         `${   string   }`;
      |          ~~~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-105 - 1]
@@ -932,6 +940,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |         `${string}`;
      |          ~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-106 - 1]
@@ -941,6 +950,7 @@ Message: Template literal expression is unnecessary and can be simplified.
    3 |         `${intersection}`;
      |          ~~~~~~~~~~~~~~~
    4 |       
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-107 - 1]
@@ -948,6 +958,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:9 - 1:23)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | true ? `${'test' || ''}`.trim() : undefined;
      |         ~~~~~~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-108 - 1]
@@ -1050,6 +1061,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:2 - 1:18)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | `${'abc' || 'def'}`[0];
      |  ~~~~~~~~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-121 - 1]
@@ -1057,6 +1069,7 @@ Diagnostic 1: noUnnecessaryTemplateExpression (1:24 - 1:46)
 Message: Template literal expression is unnecessary and can be simplified.
    1 | const value = "foo" + `${cond ? "bar" : "baz"}`;
      |                        ~~~~~~~~~~~~~~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---
 
 [TestNoUnnecessaryTemplateExpressionRule/invalid-122 - 1]
@@ -1073,4 +1086,25 @@ Message: Template literal expression is unnecessary and can be simplified.
    1 | declare const b: string;
    2 | 'a' ?? `${b && 'c'}`;
      |         ~~~~~~~~~~~
+  Suggestion 1: [suggestRemove] Remove the template literal.
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-124 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (4:14 - 4:20)
+Message: Template literal expression is unnecessary and can be simplified.
+   3 | 
+   4 | let label = `${mode}`;
+     |              ~~~~~~~
+   5 | label = 'auto';
+  Suggestion 1: [suggestRemove] Remove the template literal.
+---
+
+[TestNoUnnecessaryTemplateExpressionRule/invalid-125 - 1]
+Diagnostic 1: noUnnecessaryTemplateExpression (5:14 - 5:18)
+Message: Template literal expression is unnecessary and can be simplified.
+   4 | 
+   5 | let label = `${id}`;
+     |              ~~~~~
+   6 | label = 'guest';
+  Suggestion 1: [suggestRemove] Remove the template literal.
 ---

@@ -355,20 +355,24 @@ function foo<T extends string>() {
 			},
 		},
 		{
-			Code:   "`${    'a'    }`;",
-			Output: []string{"'a';"},
+			Code: "`${    'a'    }`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "'a';"},
+					},
 				},
 			},
 		},
 		{
-			Code:   "`${    \"a\"    }`;",
-			Output: []string{"\"a\";"},
+			Code: "`${    \"a\"    }`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "\"a\";"},
+					},
 				},
 			},
 		},
@@ -629,11 +633,13 @@ function foo<T extends string>() {
 			},
 		},
 		{
-			Code:   "`${'`'}`;",
-			Output: []string{"'`';"},
+			Code: "`${'`'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "'`';"},
+					},
 				},
 			},
 		},
@@ -1147,6 +1153,9 @@ function foo<T extends string>() {
 				},
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "` $${`${''}${``}`}${`{a}`} `;"},
+					},
 				},
 			},
 		},
@@ -1246,20 +1255,24 @@ function foo<T extends string>() {
 			},
 		},
 		{
-			Code:   "`${'\\u00E5'}`;",
-			Output: []string{"'\\u00E5';"},
+			Code: "`${'\\u00E5'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "'\\u00E5';"},
+					},
 				},
 			},
 		},
 		{
-			Code:   "`${'\\n'}`;",
-			Output: []string{"'\\n';"},
+			Code: "`${'\\n'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "'\\n';"},
+					},
 				},
 			},
 		},
@@ -1403,18 +1416,19 @@ this code has trailing position template expression but it isn\'t whitespace
           ` + "`" + `${arg}` + "`" + `;
         }
       `,
-			Output: []string{`
-        function func<T extends string>(arg: T) {
-          arg;
-        }
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
 					Line:      3,
 					Column:    12,
 					EndColumn: 18,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `
+        function func<T extends string>(arg: T) {
+          arg;
+        }
+      `},
+					},
 				},
 			},
 		},
@@ -1458,14 +1472,15 @@ declare const nested: string, interpolation: string;
         declare const string: 'a';
         ` + "`" + `${   string   }` + "`" + `;
       `,
-			Output: []string{`
-        declare const string: 'a';
-        string;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `
+        declare const string: 'a';
+        string;
+      `},
+					},
 				},
 			},
 		},
@@ -1474,17 +1489,18 @@ declare const nested: string, interpolation: string;
         declare const string: 'a';
         ` + "`" + `${string}` + "`" + `;
       `,
-			Output: []string{`
-        declare const string: 'a';
-        string;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
 					Line:      3,
 					Column:    10,
 					EndColumn: 19,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `
+        declare const string: 'a';
+        string;
+      `},
+					},
 				},
 			},
 		},
@@ -1493,26 +1509,29 @@ declare const nested: string, interpolation: string;
         declare const intersection: string & { _brand: 'test-brand' };
         ` + "`" + `${intersection}` + "`" + `;
       `,
-			Output: []string{`
-        declare const intersection: string & { _brand: 'test-brand' };
-        intersection;
-      `,
-			},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
 					Line:      3,
 					Column:    10,
 					EndColumn: 25,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `
+        declare const intersection: string & { _brand: 'test-brand' };
+        intersection;
+      `},
+					},
 				},
 			},
 		},
 		{
-			Code:   "true ? `${'test' || ''}`.trim() : undefined;",
-			Output: []string{"true ? ('test' || '').trim() : undefined;"},
+			Code: "true ? `${'test' || ''}`.trim() : undefined;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "true ? ('test' || '').trim() : undefined;"},
+					},
 				},
 			},
 		},
@@ -1658,20 +1677,24 @@ type Bar = Foo;
 			},
 		},
 		{
-			Code:   "`${'abc' || 'def'}`[0];",
-			Output: []string{"('abc' || 'def')[0];"},
+			Code: "`${'abc' || 'def'}`[0];",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "('abc' || 'def')[0];"},
+					},
 				},
 			},
 		},
 		{
-			Code:   `const value = "foo" + ` + "`" + `${cond ? "bar" : "baz"}` + "`" + `;`,
-			Output: []string{`const value = "foo" + (cond ? "bar" : "baz");`},
+			Code: `const value = "foo" + ` + "`" + `${cond ? "bar" : "baz"}` + "`" + `;`,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `const value = "foo" + (cond ? "bar" : "baz");`},
+					},
 				},
 			},
 		},
@@ -1685,11 +1708,67 @@ type Bar = Foo;
 			},
 		},
 		{
-			Code:   "declare const b: string;\n'a' ?? `${b && 'c'}`;",
-			Output: []string{"declare const b: string;\n'a' ?? (b && 'c');"},
+			Code: "declare const b: string;\n'a' ?? `${b && 'c'}`;",
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "noUnnecessaryTemplateExpression",
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: "declare const b: string;\n'a' ?? (b && 'c');"},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+declare const mode: 'light' | 'dark';
+
+let label = ` + "`" + `${mode}` + "`" + `;
+label = 'auto';
+export {};
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noUnnecessaryTemplateExpression",
+					Line:      4,
+					Column:    14,
+					EndColumn: 21,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `
+declare const mode: 'light' | 'dark';
+
+let label = mode;
+label = 'auto';
+export {};
+      `},
+					},
+				},
+			},
+		},
+		{
+			Code: `
+type UserId = string & { readonly __brand: 'UserId' };
+declare const id: UserId;
+
+let label = ` + "`" + `${id}` + "`" + `;
+label = 'guest';
+export {};
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "noUnnecessaryTemplateExpression",
+					Line:      5,
+					Column:    14,
+					EndColumn: 19,
+					Suggestions: []rule_tester.InvalidTestCaseSuggestion{
+						{MessageId: "suggestRemove", Output: `
+type UserId = string & { readonly __brand: 'UserId' };
+declare const id: UserId;
+
+let label = id;
+label = 'guest';
+export {};
+      `},
+					},
 				},
 			},
 		},
