@@ -78,6 +78,7 @@ Message: Use 'includes()' method instead.
    3 |           a?.indexOf(b) === -1;
      |           ~~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-9 - 1]
@@ -87,6 +88,7 @@ Message: Use 'includes()' method instead.
    3 |           a?.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-10 - 1]
@@ -141,6 +143,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-16 - 1]
@@ -150,6 +153,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-17 - 1]
@@ -159,6 +163,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-18 - 1]
@@ -168,6 +173,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-19 - 1]
@@ -177,6 +183,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-20 - 1]
@@ -186,6 +193,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-21 - 1]
@@ -195,6 +203,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-22 - 1]
@@ -204,6 +213,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-23 - 1]
@@ -213,6 +223,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-24 - 1]
@@ -222,6 +233,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-25 - 1]
@@ -231,6 +243,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-26 - 1]
@@ -240,6 +253,7 @@ Message: Use 'includes()' method instead.
   16 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
   17 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-27 - 1]
@@ -249,6 +263,7 @@ Message: Use 'includes()' method instead.
    7 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    8 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-28 - 1]
@@ -258,6 +273,7 @@ Message: Use 'includes()' method instead.
    3 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    4 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-29 - 1]
@@ -267,6 +283,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-30 - 1]
@@ -276,6 +293,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-31 - 1]
@@ -285,6 +303,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-32 - 1]
@@ -294,6 +313,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-33 - 1]
@@ -303,6 +323,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-34 - 1]
@@ -312,6 +333,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-35 - 1]
@@ -321,6 +343,7 @@ Message: Use 'includes()' method instead.
    8 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    9 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-36 - 1]
@@ -330,6 +353,7 @@ Message: Use 'includes()' method instead.
    4 |           a.indexOf(b) !== -1;
      |           ~~~~~~~~~~~~~~~~~~~
    5 |         }
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
 ---
 
 [TestPreferIncludesRule/invalid-37 - 1]
@@ -501,4 +525,45 @@ Diagnostic 1: preferStringIncludes (1:63 - 1:71)
 Message: Use `String#includes()` method with a string instead.
    1 | function f(a: string) { const p = new RegExp('a\\\\b\uD800'); p.test(a); }
      |                                                               ~~~~~~~~~
+---
+
+[TestPreferIncludesRule/invalid-58 - 1]
+Diagnostic 1: preferIncludes (3:9 - 3:30)
+Message: Use 'includes()' method instead.
+   2 |         const xs: number[] = [NaN];
+   3 |         xs.indexOf(NaN) !== -1;
+     |         ~~~~~~~~~~~~~~~~~~~~~~
+   4 | 
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
+
+Diagnostic 2: preferIncludes (6:9 - 6:36)
+Message: Use 'includes()' method instead.
+   5 |         const ys: (string | undefined)[] = [, 'a'];
+   6 |         ys.indexOf(undefined) !== -1;
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |       
+  Suggestion 1: [preferIncludesSuggestion] Use 'includes()' method instead.
+---
+
+[TestPreferIncludesRule/invalid-59 - 1]
+Diagnostic 1: preferIncludes (4:11 - 4:31)
+Message: Use 'includes()' method instead.
+   3 |         function f<T extends string>(a: 'foo' | 'bar', b: Id, c: T): void {
+   4 |           a.indexOf('o') !== -1;
+     |           ~~~~~~~~~~~~~~~~~~~~~
+   5 |           b.indexOf('x') === -1;
+
+Diagnostic 2: preferIncludes (5:11 - 5:31)
+Message: Use 'includes()' method instead.
+   4 |           a.indexOf('o') !== -1;
+   5 |           b.indexOf('x') === -1;
+     |           ~~~~~~~~~~~~~~~~~~~~~
+   6 |           c.indexOf('y') >= 0;
+
+Diagnostic 3: preferIncludes (6:11 - 6:29)
+Message: Use 'includes()' method instead.
+   5 |           b.indexOf('x') === -1;
+   6 |           c.indexOf('y') >= 0;
+     |           ~~~~~~~~~~~~~~~~~~~
+   7 |         }
 ---

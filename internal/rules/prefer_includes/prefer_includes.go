@@ -20,6 +20,13 @@ func buildPreferIncludesMessage() rule.RuleMessage {
 	}
 }
 
+func buildPreferIncludesSuggestionMessage() rule.RuleMessage {
+	return rule.RuleMessage{
+		Id:          "preferIncludesSuggestion",
+		Description: "Use 'includes()' method instead.",
+	}
+}
+
 func buildPreferStringIncludesMessage() rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "preferStringIncludes",
@@ -518,7 +525,9 @@ var PreferIncludesRule = rule.Rule{
 					})
 				}
 
-				ctx.ReportNodeWithFixes(node, buildPreferIncludesMessage(), func() []rule.RuleFix { return fixes })
+				receiverType := ctx.TypeChecker.GetTypeAtLocation(propAccess.Expression)
+				useAutoFix := utils.GetTypeName(ctx.TypeChecker, receiverType) == "string"
+				rule.ReportNodeWithFixesOrSuggestions(ctx, node, useAutoFix, buildPreferIncludesMessage(), buildPreferIncludesSuggestionMessage(), fixes...)
 			},
 		}
 	},
