@@ -5613,6 +5613,184 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
 ]
 `;
 
+exports[`TSGoLint E2E Snapshot Tests > should report global diagnostics against each tsconfig (oxc-project/oxc#27499) 1`] = `
+[
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Array'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Boolean'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'CallableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Function'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'IArguments'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'NewableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Number'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Object'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'RegExp'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'String'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Array'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Boolean'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'CallableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Function'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'IArguments'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'NewableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Number'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Object'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'RegExp'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'String'.",
+      "id": "TS2318",
+    },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should report global diagnostics discovered during checking against the tsconfig (oxc-project/oxc#27499) 1`] = `
+[
+  {
+    "file_path": "fixtures/global-and-declaration-diagnostics/checked-globals/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Disposable'.",
+      "id": "TS2318",
+    },
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should report syntactic issues 1`] = `
 [
   {
