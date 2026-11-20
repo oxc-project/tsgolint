@@ -19,19 +19,20 @@ func getDestructuringDefault(target *ast.Node, propertyPath []string) *ast.Node 
 	for i := len(propertyPath) - 1; i >= 0; i-- {
 		target = ast.SkipParentheses(target)
 		var element *ast.Node
-		if ast.IsArrayLiteralExpression(target) {
+		if ast.IsArrayLiteralExpression(target) || ast.IsArrayBindingPattern(target) {
 			index, err := strconv.Atoi(propertyPath[i])
-			elements := target.AsArrayLiteralExpression().Elements.Nodes
+			elements := ast.GetElementsOfBindingOrAssignmentPattern(target)
 			if err != nil || index < 0 || index >= len(elements) {
 				return nil
 			}
 			element = elements[index]
-		} else if ast.IsObjectLiteralExpression(target) {
-			for _, property := range target.AsObjectLiteralExpression().Properties.Nodes {
-				if ast.IsSpreadAssignment(property) || property.Name() == nil {
+		} else if ast.IsObjectLiteralExpression(target) || ast.IsObjectBindingPattern(target) {
+			for _, property := range ast.GetElementsOfBindingOrAssignmentPattern(target) {
+				propertyName := property.PropertyNameOrName()
+				if ast.IsSpreadAssignment(property) || (ast.IsBindingElement(property) && property.AsBindingElement().DotDotDotToken != nil) || propertyName == nil {
 					continue
 				}
-				name, known := ast.TryGetTextOfPropertyName(property.Name())
+				name, known := ast.TryGetTextOfPropertyName(propertyName)
 				if !known {
 					return nil
 				}
@@ -49,6 +50,9 @@ func getDestructuringDefault(target *ast.Node, propertyPath []string) *ast.Node 
 			return nil
 		}
 		if i == 0 {
+			if ast.IsBindingElement(element) {
+				return element.Initializer()
+			}
 			if ast.IsShorthandPropertyAssignment(element) {
 				return element.AsShorthandPropertyAssignment().ObjectAssignmentInitializer
 			}
@@ -183,14 +187,18 @@ func isInNarrowingAssignment(ctx rule.RuleContext, node *ast.Node, uncastType, c
 			}
 			continue
 		}
-		if !ast.IsAssignmentExpression(parent, true) || parent.AsBinaryExpression().Right != current {
+		var left *ast.Node
+		if ast.IsAssignmentExpression(parent, true) && parent.AsBinaryExpression().Right == current {
+			left = ast.SkipParentheses(parent.AsBinaryExpression().Left)
+		} else if ast.IsVariableDeclaration(parent) && parent.Initializer() == current {
+			left = parent.Name()
+		} else {
 			return false
 		}
 
-		left := ast.SkipParentheses(parent.AsBinaryExpression().Left)
 		var receiverType *checker.Type
 		if inLiteral {
-			if !ast.IsAssignmentPattern(left) {
+			if !ast.IsAssignmentPattern(left) && !ast.IsBindingPattern(left) {
 				return false
 			}
 			// Destructuring context supplies the type of the corresponding target.
@@ -218,7 +226,11 @@ func isInNarrowingAssignment(ctx rule.RuleContext, node *ast.Node, uncastType, c
 		// same union members reachable can still be reported as unnecessary.
 		uncastReduced := checker.Checker_getAssignmentReducedType(ctx.TypeChecker, receiverType, uncastType)
 		castReduced := checker.Checker_getAssignmentReducedType(ctx.TypeChecker, receiverType, castType)
-		return !checker.Checker_isTypeIdenticalTo(ctx.TypeChecker, uncastReduced, castReduced)
+		if checker.Checker_isTypeIdenticalTo(ctx.TypeChecker, uncastReduced, castReduced) {
+			return false
+		}
+		// Keep reporting declaration assertions that only widen later reads, as typescript-eslint does.
+		return !ast.IsVariableDeclaration(parent) || !checker.Checker_isTypeAssignableTo(ctx.TypeChecker, uncastReduced, castReduced)
 	}
 	return false
 }

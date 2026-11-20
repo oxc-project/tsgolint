@@ -882,7 +882,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 
 		shouldSkipContextualTypeFallback := func(node *ast.Node, castIsAny bool, uncastType, castType *checker.Type) bool {
 			parent := parentThroughParens(node)
-			// An assignment can narrow the receiver for subsequent statements.
+			// An assignment or declaration can narrow the receiver for subsequent statements.
 			// Accepting the original type does not make that narrowing unnecessary.
 			if isInNarrowingAssignment(ctx, node, uncastType, castType) {
 				return true
@@ -1198,7 +1198,8 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 						isValidNull := !typeIncludesNull || contextualTypeIncludesNull
 						isValidVoid := !typeIncludesVoid || contextualTypeIncludesVoid
 
-						if isValidUndefined && isValidNull && isValidVoid {
+						if isValidUndefined && isValidNull && isValidVoid &&
+							!isInNarrowingAssignment(ctx, node, actualType, ctx.TypeChecker.GetTypeAtLocation(node)) {
 							exclamationRange := getExclamationTokenRange()
 							ctx.ReportDiagnosticWithFixes(buildContextuallyUnnecessaryMessage(assertionRange(ctx, node)), func() []rule.RuleFix { return []rule.RuleFix{buildRemoveExclamationFix(exclamationRange)} })
 						}

@@ -1464,6 +1464,49 @@ function narrow(value: string | undefined, a: string | undefined, b: string | un
   return b.length;
 }
 `},
+		// Declaration narrowing from #1361
+		{Code: `
+function narrow(value: string | undefined) {
+  const narrowed: string | undefined = value!;
+  return narrowed.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  const narrowed: string | undefined = value as string;
+  return narrowed.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined, condition: boolean) {
+  let narrowed: string | undefined = condition ? (value as string) : '';
+  return narrowed.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  const [narrowed]: [string | undefined] = [value as string];
+  return narrowed.length;
+}
+`},
+		{Code: `
+function narrow(value: string | undefined) {
+  const { narrowed }: { narrowed: string | undefined } = { narrowed: value as string };
+  return narrowed.length;
+}
+`},
+		{Code: `
+const x: number | null = null;
+const y: number | null = x!;
+      `},
+		{Code: `
+declare function foo(arg?: number): number | void;
+const bar: number | void = foo()!;
+      `},
+		{Code: `
+const a = '';
+const b: string | undefined = (a ? undefined : a)!;
+      `},
 		// Assertions involving nested `any`, recursive callables, or asymmetric type variables are
 		// intentionally retained.
 		{Code: `
@@ -2020,26 +2063,6 @@ nonNull(s);
 		{
 			Code: `
 const x: number | null = null;
-const y: number | null = x!;
-      `,
-			Output: []string{`
-const x: number | null = null;
-const y: number | null = x;
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      3,
-					Column:    26,
-					EndLine:   3,
-					EndColumn: 28,
-				},
-			},
-		},
-		{
-			Code: `
-const x: number | null = null;
 class Foo {
   prop: number | null = x!;
 }
@@ -2145,26 +2168,6 @@ y = 0;
 					Column:    1,
 					EndLine:   5,
 					EndColumn: 3,
-				},
-			},
-		},
-		{
-			Code: `
-declare function foo(arg?: number): number | void;
-const bar: number | void = foo()!;
-      `,
-			Output: []string{`
-declare function foo(arg?: number): number | void;
-const bar: number | void = foo();
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      3,
-					Column:    28,
-					EndLine:   3,
-					EndColumn: 34,
 				},
 			},
 		},
@@ -2695,26 +2698,6 @@ class T {
 					Column:    16,
 					EndLine:   3,
 					EndColumn: 33,
-				},
-			},
-		},
-		{
-			Code: `
-const a = '';
-const b: string | undefined = (a ? undefined : a)!;
-      `,
-			Output: []string{`
-const a = '';
-const b: string | undefined = (a ? undefined : a);
-      `,
-			},
-			Errors: []rule_tester.InvalidTestCaseError{
-				{
-					MessageId: "contextuallyUnnecessary",
-					Line:      3,
-					Column:    31,
-					EndLine:   3,
-					EndColumn: 51,
 				},
 			},
 		},
@@ -4623,6 +4606,63 @@ value = 1;`},
 					Column:    21,
 					EndLine:   2,
 					EndColumn: 36,
+				},
+			},
+		},
+		{
+			Code: `function widen(value: 'a') {
+  const widened: string | undefined = value as string;
+  return widened;
+}`,
+			Output: []string{`function widen(value: 'a') {
+  const widened: string | undefined = value;
+  return widened;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    39,
+					EndLine:   2,
+					EndColumn: 54,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  const [narrowed = '']: [string | undefined] = [value as string];
+  return narrowed.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  const [narrowed = '']: [string | undefined] = [value];
+  return narrowed.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    50,
+					EndLine:   2,
+					EndColumn: 65,
+				},
+			},
+		},
+		{
+			Code: `function narrow(value: string | undefined) {
+  const { narrowed = '' }: { narrowed?: string } = { narrowed: value as string };
+  return narrowed.length;
+}`,
+			Output: []string{`function narrow(value: string | undefined) {
+  const { narrowed = '' }: { narrowed?: string } = { narrowed: value };
+  return narrowed.length;
+}`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "contextuallyUnnecessary",
+					Line:      2,
+					Column:    64,
+					EndLine:   2,
+					EndColumn: 79,
 				},
 			},
 		},
