@@ -27,6 +27,12 @@ type classInstanceChecker struct {
 	typeChecker *checker.Checker
 }
 
+type classInstanceComparison struct {
+	source  *checker.Type
+	target  *checker.Type
+	shallow bool
+}
+
 func isTypeReference(t *checker.Type) bool {
 	return utils.IsObjectType(t) && checker.Type_objectFlags(t)&checker.ObjectFlagsReference != 0
 }
@@ -126,6 +132,10 @@ func (c *classInstanceChecker) isInstanceOf(source *checker.Type, classType *che
 }
 
 func (c *classInstanceChecker) findViolation(source *checker.Type, target *checker.Type, shallow bool) *checker.Type {
+	return c.findViolationWorker(source, target, shallow, map[classInstanceComparison]struct{}{})
+}
+
+func (c *classInstanceChecker) findViolationWorker(source *checker.Type, target *checker.Type, shallow bool, active map[classInstanceComparison]struct{}) *checker.Type {
 	resolvedSource := c.resolveConstraint(source)
 	resolvedTarget := c.resolveConstraint(target)
 
@@ -137,12 +147,20 @@ func (c *classInstanceChecker) findViolation(source *checker.Type, target *check
 		return nil
 	}
 
+	comparison := classInstanceComparison{source: resolvedSource, target: resolvedTarget, shallow: shallow}
+	if _, ok := active[comparison]; ok {
+		return nil
+	}
+	active[comparison] = struct{}{}
+	// Only stop cycles on the current path; other branches may still find a violation.
+	defer delete(active, comparison)
+
 	if resolvedSource.IsUnion() {
 		for _, part := range resolvedSource.Types() {
 			if !c.typeChecker.IsTypeAssignableTo(part, resolvedTarget) {
 				continue
 			}
-			if violation := c.findViolation(part, resolvedTarget, shallow); violation != nil {
+			if violation := c.findViolationWorker(part, resolvedTarget, shallow, active); violation != nil {
 				return violation
 			}
 		}
@@ -172,7 +190,7 @@ func (c *classInstanceChecker) findViolation(source *checker.Type, target *check
 
 		var firstViolation *checker.Type
 		for _, candidate := range candidates {
-			violation := c.findViolation(resolvedSource, candidate, shallow)
+			violation := c.findViolationWorker(resolvedSource, candidate, shallow, active)
 			if violation == nil {
 				return nil
 			}
@@ -185,7 +203,7 @@ func (c *classInstanceChecker) findViolation(source *checker.Type, target *check
 
 	if resolvedTarget.IsIntersection() {
 		for _, part := range resolvedTarget.Types() {
-			if violation := c.findViolation(resolvedSource, part, shallow); violation != nil {
+			if violation := c.findViolationWorker(resolvedSource, part, shallow, active); violation != nil {
 				return violation
 			}
 		}
@@ -205,7 +223,7 @@ func (c *classInstanceChecker) findViolation(source *checker.Type, target *check
 		sourceArguments := c.typeChecker.GetTypeArguments(resolvedSource)
 		targetArguments := c.typeChecker.GetTypeArguments(resolvedTarget)
 		for i, targetArgument := range targetArguments[:min(len(sourceArguments), len(targetArguments))] {
-			if violation := c.findViolation(sourceArguments[i], targetArgument, false); violation != nil {
+			if violation := c.findViolationWorker(sourceArguments[i], targetArgument, false, active); violation != nil {
 				return violation
 			}
 		}
@@ -218,7 +236,7 @@ func (c *classInstanceChecker) findViolation(source *checker.Type, target *check
 		if sourceIndexInfo == nil || targetIndexInfo == nil {
 			continue
 		}
-		if violation := c.findViolation(sourceIndexInfo.ValueType(), targetIndexInfo.ValueType(), false); violation != nil {
+		if violation := c.findViolationWorker(sourceIndexInfo.ValueType(), targetIndexInfo.ValueType(), false, active); violation != nil {
 			return violation
 		}
 	}
