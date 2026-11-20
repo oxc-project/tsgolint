@@ -1,0 +1,738 @@
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-0 - 1]
+Diagnostic 1: objectLiteral (8:22 - 8:35)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point: Point = { x: 1, y: 2 };
+     |                      ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-1 - 1]
+Diagnostic 1: nonInstance (7:18 - 7:18)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   6 | const o = { x: 1, y: 1 };
+   7 | const p: Point = o;
+     |                  ~
+   8 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-2 - 1]
+Diagnostic 1: nonInstance (7:10 - 7:10)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   6 | function foo(o: { x: number; y: number }): Point {
+   7 |   return o;
+     |          ~
+   8 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-3 - 1]
+Diagnostic 1: nonInstance (11:10 - 11:11)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  10 | function bar(p2: Point2): Point {
+  11 |   return p2;
+     |          ~~
+  12 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-4 - 1]
+Diagnostic 1: objectLiteral (15:22 - 15:37)
+Message: This object literal is used where an instance of class `Point` is expected.
+  14 | }
+  15 | const point: Point = { x: -1, y: -2 };
+     |                      ~~~~~~~~~~~~~~~~
+  16 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-5 - 1]
+Diagnostic 1: objectLiteral (8:15 - 8:28)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point = { x: 1, y: 2 } as Point;
+     |               ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-6 - 1]
+Diagnostic 1: objectLiteral (8:22 - 8:35)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point = <Point>{ x: 1, y: 2 };
+     |                      ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-7 - 1]
+Diagnostic 1: objectLiteral (8:15 - 8:28)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point = { x: 1, y: 2 } satisfies Point;
+     |               ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-8 - 1]
+Diagnostic 1: objectLiteral (9:6 - 9:19)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | declare function draw(point: Point): void;
+   9 | draw({ x: 1, y: 2 });
+     |      ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-9 - 1]
+Diagnostic 1: objectLiteral (9:10 - 9:23)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | function make(): Point {
+   9 |   return { x: 1, y: 2 };
+     |          ~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-10 - 1]
+Diagnostic 1: objectLiteral (8:28 - 8:41)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const make = (): Point => ({ x: 1, y: 2 });
+     |                            ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-11 - 1]
+Diagnostic 1: objectLiteral (8:26 - 8:39)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const points: Point[] = [{ x: 1, y: 2 }];
+     |                          ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-12 - 1]
+Diagnostic 1: objectLiteral (8:44 - 8:57)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const shape: { origin: Point } = { origin: { x: 1, y: 2 } };
+     |                                            ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-13 - 1]
+Diagnostic 1: objectLiteral (9:9 - 9:22)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | let point: Point;
+   9 | point = { x: 1, y: 2 };
+     |         ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-14 - 1]
+Diagnostic 1: objectLiteral (8:34 - 8:47)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point: Point | undefined = { x: 1, y: 2 };
+     |                                  ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-15 - 1]
+Diagnostic 1: objectLiteral (8:38 - 8:57)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point: Point & { z: number } = { x: 1, y: 2, z: 3 };
+     |                                      ~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-16 - 1]
+Diagnostic 1: objectLiteral (11:30 - 11:47)
+Message: This object literal is used where an instance of class `Label` is expected.
+  10 | }
+  11 | const value: Label | Point = { text: 'origin' };
+     |                              ~~~~~~~~~~~~~~~~~~
+  12 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-17 - 1]
+Diagnostic 1: objectLiteral (5:26 - 5:37)
+Message: This object literal is used where an instance of class `Box<number>` is expected.
+   4 | }
+   5 | const box: Box<number> = { value: 1 };
+     |                          ~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-18 - 1]
+Diagnostic 1: objectLiteral (9:17 - 9:30)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | declare function identity<T>(value: T): T;
+   9 | identity<Point>({ x: 1, y: 2 });
+     |                 ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-19 - 1]
+Diagnostic 1: objectLiteral (5:22 - 5:38)
+Message: This object literal is used where an instance of class `Shape` is expected.
+   4 | }
+   5 | const shape: Shape = { area: () => 1 };
+     |                      ~~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-20 - 1]
+Diagnostic 1: objectLiteral (6:22 - 6:35)
+Message: This object literal is used where an instance of class `Point` is expected.
+   5 | }
+   6 | const point: Point = { x: 1, y: 2 };
+     |                      ~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-21 - 1]
+Diagnostic 1: objectLiteral (8:22 - 8:43)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point: Point = { ...new Point(1, 2) };
+     |                      ~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-22 - 1]
+Diagnostic 1: objectLiteral (9:34 - 9:47)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | declare const condition: boolean;
+   9 | const point: Point = condition ? { x: 1, y: 2 } : new Point(3, 4);
+     |                                  ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-23 - 1]
+Diagnostic 1: objectLiteral (9:18 - 9:31)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | class Line {
+   9 |   start: Point = { x: 0, y: 0 };
+     |                  ~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-24 - 1]
+Diagnostic 1: objectLiteral (8:30 - 8:43)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | function draw(point: Point = { x: 0, y: 0 }) {}
+     |                              ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-25 - 1]
+Diagnostic 1: objectLiteral (9:31 - 9:44)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | declare function Marker(props: { point: Point }): null;
+   9 | const marker = <Marker point={{ x: 1, y: 2 }} />;
+     |                               ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-26 - 1]
+Diagnostic 1: objectLiteral (8:43 - 8:56)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | }
+   8 | const point: InstanceType<typeof Point> = { x: 1, y: 2 };
+     |                                           ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-27 - 1]
+Diagnostic 1: objectLiteral (9:30 - 9:43)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | const origin = new Point(0, 0);
+   9 | const point: typeof origin = { x: 1, y: 2 };
+     |                              ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-28 - 1]
+Diagnostic 1: objectLiteral (9:10 - 9:23)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | async function make(): Promise<Point> {
+   9 |   return { x: 1, y: 2 };
+     |          ~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-29 - 1]
+Diagnostic 1: objectLiteral (9:17 - 9:30)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | declare const value: { point?: Point };
+   9 | const { point = { x: 0, y: 0 } } = value;
+     |                 ~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-30 - 1]
+Diagnostic 1: objectLiteral (10:12 - 10:25)
+Message: This object literal is used where an instance of class `Point` is expected.
+   9 |   get point(): Point {
+  10 |     return { x: 0, y: 0 };
+     |            ~~~~~~~~~~~~~~
+  11 |   }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-31 - 1]
+Diagnostic 1: objectLiteral (8:43 - 8:56)
+Message: This object literal is used where an instance of class `Point` is expected.
+   7 | };
+   8 | const point: InstanceType<typeof Point> = { x: 1, y: 2 };
+     |                                           ~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-32 - 1]
+Diagnostic 1: nonInstance (9:22 - 9:26)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const point: Point = plain;
+     |                      ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-33 - 1]
+Diagnostic 1: nonInstance (8:31 - 8:61)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   7 | }
+   8 | const point: Promise<Point> = Promise.resolve({ x: 1, y: 2 });
+     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-34 - 1]
+Diagnostic 1: nonInstance (8:25 - 8:51)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   7 | }
+   8 | const points: Point[] = [1].map(x => ({ x, y: 1 }));
+     |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-35 - 1]
+Diagnostic 1: nonInstance (9:22 - 9:45)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare function identity<T>(value: T): T;
+   9 | const point: Point = identity({ x: 1, y: 2 });
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-36 - 1]
+Diagnostic 1: nonInstance (9:36 - 9:63)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const points: Map<string, Point> = new Map([['origin', plain]]);
+     |                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-37 - 1]
+Diagnostic 1: nonInstance (9:34 - 9:38)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const points: [Point, number] = [plain, 1];
+     |                                  ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-38 - 1]
+Diagnostic 1: objectLiteral (9:22 - 9:33)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | declare const plain: { x: number; y: number };
+   9 | const point: Point = { ...plain };
+     |                      ~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-39 - 1]
+Diagnostic 1: nonInstance (9:44 - 9:48)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const shape: { origin: Point } = { origin: plain };
+     |                                            ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-40 - 1]
+Diagnostic 1: nonInstance (10:24 - 10:39)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | async function get() {
+  10 |   const point: Point = await getPlain();
+     |                        ~~~~~~~~~~~~~~~~
+  11 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-41 - 1]
+Diagnostic 1: nonInstance (10:22 - 10:26)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare const fallback: Point;
+  10 | const point: Point = plain ?? fallback;
+     |                      ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-42 - 1]
+Diagnostic 1: nonInstance (9:15 - 9:36)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const point = Promise.resolve(plain) satisfies Promise<Point>;
+     |               ~~~~~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-43 - 1]
+Diagnostic 1: nonInstance (10:23 - 10:27)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare function draw(...points: Point[]): void;
+  10 | draw(new Point(1, 2), plain);
+     |                       ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-44 - 1]
+Diagnostic 1: nonInstance (14:22 - 14:37)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  13 | }
+  14 | const point: Point = new Vector(1, 2);
+     |                      ~~~~~~~~~~~~~~~~
+  15 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-45 - 1]
+Diagnostic 1: nonInstance (12:25 - 12:38)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  11 | }
+  12 | const box: Box<Point> = new Box(plain);
+     |                         ~~~~~~~~~~~~~~
+  13 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-46 - 1]
+Diagnostic 1: objectLiteral (11:22 - 11:41)
+Message: This object literal is used where an instance of class `Point` is expected.
+  10 | }
+  11 | const fancy: Fancy = { x: 1, y: 2, z: 3 };
+     |                      ~~~~~~~~~~~~~~~~~~~~
+  12 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-47 - 1]
+Diagnostic 1: nonInstance (10:10 - 10:32)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | function getPoints(): Point[] {
+  10 |   return [plain].filter(Boolean);
+     |          ~~~~~~~~~~~~~~~~~~~~~~~
+  11 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-48 - 1]
+Diagnostic 1: nonInstance (15:10 - 15:14)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  14 | }
+  15 | new Line(plain, new Point(1, 2));
+     |          ~~~~~
+  16 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-49 - 1]
+Diagnostic 1: nonInstance (14:11 - 14:15)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  13 |   constructor() {
+  14 |     super(plain);
+     |           ~~~~~
+  15 |   }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-50 - 1]
+Diagnostic 1: nonInstance (10:8 - 10:12)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare const draw: ((point: Point) => void) | undefined;
+  10 | draw?.(plain);
+     |        ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-51 - 1]
+Diagnostic 1: objectLiteral (13:12 - 13:25)
+Message: This object literal is used where an instance of class `Point` is expected.
+  12 |   get() {
+  13 |     return { x: 1, y: 2 };
+     |            ~~~~~~~~~~~~~~
+  14 |   },
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-52 - 1]
+Diagnostic 1: nonInstance (11:12 - 11:16)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  10 |   get(): Point {
+  11 |     return plain;
+     |            ~~~~~
+  12 |   }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-53 - 1]
+Diagnostic 1: nonInstance (10:9 - 10:13)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | function* points(): Generator<Point> {
+  10 |   yield plain;
+     |         ~~~~~
+  11 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-54 - 1]
+Diagnostic 1: nonInstance (10:10 - 10:14)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | const make: () => Point = () => {
+  10 |   return plain;
+     |          ~~~~~
+  11 | };
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-55 - 1]
+Diagnostic 1: nonInstance (9:48 - 9:52)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const draw: (point?: Point) => void = (point = plain) => {};
+     |                                                ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-56 - 1]
+Diagnostic 1: nonInstance (10:37 - 10:41)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | class Holder {
+  10 |   constructor(public point: Point = plain) {}
+     |                                     ~~~~~
+  11 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-57 - 1]
+Diagnostic 1: nonInstance (10:27 - 10:31)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | class Holder {
+  10 |   accessor point: Point = plain;
+     |                           ~~~~~
+  11 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-58 - 1]
+Diagnostic 1: nonInstance (10:23 - 10:27)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | let point: Point;
+  10 | ({ point } = { point: plain });
+     |                       ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-59 - 1]
+Diagnostic 1: nonInstance (12:23 - 12:27)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  11 | }
+  12 | new Holder().origin = plain;
+     |                       ~~~~~
+  13 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-60 - 1]
+Diagnostic 1: nonInstance (10:13 - 10:17)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare const points: Point[];
+  10 | points[0] = plain;
+     |             ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-61 - 1]
+Diagnostic 1: nonInstance (10:11 - 10:15)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | let point: Point | undefined;
+  10 | point ??= plain;
+     |           ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-62 - 1]
+Diagnostic 1: nonInstance (9:26 - 9:30)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const point: Point = (0, plain);
+     |                          ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-63 - 1]
+Diagnostic 1: nonInstance (10:34 - 10:38)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare const condition: boolean;
+  10 | const point: Point = condition ? plain || new Point(1, 2) : new Point(3, 4);
+     |                                  ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-64 - 1]
+Diagnostic 1: nonInstance (10:48 - 10:52)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare const key: string;
+  10 | const record: Record<string, Point> = { [key]: plain };
+     |                                                ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-65 - 1]
+Diagnostic 1: nonInstance (9:27 - 9:31)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const grid: Point[][] = [[plain]];
+     |                           ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-66 - 1]
+Diagnostic 1: objectLiteral (9:10 - 9:23)
+Message: This object literal is used where an instance of class `Point` is expected.
+   8 | function make<T extends Point>(): T {
+   9 |   return { x: 1, y: 2 } as T;
+     |          ~~~~~~~~~~~~~~
+  10 | }
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-67 - 1]
+Diagnostic 1: nonInstance (9:22 - 9:27)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const maybe: { x: number; y: number } | undefined;
+   9 | const point: Point = maybe!;
+     |                      ~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-68 - 1]
+Diagnostic 1: nonInstance (9:53 - 9:57)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const point = new Promise<Point>(resolve => resolve(plain));
+     |                                                     ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-69 - 1]
+Diagnostic 1: nonInstance (12:32 - 12:36)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+  11 | }
+  12 | const point: Shape['origin'] = plain;
+     |                                ~~~~~
+  13 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-70 - 1]
+Diagnostic 1: nonInstance (9:34 - 9:39)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plains: { x: number; y: number }[];
+   9 | const points: readonly Point[] = plains;
+     |                                  ~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-71 - 1]
+Diagnostic 1: nonInstance (9:39 - 9:44)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plains: Record<string, { x: number; y: number }>;
+   9 | const points: Record<string, Point> = plains;
+     |                                       ~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-72 - 1]
+Diagnostic 1: nonInstance (9:38 - 9:67)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const points: Map<string, Point[]> = new Map([['origin', [plain]]]);
+     |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-73 - 1]
+Diagnostic 1: nonInstance (9:22 - 9:26)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const union: Point | { x: number; y: number };
+   9 | const point: Point = union;
+     |                      ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-74 - 1]
+Diagnostic 1: nonInstance (9:22 - 9:33)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const intersection: { x: number } & { y: number };
+   9 | const point: Point = intersection;
+     |                      ~~~~~~~~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-75 - 1]
+Diagnostic 1: nonInstance (9:35 - 9:39)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const points: (Point | null)[] = [plain, null];
+     |                                   ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-76 - 1]
+Diagnostic 1: nonInstance (10:38 - 10:42)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare const condition: boolean;
+  10 | const points: Point[] = [condition ? plain : new Point(1, 2)];
+     |                                      ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-77 - 1]
+Diagnostic 1: nonInstance (10:6 - 10:10)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare function draw(point: Point): void;
+  10 | draw(plain as Point);
+     |      ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-78 - 1]
+Diagnostic 1: nonInstance (9:49 - 9:53)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const points: [string, ...Point[]] = ['origin', plain];
+     |                                                 ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-79 - 1]
+Diagnostic 1: nonInstance (9:45 - 9:49)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   8 | declare const plain: { x: number; y: number };
+   9 | const shape: { origin?: Point } = { origin: plain };
+     |                                             ~~~~~
+  10 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-80 - 1]
+Diagnostic 1: nonInstance (10:25 - 10:29)
+Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
+   9 | declare function Marker(props: { children: Point }): null;
+  10 | const marker = <Marker>{plain}</Marker>;
+     |                         ~~~~~
+  11 |       
+---
+
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-81 - 1]
+Diagnostic 1: nonInstance (6:14 - 6:18)
+Message: This value is used where an instance of class `Beta` is expected, but was not created by its constructor.
+   5 | declare const value: string | { beta: number };
+   6 | const beta = value as Beta;
+     |              ~~~~~
+   7 |       
+---

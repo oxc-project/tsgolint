@@ -2229,6 +2229,32 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     "rule": "no-unsafe-member-access",
   },
   {
+    "file_path": "fixtures/basic/rules/no-unsafe-class-instance-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This object literal is used where an instance of class \`Point\` is expected.",
+      "id": "objectLiteral",
+    },
+    "range": {
+      "end": 120,
+      "pos": 104,
+    },
+    "rule": "no-unsafe-class-instance-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-class-instance-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This value is used where an instance of class \`Point\` is expected, but was not created by its constructor.",
+      "id": "nonInstance",
+    },
+    "range": {
+      "end": 200,
+      "pos": 195,
+    },
+    "rule": "no-unsafe-class-instance-assignment",
+  },
+  {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
     "kind": 0,
     "message": {
