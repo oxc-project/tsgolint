@@ -4451,3 +4451,58 @@ export const outsideJsx = () => {
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
+
+func TestPreferOptionalChainRuleOrTypeof(t *testing.T) {
+	t.Parallel()
+
+	// https://github.com/oxc-project/oxc/issues/29545
+	var invalidCases []rule_tester.InvalidTestCase
+	for _, guard := range []struct {
+		typ        string
+		expression string
+	}{
+		{"{ id?: number } | null", "foo === null"},
+		{"{ id?: number } | null", "foo == null"},
+		{"{ id?: number } | undefined", "!foo"},
+		{"{ id?: number } | undefined", "foo === undefined"},
+		{"{ id?: number } | null | undefined", "foo == null"},
+	} {
+		declaration := "declare const foo: " + guard.typ + ";\n"
+		for _, operator := range []string{"===", "=="} {
+			for _, reversed := range []bool{false, true} {
+				comparison := "typeof foo.id " + operator + " 'undefined'"
+				if reversed {
+					comparison = "'undefined' " + operator + " typeof foo.id"
+				}
+				invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+					Code:   declaration + guard.expression + " || " + comparison + ";",
+					Output: []string{declaration + strings.ReplaceAll(comparison, "foo.id", "foo?.id") + ";"},
+					Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+				})
+			}
+		}
+	}
+
+	for _, testCase := range []struct {
+		typ    string
+		code   string
+		output string
+	}{
+		{"{ id?: number } | null", "foo === null || (typeof foo.id) === 'undefined'", "(typeof foo?.id) === 'undefined'"},
+		{"{ id?: number } | null", "foo === null || (typeof foo.id === 'undefined')", "(typeof foo?.id === 'undefined')"},
+		{"{ id?: number } | null", "foo === null || typeof /* keep */ foo.id === 'undefined'", "typeof /* keep */ foo?.id === 'undefined'"},
+		{"{ id?: number } | null", "foo === null || 'undefined' === (typeof foo.id)", "'undefined' === (typeof foo?.id)"},
+		{"{ id?: number } | null", "foo === null || typeof foo['id'] === 'undefined'", "typeof foo?.['id'] === 'undefined'"},
+		{"(() => number | undefined) | null", "foo === null || typeof foo() === 'undefined'", "typeof foo?.() === 'undefined'"},
+		{"{ child?: { id?: number } } | null", "foo == null || foo.child == null || typeof foo.child.id === 'undefined'", "typeof foo?.child?.id === 'undefined'"},
+	} {
+		declaration := "declare const foo: " + testCase.typ + ";\n"
+		invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+			Code:   declaration + testCase.code + ";",
+			Output: []string{declaration + testCase.output + ";"},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+		})
+	}
+
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, nil, invalidCases)
+}
