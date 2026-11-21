@@ -886,3 +886,23 @@ Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSO
      |                          ~~~~
   32 |       
 ---
+
+[TestNoBaseToStringRule/invalid-90 - 1]
+Diagnostic 1: baseToString (9:4 - 9:4)
+Message: 'a' may use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   8 |     };
+   9 | `${a}`;
+     |    ~
+  10 |       
+---
+
+[TestNoBaseToStringRule/invalid-91 - 1]
+Diagnostic 1: baseToString (5:6 - 5:6)
+Message: 'a' will use Object's default stringification format ('[object Object]') when stringified.
+Help: Consider picking a property (e.g. `user.name`), using a formatter (or `JSON.stringify`), or implementing a custom `toString()`/`toLocaleString()` on the type.
+   4 | };
+   5 | '' + a;
+     |      ~
+   6 |       
+---

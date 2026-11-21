@@ -275,6 +275,13 @@ var NoBaseToStringRule = rule.Rule{
 					return collectArrayCertainty(t, append(visited, t))
 				}
 
+				// String conversion calls [Symbol.toPrimitive] first, and Object
+				// does not declare it, so any declaration is user-defined.
+				// see https://github.com/typescript-eslint/typescript-eslint/pull/11901
+				if utils.GetWellKnownSymbolPropertyOfType(t, "toPrimitive", ctx.TypeChecker) != nil {
+					return usefulnessAlways
+				}
+
 				foundFallbackOnObject := false
 				for _, propertyName := range []string{"toString", "toLocaleString", "valueOf"} {
 					property := checker.Checker_getPropertyOfType(ctx.TypeChecker, t, propertyName)
