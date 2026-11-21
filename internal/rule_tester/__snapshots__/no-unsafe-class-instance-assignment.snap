@@ -737,7 +737,7 @@ Message: This value is used where an instance of class `Beta` is expected, but w
    7 |       
 ---
 
-[TestNoUnsafeClassInstanceAssignmentRuleRecursiveTypes/invalid-0 - 1]
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-82 - 1]
 Diagnostic 1: nonInstance (6:24 - 6:29)
 Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
    5 | declare const source: Source;
@@ -746,7 +746,7 @@ Message: This value is used where an instance of class `Point` is expected, but 
    7 | 
 ---
 
-[TestNoUnsafeClassInstanceAssignmentRuleRecursiveTypes/invalid-1 - 1]
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-83 - 1]
 Diagnostic 1: nonInstance (6:24 - 6:29)
 Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
    5 | declare const source: Source;
@@ -762,7 +762,7 @@ Message: This value is used where an instance of class `Point` is expected, but 
    8 | 
 ---
 
-[TestNoUnsafeClassInstanceAssignmentRuleRecursiveTypes/invalid-2 - 1]
+[TestNoUnsafeClassInstanceAssignmentRule/invalid-84 - 1]
 Diagnostic 1: nonInstance (7:24 - 7:29)
 Message: This value is used where an instance of class `Point` is expected, but was not created by its constructor.
    6 | declare const source: Source;

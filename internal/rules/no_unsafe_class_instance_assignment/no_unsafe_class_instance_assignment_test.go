@@ -16,69 +16,6 @@ var reactTypesFiles = map[string]string{
 `,
 }
 
-func TestNoUnsafeClassInstanceAssignmentRuleRecursiveTypes(t *testing.T) {
-	t.Parallel()
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeClassInstanceAssignmentRule, []rule_tester.ValidTestCase{
-		{Code: `
-class Point { x = 0; }
-type Source = { [key: string]: Source };
-type Target = { [key: string]: Target | Point };
-declare const source: Source;
-const target: Target = source;
-`},
-		{Code: `
-class Point { x = 0; }
-type Source = { [key: number]: Source };
-type Target = { [key: number]: Target | Point };
-declare const source: Source;
-const target: Target = source;
-`},
-		{Code: `
-class Point { x = 0; }
-type Source = { [key: string]: SourceChild };
-type SourceChild = { [key: number]: Source };
-type Target = { [key: string]: TargetChild | Point };
-type TargetChild = { [key: number]: Target | Point };
-declare const source: Source;
-const target: Target = source;
-`},
-		{Code: `
-class Point { x = 0; }
-type Source = Source[];
-type Target = (Target | Point)[];
-declare const source: Source;
-const target: Target = source;
-`},
-	}, []rule_tester.InvalidTestCase{
-		{Code: `
-class Point { x = 0; }
-type Source = { [key: number]: Source; [key: string]: Source | { x: number } };
-type Target = { [key: number]: Target; [key: string]: Target | Point };
-declare const source: Source;
-const target: Target = source;
-`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "nonInstance", Line: 6, Column: 24, EndLine: 6, EndColumn: 30}}},
-		{Code: `
-class Point { x = 0; }
-type Source = [Source, { x: number }];
-type Target = [Target, Point];
-declare const source: Source;
-const target: Target = source;
-const another: Target = source;
-`, Errors: []rule_tester.InvalidTestCaseError{
-			{MessageId: "nonInstance", Line: 6, Column: 24, EndLine: 6, EndColumn: 30},
-			{MessageId: "nonInstance", Line: 7, Column: 25, EndLine: 7, EndColumn: 31},
-		}},
-		{Code: `
-class Point { x = 0; }
-class OtherPoint { x = 0; }
-type Source = [Source, OtherPoint, OtherPoint];
-type Target = [Target, Point | OtherPoint, Point];
-declare const source: Source;
-const target: Target = source;
-`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "nonInstance", Line: 7, Column: 24, EndLine: 7, EndColumn: 30}}},
-	})
-}
-
 func TestNoUnsafeClassInstanceAssignmentRule(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoUnsafeClassInstanceAssignmentRule, []rule_tester.ValidTestCase{
@@ -624,6 +561,36 @@ function* points(): Generator<Point | undefined> {
 declare function Marker(props: { children?: Point }): null;
 const marker = <Marker>{/* empty */}</Marker>;
       `, Tsx: true, Files: reactTypesFiles},
+		{Code: `
+class Point { x = 0; }
+type Source = { [key: string]: Source };
+type Target = { [key: string]: Target | Point };
+declare const source: Source;
+const target: Target = source;
+`},
+		{Code: `
+class Point { x = 0; }
+type Source = { [key: number]: Source };
+type Target = { [key: number]: Target | Point };
+declare const source: Source;
+const target: Target = source;
+`},
+		{Code: `
+class Point { x = 0; }
+type Source = { [key: string]: SourceChild };
+type SourceChild = { [key: number]: Source };
+type Target = { [key: string]: TargetChild | Point };
+type TargetChild = { [key: number]: Target | Point };
+declare const source: Source;
+const target: Target = source;
+`},
+		{Code: `
+class Point { x = 0; }
+type Source = Source[];
+type Target = (Target | Point)[];
+declare const source: Source;
+const target: Target = source;
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 class Point {
@@ -1493,5 +1460,31 @@ class Beta {
 declare const value: string | { beta: number };
 const beta = value as Beta;
       `, Errors: []rule_tester.InvalidTestCaseError{{Column: 14, EndColumn: 19, EndLine: 6, Line: 6, MessageId: "nonInstance"}}},
+		{Code: `
+class Point { x = 0; }
+type Source = { [key: number]: Source; [key: string]: Source | { x: number } };
+type Target = { [key: number]: Target; [key: string]: Target | Point };
+declare const source: Source;
+const target: Target = source;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "nonInstance", Line: 6, Column: 24, EndLine: 6, EndColumn: 30}}},
+		{Code: `
+class Point { x = 0; }
+type Source = [Source, { x: number }];
+type Target = [Target, Point];
+declare const source: Source;
+const target: Target = source;
+const another: Target = source;
+`, Errors: []rule_tester.InvalidTestCaseError{
+			{MessageId: "nonInstance", Line: 6, Column: 24, EndLine: 6, EndColumn: 30},
+			{MessageId: "nonInstance", Line: 7, Column: 25, EndLine: 7, EndColumn: 31},
+		}},
+		{Code: `
+class Point { x = 0; }
+class OtherPoint { x = 0; }
+type Source = [Source, OtherPoint, OtherPoint];
+type Target = [Target, Point | OtherPoint, Point];
+declare const source: Source;
+const target: Target = source;
+`, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "nonInstance", Line: 7, Column: 24, EndLine: 7, EndColumn: 30}}},
 	})
 }
