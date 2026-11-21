@@ -152,7 +152,6 @@ func (c *classInstanceChecker) findViolationWorker(source *checker.Type, target 
 		return nil
 	}
 	active[comparison] = struct{}{}
-	// Only stop cycles on the current path; other branches may still find a violation.
 	defer delete(active, comparison)
 
 	if resolvedSource.IsUnion() {
