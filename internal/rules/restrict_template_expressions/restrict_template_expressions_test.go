@@ -361,6 +361,16 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 		{Code: "const msg = `arg = ${undefined}`;"},
 		{Code: "const msg = `arg = ${123}`;"},
 		{Code: "const msg = `arg = ${'abc'}`;"},
+		{
+			Code: `
+        type Value = string | Value[];
+        type Tuple = readonly [string | Tuple];
+        declare const value: Value;
+        declare const tuple: Tuple;
+        const msg = ` + "`" + `${value} ${tuple}` + "`" + `;
+      `,
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
@@ -614,6 +624,13 @@ func TestRestrictTemplateExpressionsRule(t *testing.T) {
 					Column:    27,
 				},
 			},
+		},
+		{
+			Code: "type Value = string | Date | Array<Value>;\n" +
+				"declare const value: Value;\n" +
+				"export const text = `${value}`;",
+			Options: rule_tester.OptionsFromJSON[RestrictTemplateExpressionsOptions](`{"allowArray": true}`),
+			Errors:  []rule_tester.InvalidTestCaseError{{MessageId: "invalidType", Line: 3, Column: 24}},
 		},
 	})
 }
