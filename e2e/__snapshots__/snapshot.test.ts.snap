@@ -1229,12 +1229,34 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
-      "id": "meaninglessVoidOperator",
+      "description": "void operator is useless here; it should only discard a call's return value",
+      "id": "meaninglessVoidOnNonCall",
     },
     "range": {
       "end": 175,
       "pos": 161,
+    },
+    "rule": "no-meaningless-void-operator",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 254,
+          "pos": 250,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "void operator is useless here; it should only discard a call's return value",
+      "id": "meaninglessVoidOnNonCall",
+    },
+    "range": {
+      "end": 274,
+      "pos": 250,
     },
     "rule": "no-meaningless-void-operator",
   },
