@@ -31,11 +31,33 @@ var NoMeaninglessVoidOperatorRule = rule.Rule{
 			ast.KindVoidExpression: func(node *ast.Node) {
 				arg := node.AsVoidExpression().Expression
 				inner := ast.SkipOuterExpressions(arg, ast.OEKParentheses|ast.OEKAssertions|ast.OEKComma)
-				// `void (x = value)` explicitly discards the assignment result.
-				if ast.IsAssignmentExpression(inner, false) {
+				if ast.IsAssignmentExpression(inner, false) || (ast.IsNumericLiteral(inner) && inner.AsNumericLiteral().Text == "0") {
 					return
 				}
 				argType := ctx.TypeChecker.GetTypeAtLocation(arg)
+				fixRemoveVoidKeyword := func() []rule.RuleFix {
+					return []rule.RuleFix{rule.RuleFixRemoveRange(utils.TrimNodeTextRange(ctx.SourceFile, node).WithEnd(arg.Pos()))}
+				}
+
+				if !ast.IsCallExpression(inner) || ast.IsImportCall(inner) {
+					if utils.IsThenableType(ctx.TypeChecker, arg, argType) {
+						return
+					}
+					message := rule.RuleMessage{
+						Id:          "meaninglessVoidOnNonCall",
+						Description: "void operator is useless here; it should only discard a call's return value",
+					}
+					parent := node.Parent
+					for ast.IsParenthesizedExpression(parent) {
+						parent = parent.Parent
+					}
+					if ast.IsExpressionStatement(parent) {
+						ctx.ReportNodeWithFixes(node, message, fixRemoveVoidKeyword)
+					} else {
+						ctx.ReportNode(node, message)
+					}
+					return
+				}
 
 				unionParts := utils.UnionTypeParts(argType)
 
@@ -46,17 +68,13 @@ var NoMeaninglessVoidOperatorRule = rule.Rule{
 					return utils.IsTypeFlagSet(t, checker.TypeFlagsVoidLike|checker.TypeFlagsNever)
 				})
 
-				fixRemoveVoidKeyword := func() rule.RuleFix {
-					return rule.RuleFixRemoveRange(utils.TrimNodeTextRange(ctx.SourceFile, node).WithEnd(arg.Pos()))
-				}
-
 				if isAlwaysVoidLike {
-					ctx.ReportNodeWithFixes(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), func() []rule.RuleFix { return []rule.RuleFix{fixRemoveVoidKeyword()} })
+					ctx.ReportNodeWithFixes(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), fixRemoveVoidKeyword)
 				} else if opts.CheckNever && isAlwaysVoidLikeOrNever {
 					ctx.ReportNodeWithSuggestions(node, buildMeaninglessVoidOperatorMessage(ctx.TypeChecker.TypeToString(argType)), func() []rule.RuleSuggestion {
 						return []rule.RuleSuggestion{{
 							Message:  buildRemoveVoidMessage(),
-							FixesArr: []rule.RuleFix{fixRemoveVoidKeyword()},
+							FixesArr: fixRemoveVoidKeyword(),
 						}}
 					})
 				}

@@ -16,12 +16,11 @@ Message: void operator shouldn't be used on void; it should convey that a return
 ---
 
 [TestNoMeaninglessVoidOperatorRule/invalid-2 - 1]
-Diagnostic 1: meaninglessVoidOperator (3:3 - 3:8)
+Diagnostic 1: meaninglessVoidOperator (2:1 - 2:11)
 Message: void operator shouldn't be used on never; it should convey that a return value is being ignored
-   2 | function bar(x: never) {
-   3 |   void x;
-     |   ~~~~~~
-   4 | }
+   1 | declare function fail(): never;
+   2 | void fail();
+     | ~~~~~~~~~~~
   Suggestion 1: [removeVoid] Remove 'void'
 ---
 
@@ -39,4 +38,46 @@ Diagnostic 1: meaninglessVoidOperator (1:56 - 1:83)
 Message: void operator shouldn't be used on void; it should convey that a return value is being ignored
    1 | declare let x: undefined; declare function fn(): void; void ((x = undefined), fn());
      |                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-5 - 1]
+Diagnostic 1: meaninglessVoidOnNonCall (1:29 - 1:40)
+Message: void operator is useless here; it should only discard a call's return value
+   1 | function handler(): void {} void handler; export {};
+     |                             ~~~~~~~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-6 - 1]
+Diagnostic 1: meaninglessVoidOnNonCall (1:27 - 1:32)
+Message: void operator is useless here; it should only discard a call's return value
+   1 | function bar(x: number) { void x; }
+     |                           ~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-7 - 1]
+Diagnostic 1: meaninglessVoidOnNonCall (1:26 - 1:31)
+Message: void operator is useless here; it should only discard a call's return value
+   1 | function bar(x: never) { void x; }
+     |                          ~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-8 - 1]
+Diagnostic 1: meaninglessVoidOnNonCall (1:52 - 1:72)
+Message: void operator is useless here; it should only discard a call's return value
+   1 | declare const obj: { value: number } | undefined; (void (0, obj?.value)!);
+     |                                                    ~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-9 - 1]
+Diagnostic 1: meaninglessVoidOnNonCall (1:16 - 1:21)
+Message: void operator is useless here; it should only discard a call's return value
+   1 | const result = void 1;
+     |                ~~~~~~
+---
+
+[TestNoMeaninglessVoidOperatorRule/invalid-10 - 1]
+Diagnostic 1: meaninglessVoidOnNonCall (1:16 - 1:49)
+Message: void operator is useless here; it should only discard a call's return value
+   1 | const result = void (import('./file') as unknown); export {};
+     |                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ---
