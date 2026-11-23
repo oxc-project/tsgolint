@@ -50,16 +50,30 @@ var RestrictTemplateExpressionsRule = rule.Rule{
 
 		globalRegexpType := checker.Checker_globalRegExpType(ctx.TypeChecker)
 
+		var activeArrays map[*checker.Type]struct{}
 		var isTypeAllowed func(innerType *checker.Type) bool
 		isTypeAllowed = func(innerType *checker.Type) bool {
 			return utils.Every(utils.UnionTypeParts(innerType), func(t *checker.Type) bool {
 				return utils.Some(utils.IntersectionTypeParts(t), func(t *checker.Type) bool {
-					return utils.IsTypeFlagSet(t, allowedFlags) ||
+					if utils.IsTypeFlagSet(t, allowedFlags) ||
 						(opts.AllowRegExp && t == globalRegexpType) ||
 						(len(opts.Allow) > 0 && utils.MatchesTypeOrBaseType(ctx.TypeChecker, t, func(t *checker.Type) bool {
 							return utils.TypeMatchesSomeSpecifier(t, opts.Allow, ctx.Program)
-						})) ||
-						(opts.AllowArray && checker.Checker_isArrayOrTupleType(ctx.TypeChecker, t) && isTypeAllowed(utils.GetNumberIndexType(ctx.TypeChecker, t)))
+						})) {
+						return true
+					}
+					if !opts.AllowArray || !checker.Checker_isArrayOrTupleType(ctx.TypeChecker, t) {
+						return false
+					}
+					if _, active := activeArrays[t]; active {
+						return true
+					}
+					if activeArrays == nil {
+						activeArrays = make(map[*checker.Type]struct{})
+					}
+					activeArrays[t] = struct{}{}
+					defer delete(activeArrays, t)
+					return isTypeAllowed(utils.GetNumberIndexType(ctx.TypeChecker, t))
 				})
 			})
 		}
