@@ -81,6 +81,15 @@ declare function use<
 >(callback: A & { kind: 'a' } & B & C & D & E & F & G & H & I & J & K & L & M & N & { kind: 'b' }): void;
 use(() => {});
 `},
+		{Code: `
+declare class Schema<T> {
+  refine<R extends T>(fn: (arg: T) => arg is R): void;
+  refine(fn: (arg: T) => void): void;
+  refine(fn: (arg: T) => Promise<void>): void;
+}
+declare const schema: Schema<string>;
+schema.refine(async (arg) => { await Promise.resolve(arg); });
+`},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: declarations + `on('start', async () => {});`,
