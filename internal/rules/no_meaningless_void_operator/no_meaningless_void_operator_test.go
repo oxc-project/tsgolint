@@ -152,5 +152,44 @@ const foo = (() => {}) as (() => void) | undefined;
 			Code:   `const result = void (import('./file') as unknown); export {};`,
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOnNonCall"}},
 		},
+		{
+			Code:   `void function() {};`,
+			Output: []string{`( function() {});`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOnNonCall"}},
+		},
+		{
+			Code:   `void { a: 1, b: 2 };`,
+			Output: []string{`( { a: 1, b: 2 });`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOnNonCall"}},
+		},
+		{
+			Code:   `if (true) void /* keep */ async function() {};`,
+			Output: []string{`if (true) ( /* keep */ async function() {});`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOnNonCall"}},
+		},
+		{
+			Code:   `void class {}.name;`,
+			Output: []string{`( class {}.name);`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOnNonCall"}},
+		},
+		{
+			Code:   `void "use strict";`,
+			Output: []string{`( "use strict");`},
+			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "meaninglessVoidOnNonCall"}},
+		},
+		{
+			Code: `run()
+void { a: 1 };
+run()
+void [1, 2];`,
+			Output: []string{`run()
+;( { a: 1 });
+run()
+; [1, 2];`},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "meaninglessVoidOnNonCall"},
+				{MessageId: "meaninglessVoidOnNonCall"},
+			},
+		},
 	})
 }
