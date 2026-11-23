@@ -96,6 +96,22 @@ Over 50 TypeScript-specific type-aware rules are available. For detailed setup a
 > [!NOTE]
 > Non-type-aware TypeScript rules can be found in [Oxlint's TypeScript rules](https://oxc.rs/docs/guide/usage/linter/rules.html) under the TypeScript source.
 
+### Project references in large monorepos
+
+By default, `tsgolint` matches editor behavior: when a project imports a [referenced project](https://www.typescriptlang.org/docs/handbook/project-references.html), it loads the referenced project's source files, and does the same for references of references. In large monorepos with many project references, each program can then include the sources of many other projects, and building those programs can dominate the time and memory used by type-aware linting.
+
+Set `OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS=true` to read referenced projects' built declaration files (`.d.ts` in their `outDir` or `declarationDir`) instead, like `tsc --project` does:
+
+```shell
+tsc --build
+OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS=true oxlint --type-aware
+```
+
+- Referenced projects must be built first, as with `tsc --build`. If any referenced project, including references of references, is missing a declaration output, `tsgolint` reports a `tsconfig-error` diagnostic naming the project and skips linting files in that program, rather than linting with incomplete type information. Setting `OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS=true` also skips this check; imports of unbuilt projects then have error types, and results are unreliable.
+- Types of referenced projects come from their declarations instead of their sources, so results can differ slightly from what your editor shows. `tsgolint` checks that declaration outputs exist, not that they are up to date, so rebuild referenced projects after changing them.
+
+The default is unchanged when the variable is unset or has any value other than `true`.
+
 ## How it fits into Oxlint
 
 Oxlint separates linting into two layers:

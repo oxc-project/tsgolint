@@ -46,7 +46,7 @@ func setupBenchmarkEnv(b *testing.B, singleThreaded bool) benchmarkEnv {
 	fs := bundled.WrapFS(cachedvfs.From(osvfs.FS()))
 	host := utils.CreateCompilerHost(dir, fs)
 
-	program, diags, err := utils.CreateProgram(singleThreaded, fs, dir, tsconfigPath, host, false)
+	program, diags, err := utils.CreateProgram(singleThreaded, fs, dir, tsconfigPath, host, false, false)
 	if err != nil {
 		b.Fatal("failed to create program:", err)
 	}

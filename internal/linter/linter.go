@@ -53,6 +53,7 @@ type RunLinterOptions struct {
 	Fixes                      Fixes
 	TypeErrors                 TypeErrors
 	SuppressProgramDiagnostics bool
+	UseProjectReferenceOutputs bool
 	TimingStore                *RuleTimingStore
 }
 
@@ -82,6 +83,7 @@ func RunLinter(options RunLinterOptions) error {
 	fixState := options.Fixes
 	typeErrors := options.TypeErrors
 	suppressProgramDiagnostics := options.SuppressProgramDiagnostics
+	useProjectReferenceOutputs := options.UseProjectReferenceOutputs
 	timingStore := options.TimingStore
 
 	idx := 0
@@ -93,7 +95,7 @@ func RunLinter(options RunLinterOptions) error {
 		currentDirectory := tspath.GetDirectoryPath(configFileName)
 		host := utils.NewCachedFSCompilerHost(currentDirectory, fs, bundled.LibPath(), nil, nil)
 
-		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics)
+		program, diagnostics, err := utils.CreateProgram(false, fs, currentDirectory, configFileName, host, suppressProgramDiagnostics, useProjectReferenceOutputs)
 
 		if err != nil {
 			return err

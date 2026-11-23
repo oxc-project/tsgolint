@@ -525,13 +525,16 @@ func runMain() int {
 		UseCaseSensitiveFileNames: host.FS().UseCaseSensitiveFileNames(),
 	}
 
-	program, _, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host, false)
+	program, diagnostics, err := utils.CreateProgram(singleThreaded, fs, currentDirectory, configFileName, host, false, useProjectReferenceOutputs())
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error creating TS program: %v", err)
 		return 1
 	}
 
 	if program == nil {
+		for _, d := range diagnostics {
+			fmt.Fprintf(os.Stderr, "%s: %s\n", d.Description, d.Help)
+		}
 		fmt.Fprintf(os.Stderr, "error creating TS program")
 		return 1
 	}

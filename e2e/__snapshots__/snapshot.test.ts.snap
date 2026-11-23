@@ -5643,6 +5643,34 @@ See https://github.com/oxc-project/tsgolint/issues/351 for more information.",
 ]
 `;
 
+exports[`TSGoLint E2E Snapshot Tests > should lint project references from declaration outputs when OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS is true 1`] = `
+[
+  {
+    "file_path": "fixtures/project-reference-outputs/app/src/index.ts",
+    "kind": 0,
+    "labeled_ranges": [
+      {
+        "label": "This unhandled promise-like value has type \`Promise<Value>\`.",
+        "range": {
+          "end": 59,
+          "pos": 49,
+        },
+      },
+    ],
+    "message": {
+      "description": "Promises must be awaited, add void operator to ignore.",
+      "help": "The promise must end with a call to .catch, or end with a call to .then with a rejection handler, or be explicitly marked as ignored with the \`void\` operator.",
+      "id": "floatingVoid",
+    },
+    "range": {
+      "end": 59,
+      "pos": 49,
+    },
+    "rule": "no-floating-promises",
+  },
+]
+`;
+
 exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.json could not be parsed 1`] = `
 [
   {
@@ -5880,6 +5908,31 @@ exports[`TSGoLint E2E Snapshot Tests > should report type errors 1`] = `
     "range": {
       "end": 7,
       "pos": 6,
+    },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should report unbuilt project references when OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS is true 1`] = `
+[
+  {
+    "file_path": "fixtures/project-reference-outputs-missing/app/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Referenced project '../lib/tsconfig.json' has not been built",
+      "help": "Output file '../lib/dist/index.d.ts' has not been built from source file '../lib/src/index.ts'.
+OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS is set, so referenced projects are read from their declaration outputs. Build referenced projects first (for example with \`tsc --build\`), or unset OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS.",
+      "id": "tsconfig-error",
+    },
+  },
+  {
+    "file_path": "fixtures/project-reference-outputs-missing/app/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Referenced project '../core/tsconfig.json' has not been built",
+      "help": "Output file '../core/dist/index.d.ts' has not been built from source file '../core/src/index.ts'.
+OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS is set, so referenced projects are read from their declaration outputs. Build referenced projects first (for example with \`tsc --build\`), or unset OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS.",
+      "id": "tsconfig-error",
     },
   },
 ]

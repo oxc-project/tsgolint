@@ -40,6 +40,10 @@ var suppressProgramDiagnostics = sync.OnceValue(func() bool {
 	return os.Getenv("OXLINT_TSGOLINT_DANGEROUSLY_SUPPRESS_PROGRAM_DIAGNOSTICS") == "true"
 })
 
+var useProjectReferenceOutputs = sync.OnceValue(func() bool {
+	return os.Getenv(utils.UseProjectReferenceOutputsEnvVar) == "true"
+})
+
 func parseHeadlessOptions(args []string) (*headlessOptions, error) {
 	var opts headlessOptions
 	var debug string
@@ -446,6 +450,7 @@ func runHeadless(args []string) int {
 			ReportSemantic:  payload.ReportSemantic,
 		},
 		SuppressProgramDiagnostics: suppressProgramDiagnostics(),
+		UseProjectReferenceOutputs: useProjectReferenceOutputs(),
 		TimingStore:                timingStore,
 	})
 
