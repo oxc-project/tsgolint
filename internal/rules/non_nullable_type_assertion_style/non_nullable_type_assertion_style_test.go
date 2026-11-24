@@ -57,6 +57,17 @@ const x = 1 as 1;
 declare function foo<T = any>(): T;
 const bar = foo() as number;
     `},
+		{
+			Code: `
+/** @param {string[]} queue */
+export function pop(queue) {
+  const name = /** @type {string} */ (queue.pop());
+  return name;
+}
+`,
+			FileName: "repro.js",
+			TSConfig: "./tsconfig.checkJs.json",
+		},
 	}, []rule_tester.InvalidTestCase{
 		{
 			Code: `
