@@ -136,6 +136,45 @@ export {};
 type ReadonlyArray<T> = readonly [T, T];
 declare function makePair<K, T>(kind: K): K extends string ? ReadonlyArray<T> : never;
 `},
+		// https://github.com/oxc-project/tsgolint/issues/1350
+		{Code: `
+interface Box<T> {
+  get(): T;
+  set(value: T): void;
+}
+class Box<T> {}
+`},
+		{Code: `
+interface Base<T> {
+  value: T;
+}
+interface Box<T> extends Base<T> {}
+class Box<T> {}
+`},
+		{
+			Code: `
+export class StagedObject {}
+export class Query<T> extends StagedObject {}
+`,
+			FileName: "staged-query/query.ts",
+			Files: map[string]string{
+				"query.ts": `
+import { Query } from './staged-query/query';
+
+export interface QueryExecution<T> {
+  run(): Promise<T>;
+}
+
+declare module './staged-query/query' {
+  interface Query<T> extends QueryExecution<T> {}
+}
+
+export function execute<T>(query: Query<T>): Promise<T> {
+  return query.run();
+}
+`,
+			},
+		},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const func = <T,>(param: T) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: unknown) => null;"}}}}},
 		{Code: "const func = <T,>(param: [T]) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: [unknown]) => null;"}}}}},
