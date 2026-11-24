@@ -57,8 +57,6 @@ const x = 1 as 1;
 declare function foo<T = any>(): T;
 const bar = foo() as number;
     `},
-		// A JSDoc cast in a JavaScript file: `x!` is not JavaScript, so there is no
-		// non-null assertion to prefer. oxc-project/tsgolint#1282
 		{
 			Code: `
 /** @param {string[]} queue */
