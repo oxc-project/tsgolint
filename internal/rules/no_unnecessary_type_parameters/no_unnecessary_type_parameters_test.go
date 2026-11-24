@@ -175,6 +175,15 @@ export function execute<T>(query: Query<T>): Promise<T> {
 `,
 			},
 		},
+		{Code: `
+interface Box<T> {
+  first: T;
+}
+interface Box<T> {
+  second: T;
+}
+class Box<T> {}
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const func = <T,>(param: T) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: unknown) => null;"}}}}},
 		{Code: "const func = <T,>(param: [T]) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: [unknown]) => null;"}}}}},
@@ -260,5 +269,8 @@ export function execute<T>(query: Query<T>): Promise<T> {
 		{Code: "declare function takeQualifiedArray<T>(input: globalThis.Array<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeQualifiedArray(input: globalThis.Array<unknown>): void;"}}}}},
 		{Code: "declare function takeQualifiedReadonlyArray<T>(input: globalThis.ReadonlyArray<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeQualifiedReadonlyArray(input: globalThis.ReadonlyArray<unknown>): void;"}}}}},
 		{Code: "declare function makeQualifiedReadonlyArray<T>(): globalThis.ReadonlyArray<T>;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function makeQualifiedReadonlyArray(): globalThis.ReadonlyArray<unknown>;"}}}}},
+		// https://github.com/oxc-project/tsgolint/issues/1350: a merged interface counts like class members, it does not silence reports.
+		{Code: "\ninterface Box<T> {\n  value: number;\n}\nclass Box<T> {}\n", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 5, Column: 11, EndLine: 5, EndColumn: 12, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ninterface Box<T> {\n  value: number;\n}\nclass Box {}\n"}}}}},
+		{Code: "\ninterface Box<T> {\n  value: T;\n}\nclass Box<T> {}\n", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 5, Column: 11, EndLine: 5, EndColumn: 12, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ninterface Box<T> {\n  value: T;\n}\nclass Box {}\n"}}}}},
 	})
 }
