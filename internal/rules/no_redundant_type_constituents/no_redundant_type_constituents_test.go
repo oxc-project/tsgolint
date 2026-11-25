@@ -622,6 +622,8 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			},
 		},
 		{
+			// `string` is the redundant constituent, not `T` — dropping `T`
+			// would widen the type.
 			Code: `
         type T = 'a' | 'b';
         type U = T & string;
@@ -629,11 +631,13 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "primitiveOverridden",
-					Column:    18,
+					Column:    22,
 				},
 			},
 		},
 		{
+			// Each primitive is reported with the literals of the union that
+			// overrides it: `number` by `S`, `string` by `T`.
 			Code: `
         type S = 1 | 2;
         type T = 'a' | 'b';
@@ -642,11 +646,11 @@ func TestNoRedundantTypeConstituentsRule(t *testing.T) {
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
 					MessageId: "primitiveOverridden",
-					Column:    18,
+					Column:    35,
 				},
 				{
 					MessageId: "primitiveOverridden",
-					Column:    22,
+					Column:    26,
 				},
 			},
 		},
