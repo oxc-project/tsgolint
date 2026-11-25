@@ -246,6 +246,31 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 			})
 		}
 
+		// Whether `object` (the non-primitive type) is one of t's union parts. `object`
+		// and an all-optional object type are mutually assignable, yet an assertion
+		// between them changes the type: the property reads exist on one side only.
+		hasNonPrimitivePart := func(t *checker.Type) bool {
+			return slices.ContainsFunc(utils.UnionTypeParts(t), func(part *checker.Type) bool {
+				return utils.IsTypeFlagSet(part, checker.TypeFlagsNonPrimitive)
+			})
+		}
+
+		// The property names a read can reach on t. A union with a `null` or
+		// `undefined` part has no properties of its own (`getPropertiesOfType` keeps
+		// only those on every part), so the other parts are read instead.
+		reachablePropertyNames := func(t *checker.Type) utils.Set[string] {
+			names := utils.Set[string]{}
+			for _, part := range utils.UnionTypeParts(t) {
+				if utils.IsTypeFlagSet(part, checker.TypeFlagsNullable) {
+					continue
+				}
+				for _, prop := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, part) {
+					names.Add(prop.Name)
+				}
+			}
+			return names
+		}
+
 		hasSameProperties := func(uncast, cast *checker.Type) bool {
 			uncastProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, uncast)
 			castProps := checker.Checker_getPropertiesOfType(ctx.TypeChecker, cast)
@@ -262,6 +287,17 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				castProp := castPropsByName[prop.Name]
 				if castProp == nil ||
 					checker.Checker_isReadonlySymbol(ctx.TypeChecker, prop) != checker.Checker_isReadonlySymbol(ctx.TypeChecker, castProp) {
+					return false
+				}
+			}
+
+			uncastNames := reachablePropertyNames(uncast)
+			castNames := reachablePropertyNames(cast)
+			if uncastNames.Len() != castNames.Len() {
+				return false
+			}
+			for name := range uncastNames.Keys() {
+				if !castNames.Has(name) {
 					return false
 				}
 			}
@@ -399,7 +435,7 @@ var NoUnnecessaryTypeAssertionRule = rule.Rule{
 				return areUnionPartsEquivalentIgnoringUndefined(uncast, cast)
 			}
 
-			if (utils.IsTypeFlagSet(uncast, checker.TypeFlagsNonPrimitive) && !utils.IsTypeFlagSet(cast, checker.TypeFlagsNonPrimitive)) ||
+			if (hasNonPrimitivePart(uncast) && !hasNonPrimitivePart(cast)) ||
 				(hasIndexSignature(uncast) != hasIndexSignature(cast)) {
 				return false
 			}
