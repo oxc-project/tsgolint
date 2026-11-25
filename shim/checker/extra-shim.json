@@ -53,7 +53,8 @@
       "IsNullableType",
       "getIndexInfosOfType",
       "isReadonlySymbol",
-      "getContextFreeTypeOfExpression"
+      "getContextFreeTypeOfExpression",
+      "isGenericMappedType"
     ]
   },
   "ExtraFields": {

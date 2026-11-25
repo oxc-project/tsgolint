@@ -95,6 +95,12 @@ type Keys<T> = T extends infer U ? keyof U : never;
 type ReadonlyMapped<T extends object> = { readonly [Key in Keys<T>]: number };
 type Referenced<T extends object> = ReadonlyMapped<T>;
     `},
+		{Code: `
+interface Table {
+  row: {};
+}
+declare function update<T extends Table>(values: Partial<T['row']>): void;
+    `},
 	}, []rule_tester.InvalidTestCase{
 		{Code: `
 type Data = { name: string; num: number };
@@ -141,5 +147,8 @@ type Unexpected = DistributiveOmit<Data | Data2, 'name'>;
 type Data = { a: string };
 type Unexpected = Omit<Data, 'a'> & Omit<Data, 'a'>;
       `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "noGeneratedEmptyObjectType", Column: 19, EndColumn: 52, EndLine: 3, Line: 3}}},
+		{Code: `
+declare function pickNone<T>(value: Pick<T, never>): void;
+      `, Errors: []rule_tester.InvalidTestCaseError{{MessageId: "noGeneratedEmptyObjectType", Column: 37, EndColumn: 51, EndLine: 2, Line: 2}}},
 	})
 }
