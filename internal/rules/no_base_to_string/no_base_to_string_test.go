@@ -130,6 +130,53 @@ const literalWithToString = {
 };
 '' + literalWithToString;
     `},
+			// https://github.com/oxc-project/tsgolint/issues/1345
+			{Code: `
+declare const a: {
+  [Symbol.toPrimitive](): string;
+};
+` + "`" + `${a}` + "`" + `;
+    `},
+			{Code: `
+interface Q {
+  [Symbol.toPrimitive](hint: string): string;
+}
+declare const q: Q;
+String(q);
+'' + q;
+    `},
+			{Code: `
+class A {
+  [Symbol.toPrimitive](): string {
+    return 'A';
+  }
+}
+` + "`" + `${new A()}` + "`" + `;
+String(new A());
+    `},
+			{Code: `
+class B {
+  [Symbol.toPrimitive] = () => 'B';
+}
+'' + new B();
+    `},
+			{Code: `
+class Base {
+  [Symbol.toPrimitive]() {
+    return 'base';
+  }
+}
+class Derived extends Base {}
+'' + new Derived();
+    `},
+			{Code: `
+const withToPrimitive = {
+  [Symbol.toPrimitive]() {
+    return 'Hello, world!';
+  },
+};
+'' + withToPrimitive;
+    `},
 			{Code: `
 const printer = (inVar: string | number | boolean) => {
   inVar.toString();
@@ -1745,6 +1792,36 @@ type Expression =
 declare const node: Expression;
 
 throw new Error(` + "`" + `Fail: ${node}` + "`" + `);
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const a:
+  | {
+      [Symbol.toPrimitive](): string;
+    }
+  | {
+      other: true;
+    };
+` + "`" + `${a}` + "`" + `;
+      `,
+			Errors: []rule_tester.InvalidTestCaseError{
+				{
+					MessageId: "baseToString",
+				},
+			},
+		},
+		{
+			Code: `
+declare const a: {
+  toPrimitive(): string;
+};
+'' + a;
       `,
 			Errors: []rule_tester.InvalidTestCaseError{
 				{
