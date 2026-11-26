@@ -692,11 +692,8 @@ var NoMisusedPromisesRule = rule.Rule{
 			})
 
 			for _, index := range thenableReturnIndices {
-				at := slices.Index(voidReturnIndices, index)
-				if at >= 0 {
-					voidReturnIndices = slices.Delete(voidReturnIndices, at, at+1)
-					delete(voidReturnExpectations, index)
-				}
+				voidReturnIndices = slices.DeleteFunc(voidReturnIndices, func(i int) bool { return i == index })
+				delete(voidReturnExpectations, index)
 			}
 
 			return voidReturnIndices, voidReturnExpectations
