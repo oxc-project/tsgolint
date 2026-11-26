@@ -185,7 +185,7 @@ func getTypeParameterListRemovalRange(ctx rule.RuleContext, typeParameters []*as
 	return core.NewTextRange(start, targetTypeParameter.End())
 }
 
-func classMembers(node *ast.Node) []*ast.Node {
+func declarationMembers(node *ast.Node) []*ast.Node {
 	if node == nil {
 		return nil
 	}
@@ -195,9 +195,33 @@ func classMembers(node *ast.Node) []*ast.Node {
 		return node.AsClassDeclaration().Members.Nodes
 	case ast.KindClassExpression:
 		return node.AsClassExpression().Members.Nodes
+	case ast.KindInterfaceDeclaration:
+		return node.AsInterfaceDeclaration().Members.Nodes
 	default:
 		return nil
 	}
+}
+
+// classAndMergedInterfaceDeclarations returns the class followed by every
+// interface declaration merged into it, whether in the same file or through
+// module augmentation. The merged interfaces share the class's type parameters.
+func classAndMergedInterfaceDeclarations(ctx rule.RuleContext, node *ast.Node) []*ast.Node {
+	declarations := []*ast.Node{node}
+
+	name := node.Name()
+	if name == nil {
+		return declarations
+	}
+	symbol := ctx.TypeChecker.GetSymbolAtLocation(name)
+	if symbol == nil {
+		return declarations
+	}
+	for _, declaration := range symbol.Declarations {
+		if ast.IsInterfaceDeclaration(declaration) {
+			declarations = append(declarations, declaration)
+		}
+	}
+	return declarations
 }
 
 func countTypeParameterUsage(ctx rule.RuleContext, node *ast.Node, targetSymbols map[*ast.Symbol]struct{}) map[*ast.Symbol]int {
@@ -211,21 +235,23 @@ func countTypeParameterUsage(ctx rule.RuleContext, node *ast.Node, targetSymbols
 			}
 			remainingTargets = collectTypeParameterUsageCounts(ctx, typeParameter, counts, targetSymbols, remainingTargets, true)
 		}
-		if heritageClauses := utils.GetHeritageClauses(node); heritageClauses != nil {
-			for _, heritageClause := range heritageClauses.Nodes {
-				for _, heritageType := range heritageClause.AsHeritageClause().Types.Nodes {
-					if remainingTargets == 0 {
-						break
+		for _, declaration := range classAndMergedInterfaceDeclarations(ctx, node) {
+			if heritageClauses := utils.GetHeritageClauses(declaration); heritageClauses != nil {
+				for _, heritageClause := range heritageClauses.Nodes {
+					for _, heritageType := range heritageClause.AsHeritageClause().Types.Nodes {
+						if remainingTargets == 0 {
+							break
+						}
+						remainingTargets = collectTypeParameterUsageCounts(ctx, heritageType, counts, targetSymbols, remainingTargets, true)
 					}
-					remainingTargets = collectTypeParameterUsageCounts(ctx, heritageType, counts, targetSymbols, remainingTargets, true)
 				}
 			}
-		}
-		for _, member := range classMembers(node) {
-			if remainingTargets == 0 {
-				break
+			for _, member := range declarationMembers(declaration) {
+				if remainingTargets == 0 {
+					break
+				}
+				remainingTargets = collectTypeParameterUsageCounts(ctx, member, counts, targetSymbols, remainingTargets, true)
 			}
-			remainingTargets = collectTypeParameterUsageCounts(ctx, member, counts, targetSymbols, remainingTargets, true)
 		}
 	} else {
 		collectTypeParameterUsageCounts(ctx, node, counts, targetSymbols, remainingTargets, false)

@@ -136,6 +136,54 @@ export {};
 type ReadonlyArray<T> = readonly [T, T];
 declare function makePair<K, T>(kind: K): K extends string ? ReadonlyArray<T> : never;
 `},
+		// https://github.com/oxc-project/tsgolint/issues/1350
+		{Code: `
+interface Box<T> {
+  get(): T;
+  set(value: T): void;
+}
+class Box<T> {}
+`},
+		{Code: `
+interface Base<T> {
+  value: T;
+}
+interface Box<T> extends Base<T> {}
+class Box<T> {}
+`},
+		{
+			Code: `
+export class StagedObject {}
+export class Query<T> extends StagedObject {}
+`,
+			FileName: "staged-query/query.ts",
+			Files: map[string]string{
+				"query.ts": `
+import { Query } from './staged-query/query';
+
+export interface QueryExecution<T> {
+  run(): Promise<T>;
+}
+
+declare module './staged-query/query' {
+  interface Query<T> extends QueryExecution<T> {}
+}
+
+export function execute<T>(query: Query<T>): Promise<T> {
+  return query.run();
+}
+`,
+			},
+		},
+		{Code: `
+interface Box<T> {
+  first: T;
+}
+interface Box<T> {
+  second: T;
+}
+class Box<T> {}
+`},
 	}, []rule_tester.InvalidTestCase{
 		{Code: "const func = <T,>(param: T) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: unknown) => null;"}}}}},
 		{Code: "const func = <T,>(param: [T]) => null;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "const func = (param: [unknown]) => null;"}}}}},
@@ -221,5 +269,8 @@ declare function makePair<K, T>(kind: K): K extends string ? ReadonlyArray<T> : 
 		{Code: "declare function takeQualifiedArray<T>(input: globalThis.Array<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeQualifiedArray(input: globalThis.Array<unknown>): void;"}}}}},
 		{Code: "declare function takeQualifiedReadonlyArray<T>(input: globalThis.ReadonlyArray<T>): void;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function takeQualifiedReadonlyArray(input: globalThis.ReadonlyArray<unknown>): void;"}}}}},
 		{Code: "declare function makeQualifiedReadonlyArray<T>(): globalThis.ReadonlyArray<T>;", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "declare function makeQualifiedReadonlyArray(): globalThis.ReadonlyArray<unknown>;"}}}}},
+		// https://github.com/oxc-project/tsgolint/issues/1350: a merged interface counts like class members, it does not silence reports.
+		{Code: "\ninterface Box<T> {\n  value: number;\n}\nclass Box<T> {}\n", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 5, Column: 11, EndLine: 5, EndColumn: 12, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ninterface Box<T> {\n  value: number;\n}\nclass Box {}\n"}}}}},
+		{Code: "\ninterface Box<T> {\n  value: T;\n}\nclass Box<T> {}\n", Errors: []rule_tester.InvalidTestCaseError{{MessageId: "sole", Line: 5, Column: 11, EndLine: 5, EndColumn: 12, Suggestions: []rule_tester.InvalidTestCaseSuggestion{{MessageId: "replaceUsagesWithConstraint", Output: "\ninterface Box<T> {\n  value: T;\n}\nclass Box {}\n"}}}}},
 	})
 }
