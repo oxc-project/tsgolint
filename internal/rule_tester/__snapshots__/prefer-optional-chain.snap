@@ -5494,3 +5494,219 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | const element = <Component>{() => foo && foo.bar}</Component>;
      |                                   ~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-0 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:45)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || typeof foo.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-1 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:45)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || 'undefined' === typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-2 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || typeof foo.id == 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-3 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || 'undefined' == typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-4 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo == null || typeof foo.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-5 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo == null || 'undefined' === typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-6 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:43)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo == null || typeof foo.id == 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-7 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:43)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo == null || 'undefined' == typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-8 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:37)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | !foo || typeof foo.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-9 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:37)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | !foo || 'undefined' === typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-10 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:36)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | !foo || typeof foo.id == 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-11 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:36)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | !foo || 'undefined' == typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-12 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:50)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | foo === undefined || typeof foo.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-13 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:50)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | foo === undefined || 'undefined' === typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-14 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:49)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | foo === undefined || typeof foo.id == 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-15 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:49)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | undefined;
+   2 | foo === undefined || 'undefined' == typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-16 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null | undefined;
+   2 | foo == null || typeof foo.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-17 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null | undefined;
+   2 | foo == null || 'undefined' === typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-18 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:43)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null | undefined;
+   2 | foo == null || typeof foo.id == 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-19 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:43)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null | undefined;
+   2 | foo == null || 'undefined' == typeof foo.id;
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-20 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:47)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || (typeof foo.id) === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-21 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:47)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || (typeof foo.id === 'undefined');
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-22 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:56)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || typeof /* keep */ foo.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-23 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:47)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || 'undefined' === (typeof foo.id);
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-24 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:48)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { id?: number } | null;
+   2 | foo === null || typeof foo['id'] === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-25 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:44)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: (() => number | undefined) | null;
+   2 | foo === null || typeof foo() === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRuleOrTypeof/invalid-26 - 1]
+Diagnostic 1: preferOptionalChain (2:1 - 2:71)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const foo: { child?: { id?: number } } | null;
+   2 | foo == null || foo.child == null || typeof foo.child.id === 'undefined';
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
