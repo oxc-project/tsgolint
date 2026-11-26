@@ -20,7 +20,7 @@ It is designed to integrate seamlessly with Oxlint's fast syntax linting, enabli
 Key highlights:
 
 - **Performance**: 10–20x faster than ESLint + typescript-eslint in the [benchmarks](./benchmarks/README.md)
-- **Coverage**: 59/61 targeted `typescript-eslint` type-aware rules implemented
+- **Coverage**: 61/63 targeted `typescript-eslint` type-aware rules implemented
 - **Parallel**: Multi-core rule execution for scalable analysis
 - **High impact**: catches production-grade bugs that syntax-only linting misses (for example `no-floating-promises`)
 
@@ -168,7 +168,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 
 ## Implemented Rules
 
-60 of the 62 targeted rules are implemented.
+61 of the 63 targeted rules are implemented.
 
 - [ ] [naming-convention](https://typescript-eslint.io/rules/naming-convention)
 - [ ] [prefer-destructuring](https://typescript-eslint.io/rules/prefer-destructuring)
@@ -201,6 +201,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for:
 - [x] [no-unsafe-argument](https://typescript-eslint.io/rules/no-unsafe-argument)
 - [x] [no-unsafe-assignment](https://typescript-eslint.io/rules/no-unsafe-assignment)
 - [x] [no-unsafe-call](https://typescript-eslint.io/rules/no-unsafe-call)
+- [x] [no-unsafe-class-instance-assignment](https://typescript-eslint.io/rules/no-unsafe-class-instance-assignment)
 - [x] [no-unsafe-enum-assignment](https://typescript-eslint.io/rules/no-unsafe-enum-assignment)
 - [x] [no-unsafe-enum-comparison](https://typescript-eslint.io/rules/no-unsafe-enum-comparison)
 - [x] [no-unsafe-member-access](https://typescript-eslint.io/rules/no-unsafe-member-access)

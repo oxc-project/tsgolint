@@ -256,3 +256,15 @@ Message: Invalid type used in template literal expression.
      |                           ^^^ Type: unknown
    4 |         }
 ---
+
+[TestRestrictTemplateExpressionsRule/invalid-19 - 1]
+Diagnostic 1: invalidType (3:24 - 3:28)
+Message: Invalid type used in template literal expression.
+   2 | declare const value: Value;
+   3 | export const text = `${value}`;
+     |                        ~~~~~
+  Label: Type: Value (3:24 - 3:28)
+   2 | declare const value: Value;
+   3 | export const text = `${value}`;
+     |                        ^^^^^ Type: Value
+---

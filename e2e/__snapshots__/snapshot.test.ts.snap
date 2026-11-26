@@ -1229,12 +1229,34 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
     ],
     "kind": 0,
     "message": {
-      "description": "void operator shouldn't be used on undefined; it should convey that a return value is being ignored",
-      "id": "meaninglessVoidOperator",
+      "description": "void operator is useless here; it should only discard a call's return value",
+      "id": "meaninglessVoidOnNonCall",
     },
     "range": {
       "end": 175,
       "pos": 161,
+    },
+    "rule": "no-meaningless-void-operator",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-meaningless-void-operator/index.ts",
+    "fixes": [
+      {
+        "range": {
+          "end": 254,
+          "pos": 250,
+        },
+        "text": "",
+      },
+    ],
+    "kind": 0,
+    "message": {
+      "description": "void operator is useless here; it should only discard a call's return value",
+      "id": "meaninglessVoidOnNonCall",
+    },
+    "range": {
+      "end": 274,
+      "pos": 250,
     },
     "rule": "no-meaningless-void-operator",
   },
@@ -2227,6 +2249,32 @@ exports[`TSGoLint E2E Snapshot Tests > should generate consistent diagnostics sn
       "pos": 240,
     },
     "rule": "no-unsafe-member-access",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-class-instance-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This object literal is used where an instance of class \`Point\` is expected.",
+      "id": "objectLiteral",
+    },
+    "range": {
+      "end": 120,
+      "pos": 104,
+    },
+    "rule": "no-unsafe-class-instance-assignment",
+  },
+  {
+    "file_path": "fixtures/basic/rules/no-unsafe-class-instance-assignment/index.ts",
+    "kind": 0,
+    "message": {
+      "description": "This value is used where an instance of class \`Point\` is expected, but was not created by its constructor.",
+      "id": "nonInstance",
+    },
+    "range": {
+      "end": 200,
+      "pos": 195,
+    },
+    "rule": "no-unsafe-class-instance-assignment",
   },
   {
     "file_path": "fixtures/basic/rules/no-unsafe-enum-assignment/index.ts",
@@ -5608,6 +5656,184 @@ exports[`TSGoLint E2E Snapshot Tests > should report an error if the tsconfig.js
     "range": {
       "end": 25,
       "pos": 25,
+    },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should report global diagnostics against each tsconfig (oxc-project/oxc#27499) 1`] = `
+[
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Array'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Boolean'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'CallableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Function'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'IArguments'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'NewableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Number'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Object'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'RegExp'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/a/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'String'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Array'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Boolean'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'CallableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Function'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'IArguments'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'NewableFunction'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Number'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Object'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'RegExp'.",
+      "id": "TS2318",
+    },
+  },
+  {
+    "file_path": "<tmp>/b/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'String'.",
+      "id": "TS2318",
+    },
+  },
+]
+`;
+
+exports[`TSGoLint E2E Snapshot Tests > should report global diagnostics discovered during checking against the tsconfig (oxc-project/oxc#27499) 1`] = `
+[
+  {
+    "file_path": "fixtures/global-and-declaration-diagnostics/checked-globals/tsconfig.json",
+    "kind": 1,
+    "message": {
+      "description": "Cannot find global type 'Disposable'.",
+      "id": "TS2318",
     },
   },
 ]
