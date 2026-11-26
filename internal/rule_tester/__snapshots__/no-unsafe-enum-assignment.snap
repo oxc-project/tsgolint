@@ -1351,3 +1351,30 @@ Message: The computed key used here does not have a shared enum type with the ex
      |     ~
    5 | 
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-148 - 1]
+Diagnostic 1: unsafeEnumAssignment (17:7 - 17:41)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+  16 | declare const swapped: SwappedPair<Fruit, number>;
+  17 | const pair: Pair<Fruit, number> = swapped;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  18 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-149 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:42)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | declare const numbers: Set<number>;
+   7 | const fruits: ReadonlySet<Fruit> = numbers;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | 
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-150 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:40)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | declare const number: Promise<number>;
+   7 | const fruit: PromiseLike<Fruit> = number;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 | 
+---
