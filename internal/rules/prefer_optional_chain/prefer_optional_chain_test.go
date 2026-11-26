@@ -841,6 +841,35 @@ func TestPreferOptionalChainRule(t *testing.T) {
         declare const x: void | (() => void);
         x && x();
       `},
+		// https://github.com/oxc-project/oxc/issues/29385
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        foo == null || foo.bar;
+      `},
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        foo === undefined || foo.bar;
+      `},
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        foo == null || foo.bar.baz;
+      `},
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        foo == null || foo.bar || foo.bar.baz == null;
+      `},
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        foo.bar == null || foo.bar.baz;
+      `},
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        !foo.bar || foo.bar.baz;
+      `},
+		{Code: `
+        declare const foo: { bar?: { baz?: string } } | undefined;
+        foo.bar || foo.bar.baz == null;
+      `},
 		// https://github.com/oxc-project/oxc/issues/17968
 		// https://github.com/oxc-project/tsgolint/issues/585
 		{Code: `const isTagMode = output.mode === 'tags' || output.mode === 'tags-split';`},
@@ -4448,6 +4477,24 @@ export const outsideJsx = () => {
 			Tsx:    true,
 		})
 	}
+
+	// https://github.com/oxc-project/oxc/issues/29385
+	// A trailing plain operand stays outside the chain.
+	declaration := "declare const foo: { bar?: { baz?: string } } | undefined;\n"
+	invalidCases = append(invalidCases, rule_tester.InvalidTestCase{
+		Code: declaration + "foo == null || foo.bar == null || foo.bar.baz;",
+		Errors: []rule_tester.InvalidTestCaseError{{
+			MessageId: "preferOptionalChain",
+			Suggestions: []rule_tester.InvalidTestCaseSuggestion{{
+				MessageId: "optionalChainSuggest",
+				Output:    declaration + "foo?.bar == null || foo.bar.baz;",
+			}},
+		}},
+	}, rule_tester.InvalidTestCase{
+		Code:   declaration + "foo == null || foo.bar == null || foo.bar;",
+		Output: []string{declaration + "foo?.bar == null || foo.bar;"},
+		Errors: []rule_tester.InvalidTestCaseError{{MessageId: "preferOptionalChain"}},
+	})
 
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.json", t, &PreferOptionalChainRule, validCases, invalidCases)
 }
