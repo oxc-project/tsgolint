@@ -1351,3 +1351,21 @@ Message: The computed key used here does not have a shared enum type with the ex
      |     ~
    5 | 
 ---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-148 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | declare const numbers: number[];
+   7 | const fruits: Fruit[] | undefined = numbers;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
+
+[TestNoUnsafeEnumAssignmentRule/invalid-149 - 1]
+Diagnostic 1: unsafeEnumAssignment (7:7 - 7:43)
+Message: The value assigned here does not have a shared enum type with the expected enum 'Fruit'.
+   6 | declare const numbers: number[] | string[];
+   7 | const fruits: Fruit[] | undefined = numbers;
+     |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   8 |       
+---
