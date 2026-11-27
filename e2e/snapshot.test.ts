@@ -638,6 +638,36 @@ console.log(x);
     expect(ruleDiagnostics).toMatchSnapshot();
   });
 
+  it('should lint project references from declaration outputs when OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS is true', () => {
+    const config = generateConfig([resolveTestFilePath('project-reference-outputs/app/src/index.ts')], [
+      'no-floating-promises',
+    ]);
+
+    const run = (env: NodeJS.ProcessEnv) =>
+      sortDiagnostics(parseHeadlessOutput(execFileSync(TSGOLINT_BIN, ['headless'], { input: config, env })));
+
+    const fromSources = run({ ...process.env, GOMAXPROCS: '1' });
+    const fromOutputs = run({ ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS: 'true' });
+
+    expect(fromOutputs).toEqual(fromSources);
+    expect(fromOutputs).toMatchSnapshot();
+  });
+
+  it('should report unbuilt project references when OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS is true', () => {
+    const config = generateConfig([resolveTestFilePath('project-reference-outputs-missing/app/src/index.ts')], [
+      'no-floating-promises',
+    ]);
+
+    const run = (env: NodeJS.ProcessEnv) =>
+      sortDiagnostics(parseHeadlessOutput(execFileSync(TSGOLINT_BIN, ['headless'], { input: config, env })));
+
+    const fromSources = run({ ...process.env, GOMAXPROCS: '1' });
+    expect(fromSources.map((d) => d.kind)).toEqual([DiagnosticKind.Rule]);
+
+    const fromOutputs = run({ ...process.env, GOMAXPROCS: '1', OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS: 'true' });
+    expect(fromOutputs).toMatchSnapshot();
+  });
+
   it('should work correctly with nested module namespaces and parent module searches (`ValueMatchesSomeSpecifier`) (issue #135)', async () => {
     const testFiles = await getTestFiles('issue-135');
     expect(testFiles.length).toBeGreaterThan(0);

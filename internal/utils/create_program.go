@@ -3,6 +3,7 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/microsoft/typescript-go/shim/bundled"
@@ -27,7 +28,72 @@ func enhanceHelpDiagnosticMessage(msg string) string {
 	return msg
 }
 
-func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost, suppressProgramDiagnostics bool) (*compiler.Program, []diagnostic.Internal, error) {
+// UseProjectReferenceOutputsEnvVar opts into reading project references' built declaration outputs instead of their sources.
+const UseProjectReferenceOutputsEnvVar = "OXLINT_TSGOLINT_USE_PROJECT_REFERENCE_OUTPUTS"
+
+// missingProjectReferenceOutputDiagnostics reports referenced projects, including transitive references,
+// whose declaration outputs do not exist on disk. Without this check, imports of unbuilt projects
+// would silently resolve to error types.
+func missingProjectReferenceOutputDiagnostics(program *compiler.Program, configPath string) []diagnostic.Internal {
+	fs := program.Host().FS()
+	configDir := tspath.GetDirectoryPath(configPath)
+	relative := func(fileName string) string {
+		return tspath.GetRelativePathFromDirectory(configDir, fileName, tspath.ComparePathsOptions{
+			CurrentDirectory:          configDir,
+			UseCaseSensitiveFileNames: fs.UseCaseSensitiveFileNames(),
+		})
+	}
+	var diags []diagnostic.Internal
+	program.RangeResolvedProjectReference(func(_ tspath.Path, config *tsoptions.ParsedCommandLine, _ *tsoptions.ParsedCommandLine, _ int) bool {
+		// Unresolved references are already reported as program diagnostics.
+		if config == nil {
+			return true
+		}
+		var missing []*tsoptions.SourceOutputAndProjectReference
+		for path, ref := range config.SourceToProjectReference() {
+			// A file in several referenced projects maps to only one of them; report it there.
+			if ref.OutputDts == "" || program.GetProjectReferenceFromSource(path) != ref {
+				continue
+			}
+			if !fs.FileExists(ref.OutputDts) {
+				missing = append(missing, ref)
+			}
+		}
+		if len(missing) == 0 {
+			return true
+		}
+		slices.SortFunc(missing, func(a, b *tsoptions.SourceOutputAndProjectReference) int {
+			return strings.Compare(a.Source, b.Source)
+		})
+		help := fmt.Sprintf(
+			"Output file '%s' has not been built from source file '%s'",
+			relative(missing[0].OutputDts), relative(missing[0].Source),
+		)
+		if len(missing) > 1 {
+			help += fmt.Sprintf(" (and %d more)", len(missing)-1)
+		}
+		help += fmt.Sprintf(
+			".\n%s is set, so referenced projects are read from their declaration outputs. Build referenced projects first (for example with `tsc --build`), or unset %s.",
+			UseProjectReferenceOutputsEnvVar, UseProjectReferenceOutputsEnvVar,
+		)
+		diags = append(diags, diagnostic.Internal{
+			Range:       core.UndefinedTextRange(),
+			Id:          "tsconfig-error",
+			Description: fmt.Sprintf("Referenced project '%s' has not been built", relative(config.ConfigName())),
+			Help:        help,
+			FilePath:    &configPath,
+		})
+		return true
+	})
+	return diags
+}
+
+// CreateProgram creates a program for the given tsconfig.
+//
+// By default, referenced projects contribute their source files, matching editor behavior.
+// When useProjectReferenceOutputs is true, they contribute their built declaration outputs instead,
+// matching `tsc --project`; missing outputs are reported unless program diagnostics are suppressed.
+func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath string, host compiler.CompilerHost, suppressProgramDiagnostics bool, useProjectReferenceOutputs bool) (*compiler.Program, []diagnostic.Internal, error) {
 	resolvedConfigPath := tspath.ResolvePath(cwd, tsconfigPath)
 	if !fs.FileExists(resolvedConfigPath) {
 		return nil, nil, fmt.Errorf("couldn't read tsconfig at %v", resolvedConfigPath)
@@ -77,7 +143,7 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 		Config:                      configParseResult,
 		SingleThreaded:              core.TSTrue,
 		Host:                        host,
-		UseSourceOfProjectReference: true,
+		UseSourceOfProjectReference: !useProjectReferenceOutputs,
 		// TODO: custom checker pool
 		// CreateCheckerPool: func(p *compiler.Program) compiler.CheckerPool {},
 	}
@@ -108,6 +174,12 @@ func CreateProgram(singleThreaded bool, fs vfs.FS, cwd string, tsconfigPath stri
 			}
 		}
 		return nil, internalDiags, nil
+	}
+
+	if useProjectReferenceOutputs && !suppressProgramDiagnostics {
+		if diags := missingProjectReferenceOutputDiagnostics(program, resolvedConfigPath); len(diags) > 0 {
+			return nil, diags, nil
+		}
 	}
 
 	// TODO: report syntactic diagnostics?
