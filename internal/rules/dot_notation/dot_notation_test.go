@@ -49,6 +49,10 @@ func TestDotNotation(t *testing.T) {
 		{Code: "\ntype Key = Lowercase<string>;\ntype Foo = {\n  BAR: boolean;\n  [key: Lowercase<string>]: number;\n};\ndeclare const foo: Foo;\nfoo['bar'];\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
 		{Code: "\ntype ExtraKey = `extra${string}`;\n\ntype Foo = {\n  foo: string;\n  [extraKey: ExtraKey]: number;\n};\n\nfunction f<T extends Foo>(x: T) {\n  x['extraKey'];\n}\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
 		{Code: "\ntype Foo = {\n  [key: string]: number;\n};\ndeclare const foo: Foo;\nfoo[`key_baz`];\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
+		{Code: "\ndeclare const foo: { [key: string]: number };\nfoo['bar'] = 1;\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
+		{Code: "\ndeclare const foo: Record<string, number>;\nfoo['bar'] = 1;\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
+		{Code: "\ndeclare const foo: Partial<Record<string, number>>;\nfoo['bar'] = 1;\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
+		{Code: "\ndeclare const foo: Record<`key_${string}`, number>;\nfoo['key_bar'] = 1;\n      ", TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json"},
 		{Code: "a['X-Amzn-Trace-Id'];"},
 		{Code: "a['X-Amzn-Trace-Id'];", Tsx: true},
 		{Code: "a['Prénom'];"},
@@ -256,6 +260,23 @@ func TestDotNotation(t *testing.T) {
 		{
 			Code:   "\ntype Foo = {\n  prop: boolean;\n  [key: string]: number | boolean;\n};\ndeclare const foo: Foo;\nfoo[`prop`];\n      ",
 			Output: []string{"\ntype Foo = {\n  prop: boolean;\n  [key: string]: number | boolean;\n};\ndeclare const foo: Foo;\nfoo.prop;\n      "},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "useDot"},
+			},
+			TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json",
+		},
+		// Mapped-type keys have no declarations but are not index signatures.
+		{
+			Code:   "\nconst full: Record<'a' | 'b', number> = { a: 1, b: 2 };\nfull['a'] = 3;\n      ",
+			Output: []string{"\nconst full: Record<'a' | 'b', number> = { a: 1, b: 2 };\nfull.a = 3;\n      "},
+			Errors: []rule_tester.InvalidTestCaseError{
+				{MessageId: "useDot"},
+			},
+			TSConfig: "tsconfig.noPropertyAccessFromIndexSignature.json",
+		},
+		{
+			Code:   "\nconst partial: Partial<Record<'a' | 'b', number>> = {};\npartial['a'] = 1;\n      ",
+			Output: []string{"\nconst partial: Partial<Record<'a' | 'b', number>> = {};\npartial.a = 1;\n      "},
 			Errors: []rule_tester.InvalidTestCaseError{
 				{MessageId: "useDot"},
 			},

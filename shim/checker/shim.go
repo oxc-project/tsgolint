@@ -115,6 +115,8 @@ func Checker_getSignaturesOfType(recv *checker.Checker, t *checker.Type, kind ch
 func Checker_getIndexInfosOfType(recv *checker.Checker, t *checker.Type) []*checker.IndexInfo
 //go:linkname Checker_getIndexTypeOfType github.com/microsoft/typescript-go/internal/checker.(*Checker).getIndexTypeOfType
 func Checker_getIndexTypeOfType(recv *checker.Checker, t *checker.Type, keyType *checker.Type) *checker.Type
+//go:linkname Checker_getApplicableIndexInfo github.com/microsoft/typescript-go/internal/checker.(*Checker).getApplicableIndexInfo
+func Checker_getApplicableIndexInfo(recv *checker.Checker, t *checker.Type, keyType *checker.Type) *checker.IndexInfo
 //go:linkname Checker_getBaseTypes github.com/microsoft/typescript-go/internal/checker.(*Checker).getBaseTypes
 func Checker_getBaseTypes(recv *checker.Checker, t *checker.Type) []*checker.Type
 //go:linkname Checker_getReturnTypeOfSignature github.com/microsoft/typescript-go/internal/checker.(*Checker).getReturnTypeOfSignature
