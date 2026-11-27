@@ -5494,3 +5494,17 @@ Message: Prefer using an optional chain expression instead, as it's more concise
    2 | const element = <Component>{() => foo && foo.bar}</Component>;
      |                                   ~~~~~~~~~~~~~~
 ---
+
+[TestPreferOptionalChainRule/invalid-613 - 1]
+Diagnostic 1: preferOptionalChain (1:52 - 1:65)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const a: { b: { c: Date | null } | null }; !a.b || !a.b.c;
+     |                                                    ~~~~~~~~~~~~~~
+---
+
+[TestPreferOptionalChainRule/invalid-614 - 1]
+Diagnostic 1: preferOptionalChain (1:52 - 1:73)
+Message: Prefer using an optional chain expression instead, as it's more concise and easier to read.
+   1 | declare const a: { b: { c: Date | null } | null }; !a.b || a.b.c !== null;
+     |                                                    ~~~~~~~~~~~~~~~~~~~~~~
+---
